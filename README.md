@@ -1,47 +1,55 @@
 # Strategy Agents Pipeline
 
 会議の議事録から戦略提案資料を自動生成する6体AIエージェントパイプライン。
+Claude Code の Maxプラン内で動作し、追加API費用は不要。
 
 ## アーキテクチャ
 
 ```
-Step 1: Retriever          → 議事録取得・分解 (Notion + Google Drive)
+Step 1: Retriever          → 議事録取得・分解 (Notion)
 Step 2: Issue Structurer   → イシュー言語化・構造化
 Step 3: Market Researcher  ┐ 並列実行
         Analogy Finder     ┘
 Step 4: Strategist         → 戦略構築 + Devil's Advocate批判的検証
-Step 5: Report Builder     → Google Slides提案資料作成
+Step 5: Report Builder     → Google Slides提案資料の構成作成
 ```
+
+## ディレクトリ構成
+
+```
+agents/
+├── CLAUDE.md                        # Claude Code 用プロジェクト設定
+├── orchestrator/
+│   └── PIPELINE.md                  # パイプライン実行ガイド
+└── agents/
+    ├── retriever/prompt.md          # Agent 1: 議事録取得
+    ├── issue_structurer/prompt.md   # Agent 2: イシュー構造化
+    ├── market_researcher/prompt.md  # Agent 3: 市場調査+顧客分析
+    ├── analogy_finder/prompt.md     # Agent 4: アナロジー事例
+    ├── strategist/prompt.md         # Agent 5: 戦略+批判的検証
+    └── report_builder/prompt.md     # Agent 6: 資料構成作成
+```
+
+## 前提条件
+
+1. **Claude Code** の Maxプランに加入していること
+2. **Notion MCP** が Claude Code に接続されていること
+3. **Web検索** が Claude Code で使用可能であること
 
 ## セットアップ
 
-```bash
-# 1. 依存関係インストール
-pip install -e .
+### Notion MCP 接続
+1. https://www.notion.so/my-integrations でインテグレーション作成
+2. 議事録ページの「...」→「コネクト」からインテグレーションを追加
+3. Claude Code の設定で Notion MCP を接続
 
-# 2. 環境変数設定
-cp .env.example .env
-# .env を編集して API キーを設定
+## 使い方
 
-# 3. Google OAuth2 認証情報を配置
-# config/google_credentials.json に OAuth2 クライアント認証情報を配置
+Claude Code で以下のように指示:
 
-# 4. 実行
-python -m orchestrator.main <NOTION_PAGE_ID> --drive-query "クライアント名"
+```
+/agents/orchestrator/PIPELINE.md の手順に従って、
+Notion の議事録ページ「〇〇会議」からパイプラインを実行してください。
 ```
 
-## 必要なAPI設定
-
-### Anthropic API
-- https://console.anthropic.com/ でAPIキーを取得
-
-### Notion API
-1. https://www.notion.so/my-integrations でインテグレーション作成
-2. 対象ページにインテグレーションを接続
-3. `NOTION_API_TOKEN` に設定
-
-### Google API
-1. Google Cloud Console でプロジェクト作成
-2. Drive API と Slides API を有効化
-3. OAuth2 認証情報を作成 → `config/google_credentials.json` に配置
-4. 初回実行時にブラウザ認証 → `config/google_token.json` が自動生成
+詳細は `orchestrator/PIPELINE.md` を参照。
