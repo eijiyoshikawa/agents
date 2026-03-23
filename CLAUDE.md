@@ -16,7 +16,22 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 6. **Report Builder** — Google Slides提案資料の構成作成
 
 ## 実行方法
-パイプライン全体: `/orchestrator/PIPELINE.md` を参照。
+
+### 手順書を読んで実行する場合
+```
+/agents/orchestrator/PIPELINE.md の手順に従って、
+Notion の議事録ページ「会議名」からパイプラインを実行してください。
+```
+
+### ワンショット実行（コピペ用プロンプト）
+`/agents/orchestrator/run.md` にコピペ用プロンプトを用意。
+`{{会議名}}` を置き換えて Claude Code に貼り付けるだけで全ステップが実行される。
+
+### 他の人と共有する場合
+1. このリポジトリを `git clone` する
+2. Claude Code（Max プラン）を開く
+3. MCP サーバーを設定する（Notion / Google Drive）
+4. 上記いずれかの方法で実行
 
 ## 事業領域
 - SNSマーケティング（Instagram, TikTok, YouTube 運用/広告/クリエイティブ）
