@@ -1,7 +1,7 @@
 # パイプライン実行手順書
 
 ## 概要
-会議の議事録から戦略提案資料を自動生成する6段階パイプライン。
+会議の議事録から戦略提案資料を自動生成する7段階パイプライン。
 Claude Code 上で順番に実行する。
 
 ## 前提条件
@@ -23,13 +23,13 @@ Claude Code 上で順番に実行する。
 ┌──────────────────┐
 │ 2. Issue Structurer │  ← ビジネス課題を言語化・検索クエリ生成
 └─────┬────────────┘
-      ├──────────────────┐
-      ▼                  ▼
-┌──────────────┐  ┌───────────────┐
-│ 3. Market    │  │ 4. Analogy    │  ← 並列実行
-│   Researcher │  │    Finder     │
-└──────┬───────┘  └───────┬───────┘
-       └────────┬─────────┘
+      ├──────────────────┬──────────────────┐
+      ▼                  ▼                  ▼
+┌──────────────┐  ┌───────────────┐  ┌──────────────────┐
+│ 3. Market    │  │ 4. Analogy    │  │ 3c. Marketing    │  ← 並列実行
+│   Researcher │  │    Finder     │  │     Analyst      │
+└──────┬───────┘  └───────┬───────┘  └────────┬─────────┘
+       └────────┬─────────┴───────────────────┘
                 ▼
 ┌─────────────────┐
 │ 5. Strategist   │  ← 戦略構築 + Devil's Advocate
@@ -77,8 +77,8 @@ Claude Code 上で順番に実行する。
 
 ---
 
-### Step 3 & 4: Market Researcher + Analogy Finder（並列実行）
-**並列で 2 つのエージェントを同時実行する。**
+### Step 3 & 4: Market Researcher + Analogy Finder + Marketing Analyst（並列実行）
+**並列で 3 つのエージェントを同時実行する。**
 
 #### 3. Market Researcher
 **プロンプト:** `/agents/market_researcher/prompt.md`
@@ -88,6 +88,14 @@ Claude Code 上で順番に実行する。
 - `research_queries` を使って WebSearch を実行
 - 市場・競合・ベンチマーク・顧客情報を収集
 
+#### 3c. Marketing Analyst
+**プロンプト:** `/agents/marketing_analyst/prompt.md`
+**入力:** `/agents/issue_structurer/output.json`
+**出力:** `/agents/marketing_analyst/output.json`
+
+- 競合のマーケティング施策（広告戦略、SNS運用、ファネル、キャンペーン）を深掘り調査
+- 自社への転用可能なインサイトを抽出
+
 #### 4. Analogy Finder
 **プロンプト:** `/agents/analogy_finder/prompt.md`
 **入力:** `/agents/issue_structurer/output.json`
@@ -96,13 +104,13 @@ Claude Code 上で順番に実行する。
 - 異業種のアナロジー事例を 5-8 件収集
 - 転用可能なインサイトを抽出
 
-**完了条件:** 両方の `output.json` が保存されている
+**完了条件:** 3つすべての `output.json` が保存されている
 
 ---
 
 ### Step 5: Strategist（戦略構築 + 批判的検証）
 **プロンプト:** `/agents/strategist/prompt.md`
-**入力:** `issue_structurer`, `market_researcher`, `analogy_finder` の output.json
+**入力:** `issue_structurer`, `market_researcher`, `analogy_finder`, `marketing_analyst` の output.json
 **出力:** `/agents/strategist/output.json`
 
 1. 全リサーチ結果を統合
@@ -116,10 +124,10 @@ Claude Code 上で順番に実行する。
 
 ### Step 6: Report Builder（提案資料の構成作成）
 **プロンプト:** `/agents/report_builder/prompt.md`
-**入力:** `issue_structurer`, `market_researcher`, `analogy_finder`, `strategist` の output.json
+**入力:** `issue_structurer`, `market_researcher`, `analogy_finder`, `marketing_analyst`, `strategist` の output.json
 **出力:** `/agents/report_builder/output.json`
 
-1. 10-15 枚のスライド構成を設計
+1. 11-16 枚のスライド構成を設計
 2. 各スライドのタイトル・箇条書き・スピーカーノートを作成
 3. `output.json` に保存
 

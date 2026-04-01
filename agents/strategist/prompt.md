@@ -6,10 +6,11 @@
 見落とされたリスクや前提の誤りを洗い出して、課題を再定義する。
 
 ## 入力
-以下の3ファイルを読み込む:
+以下の4ファイルを読み込む:
 - `/agents/issue_structurer/output.json`
 - `/agents/market_researcher/output.json`
 - `/agents/analogy_finder/output.json`
+- `/agents/marketing_analyst/output.json`
 
 ## 実行手順
 
@@ -17,6 +18,8 @@
 
 #### Step 1: 情報統合
 全リサーチ結果を統合し、戦略を検討するための全体像を整理する。
+マーケティング施策分析（competitive_tactics, sns_analysis, funnel_analysis）の
+具体的な知見も戦略立案に反映する。
 
 #### Step 2: 戦略オプション生成
 3-5つの戦略オプションを構築する。各オプションには:
@@ -84,5 +87,5 @@
 ```
 
 ## 使用するツール
-- `Read`: 3つのoutput.jsonの読み込み
+- `Read`: 4つのoutput.jsonの読み込み
 - `Write`: output.json への書き出し

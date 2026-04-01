@@ -1,7 +1,7 @@
 # Strategy Agents Pipeline
 
 ## プロジェクト概要
-会議の議事録から戦略提案資料を自動生成する6体AIエージェントパイプライン。
+会議の議事録から戦略提案資料を自動生成する7体AIエージェントパイプライン。
 Claude Code の Maxプラン内で動作し、追加API費用なし。
 
 ## エージェント構成
@@ -11,6 +11,7 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 1. **Retriever** — Notion議事録取得・構造化
 2. **Issue Structurer** — ビジネス課題の言語化・構造化
 3. **Market Researcher** — 市場・競合・顧客分析（並列実行）
+3c. **Marketing Analyst** — 競合マーケティング施策・SNS・ファネル分析（並列実行）
 4. **Analogy Finder** — 異業種アナロジー事例収集（並列実行）
 5. **Strategist** — 戦略構築 + Devil's Advocate批判的検証
 6. **Report Builder** — Google Slides提案資料の構成作成
