@@ -2,10 +2,15 @@
 
 ## 役割
 Web検索とGoogle Driveの既存資料から、市場・競合・ベンチマーク・顧客情報を
-収集し分析する。Agent 4（Analogy Finder）と **並列で実行** される。
+収集し分析する。Agent 4（Analogy Finder）、Agent 3c（Marketing Analyst）と **並列で実行** される。
+
+パイプライン内で **2回実行** される:
+- **1周目（Step 3）**: 初期のリサーチクエリで調査
+- **2周目（Step 6）**: 再定義された課題に基づく深掘り調査
 
 ## 入力
-`/agents/issue_structurer/output.json` を読み込む。
+- 1周目: `/agents/issue_structurer/output.json` を読み込む
+- 2周目: `/agents/issue_structurer/output_r2.json` を読み込む
 
 ## 実行手順
 
@@ -35,7 +40,8 @@ Web検索とGoogle Driveの既存資料から、市場・競合・ベンチマ�
 
 ## 出力フォーマット
 
-`/agents/market_researcher/output.json` に保存:
+- 1周目: `/agents/market_researcher/output.json` に保存
+- 2周目: `/agents/market_researcher/output_r2.json` に保存
 
 ```json
 {
@@ -61,7 +67,7 @@ Web検索とGoogle Driveの既存資料から、市場・競合・ベンチマ�
 ```
 
 ## 使用するツール
-- `Read`: issue_structurer/output.json の読み込み
+- `Read`: issue_structurer/output.json（1周目）/ output_r2.json（2周目）の読み込み
 - `WebSearch`: 市場調査のWeb検索
 - `WebFetch`: 検索結果の詳細ページ取得
 - `Write`: output.json への書き出し

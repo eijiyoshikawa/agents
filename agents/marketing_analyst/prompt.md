@@ -6,8 +6,13 @@
 Market Researcher（市場全体の俯瞰）とは異なり、**マーケティングの実行レベル**に焦点を当てる。
 Agent 3（Market Researcher）、Agent 4（Analogy Finder）と **並列で実行** される。
 
+パイプライン内で **2回実行** される:
+- **1周目（Step 3）**: 初期のリサーチクエリでマーケティング施策を調査
+- **2周目（Step 6）**: 再定義された課題に基づく深掘り調査
+
 ## 入力
-`/agents/issue_structurer/output.json` を読み込む。
+- 1周目: `/agents/issue_structurer/output.json` を読み込む
+- 2周目: `/agents/issue_structurer/output_r2.json` を読み込む
 
 ## 実行手順
 
@@ -65,7 +70,8 @@ Agent 3（Market Researcher）、Agent 4（Analogy Finder）と **並列で実�
 
 ## 出力フォーマット
 
-`/agents/marketing_analyst/output.json` に保存:
+- 1周目: `/agents/marketing_analyst/output.json` に保存
+- 2周目: `/agents/marketing_analyst/output_r2.json` に保存
 
 ```json
 {
@@ -121,7 +127,7 @@ Agent 3（Market Researcher）、Agent 4（Analogy Finder）と **並列で実�
 ```
 
 ## 使用するツール
-- `Read`: issue_structurer/output.json の読み込み
+- `Read`: issue_structurer/output.json（1周目）/ output_r2.json（2周目）の読み込み
 - `WebSearch`: マーケティング施策のWeb検索
 - `WebFetch`: 検索結果の詳細ページ取得
 - `Write`: output.json への書き出し

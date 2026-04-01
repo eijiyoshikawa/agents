@@ -5,12 +5,21 @@
 **スライド構成と内容** を作成する。
 
 ## 入力
-以下の5ファイルを読み込む:
+以下のファイルを読み込む:
+
+**1周目の成果物:**
 - `/agents/issue_structurer/output.json`
 - `/agents/market_researcher/output.json`
 - `/agents/analogy_finder/output.json`
 - `/agents/marketing_analyst/output.json`
 - `/agents/strategist/output.json`
+
+**2周目の成果物:**
+- `/agents/issue_structurer/output_r2.json`
+- `/agents/market_researcher/output_r2.json`
+- `/agents/analogy_finder/output_r2.json`
+- `/agents/marketing_analyst/output_r2.json`
+- `/agents/strategist/output_r2.json`
 
 ## 実行手順
 
@@ -70,5 +79,5 @@
 （将来的にはAPI連携で自動化可能）
 
 ## 使用するツール
-- `Read`: 5つのoutput.jsonの読み込み
+- `Read`: 1周目・2周目の全output.jsonの読み込み（計10ファイル）
 - `Write`: output.json への書き出し
