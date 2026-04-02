@@ -8,12 +8,16 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 各エージェントのプロンプトは `/agents/<agent_name>/prompt.md` に定義。
 出力は `/agents/<agent_name>/output.json` に保存される。
 
+### 戦略提案パイプライン
 1. **Retriever** — Notion議事録取得・構造化
 2. **Issue Structurer** — ビジネス課題の言語化・構造化
 3. **Market Researcher** — 市場・競合・顧客分析（並列実行）
 4. **Analogy Finder** — 異業種アナロジー事例収集（並列実行）
 5. **Strategist** — 戦略構築 + Devil's Advocate批判的検証
 6. **Report Builder** — Google Slides提案資料の構成作成
+
+### データ収集
+7. **Web Scraper** — 会員サイト自動ログイン・情報収集・Notion格納
 
 ## 実行方法
 
@@ -27,10 +31,22 @@ Notion の議事録ページ「会議名」からパイプラインを実行し�
 `/agents/orchestrator/run.md` にコピペ用プロンプトを用意。
 `{{会議名}}` を置き換えて Claude Code に貼り付けるだけで全ステップが実行される。
 
+### Web Scraper（会員サイト情報収集）の実行
+```
+/agents/web_scraper/prompt.md の手順に従って、
+サイト設定「サイト名.json」から情報を収集し、
+Notionの「収集データ」データベースに保存してください。
+```
+
+**前提条件:**
+- Playwright MCP サーバーが接続済み（`npx @anthropic/mcp-server-playwright`）
+- `.env` に対象サイトの認証情報を設定済み
+- `agents/web_scraper/sites/` にサイト設定ファイルを作成済み
+
 ### 他の人と共有する場合
 1. このリポジトリを `git clone` する
 2. Claude Code（Max プラン）を開く
-3. MCP サーバーを設定する（Notion / Google Drive）
+3. MCP サーバーを設定する（Notion / Google Drive / Playwright）
 4. 上記いずれかの方法で実行
 
 ## 事業領域
