@@ -33,6 +33,49 @@ Notion の議事録ページ「会議名」からパイプラインを実行し�
 3. MCP サーバーを設定する（Notion / Google Drive）
 4. 上記いずれかの方法で実行
 
+---
+
+# Web Builder Pipeline
+
+## 概要
+参考サイトのURLから高再現度のWebサイトを自動生成する8体AIエージェント + 2周イテレーションパイプライン。
+Next.js + Tailwind CSS で実装し、Vercel に自動デプロイして品質検証まで自走する。
+
+## エージェント構成
+各エージェントのプロンプトは `/agents/web_builder/<agent_name>/prompt.md` に定義。
+出力は `/agents/web_builder/<agent_name>/output.json` に保存される。
+
+0. **Site Scanner** — 技術スタック検出・ページ構成・サイトマップ把握
+1. **Structure Analyzer** — HTML構造・セクション構成・ナビゲーション解析（並列実行）
+2. **Design Analyzer** — カラー・タイポグラフィ・スペーシング抽出（並列実行）
+3. **Motion Analyzer** — アニメーション・トランジション・スクロールエフェクト特定（並列実行）
+4. **Interaction Analyzer** — フォーム・モーダル・タブ・スライダー解析（並列実行）
+5. **Asset Collector** — 画像・フォント・アイコン収集・代替戦略策定
+6. **Builder** — 全解析結果を統合しNext.js + Tailwind CSSで実装
+7. **QA Reviewer** — Vercelデプロイ → 参考サイト比較 → 修正指示生成
+
+## 実行フロー
+Scanner → 4エージェント並列解析 → Asset収集 → [Builder → QA] × 2周
+
+## 実行方法
+
+### 手順書を読んで実行する場合
+```
+/agents/web_builder/orchestrator/PIPELINE.md の手順に従って、
+参考サイト「URL」からパイプラインを実行してください。
+```
+
+### ワンショット実行（コピペ用プロンプト）
+`/agents/web_builder/orchestrator/run.md` にコピペ用プロンプトを用意。
+`{{参考URL}}` を置き換えて Claude Code に貼り付けるだけで全ステップが実行される。
+
+### 前提条件
+- Claude Code（Max プラン）
+- Vercel MCP サーバー接続済み
+- Node.js 18+
+
+---
+
 ## 事業領域
 - SNSマーケティング（Instagram, TikTok, YouTube 運用/広告/クリエイティブ）
 - 不動産業界特化型BPO（AIエージェント活用）
