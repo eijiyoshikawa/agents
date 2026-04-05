@@ -10,6 +10,7 @@ import {
   ArrowLeft,
 } from "lucide-react"
 import type { Metadata } from "next"
+import { generateJobPostingSchema } from "@/lib/structured-data"
 
 type Props = {
   params: Promise<{ id: string }>
@@ -57,8 +58,35 @@ export default async function JobDetailPage({ params }: Props) {
     .update({ where: { id }, data: { viewCount: { increment: 1 } } })
     .catch(() => {})
 
+  const jsonLd = generateJobPostingSchema({
+    id: job.id,
+    title: job.title,
+    description: job.description,
+    category: job.category,
+    employmentType: job.employmentType,
+    salaryMin: job.salaryMin,
+    salaryMax: job.salaryMax,
+    salaryType: job.salaryType,
+    prefecture: job.prefecture,
+    city: job.city,
+    address: job.address,
+    publishedAt: job.publishedAt,
+    createdAt: job.createdAt,
+    company: job.company
+      ? {
+          name: job.company.name,
+          logoUrl: job.company.logoUrl,
+          websiteUrl: job.company.websiteUrl,
+        }
+      : null,
+  })
+
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <Link
         href="/jobs"
         className="inline-flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900"
