@@ -88,13 +88,8 @@ type Props = {
 }
 
 export async function generateStaticParams() {
-  const combos: { prefecture: string; category: string }[] = []
-  for (const prefecture of POPULAR_PREFECTURES) {
-    for (const category of POPULAR_CATEGORIES) {
-      combos.push({ prefecture, category })
-    }
-  }
-  return combos
+  // ビルド時にはDB接続不要。ISR(revalidate)でオンデマンド生成する。
+  return []
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
