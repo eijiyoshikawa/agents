@@ -11,3 +11,6 @@ token.json
 dist/
 build/
 .pytest_cache/
+app/node_modules/
+app/.next/
+app/.env
