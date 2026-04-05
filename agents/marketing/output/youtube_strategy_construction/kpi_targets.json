@@ -1,0 +1,163 @@
+{
+  "measurement_frequency": {
+    "daily": ["再生回数", "登録者数変動"],
+    "weekly": ["視聴維持率", "CTR", "インプレッション数"],
+    "monthly": ["総合KPIレビュー", "リード数", "コンテンツ別パフォーマンス"],
+    "quarterly": ["戦略レビュー", "ROI算出", "コンセプト再評価"]
+  },
+  "targets": {
+    "3_months": {
+      "period": "Phase 1完了時",
+      "metrics": {
+        "video_count": {
+          "target": 24,
+          "unit": "本",
+          "note": "週2本 x 12週"
+        },
+        "subscribers": {
+          "target": 1000,
+          "unit": "人",
+          "note": "収益化条件の1つ"
+        },
+        "monthly_views": {
+          "target": 30000,
+          "unit": "回/月",
+          "note": "平均1,250回/本"
+        },
+        "average_view_duration_rate": {
+          "target": 40,
+          "unit": "%",
+          "note": "YouTube平均は30-40%。40%以上で高評価"
+        },
+        "ctr": {
+          "target": 5,
+          "unit": "%",
+          "note": "サムネイル・タイトル最適化の指標"
+        },
+        "website_sessions_from_youtube": {
+          "target": 100,
+          "unit": "セッション/月",
+          "note": "概要欄リンク経由のサイト訪問"
+        },
+        "leads": {
+          "target": 0,
+          "unit": "件/月",
+          "note": "このフェーズではリード獲得は期待しない"
+        }
+      },
+      "success_criteria": "登録者1,000人達成 & 週2本ペースの維持",
+      "pivot_trigger": "3ヶ月で登録者300人未満の場合、コンセプト再検討"
+    },
+    "6_months": {
+      "period": "Phase 2完了時",
+      "metrics": {
+        "video_count": {
+          "target": 48,
+          "unit": "本（長尺）+ 12本（Shorts）"
+        },
+        "subscribers": {
+          "target": 3000,
+          "unit": "人"
+        },
+        "monthly_views": {
+          "target": 100000,
+          "unit": "回/月"
+        },
+        "watch_time_hours": {
+          "target": 4000,
+          "unit": "時間（年間累計）",
+          "note": "収益化条件"
+        },
+        "average_view_duration_rate": {
+          "target": 42,
+          "unit": "%"
+        },
+        "ctr": {
+          "target": 6,
+          "unit": "%"
+        },
+        "youtube_monetization": {
+          "target": "達成",
+          "note": "登録者1,000人 + 年間4,000時間"
+        },
+        "youtube_ad_revenue": {
+          "target": "10000-30000",
+          "unit": "円/月"
+        },
+        "website_sessions_from_youtube": {
+          "target": 500,
+          "unit": "セッション/月"
+        },
+        "leads": {
+          "target": "2-3",
+          "unit": "件/月"
+        },
+        "inquiries": {
+          "target": 5,
+          "unit": "件/月",
+          "note": "問い合わせ（リード含む全件）"
+        }
+      },
+      "success_criteria": "収益化条件達成 & 初のリード獲得",
+      "pivot_trigger": "6ヶ月で登録者1,000人未満の場合、ターゲット/コンテンツの大幅見直し"
+    },
+    "12_months": {
+      "period": "Phase 3完了時",
+      "metrics": {
+        "video_count": {
+          "target": 96,
+          "unit": "本（長尺）+ 48本（Shorts）"
+        },
+        "subscribers": {
+          "target": 10000,
+          "unit": "人"
+        },
+        "monthly_views": {
+          "target": 300000,
+          "unit": "回/月"
+        },
+        "average_view_duration_rate": {
+          "target": 45,
+          "unit": "%"
+        },
+        "ctr": {
+          "target": 7,
+          "unit": "%"
+        },
+        "youtube_ad_revenue": {
+          "target": "50000-100000",
+          "unit": "円/月"
+        },
+        "leads": {
+          "target": 5,
+          "unit": "件/月"
+        },
+        "lead_conversion_rate": {
+          "target": 25,
+          "unit": "%",
+          "note": "リード→受注の転換率"
+        },
+        "tieup_deals": {
+          "target": 1,
+          "unit": "件/月"
+        },
+        "revenue_from_leads": {
+          "target": 1000000,
+          "unit": "円/月",
+          "note": "リード経由の受注額"
+        },
+        "total_youtube_direct_revenue": {
+          "target": "150000-400000",
+          "unit": "円/月",
+          "note": "広告 + タイアップ"
+        }
+      },
+      "success_criteria": "登録者1万人 & リード経由の月間受注100万円以上",
+      "pivot_trigger": "12ヶ月で登録者3,000人未満の場合、チャンネル継続の再判断"
+    }
+  },
+  "north_star_metric": {
+    "metric": "リード経由の月間受注額",
+    "rationale": "YouTube広告収入ではなく、自社事業へのリード獲得が本質的な目的。登録者数や再生回数は手段であり、最終的に事業収益に繋がっているかが最重要指標。"
+  }
+}

@@ -1,0 +1,136 @@
+{
+  "initial_investment": {
+    "total_yen": 250000,
+    "items": [
+      {
+        "item": "カメラ",
+        "model_suggestion": "Sony ZV-E10 II または同等品",
+        "cost_yen": 130000,
+        "priority": "必須",
+        "note": "4K対応、オートフォーカス性能重視。既存機材があれば不要"
+      },
+      {
+        "item": "ワイヤレスマイク",
+        "model_suggestion": "RODE Wireless GO II",
+        "cost_yen": 40000,
+        "priority": "必須",
+        "note": "音質は視聴維持率に直結。最も投資対効果が高い機材"
+      },
+      {
+        "item": "照明",
+        "model_suggestion": "Elgato Key Light 2灯セット or Neewer LEDパネル",
+        "cost_yen": 30000,
+        "priority": "必須",
+        "note": "顔出しの場合の明るさ・影の制御用"
+      },
+      {
+        "item": "三脚",
+        "model_suggestion": "Manfrotto Befree等",
+        "cost_yen": 20000,
+        "priority": "必須",
+        "note": "安定した画角の確保"
+      },
+      {
+        "item": "背景・スタジオセット",
+        "model_suggestion": "パーテーション + 小物",
+        "cost_yen": 30000,
+        "priority": "推奨",
+        "note": "オフィスの一角で可。テック感のある背景を構築"
+      }
+    ]
+  },
+  "monthly_running_cost": {
+    "total_range_yen": "150000-250000",
+    "items": [
+      {
+        "item": "動画編集（外注）",
+        "quantity": "月8本",
+        "unit_cost_yen": "15000-25000",
+        "total_yen": "120000-200000",
+        "priority": "必須",
+        "note": "テロップ、BGM、カット編集、図解アニメーション。クオリティ重視のため外注推奨"
+      },
+      {
+        "item": "サムネイル制作",
+        "quantity": "月8本",
+        "unit_cost_yen": "3000-5000",
+        "total_yen": "24000-40000",
+        "priority": "必須",
+        "note": "CTR（クリック率）に直結。A/Bテスト用に2種類作る場合もあり"
+      },
+      {
+        "item": "BGM・素材ライセンス",
+        "quantity": "月額",
+        "unit_cost_yen": null,
+        "total_yen": 3000,
+        "priority": "推奨",
+        "note": "Artlist, Epidemic Sound等のサブスクリプション"
+      },
+      {
+        "item": "分析ツール",
+        "quantity": "月額",
+        "unit_cost_yen": null,
+        "total_yen": 3000,
+        "priority": "推奨",
+        "note": "vidIQ or TubeBuddy のProプラン。SEO最適化用"
+      }
+    ]
+  },
+  "human_resources": {
+    "roles": [
+      {
+        "role": "企画・構成・出演",
+        "source": "社内",
+        "monthly_hours": 20,
+        "description": "動画テーマ選定、台本・構成作成、出演（撮影含む）",
+        "required_skills": ["プレゼンテーション", "業界知識", "マーケティング知見"],
+        "candidate": "代表 or マーケティングディレクター"
+      },
+      {
+        "role": "撮影",
+        "source": "社内",
+        "monthly_hours": 8,
+        "description": "週2本 x 各1時間の撮影。セットアップ・片付け含む",
+        "required_skills": ["カメラ操作", "照明セッティング"],
+        "candidate": "出演者本人 or アシスタント"
+      },
+      {
+        "role": "SEO・データ分析",
+        "source": "社内",
+        "monthly_hours": 4,
+        "description": "キーワード調査、競合分析、パフォーマンスレビュー、改善提案",
+        "required_skills": ["YouTube Analytics", "SEOツール操作"],
+        "candidate": "マーケティング担当"
+      },
+      {
+        "role": "動画編集",
+        "source": "外注",
+        "monthly_hours": null,
+        "description": "カット編集、テロップ、図解アニメーション、BGM挿入、カラグレ",
+        "required_skills": ["Premiere Pro/DaVinci", "After Effects", "図解デザイン"],
+        "candidate": "編集パートナー（フリーランス or 制作会社）"
+      },
+      {
+        "role": "サムネイルデザイン",
+        "source": "外注",
+        "monthly_hours": null,
+        "description": "サムネイル画像の制作。A/Bテスト用バリエーション",
+        "required_skills": ["Photoshop/Canva", "YouTubeサムネイルのトレンド理解"],
+        "candidate": "デザイナー（フリーランス）"
+      }
+    ],
+    "total_internal_hours_monthly": 32,
+    "note": "社内リソース月32時間 + 外注費15-25万円/月の体制。出演者の確保が最も重要。"
+  },
+  "production_workflow": {
+    "weekly_schedule": {
+      "monday": "企画・リサーチ（2時間）",
+      "tuesday": "台本・構成作成（2時間）",
+      "wednesday": "撮影 2本（2時間）",
+      "thursday": "編集チェック・フィードバック（1時間）",
+      "friday": "公開・SNS展開・データ確認（1時間）"
+    },
+    "lead_time": "撮影から公開まで5-7日",
+    "buffer_stock": "常に2週間分（4本）の完成動画をストックしておく"
+  }
+}
