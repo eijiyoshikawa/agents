@@ -23,6 +23,18 @@
 | Customer Success Agent | 顧客満足・リテンション | 週次 |
 | KPI Dashboard Agent | 全社KPI集計 | 日次 |
 | QA Reviewer Agent | 品質管理 | 随時（全出力時） |
+| Tech Lead Agent | 技術統括・アーキテクチャ | 週次 |
+| Devils Advocate Agent | 批判的検証・意思決定品質 | 随時 |
+
+### 開発部門（Tech Lead Agent 配下）
+| エージェント | 管掌領域 | レポート先 |
+|------------|---------|-----------|
+| Frontend Engineer Agent | フロントエンド開発 | Tech Lead Agent |
+| Backend Engineer Agent | バックエンド開発 | Tech Lead Agent |
+| Infrastructure Agent | インフラ・DevOps | Tech Lead Agent |
+| UI/UX Designer Agent | デザイン・UX | Tech Lead Agent |
+| Data Engineer Agent | データパイプライン・クローラー | Tech Lead Agent |
+| QA Engineer Agent | テスト自動化・品質保証 | Tech Lead Agent |
 
 ### 戦略提案パイプライン（既存）
 既存の6体エージェント（Retriever → Report Builder）は「コンサルティング事業部」として引き続き稼働。CEO Agentがパイプライン全体の品質を最終承認する。

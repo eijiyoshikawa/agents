@@ -2,8 +2,9 @@
 
 ## プロジェクト概要
 法人経営を0から100まで遂行可能なAIエージェント組織。
-CEO Agentを頂点とした16体のエージェントが、相互に連携・検証しながら経営全機能をカバーする。
+CEO Agentを頂点とした24体のエージェントが、相互に連携・検証しながら経営全機能をカバーする。
 Claude Code の Maxプラン内で動作し、追加API費用なし。
+開発部門（8体）を擁し、プロダクト開発も組織内で完結可能。
 
 ## 組織図
 
@@ -12,26 +13,23 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
                     │  CEO Agent   │ ← 統括・意思決定・品質管理
                     └──────┬───────┘
                            │
-        ┌──────────────────┼──────────────────┐
-        │                  │                  │
-   ┌────▼────┐      ┌─────▼─────┐     ┌──────▼──────┐
-   │ 営業部門 │      │ 管理部門  │     │ コンサル事業部 │
-   └────┬────┘      └─────┬─────┘     └──────┬──────┘
-        │                  │                  │
-  ┌─────┼─────┐    ┌──────┼──────┐    ┌──────┼──────────┐
-  │     │     │    │      │      │    │      │          │
-Sales Marketing CS Finance HR  Legal  戦略提案パイプライン
-                                      (既存6体)
-        ┌──────────────────┐
-        │ 横断チーム        │
-        ├──────────────────┤
-        │ QA Reviewer      │ ← 全出力の品質管理
-        │ KPI Dashboard    │ ← 全社KPI集計
-        │ Project Manager  │ ← プロジェクト管理
-        └──────────────────┘
+     ┌──────────┬──────────┼──────────┬──────────────┐
+     │          │          │          │              │
+┌────▼────┐ ┌──▼───┐ ┌───▼────┐ ┌───▼────┐ ┌───────▼───────┐
+│ 営業部門 │ │管理  │ │コンサル│ │横断    │ │ 開発部門       │
+│         │ │部門  │ │事業部 │ │チーム  │ │ (8体)         │
+└────┬────┘ └──┬───┘ └───┬────┘ └───┬────┘ └───────┬───────┘
+     │         │         │         │               │
+  Sales    Finance   パイプライン  QA Reviewer   Tech Lead
+  Marketing HR       (6体)      KPI Dashboard  ├ FE Engineer
+  CS       Legal               PM Agent       ├ BE Engineer
+                               Devils Advocate├ Infrastructure
+                                              ├ UI/UX Designer
+                                              ├ Data Engineer
+                                              └ QA Engineer
 ```
 
-## エージェント構成（全16体）
+## エージェント構成（全24体）
 各エージェントのプロンプトは `/agents/<agent_name>/prompt.md` に定義。
 出力は `/agents/<agent_name>/output.json` に保存される。
 
@@ -61,6 +59,18 @@ Sales Marketing CS Finance HR  Legal  戦略提案パイプライン
 15. **QA Reviewer Agent** — 全出力の品質検証・相互整合性チェック
 16. **KPI Dashboard Agent** — 全社KPI集計・異常検知・レポーティング
 
+### 開発部門（Tech Lead Agent 配下）
+17. **Tech Lead Agent** — 技術統括・アーキテクチャ設計・技術選定・コー���レビュー方針
+18. **Frontend Engineer Agent** — Next.js/TypeScript UI実装・SEO最適化・レスポンシブ
+19. **Backend Engineer Agent** — API設計・DB設計・認証・課金連携・ビジネスロジック
+20. **Infrastructure Agent** — Vercelデプロイ・CI/CD・監視・セキュリティ基盤
+21. **UI/UX Designer Agent** — デザインシステム・ワイヤーフレーム・ユーザビリティ
+22. **Data Engineer Agent** — ハローワーククローラー・データパイプライ���・検索エンジン
+23. **QA Engineer Agent** — テスト自動化・E2E・パフォーマンス・セキュリティテスト
+
+### 独立監査
+24. **Devil's Advocate Agent** — 全提案・設計の批判的検証・前提の疑問視・リスク顕在化
+
 ## 相互干渉（チェック&バランス）
 
 全エージェントはQA Reviewerによる品質チェックを受ける。
@@ -79,6 +89,13 @@ Sales Marketing CS Finance HR  Legal  戦略提案パイプライン
 | KPI Dashboard → CEO | 日次KPI・異常アラート |
 | QA Reviewer → 全体 | 品質差し戻し・改善指示 |
 | CEO → 全体 | 優先度指示・リソース配分・最終承認 |
+| PM → Tech Lead | 開発プロジェクトのスプリント計画 |
+| Tech Lead → 開発部門 | 技術タスク分解・実装指示 |
+| Data Engineer → Legal | ハローワーク転載コンプライアンス確認 |
+| Backend Engineer → Finance | Stripe課金連携・テスト |
+| Devils Advocate → CEO | 重要意思決定の批判的検証結果 |
+| Devils Advocate → Tech Lead | アーキテクチャ・技術選定の批判的検証 |
+| QA Engineer → QA Reviewer | テスト結果の品質横断チェック |
 
 ## 実行方法
 
