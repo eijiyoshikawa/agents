@@ -64,21 +64,41 @@ Sales Marketing CS Finance HR  Legal  戦略提案パイプライン
 ## 相互干渉（チェック&バランス）
 
 全エージェントはQA Reviewerによる品質チェックを受ける。
-主要な相互連携:
+全エージェントはKPI Dashboardによるパフォーマンス測定を受ける。
+CEO Agentは HR Agent + QA Reviewer による月次監査を受ける。
+
+### 主要な相互連携（双方向）
 
 | 連携 | 内容 |
 |------|------|
-| Sales → Retriever | 商談ヒアリング議事録の取得トリガー |
-| Sales → Finance | 見積依頼・受注通知 |
-| Sales → PM | 受注後プロジェクト立ち上げ |
-| PM → Finance | 工数実績・請求トリガー |
-| PM → CS | 納品後ハンドオフ |
-| CS → Sales | アップセル機会・リファラル |
-| Marketing → Sales | リード引き渡し |
+| **ビジネスフロー** | |
+| Sales ↔ Retriever | 商談ヒアリング議事録の取得 ↔ 議事録精度フィードバック |
+| Sales ↔ Finance | 見積依頼・受注通知 ↔ 見積完了・与信情報 |
+| Sales ↔ PM | 受注後PJ立ち上げ ↔ 納品完了通知（追加提案機会） |
+| Sales ↔ Marketing | リード品質フィードバック ↔ リード引き渡し |
+| Sales ↔ CS | アップセル機会・リファラル ↔ 新規受注情報 |
+| Sales ↔ Legal | 契約書レビュー依頼 ↔ レビュー結果 |
+| PM ↔ Finance | 工数実績・請求トリガー ↔ 予算制約・原価情報 |
+| PM ↔ CS | 納品後ハンドオフ ↔ サービス品質フィードバック |
+| PM ↔ HR | リソース不足アラート ↔ 人員・スキル情報 |
+| Marketing ↔ CS | キャンペーン情報 ↔ 顧客事例の活用許可 |
+| Finance ↔ HR | 人件費予算 ↔ 採用コスト |
+| Finance ↔ Legal | 補助金法務確認 ↔ 申請要件の法的確認 |
+| HR ↔ Legal | 就業規則確認依頼 ↔ 労務法務アドバイス |
+| **統括・監査フロー** | |
+| CEO → 全体 | 優先度指示・リソース配分・最終承認 |
 | Finance → CEO | 週次PL・キャッシュフロー |
 | KPI Dashboard → CEO | 日次KPI・異常アラート |
+| KPI Dashboard → 各Agent | 担当KPI実績フィードバック |
 | QA Reviewer → 全体 | 品質差し戻し・改善指示 |
-| CEO → 全体 | 優先度指示・リソース配分・最終承認 |
+| HR + QA → CEO | **月次CEO監査**（意思決定根拠・公平性検証） |
+| **パイプライン内フィードバック** | |
+| Issue Structurer → Retriever | 議事録情報不足時の追加取得依頼 |
+| Strategist → Market Researcher | データ不足領域の追加調査依頼 |
+| Strategist → Analogy Finder | 転用インサイト具体化の依頼 |
+| Report Builder → Strategist | 戦略説明の明確化依頼 |
+| Finance → Strategist | コスト前提の妥当性検証 |
+| PM → Strategist | 実行ロードマップの実現可能性検証 |
 
 ## 実行方法
 

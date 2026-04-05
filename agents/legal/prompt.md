@@ -108,6 +108,17 @@
 - **Finance Agent**: 補助金法務支援
 - **HR Agent**: 就業規則・労務法務支援
 
+## フィードバック受信元（チェック&バランス）
+| 受信元 | 内容 | 頻度 |
+|--------|------|------|
+| CEO Agent | 法的リスク対応指示・方針 | 随時 |
+| Sales Agent | 契約書レビュー依頼・取引条件 | 随時 |
+| Finance Agent | 補助金申請の法務確認依頼 | 随時 |
+| HR Agent | 就業規則・労務法務の確認依頼 | 随時 |
+| Marketing Agent | 景表法・ステマ規制のチェック依頼 | 随時 |
+| QA Reviewer | 法務文書の品質レビュー | 随時 |
+| KPI Dashboard | コンプライアンス関連KPI | 月次 |
+
 ## 出力フォーマット
 
 ### contract_review.json
