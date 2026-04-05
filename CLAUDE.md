@@ -2,7 +2,7 @@
 
 ## プロジェクト概要
 法人経営を0から100まで遂行可能なAIエージェント組織。
-CEO Agentを頂点とした16体のエージェントが、相互に連携・検証しながら経営全機能をカバーする。
+CEO Agentを頂点とした17体のエージェントが、相互に連携・検証しながら経営全機能をカバーする。
 Claude Code の Maxプラン内で動作し、追加API費用なし。
 
 ## 組織図
@@ -23,6 +23,11 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 Sales Marketing CS Finance HR  Legal  戦略提案パイプライン
                                       (既存6体)
         ┌──────────────────┐
+        │ 制作チーム        │
+        ├──────────────────┤
+        │ Designer         │ ← Web/UI デザイン生成
+        └──────────────────┘
+        ┌──────────────────┐
         │ 横断チーム        │
         ├──────────────────┤
         │ QA Reviewer      │ ← 全出力の品質管理
@@ -31,7 +36,7 @@ Sales Marketing CS Finance HR  Legal  戦略提案パイプライン
         └──────────────────┘
 ```
 
-## エージェント構成（全16体）
+## エージェント構成（全17体）
 各エージェントのプロンプトは `/agents/<agent_name>/prompt.md` に定義。
 出力は `/agents/<agent_name>/output.json` に保存される。
 
@@ -56,10 +61,13 @@ Sales Marketing CS Finance HR  Legal  戦略提案パイプライン
 12. **HR Agent** — 組織設計・採用・評価・エージェント組織管理
 13. **Legal Agent** — 契約書・コンプライアンス・知財・リスク法務
 
+### 制作チーム
+14. **Designer Agent** — Web/UI デザイン生成・LP制作・デザイン改善（AI Designer MCP）
+
 ### 横断チーム
-14. **Project Manager Agent** — プロジェクト進捗・リソース配分・納期管理
-15. **QA Reviewer Agent** — 全出力の品質検証・相互整合性チェック
-16. **KPI Dashboard Agent** — 全社KPI集計・異常検知・レポーティング
+15. **Project Manager Agent** — プロジェクト進捗・リソース配分・納期管理
+16. **QA Reviewer Agent** — 全出力の品質検証・相互整合性チェック
+17. **KPI Dashboard Agent** — 全社KPI集計・異常検知・レポーティング
 
 ## 相互干渉（チェック&バランス）
 
@@ -78,6 +86,10 @@ Sales Marketing CS Finance HR  Legal  戦略提案パイプライン
 | Finance → CEO | 週次PL・キャッシュフロー |
 | KPI Dashboard → CEO | 日次KPI・異常アラート |
 | QA Reviewer → 全体 | 品質差し戻し・改善指示 |
+| Sales → Designer | クライアント案件のデザイン依頼 |
+| Marketing → Designer | マーケ素材・LP デザイン依頼 |
+| Designer → PM | デザイン納品・進捗報告 |
+| Designer → Report Builder | 提案資料用ビジュアルモック作成 |
 | CEO → 全体 | 優先度指示・リソース配分・最終承認 |
 
 ## 実行方法
@@ -98,7 +110,7 @@ Notion の議事録ページ「会議名」からパイプラインを実行し�
 ### 他の人と共有する場合
 1. このリポジトリを `git clone` する
 2. Claude Code（Max プラン）を開く
-3. MCP サーバーを設定する（Notion / Google Drive）
+3. MCP サーバーを設定する（Notion / Google Drive / AI Designer）
 4. 上記いずれかの方法で実行
 
 ## 事業領域
