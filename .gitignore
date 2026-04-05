@@ -11,3 +11,5 @@ token.json
 dist/
 build/
 .pytest_cache/
+.aidesigner/*
+!.aidesigner/.gitkeep
