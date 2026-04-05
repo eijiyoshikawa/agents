@@ -2,7 +2,7 @@
 
 ## プロジェクト概要
 法人経営を0から100まで遂行可能なAIエージェント組織。
-CEO Agentを頂点とした17体のエージェントが、相互に連携・検証しながら経営全機能をカバーする。
+CEO Agentを頂点とした22体のエージェントが、相互に連携・検証しながら経営全機能をカバーする。
 Claude Code の Maxプラン内で動作し、追加API費用なし。
 
 ## 組織図
@@ -20,12 +20,15 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
         │                  │                  │
   ┌─────┼─────┐    ┌──────┼──────┐    ┌──────┼──────────┐
   │     │     │    │      │      │    │      │          │
-Sales Marketing CS Finance HR  Legal  戦略提案パイプライン
-                                      (既存6体)
+Sales  Marketing  CS    Finance HR  Legal  戦略提案パイプライン
+SNS Ops  Ad Ops                            (既存6体)
+
         ┌──────────────────┐
         │ 制作チーム        │
         ├──────────────────┤
         │ Designer         │ ← Web/UI デザイン生成
+        │ Engineer         │ ← 実装・開発
+        │ Content Creator  │ ← コンテンツ制作
         └──────────────────┘
         ┌──────────────────┐
         │ 横断チーム        │
@@ -33,10 +36,11 @@ Sales Marketing CS Finance HR  Legal  戦略提案パイプライン
         │ QA Reviewer      │ ← 全出力の品質管理
         │ KPI Dashboard    │ ← 全社KPI集計
         │ Project Manager  │ ← プロジェクト管理
+        │ Data Analyst     │ ← データ分析・インサイト
         └──────────────────┘
 ```
 
-## エージェント構成（全17体）
+## エージェント構成（全22体）
 各エージェントのプロンプトは `/agents/<agent_name>/prompt.md` に定義。
 出力は `/agents/<agent_name>/output.json` に保存される。
 
@@ -55,19 +59,24 @@ Sales Marketing CS Finance HR  Legal  戦略提案パイプライン
 8. **Sales Agent** — リード管理・商談パイプライン・受注管理
 9. **Marketing Agent** — 自社マーケティング・ブランディング・リード獲得
 10. **Customer Success Agent** — 顧客満足度・リテンション・アップセル
+11. **SNS Operator Agent** — Instagram/TikTok/YouTube運用・投稿管理・エンゲージメント分析
+12. **Ad Operations Agent** — Google/Meta/TikTok/YouTube広告の出稿・運用・ROAS最適化
 
 ### 管理部門
-11. **Finance Agent** — 経理・財務・見積・請求・PL管理・補助金
-12. **HR Agent** — 組織設計・採用・評価・エージェント組織管理
-13. **Legal Agent** — 契約書・コンプライアンス・知財・リスク法務
+13. **Finance Agent** — 経理・財務・見積・請求・PL管理・補助金
+14. **HR Agent** — 組織設計・採用・評価・エージェント組織管理
+15. **Legal Agent** — 契約書・コンプライアンス・知財・リスク法務
 
 ### 制作チーム
-14. **Designer Agent** — Web/UI デザイン生成・LP制作・デザイン改善（AI Designer MCP）
+16. **Designer Agent** — Web/UI デザイン生成・LP制作・デザイン改善（AI Designer MCP）
+17. **Engineer Agent** — LP/Web/AIシステムの実装・開発・デプロイ
+18. **Content Creator Agent** — SNS投稿・ブログ・動画台本・広告コピー・メルマガ制作
 
 ### 横断チーム
-15. **Project Manager Agent** — プロジェクト進捗・リソース配分・納期管理
-16. **QA Reviewer Agent** — 全出力の品質検証・相互整合性チェック
-17. **KPI Dashboard Agent** — 全社KPI集計・異常検知・レポーティング
+19. **Project Manager Agent** — プロジェクト進捗・リソース配分・納期管理
+20. **QA Reviewer Agent** — 全出力の品質検証・相互整合性チェック
+21. **KPI Dashboard Agent** — 全社KPI集計・異常検知・レポーティング
+22. **Data Analyst Agent** — データ深掘り分析・施策効果検証・予測・意思決定支援
 
 ## 相互干渉（チェック&バランス）
 
@@ -90,6 +99,18 @@ Sales Marketing CS Finance HR  Legal  戦略提案パイプライン
 | Marketing → Designer | マーケ素材・LP デザイン依頼 |
 | Designer → PM | デザイン納品・進捗報告 |
 | Designer → Report Builder | 提案資料用ビジュアルモック作成 |
+| Designer → Engineer | デザインデータの実装引き渡し |
+| Engineer → PM | 工数見積・開発進捗・納品報告 |
+| Engineer → Designer | 実装可否フィードバック |
+| Content Creator → SNS Ops | SNS投稿コンテンツ納品 |
+| Content Creator → Ad Ops | 広告コピー・クリエイティブ納品 |
+| SNS Ops → Content Creator | パフォーマンスFB・トレンド共有 |
+| SNS Ops → Ad Ops | オーガニック×ペイド連携最適化 |
+| Ad Ops → Marketing | 広告パフォーマンス報告 |
+| Ad Ops → Finance | 広告費実績データ |
+| Data Analyst → CEO | 経営インサイト・予測レポート |
+| Data Analyst → KPI Dashboard | 分析結果データ連携 |
+| Data Analyst → Marketing | 施策効果検証・チャネルROI分析 |
 | CEO → 全体 | 優先度指示・リソース配分・最終承認 |
 
 ## 実行方法
