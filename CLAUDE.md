@@ -101,6 +101,16 @@ Notion の議事録ページ「会議名」からパイプラインを実行し�
 3. MCP サーバーを設定する（Notion / Google Drive）
 4. 上記いずれかの方法で実行
 
+## 共有リソース
+
+### デザインシステム（awesome-design-md）
+`/design-md/` に54社以上の企業デザインシステム（DESIGN.md）を格納。
+LP制作・Web制作・提案資料作成時のデザインリファレンスとして、Marketing Agent と Report Builder Agent が参照する。
+
+- 一覧: `/design-md/README.md`
+- 個別: `/design-md/{company-name}/DESIGN.md`
+- 出典: [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md)
+
 ## 事業領域
 - SNSマーケティング（Instagram, TikTok, YouTube 運用/広告/クリエイティブ）
 - 不動産業界特化型BPO（AIエージェント活用）
