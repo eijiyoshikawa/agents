@@ -2,7 +2,7 @@
 
 ## プロジェクト概要
 法人経営を0から100まで遂行可能なAIエージェント組織。
-CEO Agentを頂点とした17体のエージェントが、相互に連携・検証しながら経営全機能をカバーする。
+CEO Agentを頂点とした24体のエージェントが、相互に連携・検証しながら経営全機能をカバーする。
 Claude Code の Maxプラン内で動作し、追加API費用なし。
 
 ## 組織図
@@ -12,26 +12,27 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
                     │  CEO Agent   │ ← 統括・意思決定・品質管理
                     └──────┬───────┘
                            │
-        ┌──────────────────┼──────────────────┐
-        │                  │                  │
-   ┌────▼────┐      ┌─────▼─────┐     ┌──────▼──────┐
-   │ 営業部門 │      │ 管理部門  │     │ コンサル事業部 │
-   └────┬────┘      └─────┬─────┘     └──────┬──────┘
-        │                  │                  │
-  ┌─────┼─────┐    ┌──────┼──────┐    ┌──────┼──────────────┐
-  │     │     │    │      │      │    │      │              │
-Sales Marketing CS Finance HR  Legal  戦略提案パイプライン  Document Builder
-                                      (既存6体)          (対話型資料作成)
-        ┌──────────────────┐
-        │ 横断チーム        │
-        ├──────────────────┤
-        │ QA Reviewer      │ ← 全出力の品質管理
+        ┌──────────────────┼──────────────────┬──────────────────┐
+        │                  │                  │                  │
+   ┌────▼────┐      ┌─────▼─────┐     ┌──────▼──────┐    ┌─────▼─────┐
+   │ 営業部門 │      │ 管理部門  │     │ コンサル事業部 │    │ 開発部門  │
+   └────┬────┘      └─────┬─────┘     └──────┬──────┘    └─────┬─────┘
+        │                  │                  │                  │
+  ┌─────┼─────┐    ┌──────┼──────┐    ┌──────┼──────────────┐  │
+  │     │     │    │      │      │    │      │              │  │
+Sales Marketing CS Finance HR  Legal  戦略提案パイプライン  Doc  ├─ Tech Lead (CTO)
+                                      (既存6体)          Builder├─ Frontend Engineer
+                                                               ├─ Backend Engineer
+        ┌──────────────────┐                                   ├─ Infrastructure
+        │ 横断チーム        │                                   ├─ UI/UX Designer
+        ├──────────────────┤                                   ├─ Data Engineer
+        │ QA Reviewer      │ ← 全出力の品質管理                 └─ QA Engineer
         │ KPI Dashboard    │ ← 全社KPI集計
         │ Project Manager  │ ← プロジェクト管理
         └──────────────────┘
 ```
 
-## エージェント構成（全17体）
+## エージェント構成（全24体）
 各エージェントのプロンプトは `/agents/<agent_name>/prompt.md` に定義。
 出力は `/agents/<agent_name>/output.json` に保存される。
 
@@ -57,10 +58,19 @@ Sales Marketing CS Finance HR  Legal  戦略提案パイプライン  Document B
 13. **HR Agent** — 組織設計・採用・評価・エージェント組織管理
 14. **Legal Agent** — 契約書・コンプライアンス・知財・リスク法務
 
+### 開発部門
+15. **Tech Lead Agent** — 技術統括・アーキテクチャ設計（CTO相当）
+16. **Frontend Engineer Agent** — Next.js UI実装・SEO最適化
+17. **Backend Engineer Agent** — API・DB・認証・決済（Supabase / Stripe）
+18. **Infrastructure Agent** — デプロイ・CI/CD・監視（Vercel）
+19. **UI/UX Designer Agent** — デザインシステム・ワイヤーフレーム（Figma）
+20. **Data Engineer Agent** — Webクローラー・データパイプライン
+21. **QA Engineer Agent** — テスト自動化・品質保証（Playwright / Jest）
+
 ### 横断チーム
-15. **Project Manager Agent** — プロジェクト進捗・リソース配分・納期管理
-16. **QA Reviewer Agent** — 全出力の品質検証・相互整合性チェック
-17. **KPI Dashboard Agent** — 全社KPI集計・異常検知・レポーティング
+22. **Project Manager Agent** — プロジェクト進捗・リソース配分・納期管理
+23. **QA Reviewer Agent** — 全出力の品質検証・相互整合性チェック
+24. **KPI Dashboard Agent** — 全社KPI集計・異常検知・レポーティング
 
 ## 相互干渉（チェック&バランス）
 
@@ -82,6 +92,13 @@ Sales Marketing CS Finance HR  Legal  戦略提案パイプライン  Document B
 | Document Builder → Retriever | 商談議事録・顧客情報の取得 |
 | Document Builder → Sales | クライアント情報・商談コンテキスト参照 |
 | Document Builder → Finance | 見積・コスト情報のP5反映 |
+| Tech Lead → 開発部門全体 | 技術方針・アーキテクチャ指示・コードレビュー |
+| PM → Tech Lead | 要件定義・技術実現可能性の確認 |
+| UI/UX Designer → Frontend | デザインハンドオフ・Code Connect |
+| Frontend ↔ Backend | API仕様共有・型定義 |
+| Infrastructure → Frontend/Backend | デプロイ・環境変数管理 |
+| Data Engineer → KPI Dashboard | 集計用データの供給 |
+| QA Engineer → Frontend/Backend | テスト結果・バグ報告 |
 | CEO → 全体 | 優先度指示・リソース配分・最終承認 |
 
 ## 実行方法
