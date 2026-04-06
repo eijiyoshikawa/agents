@@ -2,7 +2,7 @@
 
 ## プロジェクト概要
 法人経営を0から100まで遂行可能なAIエージェント組織。
-CEO Agentを頂点とした16体のエージェントが、相互に連携・検証しながら経営全機能をカバーする。
+CEO Agentを頂点とした17体のエージェントが、相互に連携・検証しながら経営全機能をカバーする。
 Claude Code の Maxプラン内で動作し、追加API費用なし。
 
 ## 組織図
@@ -18,10 +18,10 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
    │ 営業部門 │      │ 管理部門  │     │ コンサル事業部 │
    └────┬────┘      └─────┬─────┘     └──────┬──────┘
         │                  │                  │
-  ┌─────┼─────┐    ┌──────┼──────┐    ┌──────┼──────────┐
-  │     │     │    │      │      │    │      │          │
-Sales Marketing CS Finance HR  Legal  戦略提案パイプライン
-                                      (既存6体)
+  ┌─────┼─────┐    ┌──────┼──────┐    ┌──────┼──────────────┐
+  │     │     │    │      │      │    │      │              │
+Sales Marketing CS Finance HR  Legal  戦略提案パイプライン  Document Builder
+                                      (既存6体)          (対話型資料作成)
         ┌──────────────────┐
         │ 横断チーム        │
         ├──────────────────┤
@@ -31,7 +31,7 @@ Sales Marketing CS Finance HR  Legal  戦略提案パイプライン
         └──────────────────┘
 ```
 
-## エージェント構成（全16体）
+## エージェント構成（全17体）
 各エージェントのプロンプトは `/agents/<agent_name>/prompt.md` に定義。
 出力は `/agents/<agent_name>/output.json` に保存される。
 
@@ -45,21 +45,22 @@ Sales Marketing CS Finance HR  Legal  戦略提案パイプライン
 5. **Analogy Finder** — 異業種アナロジー事例収集（並列実行）
 6. **Strategist** — 戦略構築 + Devil's Advocate批判的検証
 7. **Report Builder** — Google Slides提案資料の構成作成
+8. **Document Builder** — Google Slidesテンプレートベースの対話型提案資料作成（3ステップ確認制）
 
 ### 営業・マーケティング部門
-8. **Sales Agent** — リード管理・商談パイプライン・受注管理
-9. **Marketing Agent** — 自社マーケティング・ブランディング・リード獲得
-10. **Customer Success Agent** — 顧客満足度・リテンション・アップセル
+9. **Sales Agent** — リード管理・商談パイプライン・受注管理
+10. **Marketing Agent** — 自社マーケティング・ブランディング・リード獲得
+11. **Customer Success Agent** — 顧客満足度・リテンション・アップセル
 
 ### 管理部門
-11. **Finance Agent** — 経理・財務・見積・請求・PL管理・補助金
-12. **HR Agent** — 組織設計・採用・評価・エージェント組織管理
-13. **Legal Agent** — 契約書・コンプライアンス・知財・リスク法務
+12. **Finance Agent** — 経理・財務・見積・請求・PL管理・補助金
+13. **HR Agent** — 組織設計・採用・評価・エージェント組織管理
+14. **Legal Agent** — 契約書・コンプライアンス・知財・リスク法務
 
 ### 横断チーム
-14. **Project Manager Agent** — プロジェクト進捗・リソース配分・納期管理
-15. **QA Reviewer Agent** — 全出力の品質検証・相互整合性チェック
-16. **KPI Dashboard Agent** — 全社KPI集計・異常検知・レポーティング
+15. **Project Manager Agent** — プロジェクト進捗・リソース配分・納期管理
+16. **QA Reviewer Agent** — 全出力の品質検証・相互整合性チェック
+17. **KPI Dashboard Agent** — 全社KPI集計・異常検知・レポーティング
 
 ## 相互干渉（チェック&バランス）
 
@@ -78,6 +79,9 @@ Sales Marketing CS Finance HR  Legal  戦略提案パイプライン
 | Finance → CEO | 週次PL・キャッシュフロー |
 | KPI Dashboard → CEO | 日次KPI・異常アラート |
 | QA Reviewer → 全体 | 品質差し戻し・改善指示 |
+| Document Builder → Retriever | 商談議事録・顧客情報の取得 |
+| Document Builder → Sales | クライアント情報・商談コンテキスト参照 |
+| Document Builder → Finance | 見積・コスト情報のP5反映 |
 | CEO → 全体 | 優先度指示・リソース配分・最終承認 |
 
 ## 実行方法
