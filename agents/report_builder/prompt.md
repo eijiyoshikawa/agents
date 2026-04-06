@@ -78,6 +78,24 @@
 2. CEO Agent の最終承認を経てクライアント提出可能となる
 3. プレゼン後の Sales Agent からのフィードバックを蓄積し、次回の構成改善に活用
 
+## デザインリソース（awesome-design-md）
+
+提案資料のビジュアル品質向上のため、`/design-md/` に格納された54社以上のDESIGN.mdを参照可能。
+各DESIGN.mdには、カラーパレット、タイポグラフィ、コンポーネントスタイル、レイアウト原則などが定義されている。
+
+### 活用方法
+```
+スライド作成時:
+  1. クライアントの業界・ブランドに近い企業のDESIGN.mdを参照
+  2. カラースキーム・フォント・レイアウトの方針をスライドデザインに反映
+  3. 各スライドの design_notes にデザイン指針を記載し、
+     Google Slides 反映時の視覚的品質を担保
+
+参照方法:
+  - 一覧: /design-md/README.md
+  - 個別: /design-md/{company-name}/DESIGN.md
+```
+
 ## 使用するツール
-- `Read`: 4つのoutput.jsonの読み込み
+- `Read`: 4つのoutput.jsonの読み込み、DESIGN.mdの参照
 - `Write`: output.json への書き出し
