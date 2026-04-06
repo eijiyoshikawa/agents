@@ -2,7 +2,7 @@
 
 ## プロジェクト概要
 法人経営を0から100まで遂行可能なAIエージェント組織。
-CEO Agentを頂点とした16体のエージェントが、相互に連携・検証しながら経営全機能をカバーする。
+CEO Agentを頂点とした17体のエージェントが、相互に連携・検証しながら経営全機能をカバーする。
 Claude Code の Maxプラン内で動作し、追加API費用なし。
 
 ## 組織図
@@ -23,6 +23,11 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 Sales Marketing CS Finance HR  Legal  戦略提案パイプライン
                                       (既存6体)
         ┌──────────────────┐
+        │ 制作部門          │
+        ├──────────────────┤
+        │ Web Creator      │ ← サイト制作（Google Stitch活用）
+        └──────────────────┘
+        ┌──────────────────┐
         │ 横断チーム        │
         ├──────────────────┤
         │ QA Reviewer      │ ← 全出力の品質管理
@@ -31,7 +36,7 @@ Sales Marketing CS Finance HR  Legal  戦略提案パイプライン
         └──────────────────┘
 ```
 
-## エージェント構成（全16体）
+## エージェント構成（全17体）
 各エージェントのプロンプトは `/agents/<agent_name>/prompt.md` に定義。
 出力は `/agents/<agent_name>/output.json` に保存される。
 
@@ -56,10 +61,13 @@ Sales Marketing CS Finance HR  Legal  戦略提案パイプライン
 12. **HR Agent** — 組織設計・採用・評価・エージェント組織管理
 13. **Legal Agent** — 契約書・コンプライアンス・知財・リスク法務
 
+### 制作部門
+14. **Web Creator Agent** — サイト制作・Google Stitch活用デザイン・LP/コーポレートサイト
+
 ### 横断チーム
-14. **Project Manager Agent** — プロジェクト進捗・リソース配分・納期管理
-15. **QA Reviewer Agent** — 全出力の品質検証・相互整合性チェック
-16. **KPI Dashboard Agent** — 全社KPI集計・異常検知・レポーティング
+15. **Project Manager Agent** — プロジェクト進捗・リソース配分・納期管理
+16. **QA Reviewer Agent** — 全出力の品質検証・相互整合性チェック
+17. **KPI Dashboard Agent** — 全社KPI集計・異常検知・レポーティング
 
 ## 相互干渉（チェック&バランス）
 
@@ -78,6 +86,10 @@ Sales Marketing CS Finance HR  Legal  戦略提案パイプライン
 | Finance → CEO | 週次PL・キャッシュフロー |
 | KPI Dashboard → CEO | 日次KPI・異常アラート |
 | QA Reviewer → 全体 | 品質差し戻し・改善指示 |
+| Sales → Web Creator | サイト制作案件の要件引き渡し |
+| PM → Web Creator | 制作スケジュール・マイルストーン管理 |
+| Web Creator → QA Reviewer | デザイン・コード品質検証依頼 |
+| Web Creator → CS | 納品後サポートハンドオフ |
 | CEO → 全体 | 優先度指示・リソース配分・最終承認 |
 
 ## 実行方法
