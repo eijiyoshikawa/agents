@@ -1,0 +1,19 @@
+{
+  "period": null,
+  "total_conversations": 0,
+  "auto_resolved": 0,
+  "escalated_to_human": 0,
+  "auto_resolution_rate": 0,
+  "avg_response_time_sec": 0,
+  "csat_score": 0,
+  "channels": {
+    "web": 0,
+    "line": 0,
+    "instagram": 0,
+    "facebook": 0
+  },
+  "top_intents": [],
+  "unresolved_topics": [],
+  "voc_highlights": [],
+  "recommendations": []
+}

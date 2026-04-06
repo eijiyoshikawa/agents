@@ -2,7 +2,7 @@
 
 ## プロジェクト概要
 法人経営を0から100まで遂行可能なAIエージェント組織。
-CEO Agentを頂点とした32体のエージェント（+ Web Builder サブエージェント8体）が、相互に連携・検証しながら経営全機能をカバーする。
+CEO Agentを頂点とした39体のエージェント（+ Web Builder サブエージェント8体）が、相互に連携・検証しながら経営全機能をカバーする。
 企画・戦略立案から実際のプロダクト開発・サービス化まで一気通貫で実行可能。
 Claude Code の Maxプラン内で動作し、追加API費用なし。
 
@@ -22,17 +22,17 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
   Sales      Finance     Retriever        Tech Lead    QA Reviewer
   Marketing  HR          Issue Str.       Frontend E.  KPI Dashboard
   CS         Legal       Market Res.      Backend E.   Project Manager
-  SNS Op.                Analogy F.       Infrastructure Data Analyst
-  Ad Ops.                Strategist       QA Engineer
+  SNS Op.    Compliance  Analogy F.       Infrastructure Data Analyst
+  Ad Ops.                Strategist       QA Engineer   Analytics
   Content C.             Report B.        UI/UX Designer
   SEO/AIEO               Document B.      Data Engineer
-  Marketing              Marketing An.    Designer
-   Analyst                                Engineer
-                                          Web Builder
-                                            └─ 8 sub-agents
+  Copywriter             Marketing An.    Designer
+  PR                                      Engineer
+  CRM                                     Web Builder
+  Chatbot                                   └─ 8 sub-agents
 ```
 
-## エージェント構成（全33体 + サブ8体）
+## エージェント構成（全39体 + サブ8体）
 各エージェントのプロンプトは `/agents/<agent_name>/prompt.md` に定義。
 出力は `/agents/<agent_name>/output.json` に保存される。
 
@@ -57,25 +57,30 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 14. **Ad Operations** (`ad_operations`) — Google/Meta/TikTok広告運用・ROAS最適化
 15. **Content Creator** (`content_creator`) — SNS投稿・ブログ・動画脚本・広告コピー制作
 16. **SEO/AIEO Agent** (`seo_aieo`) — SEO・AI検索最適化・ディスクリプション/タグ選定・ブログ自動はめ込み（WordPress/Next.js対応）
+17. **Copywriter Agent** (`copywriter`) — LP・広告・セールスレターのCVR最大化コピー制作
+18. **PR Agent** (`pr`) — 広報・プレスリリース・メディアリレーション・危機管理広報
+19. **CRM Agent** (`crm`) — 顧客データベース管理・セグメンテーション・LTV最大化
+20. **Chatbot Agent** (`chatbot`) — Webチャット・LINE・SNS自動応答・FAQ対応・エスカレーション
 
 ### 管理部門
-17. **Finance Agent** (`finance`) — 経理・財務・見積・請求・PL管理・補助金
-18. **HR Agent** (`hr`) — 組織設計・採用・評価・エージェント組織管理
-19. **Legal Agent** (`legal`) — 契約書・コンプライアンス・知財・リスク法務
+21. **Finance Agent** (`finance`) — 経理・財務・見積・請求・PL管理・補助金
+22. **HR Agent** (`hr`) — 組織設計・採用・評価・エージェント組織管理
+23. **Legal Agent** (`legal`) — 契約書・コンプライアンス・知財・リスク法務
+24. **Compliance Agent** (`compliance`) — 景品表示法・薬機法・個人情報保護法等の法令適合チェック
 
 ### 開発部門
-20. **Tech Lead** (`tech_lead`) — CTO的技術統括・アーキテクチャ設計・技術選定
-21. **Frontend Engineer** (`frontend_engineer`) — Next.js App Router UI実装・SEO最適化
-22. **Backend Engineer** (`backend_engineer`) — API設計・DB・認証・Stripe決済連携
-23. **Infrastructure** (`infrastructure`) — デプロイ・CI/CD・監視・セキュリティ・コスト管理
-24. **QA Engineer** (`qa_engineer`) — テスト自動化・品質保証（Jest/Playwright）
-25. **UI/UX Designer** (`ui_ux_designer`) — デザインシステム構築・Figma連携・ユーザビリティ改善
-26. **Data Engineer** (`data_engineer`) — クローラー・データパイプライン・データ品質管理
-27. **Designer** (`designer`) — Web/LP/UIデザイン生成（AI Designer MCP活用）
-28. **Engineer** (`engineer`) — LP/Web/AIシステム実装（Next.js/Python/WordPress）
+25. **Tech Lead** (`tech_lead`) — CTO的技術統括・アーキテクチャ設計・技術選定
+26. **Frontend Engineer** (`frontend_engineer`) — Next.js App Router UI実装・SEO最適化
+27. **Backend Engineer** (`backend_engineer`) — API設計・DB・認証・Stripe決済連携
+28. **Infrastructure** (`infrastructure`) — デプロイ・CI/CD・監視・セキュリティ・コスト管理
+29. **QA Engineer** (`qa_engineer`) — テスト自動化・品質保証（Jest/Playwright）
+30. **UI/UX Designer** (`ui_ux_designer`) — デザインシステム構築・Figma連携・ユーザビリティ改善
+31. **Data Engineer** (`data_engineer`) — クローラー・データパイプライン・データ品質管理
+32. **Designer** (`designer`) — Web/LP/UIデザイン生成（AI Designer MCP活用）
+33. **Engineer** (`engineer`) — LP/Web/AIシステム実装（Next.js/Python/WordPress）
 
 ### Web Builder パイプライン（サブエージェント8体）
-29. **Web Builder** (`web_builder`) — 参考サイト分析→Next.js再現パイプライン
+34. **Web Builder** (`web_builder`) — 参考サイト分析→Next.js再現パイプライン
     - `site_scanner` — サイト偵察・技術検出
     - `structure_analyzer` — HTML構造・レイアウトパターン解析
     - `design_analyzer` — カラー・タイポグラフィ・スペーシング抽出
@@ -86,10 +91,11 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
     - `qa_reviewer` — Vercelデプロイ後の比較検証・修正指示
 
 ### 横断チーム
-30. **Project Manager Agent** (`project_manager`) — プロジェクト進捗・リソース配分・納期管理
-31. **QA Reviewer Agent** (`qa_reviewer`) — 全出力の品質検証・相互整合性チェック
-32. **KPI Dashboard Agent** (`kpi_dashboard`) — 全社KPI集計・異常検知・レポーティング
-33. **Data Analyst** (`data_analyst`) — 横断データ分析・インサイト抽出・意思決定支援
+35. **Project Manager Agent** (`project_manager`) — プロジェクト進捗・リソース配分・納期管理
+36. **QA Reviewer Agent** (`qa_reviewer`) — 全出力の品質検証・相互整合性チェック
+37. **KPI Dashboard Agent** (`kpi_dashboard`) — 全社KPI集計・異常検知・レポーティング
+38. **Data Analyst** (`data_analyst`) — 横断データ分析・インサイト抽出・意思決定支援
+39. **Analytics Agent** (`analytics`) — GA4/GSC/広告データ統合分析・マーケティングROI最適化
 
 ## 相互干渉（チェック&バランス）
 
@@ -121,6 +127,21 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 | Data Analyst → CEO | 分析レポート・意思決定支援 |
 | Finance → CEO | 週次PL・キャッシュフロー |
 | KPI Dashboard → CEO | 日次KPI・異常アラート |
+| Copywriter → Ad Operations | 広告コピー納品・A/Bテスト |
+| Copywriter → Designer | LP・バナーのビジュアル連携 |
+| PR → Marketing | ブランド戦略・キャンペーンPR連携 |
+| PR → Legal | プレスリリース法務チェック |
+| CRM → Sales | リードスコアリング・パイプラインデータ提供 |
+| CRM → CS | 顧客ヘルススコア・チャーンリスク共有 |
+| CRM → Marketing | セグメントデータ・キャンペーン対象リスト |
+| Chatbot → CS | FAQ対応・エスカレーション・VoC共有 |
+| Chatbot → Sales | 商談リードの引き渡し |
+| Compliance → Content Creator | コンテンツ法令チェック・修正指示 |
+| Compliance → Ad Operations | 広告出稿前の法令チェック |
+| Compliance → Legal | 法的判断の確認・規制適合チェック |
+| Analytics → Marketing | チャネル戦略・予算配分提案 |
+| Analytics → SEO/AIEO | 検索パフォーマンスデータ連携 |
+| Analytics → KPI Dashboard | 全社KPIへのデータ供給 |
 | QA Reviewer → 全体 | 品質差し戻し・改善指示 |
 | CEO → 全体 | 優先度指示・リソース配分・最終承認 |
 

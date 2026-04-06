@@ -1,0 +1,40 @@
+{
+  "period": null,
+  "traffic": {
+    "total_sessions": 0,
+    "total_users": 0,
+    "new_users": 0,
+    "channels": {
+      "organic": 0,
+      "paid": 0,
+      "social": 0,
+      "referral": 0,
+      "direct": 0
+    }
+  },
+  "conversions": {
+    "total": 0,
+    "cvr": 0,
+    "by_goal": []
+  },
+  "search_console": {
+    "total_clicks": 0,
+    "total_impressions": 0,
+    "avg_ctr": 0,
+    "avg_position": 0,
+    "top_queries": [],
+    "core_web_vitals": {
+      "lcp": null,
+      "fid": null,
+      "cls": null
+    }
+  },
+  "ads_performance": {
+    "total_spend": 0,
+    "total_revenue": 0,
+    "roas": 0,
+    "cpa": 0
+  },
+  "anomalies": [],
+  "recommendations": []
+}

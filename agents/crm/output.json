@@ -1,0 +1,27 @@
+{
+  "period": null,
+  "total_customers": 0,
+  "segments": {
+    "leads": 0,
+    "mql": 0,
+    "sql": 0,
+    "active_customers": 0,
+    "loyal_customers": 0,
+    "churned": 0
+  },
+  "pipeline": {
+    "total_value": 0,
+    "weighted_value": 0,
+    "conversion_rate": 0
+  },
+  "health_metrics": {
+    "data_quality_score": 0,
+    "cac": 0,
+    "ltv": 0,
+    "churn_rate": 0,
+    "retention_rate": 0
+  },
+  "at_risk_customers": [],
+  "upsell_opportunities": [],
+  "recommendations": []
+}

@@ -1,0 +1,18 @@
+{
+  "period": null,
+  "press_releases": {
+    "total": 0,
+    "published": [],
+    "pending": []
+  },
+  "media_coverage": {
+    "total_mentions": 0,
+    "positive": 0,
+    "neutral": 0,
+    "negative": 0,
+    "top_outlets": []
+  },
+  "brand_sentiment": null,
+  "crisis_incidents": [],
+  "recommendations": []
+}
