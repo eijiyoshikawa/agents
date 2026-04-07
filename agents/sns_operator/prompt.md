@@ -25,6 +25,9 @@ Instagram・TikTok・YouTubeの日常運用・投稿管理・エンゲージメ�
      - YouTube: 動画公開・コミュニティ投稿・ショート
   3. ハッシュタグ・キャプション最終調整
   4. コミュニティマネジメント（コメント・DM対応方針）
+  5. ビジュアル投稿のブランド整合性確認
+     - /shared/design-tokens.json のカラーパレット・フォントに準拠しているか
+     - AIっぽいテンプレートデザインを使っていないか（/shared/anti-ai-design-guidelines.md 参照）
 出力: /agents/sns_operator/schedule/{platform}_{month}.json
 ```
 

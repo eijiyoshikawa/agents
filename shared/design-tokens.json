@@ -1,0 +1,377 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "description": "全エージェント共通デザイントークン。design-md/の54社以上のプレミアムブランド分析に基づく。",
+    "usage": "プロジェクト開始時に Marketing Agent がクライアント/自社ブランドに合わせてカスタマイズし、全デザイン系エージェントが参照する。",
+    "source_analysis": "Stripe, Linear, Apple, Airbnb, Spotify, Notion, Vercel, Superhuman, Framer, Claude 等のデザインシステムから抽出",
+    "anti_ai_design": "このトークンはTailwindデフォルト値を意図的に避けている。詳細は /shared/anti-ai-design-guidelines.md を参照。"
+  },
+
+  "brand": {
+    "_comment": "プロジェクトごとにMarketing Agentが設定する。以下はデフォルトテンプレート。",
+    "name": "",
+    "personality": "warm|cool|neutral|playful|corporate|luxurious",
+    "tone": "professional|friendly|bold|minimal|elegant",
+    "reference_design_md": "/design-md/{company-name}/DESIGN.md"
+  },
+
+  "colors": {
+    "_strategy": "1つのクロマティックアクセント + 温かみのあるニュートラル。複数のブランドカラーを競合させない。",
+
+    "primary": {
+      "value": "#c96442",
+      "_note": "ブランドの主色。AI青(#3B82F6)を避ける。プロジェクトごとに必ず変更すること。",
+      "usage": "最も重要なCTA、ブランドマーク、ハイライトのみに使用"
+    },
+    "primary_hover": {
+      "value": "#b5593b",
+      "_note": "primaryの10%暗い色"
+    },
+
+    "background": {
+      "light": "#faf9f6",
+      "dark": "#0a0a0b",
+      "_note": "純白(#ffffff)は避ける。わずかに暖色に振ったオフホワイトが人間的。dark側も純黒(#000)を避ける。"
+    },
+
+    "surface": {
+      "light": "#ffffff",
+      "dark": "#141415",
+      "_note": "カード・モーダル等の表面色。backgroundと差をつける。"
+    },
+
+    "text": {
+      "primary": "#1a1a1a",
+      "secondary": "#6b6b6b",
+      "tertiary": "#9a9a9a",
+      "inverse": "#faf9f6",
+      "_note": "純黒(#000000)テキストは避ける。わずかにソフトな色合いで目の疲れを軽減。"
+    },
+
+    "border": {
+      "default": "#e8e5e0",
+      "strong": "#d1cdc6",
+      "subtle": "#f0eee9",
+      "_note": "クールグレー(#e5e7eb等)ではなくウォームグレーを使用。ブランドの温度感を境界線にも反映。"
+    },
+
+    "semantic": {
+      "success": "#2d8a56",
+      "warning": "#d4870e",
+      "error": "#c4432b",
+      "info": "#3674b5",
+      "_note": "Tailwindデフォルトの緑/黄/赤/青と異なる色相を選定。"
+    },
+
+    "accent": {
+      "value": "#8b6cc1",
+      "_note": "サブアクセント。primaryと補色関係にすると効果的。"
+    }
+  },
+
+  "typography": {
+    "_strategy": "カスタムフォントまたはOpenType機能付きフォントを必ず使用。Inter/Poppinsをデフォルト設定で使わない。",
+
+    "font_families": {
+      "display": {
+        "name": "Noto Sans JP",
+        "fallback": "'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif",
+        "_alternatives": [
+          "Sora — 幾何学的モダン",
+          "Space Grotesk — テック・プロダクト向き",
+          "DM Sans — 親しみやすいSaaS向き",
+          "Outfit — 洗練されたビジネス向き",
+          "Plus Jakarta Sans — フレンドリーで差別化",
+          "Manrope — ニュートラルだがInterと差別化"
+        ],
+        "_note": "Interを使う場合はOpenType機能(cv01, ss03)を必ず有効化すること"
+      },
+      "body": {
+        "name": "Noto Sans JP",
+        "fallback": "'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif",
+        "opentype_features": "\"palt\" 1",
+        "_note": "日本語ではpalt(プロポーショナル詰め)を必ず有効化"
+      },
+      "mono": {
+        "name": "JetBrains Mono",
+        "fallback": "'Fira Code', 'Source Code Pro', monospace"
+      }
+    },
+
+    "scale": {
+      "_note": "ディスプレイサイズは大胆に。letter-spacingは大きいサイズで負の値に。",
+      "display_xl": {
+        "size": "72px",
+        "size_mobile": "40px",
+        "weight": "500",
+        "line_height": "1.05",
+        "letter_spacing": "-3px",
+        "_reference": "Vercel: -2.88px, Framer: -5.5px, Notion: -2.125px"
+      },
+      "display_lg": {
+        "size": "56px",
+        "size_mobile": "32px",
+        "weight": "500",
+        "line_height": "1.1",
+        "letter_spacing": "-2px"
+      },
+      "h1": {
+        "size": "48px",
+        "size_mobile": "28px",
+        "weight": "600",
+        "line_height": "1.15",
+        "letter_spacing": "-1.5px"
+      },
+      "h2": {
+        "size": "36px",
+        "size_mobile": "24px",
+        "weight": "600",
+        "line_height": "1.2",
+        "letter_spacing": "-1px"
+      },
+      "h3": {
+        "size": "28px",
+        "size_mobile": "20px",
+        "weight": "600",
+        "line_height": "1.3",
+        "letter_spacing": "-0.5px"
+      },
+      "h4": {
+        "size": "22px",
+        "size_mobile": "18px",
+        "weight": "600",
+        "line_height": "1.4",
+        "letter_spacing": "-0.3px"
+      },
+      "body_lg": {
+        "size": "18px",
+        "weight": "400",
+        "line_height": "1.75",
+        "letter_spacing": "0"
+      },
+      "body": {
+        "size": "16px",
+        "weight": "400",
+        "line_height": "1.75",
+        "letter_spacing": "0"
+      },
+      "body_sm": {
+        "size": "14px",
+        "weight": "400",
+        "line_height": "1.6",
+        "letter_spacing": "0"
+      },
+      "caption": {
+        "size": "12px",
+        "weight": "500",
+        "line_height": "1.5",
+        "letter_spacing": "0.5px",
+        "_note": "キャプション・ラベルはわずかにポジティブなletter-spacing"
+      }
+    },
+
+    "headline_weight_guide": {
+      "_note": "プレミアムブランドは見出しに極太(800-900)を使わない。500-600が主流。",
+      "recommended": "500 or 600",
+      "avoid": "700+ for display sizes",
+      "_reference": "Stripe: 300, Linear: 510, Apple: 600, Claude: 500"
+    }
+  },
+
+  "spacing": {
+    "_strategy": "密なタイポグラフィ + その周囲に贅沢な余白。均一ではなくリズムのある間隔。",
+    "base": "4px",
+    "scale": {
+      "2xs": "4px",
+      "xs": "8px",
+      "sm": "12px",
+      "md": "16px",
+      "lg": "24px",
+      "xl": "32px",
+      "2xl": "48px",
+      "3xl": "64px",
+      "4xl": "96px",
+      "5xl": "128px"
+    },
+    "section_padding": {
+      "desktop": "120px",
+      "tablet": "80px",
+      "mobile": "64px",
+      "_note": "セクション間は80-120pxが標準。40px以下だと窮屈で安っぽく見える。"
+    },
+    "content_max_width": {
+      "wide": "1280px",
+      "default": "1080px",
+      "narrow": "720px",
+      "text": "640px",
+      "_note": "本文テキストは640px以下に制限すると可読性が上がる。"
+    }
+  },
+
+  "border_radius": {
+    "_strategy": "2-3種類のみ使用。ランダムに変えない。ピル形状は限定的に。",
+    "none": "0px",
+    "sm": "6px",
+    "md": "10px",
+    "lg": "16px",
+    "full": "9999px",
+    "_usage_guide": {
+      "buttons": "sm (6px) — Tailwindデフォルトの0.375rem=6pxとは差別化するなら8pxに",
+      "cards": "md (10px)",
+      "modals": "lg (16px)",
+      "pills_tags": "full (9999px) — 使いすぎ注意",
+      "_note": "全要素に同じ値(例: 8px)を適用するのはAIっぽい。用途別に3段階が理想。"
+    }
+  },
+
+  "shadows": {
+    "_strategy": "ブランドカラーを含んだ影。灰色の影は無個性。多層シャドウで奥行き。",
+    "sm": "0px 1px 2px rgba(26, 26, 26, 0.04)",
+    "md": "0px 2px 8px rgba(26, 26, 26, 0.06), 0px 1px 2px rgba(26, 26, 26, 0.04)",
+    "lg": "0px 8px 24px rgba(26, 26, 26, 0.08), 0px 2px 8px rgba(26, 26, 26, 0.04)",
+    "xl": "0px 16px 48px rgba(26, 26, 26, 0.10), 0px 4px 16px rgba(26, 26, 26, 0.06)",
+    "ring": "0px 0px 0px 1px rgba(26, 26, 26, 0.06)",
+    "inner": "inset 0px 1px 2px rgba(26, 26, 26, 0.06)",
+    "_note": "不透明度は0.04-0.10の範囲。0.2以上は重すぎてAIっぽい。Stripeは青系シャドウ、Claudeは暖色シャドウを使用。"
+  },
+
+  "motion": {
+    "_strategy": "控えめで意図的。派手なスクロールアニメーションは避ける。",
+    "duration": {
+      "instant": "100ms",
+      "fast": "200ms",
+      "normal": "300ms",
+      "slow": "500ms",
+      "entrance": "600ms"
+    },
+    "easing": {
+      "default": "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      "entrance": "cubic-bezier(0.0, 0.0, 0.2, 1)",
+      "exit": "cubic-bezier(0.4, 0.0, 1, 1)",
+      "spring": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+      "_note": "Tailwindのデフォルトease-in-out以外を使うことで差別化"
+    },
+    "scroll_animation": {
+      "fade_in": {
+        "from": { "opacity": 0, "y": 16 },
+        "to": { "opacity": 1, "y": 0 },
+        "_note": "y:20-30pxは大きすぎる。12-16pxが上品。"
+      },
+      "stagger_delay": "80ms",
+      "_note": "全セクションにスクロールアニメーションを入れない。ヒーロー・主要セクションのみ。"
+    },
+    "hover": {
+      "button": "background-color 200ms, box-shadow 200ms, transform 200ms",
+      "card": "box-shadow 300ms, transform 300ms",
+      "link": "color 150ms",
+      "_note": "scale(1.05)はダサい。scale(1.01-1.02)かtranslateY(-2px)で十分。"
+    },
+    "avoid": [
+      "全要素にfadeInUpを適用",
+      "派手なパララックス効果",
+      "テキストの1文字ずつアニメーション（ヒーロー以外）",
+      "スクロール連動の複雑なアニメーション",
+      "自動再生のカルーセル",
+      "バウンスアニメーション"
+    ]
+  },
+
+  "components": {
+    "button": {
+      "primary": {
+        "bg": "colors.primary",
+        "text": "#ffffff",
+        "padding": "12px 24px",
+        "font_weight": "500",
+        "font_size": "15px",
+        "border_radius": "border_radius.sm",
+        "hover": {
+          "bg": "colors.primary_hover",
+          "transform": "translateY(-1px)",
+          "shadow": "shadows.md"
+        },
+        "_note": "padding-x は padding-y の2倍が黄金比。フォントサイズは15pxがボタンに最適（16pxより少し引き締まる）。"
+      },
+      "secondary": {
+        "bg": "transparent",
+        "text": "colors.text.primary",
+        "border": "1px solid colors.border.default",
+        "padding": "12px 24px",
+        "hover": {
+          "bg": "colors.background.light",
+          "border_color": "colors.border.strong"
+        }
+      },
+      "ghost": {
+        "bg": "transparent",
+        "text": "colors.text.secondary",
+        "padding": "8px 16px",
+        "hover": {
+          "bg": "rgba(0,0,0,0.04)"
+        }
+      }
+    },
+    "card": {
+      "bg": "colors.surface.light",
+      "border": "1px solid colors.border.subtle",
+      "border_radius": "border_radius.md",
+      "padding": "24px",
+      "shadow": "shadows.sm",
+      "hover": {
+        "shadow": "shadows.md",
+        "border_color": "colors.border.default",
+        "transform": "translateY(-2px)"
+      },
+      "_note": "影+境界線のダブル使いでプレミアム感。影だけ・境界線だけよりリッチに見える。"
+    },
+    "input": {
+      "bg": "colors.surface.light",
+      "border": "1px solid colors.border.default",
+      "border_radius": "border_radius.sm",
+      "padding": "10px 14px",
+      "font_size": "15px",
+      "focus": {
+        "border_color": "colors.primary",
+        "ring": "0 0 0 3px rgba(primary, 0.1)",
+        "_note": "フォーカスリングは太すぎない。3pxの半透明リングが上品。"
+      }
+    }
+  },
+
+  "layout": {
+    "section_alternation": {
+      "_strategy": "背景色のコントラストでセクションを区切る（Appleスタイル）。",
+      "options": [
+        "background.light ↔ surface.light（微妙な差）",
+        "background.light ↔ background.dark（大胆なコントラスト）",
+        "同一背景 + 大きなpadding（ミニマル）"
+      ],
+      "_note": "背景色の切り替えは2パターンまで。3色以上は雑に見える。"
+    },
+    "grid": {
+      "columns": 12,
+      "gap": "spacing.lg (24px)",
+      "_note": "12カラムグリッドだがカード配列は3列が安定。4列は情報過多、2列はスカスカ。"
+    },
+    "hero": {
+      "min_height": "85vh",
+      "text_alignment": "center or left — 右揃えは避ける",
+      "cta_count": "最大2個（primary + secondary）",
+      "_note": "ヒーローでは大きなdisplay_xlフォントを使う。h1サイズでは弱い。"
+    }
+  },
+
+  "tailwind_config_template": {
+    "_note": "このテンプレートをtailwind.config.tsに反映する。Tailwindデフォルトを上書きすること。",
+    "theme_extend": {
+      "colors": "← colors セクションからマッピング",
+      "fontFamily": "← typography.font_families からマッピング",
+      "fontSize": "← typography.scale からマッピング（letter-spacing込み）",
+      "spacing": "← spacing.scale からマッピング",
+      "borderRadius": "← border_radius からマッピング",
+      "boxShadow": "← shadows からマッピング",
+      "transitionDuration": "← motion.duration からマッピング",
+      "transitionTimingFunction": "← motion.easing からマッピング"
+    }
+  }
+}
