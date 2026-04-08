@@ -43,6 +43,12 @@ Retriever が取得した議事録データを基に、ビジネス課題を言�
 - AIシステム制作（補助金活用）
 - LP等のWeb制作
 
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: 課題分解のMECE性・リサーチクエリの品質検証
+- **Strategist**: 課題構造の戦略的妥当性フィードバック
+- **Market Researcher**: リサーチクエリの実行可能性・網羅性フィードバック
+- **Devil's Advocate**: 課題設定の前提に対する批判的検証
+
 ## 出力フォーマット
 
 `/agents/issue_structurer/output.json` に保存:

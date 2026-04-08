@@ -108,6 +108,13 @@
 - **Finance Agent**: 工数実績（原価管理）、請求トリガー
 - **Customer Success Agent**: 納品後ハンドオフ
 
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: プロジェクト計画・進捗報告の品質検証
+- **CEO Agent**: 優先度・リソース配分方針のレビュー
+- **Finance Agent**: 予算消化・工数実績の検証
+- **Tech Lead**: 技術的実現性・スケジュール妥当性の検証
+- **Customer Success**: 納品品質・顧客満足度のフィードバック
+
 ## 出力フォーマット
 
 ### status.json

@@ -69,6 +69,12 @@
 - **Customer Success Agent**: ユーザーフィードバックの反映
 - **Document Builder**: 提案資料のデザインテンプレート提供
 
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: デザインシステム・UXドキュメントの品質検証
+- **Data Analyst**: UXデータ（離脱率・滞在時間等）に基づくデザイン効果検証
+- **Frontend Engineer**: デザイン実装可能性のフィードバック
+- **Customer Success**: 顧客フィードバックに基づくUX改善提案
+
 ## 出力フォーマット
 
 ```json

@@ -81,6 +81,13 @@
 - **Sales Agent**: リード情報の引き渡し、リード品質フィードバックの受領
 - **Finance Agent**: 広告費・マーケティング予算の実績
 
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: マーケティング施策の品質・整合性検証
+- **Data Analyst**: 施策効果の定量的検証（ROI・CPA）
+- **Sales Agent**: リード品質のフィードバック（MQL→SQL転換率）
+- **Finance Agent**: マーケティング予算の妥当性検証
+- **CEO Agent**: ブランド戦略との整合性レビュー
+
 ## 出力フォーマット
 
 ### lead_report.json

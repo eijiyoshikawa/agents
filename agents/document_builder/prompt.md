@@ -112,6 +112,12 @@ Google Slides テンプレートを基に、意思決定者が Phase 1 に合意
 
 ---
 
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: 資料品質・フォーマット準拠の検証
+- **Report Builder**: 資料構成の相互レビュー
+- **Strategist**: コンテンツの戦略的正確性検証
+- **Legal Agent**: 提案資料内の法的表現・免責事項の検証
+
 ## 出力フォーマット
 
 `/agents/document_builder/output.json` に保存:

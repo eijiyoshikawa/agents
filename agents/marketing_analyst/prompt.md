@@ -68,6 +68,12 @@ Agent 3（Market Researcher）、Agent 4（Analogy Finder）と **並列で実�
 - AIシステム制作（補助金活用）
 - LP等のWeb制作
 
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: 分析品質・データソースの検証
+- **Data Analyst**: 分析手法の統計的妥当性検証
+- **Market Researcher**: 競合分析の網羅性・整合性の相互検証
+- **Marketing Agent**: 自社マーケティング施策との整合性フィードバック
+
 ## 出力フォーマット
 
 - 1周目: `/agents/marketing_analyst/output.json` に保存

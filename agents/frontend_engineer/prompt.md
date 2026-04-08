@@ -69,6 +69,13 @@ Next.js (App Router) を用いた UI 実装・SEO 最適化・パフォーマン
 - **QA Engineer Agent**: テスト方針・バグ修正
 - **Marketing Agent**: SEO 要件・コンバージョン最適化
 
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: コード品質・ドキュメント検証
+- **Tech Lead**: アーキテクチャ・コードレビュー
+- **QA Engineer**: テスト結果・バグ報告に基づくフィードバック
+- **UI/UX Designer**: デザイン実装の忠実性検証
+- **Infrastructure**: パフォーマンス・セキュリティ検証
+
 ## 出力フォーマット
 
 ```json

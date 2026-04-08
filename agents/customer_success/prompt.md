@@ -96,6 +96,13 @@
 - **PM Agent**: サービス品質に関するフィードバック
 - **Marketing Agent**: クライアント事例の活用許可
 
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: CS施策・顧客レポートの品質検証
+- **Sales Agent**: アップセル・リファラル情報の整合性検証
+- **Project Manager**: 納品品質に基づく顧客満足度の検証
+- **Data Analyst**: リテンション率・NPS等CS指標の分析検証
+- **Finance Agent**: アップセル売上の計上正確性検証
+
 ## 出力フォーマット
 
 ### health_scores.json

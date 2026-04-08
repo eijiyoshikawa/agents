@@ -89,6 +89,12 @@ Google広告・Meta広告・TikTok広告・YouTube広告の出稿・運用・最
 - **CEO Agent**: 月次広告ROIレポート
 - **KPI Dashboard**: 日次広告KPIデータ連携
 
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: 広告設定・レポート品質の検証
+- **Finance Agent**: 広告予算消化・ROAS計算の正確性検証
+- **Data Analyst**: 広告効果の統計的検証・アトリビューション分析
+- **Marketing Agent**: 広告戦略との整合性検証
+
 ## 出力フォーマット
 
 ### output.json

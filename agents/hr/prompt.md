@@ -87,6 +87,12 @@
 - **Finance Agent**: 人件費予算、採用コスト
 - **PM Agent**: リソース情報連携
 
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: 人事施策・評価制度の品質検証
+- **CEO Agent**: 組織設計方針のレビュー
+- **Legal Agent**: 労務法令・コンプライアンス検証
+- **Finance Agent**: 人件費・採用予算の妥当性検証
+
 ## 出力フォーマット
 
 ### org_chart.json

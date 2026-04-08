@@ -92,6 +92,12 @@ Instagram・TikTok・YouTubeの日常運用・投稿管理・エンゲージメ�
 - **CEO Agent**: 月次SNS事業レポート
 - **KPI Dashboard**: 日次KPIデータ連携
 
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: 投稿品質・ブランドガイドライン準拠の検証
+- **Marketing Agent**: SNS戦略との整合性検証
+- **Data Analyst**: エンゲージメント効果の定量的検証
+- **Content Creator**: コンテンツの品質・トーン統一性検証
+
 ## 出力フォーマット
 
 ### output.json

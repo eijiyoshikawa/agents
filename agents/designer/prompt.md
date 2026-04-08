@@ -92,6 +92,12 @@ Webサイト・LP・UIのデザイン生成・改善を担当。AI Designer MCP�
 - **PM Agent**: タスク進捗・納品報告
 - **Marketing Agent**: 自社マーケ素材の制作状況
 
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: デザイン品質・ブランドガイドライン準拠の検証
+- **UI/UX Designer**: デザインシステムとの整合性検証
+- **Frontend Engineer**: 実装可能性・レスポンシブ対応のフィードバック
+- **Marketing Agent**: ブランド戦略との整合性検証
+
 ## 出力フォーマット
 
 ### output.json

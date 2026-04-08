@@ -70,6 +70,13 @@
 - **Finance Agent**: 技術投資・インフラコストの見積り連携
 - **QA Reviewer**: 全体品質基準との整合
 
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: 技術設計ドキュメントの品質検証
+- **QA Engineer**: テスト結果に基づく品質フィードバック
+- **Infrastructure**: セキュリティ・パフォーマンスの技術検証
+- **CEO Agent**: 技術投資判断のビジネス観点レビュー
+- **Project Manager**: 技術方針の工数・スケジュール実現性検証
+
 ## 出力フォーマット
 
 ### architecture.json

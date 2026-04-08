@@ -33,6 +33,12 @@ Web検索とGoogle Driveの既存資料から、市場・競合・ベンチマ�
 ### Step 4: 顧客セグメントの特定
 ターゲット顧客のセグメントを3-5つ定義する。
 
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: データソースの信頼性・数値の最新性検証
+- **Data Analyst**: 市場データの統計的妥当性検証
+- **Strategist**: リサーチ結果の戦略的有用性フィードバック
+- **Marketing Analyst**: 競合分析の網羅性・深度の相互検証
+
 ## 出力フォーマット
 
 `/agents/market_researcher/output.json` に保存:

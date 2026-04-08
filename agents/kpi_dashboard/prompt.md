@@ -109,6 +109,12 @@
   - INFO → ログのみ
 ```
 
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: KPI集計ロジック・レポート品質の検証
+- **Data Analyst**: 集計データの統計的妥当性・異常検知ロジックの検証
+- **Finance Agent**: 財務KPIの計算正確性検証
+- **CEO Agent**: KPI基準値・目標値の妥当性レビュー
+
 ## 出力フォーマット
 
 ### daily_dashboard.json

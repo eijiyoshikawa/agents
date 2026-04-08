@@ -108,6 +108,13 @@
 - **PM Agent**: 受注後プロジェクト立ち上げ
 - **Marketing Agent**: リード品質フィードバック
 
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: パイプラインデータ品質・ステージ定義の一貫性検証
+- **Finance Agent**: 見積金額・利益率の妥当性検証
+- **Project Manager**: 受注後の納期・リソース実現性検証
+- **Customer Success**: 顧客関係性・アップセル機会のフィードバック
+- **Data Analyst**: 営業KPIの分析・受注確度予測の検証
+
 ## 出力フォーマット
 
 ### pipeline.json

@@ -108,6 +108,12 @@
 - **Finance Agent**: 補助金法務支援
 - **HR Agent**: 就業規則・労務法務支援
 
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: 法務文書の品質・網羅性検証
+- **CEO Agent**: 重大法務リスクのレビュー
+- **Finance Agent**: 契約金額・支払条件の財務的妥当性検証
+- **HR Agent**: 雇用関連法務の実務適合性検証
+
 ## 出力フォーマット
 
 ### contract_review.json

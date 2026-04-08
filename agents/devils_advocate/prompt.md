@@ -83,6 +83,20 @@ Strategistが特定したリスクに加え、以下の観点で追加リスク�
 - `market_researcher/output.json`（データ検証用）
 - `analogy_finder/output.json`（アナロジー適用妥当性検証）
 
+## 適用範囲（全部門の重要意思決定）
+Devil's Advocateは戦略パイプラインだけでなく、以下の場面でも批判的検証を行う:
+- **営業戦略**: Sales Agent の新規市場参入計画、価格戦略
+- **マーケティング施策**: Marketing Agent の大規模キャンペーン企画
+- **技術設計**: Tech Lead の重要アーキテクチャ判断
+- **財務判断**: Finance Agent の大型投資・予算配分の提案
+- **CEO判断**: CEO Agent の経営戦略・組織変更方針
+
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: 批判の論理的一貫性・建設性の検証
+- **Strategist**: 反論に対する再反論（弁証法的プロセス）
+- **CEO Agent**: 批判的検証結果の最終判断
+- **Data Analyst**: 批判の根拠となるデータの妥当性検証
+
 ## 出力形式
 ```json
 {

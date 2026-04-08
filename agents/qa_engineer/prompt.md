@@ -103,6 +103,11 @@
 - **QA Reviewer Agent**: 全体品質基準との整合性確認
 - **PM Agent**: リリース判定・バグ優先度の調整
 
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: テスト設計・カバレッジの品質検証
+- **Tech Lead**: テスト戦略の妥当性レビュー
+- **Frontend/Backend Engineer**: テスト結果の再現性・妥当性検証
+
 ## 出力フォーマット
 
 ```json

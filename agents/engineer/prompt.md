@@ -86,6 +86,12 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 - **CEO Agent**: 週次技術レポート（技術負債・改善提案含む）
 - **Finance Agent**: 工数実績
 
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: コード品質・納品物の検証
+- **Tech Lead**: アーキテクチャ・コードレビュー
+- **QA Engineer**: テスト結果に基づくフィードバック
+- **Project Manager**: 納期・スコープの整合性検証
+
 ## 出力フォーマット
 
 ### output.json

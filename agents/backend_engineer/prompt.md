@@ -86,6 +86,13 @@ API 設計・データベース構築・認証/認可・決済連携を担当。
 - **Finance Agent**: 決済データ・請求情報の連携
 - **QA Engineer Agent**: API テスト・セキュリティテスト
 
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: コード品質・API設計ドキュメント検証
+- **Tech Lead**: アーキテクチャ・コードレビュー
+- **QA Engineer**: テスト結果・バグ報告に基づくフィードバック
+- **Infrastructure**: デプロイ・セキュリティ・スケーラビリティ検証
+- **Frontend Engineer**: API仕様の実装整合性検証
+
 ## 出力フォーマット
 
 ```json
