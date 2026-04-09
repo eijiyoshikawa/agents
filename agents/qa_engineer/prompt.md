@@ -107,6 +107,8 @@
 - **QA Reviewer**: テスト設計・カバレッジの品質検証
 - **Tech Lead**: テスト戦略の妥当性レビュー
 - **Frontend/Backend Engineer**: テスト結果の再現性・妥当性検証
+- **Project Manager**: テストカバレッジと納品マイルストーンの整合性検証
+- **Infrastructure**: CI/CDテスト統合の運用品質フィードバック
 
 ## 出力フォーマット
 
