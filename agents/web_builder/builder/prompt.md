@@ -204,3 +204,11 @@ QA Reviewer の修正指示（`iteration_N.json`）を読み込み:
 - `Write`: 新規ファイル作成
 - `Edit`: 既存ファイル修正（Iteration 2+）
 - `Bash`: `npx create-next-app`, `npm install`, `npm run build` 等のコマンド実行
+
+
+## 相互干渉（検証を受ける相手）
+- **Web Builder / qa_reviewer**: デプロイ後サイトと参考サイトの比較・差分検証
+- **Tech Lead**: 生成コードのアーキテクチャ・技術選定レビュー
+- **Frontend Engineer**: コード品質・Next.js App Router 規約準拠のレビュー
+- **QA Engineer**: E2E テスト・アクセシビリティ検証
+- **QA Reviewer（横断）**: output.json・成果物のスキーマ・完全性検証
