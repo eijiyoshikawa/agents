@@ -275,6 +275,26 @@ hotfix/<短い説明>    — 緊急修正
 ・起動時にシークレットの存在チェックを実行
 ```
 
+### セキュリティスキャン（AgentShield ライト版）
+ECC の AgentShield を参考に構築したプロジェクト専用スキャナ。
+
+```bash
+bash scripts/security-scan.sh          # ターミナル出力
+bash scripts/security-scan.sh --json   # JSON出力（CI/CD統合用）
+bash scripts/security-scan.sh --report # security-report.json 生成
+```
+
+**5つのスキャンカテゴリ:**
+1. シークレット検出（12パターン: AWS/OpenAI/Anthropic/GitHub/Slack等）
+2. 設定ファイル監査（.claude/settings.json のHook設定検証）
+3. Hookスクリプト検査（インジェクション・外部通信・破壊的操作の検出）
+4. .gitignore検証（必須パターンの存在確認）
+5. エージェントプロンプト検査（相互干渉・セキュリティ記述の確認）
+
+**グレード:** A(90-100) / B(75-89) / C(60-74) / D(40-59) / F(0-39)
+
+**推奨実行タイミング:** リリース前・月次レビュー・新エージェント追加時
+
 ### セキュリティインシデント対応
 1. 作業を中断
 2. 該当エージェント + Tech Lead + Infrastructure に報告
