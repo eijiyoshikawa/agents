@@ -103,6 +103,11 @@
 - **Data Analyst**: リテンション率・NPS等CS指標の分析検証
 - **Finance Agent**: アップセル売上の計上正確性検証
 
+## 相互干渉（検証を行う相手）
+- **Sales Agent**: 顧客フィードバック・リファラル機会・アップセル情報の共有
+- **Project Manager**: 納品品質・顧客満足度に基づくプロジェクト評価
+- **UI/UX Designer**: 顧客フィードバックに基づくUX改善提案
+
 ## 出力フォーマット
 
 ### health_scores.json

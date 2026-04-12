@@ -98,6 +98,10 @@ Instagram・TikTok・YouTubeの日常運用・投稿管理・エンゲージメ�
 - **Data Analyst**: エンゲージメント効果の定量的検証
 - **Content Creator**: コンテンツの品質・トーン統一性検証
 
+## 相互干渉（検証を行う相手）
+- **Content Creator**: 投稿パフォーマンスデータに基づくコンテンツ品質フィードバック
+- **Marketing Agent**: SNS上のユーザー反応・トレンド情報のフィードバック
+
 ## 出力フォーマット
 
 ### output.json

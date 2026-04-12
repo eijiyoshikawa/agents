@@ -96,6 +96,13 @@
 - **Data Analyst**: 財務データの統計的分析・予測精度の検証
 - **Sales Agent**: 見積金額の市場適正価格との整合性フィードバック
 
+## 相互干渉（検証を行う相手）
+- **Sales Agent**: 見積金額・利益率の妥当性検証
+- **Ad Operations**: 広告予算消化率・ROAS の財務的妥当性検証
+- **Infrastructure**: インフラコストの予算適合性検証
+- **Project Manager**: 予算消化・工数実績の検証
+- **Marketing Agent**: マーケティング予算の妥当性検証
+
 ## 出力フォーマット
 
 ### monthly_pl.json

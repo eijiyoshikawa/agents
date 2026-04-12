@@ -1,7 +1,10 @@
-# パイプライン実行ガイド
+# パイプライン実行ガイド（COO統括・詳細版）
+
+> **注**: このファイルはCOO統括下での品質保証プロセス付き詳細版です。
+> 簡易実行版は `/agents/orchestrator/PIPELINE.md` を参照してください（CLAUDE.md から参照される公式版）。
 
 このドキュメントは、AIエージェント組織によるパイプライン実行の手順書です。
-COO統括エージェントの管理下で、品質保証プロセスを含む形で実行されます。
+COO統括エージェントの管理下で、QA Reviewer による5段階の品質検証を含む形で実行されます。
 
 ## 全体フロー
 
@@ -40,7 +43,7 @@ Step 7: COO Final Review   → 最終レビュー・承認
 - **COO** — 全体統括・品質管理・意思決定
 
 ### 品質管理部門
-- **Quality Assurance** — 各工程の出力品質検証
+- **QA Reviewer** — 各工程の出力品質検証
 - **Devil's Advocate** — 戦略の独立批判的検証
 
 ### 戦略提案部門
@@ -77,7 +80,7 @@ Notion の「〇〇会議」議事録を取得・構造化してください。
 
 #### QA Check 1: Retriever出力検証
 ```
-/agents/quality_assurance/prompt.md に従って、
+/agents/qa_reviewer/prompt.md に従って、
 retriever/output.json の品質を検証してください。
 スコア70未満の場合、Step 1を再実行してください。
 ```
@@ -90,7 +93,7 @@ retriever の出力からイシューを構造化してください。
 
 #### QA Check 2: Issue Structurer出力検証
 ```
-/agents/quality_assurance/prompt.md に従って、
+/agents/qa_reviewer/prompt.md に従って、
 issue_structurer/output.json の品質を検証してください。
 ```
 
@@ -103,7 +106,7 @@ issue_structurer/output.json の品質を検証してください。
 
 #### QA Check 3: リサーチ出力検証
 ```
-/agents/quality_assurance/prompt.md に従って、
+/agents/qa_reviewer/prompt.md に従って、
 market_researcher/output.json と analogy_finder/output.json の品質を検証してください。
 ```
 
@@ -121,7 +124,7 @@ strategist/output.json の戦略を独立した視点で批判的に検証して
 
 #### QA Check 4: 戦略＋検証結果の品質検証
 ```
-/agents/quality_assurance/prompt.md に従って、
+/agents/qa_reviewer/prompt.md に従って、
 strategist/output.json と devils_advocate/output.json の品質を検証してください。
 robustness_scoreが60未満の場合、Strategistに修正を指示してください。
 ```
@@ -135,7 +138,7 @@ Devil's Advocateの検証結果もリスクスライドに反映してくださ�
 
 #### QA Check 5: 最終成果物検証
 ```
-/agents/quality_assurance/prompt.md に従って、
+/agents/qa_reviewer/prompt.md に従って、
 report_builder/output.json の最終品質を検証してください。
 ```
 
@@ -158,7 +161,7 @@ agents/
 ├── analogy_finder/output.json     ← Step 3 の出力
 ├── strategist/output.json         ← Step 4 の出力
 ├── devils_advocate/output.json    ← Step 5 の出力
-├── quality_assurance/output.json  ← 各QA Checkの出力
+├── qa_reviewer/output.json  ← 各QA Checkの出力
 └── report_builder/output.json     ← Step 6 の出力
 ```
 
