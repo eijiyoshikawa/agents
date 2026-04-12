@@ -30,6 +30,16 @@
           }
         ],
         "description": "git push 前にブランチ・コミット数を表示し、force push を警告"
+      },
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/hooks/suggest-compact.sh"
+          }
+        ],
+        "description": "ツール呼び出し50回ごとに戦略的コンパクション (/compact) を提案"
       }
     ],
     "PostToolUse": [
