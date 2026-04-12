@@ -1,0 +1,48 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/hooks/secret-scan.sh"
+          }
+        ],
+        "description": "コミット前にシークレット漏洩（APIキー・パスワード・トークン）を検出してブロック"
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/hooks/commit-msg-check.sh"
+          }
+        ],
+        "description": "コミットメッセージが Conventional Commits 規約に準拠しているか検証（警告のみ）"
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/hooks/git-push-reminder.sh"
+          }
+        ],
+        "description": "git push 前にブランチ・コミット数を表示し、force push を警告"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/hooks/console-log-warn.sh"
+          }
+        ],
+        "description": "JS/TS ファイル編集後に console.log / debugger の残留を警告"
+      }
+    ]
+  }
+}
