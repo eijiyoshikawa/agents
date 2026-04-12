@@ -42,6 +42,16 @@
           }
         ],
         "description": "JS/TS ファイル編集後に console.log / debugger の残留を警告"
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/hooks/session-learning-capture.sh"
+          }
+        ],
+        "description": "セッション学習ログが未作成の場合にリマインド（git commit 時）"
       }
     ]
   }

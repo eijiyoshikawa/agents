@@ -314,11 +314,23 @@ Claude Code のMaxプラン内で効率的に動作するための指針。
 | 技術選定の記録 | `/agents/tech_lead/tech_decisions.json` | Tech Lead |
 | KPIトレンド | `/agents/kpi_dashboard/output.json` | KPI Dashboard |
 | バグパターン | `/agents/qa_engineer/output.json` | QA Engineer |
+| **学習済みパターン** | `/learnings/instincts/` | **COO** |
+| **セッション学習ログ** | `/learnings/sessions/` | **各セッション実行者** |
+
+### 継続学習（Continuous Learning）
+ECC の Continuous Learning v2 を参考にした、セッション間のパターン学習:
+
+- **インスティンクト**: 繰り返し確認されたパターンを `learnings/instincts/` に蓄積
+- **確信度**: 初回 0.3 → 繰り返し確認で上昇 → 0.9以上で CLAUDE.md ルール昇格
+- **セッションログ**: 各セッション終了時に `learnings/sessions/` に決定事項・学びを記録
+- **月次レビュー**: COO Agent がインスティンクトの確信度を精査し、昇格・廃止を判断
+- 詳細: `/learnings/README.md`
 
 ### ベストプラクティスの共有
 - QA Reviewer の月次品質トレンド分析で頻出パターンを特定
 - Tech Lead がコーディング規約・ADR（Architecture Decision Records）を更新
 - COO がプロセス改善提案を各エージェントに反映
+- **確立されたインスティンクト（confidence ≥ 0.9）を各エージェントプロンプトに反映**
 
 ## 計画ファースト原則（Plan-First Principle）
 

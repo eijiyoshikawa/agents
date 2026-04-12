@@ -1,0 +1,92 @@
+{
+  "schema_version": "1.0",
+  "description": "組織全体に適用される学習済みパターン（インスティンクト）",
+  "updated_at": "2026-04-12",
+  "instincts": [
+    {
+      "id": "GLB-001",
+      "trigger": "パイプライン実行時にリサーチ系エージェント（Market Researcher / Analogy Finder / Marketing Analyst）が順次実行されている",
+      "action": "3体を並列実行に切り替える。独立した入力を持つため並列実行が可能で、所要時間を約1/3に短縮できる",
+      "confidence": 0.9,
+      "evidence": {
+        "count": 5,
+        "examples": [
+          "2026-04-04: 初回パイプライン実行で並列化により効率改善を確認",
+          "2026-04-08: 複数プロジェクトで並列実行の有効性を再確認"
+        ]
+      },
+      "scope": "global",
+      "domain": "operations",
+      "created_at": "2026-04-04",
+      "updated_at": "2026-04-12"
+    },
+    {
+      "id": "GLB-002",
+      "trigger": "エージェント出力に対するQAレビューで差し戻しが発生",
+      "action": "差し戻しは即座に実行し、後工程の処理を開始しない。差し戻し理由を明確に記述し、修正ポイントを具体的に指示する",
+      "confidence": 0.8,
+      "evidence": {
+        "count": 4,
+        "examples": [
+          "2026-04-06: 差し戻し遅延により後工程の手戻りが発生",
+          "2026-04-09: 即時差し戻しにより手戻りコスト削減を確認"
+        ]
+      },
+      "scope": "global",
+      "domain": "operations",
+      "created_at": "2026-04-06",
+      "updated_at": "2026-04-12"
+    },
+    {
+      "id": "GLB-003",
+      "trigger": "長いセッション（50回以上のツール呼び出し）でコンテキストが肥大化",
+      "action": "論理的な区切り（リサーチ完了→実装開始、デバッグ完了→次機能開発など）で /compact を実行。ただし実装途中では実行しない（変数名・ファイルパス・部分的状態を失う）",
+      "confidence": 0.7,
+      "evidence": {
+        "count": 3,
+        "examples": [
+          "2026-04-08: 長時間セッションでコンテキスト劣化を確認",
+          "2026-04-12: 戦略的コンパクションの効果を確認"
+        ]
+      },
+      "scope": "global",
+      "domain": "operations",
+      "created_at": "2026-04-08",
+      "updated_at": "2026-04-12"
+    },
+    {
+      "id": "GLB-004",
+      "trigger": "エージェント間でデータを受け渡す際に、大量の中間データを含めている",
+      "action": "受け渡しは output.json のみに限定する。中間データ・デバッグ情報・生ログは渡さない。必要な情報だけを構造化して渡す",
+      "confidence": 0.8,
+      "evidence": {
+        "count": 4,
+        "examples": [
+          "2026-04-04: 不要データの受け渡しでトークン浪費を確認",
+          "2026-04-09: output.json限定ルール適用後の効率改善を確認"
+        ]
+      },
+      "scope": "global",
+      "domain": "operations",
+      "created_at": "2026-04-04",
+      "updated_at": "2026-04-12"
+    },
+    {
+      "id": "GLB-005",
+      "trigger": "新機能開発や大規模変更の実装に直接着手しようとしている",
+      "action": "計画ファースト原則に従う: PM → Tech Lead → Devil's Advocate の順で計画を策定・検証してから実装に移行する。小規模修正（バグ修正・コピー変更）は省略可",
+      "confidence": 0.7,
+      "evidence": {
+        "count": 3,
+        "examples": [
+          "2026-04-08: 計画なしの実装で手戻りが発生",
+          "2026-04-12: 計画ファースト原則をCLAUDE.mdに正式導入"
+        ]
+      },
+      "scope": "global",
+      "domain": "strategy",
+      "created_at": "2026-04-08",
+      "updated_at": "2026-04-12"
+    }
+  ]
+}
