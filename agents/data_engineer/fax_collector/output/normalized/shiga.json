@@ -1,0 +1,22 @@
+{
+  "prefecture": "滋賀県",
+  "normalized_at": "2026-04-15",
+  "companies": [
+    {"company_name": "株式会社内田組", "prefecture": "滋賀県", "city": "大津市", "address": "滋賀県大津市大江2丁目33番3号", "phone": "077-545-3171", "fax": "077-543-0678", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "株式会社笹川組", "prefecture": "滋賀県", "city": "大津市", "address": "滋賀県大津市", "phone": "077-523-2314", "fax": "077-525-7404", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "ミノベ建設株式会社", "prefecture": "滋賀県", "city": "大津市", "address": "滋賀県大津市際川二丁目4番22号", "phone": "077-522-5385", "fax": "077-522-5085", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "長住建設株式会社", "prefecture": "滋賀県", "city": "彦根市", "address": "滋賀県彦根市松原町1759-140", "phone": "0749-26-1611", "fax": "0749-22-1680", "fax_validated": true, "business_category": "建築", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "株式会社近江建設", "prefecture": "滋賀県", "city": "近江八幡市", "address": "滋賀県近江八幡市中小森町846番地8", "phone": "0748-28-0111", "fax": "0748-28-0222", "fax_validated": true, "business_category": "土木", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "華建築株式会社", "prefecture": "滋賀県", "city": "彦根市", "address": "滋賀県彦根市大藪町21-7", "phone": "0749-23-0871", "fax": "0749-23-8715", "fax_validated": true, "business_category": "建築", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "株式会社岡山建設", "prefecture": "滋賀県", "city": "蒲生郡竜王町", "address": "滋賀県蒲生郡竜王町大字山之上5205番地", "phone": "0748-57-0461", "fax": "0748-57-0463", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"}
+  ],
+  "stats": {
+    "total_raw": 9,
+    "after_dedup": 7,
+    "duplicates_removed": 2,
+    "invalid_fax_removed": 0,
+    "confidence_high": 7,
+    "confidence_medium": 0,
+    "confidence_low": 0
+  }
+}
