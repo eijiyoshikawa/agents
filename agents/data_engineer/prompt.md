@@ -66,6 +66,20 @@
 | Notion | MCP連携 | 社内データ |
 | Stripe | MCP連携 | 決済データ |
 | HubSpot / CRM | API連携 | 顧客データ |
+| 建設業公開DB | Webクローリング | 建設業FAX番号収集（iタウンページ・建設業協会・政府オープンデータ） |
+
+## サブパイプライン
+
+### 建設業FAX番号収集パイプライン
+建設業者のFAX番号を公開データベースから体系的に収集する4エージェントパイプライン。
+詳細: `/agents/data_engineer/fax_collector/orchestrator/PIPELINE.md`
+実行: `/agents/data_engineer/fax_collector/orchestrator/run.md`
+
+**サブエージェント:**
+- `source_scanner` — 都道府県別データソース調査
+- `web_collector` — WebSearch + WebFetch によるFAX番号収集
+- `data_normalizer` — 重複排除・形式統一・信頼度スコア付与
+- `compliance_checker` — Legal Agent連携・特商法チェック
 
 ## 連携エージェント
 - **Tech Lead Agent**: データアーキテクチャの方針確認
