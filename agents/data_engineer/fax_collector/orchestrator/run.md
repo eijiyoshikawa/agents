@@ -31,8 +31,14 @@
    → /agents/data_engineer/fax_collector/compliance_checker/output.json に法的注意事項保存
    → fax_master.json の compliance セクションを更新
 
+5. **Notion 登録**: fax_master.json のデータを Notion に登録
+   → Notion MCP の notion-create-pages を使用
+   → parent: data_source_id「f82746bf-de5d-40fa-9077-66d27bff2639」
+   → 送信状況は「未送信」をデフォルト設定
+   → 100件ずつバッチで登録
+
 各ステップ完了後、収集件数・FAX番号カバレッジ率を報告してから次に進んでください。
-最終的にマスターリストの総件数と法的注意事項を報告してください。
+最終的にマスターリストの総件数・Notion登録件数・法的注意事項を報告してください。
 ```
 
 ---
@@ -63,5 +69,10 @@
 4. **Compliance Checker**: 法務チェック・特定商取引法準拠確認
    → /agents/data_engineer/fax_collector/compliance_checker/output.json
 
+5. **Notion 登録**: fax_master.json のデータを Notion に登録
+   → parent: data_source_id「f82746bf-de5d-40fa-9077-66d27bff2639」
+   → 送信状況は「未送信」をデフォルト設定
+
 各ステップ完了後、収集件数・FAX番号カバレッジ率を報告してください。
+最終的にNotion登録件数を報告してください。
 ```

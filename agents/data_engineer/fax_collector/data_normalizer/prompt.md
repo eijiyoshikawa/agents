@@ -133,6 +133,31 @@ rawデータと同じスキーマに以下のフィールドを追加:
 }
 ```
 
+## Notion 連携
+
+正規化完了後、Compliance Checker の後に Notion データベースへ登録する。
+Notion MCP の `notion-create-pages` を使用し、以下の設定で登録:
+
+- **parent:** `data_source_id: f82746bf-de5d-40fa-9077-66d27bff2639`
+- **バッチサイズ:** 100件ずつ
+- **プロパティマッピング:**
+
+| fax_master.json | Notion プロパティ | 型 |
+|----------------|-----------------|-----|
+| company_name | 会社名 | Title |
+| fax | FAX番号 | Phone |
+| phone | 電話番号 | Phone |
+| prefecture | 都道府県 | Select |
+| city | 市区町村 | Text |
+| address | 住所 | Text |
+| business_category | 業種区分 | Select |
+| permit_number | 許可番号 | Text |
+| confidence | 信頼度 | Select |
+| source | データソース | Text |
+| collected_at | 収集日 | Date |
+| — | 送信状況 | Select（デフォルト: 未送信） |
+
 ## 使用ツール
 - `Read`: raw/*.json の読み込み
 - `Write`: normalized/*.json, fax_master.json の書き出し
+- `notion-create-pages`: Notion データベースへの登録
