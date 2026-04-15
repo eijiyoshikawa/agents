@@ -1,0 +1,25 @@
+{
+  "prefecture": "大阪府",
+  "collected_at": "2026-04-15",
+  "sources_used": [
+    {"source_name": "企業公式サイト WebSearch結果", "url": "N/A", "records_collected": 10}
+  ],
+  "companies": [
+    {"company_name": "菱和建設株式会社", "prefecture": "大阪府", "city": "大阪市西区", "address": "大阪府大阪市西区", "phone": "06-6444-6754", "fax": "06-6444-3823", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://ryowa-kensetsu.co.jp/company/outline"},
+    {"company_name": "三和建設株式会社", "prefecture": "大阪府", "city": "大阪市淀川区", "address": "大阪府大阪市淀川区", "phone": "06-6301-5561", "fax": "", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.sgc-web.co.jp/company/company.php"},
+    {"company_name": "ケイ・アイ・エスホールディングス", "prefecture": "大阪府", "city": "東大阪市", "address": "大阪府東大阪市", "phone": "06-6743-6100", "fax": "06-6743-6170", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://kis-group.jp/profile/"},
+    {"company_name": "株式会社大浜組", "prefecture": "大阪府", "city": "東大阪市", "address": "大阪府東大阪市", "phone": "072-984-8585", "fax": "072-985-5452", "business_category": "土木", "source": "企業公式サイト", "source_url": "https://www.ohama-gumi.co.jp/"},
+    {"company_name": "株式会社霧島建設", "prefecture": "大阪府", "city": "東大阪市", "address": "大阪府東大阪市", "phone": "06-4306-3736", "fax": "06-4306-3836", "business_category": "その他", "source": "企業公式サイト", "source_url": "https://www.kirishimakensetu.com/"},
+    {"company_name": "日野建設工業株式会社", "prefecture": "大阪府", "city": "堺市西区", "address": "大阪府堺市西区浜寺石津町西4丁3番3号", "phone": "072-241-1414", "fax": "072-241-5525", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://hinokensetsu.co.jp/company.html"},
+    {"company_name": "株式会社大谷組", "prefecture": "大阪府", "city": "高槻市", "address": "大阪府高槻市萩之庄2丁目6番12号", "phone": "072-682-2315", "fax": "072-681-0505", "business_category": "土木", "source": "WebSearch結果", "source_url": ""},
+    {"company_name": "コーナン建設株式会社", "prefecture": "大阪府", "city": "大阪市北区", "address": "大阪府大阪市北区大淀南1丁目9-10", "phone": "06-6456-4311", "fax": "", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.cohnan.co.jp/about/"},
+    {"company_name": "三大建設株式会社", "prefecture": "大阪府", "city": "高槻市", "address": "大阪府高槻市", "phone": "", "fax": "", "business_category": "土木", "source": "企業公式サイト", "source_url": "https://sandai-kensetsu.com/"},
+    {"company_name": "松下建設株式会社", "prefecture": "大阪府", "city": "東大阪市", "address": "大阪府東大阪市", "phone": "072-963-5551", "fax": "", "business_category": "総合建設", "source": "WebSearch結果", "source_url": ""}
+  ],
+  "collection_stats": {
+    "total_companies": 10,
+    "companies_with_fax": 6,
+    "companies_without_fax": 4,
+    "fax_coverage_rate": "60%"
+  }
+}

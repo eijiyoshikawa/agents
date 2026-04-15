@@ -1,0 +1,21 @@
+{
+  "prefecture": "大阪府",
+  "normalized_at": "2026-04-15",
+  "companies": [
+    {"company_name": "菱和建設株式会社", "prefecture": "大阪府", "city": "大阪市西区", "address": "大阪府大阪市西区", "phone": "06-6444-6754", "fax": "06-6444-3823", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "ケイ・アイ・エスホールディングス", "prefecture": "大阪府", "city": "東大阪市", "address": "大阪府東大阪市", "phone": "06-6743-6100", "fax": "06-6743-6170", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "株式会社大浜組", "prefecture": "大阪府", "city": "東大阪市", "address": "大阪府東大阪市", "phone": "072-984-8585", "fax": "072-985-5452", "fax_validated": true, "business_category": "土木", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "株式会社霧島建設", "prefecture": "大阪府", "city": "東大阪市", "address": "大阪府東大阪市", "phone": "06-4306-3736", "fax": "06-4306-3836", "fax_validated": true, "business_category": "その他", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "日野建設工業株式会社", "prefecture": "大阪府", "city": "堺市西区", "address": "大阪府堺市西区浜寺石津町西4丁3番3号", "phone": "072-241-1414", "fax": "072-241-5525", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "株式会社大谷組", "prefecture": "大阪府", "city": "高槻市", "address": "大阪府高槻市萩之庄2丁目6番12号", "phone": "072-682-2315", "fax": "072-681-0505", "fax_validated": true, "business_category": "土木", "source": "WebSearch結果", "collected_at": "2026-04-15", "confidence": "medium"}
+  ],
+  "stats": {
+    "total_raw": 10,
+    "after_dedup": 6,
+    "duplicates_removed": 0,
+    "no_fax_removed": 4,
+    "confidence_high": 5,
+    "confidence_medium": 1,
+    "confidence_low": 0
+  }
+}
