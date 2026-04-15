@@ -1,0 +1,100 @@
+{
+  "checked_at": "2026-04-15",
+  "data_collection_compliance": {
+    "robots_txt_compliant": true,
+    "terms_of_service_compliant": true,
+    "rate_limiting_applied": true,
+    "personal_info_excluded": true,
+    "issues": [
+      "兵庫県建設業協会・兵庫県庁サイトは WebFetch で403エラー。検索エンジンのインデックスデータのみ使用"
+    ]
+  },
+  "fax_dm_legal_requirements": {
+    "applicable_laws": [
+      {
+        "law_name": "特定商取引法",
+        "relevance": "FAX広告の送信規制（2017年12月1日改正）",
+        "key_requirements": [
+          "B2B（法人間）のFAXDMは規制対象外",
+          "一般消費者向けはオプトイン（事前承諾）が必要",
+          "個人事業主宛ては消費者向けと解釈される可能性あり"
+        ],
+        "risk_level": "low",
+        "notes": "今回の収集対象は全て法人（株式会社・有限会社）であり、特商法のFAX広告規制は適用されない可能性が高い"
+      },
+      {
+        "law_name": "個人情報保護法",
+        "relevance": "法人の連絡先情報の取り扱い",
+        "key_requirements": [
+          "法人の電話番号・FAX番号は個人情報に該当しない",
+          "代表者の個人名を含む場合は個人情報に該当しうる",
+          "今回の収集では代表者の個人名は収集していない"
+        ],
+        "risk_level": "low",
+        "notes": "法人情報のみ収集しており、個人情報保護法上のリスクは低い"
+      },
+      {
+        "law_name": "特定電子メール法",
+        "relevance": "FAXは電子メールの定義に含まれない",
+        "key_requirements": [
+          "特定電子メール法はSMTPを利用する電子メールが対象",
+          "FAXは対象外"
+        ],
+        "risk_level": "low",
+        "notes": "FAXDMには特定電子メール法は適用されない"
+      }
+    ],
+    "sender_display_obligations": [
+      "送信者の名称（会社名）",
+      "送信者の住所",
+      "送信者の電話番号",
+      "FAX送信停止の申し出先（電話番号またはFAX番号）",
+      "FAX送信停止の方法の明記"
+    ],
+    "opt_out_requirements": {
+      "mechanism_required": true,
+      "response_deadline": "速やかに対応（送信リストから削除）",
+      "record_keeping": "停止要求の記録を保管（推奨1年以上）"
+    }
+  },
+  "risk_assessment": {
+    "overall_risk": "low",
+    "high_risk_records": 0,
+    "medium_risk_records": 0,
+    "low_risk_records": 13,
+    "recommendations": [
+      "全13件が法人（株式会社・有限会社）であり、特商法B2B規制対象外",
+      "FAX DM送信時には送信者情報と停止方法を必ず記載すること",
+      "送信停止要求があった場合は速やかにリストから削除すること",
+      "念のため弁護士による最終確認を推奨",
+      "送信時間帯は平日9:00-17:00を推奨"
+    ]
+  },
+  "pre_send_checklist": [
+    {
+      "item": "弁護士による法的レビュー完了",
+      "status": "pending",
+      "required": true
+    },
+    {
+      "item": "送信者情報の表示テンプレート作成",
+      "status": "pending",
+      "required": true
+    },
+    {
+      "item": "送信停止受付体制の整備",
+      "status": "pending",
+      "required": true
+    },
+    {
+      "item": "送信時間帯の設定（平日営業時間内）",
+      "status": "pending",
+      "required": true
+    },
+    {
+      "item": "テスト送信の実施",
+      "status": "pending",
+      "required": true
+    }
+  ]
+}
