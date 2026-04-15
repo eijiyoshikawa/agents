@@ -1,0 +1,214 @@
+{
+  "project_name": "まちボード（地域回覧板デジタル化サービス）",
+  "updated_at": "2026-04-15",
+  "test_strategy": {
+    "pyramid": {
+      "unit": {"percentage": 70, "tool": "Vitest", "focus": "ビジネスロジック・ユーティリティ・Server Actions・Zodバリデーション"},
+      "integration": {"percentage": 20, "tool": "Vitest + Supertest + @supabase/supabase-js", "focus": "API Routes・Supabase Auth・RLSポリシー・Stripe Webhook・通知ディスパッチ"},
+      "e2e": {"percentage": 10, "tool": "Playwright", "focus": "クリティカルユーザーフロー（5フロー）"}
+    },
+    "coverage_targets": {
+      "statement": "80% minimum",
+      "branch": "70% minimum",
+      "critical_paths": "100%"
+    },
+    "ci_integration": {
+      "trigger": "PR作成時・push時に自動実行",
+      "blocking": "テスト失敗 or カバレッジ基準未達でマージブロック",
+      "platform": "GitHub Actions"
+    }
+  },
+  "test_suites": [
+    {
+      "type": "unit",
+      "name": "ビジネスロジック・ユーティリティ",
+      "test_cases": [
+        "サブスクリプションティア判定（世帯数→ティア自動判定）",
+        "既読率計算（既読数/メンバー数×100）",
+        "招待コード生成（一意性・形式検証）",
+        "カテゴリバッジのカラーマッピング",
+        "配信予約のスケジュール判定（scheduled_at vs 現在時刻）",
+        "Zodバリデーション: 回覧板投稿スキーマ（title必須・content必須・category値検証）",
+        "Zodバリデーション: 組織作成スキーマ（name必須・type値検証）",
+        "日付フォーマットユーティリティ（ja-JP表示形式）",
+        "ページネーションヘルパー（offset/limit計算）",
+        "通知テキスト生成（回覧板タイトルから通知メッセージ生成）"
+      ],
+      "estimated_count": 45,
+      "duration": "< 10s"
+    },
+    {
+      "type": "unit",
+      "name": "React コンポーネント",
+      "test_cases": [
+        "BulletinCard: 未読/既読の表示切替",
+        "BulletinCard: カテゴリバッジの正しい表示",
+        "ReadConfirmButton: タップで状態変化（未確認→確認済み）",
+        "ReadConfirmButton: 確認済み状態では無効化",
+        "CategoryFilter: フィルター選択でコールバック発火",
+        "UnreadBadge: 未読数の正しい表示（0件時は非表示）",
+        "MagicLinkForm: メールアドレスバリデーション",
+        "MagicLinkForm: 送信後の確認メッセージ表示",
+        "FontSizeSlider: スライダー操作でフォントサイズ変更",
+        "HighContrastToggle: ON/OFF切替"
+      ],
+      "estimated_count": 35,
+      "duration": "< 15s"
+    },
+    {
+      "type": "integration",
+      "name": "API Routes + Supabase RLS",
+      "test_cases": [
+        "POST /api/bulletins: 管理者のみ投稿可能",
+        "POST /api/bulletins: 一般メンバーの投稿を403で拒否",
+        "GET /api/bulletins: 自組織の回覧板のみ返却（RLS検証）",
+        "GET /api/bulletins: 他組織の回覧板が含まれないことを検証",
+        "POST /api/bulletins/[id]/read: 自分の既読のみ記録可能",
+        "POST /api/bulletins/[id]/read: 重複既読でエラーにならない（UPSERT）",
+        "GET /api/bulletins/[id]/read-status: 管理者は全メンバーの状態を取得可能",
+        "GET /api/bulletins/[id]/read-status: 一般メンバーは自分の状態のみ",
+        "POST /api/organizations/join: 正しい招待コードで参加成功",
+        "POST /api/organizations/join: 不正な招待コードで404",
+        "POST /api/organizations/[id]/invite: 管理者のみ招待可能",
+        "RLSテスト: テナントAのユーザーがテナントBのデータにアクセス不可"
+      ],
+      "estimated_count": 25,
+      "duration": "< 30s"
+    },
+    {
+      "type": "integration",
+      "name": "Stripe Webhook",
+      "test_cases": [
+        "checkout.session.completed: organization.subscription_tierが更新される",
+        "customer.subscription.updated: ティア変更が反映される",
+        "customer.subscription.deleted: subscription_tierがfreeに戻る",
+        "invoice.payment_failed: 管理者にメール通知が送信される",
+        "署名検証: 不正な署名のリクエストを400で拒否",
+        "冪等性: 同一イベントの重複処理を防止"
+      ],
+      "estimated_count": 10,
+      "duration": "< 15s"
+    },
+    {
+      "type": "integration",
+      "name": "通知ディスパッチ",
+      "test_cases": [
+        "回覧板投稿時にWeb Push通知が送信される（モック検証）",
+        "回覧板投稿時にEmail通知が送信される（モック検証）",
+        "LINE連携有効ユーザーにLINEメッセージが送信される（モック検証）",
+        "通知無効設定のユーザーには通知が送信されない",
+        "リマインド通知が未読者にのみ送信される"
+      ],
+      "estimated_count": 8,
+      "duration": "< 10s"
+    },
+    {
+      "type": "e2e",
+      "name": "クリティカルユーザーフロー",
+      "test_cases": [
+        {
+          "flow": "F1: 住民の基本フロー",
+          "steps": "マジックリンクログイン → 回覧板フィード表示 → 回覧板詳細を開く → 「読みました」ボタンタップ → 確認済み状態に変化",
+          "assertions": ["既読ボタンの状態変化", "フィードでの既読表示更新", "既読率の即座反映"]
+        },
+        {
+          "flow": "F2: 管理者の投稿フロー",
+          "steps": "ログイン → 「投稿」ボタン → タイトル・本文入力 → カテゴリ選択 → プレビュー → 投稿 → フィードに表示確認",
+          "assertions": ["投稿がフィードに表示", "通知が送信（モック確認）", "既読率が0%で表示"]
+        },
+        {
+          "flow": "F3: 管理者のダッシュボード確認+リマインド",
+          "steps": "ログイン → 管理ダッシュボード → 既読率確認 → 未読者リスト展開 → リマインド送信",
+          "assertions": ["既読率の正しい計算", "未読者リストの正確性", "リマインド送信の完了"]
+        },
+        {
+          "flow": "F4: サブスクリプション契約",
+          "steps": "管理者ログイン → プラン管理 → プラン選択 → Stripe Checkout → 完了後にプラン反映",
+          "assertions": ["Stripe Checkoutへの遷移", "Webhook処理後のティア更新（Stripe testモード）"]
+        },
+        {
+          "flow": "F5: 組織参加（招待コード）",
+          "steps": "新規ユーザーマジックリンクログイン → オンボーディング → 招待コード入力 → 組織参加 → フィード表示",
+          "assertions": ["組織への正常参加", "フィードに組織の回覧板が表示"]
+        }
+      ],
+      "estimated_count": 5,
+      "duration": "< 120s"
+    },
+    {
+      "type": "accessibility",
+      "name": "アクセシビリティ自動テスト",
+      "test_cases": [
+        "axe-core: 全ページでWCAG 2.1 AA違反がゼロ",
+        "フォントサイズ: 全テキスト要素が16px以上（body最小18px）",
+        "タッチターゲット: 全インタラクティブ要素が48px×48px以上",
+        "コントラスト比: テキスト/背景のコントラストが7:1以上",
+        "キーボード操作: Tab/Enter/Escで全機能アクセス可能",
+        "スクリーンリーダー: 主要画面のaria-label検証",
+        "フォーカスインジケーター: 全フォーカス可能要素に視覚的インジケーター"
+      ],
+      "tool": "axe-core + Playwright",
+      "estimated_count": 10,
+      "duration": "< 30s"
+    },
+    {
+      "type": "performance",
+      "name": "パフォーマンステスト",
+      "test_cases": [
+        "Lighthouse: LCP < 2.5s（3Gシミュレーション）",
+        "Lighthouse: FID < 100ms",
+        "Lighthouse: CLS < 0.1",
+        "Lighthouse: Performance Score >= 85",
+        "API: GET /api/bulletins レスポンス < 500ms (p95)",
+        "PDF: POST /api/bulletins/[id]/pdf 生成時間 < 10s"
+      ],
+      "tool": "Lighthouse CI + Playwright",
+      "estimated_count": 6,
+      "duration": "< 60s"
+    },
+    {
+      "type": "security",
+      "name": "セキュリティテスト",
+      "test_cases": [
+        "RLSテナント分離: 他テナントのデータへの全アクセスパスを検証",
+        "認証バイパス: 未認証ユーザーが保護エンドポイントにアクセス不可",
+        "権限昇格: 一般メンバーが管理者APIを呼び出せない",
+        "CSRF: 状態変更APIにCSRFトークン検証",
+        "XSS: 回覧板投稿のHTMLサニタイズ（スクリプト注入防止）",
+        "Stripe Webhook署名: 不正署名のリクエスト拒否",
+        "レート制限: マジックリンクAPI のレート制限（同一メール5回/時）"
+      ],
+      "tool": "Vitest + 手動検証",
+      "estimated_count": 10,
+      "duration": "< 20s"
+    }
+  ],
+  "test_summary": {
+    "total_tests": 154,
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0,
+    "coverage": "0% (未実装)"
+  },
+  "test_data_strategy": {
+    "approach": "Supabase seed + Factory pattern",
+    "seed_data": [
+      "テスト組織A（自治会・100世帯）+ 管理者1名 + メンバー5名",
+      "テスト組織B（管理組合・300世帯）+ 管理者2名 + メンバー10名",
+      "回覧板10件（各カテゴリ2件ずつ）",
+      "既読確認データ（50%既読状態）"
+    ],
+    "isolation": "各テストスイートでトランザクションロールバック or テスト用テナントを使用"
+  },
+  "bugs": [],
+  "release_readiness": "no-go",
+  "release_criteria": [
+    "全ユニットテスト・結合テストがパス",
+    "5つのE2Eクリティカルフローが全て成功",
+    "axe-core: WCAG 2.1 AA違反ゼロ",
+    "Lighthouse Performance Score >= 85",
+    "ステートメントカバレッジ 80%以上",
+    "セキュリティテスト全項目パス（特にRLSテナント分離）",
+    "クリティカル・高バグ = 0件"
+  ]
+}

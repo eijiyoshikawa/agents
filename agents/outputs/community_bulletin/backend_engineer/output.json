@@ -1,0 +1,351 @@
+{
+  "project_name": "まちボード（地域回覧板デジタル化サービス）",
+  "updated_at": "2026-04-15",
+  "database": {
+    "tables": [
+      {
+        "name": "organizations",
+        "description": "自治会・マンション管理組合（テナント）",
+        "columns": [
+          {"name": "id", "type": "uuid", "primary": true, "default": "gen_random_uuid()"},
+          {"name": "name", "type": "text", "not_null": true},
+          {"name": "type", "type": "text", "not_null": true, "check": "'jichikai' | 'mansion' | 'other'"},
+          {"name": "postal_code", "type": "text"},
+          {"name": "address", "type": "text"},
+          {"name": "household_count", "type": "integer", "default": 0},
+          {"name": "invite_code", "type": "text", "unique": true, "not_null": true},
+          {"name": "stripe_customer_id", "type": "text", "unique": true},
+          {"name": "subscription_tier", "type": "text", "default": "'free'", "check": "'free' | 'mini' | 'standard' | 'premium'"},
+          {"name": "subscription_status", "type": "text", "default": "'trialing'"},
+          {"name": "trial_ends_at", "type": "timestamptz"},
+          {"name": "created_at", "type": "timestamptz", "default": "now()"},
+          {"name": "updated_at", "type": "timestamptz", "default": "now()"}
+        ]
+      },
+      {
+        "name": "profiles",
+        "description": "ユーザープロフィール（Supabase auth.usersの拡張）",
+        "columns": [
+          {"name": "id", "type": "uuid", "primary": true, "references": "auth.users(id)"},
+          {"name": "display_name", "type": "text", "not_null": true},
+          {"name": "avatar_url", "type": "text"},
+          {"name": "locale", "type": "text", "default": "'ja'"},
+          {"name": "font_size_preference", "type": "text", "default": "'default'", "check": "'default' | 'large' | 'xlarge'"},
+          {"name": "high_contrast", "type": "boolean", "default": false},
+          {"name": "created_at", "type": "timestamptz", "default": "now()"},
+          {"name": "updated_at", "type": "timestamptz", "default": "now()"}
+        ]
+      },
+      {
+        "name": "memberships",
+        "description": "ユーザーと組織の関連（多対多）",
+        "columns": [
+          {"name": "id", "type": "uuid", "primary": true, "default": "gen_random_uuid()"},
+          {"name": "user_id", "type": "uuid", "not_null": true, "references": "profiles(id)"},
+          {"name": "organization_id", "type": "uuid", "not_null": true, "references": "organizations(id)"},
+          {"name": "role", "type": "text", "not_null": true, "default": "'member'", "check": "'admin' | 'member'"},
+          {"name": "joined_at", "type": "timestamptz", "default": "now()"}
+        ],
+        "unique_constraint": ["user_id", "organization_id"]
+      },
+      {
+        "name": "bulletins",
+        "description": "回覧板投稿",
+        "columns": [
+          {"name": "id", "type": "uuid", "primary": true, "default": "gen_random_uuid()"},
+          {"name": "organization_id", "type": "uuid", "not_null": true, "references": "organizations(id)"},
+          {"name": "author_id", "type": "uuid", "not_null": true, "references": "profiles(id)"},
+          {"name": "title", "type": "text", "not_null": true},
+          {"name": "content", "type": "text", "not_null": true},
+          {"name": "category", "type": "text", "not_null": true, "default": "'general'", "check": "'general' | 'garbage' | 'disaster' | 'event' | 'important'"},
+          {"name": "priority", "type": "text", "default": "'normal'", "check": "'normal' | 'high' | 'urgent'"},
+          {"name": "image_urls", "type": "text[]", "default": "'{}'"},
+          {"name": "attachment_urls", "type": "text[]", "default": "'{}'"},
+          {"name": "pdf_url", "type": "text"},
+          {"name": "published_at", "type": "timestamptz"},
+          {"name": "scheduled_at", "type": "timestamptz"},
+          {"name": "is_draft", "type": "boolean", "default": true},
+          {"name": "notification_sent", "type": "boolean", "default": false},
+          {"name": "created_at", "type": "timestamptz", "default": "now()"},
+          {"name": "updated_at", "type": "timestamptz", "default": "now()"}
+        ],
+        "indexes": ["organization_id", "published_at DESC", "category"]
+      },
+      {
+        "name": "read_confirmations",
+        "description": "既読確認",
+        "columns": [
+          {"name": "id", "type": "uuid", "primary": true, "default": "gen_random_uuid()"},
+          {"name": "bulletin_id", "type": "uuid", "not_null": true, "references": "bulletins(id)"},
+          {"name": "user_id", "type": "uuid", "not_null": true, "references": "profiles(id)"},
+          {"name": "read_at", "type": "timestamptz", "default": "now()"}
+        ],
+        "unique_constraint": ["bulletin_id", "user_id"]
+      },
+      {
+        "name": "notification_preferences",
+        "description": "ユーザーごとの通知設定",
+        "columns": [
+          {"name": "id", "type": "uuid", "primary": true, "default": "gen_random_uuid()"},
+          {"name": "user_id", "type": "uuid", "not_null": true, "references": "profiles(id)", "unique": true},
+          {"name": "push_enabled", "type": "boolean", "default": true},
+          {"name": "email_enabled", "type": "boolean", "default": true},
+          {"name": "line_enabled", "type": "boolean", "default": false},
+          {"name": "line_user_id", "type": "text"},
+          {"name": "push_subscription", "type": "jsonb"}
+        ]
+      },
+      {
+        "name": "subscriptions",
+        "description": "Stripeサブスクリプション履歴",
+        "columns": [
+          {"name": "id", "type": "uuid", "primary": true, "default": "gen_random_uuid()"},
+          {"name": "organization_id", "type": "uuid", "not_null": true, "references": "organizations(id)"},
+          {"name": "stripe_subscription_id", "type": "text", "unique": true},
+          {"name": "stripe_price_id", "type": "text"},
+          {"name": "status", "type": "text", "not_null": true},
+          {"name": "current_period_start", "type": "timestamptz"},
+          {"name": "current_period_end", "type": "timestamptz"},
+          {"name": "cancel_at", "type": "timestamptz"},
+          {"name": "created_at", "type": "timestamptz", "default": "now()"}
+        ]
+      }
+    ],
+    "rls_policies": [
+      {
+        "table": "organizations",
+        "policy": "org_member_select",
+        "action": "SELECT",
+        "rule": "EXISTS (SELECT 1 FROM memberships WHERE memberships.organization_id = organizations.id AND memberships.user_id = auth.uid())"
+      },
+      {
+        "table": "organizations",
+        "policy": "org_admin_update",
+        "action": "UPDATE",
+        "rule": "EXISTS (SELECT 1 FROM memberships WHERE memberships.organization_id = organizations.id AND memberships.user_id = auth.uid() AND memberships.role = 'admin')"
+      },
+      {
+        "table": "bulletins",
+        "policy": "bulletin_member_select",
+        "action": "SELECT",
+        "rule": "EXISTS (SELECT 1 FROM memberships WHERE memberships.organization_id = bulletins.organization_id AND memberships.user_id = auth.uid())"
+      },
+      {
+        "table": "bulletins",
+        "policy": "bulletin_admin_insert",
+        "action": "INSERT",
+        "rule": "EXISTS (SELECT 1 FROM memberships WHERE memberships.organization_id = bulletins.organization_id AND memberships.user_id = auth.uid() AND memberships.role = 'admin')"
+      },
+      {
+        "table": "bulletins",
+        "policy": "bulletin_admin_update",
+        "action": "UPDATE",
+        "rule": "EXISTS (SELECT 1 FROM memberships WHERE memberships.organization_id = bulletins.organization_id AND memberships.user_id = auth.uid() AND memberships.role = 'admin')"
+      },
+      {
+        "table": "read_confirmations",
+        "policy": "read_own_insert",
+        "action": "INSERT",
+        "rule": "auth.uid() = user_id"
+      },
+      {
+        "table": "read_confirmations",
+        "policy": "read_member_select",
+        "action": "SELECT",
+        "rule": "EXISTS (SELECT 1 FROM bulletins JOIN memberships ON memberships.organization_id = bulletins.organization_id WHERE bulletins.id = read_confirmations.bulletin_id AND memberships.user_id = auth.uid())"
+      },
+      {
+        "table": "memberships",
+        "policy": "membership_org_member_select",
+        "action": "SELECT",
+        "rule": "EXISTS (SELECT 1 FROM memberships AS m WHERE m.organization_id = memberships.organization_id AND m.user_id = auth.uid())"
+      },
+      {
+        "table": "notification_preferences",
+        "policy": "notif_own_select_update",
+        "action": "ALL",
+        "rule": "auth.uid() = user_id"
+      }
+    ],
+    "rls_policies_count": 9,
+    "migrations_count": 1
+  },
+  "api_endpoints": [
+    {
+      "method": "POST",
+      "path": "/api/auth/magic-link",
+      "auth_required": false,
+      "description": "メールアドレスでマジックリンクを送信",
+      "status": "planned"
+    },
+    {
+      "method": "GET",
+      "path": "/api/organizations/[id]",
+      "auth_required": true,
+      "description": "組織情報の取得（メンバーのみ）",
+      "status": "planned"
+    },
+    {
+      "method": "POST",
+      "path": "/api/organizations/join",
+      "auth_required": true,
+      "description": "招待コードで組織に参加",
+      "status": "planned"
+    },
+    {
+      "method": "GET",
+      "path": "/api/organizations/[id]/members",
+      "auth_required": true,
+      "description": "メンバー一覧取得（管理者のみ）",
+      "status": "planned"
+    },
+    {
+      "method": "POST",
+      "path": "/api/organizations/[id]/invite",
+      "auth_required": true,
+      "description": "メンバー招待（マジックリンク送信）",
+      "status": "planned"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bulletins",
+      "auth_required": true,
+      "description": "回覧板一覧取得（ユーザーの所属組織のもの）",
+      "status": "planned"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bulletins/[id]",
+      "auth_required": true,
+      "description": "回覧板詳細取得",
+      "status": "planned"
+    },
+    {
+      "method": "POST",
+      "path": "/api/bulletins",
+      "auth_required": true,
+      "description": "回覧板投稿（管理者のみ）",
+      "status": "planned"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/bulletins/[id]",
+      "auth_required": true,
+      "description": "回覧板編集（管理者のみ）",
+      "status": "planned"
+    },
+    {
+      "method": "DELETE",
+      "path": "/api/bulletins/[id]",
+      "auth_required": true,
+      "description": "回覧板削除（管理者のみ）",
+      "status": "planned"
+    },
+    {
+      "method": "POST",
+      "path": "/api/bulletins/[id]/read",
+      "auth_required": true,
+      "description": "既読確認（自分のみ）",
+      "status": "planned"
+    },
+    {
+      "method": "GET",
+      "path": "/api/bulletins/[id]/read-status",
+      "auth_required": true,
+      "description": "既読状況取得（管理者: 全メンバー、一般: 自分のみ）",
+      "status": "planned"
+    },
+    {
+      "method": "POST",
+      "path": "/api/bulletins/[id]/remind",
+      "auth_required": true,
+      "description": "未読者にリマインド通知送信（管理者のみ）",
+      "status": "planned"
+    },
+    {
+      "method": "POST",
+      "path": "/api/bulletins/[id]/pdf",
+      "auth_required": true,
+      "description": "PDF生成・取得（管理者のみ）",
+      "status": "planned"
+    },
+    {
+      "method": "POST",
+      "path": "/api/subscriptions/checkout",
+      "auth_required": true,
+      "description": "Stripe Checkoutセッション作成（管理者のみ）",
+      "status": "planned"
+    },
+    {
+      "method": "POST",
+      "path": "/api/subscriptions/portal",
+      "auth_required": true,
+      "description": "Stripe Customer Portal URLの生成",
+      "status": "planned"
+    },
+    {
+      "method": "POST",
+      "path": "/api/webhooks/stripe",
+      "auth_required": false,
+      "description": "Stripe Webhookハンドラー（署名検証あり）",
+      "status": "planned"
+    },
+    {
+      "method": "PUT",
+      "path": "/api/notifications/preferences",
+      "auth_required": true,
+      "description": "通知設定の更新",
+      "status": "planned"
+    },
+    {
+      "method": "POST",
+      "path": "/api/notifications/push-subscription",
+      "auth_required": true,
+      "description": "Web Pushサブスクリプション登録",
+      "status": "planned"
+    },
+    {
+      "method": "POST",
+      "path": "/api/upload/image",
+      "auth_required": true,
+      "description": "画像アップロード（Supabase Storage）",
+      "status": "planned"
+    }
+  ],
+  "integrations": {
+    "stripe": {
+      "status": "planned",
+      "products": [
+        {"name": "まちボード ミニ", "price": "3000 JPY/month", "lookup_key": "machiboard_mini_monthly"},
+        {"name": "まちボード スタンダード", "price": "8000 JPY/month", "lookup_key": "machiboard_standard_monthly"},
+        {"name": "まちボード プレミアム", "price": "30000 JPY/month", "lookup_key": "machiboard_premium_monthly"}
+      ],
+      "webhook_events": ["checkout.session.completed", "customer.subscription.updated", "customer.subscription.deleted", "invoice.payment_succeeded", "invoice.payment_failed"]
+    },
+    "supabase_auth": {
+      "status": "planned",
+      "providers": ["magic_link (email)", "line_oauth"],
+      "session_duration": "30 days（高齢者の再認証負荷を最小化）"
+    },
+    "line_messaging_api": {
+      "status": "planned",
+      "features": ["新着回覧板のプッシュメッセージ", "リマインド通知", "Flex Messageによるリッチ表示"]
+    },
+    "resend": {
+      "status": "planned",
+      "templates": ["マジックリンク", "新着回覧板通知", "リマインド通知", "組織招待"]
+    },
+    "web_push": {
+      "status": "planned",
+      "provider": "FCM (Firebase Cloud Messaging)",
+      "features": ["新着通知", "リマインド", "Service Worker登録"]
+    }
+  },
+  "server_actions": [
+    "createBulletin — 回覧板投稿（バリデーション + DB INSERT + 通知ディスパッチ）",
+    "confirmRead — 既読確認（DB UPSERT + Realtime broadcast）",
+    "joinOrganization — 招待コードで組織参加",
+    "updateNotificationPreferences — 通知設定更新",
+    "generatePdf — PDF生成 + Storage保存"
+  ]
+}

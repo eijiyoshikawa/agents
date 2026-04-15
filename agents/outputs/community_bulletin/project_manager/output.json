@@ -1,0 +1,191 @@
+{
+  "project_id": "machiboard_mvp",
+  "updated_at": "2026-04-15",
+  "overall_status": "pending",
+  "progress_pct": 0,
+  "project_definition": {
+    "name": "まちボード MVP開発",
+    "scope": "デジタル回覧板SaaS MVP — 回覧板投稿・既読確認・通知（Push+LINE+Email）・PDF自動生成・会員管理・マジックリンク認証・Stripeサブスクリプション",
+    "out_of_scope_v1": "多言語対応、防災緊急モード、カレンダー連携、アンケート機能、音声読み上げ、SMS通知",
+    "total_duration": "14週間",
+    "team": "Tech Lead, Frontend Engineer, Backend Engineer, UI/UX Designer, QA Engineer, Infrastructure"
+  },
+  "milestones": [
+    {
+      "name": "M0: プロダクト仕様・アーキテクチャ確定",
+      "due_date": "2026-04-22",
+      "status": "completed",
+      "completion_pct": 100,
+      "deliverables": ["プロダクト仕様書", "アーキテクチャ設計書", "テスト戦略"]
+    },
+    {
+      "name": "M1: デザインシステム・ワイヤーフレーム完成",
+      "due_date": "2026-05-06",
+      "status": "pending",
+      "completion_pct": 0,
+      "deliverables": ["デザイントークン定義", "全画面ワイヤーフレーム", "コンポーネントライブラリ", "Tailwind設定"],
+      "duration_weeks": 2
+    },
+    {
+      "name": "M2: 認証・会員管理・DB基盤完成",
+      "due_date": "2026-05-20",
+      "status": "pending",
+      "completion_pct": 0,
+      "deliverables": ["Supabase Auth設定", "DB スキーマ + RLSポリシー", "マジックリンクログイン", "組織・メンバー管理CRUD"],
+      "duration_weeks": 2
+    },
+    {
+      "name": "M3: 回覧板コア機能完成（投稿・一覧・既読確認）",
+      "due_date": "2026-06-10",
+      "status": "pending",
+      "completion_pct": 0,
+      "deliverables": ["回覧板投稿画面", "フィード画面", "詳細画面 + 既読ボタン", "管理者ダッシュボード（既読率）"],
+      "duration_weeks": 3
+    },
+    {
+      "name": "M4: 通知パイプライン完成（Push + Email + LINE）",
+      "due_date": "2026-06-24",
+      "status": "pending",
+      "completion_pct": 0,
+      "deliverables": ["Web Push (Service Worker + FCM)", "Email通知 (Resend)", "LINE Messaging API連携", "通知設定画面"],
+      "duration_weeks": 2
+    },
+    {
+      "name": "M5: PDF生成・Stripe決済完成",
+      "due_date": "2026-07-08",
+      "status": "pending",
+      "completion_pct": 0,
+      "deliverables": ["回覧板PDF自動生成", "週次まとめPDF", "Stripe Checkout統合", "サブスク管理画面", "Webhook処理"],
+      "duration_weeks": 2
+    },
+    {
+      "name": "M6: QA・セキュリティ・アクセシビリティ監査",
+      "due_date": "2026-07-22",
+      "status": "pending",
+      "completion_pct": 0,
+      "deliverables": ["ユニットテスト（カバレッジ80%+）", "E2Eテスト（5クリティカルフロー）", "axe-coreアクセシビリティ監査", "セキュリティレビュー", "パフォーマンス計測"],
+      "duration_weeks": 2
+    },
+    {
+      "name": "M7: パイロットリリース",
+      "due_date": "2026-07-29",
+      "status": "pending",
+      "completion_pct": 0,
+      "deliverables": ["Vercel本番デプロイ", "パイロット自治会オンボーディング", "管理者マニュアル", "ユーザーガイド"],
+      "duration_weeks": 1
+    }
+  ],
+  "wbs": {
+    "phase_1_design": {
+      "duration": "Week 1-2",
+      "tasks": [
+        {"task": "デザイントークン定義（カラー・タイポ・スペーシング）", "owner": "UI/UX Designer", "effort_days": 2},
+        {"task": "全画面ワイヤーフレーム（10画面）", "owner": "UI/UX Designer", "effort_days": 4},
+        {"task": "コンポーネントライブラリ設計", "owner": "UI/UX Designer", "effort_days": 3},
+        {"task": "Tailwind CSS設定（tailwind.config.ts）", "owner": "Frontend Engineer", "effort_days": 1},
+        {"task": "DBスキーマ設計（ER図 + マイグレーション）", "owner": "Backend Engineer", "effort_days": 3},
+        {"task": "RLSポリシー設計", "owner": "Backend Engineer", "effort_days": 2},
+        {"task": "API設計（エンドポイント一覧 + スキーマ）", "owner": "Backend Engineer", "effort_days": 2}
+      ]
+    },
+    "phase_2_foundation": {
+      "duration": "Week 3-4",
+      "tasks": [
+        {"task": "Next.jsプロジェクト初期構成", "owner": "Frontend Engineer", "effort_days": 1},
+        {"task": "Supabase Auth設定（マジックリンク + LINE OAuth）", "owner": "Backend Engineer", "effort_days": 2},
+        {"task": "ログイン・オンボーディング画面", "owner": "Frontend Engineer", "effort_days": 3},
+        {"task": "組織（自治会）CRUD + メンバー管理API", "owner": "Backend Engineer", "effort_days": 3},
+        {"task": "組織管理画面・メンバー一覧画面", "owner": "Frontend Engineer", "effort_days": 3},
+        {"task": "共通レイアウト・ナビゲーション", "owner": "Frontend Engineer", "effort_days": 2},
+        {"task": "認証・会員管理のユニットテスト", "owner": "QA Engineer", "effort_days": 2}
+      ]
+    },
+    "phase_3_core": {
+      "duration": "Week 5-7",
+      "tasks": [
+        {"task": "回覧板CRUD API（投稿・編集・削除・一覧）", "owner": "Backend Engineer", "effort_days": 3},
+        {"task": "既読確認API + Realtime更新", "owner": "Backend Engineer", "effort_days": 2},
+        {"task": "画像アップロード（Supabase Storage）", "owner": "Backend Engineer", "effort_days": 2},
+        {"task": "回覧板フィード画面", "owner": "Frontend Engineer", "effort_days": 3},
+        {"task": "回覧板投稿画面（リッチエディタ簡易版）", "owner": "Frontend Engineer", "effort_days": 3},
+        {"task": "回覧板詳細画面 + 既読ボタン", "owner": "Frontend Engineer", "effort_days": 2},
+        {"task": "管理者ダッシュボード（既読率チャート）", "owner": "Frontend Engineer", "effort_days": 3},
+        {"task": "回覧板機能のユニット+結合テスト", "owner": "QA Engineer", "effort_days": 3}
+      ]
+    },
+    "phase_4_notifications": {
+      "duration": "Week 8-9",
+      "tasks": [
+        {"task": "Web Push設定（Service Worker + FCM）", "owner": "Backend Engineer", "effort_days": 3},
+        {"task": "Email通知（Resend統合）", "owner": "Backend Engineer", "effort_days": 2},
+        {"task": "LINE Messaging API連携", "owner": "Backend Engineer", "effort_days": 3},
+        {"task": "通知ディスパッチャー（Edge Function）", "owner": "Backend Engineer", "effort_days": 2},
+        {"task": "通知設定画面", "owner": "Frontend Engineer", "effort_days": 2},
+        {"task": "通知パイプラインの結合テスト", "owner": "QA Engineer", "effort_days": 2}
+      ]
+    },
+    "phase_5_billing_pdf": {
+      "duration": "Week 10-11",
+      "tasks": [
+        {"task": "Stripe Products/Prices設定（3ティア）", "owner": "Backend Engineer", "effort_days": 1},
+        {"task": "Stripe Checkout統合", "owner": "Backend Engineer", "effort_days": 2},
+        {"task": "Stripe Webhook処理", "owner": "Backend Engineer", "effort_days": 2},
+        {"task": "サブスクリプション管理画面", "owner": "Frontend Engineer", "effort_days": 2},
+        {"task": "PDF生成API（@react-pdf/renderer）", "owner": "Backend Engineer", "effort_days": 3},
+        {"task": "PDF プレビュー・ダウンロード画面", "owner": "Frontend Engineer", "effort_days": 2},
+        {"task": "決済・PDF機能のテスト", "owner": "QA Engineer", "effort_days": 2}
+      ]
+    },
+    "phase_6_qa": {
+      "duration": "Week 12-13",
+      "tasks": [
+        {"task": "E2Eテスト（5クリティカルフロー）", "owner": "QA Engineer", "effort_days": 4},
+        {"task": "axe-coreアクセシビリティ監査 + 修正", "owner": "QA Engineer + Frontend", "effort_days": 3},
+        {"task": "セキュリティレビュー（OWASP Top 10）", "owner": "Tech Lead", "effort_days": 2},
+        {"task": "パフォーマンス計測（Lighthouse Budget）", "owner": "QA Engineer", "effort_days": 1},
+        {"task": "バグ修正・リグレッションテスト", "owner": "全開発チーム", "effort_days": 5}
+      ]
+    },
+    "phase_7_launch": {
+      "duration": "Week 14",
+      "tasks": [
+        {"task": "本番環境セットアップ（Vercel + Supabase Production）", "owner": "Infrastructure", "effort_days": 1},
+        {"task": "本番デプロイ + スモークテスト", "owner": "Infrastructure + QA", "effort_days": 1},
+        {"task": "管理者マニュアル作成", "owner": "PM", "effort_days": 2},
+        {"task": "パイロット自治会への説明・オンボーディング", "owner": "PM + CS", "effort_days": 3}
+      ]
+    }
+  },
+  "tasks_summary": {
+    "total": 52,
+    "completed": 0,
+    "in_progress": 0,
+    "delayed": 0
+  },
+  "risks": [
+    {
+      "risk": "LINE Messaging API の利用制限（無料枠: 月200通）",
+      "impact": "high",
+      "probability": "high",
+      "mitigation": "LINE公式アカウントのライトプラン（月5,000円/5,000通）を組織ごとに設定。コストはサブスク料金に含める。大規模組織は従量課金モデルを検討"
+    },
+    {
+      "risk": "高齢者向けアクセシビリティ対応の工数膨張",
+      "impact": "medium",
+      "probability": "medium",
+      "mitigation": "WCAG AA準拠を最低基準とし、AAA対応はフォントサイズ・コントラスト比に限定。axe-coreの自動テストをCI/CDに組み込み、早期に問題を検出"
+    },
+    {
+      "risk": "Supabase RLSポリシーの設計ミスによるデータ漏洩",
+      "impact": "critical",
+      "probability": "low",
+      "mitigation": "RLSポリシーのユニットテストを必須化。別テナントからのアクセス試行テストをE2Eに含める。コードレビューでRLSを重点チェック項目に"
+    }
+  ],
+  "next_actions": [
+    "UI/UX Designerによるデザイントークン・ワイヤーフレーム着手",
+    "Backend Engineerによるテーブル設計・RLSポリシー設計",
+    "Frontend Engineerによるプロジェクト初期構成（Next.js + Tailwind + next-intl）"
+  ],
+  "blockers": []
+}
