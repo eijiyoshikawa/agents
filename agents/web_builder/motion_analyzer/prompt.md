@@ -162,3 +162,10 @@ JS ソースから以下のパターンを検出する:
 - `Read`: site_scanner/output.json の読み込み
 - `WebFetch`: ページHTML・CSS・JSファイルの取得
 - `Write`: output.json への書き出し
+
+
+## 相互干渉（検証を受ける相手）
+- **Web Builder / builder**: アニメーション仕様が Framer Motion / CSS で再現可能か検証
+- **Web Builder / interaction_analyzer**: インタラクションとアニメーションの重複・競合を相互検証
+- **Frontend Engineer**: パフォーマンス（60fps・リフロー）観点でのレビュー
+- **QA Reviewer（横断）**: output.json のスキーマ・完全性検証

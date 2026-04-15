@@ -188,3 +188,10 @@
 - `Read`: site_scanner/output.json の読み込み
 - `WebFetch`: ページHTML・JSファイルの取得
 - `Write`: output.json への書き出し
+
+
+## 相互干渉（検証を受ける相手）
+- **Web Builder / builder**: フォーム・モーダル・タブ等の挙動が実装で再現可能か検証
+- **Web Builder / motion_analyzer**: インタラクションとアニメーションの相互検証
+- **QA Engineer**: インタラクション仕様のテスト網羅性レビュー
+- **QA Reviewer（横断）**: output.json のスキーマ・完全性検証
