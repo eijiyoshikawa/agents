@@ -2,14 +2,14 @@
   "project_name": "建設業FAX番号収集",
   "updated_at": "2026-04-15",
   "collection_summary": {
-    "total_companies": 56,
-    "companies_with_fax": 56,
+    "total_companies": 65,
+    "companies_with_fax": 65,
     "fax_coverage_rate": "100%",
-    "prefectures_completed": 8,
+    "prefectures_completed": 9,
     "prefectures_total": 47,
-    "sources_used": ["兵庫県建設業協会", "京都府建設業協会", "滋賀県建設業協会", "東京建設業協会", "大阪建設業協会", "愛知県建設業協会", "横浜商工会議所", "舞鶴市建設工事業者名簿", "企業公式サイト"],
+    "sources_used": ["兵庫県建設業協会", "京都府建設業協会", "滋賀県建設業協会", "東京建設業協会", "大阪建設業協会", "愛知県建設業協会", "福岡県建設業協会", "横浜商工会議所", "舞鶴市建設工事業者名簿", "企業公式サイト"],
     "confidence_distribution": {
-      "high": 48,
+      "high": 57,
       "medium": 8,
       "low": 0
     }
