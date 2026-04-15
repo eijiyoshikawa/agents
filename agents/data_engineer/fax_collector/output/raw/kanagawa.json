@@ -1,0 +1,21 @@
+{
+  "prefecture": "神奈川県",
+  "collected_at": "2026-04-15",
+  "sources_used": [
+    {"source_name": "企業公式サイト WebSearch結果", "url": "N/A", "records_collected": 5},
+    {"source_name": "横浜商工会議所会員リスト", "url": "https://business.yokohamajapan.com/media/ja/file/members/kaiin.pdf", "records_collected": 1}
+  ],
+  "companies": [
+    {"company_name": "横浜建設株式会社", "prefecture": "神奈川県", "city": "横浜市磯子区", "address": "神奈川県横浜市磯子区岡村8-2-10", "phone": "045-352-7148", "fax": "045-352-7149", "business_category": "建築", "source": "企業公式サイト", "source_url": "http://yokoken.ltd/information"},
+    {"company_name": "芙蓉建設株式会社", "prefecture": "神奈川県", "city": "横浜市旭区", "address": "神奈川県横浜市旭区市沢町565-6", "phone": "045-453-8808", "fax": "045-352-5900", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.fuyoukensetsu.jp/"},
+    {"company_name": "工藤建設株式会社", "prefecture": "神奈川県", "city": "横浜市青葉区", "address": "神奈川県横浜市青葉区新石川四丁目33番地10", "phone": "045-911-5300", "fax": "045-911-3960", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.kudo.co.jp/corporate/profile/"},
+    {"company_name": "株式会社安藤建設", "prefecture": "神奈川県", "city": "横浜市磯子区", "address": "神奈川県横浜市磯子区中原2-1-15", "phone": "", "fax": "", "business_category": "総合建設", "source": "横浜商工会議所", "source_url": "https://business.yokohamajapan.com/media/ja/file/members/kaiin.pdf"},
+    {"company_name": "株式会社厚木工業", "prefecture": "神奈川県", "city": "厚木市", "address": "神奈川県厚木市", "phone": "046-240-6992", "fax": "", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.atsugi-kougyou.com/company/"}
+  ],
+  "collection_stats": {
+    "total_companies": 5,
+    "companies_with_fax": 3,
+    "companies_without_fax": 2,
+    "fax_coverage_rate": "60%"
+  }
+}
