@@ -1,0 +1,27 @@
+{
+  "prefecture": "東京都",
+  "collected_at": "2026-04-15",
+  "sources_used": [
+    {"source_name": "東京建設業協会 WebSearch結果", "url": "https://token.or.jp/list/", "records_collected": 3},
+    {"source_name": "企業公式サイト WebSearch結果", "url": "N/A", "records_collected": 8}
+  ],
+  "companies": [
+    {"company_name": "薩摩建設株式会社", "prefecture": "東京都", "city": "中野区", "address": "東京都中野区", "phone": "03-3360-8861", "fax": "03-3362-6245", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://satsu-ma.com/company/"},
+    {"company_name": "岩井建設株式会社", "prefecture": "東京都", "city": "文京区", "address": "東京都文京区", "phone": "03-3815-8911", "fax": "03-3815-8918", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.iwaikensetu.co.jp/"},
+    {"company_name": "株式会社三共建設", "prefecture": "東京都", "city": "渋谷区", "address": "東京都渋谷区", "phone": "03-6435-0751", "fax": "03-6435-0793", "business_category": "建築", "source": "企業公式サイト", "source_url": "https://sankyokensetu.com/company/"},
+    {"company_name": "株式会社第一建設", "prefecture": "東京都", "city": "豊島区", "address": "東京都豊島区", "phone": "", "fax": "03-3971-8161", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://d-construction.co.jp/company.html"},
+    {"company_name": "中野建設株式会社", "prefecture": "東京都", "city": "港区", "address": "東京都港区芝3丁目", "phone": "03-3456-4191", "fax": "03-3456-4190", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.nakano-kensetu.co.jp/"},
+    {"company_name": "日本建設株式会社", "prefecture": "東京都", "city": "港区", "address": "東京都港区芝三丁目8番2号 芝公園ファーストビル19F", "phone": "03-4321-0756", "fax": "", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.nihonkensetsu.co.jp/company/profile/"},
+    {"company_name": "中川企画建設株式会社 東京支店", "prefecture": "東京都", "city": "港区", "address": "東京都港区南青山1-1-1 新青山ビル7階西館", "phone": "03-5770-3721", "fax": "03-5770-3722", "business_category": "総合建設", "source": "東京都設備設計事務所協会", "source_url": "http://www.met.gr.jp/member/category/full-member/"},
+    {"company_name": "東起業株式会社", "prefecture": "東京都", "city": "江東区", "address": "東京都江東区", "phone": "03-3642-5870", "fax": "", "business_category": "土木", "source": "東京建設業協会", "source_url": "https://token.or.jp/list/"},
+    {"company_name": "石川徳建設株式会社", "prefecture": "東京都", "city": "江東区", "address": "東京都江東区", "phone": "03-5635-9871", "fax": "", "business_category": "総合建設", "source": "東京建設業協会", "source_url": "https://token.or.jp/list/"},
+    {"company_name": "大木建設株式会社", "prefecture": "東京都", "city": "江東区", "address": "東京都江東区", "phone": "03-5628-0801", "fax": "", "business_category": "総合建設", "source": "東京建設業協会", "source_url": "https://token.or.jp/list/"},
+    {"company_name": "山田建設株式会社", "prefecture": "東京都", "city": "大田区", "address": "東京都大田区北千束1-11-3", "phone": "03-3724-8211", "fax": "", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.yamada-kensetsu.co.jp/corporate"}
+  ],
+  "collection_stats": {
+    "total_companies": 11,
+    "companies_with_fax": 6,
+    "companies_without_fax": 5,
+    "fax_coverage_rate": "54.5%"
+  }
+}
