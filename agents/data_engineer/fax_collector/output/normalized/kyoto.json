@@ -1,0 +1,25 @@
+{
+  "prefecture": "京都府",
+  "normalized_at": "2026-04-15",
+  "companies": [
+    {"company_name": "要建設株式会社", "prefecture": "京都府", "city": "京都市中京区", "address": "京都府京都市中京区西ノ京馬代町19", "phone": "075-463-5161", "fax": "075-461-3188", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "source_url": "http://www.kaname-kensetsu.co.jp/cprofile.html", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "株式会社親孝", "prefecture": "京都府", "city": "京都市伏見区", "address": "京都府京都市伏見区横大路東裏町21-8", "phone": "075-205-3234", "fax": "075-205-1365", "fax_validated": true, "business_category": "土木", "source": "企業公式サイト", "source_url": "https://www.shinkou2021.com/", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "株式会社田中工業", "prefecture": "京都府", "city": "京都市伏見区", "address": "京都府京都市伏見区深草柴田屋敷町73", "phone": "075-644-9455", "fax": "075-644-9465", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.tanakakogyo73.com/company", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "株式会社京町建設", "prefecture": "京都府", "city": "京都市右京区", "address": "京都府京都市右京区西院清水町104-3 2F", "phone": "075-963-6028", "fax": "075-963-6828", "fax_validated": true, "business_category": "建築", "source": "企業公式サイト", "source_url": "https://www.kyomachi-k.co.jp/", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "株式会社山京", "prefecture": "京都府", "city": "京都市伏見区", "address": "京都府京都市伏見区南寝小屋町33番地", "phone": "075-622-1011", "fax": "075-622-0505", "fax_validated": true, "business_category": "建築", "source": "企業公式サイト", "source_url": "http://www.yamakyo.co.jp/", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "北和建設株式会社", "prefecture": "京都府", "city": "京都市北区", "address": "京都府京都市北区", "phone": "075-781-0310", "fax": "075-701-9327", "fax_validated": true, "business_category": "総合建設", "source": "京都府建設業協会 京都支部", "source_url": "https://www.kyokenkyo.or.jp/member/kyoto/", "collected_at": "2026-04-15", "confidence": "medium"},
+    {"company_name": "株式会社京都住宅建設", "prefecture": "京都府", "city": "久世郡久御山町", "address": "京都府久世郡久御山町佐山籾池33-4 KJビル3F", "phone": "0774-44-7890", "fax": "0774-44-5359", "fax_validated": true, "business_category": "建築", "source": "企業公式サイト", "source_url": "https://www.kyotojk.com/company/aboutus", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "グランライフ株式会社", "prefecture": "京都府", "city": "宇治市", "address": "京都府宇治市広野町西裏9番地7", "phone": "0774-46-1122", "fax": "0774-46-1133", "fax_validated": true, "business_category": "建築", "source": "企業公式サイト", "source_url": "https://www.life-f.jp/", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "株式会社アート", "prefecture": "京都府", "city": "舞鶴市", "address": "京都府舞鶴市", "phone": "0773-62-1579", "fax": "0773-64-7884", "fax_validated": true, "business_category": "総合建設", "source": "舞鶴市建設工事業者名簿", "source_url": "https://www.city.maizuru.kyoto.jp/", "collected_at": "2026-04-15", "confidence": "high"}
+  ],
+  "stats": {
+    "total_raw": 17,
+    "after_dedup": 9,
+    "duplicates_removed": 0,
+    "invalid_fax_removed": 1,
+    "unnamed_removed": 7,
+    "confidence_high": 8,
+    "confidence_medium": 1,
+    "confidence_low": 0
+  }
+}
