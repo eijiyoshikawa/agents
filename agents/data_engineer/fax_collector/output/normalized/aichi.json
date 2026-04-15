@@ -1,0 +1,20 @@
+{
+  "prefecture": "愛知県",
+  "normalized_at": "2026-04-15",
+  "companies": [
+    {"company_name": "矢野建設株式会社", "prefecture": "愛知県", "city": "名古屋市港区", "address": "愛知県名古屋市港区十一屋3丁目63", "phone": "052-384-2800", "fax": "052-382-0030", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "中部土木株式会社", "prefecture": "愛知県", "city": "名古屋市名東区", "address": "愛知県名古屋市名東区", "phone": "", "fax": "052-777-3320", "fax_validated": true, "business_category": "土木", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "小原建設株式会社", "prefecture": "愛知県", "city": "岡崎市", "address": "愛知県岡崎市明大寺町字西郷中37番地", "phone": "0564-51-2621", "fax": "0564-52-7662", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "丸ヨ建設工業株式会社", "prefecture": "愛知県", "city": "岡崎市", "address": "愛知県岡崎市戸崎町字郷畔20番地", "phone": "0564-51-1802", "fax": "0564-52-3597", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "株式会社山口土木", "prefecture": "愛知県", "city": "岡崎市", "address": "愛知県岡崎市", "phone": "0564-65-6570", "fax": "0564-65-6575", "fax_validated": true, "business_category": "土木", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"}
+  ],
+  "stats": {
+    "total_raw": 7,
+    "after_dedup": 5,
+    "duplicates_removed": 0,
+    "no_fax_removed": 2,
+    "confidence_high": 5,
+    "confidence_medium": 0,
+    "confidence_low": 0
+  }
+}
