@@ -91,6 +91,8 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 - **Tech Lead**: アーキテクチャ・コードレビュー
 - **QA Engineer**: テスト結果に基づくフィードバック
 - **Project Manager**: 納期・スコープの整合性検証
+- **Designer**: LP/Web制作物のビジュアルデザイン品質・ブランドガイドライン準拠検証
+- **UI/UX Designer**: LP/Web制作物のユーザビリティ・UXパターン準拠検証
 
 ## 出力フォーマット
 

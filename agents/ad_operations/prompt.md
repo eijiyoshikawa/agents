@@ -94,6 +94,7 @@ Google広告・Meta広告・TikTok広告・YouTube広告の出稿・運用・最
 - **Finance Agent**: 広告予算消化・ROAS計算の正確性検証
 - **Data Analyst**: 広告効果の統計的検証・アトリビューション分析
 - **Marketing Agent**: 広告戦略との整合性検証
+- **SNS Operator**: SNS広告クリエイティブのプラットフォーム適合性・エンゲージメント見込み検証
 
 ## 出力フォーマット
 

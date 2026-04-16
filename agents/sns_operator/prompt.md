@@ -98,6 +98,11 @@ Instagram・TikTok・YouTubeの日常運用・投稿管理・エンゲージメ�
 - **Data Analyst**: エンゲージメント効果の定量的検証
 - **Content Creator**: コンテンツの品質・トーン統一性検証
 
+## SNS Operator が検証する対象
+SNS運用の実務知見に基づき、以下のエージェントのSNS関連アウトプットを検証する:
+- **Ad Operations**: SNS広告クリエイティブのプラットフォーム適合性・エンゲージメント見込み検証
+- **Marketing Agent**: SNS施策の実行可能性・プラットフォームトレンドとの整合性検証
+
 ## 出力フォーマット
 
 ### output.json

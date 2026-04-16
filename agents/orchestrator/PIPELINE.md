@@ -1,7 +1,8 @@
 # パイプライン実行手順書
 
 ## 概要
-会議の議事録から戦略提案資料を自動生成する6段階パイプライン。
+会議の議事録から戦略提案資料を自動生成するパイプライン。
+COO統括のもと、5つのQAチェックポイントを含む品質保証プロセス付きで実行される。
 Claude Code 上で順番に実行する。
 
 ## 前提条件
@@ -13,41 +14,44 @@ Claude Code 上で順番に実行する。
 ## パイプライン全体像
 
 ```
-[Notion 議事録]
-      │
-      ▼
-┌─────────────┐
-│ 1. Retriever │  ← Notion MCP で議事録を取得・構造化
-└─────┬───────┘
-      ▼
-┌──────────────────┐
-│ 2. Issue Structurer │  ← ビジネス課題を言語化・検索クエリ生成
-└─────┬────────────┘
-      ├──────────────────┐
-      ▼                  ▼
-┌──────────────┐  ┌───────────────┐
-│ 3. Market    │  │ 4. Analogy    │  ← 並列実行
-│   Researcher │  │    Finder     │
-└──────┬───────┘  └───────┬───────┘
-       └────────┬─────────┘
-                ▼
-┌─────────────────┐
-│ 5. Strategist   │  ← 戦略構築 + Devil's Advocate
-└─────┬───────────┘
-      ▼
-┌─────────────────┐
-│ 6. Report Builder│  ← スライド構成を生成
-└─────────────────┘
-      │
-      ▼
-[Google Slides 提案資料]
+Step 0: COO                → パイプライン実行準備・品質基準設定
+           ↓
+Step 1: Retriever          → 議事録取得・構造化
+           ↓
+     QA Check Point 1      → Retriever出力の品質検証
+           ↓
+Step 2: Issue Structurer   → イシュー構造化
+           ↓
+     QA Check Point 2      → Issue Structurer出力の品質検証
+           ↓
+Step 3: Market Researcher  ┐
+        Analogy Finder     ┘ 並列実行
+           ↓
+     QA Check Point 3      → リサーチ出力の品質検証（2件）
+           ↓
+Step 4: Strategist         → 戦略構築 + 内部批判的検証
+           ↓
+Step 5: Devil's Advocate   → 独立した批判的検証（外部）
+           ↓
+     QA Check Point 4      → 戦略＋検証結果の品質検証
+           ↓
+Step 6: Report Builder     → 提案資料作成
+           ↓
+     QA Check Point 5      → 最終成果物の品質検証
+           ↓
+Step 7: COO Final Review   → 最終レビュー・承認
 ```
 
 ## 実行手順
 
-### Step 0: 準備
+### Step 0: COO 実行準備
 会議名（Notion の議事録ページ名）を確認する。
 以下の手順では `{{会議名}}` を実際の会議名に置き換えること。
+
+```
+/agents/coo/prompt.md に従って、
+パイプライン実行の準備と品質基準を設定してください。
+```
 
 ---
 
@@ -63,6 +67,15 @@ Claude Code 上で順番に実行する。
 
 ---
 
+### QA Check Point 1: Retriever出力検証
+```
+/agents/qa_reviewer/prompt.md に従って、
+retriever/output.json の品質を検証してください。
+スコア70未満の場合、Step 1を再実行してください。
+```
+
+---
+
 ### Step 2: Issue Structurer（課題の言語化）
 **プロンプト:** `/agents/issue_structurer/prompt.md`
 **入力:** `/agents/retriever/output.json`
@@ -74,6 +87,15 @@ Claude Code 上で順番に実行する。
 4. `output.json` に保存
 
 **完了条件:** `core_question` と `research_queries` が含まれている
+
+---
+
+### QA Check Point 2: Issue Structurer出力検証
+```
+/agents/qa_reviewer/prompt.md に従って、
+issue_structurer/output.json の品質を検証してください。
+スコア70未満の場合、Step 2を再実行してください。
+```
 
 ---
 
@@ -100,6 +122,15 @@ Claude Code 上で順番に実行する。
 
 ---
 
+### QA Check Point 3: リサーチ出力検証
+```
+/agents/qa_reviewer/prompt.md に従って、
+market_researcher/output.json と analogy_finder/output.json の品質を検証してください。
+スコア70未満の場合、該当ステップを再実行してください。
+```
+
+---
+
 ### Step 5: Strategist（戦略構築 + 批判的検証）
 **プロンプト:** `/agents/strategist/prompt.md`
 **入力:** `issue_structurer`, `market_researcher`, `analogy_finder` の output.json
@@ -111,6 +142,23 @@ Claude Code 上で順番に実行する。
 4. 最終推奨戦略を選定
 
 **完了条件:** `recommended_strategy` と `critical_reviews` が含まれている
+
+---
+
+### Step 5b: Devil's Advocate（独立批判的検証）
+```
+/agents/devils_advocate/prompt.md に従って、
+strategist/output.json の戦略を独立した視点で批判的に検証してください。
+```
+
+---
+
+### QA Check Point 4: 戦略＋検証結果の品質検証
+```
+/agents/qa_reviewer/prompt.md に従って、
+strategist/output.json と devils_advocate/output.json の品質を検証してください。
+robustness_score が60未満の場合、Strategist に修正を指示してください。
+```
 
 ---
 
@@ -127,7 +175,24 @@ Claude Code 上で順番に実行する。
 
 ---
 
-### Step 7: Google Slides への反映（オプション）
+### QA Check Point 5: 最終成果物検証
+```
+/agents/qa_reviewer/prompt.md に従って、
+report_builder/output.json の最終品質を検証してください。
+スコア70未満の場合、Step 6を再実行してください。
+```
+
+---
+
+### Step 7: COO 最終レビュー
+```
+/agents/coo/prompt.md に従って、
+パイプライン全体の実行結果をレビューし、最終承認を行ってください。
+```
+
+---
+
+### Step 8: Google Slides への反映（オプション）
 `report_builder/output.json` の内容を Google Slides MCP で実際のプレゼンテーションに変換する。
 
 1. `createGoogleSlides` で新しいプレゼンテーションを作成
