@@ -1,0 +1,29 @@
+{
+  "description": "Subsidy Strategist が適格性判定に使う自社マスタ。導入時に実値で上書きすること。",
+  "company_name": "",
+  "industry_code": "",
+  "industry_label": "",
+  "founded_year": null,
+  "employees": null,
+  "capital_jpy": null,
+  "revenue_last_fy_jpy": null,
+  "business_domains": [
+    "SNSマーケティング",
+    "不動産業界特化型BPO",
+    "AIシステム制作",
+    "LP等のWeb制作"
+  ],
+  "past_subsidies": [],
+  "attestations": {
+    "wage_increase_declared": false,
+    "dx_certified": false,
+    "health_management_certified": false,
+    "partnership_build": false
+  },
+  "bank_info_ready": false,
+  "gbizid_status": "not_registered",
+  "notes": [
+    "gbizid は jGrants 申請に必須。未登録の場合は先に取得すること。",
+    "賃上げ表明など加点項目は経営判断を伴うため、CEO 承認済みのもののみ true にする。"
+  ]
+}

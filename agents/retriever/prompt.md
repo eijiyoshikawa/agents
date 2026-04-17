@@ -59,6 +59,7 @@ Google Drive に過去の提案資料がある場合、関連資料を検索・�
 - **QA Reviewer**: 出力の品質チェックを受ける。差し戻しがあれば修正して再出力
 - **Sales Agent**: 商談ステージのヒアリング議事録も取得対象とする
 - **Issue Structurer**: 出力後に課題抽出の精度フィードバックを受け、次回取得時の構造化ルールを改善
+- **Subsidy Strategist / COO**: 議事録に「補助金」「助成金」キーワードが含まれる場合、SUBSIDY_PIPELINE の起動を提案
 
 ## フィードバックループ
 1. Issue Structurer から「議事録の情報が不足している」旨のフィードバックがあった場合、Notionから追加情報を取得し output.json を更新する

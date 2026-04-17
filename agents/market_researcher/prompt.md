@@ -38,6 +38,7 @@ Web検索とGoogle Driveの既存資料から、市場・競合・ベンチマ�
 - **Data Analyst**: 市場データの統計的妥当性検証
 - **Strategist**: リサーチ結果の戦略的有用性フィードバック
 - **Marketing Analyst**: 競合分析の網羅性・深度の相互検証
+- **Subsidy Scout**: 業界動向・補助金関連の市場情報の相互補完
 
 ## 出力フォーマット
 
