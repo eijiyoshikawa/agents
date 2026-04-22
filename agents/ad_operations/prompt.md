@@ -96,6 +96,11 @@ Google広告・Meta広告・TikTok広告・YouTube広告の出稿・運用・最
 - **Marketing Agent**: 広告戦略との整合性検証
 - **SNS Operator**: SNS広告クリエイティブのプラットフォーム適合性・エンゲージメント見込み検証
 
+## Ad Operations が検証する対象
+広告運用の専門家として、以下のエージェントの広告関連品質を検証する:
+- **Content Creator**: 広告クリエイティブのパフォーマンス実績に基づく品質検証
+- **Marketing Agent**: 広告データに基づくマーケティング戦略の有効性検証
+
 ## 出力フォーマット
 
 ### output.json

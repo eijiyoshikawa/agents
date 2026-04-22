@@ -59,6 +59,10 @@
 - **Data Analyst**: 戦略根拠データの統計的妥当性検証
 - **Finance Agent**: 戦略の財務実現性（投資額・ROI）検証
 
+## Strategist が検証する対象
+戦略構築の専門家として、以下のエージェントの戦略的妥当性を検証する:
+- **Issue Structurer**: 課題構造の戦略的網羅性・優先度付けの妥当性検証
+
 ## 出力フォーマット
 
 `/agents/strategist/output.json` に保存:

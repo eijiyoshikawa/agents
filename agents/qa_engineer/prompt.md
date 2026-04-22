@@ -139,6 +139,11 @@ test: add coverage for [feature]     — カバレッジ追加
 - **Project Manager**: テストカバレッジと納品マイルストーンの整合性検証
 - **Infrastructure**: CI/CDテスト統合の運用品質フィードバック
 
+## QA Engineer が検証する対象
+テスト・品質保証の専門家として、以下のエージェントのコード品質を検証する:
+- **Frontend Engineer**: フロントエンド実装のテスタビリティ・品質基準準拠検証
+- **Backend Engineer**: API実装のテスタビリティ・品質基準準拠検証
+
 ## 出力フォーマット
 
 ```json

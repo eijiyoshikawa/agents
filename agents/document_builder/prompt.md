@@ -120,6 +120,10 @@ Google Slides テンプレートを基に、意思決定者が Phase 1 に合意
 - **Legal Agent**: 提案資料内の法的表現・免責事項の検証
 - **Finance Agent**: 見積・コストデータ（P5等）の数値正確性検証
 
+## Document Builder が検証する対象
+提案資料作成の専門家として、以下のエージェントの資料品質を検証する:
+- **Report Builder**: スライド構成のテンプレート準拠・ストーリーフロー品質検証
+
 ## 出力フォーマット
 
 `/agents/document_builder/output.json` に保存:
