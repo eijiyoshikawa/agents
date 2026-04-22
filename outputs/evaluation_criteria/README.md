@@ -1,0 +1,90 @@
+# LET 評価制度ドキュメント（let-hyoka）
+
+粗利ベース × チーム連動の半期ボーナス評価制度ドキュメント。営業部・マーケティング部の2部門分のHTMLと部門選択トップページで構成。
+
+## ファイル構成
+
+```
+outputs/evaluation_criteria/
+├── index.html      # 部門選択トップページ（ルート）
+├── sales.html      # 営業部 評価制度
+├── marketing.html  # マーケティング部 評価制度
+├── vercel.json     # Vercelデプロイ設定（クリーンURL・セキュリティヘッダ）
+└── README.md       # 本ファイル
+```
+
+## 公開URL構成（let-hyoka.vercel.app）
+
+| URL | 内容 |
+|-----|-----|
+| `https://let-hyoka.vercel.app/` | 部門選択トップページ |
+| `https://let-hyoka.vercel.app/sales` | 営業部 評価制度 |
+| `https://let-hyoka.vercel.app/marketing` | マーケ部 評価制度 |
+
+## Vercelデプロイ手順
+
+### 1. Vercelプロジェクト「let-hyoka」を作成
+
+Vercel ダッシュボードから「New Project」→ GitHub リポジトリ `eijiyoshikawa/agents` を Import。
+
+### 2. プロジェクト設定
+
+| 項目 | 値 |
+|------|-----|
+| **Project Name** | `let-hyoka` |
+| **Framework Preset** | `Other`（静的HTML） |
+| **Root Directory** | `outputs/evaluation_criteria` |
+| **Build Command** | （空欄） |
+| **Output Directory** | `.`（ピリオド、そのまま） |
+| **Install Command** | （空欄） |
+
+### 3. Production Branch の指定
+
+Settings → Git → Production Branch を `claude/evaluation-criteria-framework-mkp6W` に設定。
+（レビュー後 `main` にマージした場合は `main` に変更）
+
+### 4. カスタムドメイン
+
+Settings → Domains で `let-hyoka.vercel.app` が自動付与されていることを確認。
+
+## 設計のポイント
+
+### 共通ロジック
+
+```
+半期ボーナス = 基準額(月給×2ヶ月) × 個人達成率 × チーム係数
+```
+
+**個人達成率**: 粗利達成率をそのまま反映（例：80%達成 → ×0.80、120%達成 → ×1.20）
+**チーム係数**:
+- 120%以上 → ×1.10（ブースト）
+- 70〜119% → ×1.00
+- 60〜69% → ×0.80（▲20%）
+- 60%未満 → ×0.70（▲30%固定）
+
+### グレード・月給設計（経営陣向け試算：支給額 + 5万円）
+
+| グレード | 営業（支給 → 試算） | マーケ（支給 → 試算） |
+|---------|---|---|
+| G1 | ¥300,000 → ¥350,000 | ¥250,000 → ¥300,000 |
+| G2 | ¥350,000 → ¥400,000 | ¥300,000 → ¥350,000 |
+| G3 | ¥400,000 → ¥450,000 | ¥380,000 → ¥430,000 |
+| G4 | ¥480,000 → ¥530,000 | ¥450,000 → ¥500,000 |
+
+### チーム粗利目標（TBD）
+
+現バージョンはチーム目標の数値が未確定のプレースホルダー。ユーザーから粗利ベースの目標額が確定次第、係数計算ロジック（Step 5）に反映予定。
+
+## ローカル確認
+
+```bash
+# シンプルなHTTPサーバーで確認
+cd outputs/evaluation_criteria
+python3 -m http.server 8000
+# → http://localhost:8000 をブラウザで開く
+```
+
+## バージョン
+
+- **Ver 1.0** / 2026-04-22
+- 議事録：第9期役員会議（2026-04-22）準拠
