@@ -212,9 +212,27 @@ h1 {
 }
 
 @media (max-width: 768px) {
+  body { padding: 32px 16px; }
   h1 { font-size: 28px; }
-  .cards { grid-template-columns: 1fr; }
+  .hero { margin-bottom: 32px; }
+  .cards { grid-template-columns: 1fr; gap: 14px; }
   .principles { grid-template-columns: 1fr; }
+  .card { padding: 24px 20px; }
+  .card-title { font-size: 20px; }
+  .card-arrow { top: 20px; right: 20px; font-size: 18px; }
+  .card-meta { grid-template-columns: 1fr 1fr; gap: 10px; }
+}
+
+@media (max-width: 480px) {
+  body { padding: 24px 12px; }
+  h1 { font-size: 22px; letter-spacing: -0.6px; }
+  .hero-desc { font-size: 13px; }
+  .eyebrow { font-size: 10px; letter-spacing: 2px; }
+  .card { padding: 20px 16px; }
+  .card-title { font-size: 18px; }
+  .card-sub { font-size: 12px; }
+  .meta-val { font-size: 12px; }
+  .footer-meta { font-size: 9.5px; word-break: break-all; }
 }
 </style>
 </head>
