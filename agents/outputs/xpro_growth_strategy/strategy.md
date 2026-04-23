@@ -1457,3 +1457,166 @@ CEO/Strategist/Legal の判断を **"善意の敵" として** 検証する。
 5. **利益率25%ライン**を撤退/再設計トリガーに追加
 
 ---
+
+## Step 29. 実行ロードマップ（Project Manager）
+
+### 29.1 Devil's Advocate / QA Reviewer 受けの反映
+- スローガン修正: 「凍結リスクを最小化する、攻めのX自動運用」
+- 成果保証条件: xpro起因成果に限定（達成基準を明記）
+- CEO ↔ Finance 差分 ¥800K → **CEOが承認（¥10.4Mで確定）**
+- 3シナリオ（保守/挑戦/楽観）を各KPIに併記（Data Analyst 責任でモニタ）
+
+### 29.2 90日ガントチャート（週単位）
+
+| # | タスク | W1 | W2 | W3 | W4 | W5 | W6 | W7 | W8 | W9 | W10 | W11 | W12 | W13 | 担当 |
+|---|------|----|----|----|----|----|----|----|----|----|----|----|----|----|------|
+| Phase 0 | 土台固め |    |    |    |    |    |    |    |    |    |    |    |    |    | - |
+| 0-1 | KPI棚卸・ダッシュボードv1 | ■ | ■ |    |    |    |    |    |    |    |    |    |    |    | Data Analyst / KPI |
+| 0-2 | Legal判定・X API正規化契約 | ■ | ■ |    |    |    |    |    |    |    |    |    |    |    | Legal / Tech Lead |
+| 0-3 | ICPインタビュー5名 | ■ | ■ |    |    |    |    |    |    |    |    |    |    |    | Marketing / Sales |
+| 0-4 | 競合自費購入調査 | ■ | ■ |    |    |    |    |    |    |    |    |    |    |    | Marketing Analyst |
+| 0-5 | 計測タグ・GA4・CAPI準備 | ■ | ■ |    |    |    |    |    |    |    |    |    |    |    | Data Engineer |
+| Phase 1 | リスクリバーサル+LP |    |    |    |    |    |    |    |    |    |    |    |    |    | - |
+| 1-1 | 30日成果保証制度設計 |    |    | ■ | ■ |    |    |    |    |    |    |    |    |    | Finance / Legal |
+| 1-2 | LPリニューアル＆公開 |    |    | ■ | ■ | ■ | ■ |    |    |    |    |    |    |    | UI/UX / Designer / FE |
+| 1-3 | 5分オンボーディング |    |    | ■ | ■ | ■ | ■ |    |    |    |    |    |    |    | FE / BE |
+| 1-4 | Before/After 10件取材 |    |    |    | ■ | ■ | ■ |    |    |    |    |    |    |    | CS / Content Creator |
+| 1-5 | 5プラン・年払導入 |    |    | ■ | ■ |    |    |    |    |    |    |    |    |    | Finance / BE |
+| Phase 2 | 流入拡大 |    |    |    |    |    |    |    |    |    |    |    |    |    | - |
+| 2-1 | アフィリプログラム開始 |    |    |    |    |    |    | ■ | ■ |    |    |    |    |    | Marketing / BE |
+| 2-2 | 自社X 月+1万運用 |    |    |    | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | SNS Op / Content Creator |
+| 2-3 | YouTube週2本配信 |    |    |    |    | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | ■ | Content Creator |
+| 2-4 | Meta動画クリエ20本 |    |    |    |    |    | ■ | ■ | ■ | ■ |    |    |    |    | Designer / Ad Op |
+| 2-5 | カオスマップ企画→公開 |    |    |    |    | ■ | ■ | ■ | ■ | ■ |    |    |    |    | PR / Marketing |
+| Phase 3 | 最適化 |    |    |    |    |    |    |    |    |    |    |    |    |    | - |
+| 3-1 | A/Bテスト駆動の最適化 |    |    |    |    |    |    |    |    | ■ | ■ | ■ | ■ | ■ | Data Analyst / FE |
+| 3-2 | 広告予算再配分（ROAS基準） |    |    |    |    |    |    |    |    | ■ | ■ | ■ | ■ | ■ | Ad Op / Finance |
+| 3-3 | コミュニティ（Discord）拡張 |    |    |    |    |    |    |    |    |    | ■ | ■ | ■ | ■ | CS |
+| 3-4 | 事業結果レビュー→次90日 |    |    |    |    |    |    |    |    |    |    |    |    | ■ | CEO / COO / Devil's Adv |
+
+### 29.3 クリティカルパス
+```
+Legal判定 (W1-2) → 成果保証制度設計 (W3-4) → LPリニューアル (W3-6)
+              ↘ Stripe価格改定 (W3-4) → Trial→Paid計測 (W5〜)
+計測タグ (W1-2) → CAPI稼働 (W3) → 広告配信最適化 (W5〜)
+```
+
+Legal決着が遅れると全体2週間ズレる → **最優先**。
+
+### 29.4 RACI（主要10タスク）
+
+| タスク | Responsible | Accountable | Consulted | Informed |
+|--------|-------------|-------------|-----------|----------|
+| Legal判定 | Legal | CEO | Tech Lead, Infra | 全社 |
+| LP刷新 | Frontend | UI/UX | Designer, Marketing | Content, CS |
+| 5分オンボ | Frontend | UI/UX | Backend, Data | CS |
+| 成果保証制度 | Finance | CEO | Legal, Sales, CS | Marketing |
+| アフィリ | Marketing | COO | Legal, Backend, Finance | Sales |
+| 自社X運用 | SNS Op | COO | Content Creator, PR | CEO |
+| Meta CAPI | Backend | Tech Lead | Ad Op, Data Engineer | Marketing |
+| Health Score | Backend | CS | Data Engineer, Data Analyst | CEO |
+| カオスマップ | PR | COO | Marketing, Data Analyst | CEO |
+| 価格改定 | Finance | CEO | Sales, BE, Legal | Marketing |
+
+### 29.5 依存関係マップ
+- **ブロッキング**: Legal判定 → 成果保証 / X APIコスト計算
+- **ブロッキング**: 計測タグ → CAPI → Ad Op 最適化
+- **ソフト依存**: LP刷新 ⇔ 広告クリエイティブ（並行可能）
+- **ソフト依存**: 自社X運用 ⇔ YouTube（相互補完）
+
+### 29.6 マイルストーン（検証ゲート）
+
+| ゲート | 時期 | 判定基準 | 未達時の行動 |
+|--------|------|---------|------------|
+| G1 土台完了 | W2末 | KPIダッシュ稼働 + Legal結論 | 全体2週ずらし |
+| G2 LP公開 | W6末 | LP CVR 2.5%以上（A/B比較） | LPデザイン再発注 |
+| G3 アフィリ稼働 | W8末 | 紹介50件/週 | 報酬設計見直し |
+| G4 Phase3突入判断 | W9末 | MRR +30% / 純増50件以上 | Phase2延長 |
+| G5 90日総合評価 | W13末 | MRR, CAC, LTV, NPS目標達成 | 次90日戦略書き換え |
+
+### 29.7 リスク・課題管理
+- リスクログを Notion に一元化（担当・期限・発生確率・影響度）
+- 週次で COO が棚卸・優先度更新
+- 影響度"高"は即 CEO エスカレーション
+
+### 29.8 コミュニケーションリズム
+- **Daily**: `#growth-war-room` に前日数字を Bot が投稿
+- **Weekly**: 月曜10時 30分定例（KPI＋今週の勝ち筋/負け筋）
+- **Bi-weekly**: Devil's Advocate セッション（偶数週金曜）
+- **Monthly**: 全社リビュー + CEO声明
+- **Quarterly**: 次90日戦略リフレッシュ
+
+### 29.9 エスカレーション基準
+- 週次目標未達2連続 → COO招集、原因特定24h以内
+- 予算超過 10%以上 → Finance 経由でCEO承認必須
+- 法務/インシデント発生 → 即 Legal + CEO
+- 炎上検知 → PR + CEO + CS で15分以内にアクション
+
+---
+
+## Step 30. 統合議事録サマリ（System）
+
+### 30.1 会議の結論（3行）
+1. **ポジショニング**: 「凍結リスクを最小化する、攻めのX自動運用」= 深い自動化×高い安心 の空白象限を取る
+2. **差別化エンジン**: 30日成果保証（xpro起因成果に限定）+ 5分オンボーディング + ドッグフーディングの自社X
+3. **90日ゴール**: WAA 5,000 / MRR ¥15M / LP CVR 4% / Churn 4% / LTV/CAC > 3
+
+### 30.2 本日決定された主要事項
+
+| # | 決定事項 | 責任者 | 期限 |
+|---|---------|-------|------|
+| D1 | 公式X API v2 Pro tier正規化路線 | Legal / Tech Lead | W2 |
+| D2 | 価格5プラン体系（Free/Personal/Pro/Agency/Ent） | Finance / Sales | W4 |
+| D3 | 30日成果保証（xpro起因成果限定） | Finance / Legal / CEO | W4 |
+| D4 | スローガン「凍結リスクを最小化する、攻めのX自動運用」 | Marketing / CEO | W3 |
+| D5 | アフィリ30%・3ヶ月持続プログラム | Marketing / BE | W8 |
+| D6 | 自社X 90日+30,000フォロワー運用 | SNS Op / Content | 継続 |
+| D7 | YouTube「Xプロ研究所」週2本 | Content Creator | W5〜 |
+| D8 | 90日予算 ¥10.4M 承認（CEO承認済） | CEO / Finance | 確定 |
+| D9 | Growth PM採用開始 | HR / CEO | W2〜 |
+| D10 | 利益率25%ライン・MRR ¥6M が撤退トリガー | CEO / Finance | 監視 |
+
+### 30.3 本日のアクション（当週着手）
+- [ ] Legal: X開発者契約の精査開始
+- [ ] Data Analyst: 現状KPI棚卸 → ダッシュボードv1
+- [ ] Marketing: ICPインタビュー候補5名リストアップ
+- [ ] Marketing Analyst: 競合5社の課金プラン自費購入
+- [ ] Data Engineer: events.yaml スキーマ定義開始
+- [ ] HR: Growth PM 募集要項作成
+
+### 30.4 主要KPI（90日ゴール）
+
+| カテゴリ | 指標 | 保守 | 挑戦 | 楽観 |
+|---------|------|------|------|------|
+| 収益 | MRR | ¥7M | ¥10M | ¥15M |
+| 会員 | WAA | 2,500 | 3,500 | 5,000 |
+| 獲得 | LP CVR | 2.5% | 4.0% | 6.0% |
+| 定着 | 月次Churn | 6% | 4% | 3% |
+| 経済 | LTV/CAC | 2.0 | 3.0 | 4.0 |
+| ブランド | 自社Xフォロワー | +10,000 | +20,000 | +30,000 |
+| 口コミ | 紹介経由CV比率 | 15% | 25% | 35% |
+
+### 30.5 出席エージェント（全員参加）
+統括2 / コンサル事業部9 / 営業マーケ7 / 管理3 / 開発10（+サブ8）/ 横断4
+= **35エージェント + サブ8** 全員が本議事録に寄与。
+
+### 30.6 申し送り・継続議題
+- 月次レビューで実測値に差分更新
+- 未達項目は Devil's Advocate と合同レビュー
+- 四半期で戦略リフレッシュ
+- `/learnings/sessions/` にセッションログ記録
+
+### 30.7 参考資料（同一リポジトリ内）
+- `/CLAUDE.md` — 組織標準・開発基準・セキュリティ基準
+- `/agents/*/prompt.md` — 各エージェント役割定義
+- `/design-md/` — ブランドリファレンス（LP改修で活用）
+- 本議事録: `/agents/outputs/xpro_growth_strategy/strategy.md`
+
+### 30.8 制約・前提の再掲
+- 外部URL（xpro.skma.asia）はサンドボックスで取得不可。サービス仕様は仮説ベース。
+- 実際のKPI・LP・料金・機能が判明し次第、本書を差分更新する。
+- 法務判断は弁護士の正式レビューを前提に最終化する。
+
+---
+
+**議事録終了 / 2026-04-23 / Branch: claude/grow-service-membership-RuIKH**
