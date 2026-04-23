@@ -816,3 +816,196 @@ Step 5 (30秒): Aha確認（「明日の朝、自動でポストされます！�
 - AIアシスト比率 50%（コスト最適化）
 
 ---
+
+## Step 19. フロントエンド実装（Frontend Engineer）
+
+### 19.1 技術選定（既存スタック維持を前提）
+- Next.js 15 (App Router) / React 19 / TypeScript strict
+- Tailwind CSS + shadcn/ui
+- React Query / Zustand（状態管理）
+- next-intl（i18n、将来的な多言語対応の余地）
+- Vercel デプロイ前提
+
+### 19.2 90日実装スコープ（優先順）
+
+| # | 機能 | 規模 | 担当目安 | 完了条件 |
+|---|------|------|---------|---------|
+| F1 | LP リニューアル（A/Bテスト基盤付き） | M | 2週 | Week 4公開, CWV Good |
+| F2 | 5分オンボーディングウィザード | L | 3週 | 完了率60%実測 |
+| F3 | ダッシュボード再設計（モバイル最適） | L | 3週 | LCP < 2.5s |
+| F4 | 共有ダッシュボードURL（公開ページ） | S | 1週 | OGP画像自動生成 |
+| F5 | アフィリ管理画面 | M | 2週 | 紹介リンク発行・成果照会 |
+| F6 | 価格表ページ刷新 + 年払トグル | S | 1週 | Stripe Checkout連動 |
+| F7 | Streak/バッジUI | M | 2週 | アニメーション含む |
+| F8 | 解約フロー再設計（引き止めモーダル） | S | 1週 | 解約阻止率 +20% |
+
+### 19.3 LP A/Bテスト基盤
+- Vercel Edge Middleware + Cookie ベースで variant 振り分け
+- GA4 / PostHog にイベント送信
+- 統計的有意検定は PostHog 側で運用
+- バリアント運用ルール: 最低14日 or 1,000CV、片側で勝率95%以上
+
+### 19.4 パフォーマンス基準
+- Core Web Vitals すべて Good
+- LCP < 2.5s / INP < 200ms / CLS < 0.1
+- 初回JS転送 < 200KB (gzip)
+- 画像は next/image + AVIF
+- Lighthouse Performance >= 90
+
+### 19.5 開発標準準拠（CLAUDE.md準拠）
+- 関数 < 50行 / ファイル < 800行 / ネスト < 4
+- Storybook で各UIコンポーネント可視化
+- Playwright で主要フローE2Eテスト
+- PR テンプレ + QA Reviewer レビュー必須
+
+### 19.6 アクセシビリティ実装
+- shadcn/ui 由来のARIA準拠コンポーネント優先
+- キーボードナビゲーション全画面で動作
+- フォーカスリング非削除（accessibility-first）
+- カラー単独で意味を伝えない
+
+### 19.7 計測タグ実装
+- GA4 / Meta Pixel / X Pixel / TikTok Pixel
+- イベント名は Data Engineer 設計のスキーマに準拠
+- 重要CV（無料登録/課金）はサーバー側 CAPI でも送信（Step 20連携）
+
+---
+
+## Step 20. バックエンド・決済・計測（Backend Engineer）
+
+### 20.1 アーキテクチャ概観
+- Next.js Route Handlers + Server Actions
+- DB: Supabase (Postgres) / Auth: Supabase Auth + OAuth (X連携)
+- 決済: Stripe（Subscriptions, Checkout, Customer Portal, Webhook）
+- ジョブ: Inngest or Cloudflare Queues（投稿スケジューリング）
+- API: tRPC（内部）/ REST（外部・代行ホワイトラベル）
+
+### 20.2 90日バックエンド実装スコープ
+
+| # | 機能 | 概要 | 担当目安 |
+|---|------|------|---------|
+| B1 | Stripe 5プラン整備（年払・トライアル・クーポン） | プロモコード/初月50%/30日成果保証返金フロー | 2週 |
+| B2 | アフィリ報酬計算エンジン | 30%報酬・3ヶ月持続・自動振込or出金 | 3週 |
+| B3 | Health Score 計算バッチ（日次） | 16.4のシグナル→スコア→DB保存→CSアラート | 2週 |
+| B4 | Meta CAPI / X CAPI サーバー側送信 | Stripe Webhook → 媒体に CV 送信 | 1週 |
+| B5 | 共有ダッシュボードAPI | 公開URL用read-only API + キャッシュ | 1週 |
+| B6 | 解約予兆Webhook | At Risk 検知 → Slack/CS自動通知 | 1週 |
+| B7 | X 公式API最適化レイヤー | quota管理、フェイルオーバー、再試行 | 3週 |
+| B8 | 利用ログ分析API | 自動化実行ログを Data Engineer 側へ flush | 2週 |
+
+### 20.3 Stripe 設計詳細
+- **Products / Prices**: 5プラン × 月/年 = 10 Price ID
+- **Trial**: 14日（クレカ任意 → 課金移行時に取得）
+- **Coupons**:
+  - `WELCOME50`（初月50%OFF）
+  - `WIN_BACK_30`（解約後リエンゲージ）
+  - `AMBASSADOR_FREE`（アンバサダー無料）
+- **30日成果保証**: 初回課金から30日以内の解約は全額返金（Refund API + 内部審査フラグ）
+- **Webhook**: `customer.subscription.created/updated/deleted`, `invoice.payment_succeeded/failed`
+- **PII管理**: Stripe Customer Portal を正面活用、自社DBには最小限のみ保持
+
+### 20.4 X API利用設計
+- **公式X API v2 Pro tier**（Step25 Legal結論を前提）
+- Per-user OAuth 2.0 + PKCE
+- Rate Limit 管理: per-user バケット + アプリ全体バケットを Redis で
+- Backoff: 指数増 + jitter
+- Quota枯渇時はジョブを Delay Queue に退避、ユーザーへ通知
+
+### 20.5 セキュリティ
+- 認証: Supabase Auth（MFA optional）
+- 認可: RLS（Row Level Security）でテナント分離
+- シークレット: Vercel Env + Supabase Vault、コミット禁止
+- 監査ログ: 全管理操作を audit_log テーブルへ
+- 暗号化: at rest（Supabase標準）+ in transit（TLS）
+- 脆弱性スキャン: `bash scripts/security-scan.sh` を CI で実行
+
+### 20.6 SLA / 信頼性
+- 可用性目標 99.9%
+- 投稿スケジュールの実行成功率 99.5%
+- 失敗時は3回リトライ + ユーザー通知
+- ステータスページ（statuspage.io 等）公開
+
+### 20.7 テスト戦略
+- ユニット 70% / 結合 20% / E2E 10%
+- Stripe Webhook は録画したペイロードでリプレイテスト
+- X API 連携は MSW でモック + Sandbox環境テスト
+
+---
+
+## Step 21. データパイプライン・計測基盤（Data Engineer）
+
+### 21.1 データ基盤アーキテクチャ
+```
+[Web/App] ──┐
+[Stripe ]──┼─► [Segment / RudderStack]
+[X API  ]──┘         │
+                     ▼
+            [BigQuery / DuckDB]
+                     │
+        ┌────────────┼─────────────┐
+        ▼            ▼             ▼
+     [Looker]   [Metabase]   [Notion KPI Dashboard]
+```
+
+### 21.2 イベントスキーマ標準化（最初の30）
+ユーザー操作・成果イベントを統一スキーマで定義。
+
+| Event | Properties（抜粋） |
+|-------|------------------|
+| `lp_viewed` | utm_source, utm_campaign, variant_id |
+| `signup_started` | plan_intent |
+| `signup_completed` | plan, source |
+| `oauth_x_connected` | account_id_hash |
+| `onboarding_step_completed` | step_number, time_taken_sec |
+| `aha_achieved` | followers_delta, impressions_delta |
+| `subscription_created` | plan, mrr_jpy, has_trial |
+| `subscription_canceled` | reason, tenure_days |
+| `affiliate_link_generated` | code |
+| `affiliate_conversion` | code, mrr_jpy |
+| `post_scheduled` | template_id |
+| `post_published` | success_bool, latency_ms |
+| `post_failed` | error_code |
+| ... | 計30 |
+
+スキーマは `events.yaml` に集約、CI で型生成 → Frontend/Backend が型安全に送信。
+
+### 21.3 計測基盤の構築タスク
+
+| # | タスク | 担当目安 |
+|---|------|---------|
+| D1 | イベントスキーマ定義 + 型自動生成 | 1週 |
+| D2 | Segment（or 自前ingest） + BigQuery 連携 | 1週 |
+| D3 | dbt モデル整備（fact/dim） | 2週 |
+| D4 | Lookerダッシュボード（経営KPI） | 2週 |
+| D5 | Metabaseダッシュボード（運用KPI） | 1週 |
+| D6 | Reverse ETL（Health Score → Slack/CS） | 1週 |
+| D7 | データ品質テスト（dbt test） | 1週 |
+
+### 21.4 主要データマート
+
+| テーブル | 粒度 | 用途 |
+|---------|------|------|
+| `fct_subscription_daily` | user × day | MRR/Churn/Cohort |
+| `fct_attribution_first_touch` | user | チャネル別CAC計算 |
+| `fct_affiliate_payout` | affiliate × month | 報酬算定 |
+| `fct_x_api_usage` | account × day | quota消費・原価分析 |
+| `dim_user` | user | プラン・登録日・ICPセグメント |
+| `dim_plan` | plan | 価格マスタ |
+
+### 21.5 データガバナンス
+- PIIマスキング（メール・X handle 等を別レイヤで管理）
+- アクセス権: `analyst_read`, `engineer_write`, `admin_full`
+- データ保持: 生ログ12ヶ月、集計データ無期限
+- 監査: BigQuery Audit Log を月次レビュー
+
+### 21.6 KPI鮮度SLA
+- 経営KPI（MRR/CAC/Churn）: 24h以内
+- 運用KPI（実行成功率、CV件数）: 1h以内
+- アラート系（決済失敗、API障害）: ニアリアルタイム（5分以内）
+
+### 21.7 Data Engineer × KPI Dashboard 連携
+- Looker Embedding で KPI Dashboard Agent が日次取得
+- 異常検知（z-score基準）→ Slackへ通知
+- 月次のCohort/LTV分析は dbt + Python で自動化
+
+---
