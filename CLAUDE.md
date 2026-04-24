@@ -181,6 +181,17 @@ LP制作・Web制作・提案資料作成時のデザインリファレンスと
 - 個別: `/design-md/{company-name}/DESIGN.md`
 - 出典: [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md)
 
+### モーションライブラリ（MOTION_30）
+`/design-md/motion-library/MOTION_30.md` に Web コンテンツ向けモーション30選を収録。
+LP・Webサイト・ダッシュボード等の制作時に、Designer / UI/UX Designer / Engineer / Frontend Engineer / Web Builder（motion_analyzer / builder）が共通語彙として参照する。
+
+- 5カテゴリ（ナビ遷移 / テキスト / インタラクション / スクロール背景 / 先進性）× 各6モーション
+- 各モーションに `motion_key` / 演出 / 活用例 / 推奨実装 / サンプルコード / アクセシビリティ注意を記載
+- **必須ルール**:
+  - モーション指定・実装は必ず `motion_key` を引用
+  - 該当モーションが無い場合はドキュメントに追加してから使用
+  - `prefers-reduced-motion: reduce` 対応を全モーションで実装
+
 ## 事業領域
 - SNSマーケティング（Instagram, TikTok, YouTube 運用/広告/クリエイティブ）
 - 不動産業界特化型BPO（AIエージェント活用）

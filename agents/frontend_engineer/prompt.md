@@ -107,3 +107,30 @@ Next.js (App Router) を用いた UI 実装・SEO 最適化・パフォーマン
 - ファイル読み書き（コード実装・設定ファイル）
 - Figma MCP（デザイン参照・Code Connect）
 - Vercel MCP（デプロイ・プレビュー確認）
+
+## モーション実装（必須参照）
+
+Next.js App Router での UI 実装にモーションを含める場合は **必ず `/design-md/motion-library/MOTION_30.md`** を参照する。
+
+**実装ルール:**
+- UI/UX Designer から渡された `motion_key` を基に、MOTION_30.md のサンプル実装を参考にコード化
+- 独自モーションが必要な場合は実装前に MOTION_30.md へ追加（QA Reviewer レビュー必須）
+- `prefers-reduced-motion: reduce` 対応を全実装で必須化（`globals.css` にグローバルルールを配置）
+- Core Web Vitals への影響を計測（特に CLS / INP）。閾値超過時はモーションを簡素化
+- `framer-motion` を Client Component で使用する際は `"use client"` を忘れず、SSR 時の不一致を回避
+
+**共通 CSS（`src/app/globals.css` に配置）:**
+```css
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+```
+
+**アクセシビリティテスト:**
+- axe-core でモーション起因のフォーカス喪失・読み上げ不備を検証
+- Playwright で `prefers-reduced-motion` エミュレーションテストを追加

@@ -162,3 +162,40 @@ JS ソースから以下のパターンを検出する:
 - `Read`: site_scanner/output.json の読み込み
 - `WebFetch`: ページHTML・CSS・JSファイルの取得
 - `Write`: output.json への書き出し
+
+## モーション語彙のマッピング（必須参照）
+
+解析で検出したモーションは、**必ず `/design-md/motion-library/MOTION_30.md` の `motion_key`** にマッピングして出力する。Builder が同じ語彙でモーションを再現できるようにするため。
+
+**マッピング手順:**
+1. 検出したモーションの演出・発火条件・使用ライブラリを整理
+2. MOTION_30.md の 30件から最も近い `motion_key` を選択
+3. 複数候補がある場合は演出の忠実度が高い方を優先
+4. 該当する `motion_key` が無い場合は `motion_key: "custom"` としたうえで、MOTION_30.md への追加候補として `proposed_motion` フィールドに詳細を記録
+
+**output.json への追記フィールド:**
+```json
+{
+  "scroll_animations": [
+    {
+      "section_id": "hero",
+      "target": "h1",
+      "motion_key": "masking-reveal",
+      "trigger": "on-load",
+      "duration": "0.7s",
+      "easing": "cubic-bezier(0.33, 1, 0.68, 1)",
+      "stagger": "0.08s",
+      "implementation": "framer-motion + overflow-hidden wrapper"
+    }
+  ],
+  "proposed_motion": []
+}
+```
+
+**よくあるマッピング例:**
+- 画面一面が円形に展開する → `circle-reveal`
+- 斜めパネルで画面遷移 → `slanted-slide`
+- 文字が下からマスクで現れる → `masking-reveal`
+- 数字がドラムロール → `slot-counter`
+- カードが3D傾斜 → `card-tilt`
+- 常時ノイズ背景 → `overlay-texture`
