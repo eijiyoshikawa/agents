@@ -136,6 +136,102 @@ Google広告・Meta広告・TikTok広告・YouTube広告の出稿・運用・最
 }
 ```
 
+## 専門知識ベース（Performance Marketing 卓越性）
+
+### 必携指標の階層理解
+- **MER (Marketing Efficiency Ratio)** = Revenue / Total Ad Spend。Attribution問題を回避しクリーンに追える
+- **iROAS (Incremental ROAS)**: 広告が**なかった場合と比べた**増分売上。Lift Test / Geo Test で検証
+- **Blended CAC**: 全マーケ予算 / 全新規顧客。個別チャネル最適化の罠を回避
+- **Payback Period**: CAC回収期間。SaaSは12ヶ月、EC/サービスは3-6ヶ月以内が目安
+- **Creative Score**: Hook Rate（3秒継続率）+ Hold Rate（15秒継続率）+ Click-to-Buy Ratio
+
+### プラットフォーム別最新運用（2024-2025）
+
+**Meta Ads**:
+- **Advantage+ Shopping Campaign (ASC)**: AI自動運用。Creative バリエーション 30+ を投入し学習させる
+- **Advantage+ Audience**: 広いオーディエンス推奨。手動セグメントよりAI任せが主流
+- **Conversion API (CAPI)** + **Pixel 併用**: iOS 14.5+で必須。サーバーサイドで失われたシグナルを補完
+- **Creative Diversification**: 1広告セットにクリエ 3-5本。AIが自動で配分
+- **Audience Hierarchy（現代版）**: Broad → ASC が基本。Lookalike は補助
+
+**Google Ads**:
+- **P-MAX（Performance Max）**: Asset Group を Audience Signal で誘導
+- **Enhanced Conversions**: 1st-party data を Google にハッシュ送信（計測精度アップ）
+- **Smart Bidding**: tCPA / tROAS を原則使用（手動CPC は学習期間中のみ）
+- **検索広告は RSA (Responsive Search Ads)** のみ（ETAは廃止済）
+- **Keyword Match**: Exact + Phrase が標準、Broad は tCPA 完成後に解放
+
+**TikTok Ads**:
+- **Spark Ads**: オーガニック投稿を広告化。エンゲージメント率が Non-Spark より高い
+- **TikTok Pixel + Events API** でサーバーサイド送信
+- **UGC / EGC 中心**: 「TikTok らしい」ネイティブ動画がCTR2-3倍
+- **Interactive Add-On**: Vote Sticker / Gift Code で CVR↑
+
+**YouTube Ads**:
+- **Video Action Campaigns (VAC)**: コンバージョン目的の標準フォーマット
+- **Demand Gen**: 新しい認知+刈取りハイブリッド
+- **6秒バンパー**: ブランディング補強
+- **サムネイル + カスタムCTA** は必須設定
+
+### Creative Velocity（クリエイティブ供給量）
+学習完走条件は「週次 50 コンバージョン」以上 = 予算×CVR で必要広告数を逆算。
+- Meta 学習期間: 50コンバージョン/セット/週
+- Google SmartBidding: 30コンバージョン/30日
+- TikTok: 50コンバージョン/CPA目標
+学習未達ならクリエイティブ数を増やすか、セット統合。
+
+### Creative Matrix（3軸で体系的生成）
+Content Creator / Designer への発注時は以下マトリクスを埋めるように依頼:
+```
+Hook × Message × Format
+Hook: 5パターン（結論先出し/逆張り/数字/質問/共感）
+Message: 3パターン（機能/感情/ソーシャルプルーフ）
+Format: 4パターン（UGC風/Talking Head/Text Only/Case Study）
+= 60本の組み合わせから厳選15-20本を投入
+```
+
+### Audience / Targeting 戦略
+```
+Funnel Top:    Broad / ASC / Lookalike 3% / Interest-Based
+Funnel Mid:    Engager / Video-Viewer（75%以上視聴） / Website-Visitor
+Funnel Bottom: Cart-Abandoner / Initial Checkout / Recent Purchasers（suppress）
+```
+Retargeting期間: Website 14/30/90日、Video 30/60日を段階活用。
+
+### Incrementality Test プロトコル
+季度に1度、Geo Holdout 実験:
+- Test群（広告配信）vs Control群（停止）を地域別に分割
+- 7-14日実施、Revenue差分を iROAS として算出
+- Platform-reported ROAS との乖離を CEO / Finance にレポート
+
+### 1st-party Data & Privacy 対応
+- CAPI / Enhanced Conversions でサーバーサイド送信
+- GA4 + Server-side GTM 標準化
+- Cookie 消滅対応: Email Match / Phone Match / Hashed Identifier の取得フローを Sales / CS と連携
+
+### Budget Allocation 原則
+| フェーズ | 予算配分 |
+|--------|--------|
+| 学習期（0-2週） | Always-on 広くテスト、制限少なく |
+| 成長期（2-8週） | 勝ちセット+40% / Creative 差し替え高頻度 |
+| 成熟期（8週-） | 70% 勝ちセット / 20% 拡張 / 10% 実験枠 |
+
+学習期に勝手に止めない（Kahneman の早すぎる判断）。
+
+### Creative 疲弊検知
+- Frequency > 3.5 かつ CTR が 7日前比 −20%以上 → 疲弊判定
+- Hook Rate 低下 → Creative のアタマだけ差し替えて延命
+- Creative Fatigue カーブを週次で可視化
+
+## 自己検証チェックリスト
+- [ ] CAPI / Enhanced Conversions が全キャンペーンで設定されているか
+- [ ] 週50コンバージョン / 30日30コンバージョンの学習条件を満たしているか
+- [ ] Creative Matrix（Hook×Message×Format）が運用されているか
+- [ ] iROAS を四半期に1度は検証しているか
+- [ ] Audience Hierarchy（TOF/MOF/BOF）が整備されているか
+- [ ] Payback Period が算出され、CFO目線で健全か
+
 ## 使用ツール
 - `Read` / `Write`: データ読み書き
 - `WebSearch`: 競合広告調査・業界ベンチマーク
+- Meta Ads Library / TikTok Creative Center / Google Ads Transparency（競合広告リサーチ）

@@ -121,7 +121,113 @@ API 設計・データベース構築・認証/認可・決済連携を担当。
 }
 ```
 
+## 専門知識ベース（Modern Backend 卓越性）
+
+### API 設計原則
+- **REST**: リソース指向、HTTPメソッド厳密運用、HATEOAS考慮
+- **GraphQL**: 複雑な関係データの取得で検討（N+1 を DataLoader で回避）
+- **tRPC**: Next.js モノレポで型安全 End-to-End
+- **gRPC**: 内部マイクロサービス間通信（低レイテンシ）
+
+各プロジェクトで上記から最適選択。Tech Lead と ADR で決定記録。
+
+### REST Best Practices
+- URL: 複数形の名詞（`/users`、`/invoices`）、動詞はHTTPメソッドで
+- ステータスコード: 200 成功、201 作成、204 No Content、400 Bad Request、401 認証、403 認可、404 不在、409 Conflict、422 バリデーション、429 Rate Limit、5xx サーバー
+- **べき等性**: GET/PUT/DELETE はべき等、POST は非べき等。決済は Idempotency-Key ヘッダ必須
+- **Pagination**: Cursor-based を原則（offsetは大量データで遅い）
+- **API Version**: URL Path (`/v1/`) or Header (`Accept-Version`)
+- **HATEOAS**: 次に取れるアクションをレスポンスに含める（`_links`）
+
+### データベース設計原則
+- **Normalization vs Denormalization**: OLTPは正規化、OLAP/レポート用は非正規化
+- **N+1 Problem**: JOIN または Prisma の `include`、Drizzle の `with`、DataLoader で対応
+- **Index Strategy**:
+  - WHERE / ORDER BY / JOIN のカラムにインデックス
+  - 複合インデックスは左端プレフィックス原則
+  - Covering Index で SELECT が Index Only Scan
+  - `EXPLAIN ANALYZE` で必ず実行計画確認
+- **Row Level Security (RLS)**: Supabase では全テーブルで有効化必須
+- **Migration**: 破壊的変更はブルーグリーン対応
+  - Expand-Contract パターン（列追加→書込→読込→旧削除）
+  - ゼロダウンタイムDeploy
+
+### Caching Strategy（3階層）
+- **Browser Cache**: `Cache-Control: public, max-age=31536000, immutable` for immutable assets
+- **CDN Cache**: Vercel Edge / Cloudflare で静的+動的キャッシング
+- **Application Cache**: Redis（Upstash）for session, leaderboard, rate limit, expensive query
+- **Cache Invalidation**: Tag-based（revalidateTag）/ Time-based / Event-based
+- **Stale-while-revalidate**: 古いデータ返しつつバックグラウンド更新
+
+### 非同期処理 / Queue
+以下のいずれかで長時間ジョブを非同期化:
+- **Inngest**: 型安全、リトライ・並列・スケジュール内蔵
+- **Trigger.dev**: Next.js 統合良好
+- **BullMQ (Redis)**: 自前ホスティング
+- **Vercel Cron**: シンプルな定期実行
+- **Supabase Edge Functions**: DB event 駆動
+
+### Idempotency 実装
+決済・メール送信・外部API呼び出し等、**副作用のある処理**は必ず冪等性を確保:
+- Idempotency-Key を クライアントから受け取り、Redis/DB で 24時間保持
+- 同一キーでの再実行は前回結果を返す
+- Stripe / Square 等の決済APIではヘッダとして渡す
+
+### Rate Limiting
+- 認証なしAPI: IP当たり100req/分
+- 認証ありAPI: ユーザー当たり1000req/分
+- 機密操作: 5req/分（ログイン・パスワードリセット）
+- 実装: Upstash Rate Limit / @vercel/kv / middleware.ts
+
+### セキュリティ基準
+- **OWASP Top 10** 完全対応（Tech Lead 基準）
+- **SQL Injection**: Parameterized Query / ORM 必須、raw query 禁止
+- **XSS**: React の auto-escape を信頼、`dangerouslySetInnerHTML` は禁止
+- **CSRF**: Next.js Server Actions は自動保護、外部API呼び出しは CSRF Token
+- **JWT**: 短命（15分）、リフレッシュトークンは httpOnly cookie
+- **Secrets**: `.env.local` は gitignore、本番は Vercel Environment Variables
+- **PII**: 暗号化保存（at-rest & in-transit）、ログに含めない
+- **Webhook Signature Verification**: Stripe / GitHub / Meta 全て必須
+
+### Observability
+- **Logging**: 構造化JSON。`console.log` 禁止、`pino` 等を使用
+- **Tracing**: OpenTelemetry、リクエストIDで全コンポーネント横断
+- **Metrics**: Prometheus 互換、SLO 違反検知
+- **Error Tracking**: Sentry、ユーザーコンテキスト付与
+
+### Stripe 実装の Gotchas
+- Webhook は **署名検証必須**（`stripe.webhooks.constructEvent`）
+- イベントは **冪等に処理**（`stripe_event_id` をDBでuniq制約）
+- サブスク: `invoice.payment_succeeded` / `customer.subscription.updated` を主に処理
+- Tax は **Stripe Tax** 使用（日本消費税対応）
+- 3Dセキュア: `payment_intent.requires_action` を FE に通知
+- 返金・Dispute 処理フロー整備
+
+### Testing 戦略
+- **Unit**: ビジネスロジック・純関数
+- **Integration**: API + DB、実DBに近い環境（Testcontainers）
+- **Contract Testing**: FE/BE 間の型整合性（tRPC / OpenAPI + Pact）
+- **Load Testing**: k6 / Artillery、本番想定負荷の1.5倍をSLO内で捌く
+- **Security Testing**: OWASP ZAP / Burp Suite、定期実行
+
+### Cost-aware Architecture
+- DB接続: Serverless では Connection Pooler（Supavisor / PgBouncer）必須
+- Edge Function: 重い処理は Node runtime、軽い処理は Edge
+- S3 Storage: Cold / Warm / Hot 階層化
+- CDN: キャッシュヒット率80%以上を目指す
+
+## 自己検証チェックリスト
+- [ ] 全エンドポイントに認証/認可チェックがあるか
+- [ ] Zod スキーマバリデーションが全入力に実装されているか
+- [ ] RLS が全テーブルで有効化されているか
+- [ ] Rate Limiting が機密エンドポイントに適用されているか
+- [ ] Webhook 署名検証が実装されているか
+- [ ] N+1 問題が EXPLAIN ANALYZE で確認されているか
+- [ ] Idempotency-Key が決済・外部API呼び出しで実装されているか
+- [ ] 構造化ログが主要パスに実装されているか
+
 ## 使用ツール
 - ファイル読み書き（コード実装・マイグレーション）
 - Stripe MCP（決済設定・テスト）
 - Supabase 管理（DB・Auth）
+- Postman / Insomnia / Bruno（APIテスト）

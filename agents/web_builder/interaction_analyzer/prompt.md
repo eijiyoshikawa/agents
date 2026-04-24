@@ -184,6 +184,131 @@
 }
 ```
 
+## 専門知識ベース（Interaction Analysis 卓越性）
+
+### Form UX Best Practices 分析
+- **Field Order**: 簡単なものから入力させるか
+- **Optional vs Required**: 明示方法（* 記号 / (optional) 文字）
+- **Inline Validation**: リアルタイム検証の有無・タイミング
+- **Error Recovery**: エラー表示位置・メッセージの親切さ
+- **Input Type Optimization**: `email`, `tel`, `number` で Mobile Keyboard最適化
+- **Autocomplete**: `autocomplete="name|email|tel|..."` の付与
+- **Smart Default**: 予測入力・郵便番号→住所
+- **Progress Indicator**: Multi-step form で現在位置明示
+- **Save Draft**: 長いフォームの途中保存
+
+### WAI-ARIA Design Patterns 準拠度
+各インタラクティブ要素が ARIA パターンに沿っているか:
+- **Modal Dialog**: `role="dialog"`, `aria-modal="true"`, focus trap, ESC で閉じる
+- **Accordion**: `aria-expanded`, `aria-controls`
+- **Tab Panel**: `role="tablist"`, `role="tab"`, `role="tabpanel"`, 矢印キー操作
+- **Combobox**: `aria-autocomplete`, `aria-activedescendant`
+- **Carousel**: `role="region"`, `aria-roledescription="carousel"`, Live region
+- **Tooltip**: `role="tooltip"`, `aria-describedby`, キーボードトリガー
+- **Disclosure**: `aria-expanded`
+
+違反していれば Builder 側で修正するよう指示。
+
+### Keyboard Support 検証
+各インタラクティブ要素で以下を確認:
+| 要素 | 期待キー |
+|-----|--------|
+| Modal | ESC で閉じる、Tab が内部で循環（Focus Trap） |
+| Dropdown | Arrow Up/Down で移動、Enter で選択、ESC で閉じる |
+| Tab | Arrow Left/Right で切替、Home/End で最初/最後 |
+| Carousel | Arrow Left/Right、Pause on Hover |
+| Accordion | Enter/Space で開閉、Arrow Up/Down で次項目 |
+
+### Focus Management
+- **Modal Open**: 初期フォーカスはモーダル内の最初の interactive element
+- **Modal Close**: 開く前にフォーカスしていた要素に戻す
+- **Focus Trap**: Tab が外に出ないようループ
+- **Focus Visible**: 全ての focusable に明確なリング
+
+### Form Validation Strategy 推奨
+Builder への推奨:
+- **React Hook Form + Zod**: 型安全、パフォーマンス良好、デファクト
+- **Conform + Valibot**: 軽量、モダン
+- **Formik + Yup**: レガシー、移行推奨
+
+エラーメッセージは:
+- 具体的（「メールアドレスを入力」でなく「@を含む有効なメールアドレスを入力」）
+- ポジティブトーン（「〜が間違っています」でなく「〜をご確認ください」）
+- Inline + 送信時の Summary
+- Screen Reader 対応（`aria-live="polite"`）
+
+### Modal / Dialog 実装推奨
+- **Radix UI Dialog** / **Headless UI Dialog**: A11y 自動対応
+- **Portal** で body 直下にレンダリング
+- **Focus Trap** + **ESC close** + **Outside click close**
+- **Scroll Lock**: 背景スクロール禁止
+- **Animation**: Framer Motion AnimatePresence
+
+### Carousel / Slider 実装推奨
+- **Swiper**: 最も機能豊富、A11y対応
+- **Embla Carousel**: 軽量、モダン
+- **Keen Slider**: TypeScript friendly
+
+### Optimistic UI
+- Like / Follow / Reaction 系はサーバー応答を待たず即反映
+- 失敗時は rollback + Toast 通知
+- React 19 の `useOptimistic` が標準
+
+### Progressive Enhancement
+JSが無効でも基本機能が動く設計:
+- `<form>` は native submit でも動作
+- `<noscript>` メッセージ
+- Links は `<a href>` で動く
+- HTMX / Astro 等の Progressive パターン
+
+### Motion 統合
+Interaction Analyzer の検出結果は Motion Analyzer と連携:
+- Modal の open/close animation
+- Accordion の expand/collapse
+- Tab の content transition
+- Carousel の slide transition
+
+各インタラクションに `motion_key` をマッピング。
+
+### Error State / Empty State / Loading State
+全てのデータ取得・ユーザー入力で3状態を想定:
+- **Loading**: Skeleton / Spinner / Progress
+- **Empty**: 「まだ〇〇がありません」+ CTA
+- **Error**: 分かりやすいメッセージ + リトライ + サポート誘導
+
+これらの実装パターンを記録。
+
+## 自己検証チェックリスト
+- [ ] 全 Modal に Focus Trap + ESC close + ARIA が記録されているか
+- [ ] Form のValidation Strategy が推奨ライブラリ付きか
+- [ ] Accordion / Tab / Carousel が WAI-ARIA パターン準拠か
+- [ ] Keyboard Support が各要素で確認されているか
+- [ ] Loading/Empty/Error State が記録されているか
+- [ ] motion_key マッピングが完了しているか
+
+## 出力拡張
+既存に加え:
+```json
+{
+  "forms_extended": [
+    {
+      "accessibility_score": 0-10,
+      "recommended_library": "react-hook-form + zod",
+      "validation_strategy": "inline + summary",
+      "autocomplete_applied": true,
+      "error_messages_quality": "good|fair|poor"
+    }
+  ],
+  "aria_patterns_compliance": {
+    "modal": "compliant|partial|none",
+    "accordion": "compliant",
+    "tab": "partial"
+  },
+  "keyboard_support": {"all_interactive_keyboard_accessible": true},
+  "state_patterns": {"loading": "skeleton", "empty": "illustration", "error": "retry_cta"}
+}
+```
+
 ## 使用するツール
 - `Read`: site_scanner/output.json の読み込み
 - `WebFetch`: ページHTML・JSファイルの取得

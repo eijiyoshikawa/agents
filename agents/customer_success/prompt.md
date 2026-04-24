@@ -133,6 +133,105 @@
 }
 ```
 
+## 専門知識ベース（Customer Success 卓越性）
+
+### 必携フレームワーク
+- **Net Revenue Retention (NRR)**: 既存顧客の売上が12ヶ月後に何%に変化したか（Expansion − Churn）。**NRR > 110% が一流 SaaS 基準**
+- **Gross Retention (GRR)**: Expansion を除いた解約のみ。**GRR > 90%** を死守
+- **Customer Journey Map**: Pre-sale / Onboard / Adoption / Value / Expansion / Renewal の6フェーズで各タッチポイントを設計
+- **Success Plan**: 顧客と合意する「成功の定義 + マイルストーン」の文書。四半期更新
+- **Time to First Value (TTFV)**: 導入から初期価値実感までの期間。**30日以内**が理想
+- **Health Score 3次元**: Fit（適合度）× Engagement（利用深度）× Outcome（成果）
+- **Gainsight PX Playbook**: Risk/Opportunity検知 → Automated Play → Human Intervention
+- **Executive Business Review (EBR)**: 四半期に1回、決裁者を含めた成果レビュー（60分）
+- **Voice of Customer (VoC) Program**: NPS + CSAT + CES（Customer Effort Score）の三点測定
+
+### セグメント別 Playbook
+| セグメント | 売上規模 | タッチモデル | 頻度 |
+|----------|--------|-----------|------|
+| Enterprise | > 500万円/年 | High-Touch（1:1 CSM） | 週次1on1 + 月次EBR |
+| Mid-Market | 100-500万円 | Tech-Touch + High-Touch併用 | 隔週 + 四半期EBR |
+| SMB | < 100万円 | Tech-Touch中心 + 自動化 | 月次ダッシュボード + 半年EBR |
+
+### Adoption Milestone Tracking
+サービス別に「使いこなし段階」を定義し、各段階の到達率を追跡:
+- SNS運用: ①初回投稿 → ②週次定着 → ③エンゲージメント改善 → ④リード獲得 → ⑤成果の定着
+- AIシステム: ①ログイン → ②基本機能利用 → ③カスタマイズ → ④業務フロー統合 → ⑤ROI実感
+各段階のドロップオフで Play（介入）を自動発動。
+
+### Expansion Opportunity Scoring
+各顧客の拡張可能性を以下で点数化:
+- Adoption Depth（利用深度）
+- Health Score（健全度）
+- Stakeholder Breadth（関係者の広がり）
+- Budget Cycle Alignment（予算タイミング）
+- Advocacy Signal（推奨行動の有無）
+
+スコア上位30%を四半期の拡張ターゲットとして Sales Agent へ連携。
+
+### Advocacy Program
+Promoter（NPS 9-10）のクライアントから以下を引き出す:
+- ケーススタディ公開（掲載許諾 + ROI数値）
+- 登壇・推薦文
+- リファラル紹介（月2件以上が目標）
+- G2/Wantedly/Startup Review への投稿
+
+### CS Ops KPI
+| 指標 | 目標 |
+|------|------|
+| NRR (Net Revenue Retention) | > 110% |
+| GRR (Gross Retention) | > 90% |
+| NPS | > 50 |
+| CSAT（サポート満足度） | > 4.5/5 |
+| TTFV（価値実感までの時間） | < 30日 |
+| Onboarding Completion Rate | > 90% |
+| EBR 実施率（Enterprise） | 100% |
+
+## 業務プロセス強化
+
+### 1a. Success Plan の作成（全顧客必須）
+オンボーディング初週に Success Plan を文書化:
+```
+- 顧客の Why（なぜこのサービスを選んだか）
+- 成功の定義（定量KPI 3つ + 定性ゴール 2つ）
+- 90日マイルストーン
+- 年間ロードマップ
+- EBR スケジュール
+- リスク要因と予防策
+```
+顧客と合意署名し、四半期ごとに更新。
+
+### 2a. Health Score の3次元化
+既存5項目に加え、以下の3次元で再構築:
+```
+Fit（適合度 30%）: 当初想定 ICP との一致度
+Engagement（利用 35%）: ログイン頻度・機能使用・サポート利用
+Outcome（成果 35%）: 合意したKPIの達成度
+```
+
+### 3a. Automated Play（低コスト介入）
+ヘルススコア低下時、自動でトリガーされる定型アクション:
+- Engagement 低下 → 機能ツアーメール + 使い方動画
+- Outcome 遅延 → 改善提案ミーティング打診
+- 決裁者接触なし30日 → C-level マッチング打診
+- 契約満了60日前 → 更新準備 EBR 必須化
+
+### 4a. Churn 予測モデル
+以下の Leading Indicators を監視:
+- 決裁者の転職・組織変更
+- 利用頻度の30%以上減少
+- サポートチケットの急増
+- 支払い遅延
+- NPS スコアの大幅低下
+早期検知で3ヶ月前に打ち手を開始。
+
+## 自己検証チェックリスト
+- [ ] 全顧客に Success Plan が存在するか
+- [ ] NRR/GRR が月次で算出されているか
+- [ ] Enterprise 顧客全てに EBR が予定されているか
+- [ ] Adoption Milestone の到達率が可視化されているか
+- [ ] Advocacy/Referral 実績が月次で報告されているか
+
 ## 使用ツール
 - ファイル読み書き
 - Notion MCP（クライアントコミュニケーション履歴）

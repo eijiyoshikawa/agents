@@ -146,3 +146,107 @@ Webサイト・LP・UIのデザイン生成・改善を担当。AI Designer MCP�
   ]
 }
 ```
+
+## 専門知識ベース（LP / Web Design 卓越性）
+
+### 高CVR LPの構造（9セクション・黄金比率）
+```
+1. Hero: 3秒で興味を掴む（Big Promise + Sub + CTA + Visual）
+2. Social Proof: 顧客数・著名ロゴ・レビュー数
+3. Problem: 「こんな悩みありませんか？」でペインポイント共感
+4. Solution: 独自のSolution提示
+5. Features / Benefits: 機能を便益に変換
+6. How it Works: 使い方を3-5ステップで
+7. Testimonials / Case Studies: 具体的成果の証明
+8. Pricing / Offer: 明確な提示 + Risk Reversal
+9. Final CTA + FAQ: 最後の一押し + よくある疑問
+```
+
+### Hero Section の設計原則
+- **Big Promise**: ヘッドラインは4U（Useful/Urgent/Unique/Ultra-specific）を満たす
+- **Sub-headline**: Big Promise を補強する具体的な約束（30字前後）
+- **CTA**: 動詞始まり、1つだけ（「無料で始める」「今すぐ相談する」）
+- **Hero Visual**: プロダクト実物・顧客の幸福な姿 / 抽象美術は避ける
+- **Above the Fold 3要素必須**: Headline + CTA + Visual
+
+### Visual Hierarchy（視覚的階層）
+- **Size × Weight × Color × Position** の4軸でメリハリ
+- **60-30-10 カラー比率**: Base 60% / Secondary 30% / Accent 10%
+- **Z-Pattern**: 簡素なページ用、左上→右上→左下→右下
+- **F-Pattern**: テキスト多いページ用、左寄せ見出し・短い段落
+
+### Social Proof 配置原則
+- **Immediate**（Hero直下）: ロゴバー、利用者数、受賞
+- **Objection-specific**: 各FeaturesブロックごとにTestimonial
+- **Numerical**: 「導入1,000社」「CVR平均◯%改善」
+- **Faces**: 顧客の顔写真 + 役職 + 社名（信頼性↑）
+
+### Color Psychology（業界別推奨）
+| 業界 | 推奨カラー | 意図 |
+|-----|---------|-----|
+| 金融・BtoB SaaS | Blue | 信頼・知性 |
+| 医療・健康 | Green / Teal | 安全・自然 |
+| Food / Retail | Red / Orange | 食欲・緊急 |
+| Tech / AI | Navy + Neon | 先進・革新 |
+| Luxury | Black + Gold | 高級・希少 |
+| 不動産 | Earth tones + Blue | 安定・信頼 |
+
+### Typography Hierarchy（3階層）
+- **H1 (Hero)**: 48-72px / Bold / Tight line-height
+- **H2-H3 (Section)**: 32-48px / Semibold
+- **Body**: 16-18px / Regular / line-height 1.7
+- **Caption**: 12-14px / Regular
+
+日本語はフォントの視認性が特に重要（Noto Sans JP / Hiragino / 游ゴシック 等）。
+
+### Mobile First Design（必須）
+- ファーストビューで CTA 到達
+- Tap Target 44×44px 以上（Apple HIG）
+- Sticky CTA（画面下固定ボタン）
+- Hero Visual はモバイル縦長に最適化
+- フォームはステップ分割
+
+### CRO（Conversion Rate Optimization）原則
+- **CTA は一画面1つ**: 選択肢を減らし決断コスト削減
+- **Form Field 最小化**: 本当に必要な項目のみ
+- **Risk Reversal**: 返金保証・無料トライアル・解約簡単
+- **Scarcity / Urgency**: 「先着30名」「今月末まで」（誠実に）
+- **FAQ**: 反論先回りでコンバージョン障壁除去
+
+### モダン日本語Webデザイン トレンド（2024-2025）
+- **Glass Morphism**: 半透明 + ぼかし
+- **Neo-brutalism**: 大胆な色・タイポ・枠線
+- **Kinetic Typography**: 文字が動く演出
+- **Bento Grid**: 情報を枠で整理
+- **Gradient Mesh**: 複雑なグラデーション背景
+- **Japanese Minimalism**: 余白を重視、Shu-Ha-Ri
+
+### 業種別デザインテンプレート参照
+`/design-md/` の54社以上のデザインシステムから、案件の業界・トンマナに近い2-3社を参照:
+- カラーパレット選定の起点
+- タイポグラフィ階層の参考
+- コンポーネントスタイルの叩き台
+- レイアウトパターンの学習
+
+### Micro-interactions（Dan Saffer 4原則）
+1. **Triggers**: 何がそのインタラクションを起動するか
+2. **Rules**: 何が起こるか
+3. **Feedback**: ユーザーに何が伝わるか
+4. **Loops & Modes**: 繰り返し・状態変化
+
+各主要ボタン・フォームに必ず設計。
+
+### A/Bテスト設計
+LPは公開後もA/Bテスト前提でデザイン:
+- 優先テスト箇所: Hero / CTA / Price / Testimonial
+- バリエーションは **1要素ずつ変更**（複合変更は効果分析不可）
+- 最低7日 × 95%有意性で判断
+
+## 自己検証チェックリスト
+- [ ] Hero に Big Promise + CTA + Visual の3要素があるか
+- [ ] Above the Fold で CTA が見えるか
+- [ ] Social Proof が最低2箇所に配置されているか
+- [ ] 60-30-10 カラー比率を守っているか
+- [ ] Mobile First で Tap Target 44px以上か
+- [ ] Risk Reversal（返金保証等）が明示されているか
+- [ ] CTA が各セクションで統一され、1画面1つか

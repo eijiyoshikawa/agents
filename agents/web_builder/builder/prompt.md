@@ -233,3 +233,144 @@ motion_analyzer の出力に含まれる `motion_key` は **すべて `/design-m
 - GSAP 系（kinetic-flow の複雑版 / path-animation の高度版）→ `npm install gsap`
 - tsParticles（particle-connect）→ `npm install @tsparticles/react @tsparticles/engine`
 - WebGL（liquid-hover）→ `npm install three` または `npm install ogl`
+
+## 専門知識ベース（Implementation 卓越性）
+
+### Atomic Design コンポーネント分解
+```
+src/components/
+├── atoms/       # Button, Input, Icon, Badge
+├── molecules/   # FormField, CardHeader, NavItem
+├── organisms/   # Header, Footer, Hero, FeatureGrid
+├── templates/   # PageLayout, LandingLayout
+└── pages/       # (Next.js App Router の page.tsx)
+```
+全コンポーネントに props 型定義（TypeScript）+ Storybook 対応構造。
+
+### Server / Client Component Strategy
+- デフォルト = Server Component（Tree の葉は Client）
+- `useState` / `useEffect` / `onClick` を使うコンポーネントのみ `"use client"`
+- Interactive な部分のみ Client 化で Bundle Size 削減
+
+### Next.js Metadata API 活用（SEO）
+各 page.tsx で:
+```tsx
+export const metadata: Metadata = {
+  title: "ページタイトル",
+  description: "説明文",
+  openGraph: { images: [{ url: "/og.png" }] },
+  twitter: { card: "summary_large_image" },
+};
+```
+動的OGP は `opengraph-image.tsx` / `twitter-image.tsx` で `@vercel/og` 活用。
+
+### Error Boundary / Loading / Not Found
+全 Route Segment に対し:
+- `error.tsx`: エラー境界
+- `loading.tsx`: Suspense フォールバック
+- `not-found.tsx`: 404
+- `global-error.tsx`: root error boundary
+
+これが無いとUXが崩れるので自動追加。
+
+### Accessibility CI 統合
+- `eslint-plugin-jsx-a11y` を ESLint に追加
+- `@axe-core/react` で開発時チェック
+- Lighthouse CI で Accessibility 90+ を Quality Gate
+
+### Performance Budget
+package.json に:
+```json
+{
+  "scripts": {
+    "build:analyze": "ANALYZE=true next build",
+    "lighthouse": "lhci autorun"
+  }
+}
+```
+- JS Initial Bundle < 180KB gzipped
+- LCP < 2.5s / INP < 200ms / CLS < 0.1
+- Lighthouse 全項目 90+
+
+### ESLint / Prettier / TypeScript 設定
+- `next/core-web-vitals` + `next/typescript` を extends
+- Prettier: tailwind plugin 追加（クラス順序整理）
+- TypeScript strict mode: `"strict": true`
+
+### 環境変数テンプレ
+`.env.example` に以下を含める:
+```
+NEXT_PUBLIC_SITE_URL=
+NEXT_PUBLIC_GA_ID=
+# 実運用に必要な変数のテンプレ
+```
+
+### Vercel Auto Deploy
+- `vercel.json` で環境ごとの設定
+- GitHub 連携で PR ごとにプレビューURL
+- 環境変数を Vercel Dashboard で設定
+- `@vercel/analytics` + `@vercel/speed-insights` を追加
+
+### prefers-reduced-motion 共通CSS（既に記載）に加えて:
+- `@media (prefers-color-scheme: dark)` でダークモード対応
+- Print media query（印刷時の調整）
+- `@media (prefers-contrast: high)` で高コントラスト対応
+
+### Security Headers
+`next.config.ts` の headers() で:
+```tsx
+{
+  key: "X-Frame-Options", value: "DENY",
+  key: "X-Content-Type-Options", value: "nosniff",
+  key: "Referrer-Policy", value: "strict-origin-when-cross-origin",
+  key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()",
+  key: "Content-Security-Policy", value: "...",
+}
+```
+
+### Image Optimization
+- `next/image` を全画像で使用
+- LCP画像: `priority={true}` + `fetchPriority="high"`
+- Below-fold: デフォルト（lazy loading）
+- 外部ドメインは `next.config.ts` の `images.remotePatterns` に許可
+- Blur placeholder: `placeholder="blur"` + `blurDataURL`
+
+### Font Optimization
+`src/app/layout.tsx`:
+```tsx
+import { Noto_Sans_JP, Inter } from 'next/font/google';
+const noto = Noto_Sans_JP({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-noto",
+  preload: true,
+});
+```
+
+### SEO Files
+- `sitemap.xml`: `sitemap.ts` で動的生成
+- `robots.txt`: `robots.ts` で動的生成
+- `manifest.json`: PWA対応（Web App Manifest）
+
+### README / Documentation
+- セットアップ手順
+- 環境変数説明
+- デプロイ手順
+- 設計思想（motion_key 参照、コンポーネント構成）
+
+### Build Quality Gate（Iteration 完了前）
+```bash
+npm run lint && \
+npm run build && \
+npx @lhci/cli@latest autorun
+```
+全てpassしなければ Iteration 完了とみなさない。
+
+## 自己検証チェックリスト
+- [ ] Server / Client Component の分離が最小範囲か
+- [ ] error.tsx / loading.tsx / not-found.tsx が配置されているか
+- [ ] Metadata API が全ページで設定されているか
+- [ ] prefers-reduced-motion 対応が globals.css に含まれているか
+- [ ] Security Headers が next.config.ts に設定されているか
+- [ ] Lighthouse 全項目 90+ を達成しているか
+- [ ] README + .env.example が整備されているか

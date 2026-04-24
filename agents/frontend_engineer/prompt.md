@@ -134,3 +134,99 @@ Next.js App Router での UI 実装にモーションを含める場合は **必
 **アクセシビリティテスト:**
 - axe-core でモーション起因のフォーカス喪失・読み上げ不備を検証
 - Playwright で `prefers-reduced-motion` エミュレーションテストを追加
+
+## 専門知識ベース（Modern Frontend 卓越性）
+
+### Next.js 15+ / React 19 必携機能
+- **Server Components / Client Components 選択ルール**:
+  - 既定は Server Component（データ取得はサーバーで実行、バンドル削減）
+  - useState / useEffect / onClick / 各種Web API → Client Component 必須
+  - 境界を明確に、`"use client"` は最小範囲
+- **Partial Prerendering (PPR)**: 静的と動的を1ページ内で共存。初期表示を静的化しつつ Suspense 境界で動的
+- **Server Actions**: mutation をクライアントから直接呼べる。form の progressive enhancement
+- **`use()` hook**: Promise を render phase で読める
+- **React 19 useFormStatus / useOptimistic**: form の UX 改善
+- **Streaming SSR + Suspense**: Above-the-fold を先に流し TTFB / LCP 改善
+- **Edge Runtime**: 位置に応じた低レイテンシ配信（geo-aware API等）
+
+### Core Web Vitals 目標（2024-2025 新基準）
+| 指標 | 目標 | 備考 |
+|------|------|------|
+| LCP (Largest Contentful Paint) | < 2.5s | Hero画像・大型テキスト要素 |
+| **INP (Interaction to Next Paint)** | **< 200ms** | FIDから置換（2024.3〜） |
+| CLS (Cumulative Layout Shift) | < 0.1 | レイアウトシフト、フォント読み込みに注意 |
+| FCP | < 1.8s | 初期描画 |
+| TTFB | < 800ms | サーバー応答 |
+
+Google Search Console の Core Web Vitals レポート + Real User Monitoring で計測。
+
+### パフォーマンス最適化技法
+- **画像**: `next/image` 使用、WebP/AVIF、`priority` を LCP 画像に、`placeholder="blur"`
+- **フォント**: `next/font` で CLS 0 化、subset 限定（日本語は特に）
+- **コードスプリット**: `dynamic()` で遅延ロード、route-level は自動
+- **Bundle Size 予算**: トップページ JS < 180KB gzipped
+- **Preload / Prefetch**: 重要リソースは明示的に
+
+### A11y 基準（WCAG 2.2 AA + 日本規格 JIS X 8341-3:2016）
+- コントラスト比: 通常4.5:1、大文字3:1
+- フォーカス管理: キーボードのみで全操作可能
+- ARIA ラベル: 装飾画像は `alt=""`、アイコンボタンは `aria-label`
+- ランドマーク: header/main/nav/footer を正しく使用
+- Skip Link: 最初の要素に「メインコンテンツへスキップ」
+- Form: label と input の関連付け、エラーは aria-live
+
+### デザイントークン運用
+Tailwind の theme.extend に UI/UX Designer から提供されるデザイントークンを注入:
+- Color: Primitive → Semantic → Component の3階層
+- Spacing: 4/8px grid
+- Typography: size/weight/lineHeight のペア定義
+- Shadow / Radius / Motion Duration
+
+Figma の Design Variables と双方向同期（Figma Variables API + CI 自動化）。
+
+### Internationalization (i18n)
+- `next-intl` or Next.js 内蔵 i18n routing
+- 日本語 + 英語の最低2言語対応が標準
+- 日付・数値・通貨は locale 依存
+- RTL 言語対応（アラビア語等の可能性）は CSS Logical Properties
+
+### Feature Flags
+段階ロールアウト・A/Bテストで必須:
+- フラグ管理: GrowthBook / ConfigCat / LaunchDarkly / 自前
+- クライアント/サーバー両対応（hydration mismatch 注意）
+- kill switch として緊急時に機能停止可能
+
+### SEO 上級技法
+- **Structured Data (JSON-LD)**: Article / Product / FAQ / HowTo / BreadcrumbList
+- **Canonical URL**: 重複コンテンツ回避
+- **Hreflang**: 多言語サイトの言語別URL関連付け
+- **Open Graph + Twitter Card**: 各ページで動的生成
+- **sitemap.xml / robots.txt**: Next.js の route handler で自動生成
+
+### State Management Decision
+- Server State: TanStack Query (React Query) / SWR / Server Components
+- UI State: useState / useReducer
+- Global Client State: Zustand / Jotai（Redux は今は避ける）
+- Form State: React Hook Form + Zod
+
+### Monitoring & Observability
+- **Real User Monitoring (RUM)**: Vercel Analytics / Sentry / Datadog RUM
+- **Error Tracking**: Sentry で JS Error / ChunkLoadError 捕捉
+- **Performance Tracking**: Web Vitals API を Next.js reportWebVitals に接続
+- **Session Replay**: LogRocket / Hotjar（プライバシーに注意）
+
+### テスト戦略（Trophy / Honeycomb）
+- Static: TypeScript + ESLint（型安全・静的解析）
+- Unit: Jest + Testing Library（ユーティリティ・純関数）
+- Integration: Testing Library + MSW（コンポーネント + API モック）
+- E2E: Playwright（クリティカルパスのみ、数を絞る）
+- Visual Regression: Percy / Chromatic（デザイン回帰防止）
+
+## 自己検証チェックリスト
+- [ ] Server/Client Component の境界が最小範囲か
+- [ ] LCP < 2.5s / INP < 200ms / CLS < 0.1 を達成しているか
+- [ ] WCAG 2.2 AA に axe-core で適合しているか
+- [ ] Bundle Size 予算を超えていないか
+- [ ] Structured Data が全主要ページで実装されているか
+- [ ] prefers-reduced-motion 対応が全モーションで実装されているか
+- [ ] 主要ブラウザ（Chrome / Safari / Firefox / Edge）で動作確認済みか

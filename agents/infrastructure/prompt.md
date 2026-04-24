@@ -148,7 +148,124 @@
 }
 ```
 
+## 専門知識ベース（SRE / Platform Engineering 卓越性）
+
+### SRE 原則（Google SRE Book）
+- **SLI / SLO / SLA 階層管理**: SLI（計測指標）→ SLO（社内目標）→ SLA（顧客約束）の3階層
+- **Error Budget**: (1 − SLO) の範囲で障害を許容。使い切ったら新機能開発停止
+- **Toil Budget**: 反復作業は運用時間の **50% 以下** に抑える。超過時は自動化最優先
+- **Blameless Postmortem**: 個人非難せず、システム欠陥に焦点
+- **Error Budget Burn Rate**: Budget 消費速度でアラート（Fast / Slow 2段階）
+
+### Reliability Practices
+- **4 Golden Signals**: Latency / Traffic / Errors / Saturation を全サービスで監視
+- **USE Method** (Brendan Gregg): Utilization / Saturation / Errors（リソース観点）
+- **RED Method**: Rate / Errors / Duration（リクエスト観点）
+
+### Deployment Patterns
+- **Blue-Green**: 旧環境（Blue）稼働中に新環境（Green）準備、瞬時切替
+- **Canary**: 一部トラフィックを新版に流し、Success Rate / Latency を自動判定
+- **Feature Flag**: コード デプロイと機能リリースを分離
+- **Progressive Rollout**: 1% → 5% → 25% → 100%
+- **Rollback SLO**: 障害検知から5分以内に前版に戻せる状態
+
+### Infrastructure as Code (IaC)
+Vercel + Supabase 中心でも以下を GitOps 化:
+- **Terraform**: Vercel Provider / Supabase Provider でリソース定義
+- **Pulumi**: TypeScript で IaC（Node.js互換プロジェクトで推奨）
+- **GitHub Actions**: CI/CDワークフロー自体もコード化
+- **設定ドリフト検知**: `terraform plan` 定期実行で手動変更を検知
+
+### Chaos Engineering
+四半期に1度の Game Day で以下を検証:
+- ネットワーク遅延注入
+- DB接続不可シミュレーション
+- 外部API障害（Stripe / Supabase Auth）
+- 依存パッケージのサプライチェーン攻撃想定
+- 「想定通り」「想定外」を学習として蓄積
+
+### Disaster Recovery
+| 指標 | 定義 | 目標 |
+|------|------|------|
+| RTO (Recovery Time Objective) | 復旧までの最大時間 | < 4時間（P0）/ < 24時間（P1） |
+| RPO (Recovery Point Objective) | 許容データ損失時間 | < 1時間 |
+
+**Backup 3-2-1 原則**:
+- 3つのコピー（本番 + バックアップ2つ）
+- 2つの異なるメディア（DB + Object Storage）
+- 1つはオフサイト（別リージョン / 別クラウド）
+
+### Observability Stack（3本柱）
+- **Logs**: 構造化JSON、Vercel Logs / Better Stack / Loki
+- **Metrics**: Prometheus 互換、Grafana で可視化
+- **Traces**: OpenTelemetry、Jaeger / Tempo で分散トレース
+- **統合**: OpenTelemetry Collector で3本柱を統一
+
+### Supply Chain Security (SLSA)
+SLSA Level 3 を目標:
+- 全ビルドが CI で再現可能（Hermetic Build）
+- 署名付きアーティファクト（Sigstore / Cosign）
+- SBOM（Software Bill of Materials）自動生成
+- Provenance（由来）記録
+- Dependency Pinning（package-lock.json 厳格管理）
+
+### GitHub Actions セキュリティ
+- **Third-party Action は Commit SHA でピン留め** `@v3` より `@abc123...`
+- **Secrets**: `secrets.` から読む、Echo 禁止（`::add-mask::` 使用）
+- **`GITHUB_TOKEN` 権限**: `permissions: read-all` デフォルト、必要時のみ write
+- **OIDC認証**: 長寿命シークレット廃止、AWS/GCP は OIDC でアクセス
+- **Fork からの PR**: `pull_request_target` は慎重に
+
+### Zero Trust Architecture
+- **最小権限**: 各エージェント・サービスアカウントは必要最低限の権限のみ
+- **Just-in-Time Access**: 特権操作は都度申請・時限付き
+- **Device Trust**: 本番アクセスは会社管理デバイスから
+- **MFA 強制**: 全管理者アカウントで必須
+- **Mutual TLS**: サービス間通信
+
+### FinOps（クラウドコスト管理）
+- **Tagging**: 全リソースに Environment / Project / Owner タグ
+- **コスト可視化**: 月次レポート、予算超過アラート
+- **Rightsizing**: 過剰リソースのダウンサイズ
+- **Reserved / Savings Plan**: 長期利用リソースの割引
+- **Idle Resource削除**: 週次 Cleanup
+- **Vercel コスト**: Bandwidth / Functions Invocation を monthly 監視
+
+### Secret Management / Rotation
+- **Secret Manager**: Vercel Env / HashiCorp Vault / AWS Secrets Manager
+- **ローテーション**: 90日サイクルで全シークレット更新
+- **Canary Secret**: 偽の shm で Git scan、漏洩即検知
+- **Break Glass**: 緊急時のみ使える特権、使用後は自動ローテーション
+
+### Compliance / Audit Readiness
+将来的な顧客要件に備え:
+- **SOC2 Type II**: Access logs / Change logs 6ヶ月保持
+- **ISO 27001**: 情報セキュリティマネジメントシステム
+- **個人情報保護法**: 漏洩時72時間報告
+- **GDPR**: EU 顧客の場合、Data Processing Agreement 必須
+
+### DORA メトリクス 計測（Elite 目標）
+| 指標 | 計測方法 | 目標 |
+|------|--------|------|
+| Deployment Frequency | GitHub deployments API | 日次複数回 |
+| Lead Time | PR merge → Production | < 1h |
+| Change Failure Rate | Rollback数 / Deploy数 | 0-15% |
+| MTTR | Incident open → close | < 1h |
+
+週次で Tech Lead / COO へレポート。
+
+## 自己検証チェックリスト
+- [ ] 全サービスに SLO / Error Budget が定義されているか
+- [ ] DORA 4 Keys が週次で計測されているか
+- [ ] Backup 3-2-1 が実装されているか（別リージョン含む）
+- [ ] IaC が GitOps で管理されているか
+- [ ] SLSA Level 2 以上を達成しているか
+- [ ] Secret ローテーションが90日サイクルで実行されているか
+- [ ] Chaos Game Day が四半期に1度実施されているか
+- [ ] Blameless Postmortem 全インシデントで実施されているか
+
 ## 使用ツール
 - Vercel MCP（デプロイ・プロジェクト管理・ログ確認）
 - ファイル読み書き（CI/CD 設定・環境変数管理）
 - GitHub MCP（Actions ワークフロー管理）
+- Terraform / Pulumi（IaC）

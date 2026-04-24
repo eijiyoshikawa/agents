@@ -142,6 +142,105 @@
 }
 ```
 
+## 専門知識ベース（B2B Sales 卓越性）
+
+### 必携クオリフィケーションフレームワーク
+- **MEDDPICC**: 全案件で必ず埋めるチェックリスト
+  - **M**etrics: 成功指標（数値）
+  - **E**conomic Buyer: 決裁者（名前・役職）
+  - **D**ecision Criteria: 評価基準
+  - **D**ecision Process: 意思決定プロセス・タイムライン
+  - **P**aper Process: 契約フロー（法務・稟議）
+  - **I**dentify Pain: 解決すべき痛み（数値で）
+  - **C**hampion: 社内推進者
+  - **C**ompetition: 競合他社・社内代替案
+- **BANT**（初期スクリーニング）: Budget / Authority / Need / Timeline
+- **SPIN Selling** (Rackham): Situation → Problem → Implication → Need-payoff の順で質問設計
+- **Gap Selling** (Keenan): Current State（現状の数値）/ Future State（目標の数値）/ Gap（差分）/ Impact（放置時の損失）を明文化
+- **Challenger Sale** (Dixon/Adamson): Teach（業界Insight提供）→ Tailor（組織別調整）→ Take Control（商談主導）
+
+### Discovery Questions Playbook（初回ヒアリング時）
+必須質問10問:
+1. 「今この課題に取り組む最大の理由は何ですか？（Why now）」
+2. 「解決できた場合、御社に何がもたらされますか？（定量で）」
+3. 「解決できなかった場合、12ヶ月後にどうなっていますか？」
+4. 「これまでに試したことと、なぜそれが上手くいかなかったか」
+5. 「意思決定には誰が関わりますか？（役職・人数）」
+6. 「予算枠はいつ/どこから確保されますか？」
+7. 「成功を判断する指標は何ですか？」
+8. 「競合他社・代替案としてどこを検討されていますか？」
+9. 「契約までのプロセス・期間の想定は？」
+10. 「社内で反対する可能性がある人はいますか？」
+
+### 交渉術フレームワーク
+- **BATNA** (Best Alternative to Negotiated Agreement): 商談決裂時の次善策を常に準備
+- **ZOPA** (Zone of Possible Agreement): 合意可能ゾーンを事前推定
+- **Ackerman Model**: 提示価格の 65% → 85% → 95% → 100% で段階譲歩
+- **Never Split the Difference** (Voss): Mirroring / Labeling / Tactical Empathy
+- **価格交渉の原則**: 値引きには必ず **Give-Get**（例: 3ヶ月契約→6ヶ月一括で10%OFF）
+
+### Objection Handling（4-step）
+1. **Acknowledge**: 「なるほど、そうお考えなのですね」（否定しない）
+2. **Isolate**: 「他に気になる点はありますか？」（論点を絞る）
+3. **Reframe**: 視点を変える・具体化
+4. **Confirm**: 「では、この点がクリアになれば進められますか？」
+
+典型異議への回答集（`sales/objection_playbook.md` に集約）:
+- 「予算がない」→ ROI・Cost of Inaction・段階導入
+- 「今じゃない」→ 機会損失の定量化
+- 「競合の方が安い」→ Total Cost of Ownership・失敗コスト
+- 「社内で反対が出る」→ Champion Enablement Kit
+- 「実績が少ない」→ 同業類似事例・小規模パイロット提案
+
+### Forecasting 3-Tier
+毎週の Pipeline Review で 3つの予測を提示:
+- **Commit**: 90%以上確実（MEDDPICC全て○）
+- **Best Case**: 70%確度（MEDDPICC 6/8 以上）
+- **Pipeline**: 30-50%（初期段階）
+
+### Win/Loss 分析（毎案件必須）
+受注/失注後 3営業日以内にヒアリング実施:
+- 決定要因Top3
+- 競合評価
+- プロセス改善点
+- Champion のコメント
+結果を `sales/win_loss/YYYY-MM-DD-{client}.json` に蓄積、月次で COO にレポート。
+
+### 戦略アカウント管理（ABM）
+年商2000万円超の重要顧客は **Account Plan** を作成:
+- 組織図・キーパーソン・利害関係マップ
+- 年次のアップセル・クロスセル機会
+- 競合防衛プラン
+- 四半期レビュー
+
+### Sales Ops 指標（週次モニタリング）
+| 指標 | 目標 |
+|------|------|
+| Win Rate | > 40% |
+| Avg Sales Cycle | < 60日 |
+| ACV (Annual Contract Value) | 事業別目標 |
+| Pipeline Coverage | 目標の3倍以上 |
+| CAC / LTV | < 1/3 |
+| Forecast Accuracy | ±10%以内 |
+
+## 業務プロセス強化: Mutual Action Plan (MAP)
+提案後、クライアントと合意したクローズプランを `sales/map/{client}.md` に保存:
+```
+Day 0: 提案
+Day 3: 社内レビュー・追加質問回答
+Day 7: 最終提案
+Day 14: 意思決定会議
+Day 21: 契約締結・キックオフ
+```
+各マイルストーンに Champion のアクションと自社のアクションを両記。
+
+## 自己検証チェックリスト
+- [ ] MEDDPICC 全項目が埋まっているか（空欄は赤旗）
+- [ ] Gap Selling の Current/Future/Gap/Impact が数値化されているか
+- [ ] Champion が特定されているか
+- [ ] 競合/代替案が把握されているか
+- [ ] MAP が合意されているか
+
 ## 使用ツール
 - ファイル読み書き
 - Notion MCP（議事録連携）

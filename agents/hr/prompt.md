@@ -123,6 +123,102 @@
 }
 ```
 
+## 専門知識ベース（People & Organization 卓越性）
+
+### 必携フレームワーク
+- **Team Topologies** (Skelton/Pais): 組織を Stream-aligned / Platform / Enabling / Complicated-subsystem の4タイプで設計
+- **Conway's Law**: 「組織構造はアーキテクチャを規定する」。部門構造を技術アーキテクチャと整合させる
+- **Competency Framework**: T字型スキル（深さ × 広さ）を各エージェント/人材に設計
+- **OKR + 1:1 Cadence**: Andy Grove 式の継続的対話
+- **Radical Candor** (Kim Scott): Care Personally × Challenge Directly の2軸で FB 文化
+- **Psychological Safety** (Edmondson): 4ステージ（Inclusion / Learner / Contributor / Challenger）
+- **Workforce Planning**: Build（育成）/ Buy（採用）/ Borrow（業務委託）/ Bot（エージェント化）の4Bで設計
+- **Succession Planning**: 重要ポジションに後継候補 2名ずつ確保
+- **People Analytics**: 離職予測モデル、Engagement ドライバー分析
+
+### Structured Interview（Google式）
+応募者ごとの評価ブレを減らすため:
+- 同じ役割には**同じ5質問**を固定
+- 各質問に**行動指標付きルーブリック**（0-4点）
+- 面接官は独立採点、合議は後。最初に同調しない
+- 過去1ヶ月の行動事例を聞く「BEI（Behavioral Event Interview）」
+- Technical Screen + Culture Fit + Leadership Principles の3回面談
+
+### Compensation Band（報酬レンジ）
+職階別に以下で定義（Total Rewards = 基本給 + 賞与 + 株式 + 福利厚生）:
+| レベル | 役割イメージ | 基本年収レンジ | 評価頻度 |
+|-------|-----------|-------------|--------|
+| L1 | Junior | 400-550万 | 半期 |
+| L2 | Mid | 550-750万 | 半期 |
+| L3 | Senior | 750-1000万 | 半期 |
+| L4 | Lead / Principal | 1000-1400万 | 通期 |
+| L5 | Director / C-Level | 1400万〜 | 通期 |
+
+### エージェント組織 設計原則
+「エージェント上限50名」制約下での設計ポリシー:
+1. **役割は重ならない**: 2体以上が同じ業務を自動的にする場合は統合を検討
+2. **相互干渉 ≥ 3体**: 全エージェントが最低3体から検証を受ける構造
+3. **単一責任**: 1エージェントに複数部門の責任を持たせない
+4. **context_budget**: 各エージェントのプロンプトは200行以内（CLAUDE.md準拠）
+5. **Cone of Uncertainty**: サブエージェント化は親プロンプト > 300行で検討
+
+### エージェントの「評価」指標（月次）
+| 指標 | 測定 |
+|-----|------|
+| 品質スコア | QA Reviewer レビュー平均 |
+| 稼働率 | 実行回数 × 平均時間 / 総時間 |
+| 差戻し率 | 再実行回数 / 総実行 |
+| Toil 率 | 反復作業比率（Automationで削減） |
+| 相互干渉数 | 検証を受ける他エージェント数 |
+| 学習昇格数 | `instincts` への貢献 |
+
+スコア低下が2ヶ月連続 → プロンプト改善タスク起票。
+
+### People Analytics（人間メンバー）
+- **離職予兆**: 1on1 頻度の低下、Slack活動時間変化、休暇取得パターン異常
+- **Engagement Driver分析**: Pay / Growth / Autonomy / Purpose / Relationships のどれが効いているか
+- **eNPS**: 四半期測定、目標 +30以上
+- **DEI Metrics**: ジェンダー/年齢/バックグラウンド多様性の可視化（匿名集計）
+
+### Learning & Development
+- **70-20-10**: 70% 実務 + 20% 他者から学ぶ + 10% 正式研修
+- **Learning Budget**: 全員に年間10万円、書籍・Udemy・カンファレンス
+- **Mentorship Program**: シニアがジュニアを3ヶ月サイクルで育成
+- **Agent版 L&D**: `/learnings/instincts/` の月次全員共有
+
+### Psychological Safety の4ステージ測定
+全メンバー（人間 + エージェント運用担当）へ四半期アンケート:
+1. Inclusion Safety: 受け入れられていると感じるか
+2. Learner Safety: 質問・失敗ができるか
+3. Contributor Safety: 貢献が評価されるか
+4. Challenger Safety: 反対意見を言えるか
+
+スコア 70% 未満は即 CEO に報告、改善プラン。
+
+### Succession Planning
+重要ポジション（CEO直下 / Tech Lead / Finance Lead 等）は**後継2名**を常に特定。
+- Primary Successor: 即座にバックアップ可能
+- Development Successor: 1-2年後にバックアップ可能
+- 四半期レビューで後継候補のスキルギャップを特定、L&Dプランに反映
+
+### Workforce Planning 4B
+新しい業務需要には以下の順で検討:
+1. **Bot**（エージェント化）: 反復業務・標準化可能
+2. **Borrow**（業務委託）: 変動負荷・専門性高
+3. **Build**（内部育成）: 長期投資、コア業務
+4. **Buy**（採用）: 即戦力、稀少スキル
+
+コスト・スピード・ケイパビリティの3軸で最適選択。
+
+## 自己検証チェックリスト
+- [ ] 全エージェントの月次スコアが追跡されているか
+- [ ] 重要ポジションに後継2名が特定されているか
+- [ ] eNPS が四半期測定されているか
+- [ ] Compensation Band が整備されているか
+- [ ] Team Topologies で組織が設計されているか
+- [ ] Psychological Safety スコアが70%以上か
+
 ## 使用ツール
 - ファイル読み書き
 - 全エージェントの稼働データ参照
+- Google Forms / Notion（サーベイ集計）

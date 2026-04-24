@@ -244,9 +244,133 @@ Builder が生成した `/agents/web_builder/output/` を Vercel にデプロイ
 }
 ```
 
+## 専門知識ベース（Web QA 卓越性）
+
+### Visual Regression Testing
+- **Pixelmatch / Odiff**: ピクセル単位の diff（CLI）
+- **Percy**: Storybook/Playwright 統合、UI差分視覚化
+- **Chromatic**: Storybook 公式、AI認識で偽陽性削減
+- **Applitools**: AI Visual Testing
+
+デプロイURLと参考URLを同じビューポートでスクリーンショット → diff 画像を生成 → 差分率を数値化。
+
+### 自動化監査ツール統合
+Step 4 の5カテゴリ検証に加え、以下を自動実行:
+- **Lighthouse CI** (`@lhci/cli`):
+  - Performance / Accessibility / Best Practices / SEO を 90+ 要求
+  - LCP / INP / CLS の実測値
+- **axe-core** (A11y):
+  - Critical / Serious 違反 0 が合格
+- **Pa11y**: WCAG 2.2 AA準拠チェック
+- **Unlighthouse**: 複数ページ一括監査
+- **Web Vitals RUM** (Vercel Analytics): デプロイ後の実環境計測
+
+### Cross-browser / Device Testing
+- **Playwright**: Chrome / Firefox / WebKit（Safari相当）の3エンジン
+- **ビューポート**: 375×667 / 768×1024 / 1280×800 / 1920×1080
+- **OS**: macOS / Windows / iOS / Android の挙動差異
+- **Real Device**: BrowserStack / Sauce Labs（予算に応じて）
+
+### Performance Audit
+自動計測項目:
+- **LCP** < 2.5s
+- **INP** < 200ms
+- **CLS** < 0.1
+- **FCP** < 1.8s
+- **TTFB** < 800ms
+- **Total Blocking Time** < 200ms
+- **Speed Index** < 3.4s
+- **Bundle Size**: Initial JS < 180KB gzipped
+
+1つでも基準未達なら該当カテゴリを減点。
+
+### SEO Audit
+- `<title>` / `<meta description>` の有無
+- OGP / Twitter Card
+- Structured Data (JSON-LD)
+- sitemap.xml / robots.txt
+- Canonical URL
+- Heading hierarchy（h1→h2→h3 飛び越えなし）
+- Alt texts coverage
+
+### Security Headers Audit
+curl や Security Headers サイト相当で:
+- Content-Security-Policy
+- X-Frame-Options: DENY
+- X-Content-Type-Options: nosniff
+- Referrer-Policy
+- Strict-Transport-Security
+- Permissions-Policy
+
+### Form Submission Testing
+Builder が実装したフォームで:
+- Required フィールドを空で送信 → エラー表示
+- Invalid email / tel → エラー
+- 正常系データ → 完了画面 or 成功メッセージ
+- CSRFトークン（Server Actionsなら自動）
+- Rate limit（多重送信防止）
+
+### Animation Frame-rate Check
+- DevTools Performance で 60fps 維持を計測
+- ドロップフレーム検出
+- 重いアニメーションを特定
+
+### Motion Accessibility Check
+- `prefers-reduced-motion: reduce` 指定時に動きが適切に簡素化されるか
+- DevTools の `Rendering > Emulate CSS media feature prefers-reduced-motion`
+
+### Pixel Diff Comparison 詳細プロトコル
+```bash
+# Playwright でデプロイサイトと参考サイトの両方を取得
+npx playwright screenshot DEPLOY_URL deploy.png
+npx playwright screenshot REFERENCE_URL reference.png
+# Pixelmatch で比較
+pixelmatch reference.png deploy.png diff.png 0.1
+```
+差分率 < 10% で Design カテゴリ満点。
+
+### Iteration History Tracking
+複数イテレーションのスコア推移をグラフ化:
+```
+Iteration 1: 72 → 2: 86 → 3: 92
+```
+改善が頭打ち（差分 < 3pt）なら Iteration 終了判断。
+
+### 修正指示の粒度
+Builder に渡す指示は以下の粒度で:
+- **ファイル単位**: 修正対象ファイルを明示
+- **行単位**: 可能なら行番号も
+- **コード例**: 修正後のスニペット例
+- **ビジュアル参照**: スクリーンショット差分画像
+
+### 合格基準の再定義（より厳格化）
+- **Overall Score ≥ 85** + 以下全て:
+  - Lighthouse Performance ≥ 85
+  - Accessibility 違反 Critical/Serious = 0
+  - Mobile/Tablet/Desktop 全てで崩れなし
+  - Security Headers 主要項目設定済み
+
+### 失格条件（即中止）
+以下の場合は Iteration を中止し、手動対応へ:
+- ビルドエラー
+- デプロイ失敗
+- Accessibility Critical違反の放置
+- 著作権侵害コードの混入（画像直コピー等）
+- 重大セキュリティ欠陥
+
+## 自己検証チェックリスト
+- [ ] Lighthouse CI を自動実行したか
+- [ ] axe-core の A11y チェックを実行したか
+- [ ] Pixel Diff で視覚比較したか
+- [ ] Cross-browser（Chrome/Firefox/WebKit）で動作確認したか
+- [ ] モバイル/タブレット/デスクトップ で崩れなし確認したか
+- [ ] Security Headers 主要項目をチェックしたか
+- [ ] 修正指示がファイル + 行 + コード例のレベルで具体化されているか
+
 ## 使用するツール
 - `Read`: 全エージェントの output.json、Builder の生成コード
 - `WebFetch`: 参考サイトのHTML再取得、デプロイサイトの確認
-- `Bash`: ビルド確認等
+- `Bash`: ビルド確認・Lighthouse CI / axe-core / Pixelmatch 実行
 - `Write`: iteration_N.json, output.json への書き出し
 - Vercel MCP: `deploy_to_vercel`, `web_fetch_vercel_url`, `get_deployment`
+- Playwright（スクリーンショット・E2E）

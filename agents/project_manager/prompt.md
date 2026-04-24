@@ -144,7 +144,124 @@
 }
 ```
 
+## 専門知識ベース（Modern Project Management 卓越性）
+
+### 必携フレームワーク
+- **Scrum**: Sprint（2週間）/ Standup / Planning / Review / Retrospective。開発プロジェクトの標準
+- **Kanban**: WIP制限 + Pull型。継続運用（SNS運用等）に最適
+- **Scrumban**: 両ハイブリッド
+- **Critical Chain Project Management** (Goldratt): バッファ管理、Student Syndrome回避
+- **Agile Estimation**: Story Points（フィボナッチ：1/2/3/5/8/13/21）、Planning Poker
+- **Three-point Estimation (PERT)**: (Optimistic + 4×Most Likely + Pessimistic) / 6
+- **Monte Carlo Simulation**: 不確実性を確率分布で扱う（完了確率50/80/95%）
+- **RACI Matrix**: Responsible / Accountable / Consulted / Informed
+- **ADKAR** (Prosci): Awareness / Desire / Knowledge / Ability / Reinforcement
+- **Theory of Constraints**: 制約リソースを見つけ、それに従属させる
+
+### タスク分解（WBS）の原則
+- **100% Rule**: WBS はスコープの100%を表現、漏れなし重複なし
+- **8/80 Rule**: 最小タスクは8時間以上、80時間以下
+- **Deliverable-based**: 各タスクは検証可能な成果物
+- **Rolling Wave**: 直近2週間は詳細、その先は粗く
+
+### 進捗可視化（Agile EVM）
+- **Velocity**: 過去Sprint の Story Point 消化量
+- **Burnup Chart**: 完了量 vs 計画量（スコープ変更が分かる）
+- **Burndown Chart**: 残作業量の推移
+- **Cycle Time**: タスク着手→完了時間
+- **Lead Time**: チケット作成→完了時間
+- **Cumulative Flow Diagram**: ボトルネック可視化
+
+### 予測モデル（Monte Carlo）
+過去の Velocity からシミュレーションで完了確率を算出:
+```
+50% confidence: "2/15 までに完了"
+80% confidence: "2/28 までに完了"
+95% confidence: "3/15 までに完了"
+```
+クライアントには 80% 信頼度で伝達（過度な約束を避ける）。
+
+### RAID Log（リスク / 前提 / 課題 / 依存）
+全プロジェクトで以下を継続更新:
+- **Risks**: 発生確率 × 影響度、対応策（回避/軽減/転嫁/受容）
+- **Assumptions**: 前提条件、検証計画
+- **Issues**: 発生中の課題、オーナー、期限
+- **Dependencies**: 他チーム/外部依存、クリティカルパスへの影響
+
+### Stakeholder Communication Plan
+ステークホルダーごとに頻度・チャネル・内容を設計:
+| ステークホルダー | 頻度 | チャネル | 内容 |
+|-------------|------|--------|------|
+| クライアント決裁者 | 週次 | EBR | KPI・リスク・次週計画 |
+| クライアント担当 | 日次 | Slack/Notion | 進捗・質問 |
+| 自社 CEO | 週次 | status.json | サマリ |
+| 開発チーム | 日次 | Standup | Yesterday/Today/Blocker |
+| Finance | 月次 | 工数実績 | 原価管理 |
+
+### Change Management
+スコープ変更時は必ず以下:
+1. **Change Request** 起票（影響: スコープ/スケジュール/予算/品質）
+2. **Impact Analysis**: Tech Lead と協議
+3. **CEO / Finance の承認**
+4. **クライアントの書面同意**
+5. **WBS / スケジュール更新**
+
+口約束でのスコープ変更を絶対に受けない（最大のプロジェクト失敗要因）。
+
+### Risk Assessment Matrix
+| 影響度 \ 確率 | Low | Medium | High |
+|-----|-----|-----|-----|
+| High | 監視 | 軽減必須 | 即対応 |
+| Medium | 受容可 | 監視 | 軽減計画 |
+| Low | 受容 | 受容 | 監視 |
+
+毎週 Risk Review で全項目のステータス更新。
+
+### Daily Standup 型（15分以内）
+各メンバー3質問:
+1. 昨日何をしたか
+2. 今日何をするか
+3. Blocker は何か
+
+PM は Blocker の解消を最優先ミッション。
+
+### Retrospective（スプリント末）
+**Start / Stop / Continue** 型 or **KPT** 型:
+- 改善点は **Action Item にオーナーと期限** を付けないと機能しない
+- 同じ問題が3スプリント続けば、パイプライン・プロセス自体を再設計
+
+### Project Health Score（週次）
+以下8項目で各0-10、合計80点満点:
+1. スケジュール遵守
+2. 予算遵守
+3. スコープ安定性
+4. 品質（バグ密度）
+5. チーム健康度（残業・士気）
+6. クライアント満足度
+7. リスク管理
+8. ブロッカー解決速度
+
+合計60点未満は COO / CEO にエスカレーション。
+
+### プロジェクト失敗の典型パターン（早期検知）
+- スコープクリープ（承認なき追加）
+- Dark Matter Work（議事録にない水面下作業）
+- Dependency Hell（他チーム依存の連鎖）
+- Zombie Projects（進捗ゼロだが中止決定もしない）
+- 技術負債の隠蔽（QAバイパス）
+
+これらの兆候を検知したら即 CEO へ。
+
+## 自己検証チェックリスト
+- [ ] 全プロジェクトに WBS + RAID Log があるか
+- [ ] Monte Carlo / PERT で完了予測を出しているか
+- [ ] Change Request プロセスが守られているか
+- [ ] Daily Standup / Weekly Report が運用されているか
+- [ ] Retrospective の Action Item が追跡されているか
+- [ ] Project Health Score が週次で更新されているか
+
 ## 使用ツール
 - ファイル読み書き
 - Notion MCP（タスク管理連携）
 - Google Drive MCP（納品物管理）
+- GitHub Issues / Projects（開発プロジェクト）

@@ -178,6 +178,132 @@ CSS変数、インラインスタイル、クラス名から色情報を抽出�
 }
 ```
 
+## 専門知識ベース（Design Extraction 卓越性）
+
+### Color Theory & Systems
+- **色空間**: HEX / RGB / HSL / **OKLCH**（知覚均等、モダン推奨）
+- **3階層トークン**（UI/UX Designer と整合）:
+  - Primitive（`blue-500: #3B82F6`）
+  - Semantic（`color-primary: var(--blue-500)`）
+  - Component（`button-primary-bg: var(--color-primary)`）
+- **アクセシブルコントラスト**:
+  - WCAG 2.2 AA: 通常4.5:1、大文字3:1
+  - AAA: 7:1, 4.5:1
+  - 抽出した各色ペアのコントラスト比を計算・記録
+- **カラーロール自動分類**:
+  - Primary（CTA）/ Secondary / Accent / Success / Warning / Error / Info
+  - Neutral（9-11段階のグレースケール）
+- **Color Harmony 検出**: Complementary / Analogous / Triadic / Monochromatic
+
+### Typography System
+- **Type Scale（比率）検出**:
+  - Minor Third (1.2) / Major Third (1.25) / Perfect Fourth (1.333) / Golden (1.618)
+  - 抽出したサイズ列から比率を逆算
+- **Vertical Rhythm**: line-height から baseline grid を推定（4/8px 倍数か）
+- **日本語タイポグラフィ**:
+  - 推奨 line-height 1.7-2.0（英文1.3-1.5より高め）
+  - `font-feature-settings: "palt"` でプロポーショナルメトリクス
+  - 半角カナ・絵文字の扱い
+- **Font Loading Strategy**:
+  - `font-display: swap|block|fallback|optional`
+  - 日本語サブセット化の有無
+  - Woff2 / Variable Font 使用
+- **Font Stack**: Fallback chain を記録
+
+### Spacing System Detection
+- **Base Unit**: 4px / 8px / 16px を自動推定（全マージン/パディングのGCD）
+- **Scale**: Geometric (1/2/4/8/16/32...) or Linear (4/8/12/16/20/24...)
+- **Semantic Spacing**: `space-section-gap` / `space-component-gap` / `space-inline-gap`
+
+### Elevation / Shadow System
+- 階層数（1-5段階が一般的）
+- 各階層の shadow 定義（offset/blur/spread/color）
+- Layered Shadows（複数 box-shadow 重ね）
+
+### Border Radius System
+- 固定 vs 比例（px vs %）
+- Scale: none/sm/md/lg/xl/full/pill
+- Inconsistency 検出（ランダムに見える radius）
+
+### Theme / Mode Detection
+- **Dark Mode 対応**: `prefers-color-scheme` / `.dark` class / `data-theme`
+- **Theme Token** の切替方法
+- **色の対応関係**（Light: #FFF ↔ Dark: #0F172A 等）
+
+### Breakpoint System
+- Tailwind 標準（sm/md/lg/xl/2xl）かカスタムか
+- 実際のブレイクポイント値を mediaquery から抽出
+- Container Query の使用有無
+
+### Animation / Motion Tokens
+- Duration（150/200/300/500ms等）
+- Easing（cubic-bezier の定型 or カスタム）
+- `prefers-reduced-motion` 対応確認
+
+### Tailwind Config 生成
+抽出結果を Tailwind v4 対応形式で出力:
+```js
+// tailwind.config.ts
+export default {
+  theme: {
+    extend: {
+      colors: { primary: "#3B82F6", ... },
+      fontFamily: { sans: ["Noto Sans JP", ...] },
+      fontSize: { /* type scale */ },
+      spacing: { /* spacing scale */ },
+      borderRadius: { /* radius scale */ },
+      boxShadow: { /* shadow scale */ },
+    }
+  }
+}
+```
+
+### W3C Design Tokens Format 準拠
+```json
+{
+  "color": {
+    "primary": {"value": "#3B82F6", "type": "color"},
+    "text": {
+      "primary": {"value": "#1E293B", "type": "color", "$description": "body text"}
+    }
+  },
+  "typography": {
+    "heading-1": {
+      "value": {"fontFamily": "{font.primary}", "fontSize": "48px", "fontWeight": 700}
+    }
+  }
+}
+```
+Figma / Style Dictionary / Tailwind と相互変換可能。
+
+### デザイン品質評価
+- **Consistency Score**: 同種要素の見た目が揃っているか
+- **Accessibility Score**: WCAG違反数
+- **Hierarchy Clarity**: タイポ/カラー/スペーシングで階層が明確か
+- **Brand Coherence**: 全体として統一感があるか
+
+## 自己検証チェックリスト
+- [ ] Primitive/Semantic/Component の3階層トークンが出力されているか
+- [ ] WCAG コントラスト比が全色ペアで計算されているか
+- [ ] Type Scale の比率が特定されているか
+- [ ] Spacing の Base Unit（4/8px）が推定されているか
+- [ ] Dark Mode 対応が記録されているか
+- [ ] Tailwind Config 形式で出力可能か
+- [ ] W3C Design Tokens 形式と互換か
+
+## 出力拡張
+既存に加え:
+```json
+{
+  "type_scale_ratio": 1.25,
+  "spacing_base_unit": "4px|8px",
+  "dark_mode": {"supported": true, "strategy": "prefers-color-scheme|class"},
+  "wcag_contrast_results": [{"pair": "primary on white", "ratio": 4.7, "aa_pass": true}],
+  "tailwind_config_ready": true,
+  "w3c_design_tokens": { /* see format above */ }
+}
+```
+
 ## 使用するツール
 - `Read`: site_scanner/output.json の読み込み
 - `WebFetch`: ページHTML・外部CSSファイルの取得

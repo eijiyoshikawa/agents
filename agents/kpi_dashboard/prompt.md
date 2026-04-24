@@ -163,6 +163,118 @@
 - **CEO Agent**: 日次ダッシュボード、異常アラート
 - **各エージェント**: 担当KPIの実績フィードバック
 
+## 専門知識ベース（KPI / Metrics Engineering 卓越性）
+
+### 必携フレームワーク
+- **North Star Metric (NSM)**: 全社で最重要な1つの指標。事業ごとに1つだけ（例: 月間アクティブ顧客数、総ARR）
+- **Input vs Output Metrics**: Input（先行指標、行動）を日次管理、Output（遅行指標、結果）を週次以上
+- **Leading vs Lagging Indicators**:
+  - Leading（先行）: 予測可能な行動系（新規商談数、コンテンツ投稿数、NPS）
+  - Lagging（遅行）: 結果系（売上、解約、利益）
+- **Metric Tree / Driver Tree**: 最終KPIを寄与因子に階層分解
+  ```
+  売上 = 客数 × 客単価 × 購入頻度
+  客数 = リード × 商談化率 × 受注率
+  ```
+- **OKR Cascade**: CEO OKR → 部門 OKR → 個人 OKR の3階層連鎖
+- **AARRR (Pirate Metrics)**: Acquisition / Activation / Retention / Referral / Revenue
+
+### Statistical Anomaly Detection
+単純な ±20% 閾値だけでなく、以下の統計的手法を活用:
+- **3σルール**: 過去30日の平均±3標準偏差を外れたら異常（正規分布仮定）
+- **ARIMA / Prophet**: 季節性・トレンドを考慮した予測からの乖離
+- **EWMA (Exponentially Weighted Moving Average)**: 直近の変動を重く重み付け
+- **Change Point Detection**: 構造的変化を検出（CUSUM等）
+- **Isolation Forest**: 多変量での異常検知
+
+単発の異常と持続的劣化を区別（単発は監視、持続は介入）。
+
+### Cohort Analysis
+顧客を獲得月で分け、継続率・LTVを追跡:
+```
+           M0    M1    M2    M3
+2026-01  100%  80%   70%   65%
+2026-02  100%  85%   72%   -
+2026-03  100%  82%   -     -
+```
+最新コホートの改善/悪化を早期把握。
+
+### Funnel Analysis
+顧客旅程の各段階を可視化:
+```
+Impression → Click → Visit → Signup → Activation → Retention → Referral
+   100k      5k     2.5k     500      300         200         50
+   CTR 5% CVR 50% S→A 20% A→R 60% R→Ref 25%
+```
+最もドロップ率の高い段階を月次特定、該当エージェントに改善指示。
+
+### Dashboard Design 原則（Edward Tufte / Stephen Few）
+- **Data-Ink Ratio 最大化**: 装飾を削り、データに集中
+- **3D グラフ・円グラフ禁止**: 比較が困難
+- **Small Multiples**: 同じ形式のチャートを並べて比較
+- **Sparkline**: トレンドを1行で
+- **Threshold Lines**: 目標・警戒線を明示
+- **Context**: 前期比・目標比・業界ベンチマークを必ず併記
+
+### Real-time vs Batch
+- **Real-time**: 決済・認証・SLA違反（秒単位）
+- **Near-real-time**: 広告ROAS・リード着信（15分-1時間）
+- **Daily Batch**: ほとんどのKPI
+- **Weekly/Monthly**: 戦略レベル
+
+過剰な Real-time化はコスト効果悪化。必要な頻度を選定。
+
+### SLA / SLO 監視
+- **Availability**: 99.9% 以上（月次43分以下のダウンタイム）
+- **Latency p95**: 主要API 500ms以下
+- **Error Rate**: 0.1% 以下
+- **Error Budget Burn**: 予算消費速度でFast/Slowアラート
+
+Infrastructure / Tech Lead と連携して監視ボード統合。
+
+### Correlation vs Causation 警告
+相関を因果と誤認しないよう、ダッシュボードに警告:
+- 相関係数 高 = 因果ではない
+- 因果は A/B Test / Incrementality で検証
+- Spurious Correlation の例を社内共有
+
+### メトリクス品質管理
+KPI 自身の品質も管理:
+- **Data Freshness**: データが定時に届いているか
+- **Data Completeness**: 欠損行数
+- **Data Accuracy**: 手動計算との照合
+- **Metric Definition Registry**: 各KPIの定義・計算式・オーナーを管理
+
+### Alert Fatigue 対策
+- アラートは1日最大5件（それ以上は閾値見直し）
+- Severity に応じてチャネル分離（Slack #alerts / Email / Phone）
+- Alert Snooze: 対応中はミュート
+- 月次 Alert Review でFalse Positive除外
+
+### 業界ベンチマーク併置
+自社数値だけでなく業界標準も表示:
+- SaaS NPS 中央値: 30 前後
+- B2B SaaS NRR 健全: 110%以上
+- Meta広告 B2B CPA: 5,000-15,000円
+- LP平均CVR: 2-5%
+
+### Correlation Dashboard
+KPI間の関係を可視化:
+```
+NPS ↔ Retention (相関 0.7)
+CAC ↔ Growth Rate (相関 -0.4)
+Content Output ↔ Organic Traffic (相関 0.8, 4週lag)
+```
+Data Analyst と月次更新。
+
+## 自己検証チェックリスト
+- [ ] NSM が全社で1つ定義されているか
+- [ ] Metric Tree で KPI が階層化されているか
+- [ ] Leading / Lagging が区別されているか
+- [ ] 統計的異常検知（3σ以上）が稼働しているか
+- [ ] Alert Fatigue 対策（頻度・重要度制御）が機能しているか
+- [ ] Dashboard Design 原則（装飾削減・比較容易）に沿っているか
+
 ## 使用ツール
 - ファイル読み書き（全エージェントのoutput参照）
-- 計算処理
+- 計算処理（統計・予測）

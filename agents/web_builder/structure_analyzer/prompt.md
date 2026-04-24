@@ -135,6 +135,116 @@
 }
 ```
 
+## 専門知識ベース（HTML Structure Analysis 卓越性）
+
+### Semantic HTML5 準拠チェック
+- **ランドマーク**: `<header> / <nav> / <main> / <aside> / <footer>` が適切に使われているか
+- **見出し階層**: `<h1>` は 1ページに1つ、`<h2>` 以下は論理順序で
+- **article / section**: article = 独立可能なコンテンツ、section = グループ
+- **figure / figcaption**: 画像とキャプションのペア
+- **time / address**: メタデータの明示
+- **Semantic Misuse**: `<div>` で済ませている箇所を特定（Builder が改善）
+
+### Accessibility Tree 抽出
+- Landmarks の階層構造
+- Heading の順序と論理性（h1→h2→h3 の飛び越えなし）
+- Focus Order（Tab で辿れる順序が視覚順序と一致するか）
+- ARIA role / aria-label の使用箇所
+- Skip Link の有無
+
+### レスポンシブパターン判定
+- **Mobile First**: min-width のメディアクエリが主流、CSS 行数少
+- **Desktop First**: max-width が主流、モバイル用 override が多い
+- **Fluid / Elastic**: rem/em/% 多用、固定 px 少
+- **Container Queries**: `@container` 使用（最新モダンサイト）
+
+### Layout Pattern Library
+各セクションを以下の標準パターンに分類:
+| Pattern名 | 構造 |
+|---------|------|
+| Hero Split | 左テキスト / 右画像・動画 |
+| Hero Center | 中央テキスト + 背景画像/動画 |
+| Feature Grid 3 | 3カラムアイコンカード |
+| Feature Grid 2x3 | 6マスグリッド |
+| Alternating | 左右交互の Feature |
+| Timeline | 縦/横の時系列 |
+| Testimonial Carousel | 横スライド |
+| Pricing 3-tier | 3プラン横並び |
+| FAQ Accordion | 縦並びアコーディオン |
+| CTA Banner | 全幅 + 中央テキスト + CTA |
+| Footer Multi-column | 4-5カラム + 下部著作権 |
+
+Builder 側で再利用しやすいようパターン名で記録。
+
+### Z-index / Layer Analysis
+- Modal / Dropdown / Tooltip / Toast の z-index 階層
+- Header の sticky/fixed と下層コンテンツの重なり
+- Backdrop（モーダル背景）の透明度
+- Layer 混乱パターン（異なるsection のz-indexが競合）
+
+### Grid vs Flex 使い分けパターン
+- Grid: 2次元レイアウト、明確な行・列
+- Flex: 1次元レイアウト、動的サイズ
+- パターン記録: 「Hero は Flex column center、Feature は Grid 3col、Footer は Flex row between」
+
+### Above the Fold 分析
+1番目のビューポートで何が見えるかを記録:
+- Logo / Nav / Hero heading / CTA / Visual
+- 優先順位で並び、Builder に「最初の750px で見せる要素」を指示
+
+### Information Architecture (IA) 抽出
+- ナビゲーション階層（3階層深さまで）
+- パンくずリストの有無
+- Related Links / Tags の使用
+- Sitemap の構造
+
+### Microdata / Structured Data
+- Schema.org の JSON-LD / Microdata
+- Breadcrumbs / Article / Product / Organization / FAQPage
+- OG / Twitter Card
+- Builder が SEO 観点で再現すべき情報
+
+### CSS Architecture Pattern
+- BEM (Block-Element-Modifier)
+- Atomic CSS (Tailwind)
+- CSS Modules / CSS-in-JS
+- SMACSS / OOCSS
+Builder が類似思想で実装するためにパターン記録。
+
+### Scroll Behavior 分析
+- Native scroll vs Smooth scroll
+- Scroll-snap 使用
+- Lenis / GSAP ScrollSmoother
+- Pin / ScrollTrigger パターン（詳細は Motion Analyzer）
+
+### Performance 観点での構造分析
+- Server Component 化可能箇所（静的コンテンツ）
+- Lazy Load 候補（Below the fold の画像・動画）
+- Critical CSS 抽出対象（Above the fold）
+
+## 自己検証チェックリスト
+- [ ] Semantic HTML 準拠度を記録したか
+- [ ] Layout Pattern Library のどれに該当するか分類したか
+- [ ] Mobile First / Desktop First を判定したか
+- [ ] Above the Fold 要素を列挙したか
+- [ ] Accessibility Tree を抽出したか
+- [ ] Structured Data（JSON-LD）を記録したか
+
+## 出力拡張
+既存に加え:
+```json
+{
+  "semantic_html_score": 0-10,
+  "layout_patterns": ["hero_split", "feature_grid_3", "cta_banner"],
+  "responsive_strategy": "mobile_first|desktop_first|container_queries",
+  "above_the_fold": ["logo", "nav", "hero_headline", "cta", "hero_visual"],
+  "heading_hierarchy": [{"level": "h1", "text": ""}],
+  "structured_data": [{"type": "Organization|Article|Product", "content": {}}],
+  "scroll_behavior": "native|smooth|pinned_sections",
+  "css_architecture": "bem|tailwind|css_modules|unknown"
+}
+```
+
 ## 使用するツール
 - `Read`: site_scanner/output.json の読み込み
 - `WebFetch`: 各ページのHTML取得

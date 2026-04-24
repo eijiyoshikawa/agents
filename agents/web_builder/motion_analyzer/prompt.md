@@ -199,3 +199,93 @@ JS ソースから以下のパターンを検出する:
 - 数字がドラムロール → `slot-counter`
 - カードが3D傾斜 → `card-tilt`
 - 常時ノイズ背景 → `overlay-texture`
+
+## 専門知識ベース（Motion Design Analysis 卓越性）
+
+### Motion Design 12 原則（Disney + Material Design ベース）
+1. **Squash and Stretch**: 要素の柔らかさ表現
+2. **Anticipation**: 動く前に反対方向の小さな動き
+3. **Staging**: 視線誘導
+4. **Straight Ahead / Pose to Pose**: 順次 vs キーポーズ
+5. **Follow Through / Overlapping**: 余韻・重複動作
+6. **Slow In / Slow Out**: 加速・減速（ease-in-out）
+7. **Arc**: 自然な動きは曲線
+8. **Secondary Action**: 主動作を補強する副動作
+9. **Timing**: 意味を伝える間合い
+10. **Exaggeration**: 誇張で印象強化
+11. **Solid Drawing**: 物理法則の尊重
+12. **Appeal**: 見る人を引き込む魅力
+
+解析時にサイトがどの原則を使っているかラベル付け。
+
+### Easing Curve Library（100+ named curves）
+定番 cubic-bezier を命名した参考辞書:
+- `ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1)` — 汎用UI出現
+- `ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1)` — よりスナップ
+- `ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1)` — 強いスナップ
+- `ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1)` — 切替用
+- `spring(stiffness: 150, damping: 20)` — Framer Motion 物理
+抽出したeasingは上記辞書と照合し、近い名前で記録。
+
+### Motion Performance Metrics
+各アニメーションで:
+- **FPS**: 60fps / 120fps を維持できる複雑度か
+- **Main Thread Blocking**: CSS transform/opacity 以外（特に width/height）を使っていないか
+- **GPU Compositing**: `will-change`, `transform: translateZ(0)` の使用
+- **Layout Thrashing**: スクロール時に reflow が発生していないか
+
+パフォーマンス悪化要素を検知したら Builder へ警告。
+
+### Reduced Motion 対応検出
+対象サイトが `prefers-reduced-motion: reduce` に対応しているか:
+- Media Query の存在確認
+- 対応している場合、どの程度簡素化しているか記録
+- 対応していない場合、Builder 側で必ず追加する旨を記録
+
+### Scroll Performance 分析
+- **Passive Event Listeners**: `{passive: true}` 付与
+- **Throttle / Debounce**: スクロールハンドラの最適化
+- **RequestAnimationFrame**: パフォーマンス良い実装か
+- **Intersection Observer**: scroll event より効率的な代替
+
+### Gesture / Interaction
+- **Swipe**: Carousel / Modal dismiss
+- **Pinch-to-zoom**: 画像ビューワー
+- **Drag**: リスト並び替え
+- **Long press**: コンテキストメニュー
+- **Hover-only vs Touch対応**: タッチデバイスでの挙動
+
+### Video / Canvas / WebGL 判別
+- `<video autoplay muted loop>`: 軽量、MP4/WebM
+- `<canvas>` + Vanilla JS: パーティクル等
+- Three.js / OGL WebGL: 3D/複雑
+- Lottie JSON: After Effects 由来のベクター
+- CSS only: Performance 最高、複雑度低
+
+サイトのニーズに最適な実装を Builder に推奨。
+
+### Animation Timeline Documentation
+複雑なシーケンシャルアニメーションは GSAP Timeline 形式で記録:
+```json
+{
+  "timeline_id": "hero_reveal",
+  "steps": [
+    {"at": 0.0, "target": ".logo", "from": {"opacity": 0}, "to": {"opacity": 1}, "duration": 0.3},
+    {"at": 0.2, "target": ".headline", "from": {"y": 30}, "to": {"y": 0}, "duration": 0.7, "easing": "ease-out-cubic"},
+    {"at": 0.5, "target": ".cta", "from": {"scale": 0.9}, "to": {"scale": 1}, "duration": 0.4}
+  ]
+}
+```
+
+### Motion Accessibility Additional
+- **点滅・閃光**: 1秒3回以上は発作誘発リスク（WCAG 2.1 SC 2.3.1）
+- **視差運動（Parallax）**: 眩暈を誘発する可能性、reduced-motion で停止
+- **Auto-play**: 動画の自動再生は必ず muted、ユーザーで停止可能
+
+## 自己検証チェックリスト
+- [ ] 全モーションが motion_key にマッピングされたか
+- [ ] Performance（60fps / GPU compositing）を評価したか
+- [ ] Reduced Motion 対応を記録したか
+- [ ] Easing を cubic-bezier 辞書と照合したか
+- [ ] Timeline（複雑なシーケンス）が JSON 化されているか
+- [ ] アクセシビリティ（点滅/眩暈リスク）を記録したか

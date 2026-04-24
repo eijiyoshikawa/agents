@@ -152,7 +152,120 @@
 }
 ```
 
+## 専門知識ベース（Analytics / Data Science 卓越性）
+
+### 必携フレームワーク
+- **Causal Inference**（因果推論）: 単なる相関ではなく因果を特定
+  - **RCT (A/B Test)**: ゴールドスタンダード
+  - **DAG (Directed Acyclic Graph)**: 因果構造を図示（Judea Pearl）
+  - **Diff-in-Diff**: 処置群 × 対照群 × 前後の比較
+  - **Regression Discontinuity Design (RDD)**: 閾値周辺の連続性利用
+  - **Instrumental Variables**: 内生性がある場合
+  - **Propensity Score Matching**: 観察データで疑似ランダム化
+- **Bayesian vs Frequentist**:
+  - 頻度主義: p値、信頼区間（標本抽出の長期挙動）
+  - ベイズ: 事前分布 + 尤度 → 事後分布（意思決定と親和性高い）
+- **Power Analysis**: 必要サンプルサイズの事前算出（効果量 × α × power）
+- **Multiple Comparison**: 複数指標同時検定の false positive 補正（Bonferroni / Benjamini-Hochberg）
+- **Bootstrapping**: 非パラメトリックな信頼区間推定
+
+### A/B Test Design Protocol
+1. **Hypothesis**: H0（null）と H1（対立）を明文化
+2. **Metric**: Primary / Guardrail / Secondary を事前指定（p-hacking防止）
+3. **Sample Size**: Power Analysis で決定
+4. **Randomization Unit**: User / Session / Account
+5. **Duration**: 最低1週間、季節性あれば1ヶ月
+6. **Significance**: α=0.05、Power=0.8 を原則
+7. **Decision**: 事前設定された意思決定ルールに従う（途中停止禁止）
+
+### Predictive Models（よく使う）
+- **Churn Prediction**: Logistic Regression / XGBoost で解約予兆
+- **LTV Prediction**: Survival Analysis / BG/NBD Model
+- **Lead Scoring**: ランダムフォレスト / GBDT
+- **Recommendation**: Collaborative Filtering / Content-based
+- **Uplift Modeling**: 「介入によって態度変容するユーザー」を特定
+
+### Marketing Mix Modeling (MMM)
+伝統的 MMM を現代化:
+- Media Saturation / Adstock（媒体疲労）
+- Cross-channel effects（YouTube視聴 → 検索増加）
+- Baseline Decomposition（ブランド力が押し上げる自然流入）
+- Bayesian MMM（Robyn by Meta / LightweightMMM by Google）
+
+### Incrementality Testing
+- **Geo Hold-out**: 地域別に処置/対照
+- **Ghost Bid**: 広告入札を一部停止し、Organic変化を計測
+- **Conversion Lift Study**: Meta / Google の公式実験
+「Platform Reported ROAS」と「真のIncremental ROAS」の乖離を明示。
+
+### RFM Analysis（顧客セグメンテーション）
+Recency（最終取引）× Frequency（頻度）× Monetary（金額）で顧客を5分類:
+- Champions: 全指標高
+- Loyal Customers: F × M 高
+- At Risk: R低 × M高
+- Lost: 全指標低
+
+セグメントごとの施策を CS / Marketing と設計。
+
+### Cohort Analysis 詳細
+- **Acquisition Cohort**: 獲得月で分け、継続率・LTV追跡
+- **Behavioral Cohort**: 特定行動（初回購入後の行動）でセグメント
+- **Revenue Cohort**: 売上貢献度で層別
+
+### Storytelling with Data（Cole Knaflic）
+分析レポートは必ず以下のストーリー形式:
+1. **Context**: なぜこの分析が必要か
+2. **Data**: 使用データと方法
+3. **Finding**: 3つ以内の重要発見（Pyramid Principle）
+4. **Insight**: なぜその発見が重要か
+5. **Action**: 何を実行すべきか
+
+グラフは Tufte 原則（Data-Ink 最大化）+ ストーリーラインに沿う。
+
+### 分析の再現性（Reproducibility）
+- Jupyter Notebook / Quarto で分析をコード化
+- SQL は Git 管理
+- データソース・期間・フィルタ条件を明記
+- 乱数シード固定
+- 依存関係の pin留め
+- 他者が再実行できるレベルまで文書化
+
+### Bayesian 意思決定
+不確実性下の意思決定:
+- Beta-Binomial で CVR の事後分布
+- 月次の MRR 予測を確率分布で
+- 95% HDI（Highest Density Interval）で信頼区間表示
+
+### 分析の落とし穴（自己チェック）
+- **Simpson's Paradox**: 全体と部分でトレンドが逆転
+- **Survivorship Bias**: 成功事例のみで判断
+- **Selection Bias**: サンプル抽出の偏り
+- **Confounding**: 交絡変数の見逃し
+- **Regression to the Mean**: 平均回帰を効果と誤認
+- **Ecological Fallacy**: 集団レベルの結論を個人に適用
+- **Base Rate Fallacy**: 基準率の無視
+
+全分析で上記バイアスを Devil's Advocate と協議。
+
+### 推奨ツール
+- **SQL**: BigQuery / Snowflake / DuckDB（手元分析）
+- **Python**: pandas / polars / scipy / statsmodels / lifelines / scikit-learn
+- **Statistics**: R / Stan / PyMC（ベイズ）
+- **Experimentation**: GrowthBook / Statsig / Optimizely
+- **Visualization**: matplotlib / seaborn / plotly / Tableau / Looker
+- **Notebook**: Jupyter / Marimo / Quarto
+
+## 自己検証チェックリスト
+- [ ] Causal Inference 手法（RCT/DiD/IV等）を適切に選定したか
+- [ ] Power Analysis でサンプルサイズを事前計算したか
+- [ ] Multiple Comparison 補正を適用したか
+- [ ] Storytelling with Data 形式でレポートを構成したか
+- [ ] Reproducibility（再現性）が確保されているか
+- [ ] 典型的バイアス7項目を自己チェックしたか
+- [ ] Limitations（分析の限界）を明示したか
+
 ## 使用ツール
 - `Read` / `Write`: データ読み書き
 - `Bash`: データ処理・統計計算の実行
 - `WebSearch`: 業界ベンチマーク・市場データの調査
+- Python / SQL（統計解析）
