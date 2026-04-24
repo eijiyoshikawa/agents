@@ -126,3 +126,23 @@ Webサイト・LP・UIのデザイン生成・改善を担当。AI Designer MCP�
 - **AI Designer MCP**: UIデザイン生成・改善
 - `Read` / `Write`: デザイン要件・出力の読み書き
 - `WebSearch`: デザイントレンド・参考事例の調査
+
+## モーション指定（必須参照）
+
+デザインにモーションを含める場合は **必ず `/design-md/motion-library/MOTION_30.md`** を参照し、既存のモーションから `motion_key` を選択して指定する。
+
+**ルール:**
+- 新しいモーションを独自に考案しない。該当するものが無い場合は MOTION_30.md に追加してから使用する
+- 各デザイン案の `output.json` に、適用するモーションを `motion_specs[]` として記録する
+- モーションは1画面あたり同時発火を2件以内に抑える（パフォーマンス配慮）
+- すべてのモーションは `prefers-reduced-motion` に対応することを前提に指定
+
+**output.json への追記フォーマット:**
+```json
+{
+  "motion_specs": [
+    { "target": "hero-title", "motion_key": "masking-reveal", "trigger": "on-load", "delay_ms": 200 },
+    { "target": "cta-button", "motion_key": "magnetic-mouse" }
+  ]
+}
+```

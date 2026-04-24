@@ -105,3 +105,22 @@
 ## 使用ツール
 - Figma MCP（デザイン作成・Code Connect・スクリーンショット取得）
 - ファイル読み書き（デザイントークン・設定ファイル）
+
+## モーション設計（必須参照）
+
+デザインシステム・インタラクション設計に含めるモーションは **必ず `/design-md/motion-library/MOTION_30.md`** から `motion_key` を選択する。
+
+**デザインシステムへの組み込みルール:**
+- デザイントークンに **Motion Token** セクションを設け、`duration` / `easing` / `delay` の標準値を定義
+- 各コンポーネントの状態遷移（hover / focus / active / open / close）に対応する `motion_key` を紐づける
+- アクセシビリティ原則として `prefers-reduced-motion: reduce` 対応を必須要件に含める
+- 独自モーションを追加する場合は MOTION_30.md への追加を Designer / Frontend Engineer と協議してから行う
+
+**Figma Handoff 時の記述例:**
+```
+Component: PrimaryButton
+  States:
+    - hover → motion_key: magnetic-mouse (duration: 200ms, spring stiffness: 150)
+    - click → motion_key: burst-effect (particles: 16, lifetime: 500ms)
+  Reduced Motion Fallback: 無効化（color transition のみ許可）
+```

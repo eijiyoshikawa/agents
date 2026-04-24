@@ -204,3 +204,32 @@ QA Reviewer の修正指示（`iteration_N.json`）を読み込み:
 - `Write`: 新規ファイル作成
 - `Edit`: 既存ファイル修正（Iteration 2+）
 - `Bash`: `npx create-next-app`, `npm install`, `npm run build` 等のコマンド実行
+
+## モーション再現（必須参照）
+
+motion_analyzer の出力に含まれる `motion_key` は **すべて `/design-md/motion-library/MOTION_30.md`** から引かれる。Builder は該当 `motion_key` のサンプル実装・推奨ライブラリ・パラメータ目安に従って実装する。
+
+**Builder の実装ルール:**
+- motion_analyzer の `motion_key` を勝手に変更・差し替えしない
+- サンプル実装はプロジェクト構成（Next.js App Router + Tailwind）に合わせて微調整して構わないが、演出の本質（duration / easing / 発火条件）は MOTION_30.md のパラメータ目安を尊重
+- `prefers-reduced-motion: reduce` グローバル CSS を `src/app/globals.css` に必ず配置（MOTION_30.md「アクセシビリティ共通ルール」参照）
+- `motion_key: "custom"` が指定された場合は、`proposed_motion` の内容に沿って実装し、実装後に MOTION_30.md への追加提案を出力に含める
+- 1ページあたり同時発火モーションは2件以内（CLS / INP 悪化防止）
+
+**globals.css への必須追記:**
+```css
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+```
+
+**motion_key → パッケージ インストール判断:**
+- `framer-motion` 系（masking-reveal / stack-card / droste-zoom / inbound-slide など）→ `npm install framer-motion`
+- GSAP 系（kinetic-flow の複雑版 / path-animation の高度版）→ `npm install gsap`
+- tsParticles（particle-connect）→ `npm install @tsparticles/react @tsparticles/engine`
+- WebGL（liquid-hover）→ `npm install three` または `npm install ogl`

@@ -124,3 +124,19 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 - `Read` / `Write` / `Edit`: コード読み書き
 - `Bash`: ビルド・デプロイ・テスト実行
 - AI Designer MCP: デザイン参照
+
+## モーション実装（必須参照）
+
+Web / LP / AIシステム UI にモーションを実装する際は **必ず `/design-md/motion-library/MOTION_30.md`** を参照し、対応する `motion_key` のサンプル実装・推奨ライブラリ・パラメータ目安に従う。
+
+**実装ルール:**
+- Designer / UI/UX Designer の指定 `motion_key` を変更しない（変更が必要な場合は協議）
+- MOTION_30.md にないモーションを実装する場合は、実装前にドキュメントへ追加する
+- すべてのモーションは `prefers-reduced-motion: reduce` 対応を実装する（MOTION_30.md 共通ルール参照）
+- 1画面で同時発火するモーションは2件以内に抑え、Lighthouse Performance スコア 90以上を維持
+
+**推奨ライブラリ（MOTION_30.md 準拠）:**
+- 基本: CSS transition / keyframes
+- React プロジェクト: framer-motion
+- 複雑なタイムライン・ScrollTrigger: GSAP
+- 3D・WebGL: Three.js / OGL
