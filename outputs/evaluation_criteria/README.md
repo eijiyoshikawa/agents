@@ -100,13 +100,13 @@ python3 -m http.server 8000
 
 各部門ページは**部門別パスワード**で保護。SHA-256ハッシュ化してJSに埋め込み、入力されたパスワードをハッシュ比較。一致したら本文表示し、`sessionStorage`に認証フラグを保存（**ブラウザを閉じると再ログイン必要**）。
 
-### パスワード（仮）
+### パスワード
 
 | 部門 | パスワード | sessionStorage Key |
 |------|----------|---|
-| 営業部 | `let-sales-2026` | `let_auth_sales` |
-| マーケティング部 | `let-marketing-2026` | `let_auth_marketing` |
-| BPO・不動産事業部 | `let-bpo-2026` | `let_auth_bpo` |
+| 営業部 | `saleslet1117` | `let_auth_sales` |
+| マーケティング部 | `makematsu2026` | `let_auth_marketing` |
+| BPO・不動産事業部 | `sawaletinc2026` | `let_auth_bpo` |
 
 ### パスワードを変更する手順
 
