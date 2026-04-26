@@ -18,6 +18,8 @@
   --sales-light: #EAF1FB;
   --mkt: #5B21B6;
   --mkt-light: #F3F0FD;
+  --bpo: #B85C00;
+  --bpo-light: #FEF5EA;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -71,8 +73,8 @@ h1 {
 
 .cards {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
   margin-bottom: 40px;
 }
 
@@ -99,6 +101,8 @@ h1 {
 .card.sales:hover { background: var(--sales-light); }
 .card.mkt { border-color: var(--mkt); }
 .card.mkt:hover { background: var(--mkt-light); }
+.card.bpo { border-color: var(--bpo); }
+.card.bpo:hover { background: var(--bpo-light); }
 
 .card-tag {
   font-family: 'IBM Plex Mono', monospace;
@@ -115,6 +119,7 @@ h1 {
 
 .sales .card-tag { background: var(--sales); }
 .mkt .card-tag { background: var(--mkt); }
+.bpo .card-tag { background: var(--bpo); }
 
 .card-title {
   font-size: 24px;
@@ -211,6 +216,10 @@ h1 {
   letter-spacing: 1px;
 }
 
+@media (max-width: 1024px) {
+  .cards { grid-template-columns: 1fr 1fr; }
+}
+
 @media (max-width: 768px) {
   body { padding: 32px 16px; }
   h1 { font-size: 28px; }
@@ -298,6 +307,31 @@ h1 {
         </div>
       </div>
     </a>
+
+    <a href="bpo.html" class="card bpo">
+      <span class="card-arrow">→</span>
+      <span class="card-tag">BPO / RealEstate</span>
+      <div class="card-title">BPO・不動産事業部</div>
+      <div class="card-sub">BPO & Real Estate Division / G1〜G4 の4等級</div>
+      <div class="card-meta">
+        <div class="card-meta-item">
+          <div class="meta-label">G1 支給額</div>
+          <div class="meta-val">¥220,000 / 月</div>
+        </div>
+        <div class="card-meta-item">
+          <div class="meta-label">G2 半期目標</div>
+          <div class="meta-val">540万 粗利</div>
+        </div>
+        <div class="card-meta-item">
+          <div class="meta-label">特別ボーナス</div>
+          <div class="meta-val">外注費40%以下</div>
+        </div>
+        <div class="card-meta-item">
+          <div class="meta-label">対象期間</div>
+          <div class="meta-val">2025/10〜2026/9</div>
+        </div>
+      </div>
+    </a>
   </div>
 
   <div class="footer-info">
@@ -314,6 +348,13 @@ h1 {
       <div class="principle">
         <strong>半期1回支給</strong>
         <span>上期9月末 / 下期3月末評価、翌月支給</span>
+      </div>
+    </div>
+    <div class="footer-info-title" style="margin-top:24px;">BPO・不動産事業部の追加軸</div>
+    <div class="principles" style="grid-template-columns: 1fr;">
+      <div class="principle" style="border-color: var(--bpo); background: var(--bpo-light);">
+        <strong style="color: var(--bpo);">外注費40%以下達成で全員に月給1ヶ月分の特別ボーナス</strong>
+        <span>対象期間 2025年10月 〜 2026年9月（年次判定・翌10月支給）</span>
       </div>
     </div>
     <div class="footer-meta">CONFIDENTIAL — 経営陣向け試算（支給額 + 社保5万円加算）／ Ver 1.0 ／ 2026-04-22</div>
