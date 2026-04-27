@@ -1002,9 +1002,10 @@ h1 em { font-style: normal; color: var(--accent); }
       <table class="coef-table">
         <tr><td class="coef-range">120% 以上（ブースト）</td><td class="coef-val boost">× 1.10</td></tr>
         <tr><td class="coef-range">100 〜 119%</td><td class="coef-val">× 1.00</td></tr>
-        <tr><td class="coef-range">70 〜 99%</td><td class="coef-val">× 1.00</td></tr>
-        <tr><td class="coef-range">60 〜 69%（▲20%）</td><td class="coef-val mid">× 0.80</td></tr>
-        <tr><td class="coef-range">60% 未満（▲30% 固定）</td><td class="coef-val cut">× 0.70</td></tr>
+        <tr><td class="coef-range">80 〜 99%（▲10%）</td><td class="coef-val mid">× 0.90</td></tr>
+        <tr><td class="coef-range">70 〜 79%（▲20%）</td><td class="coef-val mid">× 0.80</td></tr>
+        <tr><td class="coef-range">60 〜 69%（▲30%）</td><td class="coef-val cut">× 0.70</td></tr>
+        <tr><td class="coef-range">60% 未満（▲40%）</td><td class="coef-val cut">× 0.60</td></tr>
       </table>
     </div>
   </div>
@@ -1018,14 +1019,15 @@ h1 em { font-style: normal; color: var(--accent); }
       <thead>
         <tr>
           <th rowspan="2">個人達成率</th>
-          <th colspan="5">チーム達成率</th>
+          <th colspan="6">チーム達成率</th>
         </tr>
         <tr>
           <th>120%+（×1.10）</th>
           <th>100-119%（×1.00）</th>
-          <th>70-99%（×1.00）</th>
-          <th>60-69%（×0.80）</th>
-          <th>&lt;60%（×0.70）</th>
+          <th>80-99%（×0.90）</th>
+          <th>70-79%（×0.80）</th>
+          <th>60-69%（×0.70）</th>
+          <th>&lt;60%（×0.60）</th>
         </tr>
       </thead>
       <tbody>
@@ -1033,33 +1035,37 @@ h1 em { font-style: normal; color: var(--accent); }
           <td class="row-label">120% 達成</td>
           <td class="mx-boost">1.32</td>
           <td class="mx-boost">1.20</td>
-          <td class="mx-boost">1.20</td>
+          <td class="mx-ok">1.08</td>
           <td class="mx-ok">0.96</td>
-          <td class="mx-warn">0.84</td>
+          <td class="mx-ok">0.84</td>
+          <td class="mx-warn">0.72</td>
         </tr>
         <tr>
           <td class="row-label">100% 達成 ✦</td>
           <td class="mx-boost">1.10</td>
           <td class="mx-ok">1.00</td>
-          <td class="mx-ok">1.00</td>
-          <td class="mx-warn">0.80</td>
-          <td class="mx-danger">0.70</td>
+          <td class="mx-ok">0.90</td>
+          <td class="mx-ok">0.80</td>
+          <td class="mx-warn">0.70</td>
+          <td class="mx-warn">0.60</td>
         </tr>
         <tr>
           <td class="row-label">80% 達成</td>
           <td class="mx-ok">0.88</td>
           <td class="mx-ok">0.80</td>
-          <td class="mx-ok">0.80</td>
+          <td class="mx-warn">0.72</td>
           <td class="mx-warn">0.64</td>
           <td class="mx-danger">0.56</td>
+          <td class="mx-danger">0.48</td>
         </tr>
         <tr>
           <td class="row-label">60% 達成</td>
           <td class="mx-warn">0.66</td>
           <td class="mx-warn">0.60</td>
-          <td class="mx-warn">0.60</td>
+          <td class="mx-danger">0.54</td>
           <td class="mx-danger">0.48</td>
           <td class="mx-danger">0.42</td>
+          <td class="mx-danger">0.36</td>
         </tr>
       </tbody>
     </table>
@@ -1094,10 +1100,10 @@ h1 em { font-style: normal; color: var(--accent); }
       <div class="ex-calc">
         基準額：600,000<br>
         個人：× 1.00<br>
-        チーム：× 0.70（▲30%）<br>
-        600,000 × 1.00 × 0.70
+        チーム：× 0.60（▲40% / 60%未満）<br>
+        600,000 × 1.00 × 0.60
       </div>
-      <div class="ex-result neg">＋420,000 円（▲180,000）</div>
+      <div class="ex-result neg">＋360,000 円（▲240,000）</div>
     </div>
   </div>
 </div>
