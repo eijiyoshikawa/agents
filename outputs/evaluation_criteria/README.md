@@ -1,27 +1,49 @@
 # LET 評価制度ドキュメント（let-hyoka）
 
-粗利ベース × チーム連動の半期ボーナス評価制度ドキュメント。営業部・マーケティング部・BPO/不動産事業部の3部門分のHTMLと部門選択トップページで構成。
+粗利ベース × チーム連動の半期ボーナス評価制度ドキュメント。**経営陣用**（フル情報）と**従業員用**（demo/）の2系統で運用。
 
 ## ファイル構成
 
 ```
 outputs/evaluation_criteria/
-├── index.html      # 部門選択トップページ（ルート）
-├── sales.html      # 営業部 評価制度
-├── marketing.html  # マーケティング部 評価制度
-├── bpo.html        # BPO・不動産事業部 評価制度（年次特別ボーナス含む）
-├── vercel.json     # Vercelデプロイ設定（クリーンURL・セキュリティヘッダ）
-└── README.md       # 本ファイル
+├── index.html         # 経営陣用 部門選択トップ（パスワードなし）
+├── sales.html         # 経営陣用 営業部
+├── marketing.html     # 経営陣用 マーケ部
+├── bpo.html           # 経営陣用 BPO・不動産事業部
+├── demo/              # 従業員用（部署別 / 相互ナビ無し）
+│   ├── sales.html     #   営業部メンバー向け
+│   ├── marketing.html #   マーケメンバー向け
+│   └── bpo.html       #   BPO・不動産メンバー向け
+├── vercel.json        # Vercelデプロイ設定（クリーンURL）
+└── README.md          # 本ファイル
 ```
 
 ## 公開URL構成（let-hyoka.vercel.app）
 
+### 経営陣用（フル情報・部門間ナビあり）
+
 | URL | 内容 |
 |-----|-----|
-| `https://let-hyoka.vercel.app/` | 部門選択トップページ |
+| `https://let-hyoka.vercel.app/` | 部門選択トップ |
 | `https://let-hyoka.vercel.app/sales` | 営業部 評価制度 |
 | `https://let-hyoka.vercel.app/marketing` | マーケ部 評価制度 |
 | `https://let-hyoka.vercel.app/bpo` | BPO・不動産事業部 評価制度 |
+
+### 従業員用（部署別 / 部門選択トップなし / 相互リンクなし）
+
+| URL | 配布先 |
+|-----|-----|
+| `https://let-hyoka.vercel.app/demo/sales` | 営業部メンバー専用 |
+| `https://let-hyoka.vercel.app/demo/marketing` | マーケ部メンバー専用 |
+| `https://let-hyoka.vercel.app/demo/bpo` | BPO・不動産事業部メンバー専用 |
+
+## アクセス制御の考え方
+
+- **パスワード保護はかけない**（経営陣・従業員いずれも）
+- 従業員用は **URLを部署ごとに分離**することで他部署との横断を防止
+  - 営業の人には `/demo/sales` のみを共有 → 他部署のURLを知らないので干渉できない
+  - 各 `/demo/*` ページには相互リンク（部門選択に戻るボタン等）を設置していない
+- URLを共有する際は、**部署ごとに該当URLのみ**を伝達する運用とする
 
 ## Vercelデプロイ手順
 
@@ -43,10 +65,6 @@ Vercel ダッシュボードから「New Project」→ GitHub リポジトリ `e
 ### 3. Production Branch の指定
 
 Settings → Git → Production Branch を `let-hyoka` に設定。
-
-### 4. カスタムドメイン
-
-Settings → Domains で `let-hyoka.vercel.app` が自動付与されていることを確認。
 
 ## 設計のポイント
 
@@ -90,40 +108,18 @@ Settings → Domains で `let-hyoka.vercel.app` が自動付与されている�
 ## ローカル確認
 
 ```bash
-# シンプルなHTTPサーバーで確認
 cd outputs/evaluation_criteria
 python3 -m http.server 8000
-# → http://localhost:8000 をブラウザで開く
+# 経営陣 → http://localhost:8000/
+# 従業員 → http://localhost:8000/demo/sales.html など
 ```
-
-## アクセス制御（パスワード認証）
-
-各部門ページは**部門別パスワード**で保護。SHA-256ハッシュ化してJSに埋め込み、入力されたパスワードをハッシュ比較。一致したら本文表示し、`sessionStorage`に認証フラグを保存（**ブラウザを閉じると再ログイン必要**）。
-
-### パスワード
-
-| 部門 | パスワード | sessionStorage Key |
-|------|----------|---|
-| 営業部 | `saleslet1117` | `let_auth_sales` |
-| マーケティング部 | `makematsu2026` | `let_auth_marketing` |
-| BPO・不動産事業部 | `sawaletinc2026` | `let_auth_bpo` |
-
-### パスワードを変更する手順
-
-1. 新パスワードを決める（例: `new-pass-2026`）
-2. SHA-256ハッシュを生成: `printf '%s' "new-pass-2026" | sha256sum`
-3. 各HTMLファイルの末尾 `<script>` 内 `PASS_HASH` 定数を新ハッシュに差し替え
-4. コミット・push → Vercel自動デプロイ
-
-### セキュリティの限界
-
-クライアントサイドJSによる認証のため、HTMLソースを開いて解析されればパスワードハッシュをブルートフォースされる可能性があります。**社内向けの軽い目隠し**としてご利用ください。本格的なアクセス制御が必要な場合は Vercel Pro（Password Protection）または独自バックエンドの検討を推奨します。
 
 ## バージョン履歴
 
 - **Ver 1.0** / 2026-04-22 — 営業部・マーケ部 初版
 - **Ver 1.1** / 2026-04-22 — BPO・不動産事業部追加（年次特別ボーナス制度導入）
 - **Ver 1.2** / 2026-04-26 — 各部門ページにパスワード認証ゲート追加（業種横断防止）
+- **Ver 1.3** / 2026-04-27 — パスワード認証を解除。従業員用 `/demo/*` 配下に部署別ページを新設（経営陣用と分離・部署間ナビなし）
 
 ## 議事録ベース
 
