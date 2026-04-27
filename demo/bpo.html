@@ -579,6 +579,162 @@ h1 em { font-style: normal; color: var(--accent); }
   .special-title { font-size: 15px; padding-right: 80px; }
 }
 
+/* === 事業構造マップ（Step 0） === */
+.biz-wrap {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 20px;
+}
+.biz-bar {
+  display: flex;
+  height: 36px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 18px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+.biz-seg-bpo { background: var(--accent); display: flex; align-items: center; justify-content: center; }
+.biz-seg-real { background: var(--g4); display: flex; align-items: center; justify-content: center; }
+
+.biz-overview {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.biz-summary-card {
+  border: 1.5px solid var(--accent);
+  background: var(--accent-light);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+.biz-summary-card.real { border-color: var(--g4); background: var(--g4-light); }
+.biz-summary-name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 4px;
+}
+.biz-summary-share {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.biz-summary-card.real .biz-summary-share { color: var(--g4); }
+.biz-summary-policy { font-size: 12px; color: var(--ink-2); margin-top: 4px; line-height: 1.5; }
+
+.biz-detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.biz-detail-card {
+  background: var(--white);
+  border: 1.5px solid var(--rule);
+  border-radius: 8px;
+  padding: 14px;
+}
+.biz-detail-card.improve { border-color: var(--orange); background: #FFF7ED; }
+.biz-detail-card.maintain { border-color: var(--blue); background: #EFF6FF; }
+.biz-detail-status {
+  display: inline-block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 3px;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.biz-detail-card.improve .biz-detail-status { background: var(--orange); }
+.biz-detail-card.maintain .biz-detail-status { background: var(--blue); }
+.biz-detail-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.biz-detail-share { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-3); margin-bottom: 10px; }
+.biz-detail-issue {
+  font-size: 12px;
+  color: var(--ink-2);
+  line-height: 1.5;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--rule);
+}
+.biz-detail-target { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--ink); font-weight: 600; line-height: 1.6; }
+
+/* === 翌年度方針（Step 7） === */
+.next-year-wrap {
+  background: linear-gradient(135deg, #EFF6FF 0%, var(--white) 100%);
+  border: 2px solid var(--blue);
+  border-radius: 12px;
+  padding: 28px;
+  position: relative;
+}
+.ny-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--blue);
+  color: #fff;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 5px 11px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+.ny-title { font-size: 18px; font-weight: 900; color: var(--blue); margin-bottom: 8px; padding-right: 110px; line-height: 1.3; }
+.ny-sub { font-size: 12.5px; color: var(--ink-2); margin-bottom: 22px; line-height: 1.7; }
+
+.ny-block {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+}
+.ny-block:last-child { margin-bottom: 0; }
+.ny-block-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--blue);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.ny-block-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.ny-block-desc { font-size: 12px; color: var(--ink-2); line-height: 1.7; }
+.ny-block-formula {
+  background: var(--ink);
+  color: #fff;
+  padding: 14px 16px;
+  border-radius: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  margin-top: 10px;
+  line-height: 1.8;
+}
+.ny-block-formula .accent-text { color: #FBBF77; font-weight: 600; }
+
+.ny-targets-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+.ny-target-card { border: 1px solid var(--rule); border-radius: 6px; padding: 12px; background: var(--page); }
+.ny-target-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--ink-3); letter-spacing: 1px; margin-bottom: 4px; }
+.ny-target-name { font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+.ny-target-value { font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 700; color: var(--accent); }
+
+@media (max-width: 768px) {
+  .biz-overview { grid-template-columns: 1fr; }
+  .biz-detail-grid { grid-template-columns: 1fr; }
+  .ny-targets-grid { grid-template-columns: 1fr; }
+  .ny-title { padding-right: 90px; font-size: 16px; }
+  .next-year-wrap { padding: 22px 18px; }
+  .ny-block-formula { font-size: 11px; }
+}
+
 </style>
 </head>
 <body>
@@ -610,6 +766,63 @@ h1 em { font-style: normal; color: var(--accent); }
     </div>
   </div>
 </header>
+<div class="sec-title">Step 0 — 事業構造と評価方針</div>
+<div class="biz-wrap">
+  <div class="biz-bar">
+    <div class="biz-seg-bpo" style="width: 90%">BPO 90%</div>
+    <div class="biz-seg-real" style="width: 10%">不動産 10%</div>
+  </div>
+
+  <div class="biz-overview">
+    <div class="biz-summary-card">
+      <div class="biz-summary-name">BPO事業</div>
+      <div class="biz-summary-share">90%</div>
+      <div class="biz-summary-policy">主力事業 / 原価40%以下を年間目標</div>
+    </div>
+    <div class="biz-summary-card real">
+      <div class="biz-summary-name">不動産事業</div>
+      <div class="biz-summary-share">10%</div>
+      <div class="biz-summary-policy">3部門で構成。各部門ごとに方針を分けて運営する。</div>
+    </div>
+  </div>
+
+  <div class="biz-detail-grid">
+    <div class="biz-detail-card improve">
+      <div class="biz-detail-status">改善対象</div>
+      <div class="biz-detail-name">① 自社反響不動産仲介</div>
+      <div class="biz-detail-share">不動産部門の 10%</div>
+      <div class="biz-detail-issue">
+        反響不足 / 対策未実施。1対応あたりヒアリング外注 3,000円が発生し、成約ゼロだと赤字構造になる。
+      </div>
+      <div class="biz-detail-target">
+        目標：月間売上 50万円<br>体制整備＆評価指標導入
+      </div>
+    </div>
+    <div class="biz-detail-card improve">
+      <div class="biz-detail-status">改善対象</div>
+      <div class="biz-detail-name">② 自社エージェント仲介</div>
+      <div class="biz-detail-share">不動産部門の 85%</div>
+      <div class="biz-detail-issue">
+        外注費が約80%を占有。月間売上は50〜100万円に留まり、収益性が低い。
+      </div>
+      <div class="biz-detail-target">
+        目標：月間売上 100万円<br>外注費比率の改善
+      </div>
+    </div>
+    <div class="biz-detail-card maintain">
+      <div class="biz-detail-status">現状維持</div>
+      <div class="biz-detail-name">③ 不動産管理業</div>
+      <div class="biz-detail-share">不動産部門の 5%</div>
+      <div class="biz-detail-issue">
+        伸長計画なし。既存契約の維持運用のみ。
+      </div>
+      <div class="biz-detail-target">
+        ノークレーム維持でOK<br>（成長対象外・評価指標なし）
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="sec-title">Step 1 — 実質人件費の計算（経営陣向け試算）</div>
 <div class="cost-grid">
   <div class="cost-card cg1">
@@ -893,39 +1106,25 @@ h1 em { font-style: normal; color: var(--accent); }
     </thead>
     <tbody>
       <tr>
-        <td><span class="rt-score positive">90点以上</span></td>
-        <td><span class="rank-badge rb-s" style="font-size:13px;padding:3px 10px">S</span></td>
-        <td><span class="rt-raise positive">+15,000円/月</span></td>
-        <td>昇格審査対象（即時）</td>
-        <td>粗利・外注費・品質すべてで卓越。次グレードに即昇格検討</td>
-      </tr>
-      <tr>
-        <td><span class="rt-score positive">80〜89点</span></td>
+        <td><span class="rt-score positive">80点以上</span></td>
         <td><span class="rank-badge rb-a" style="font-size:13px;padding:3px 10px">A</span></td>
         <td><span class="rt-raise positive">+10,000円/月</span></td>
         <td>昇格候補にリストアップ</td>
         <td>非常に優秀。2期連続Aで昇格審査に入る</td>
       </tr>
       <tr>
-        <td><span class="rt-score" style="color:var(--yellow)">70〜79点</span></td>
+        <td><span class="rt-score" style="color:var(--yellow)">60〜79点</span></td>
         <td><span class="rank-badge rb-b" style="font-size:13px;padding:3px 10px">B</span></td>
-        <td><span class="rt-raise positive">+5,000円/月</span></td>
+        <td><span class="rt-raise neutral">±0円</span></td>
         <td>現等級を維持</td>
         <td>必達ライン達成。標準的な成長を継続</td>
       </tr>
       <tr>
-        <td><span class="rt-score" style="color:var(--orange)">55〜69点</span></td>
+        <td><span class="rt-score negative">60点未満</span></td>
         <td><span class="rank-badge rb-c" style="font-size:13px;padding:3px 10px">C</span></td>
-        <td><span class="rt-raise neutral">±0円</span></td>
-        <td>現等級を維持（改善計画必須）</td>
-        <td>要改善。翌月末までに改善アクションプランを提出</td>
-      </tr>
-      <tr>
-        <td><span class="rt-score negative">55点未満</span></td>
-        <td><span class="rank-badge rb-d" style="font-size:13px;padding:3px 10px">D</span></td>
         <td><span class="rt-raise negative">−5,000円/月</span></td>
         <td>2期連続で降格審査</td>
-        <td>緊急フォロー。役員と即面談・業務再アサイン</td>
+        <td>要改善。翌月末までに改善アクションプラン提出、役員面談</td>
       </tr>
     </tbody>
   </table>
@@ -1066,13 +1265,13 @@ h1 em { font-style: normal; color: var(--accent); }
     </div>
   </div>
 </div>
-<div class="sec-title">Step 6 — 年次特別インセンティブ（事業部固有）</div>
+<div class="sec-title">Step 6 — 年次特別インセンティブ【現年度 2025/10〜2026/9】</div>
 <div class="special-wrap">
-  <span class="special-badge">BPO Exclusive</span>
-  <div class="special-title">外注費40%以下達成で<br>全員に月給1ヶ月分の特別ボーナス</div>
+  <span class="special-badge">FY 2025/10 - 2026/9</span>
+  <div class="special-title">BPO売上の原価40%以下達成で<br>全員に月給1ヶ月分の特別ボーナス</div>
   <div class="special-sub">
-    BPO事業部の収益構造の根幹である「外注費比率」を年間で40%以下に抑えられた場合、
-    事業部に所属する正社員<strong>全員</strong>に対し、半期ボーナスとは<strong>別建て</strong>で月給1ヶ月分の特別ボーナスを支給する。
+    本年度（2025/10〜2026/9）はBPO単独評価。<strong>BPO売上に対する原価比率</strong>を年間通算で40%以下に抑えられた場合、
+    事業部に所属する正社員<strong>全員</strong>に対し、半期ボーナスとは<strong>別建て</strong>で月給1ヶ月分の特別ボーナスを支給する。翌年度以降は不動産事業も評価軸に組み込む（Step 7参照）。
   </div>
 
   <div class="special-grid">
@@ -1132,7 +1331,66 @@ h1 em { font-style: normal; color: var(--accent); }
     未達時　&nbsp;: 41%以上で着地した場合は支給なし（部分支給なし／オール・オア・ナッシング）
   </div>
 </div>
-<div class="sec-title">Step 7 — 評価サイクル</div>
+<div class="sec-title">Step 7 — 翌年度方針【FY 2026/10〜】</div>
+<div class="next-year-wrap">
+  <span class="ny-badge">FY 2026/10〜</span>
+  <div class="ny-title">2軸評価制度への移行と<br>事業再投資型インセンティブ</div>
+  <div class="ny-sub">
+    現年度（Step 6）はBPO単独の年次特別ボーナス。翌年度からは不動産事業も組み入れた2軸評価へ移行し、
+    BPO原価の25%以下削減分は事業再投資（自社不動産の広告投資・外注マネージャークラスへの追加報酬等）に活用する制度設計を進める。
+  </div>
+
+  <div class="ny-block">
+    <div class="ny-block-num">01 / Multi-Axis</div>
+    <div class="ny-block-title">BPO + 不動産の 2軸定量評価制度</div>
+    <div class="ny-block-desc">
+      BPOのみだった評価軸に不動産事業を追加。各事業ごとに独立した粗利目標を設定し、
+      両軸の達成度を加味した総合評価へ移行する。
+    </div>
+  </div>
+
+  <div class="ny-block">
+    <div class="ny-block-num">02 / Reinvestment</div>
+    <div class="ny-block-title">BPO原価 25%以下削減分の事業再投資</div>
+    <div class="ny-block-desc">
+      BPOの原価率を 25%以下 に圧縮できた場合、削減できた差分を以下の用途に再投資する制度を導入予定。
+      個人への直接還元ではなく、事業成長と組織強化のための原資として活用する。
+    </div>
+    <div class="ny-block-formula">
+      <span class="accent-text">削減差分 = 25% − (実績原価率)</span>　× BPO売上<br><br>
+      用途A : 自社不動産事業の<span class="accent-text">広告投資</span>（リード獲得強化）<br>
+      用途B : 外注マネージャークラスへの<span class="accent-text">追加報酬</span>（組織強化）<br>
+      用途C : 上記の組み合わせ（経営判断で配分）
+    </div>
+  </div>
+
+  <div class="ny-block">
+    <div class="ny-block-num">03 / Real Estate Targets</div>
+    <div class="ny-block-title">不動産3部門の評価軸</div>
+    <div class="ny-block-desc">
+      Step 0で示した3部門それぞれに固有の評価指標を設定。下記の月間売上目標を達成度の基準とする。
+    </div>
+    <div class="ny-targets-grid">
+      <div class="ny-target-card">
+        <div class="ny-target-label">① 反響仲介</div>
+        <div class="ny-target-name">月間売上目標</div>
+        <div class="ny-target-value">¥500,000</div>
+      </div>
+      <div class="ny-target-card">
+        <div class="ny-target-label">② エージェント仲介</div>
+        <div class="ny-target-name">月間売上目標</div>
+        <div class="ny-target-value">¥1,000,000</div>
+      </div>
+      <div class="ny-target-card">
+        <div class="ny-target-label">③ 管理業</div>
+        <div class="ny-target-name">ノークレーム維持</div>
+        <div class="ny-target-value" style="color:var(--blue);font-size:13px;">— 成長対象外</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sec-title">Step 8 — 評価サイクル</div>
 <div class="timeline">
   <div class="tl-card">
     <div class="tl-timing">毎月末</div>
@@ -1151,8 +1409,8 @@ h1 em { font-style: normal; color: var(--accent); }
   </div>
   <div class="tl-card">
     <div class="tl-timing">2026/10</div>
-    <div class="tl-action">年次特別ボーナス判定</div>
-    <div class="tl-desc">2025/10〜2026/9の通算で外注費比率を確定。40%以下なら全員に月給1ヶ月分を加算支給。</div>
+    <div class="tl-action">年次特別ボーナス判定 + 翌年度制度発動</div>
+    <div class="tl-desc">2025/10〜2026/9の通算でBPO原価40%以下を判定 → 達成なら全員に月給1ヶ月分加算。同時にStep 7の2軸評価・25%再投資制度に移行。</div>
   </div>
 </div>
 <div class="doc-footer">
