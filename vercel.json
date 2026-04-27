@@ -15,6 +15,10 @@
   ],
   "rewrites": [
     { "source": "/sales", "destination": "/sales.html" },
-    { "source": "/marketing", "destination": "/marketing.html" }
+    { "source": "/marketing", "destination": "/marketing.html" },
+    { "source": "/bpo", "destination": "/bpo.html" },
+    { "source": "/demo/sales", "destination": "/demo/sales.html" },
+    { "source": "/demo/marketing", "destination": "/demo/marketing.html" },
+    { "source": "/demo/bpo", "destination": "/demo/bpo.html" }
   ]
 }
