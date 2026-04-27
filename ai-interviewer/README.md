@@ -127,12 +127,27 @@ curl -X POST http://localhost:3000/api/heygen-token
 
 | Phase | 内容 | 状態 |
 | --- | --- | --- |
-| 1 | 基盤セットアップ・型定義・プロンプト・トークン発行 | **進行中 (this scaffold)** |
-| 2 | HeyGenアバター単体動作 (固定セリフ) | 未着手 |
-| 3 | 音声入力 + Claude応答ループ | 未着手 |
-| 4 | 面接フロー実装 (求人注入・フェーズ管理・自動終了) | 未着手 |
-| 5 | 評価生成 + Notion保存 + 結果ページ | 未着手 |
-| 6 | UI磨き込み + Vercelデプロイ | 未着手 |
+| 1 | 基盤セットアップ・型定義・プロンプト・トークン発行 | ✅ 完了 |
+| 2 | HeyGenアバター単体動作 (`lib/heygen.ts` / `AvatarSession`) | ✅ 完了 |
+| 3 | 音声入力 + Claude応答ループ (`MicController` / VAD / `/api/transcribe` / `/api/claude` ストリーム) | ✅ 完了 |
+| 4 | 面接フロー実装 (`/api/notion/job/[id]` で求人注入 / 30分自動終了 / `[INTERVIEW_END]` 検出) | ✅ 完了 |
+| 5 | 評価生成 + Notion保存 + 結果ページ (`/api/evaluate` / `/api/notion/save` / `/result/[id]`) | ✅ 完了 |
+| 6 | UI磨き込み + Vercelデプロイ | UI 完了 / デプロイは手動 |
+
+## Notion DB の自動構築
+
+事前に以下を済ませてから実行:
+1. https://www.notion.so/my-integrations で Integration を作成
+2. Integration を親ページ（DBを置きたい場所）に「Add connections」で接続
+3. `.env.local` に `NOTION_API_KEY` を設定
+
+```bash
+npm run setup:notion -- <親ページIDまたはURL>
+# 例:
+npm run setup:notion -- https://www.notion.so/AI-34fc57ee1f6080f6bb6fe3040f8f06cf
+```
+
+実行後に出力される `NOTION_JOB_DB_ID` / `NOTION_INTERVIEW_DB_ID` を `.env.local` に追記してください。
 
 ## スクリプト
 
@@ -143,6 +158,7 @@ curl -X POST http://localhost:3000/api/heygen-token
 | `npm run start` | 本番モード起動 |
 | `npm run lint` | ESLint |
 | `npm run typecheck` | `tsc --noEmit` |
+| `npm run setup:notion -- <page-id>` | Notion DB を自動作成 |
 
 ## 確認事項 (実装前に相談が必要)
 
