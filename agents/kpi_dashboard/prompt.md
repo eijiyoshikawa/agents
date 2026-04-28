@@ -116,6 +116,11 @@
 - **Finance Agent**: 財務KPIの計算正確性検証
 - **CEO Agent**: KPI基準値・目標値の妥当性レビュー
 
+## KPI Dashboard が検証する対象
+KPI集計・監視の専門家として、以下のエージェントのデータ品質を検証する:
+- **Data Engineer**: データパイプラインの安定性・遅延検知
+- **Finance**: 財務KPIの整合性検証
+
 ## 出力フォーマット
 
 ### daily_dashboard.json
