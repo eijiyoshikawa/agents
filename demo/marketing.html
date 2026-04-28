@@ -738,32 +738,30 @@ h1 em { font-style: normal; color: var(--accent); }
     </div>
   </div>
 </header>
-<div class="sec-title">Step 0 — 営業×マーケの粗利配分ルール（前提）</div>
+<div class="sec-title">Step 0 — マーケティング部の粗利定義と評価基準（前提）</div>
 <div class="allocation-wrap">
   <div class="allocation-grid">
-    <div class="alloc-card">
-      <div class="alloc-title">新規契約時</div>
-      <div class="alloc-bar">
-        <div class="alloc-sales" style="width: 65%">営業 65%</div>
-        <div class="alloc-mkt" style="width: 35%">マーケ 35%</div>
-      </div>
+    <div class="alloc-card" style="border-color: var(--accent); background: var(--accent-light);">
+      <div class="alloc-title">月額（リテーナー）案件</div>
       <div class="alloc-note">
-        獲得〜契約までの営業コミュニケーションの比重が大きいため、新規時は営業側の配分を厚くする（60〜70%）。残りがマーケ売上となり、広告費・編集費を差し引いた残額がマーケ粗利。
+        運用代行・固定報酬型。売上から <strong>実費（広告費・交通費・外注費）</strong> を控除した残額が <strong>実質粗利</strong> として評価対象。
       </div>
     </div>
-    <div class="alloc-card">
-      <div class="alloc-title">継続時（2期目以降）</div>
-      <div class="alloc-bar">
-        <div class="alloc-sales" style="width: 35%">営業 35%</div>
-        <div class="alloc-mkt" style="width: 65%">マーケ 65%</div>
-      </div>
+    <div class="alloc-card" style="border-color: var(--accent); background: var(--accent-light);">
+      <div class="alloc-title">成果報酬型 案件</div>
       <div class="alloc-note">
-        継続は実際の成果（運用結果）でクライアントが判断するため、マーケ側の貢献が大きい。そのため配分を逆転させ、マーケが60〜70%を受け取る設計。
+        成果連動型・スポット制作含む。<strong>同じく売上 − 実費（広告費・交通費・外注費）</strong>で実質粗利を算出。新規／継続の区分は撤廃し全案件統一。
       </div>
     </div>
   </div>
+  <div class="bonus-formula" style="margin-top: 18px; line-height: 1.9;">
+    <span class="comment">// 実質粗利の定義（全案件共通）</span><br>
+    <span class="highlight">実質粗利</span> = 売上 − 実費（<span class="highlight">広告費</span> + <span class="highlight">交通費</span> + <span class="highlight">外注費</span>）<br><br>
+    <span class="comment">// ※ 月額パターンでも成果報酬パターンでも同じ計算式</span><br>
+    <span class="comment">// ※ 案件タイプ・新規／継続の区分による配分逆転は撤廃（簡素化）</span>
+  </div>
   <div class="cost-note" style="margin-top: 14px;">
-    ✦ 例：180万円の契約 → 営業粗利90万 + マーケ粗利63万（新規時35%配分から広告費・編集費を控除）。継続2期目以降はマーケ側が主導配分に切り替わる。
+    ✦ 例：月額運用 30万円の案件 → 広告費9万 + 交通費5千 + 外注費3万 = 実費12.5万 → 実質粗利 17.5万（粗利率58%）
   </div>
 </div>
 <div class="sec-title">Step 1 — 実質人件費の計算（経営陣向け試算）</div>
@@ -1049,15 +1047,11 @@ h1 em { font-style: normal; color: var(--accent); }
     </div>
     <div class="score-items">
       <div class="score-item">
-        <div class="score-item-name">月次粗利達成率（半期平均）<br><span style="font-size:11px;color:var(--ink-3)">B達成=30点、S=40点、D=0点</span></div>
-        <div class="score-item-pts">MAX 40点</div>
+        <div class="score-item-name">月次<strong>実質粗利</strong>達成率（半期平均）<br><span style="font-size:11px;color:var(--ink-3)">B達成=40点、S=50点、D=0点 ／ 売上−実費（広告費・交通費・外注費）</span></div>
+        <div class="score-item-pts">MAX 50点</div>
       </div>
       <div class="score-item">
-        <div class="score-item-name">担当クライアント継続率<br><span style="font-size:11px;color:var(--ink-3)">90%以上=満点。運用結果が継続判断の根拠</span></div>
-        <div class="score-item-pts">MAX 10点</div>
-      </div>
-      <div class="score-item">
-        <div class="score-item-name">運用効率（CPA・ROAS等）<br><span style="font-size:11px;color:var(--ink-3)">クライアント目標達成率の平均</span></div>
+        <div class="score-item-name">運用効率（CPA・ROAS等）<br><span style="font-size:11px;color:var(--ink-3)">クライアント目標達成率の平均（※継続率は別軸：Step 5の係数）</span></div>
         <div class="score-item-pts">MAX 10点</div>
       </div>
     </div>
@@ -1124,19 +1118,20 @@ h1 em { font-style: normal; color: var(--accent); }
 <div class="bonus-wrap">
   <div class="bonus-formula">
     <span class="comment">// 半期ボーナス計算式</span><br>
-    半期ボーナス = <span class="highlight">基準額</span> × <span class="highlight">個人達成率</span> × <span class="highlight">チーム係数</span><br><br>
+    半期ボーナス = <span class="highlight">基準額</span> × <span class="highlight">個人達成率</span> × <span class="highlight">チーム係数</span> × <span class="highlight">継続率係数</span><br><br>
     <span class="comment">// 基準額（月給 × 2ヶ月）</span><br>
     G1 Jr ディレクター    : 250,000 × 2 = <span class="highlight">500,000円</span>（= 固定残業代を引いた金額 × 2ヶ月）<br>
     G2 ディレクター       : 300,000 × 2 = <span class="highlight">600,000円</span>（= 固定残業代を引いた金額 × 2ヶ月）<br>
     G3 シニアディレクター  : 380,000 × 2 = <span class="highlight">760,000円</span>（= 固定残業代を引いた金額 × 2ヶ月）<br>
     G4 マーケマネージャー  : 450,000 × 2 = <span class="highlight">900,000円</span>（= 固定残業代を引いた金額 × 2ヶ月）<br><br>
     <span class="comment">// （固定残業代を引いた金額）が基準。ボーナス基準額は実質月給の2ヶ月分相当</span><br>
-    <span class="comment">// 個人達成率：半期粗利達成率をそのまま反映</span><br>
+    <span class="comment">// 個人達成率：半期実質粗利達成率をそのまま反映</span><br>
+    <span class="comment">// 継続率係数：担当クライアントの継続率を直接係数化（100%=×1.00、90%=×0.90 等）</span><br>
     <span class="comment">// 定性評価（ナレッジ共有含む）はStep 4の昇給連動に反映</span><br>
     <span class="comment">// 支給タイミング：上期＝9月末、下期＝3月末 ／ 支給月：10月・4月</span>
   </div>
 
-  <div class="coef-grid">
+  <div class="coef-grid" style="grid-template-columns: 1fr 1fr 1fr;">
     <div class="coef-box">
       <div class="coef-head">
         <span>個人達成率（そのまま反映）</span>
@@ -1162,6 +1157,20 @@ h1 em { font-style: normal; color: var(--accent); }
         <tr><td class="coef-range">70 〜 79%（▲20%）</td><td class="coef-val mid">× 0.80</td></tr>
         <tr><td class="coef-range">60 〜 69%（▲30%）</td><td class="coef-val cut">× 0.70</td></tr>
         <tr><td class="coef-range">60% 未満（▲40%）</td><td class="coef-val cut">× 0.60</td></tr>
+      </table>
+    </div>
+    <div class="coef-box">
+      <div class="coef-head">
+        <span>継続率係数（マーケ固有）</span>
+        <span class="coef-tag">Retention</span>
+      </div>
+      <table class="coef-table">
+        <tr><td class="coef-range">100%</td><td class="coef-val boost">× 1.00</td></tr>
+        <tr><td class="coef-range">95%</td><td class="coef-val boost">× 0.95</td></tr>
+        <tr><td class="coef-range">90%</td><td class="coef-val mid">× 0.90</td></tr>
+        <tr><td class="coef-range">85%</td><td class="coef-val mid">× 0.85</td></tr>
+        <tr><td class="coef-range">80%</td><td class="coef-val mid">× 0.80</td></tr>
+        <tr><td class="coef-range">80% 未満</td><td class="coef-val cut">継続率 ÷ 100</td></tr>
       </table>
     </div>
   </div>
@@ -1230,36 +1239,39 @@ h1 em { font-style: normal; color: var(--accent); }
   <div class="examples">
     <div class="example">
       <div class="ex-label">Example 01 — 標準達成</div>
-      <div class="ex-scenario">G2 ディレクター（10社担当）<br>個人100% × チーム100%</div>
+      <div class="ex-scenario">G2 ディレクター<br>個人100% × チーム100% × 継続率100%</div>
       <div class="ex-calc">
         基準額：600,000<br>
         個人：× 1.00<br>
         チーム：× 1.00<br>
-        600,000 × 1.00 × 1.00
+        継続率：× 1.00<br>
+        600,000 × 1.00 × 1.00 × 1.00
       </div>
       <div class="ex-result pos">＋600,000 円</div>
     </div>
     <div class="example">
       <div class="ex-label">Example 02 — ブースト</div>
-      <div class="ex-scenario">G2 ディレクター<br>個人120% × チーム125%</div>
+      <div class="ex-scenario">G2 ディレクター<br>個人120% × チーム125% × 継続率100%</div>
       <div class="ex-calc">
         基準額：600,000<br>
         個人：× 1.20<br>
         チーム：× 1.10<br>
-        600,000 × 1.20 × 1.10
+        継続率：× 1.00<br>
+        600,000 × 1.20 × 1.10 × 1.00
       </div>
       <div class="ex-result pos">＋792,000 円</div>
     </div>
     <div class="example">
-      <div class="ex-label">Example 03 — チーム大幅未達</div>
-      <div class="ex-scenario">G2 ディレクター<br>個人100% × チーム55%（60%未満）</div>
+      <div class="ex-label">Example 03 — チーム未達+継続率低下</div>
+      <div class="ex-scenario">G2 ディレクター<br>個人100% × チーム75% × 継続率90%</div>
       <div class="ex-calc">
         基準額：600,000<br>
         個人：× 1.00<br>
-        チーム：× 0.60（▲40% / 60%未満）<br>
-        600,000 × 1.00 × 0.60
+        チーム：× 0.80（70-79%帯）<br>
+        継続率：× 0.90<br>
+        600,000 × 1.00 × 0.80 × 0.90
       </div>
-      <div class="ex-result neg">＋360,000 円（▲240,000）</div>
+      <div class="ex-result neg">＋432,000 円（▲168,000）</div>
     </div>
   </div>
 </div>
