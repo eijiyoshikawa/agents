@@ -734,7 +734,7 @@ h1 em { font-style: normal; color: var(--accent); }
     </div>
     <div class="phil-item">
       <div class="phil-label">ボーナス</div>
-      <div class="phil-val">半期1回 / 月給×2ヶ月を基準額とし、個人達成率×チーム係数で算出</div>
+      <div class="phil-val">半期1回 / 月給×1ヶ月を基準額とし、個人達成率×チーム係数で算出</div>
     </div>
   </div>
 </header>
@@ -1119,12 +1119,12 @@ h1 em { font-style: normal; color: var(--accent); }
   <div class="bonus-formula">
     <span class="comment">// 半期ボーナス計算式</span><br>
     半期ボーナス = <span class="highlight">基準額</span> × <span class="highlight">個人達成率</span> × <span class="highlight">チーム係数</span> × <span class="highlight">継続率係数</span><br><br>
-    <span class="comment">// 基準額（月給 × 2ヶ月）</span><br>
-    G1 Jr ディレクター    : 250,000 × 2 = <span class="highlight">500,000円</span>（= 固定残業代を引いた金額 × 2ヶ月）<br>
-    G2 ディレクター       : 300,000 × 2 = <span class="highlight">600,000円</span>（= 固定残業代を引いた金額 × 2ヶ月）<br>
-    G3 シニアディレクター  : 380,000 × 2 = <span class="highlight">760,000円</span>（= 固定残業代を引いた金額 × 2ヶ月）<br>
-    G4 マーケマネージャー  : 450,000 × 2 = <span class="highlight">900,000円</span>（= 固定残業代を引いた金額 × 2ヶ月）<br><br>
-    <span class="comment">// （固定残業代を引いた金額）が基準。ボーナス基準額は実質月給の2ヶ月分相当</span><br>
+    <span class="comment">// 基準額（月給 × 1ヶ月）</span><br>
+    G1 Jr ディレクター    : 250,000 × 1 = <span class="highlight">250,000円</span>（= 固定残業代を引いた金額 × 1ヶ月）<br>
+    G2 ディレクター       : 300,000 × 1 = <span class="highlight">300,000円</span>（= 固定残業代を引いた金額 × 1ヶ月）<br>
+    G3 シニアディレクター  : 380,000 × 1 = <span class="highlight">380,000円</span>（= 固定残業代を引いた金額 × 1ヶ月）<br>
+    G4 マーケマネージャー  : 450,000 × 1 = <span class="highlight">450,000円</span>（= 固定残業代を引いた金額 × 1ヶ月）<br><br>
+    <span class="comment">// （固定残業代を引いた金額）が基準。ボーナス基準額は実質月給の1ヶ月分相当</span><br>
     <span class="comment">// 個人達成率：半期実質粗利達成率をそのまま反映</span><br>
     <span class="comment">// 継続率係数：担当クライアントの継続率を直接係数化（100%=×1.00、90%=×0.90 等）</span><br>
     <span class="comment">// 定性評価（ナレッジ共有含む）はStep 4の昇給連動に反映</span><br>
@@ -1247,7 +1247,7 @@ h1 em { font-style: normal; color: var(--accent); }
         継続率：× 1.00<br>
         600,000 × 1.00 × 1.00 × 1.00
       </div>
-      <div class="ex-result pos">＋600,000 円</div>
+      <div class="ex-result pos">＋300,000 円</div>
     </div>
     <div class="example">
       <div class="ex-label">Example 02 — ブースト</div>
@@ -1259,7 +1259,7 @@ h1 em { font-style: normal; color: var(--accent); }
         継続率：× 1.00<br>
         600,000 × 1.20 × 1.10 × 1.00
       </div>
-      <div class="ex-result pos">＋792,000 円</div>
+      <div class="ex-result pos">＋396,000 円</div>
     </div>
     <div class="example">
       <div class="ex-label">Example 03 — チーム未達+継続率低下</div>
@@ -1269,9 +1269,9 @@ h1 em { font-style: normal; color: var(--accent); }
         個人：× 1.00<br>
         チーム：× 0.80（70-79%帯）<br>
         継続率：× 0.90<br>
-        600,000 × 1.00 × 0.80 × 0.90
+        300,000 × 1.00 × 0.80 × 0.90
       </div>
-      <div class="ex-result neg">＋432,000 円（▲168,000）</div>
+      <div class="ex-result neg">＋216,000 円（▲84,000）</div>
     </div>
   </div>
 </div>

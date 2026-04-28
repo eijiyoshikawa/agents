@@ -789,7 +789,7 @@ h1 em {
     </div>
     <div class="phil-item">
       <div class="phil-label">ボーナス</div>
-      <div class="phil-val">半期1回 / 月給×2ヶ月を基準額とし、個人達成率×チーム係数で算出</div>
+      <div class="phil-val">半期1回 / 月給×1ヶ月を基準額とし、個人達成率×チーム係数で算出</div>
     </div>
   </div>
 </header>
@@ -1152,12 +1152,12 @@ h1 em {
   <div class="bonus-formula">
     <span class="comment">// 半期ボーナス計算式</span><br>
     半期ボーナス = <span class="highlight">基準額</span> × <span class="highlight">個人達成率</span> × <span class="highlight">チーム係数</span><br><br>
-    <span class="comment">// 基準額（月給 × 2ヶ月）</span><br>
-    G1 ジュニア     : 300,000 × 2 = <span class="highlight">600,000円</span>（= 固定残業代を引いた金額 × 2ヶ月）<br>
-    G2 スタンダード  : 350,000 × 2 = <span class="highlight">700,000円</span>（= 固定残業代を引いた金額 × 2ヶ月）<br>
-    G3 シニア       : 400,000 × 2 = <span class="highlight">800,000円</span>（= 固定残業代を引いた金額 × 2ヶ月）<br>
-    G4 マネージャー  : 480,000 × 2 = <span class="highlight">960,000円</span>（= 固定残業代を引いた金額 × 2ヶ月）<br><br>
-    <span class="comment">// （固定残業代を引いた金額）が基準。ボーナス基準額は実質月給の2ヶ月分相当</span><br>
+    <span class="comment">// 基準額（月給 × 1ヶ月）</span><br>
+    G1 ジュニア     : 300,000 × 1 = <span class="highlight">300,000円</span>（= 固定残業代を引いた金額 × 1ヶ月）<br>
+    G2 スタンダード  : 350,000 × 1 = <span class="highlight">350,000円</span>（= 固定残業代を引いた金額 × 1ヶ月）<br>
+    G3 シニア       : 400,000 × 1 = <span class="highlight">400,000円</span>（= 固定残業代を引いた金額 × 1ヶ月）<br>
+    G4 マネージャー  : 480,000 × 1 = <span class="highlight">480,000円</span>（= 固定残業代を引いた金額 × 1ヶ月）<br><br>
+    <span class="comment">// （固定残業代を引いた金額）が基準。ボーナス基準額は実質月給の1ヶ月分相当</span><br>
     <span class="comment">// 個人達成率：半期粗利達成率をそのまま反映</span><br>
     <span class="comment">// 定性評価はこのStepとは別で加味（Step 4の昇給連動に反映）</span><br>
     <span class="comment">// 支給タイミング：上期＝9月末、下期＝3月末 ／ 支給月：10月・4月</span>
@@ -1259,12 +1259,12 @@ h1 em {
       <div class="ex-label">Example 01 — 標準達成</div>
       <div class="ex-scenario">G2 スタンダード営業<br>個人100% × チーム100%</div>
       <div class="ex-calc">
-        基準額：700,000<br>
+        基準額：350,000<br>
         個人：× 1.00<br>
         チーム：× 1.00<br>
-        700,000 × 1.00 × 1.00
+        350,000 × 1.00 × 1.00
       </div>
-      <div class="ex-result pos">＋700,000 円</div>
+      <div class="ex-result pos">＋350,000 円</div>
     </div>
     <div class="example">
       <div class="ex-label">Example 02 — ブースト</div>
@@ -1275,7 +1275,7 @@ h1 em {
         チーム：× 1.10<br>
         700,000 × 1.20 × 1.10
       </div>
-      <div class="ex-result pos">＋924,000 円</div>
+      <div class="ex-result pos">＋462,000 円</div>
     </div>
     <div class="example">
       <div class="ex-label">Example 03 — チーム大幅未達</div>
@@ -1284,9 +1284,9 @@ h1 em {
         基準額：700,000<br>
         個人：× 1.00<br>
         チーム：× 0.60（▲40% / 60%未満）<br>
-        700,000 × 1.00 × 0.60
+        350,000 × 1.00 × 0.60
       </div>
-      <div class="ex-result neg">＋420,000 円（▲280,000）</div>
+      <div class="ex-result neg">＋210,000 円（▲140,000）</div>
     </div>
   </div>
 </div>
