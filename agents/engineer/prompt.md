@@ -33,29 +33,35 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 出力: /agents/engineer/tech_design/{project_name}.json
 ```
 
-### 2. 実装
+### 2. 実装（TDD準拠）
 ```
 処理:
-  1. 開発環境セットアップ
-  2. コンポーネント単位での実装
-     - HTML/CSS → コンポーネント化
-     - レスポンシブ対応
-     - アニメーション・インタラクション実装
-  3. バックエンド・API実装（必要な場合）
-  4. CMS連携・データ連携
-  5. フォーム・問い合わせ機能
+  1. 開発環境セットアップ（テンプレートリポジトリから初期化）
+  2. テストファースト:
+     - RED: 要件をテストとして記述
+     - GREEN: テストを通す最小限のコードを実装
+     - REFACTOR: コード品質を改善
+  3. コンポーネント単位での実装
+     - セマンティックHTML → React/Nextコンポーネント化
+     - レスポンシブ対応（モバイルファースト: 375px → 768px → 1280px）
+     - アニメーション（CSS Transitions優先、複雑な場合のみFramer Motion）
+  4. バックエンド・API実装（必要な場合）
+  5. CMS連携・データ連携
+  6. フォーム実装（React Hook Form + Zod、スパム対策reCAPTCHA/hCaptcha）
+  7. 画像最適化（WebP/AVIF自動変換、srcsetでレスポンシブ画像）
 出力: ソースコード一式
 ```
 
-### 3. テスト・品質保証
+### 3. テスト・品質保証（Lighthouse 90+必達）
 ```
 処理:
-  1. クロスブラウザテスト
-  2. レスポンシブ表示確認
-  3. パフォーマンス計測（Lighthouse）
-  4. アクセシビリティチェック
-  5. セキュリティチェック（OWASP基準）
-  6. SEO基本対策の確認
+  1. クロスブラウザテスト（Chrome/Safari/Firefox/Edge）
+  2. レスポンシブ表示確認（実機 or DevTools: iPhone SE/iPhone 14/iPad/Desktop）
+  3. パフォーマンス計測（Lighthouse 全カテゴリ90+が合格ライン）
+  4. アクセシビリティチェック（axe-core + 手動キーボードテスト）
+  5. セキュリティチェック（OWASP基準 + セキュリティヘッダー確認）
+  6. SEO対策確認（メタタグ/OGP/構造化データ/サイトマップ/robots.txt）
+  7. フォーム動作テスト（正常系/異常系/バリデーション/送信確認）
 出力: /agents/engineer/test_report/{project_name}.json
 ```
 

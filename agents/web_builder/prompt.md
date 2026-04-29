@@ -70,6 +70,16 @@
 - **合格ライン**: QA Reviewer overall_score >= 85
 - **5カテゴリ**: Structure(20点), Design(25点), Motion(20点), Interaction(20点), Responsive(15点)
 - **最大イテレーション**: 2周（それ以上は手動修正に切り替え）
+- **技術品質**: Lighthouse Performance 90+ / Accessibility 90+ / SEO 90+
+- **コード品質**: TypeScript strict mode、ESLint 0 errors、関数50行以内
+
+## パフォーマンス最適化チェックリスト
+再現実装時に以下を必ず適用:
+- [ ] next/image で画像を最適化（lazy loading + srcset）
+- [ ] next/font でフォントを最適化（font-display: swap）
+- [ ] 動的インポートでコード分割（heavy componentはdynamic import）
+- [ ] Server Components をデフォルト使用（Client Componentsは最小限に）
+- [ ] メタデータはgenerateMetadata APIで静的生成
 
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer（横断チーム）**: パイプライン全体の品質・最終成果物の検証

@@ -31,11 +31,16 @@ Next.js (App Router) を用いた UI 実装・SEO 最適化・パフォーマン
 ```
 入力: マーケティング要件 / コンテンツ戦略
 処理:
-  1. メタデータ設計（title / description / OGP）
-  2. 構造化データ（JSON-LD）の実装
+  1. メタデータ設計（title / description / OGP / Twitter Card）
+  2. 構造化データ（JSON-LD）の実装（Organization / Product / FAQ / BreadcrumbList）
   3. サイトマップ・robots.txt の設定
   4. Core Web Vitals の計測と改善
-  5. SSR / SSG / ISR の最適な選択
+  5. SSR / SSG / ISR の最適な選択（レンダリング戦略の判定基準）:
+     - 更新頻度 高 + 動的データ → SSR
+     - 更新頻度 低 + 静的 → SSG
+     - 更新頻度 中 → ISR（revalidate 最適値設定）
+  6. 画像最適化（next/image, WebP/AVIF自動変換, lazy loading）
+  7. フォント最適化（next/font, FOUT/FOIT対策, font-display: swap）
 出力: SEO設定ファイル + パフォーマンスレポート
 ```
 
@@ -43,11 +48,23 @@ Next.js (App Router) を用いた UI 実装・SEO 最適化・パフォーマン
 ```
 入力: 実装済みコンポーネント・ページ
 処理:
-  1. コンポーネントテスト（Jest + Testing Library）
-  2. E2E テスト（Playwright）
-  3. ビジュアルリグレッションテスト
-  4. アクセシビリティテスト（axe-core）
+  1. コンポーネントテスト（Jest + Testing Library）— ユーザー操作ベースのテスト
+  2. E2E テスト（Playwright）— クリティカルフロー: 認証→主要機能→決済
+  3. ビジュアルリグレッションテスト（Chromatic or Percy）
+  4. アクセシビリティテスト（axe-core + 手動キーボードナビゲーション確認）
+  5. パフォーマンステスト（Lighthouse CI でスコア90+を維持）
 出力: テスト結果レポート
+```
+
+### 4. 状態管理・データフロー設計
+```
+判定基準:
+  - サーバー状態（APIデータ）→ React Server Components + fetch cache
+  - クライアントローカル状態（UI状態）→ useState / useReducer
+  - グローバルクライアント状態 → zustand（必要最小限に留める）
+  - フォーム状態 → React Hook Form + Zod
+  - URL状態（フィルタ/ソート/ページ）→ searchParams（Server Componentで処理）
+原則: サーバーで処理可能なものはサーバーで完結させ、クライアントバンドルを最小化
 ```
 
 ## 技術スタック

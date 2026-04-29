@@ -139,7 +139,16 @@ const fadeInUp = {
 
 Tailwind の `sm:`, `md:`, `lg:`, `xl:` プレフィックスを活用。
 
-### Step 10: ビルド確認
+### Step 10: パフォーマンス最適化チェック
+ビルド前に以下を確認:
+- [ ] Server Components をデフォルト使用（`'use client'` は必要最小限）
+- [ ] 動的インポート（`next/dynamic`）で重いコンポーネントを遅延読み込み
+- [ ] next/image で全画像を最適化（width/height/alt必須）
+- [ ] next/font でフォント読み込みを最適化
+- [ ] `prefers-reduced-motion` メディアクエリでアニメーション制御
+- [ ] 不要な依存パッケージがないか確認
+
+### Step 11: ビルド確認
 ```bash
 cd /agents/web_builder/output
 npm run build

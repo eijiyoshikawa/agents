@@ -61,10 +61,17 @@ JS ソースから以下のパターンを検出する:
 - テキストアニメーション（タイピング、文字ごとのフェードイン等）
 - スクロールバー連動のプログレスバー
 
-### Step 6: 実装推奨の決定
+### Step 6: パフォーマンス影響評価
+各アニメーションのパフォーマンスへの影響を評価:
+- **GPU最適化可能**: transform, opacityのみ使用 → 高パフォーマンス
+- **リフロー誘発**: width, height, top, left等の変更 → 代替実装を検討
+- **will-change推奨**: 複雑なアニメーションには `will-change: transform` を適用
+- `prefers-reduced-motion` メディアクエリ対応の必要性を記録
+
+### Step 7: 実装推奨の決定
 検出したアニメーションの複雑さに応じて、最適な実装方法を推奨する:
 
-- **CSS only**: シンプルなhover、transition、基本的なkeyframes
+- **CSS only**: シンプルなhover、transition、基本的なkeyframes（パフォーマンス最優先）
 - **framer-motion**: React向けスクロールアニメーション、ページ遷移
 - **GSAP**: 複雑なタイムライン、ScrollTrigger連動、パフォーマンス重視
 

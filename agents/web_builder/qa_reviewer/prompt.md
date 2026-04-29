@@ -105,9 +105,17 @@ Builder が生成した `/agents/web_builder/output/` を Vercel にデプロイ
 - **medium**: 細かいスペーシング、アニメーションの微調整、フォントサイズの差異
 - **low**: 装飾的な細部、最適化的な改善
 
-### Step 7: 合格判定
-- `overall_score >= 85` → **合格**（`pass: true`）
-- `overall_score < 85` → **不合格**（`pass: false`、修正指示を出す）
+### Step 7: Lighthouse スコア検証
+デプロイ済みサイトの Lighthouse スコアを確認（PageSpeed Insights or Lighthouse CI）:
+- Performance: 90+ 必達
+- Accessibility: 90+ 必達
+- Best Practices: 90+ 必達
+- SEO: 90+ 必達
+スコア未達の場合は fix_instructions に改善指示を追加。
+
+### Step 8: 合格判定
+- `overall_score >= 85` かつ Lighthouse 全カテゴリ 90+ → **合格**（`pass: true`）
+- 上記未達 → **不合格**（`pass: false`、修正指示を出す）
 
 ## 出力フォーマット
 

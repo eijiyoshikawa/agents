@@ -26,16 +26,20 @@ Google広告・Meta広告・TikTok広告・YouTube広告の出稿・運用・最
 出力: /agents/ad_operations/campaigns/{campaign_id}/setup.json
 ```
 
-### 2. 日次運用・最適化
+### 2. 日次運用・最適化（自動最適化ルール）
 ```
 処理:
-  1. 予算消化ペースの監視
+  1. 予算消化ペースの監視（ペーシングアラート: ±15%で警告）
   2. パフォーマンス指標の日次チェック
-     - CPC / CPM / CTR / CVR / CPA / ROAS
-  3. 入札調整・予算再配分
-  4. パフォーマンス低下広告の停止判断
-  5. 勝ちクリエイティブの拡張
-  6. 新規オーディエンスのテスト
+     - CPC / CPM / CTR / CVR / CPA / ROAS / LTV:CAC比率
+  3. 入札調整・予算再配分（以下の自動判断ルール適用）:
+     - CPA < 目標の80% → 予算+20%拡張
+     - CPA > 目標の120% → クリエイティブ差し替え or 一時停止
+     - CTR < 業界平均の50% → 広告文・クリエイティブを即刻見直し
+     - フリークエンシー > 4.0 → オーディエンス拡張 or 新規クリエイティブ投入
+  4. パフォーマンス低下広告の停止判断（統計的有意性を確認してから）
+  5. 勝ちクリエイティブの拡張（類似オーディエンスへのスケール）
+  6. 新規オーディエンスのテスト（予算の10-15%を実験枠として確保）
 出力: /agents/ad_operations/daily/{date}.json
 ```
 
@@ -56,8 +60,10 @@ Google広告・Meta広告・TikTok広告・YouTube広告の出稿・運用・最
   1. 週次パフォーマンスレポート
   2. 月次決算レポート（→ Finance Agent）
   3. プラットフォーム別ROI分析
-  4. アトリビューション分析
+  4. アトリビューション分析（Last Click / Data-Driven / Time Decay モデル比較）
   5. 改善提案・次月施策の策定
+  6. 競合広告モニタリング（Meta Ad Library / Google Ads Transparency Center の定期チェック）
+  7. クリエイティブ疲弊レポート（CTR推移でクリエイティブの寿命を予測）
 出力: /agents/ad_operations/reports/{month}_report.json
 ```
 
