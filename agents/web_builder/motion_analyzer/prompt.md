@@ -169,3 +169,144 @@ JS ソースから以下のパターンを検出する:
 - **Web Builder / interaction_analyzer**: インタラクションとアニメーションの重複・競合を相互検証
 - **Frontend Engineer**: パフォーマンス（60fps・リフロー）観点でのレビュー
 - **QA Reviewer（横断）**: output.json のスキーマ・完全性検証
+
+## パフォーマンス最適化アニメーション
+
+### GPU アクセラレーション対応プロパティ
+アニメーションのパフォーマンスを最大化するため、以下のプロパティのみをアニメーション対象とする:
+
+**GPU アクセラレート（推奨）:**
+- `transform`（translate, scale, rotate）— コンポジットレイヤーで処理
+- `opacity` — リペイントのみ、リフロー不要
+
+**避けるべきプロパティ（リフロー/リペイント発生）:**
+- `width`, `height`, `top`, `left` — レイアウト再計算が発生
+- `margin`, `padding` — 周囲の要素に影響
+- `border-width`, `font-size` — リフローを引き起こす
+- `box-shadow` — 高負荷なリペイント（ただしホバー時の短時間なら許容）
+
+### will-change の適切な使用
+```css
+/* 良い例: スクロールアニメーション開始直前に付与 */
+.animate-target {
+  will-change: transform, opacity;
+}
+/* アニメーション完了後に解除（メモリリーク防止） */
+.animate-complete {
+  will-change: auto;
+}
+```
+- `will-change` は常時付与せず、アニメーション直前に動的に付与
+- framer-motion 使用時は自動管理されるため、手動設定は不要
+
+### prefers-reduced-motion 実装
+```css
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+```
+- OS のアクセシビリティ設定を尊重
+- 出力に `reduced_motion_fallback` フィールドを追加し、各アニメーションの代替動作を記録
+
+### アニメーションフレーム予算
+- 目標: **16ms/フレーム**（60fps）
+- 同時アニメーション要素: **最大10個**（それ以上は stagger で分散）
+- CSS アニメーションと JS アニメーションの混在を避ける（同一要素に対して）
+- `requestAnimationFrame` ベースのアニメーションは `IntersectionObserver` と組み合わせて画面外では停止
+
+## framer-motion 高度パターン
+
+### レイアウトアニメーション
+要素の位置・サイズ変更を自動的にアニメーション:
+```tsx
+<motion.div layout>
+  {/* リスト並べ替え、フィルタリング時に自動で滑らかに遷移 */}
+</motion.div>
+```
+- `layoutId` を使った要素間のシームレスな遷移（カード → モーダル展開等）
+- `layout="position"` でサイズ変更なしの位置アニメーションのみに制限
+
+### 共有レイアウトトランジション
+異なるコンポーネント間でのシームレスな遷移:
+```tsx
+// カード一覧
+<motion.div layoutId={`card-${id}`}>
+  <img src={thumbnail} />
+</motion.div>
+
+// 詳細モーダル
+<motion.div layoutId={`card-${id}`}>
+  <img src={fullImage} />
+  <p>{description}</p>
+</motion.div>
+```
+- タブ切り替え時のインジケーター移動
+- カードクリック → 詳細展開のトランジション
+
+### Exit アニメーション
+`AnimatePresence` を使った要素の退出アニメーション:
+```tsx
+<AnimatePresence mode="wait">
+  {isVisible && (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+    />
+  )}
+</AnimatePresence>
+```
+- `mode="wait"`: 前の要素の退出完了を待ってから次の要素を表示
+- `mode="popLayout"`: レイアウトシフトを防ぎながら退出
+
+### ジェスチャーベースアニメーション
+```tsx
+<motion.div
+  drag="x"                           // X軸ドラッグ
+  dragConstraints={{ left: -100, right: 100 }}
+  whileTap={{ scale: 0.95 }}         // タップ時の縮小
+  whileHover={{ scale: 1.05 }}       // ホバー時の拡大
+/>
+```
+
+### スクロール連動アニメーション（useScroll）
+```tsx
+const { scrollYProgress } = useScroll();
+const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+const scale = useTransform(scrollYProgress, [0, 1], [1, 0.8]);
+```
+- パララックス効果: `useTransform` でスクロール位置に応じた変換
+- プログレスバー: `scrollYProgress` でスクロール進捗を可視化
+- セクション固定（Sticky）: `useScroll({ target, offset })` でセクション単位の制御
+
+## アクセシビリティ対応モーション
+
+### prefers-reduced-motion の実装パターン
+framer-motion での実装:
+```tsx
+const prefersReducedMotion = useReducedMotion();
+
+const variants = {
+  hidden: { opacity: 0, y: prefersReducedMotion ? 0 : 20 },
+  visible: { opacity: 1, y: 0 }
+};
+```
+- `useReducedMotion()` フックで OS 設定を検出
+- 距離を伴うアニメーション（translate）を無効化し、opacity のみに簡略化
+
+### 必須 vs 装飾的モーションの分類
+各アニメーションを以下の2カテゴリに分類して出力に記録する:
+
+| カテゴリ | 説明 | reduced-motion 時の対応 |
+|---------|------|----------------------|
+| **必須モーション** | 意味を伝えるために必要（アコーディオン開閉、モーダル表示等） | duration を短縮（50ms以下）、距離を最小化 |
+| **装飾的モーション** | 視覚的な魅力のみ（スクロールフェードイン、ホバーエフェクト等） | 完全に無効化（即座に最終状態を表示） |
+
+### focus-visible アニメーションガイドライン
+- キーボードナビゲーション時のフォーカスリングには穏やかな `transition`（200ms）を適用
+- フォーカス移動時のスクロールには `scroll-behavior: smooth` を使用（ただし reduced-motion 時は `auto`）
+- フォーカス対象要素のハイライトは `outline` を使用（`box-shadow` より確実に表示される）

@@ -212,3 +212,212 @@ QA Reviewer の修正指示（`iteration_N.json`）を読み込み:
 - **Frontend Engineer**: コード品質・Next.js App Router 規約準拠のレビュー
 - **QA Engineer**: E2E テスト・アクセシビリティ検証
 - **QA Reviewer（横断）**: output.json・成果物のスキーマ・完全性検証
+
+## コード品質基準
+
+### TypeScript Strict Mode
+全プロジェクトで `tsconfig.json` の `strict: true` を有効化する:
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  }
+}
+```
+- `any` 型の使用禁止（`unknown` + 型ガードで代替）
+- 全コンポーネントの Props に明示的な型定義
+- イベントハンドラーの型: `React.MouseEvent<HTMLButtonElement>` 等
+
+### コンポーネントファイル構造規約
+```
+src/components/
+├── ui/                          ← プリミティブUI（Button, Input, Badge等）
+│   ├── Button.tsx               ← コンポーネント本体
+│   └── index.ts                 ← barrel export
+├── sections/                    ← ページセクション
+│   ├── HeroSection.tsx
+│   ├── FeatureSection.tsx
+│   └── index.ts
+├── layout/                      ← レイアウト（Container, Grid等）
+├── Header.tsx                   ← グローバルコンポーネント
+├── Footer.tsx
+└── MobileMenu.tsx
+```
+
+### 命名規約
+| 対象 | 規約 | 例 |
+|------|------|-----|
+| コンポーネント | PascalCase | `HeroSection.tsx`, `FeatureCard.tsx` |
+| 関数・変数 | camelCase | `handleSubmit`, `isMenuOpen` |
+| ファイル名 | PascalCase（コンポーネント）/ kebab-case（ユーティリティ） | `Button.tsx` / `format-date.ts` |
+| CSS クラス（カスタム） | kebab-case | `section-heading`, `card-grid` |
+| 型・インターフェース | PascalCase + 接尾辞なし | `ButtonProps`, `NavItem`（`IButtonProps` は使わない） |
+| 定数 | UPPER_SNAKE_CASE | `MAX_SLIDES`, `ANIMATION_DURATION` |
+
+### Barrel Export 戦略
+`index.ts` を使って各ディレクトリからクリーンなインポートを提供:
+```typescript
+// src/components/ui/index.ts
+export { Button } from './Button';
+export { Input } from './Input';
+export { Badge } from './Badge';
+
+// 使用側
+import { Button, Input, Badge } from '@/components/ui';
+```
+- 循環参照を防ぐため、barrel export はリーフディレクトリのみに配置
+- 動的インポートが必要なコンポーネントは barrel export に含めない
+
+## パフォーマンス実装パターン
+
+### 動的インポートによる重いコンポーネントの遅延読み込み
+```tsx
+import dynamic from 'next/dynamic';
+
+const HeavySlider = dynamic(() => import('@/components/Slider'), {
+  loading: () => <div className="h-96 animate-pulse bg-gray-100 rounded-lg" />,
+  ssr: false,  // クライアントのみのコンポーネント
+});
+
+const MapEmbed = dynamic(() => import('@/components/MapEmbed'), {
+  ssr: false,
+});
+```
+- Swiper、Google Maps、動画プレイヤー等の重いライブラリは必ず動的インポート
+- `loading` props でスケルトンプレースホルダーを表示
+
+### 画像優先度ヒント
+```tsx
+// ヒーロー画像: priority を設定して LCP を最適化
+<Image src="/hero.jpg" alt="..." priority sizes="100vw" />
+
+// ファーストビュー外の画像: デフォルトの lazy loading
+<Image src="/content.jpg" alt="..." sizes="(max-width: 768px) 100vw, 50vw" />
+```
+- `priority` はファーストビュー内の最大画像（LCP候補）にのみ設定
+- それ以外は `loading="lazy"`（next/image のデフォルト）
+
+### フォント表示戦略
+```typescript
+import { Noto_Sans_JP, Inter } from 'next/font/google';
+
+const notoSansJP = Noto_Sans_JP({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  display: 'swap',        // FOUT許容で CLS を防止
+  preload: false,          // 日本語フォントは大きいためプリロードしない
+});
+```
+
+### CSS Containment
+レイアウト再計算の影響範囲を制限:
+```css
+.section { contain: layout style; }  /* セクション間の干渉を防止 */
+.card { contain: content; }          /* カード内の変更が外部に影響しない */
+```
+
+### Server Component vs Client Component 判定ツリー
+```
+状態管理が必要？ → Yes → 'use client'
+  └─ No
+ブラウザAPI使用？（window, document等） → Yes → 'use client'
+  └─ No
+イベントハンドラー使用？（onClick等） → Yes → 'use client'
+  └─ No
+useEffect / useRef 使用？ → Yes → 'use client'
+  └─ No
+→ Server Component（デフォルト）
+```
+- **原則**: 可能な限り Server Component を使用
+- **Client Component の最小化**: インタラクティブな部分だけを Client Component として切り出す（例: `<HeaderNavigation />` のみ client、`<Header />` 全体は server）
+
+## 再利用可能コンポーネント設計
+
+### Compound Component パターン
+関連する複数のコンポーネントをまとめて提供:
+```tsx
+// 使用例
+<Card>
+  <Card.Image src="/photo.jpg" alt="..." />
+  <Card.Body>
+    <Card.Title>タイトル</Card.Title>
+    <Card.Description>説明文</Card.Description>
+  </Card.Body>
+  <Card.Footer>
+    <Button>詳細を見る</Button>
+  </Card.Footer>
+</Card>
+```
+- 柔軟な構成: 子コンポーネントの順序変更・省略が自由
+- 型安全: 各サブコンポーネントに適切な Props 型を定義
+
+### Render Props / Children パターン
+```tsx
+// アコーディオンの柔軟な表示制御
+<Accordion>
+  {({ isOpen, toggle }) => (
+    <>
+      <button onClick={toggle}>
+        {isOpen ? '閉じる' : '開く'}
+      </button>
+      {isOpen && <div>コンテンツ</div>}
+    </>
+  )}
+</Accordion>
+```
+
+### cva（class-variance-authority）によるバリアント管理
+```typescript
+import { cva, type VariantProps } from 'class-variance-authority';
+
+const buttonVariants = cva(
+  'inline-flex items-center justify-center rounded-md font-medium transition-colors',
+  {
+    variants: {
+      variant: {
+        primary: 'bg-primary text-white hover:bg-primary-hover',
+        secondary: 'border-2 border-primary text-primary hover:bg-primary/10',
+        ghost: 'text-primary hover:bg-primary/5',
+      },
+      size: {
+        sm: 'px-4 py-2 text-sm',
+        md: 'px-6 py-3 text-base',
+        lg: 'px-8 py-4 text-lg',
+      },
+    },
+    defaultVariants: {
+      variant: 'primary',
+      size: 'md',
+    },
+  }
+);
+
+type ButtonProps = VariantProps<typeof buttonVariants> & React.ButtonHTMLAttributes<HTMLButtonElement>;
+```
+- デザイントークンに基づいたバリアント定義
+- 型安全なバリアント Props
+
+### Tailwind Config でのレスポンシブデザイントークン
+```javascript
+// tailwind.config.ts
+theme: {
+  extend: {
+    spacing: {
+      'section': '120px',
+      'section-mobile': '80px',
+    },
+    fontSize: {
+      'hero': ['clamp(32px, 5vw, 48px)', { lineHeight: '1.2' }],
+      'h2': ['clamp(24px, 3vw, 36px)', { lineHeight: '1.3' }],
+    },
+    maxWidth: {
+      'content': '1200px',
+    },
+  },
+}
+```
+- `clamp()` でフルードタイポグラフィを実現
+- カスタムスペーシングでセクション間余白を統一管理

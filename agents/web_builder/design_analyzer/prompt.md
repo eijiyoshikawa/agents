@@ -189,3 +189,150 @@ CSS変数、インラインスタイル、クラス名から色情報を抽出�
 - **UI/UX Designer**: デザインシステム観点での妥当性・一貫性レビュー
 - **Designer**: カラー/タイポ分類の質感と整合するかレビュー
 - **QA Reviewer（横断）**: output.json のスキーマ・完全性検証
+
+## Tailwind CSS マッピング自動化
+
+### カラー → Tailwind クラスマッピング
+抽出した全カラー値を Tailwind CSS の設定形式に自動変換する:
+
+**マッピングルール:**
+```javascript
+// tailwind.config.ts への出力形式
+colors: {
+  primary: {
+    DEFAULT: '#3B82F6',     // メインブランドカラー
+    hover: '#2563EB',       // ホバー時（10%暗く）
+    light: '#DBEAFE',       // 薄いバリエーション（背景用）
+    dark: '#1D4ED8',        // 濃いバリエーション
+  },
+  secondary: { ... },
+  accent: { ... },
+  background: {
+    DEFAULT: '#FFFFFF',
+    alt: '#F8FAFC',
+    dark: '#0F172A',
+  },
+  text: {
+    DEFAULT: '#1E293B',
+    muted: '#64748B',
+    inverted: '#F8FAFC',
+  },
+}
+```
+
+### スペーシング → Tailwind スケール変換
+抽出した余白値を Tailwind のスペーシングスケールに最も近い値にマッピングする:
+
+| 実測値 | Tailwind クラス | 実際の値 |
+|--------|---------------|---------|
+| 4px | `p-1` / `m-1` | 4px (0.25rem) |
+| 8px | `p-2` / `m-2` | 8px (0.5rem) |
+| 12px | `p-3` / `m-3` | 12px (0.75rem) |
+| 16px | `p-4` / `m-4` | 16px (1rem) |
+| 24px | `p-6` / `m-6` | 24px (1.5rem) |
+| 32px | `p-8` / `m-8` | 32px (2rem) |
+| 48px | `p-12` / `m-12` | 48px (3rem) |
+| 64px | `p-16` / `m-16` | 64px (4rem) |
+| 80px | `p-20` / `m-20` | 80px (5rem) |
+| 120px | `p-[120px]` | カスタム値 |
+
+### タイポグラフィ → Tailwind 設定生成
+```javascript
+// tailwind.config.ts への出力形式
+fontSize: {
+  'hero': ['48px', { lineHeight: '1.2', fontWeight: '700' }],
+  'h2': ['36px', { lineHeight: '1.3', fontWeight: '700' }],
+  'h3': ['24px', { lineHeight: '1.4', fontWeight: '600' }],
+  'body': ['16px', { lineHeight: '1.8', letterSpacing: '0.02em' }],
+  'small': ['14px', { lineHeight: '1.6' }],
+  'caption': ['12px', { lineHeight: '1.5' }],
+}
+```
+
+### シャドウ → Tailwind ユーティリティマッピング
+| 実測シャドウ値 | Tailwind クラス | 用途 |
+|-------------|---------------|------|
+| `0 1px 2px rgba(0,0,0,0.05)` | `shadow-sm` | 微細なシャドウ |
+| `0 1px 3px rgba(0,0,0,0.1)` | `shadow` | デフォルト |
+| `0 4px 6px rgba(0,0,0,0.1)` | `shadow-md` | カード |
+| `0 10px 15px rgba(0,0,0,0.1)` | `shadow-lg` | ホバー時 |
+| `0 20px 25px rgba(0,0,0,0.1)` | `shadow-xl` | モーダル |
+| カスタム値 | `shadow-[値]` | `tailwind.config.ts` に追加 |
+
+## ダークモード対応分析
+
+### ダークモード検出
+参考サイトでのダークモード実装の有無と方式を検出する:
+
+**検出ポイント:**
+- `@media (prefers-color-scheme: dark)` のCSS定義
+- `<html class="dark">` / `data-theme="dark"` の切り替え機構
+- ダークモードトグルボタン（月/太陽アイコン等）の有無
+- CSS カスタムプロパティによるテーマ変数の二重定義
+
+**ダークモードが検出された場合の出力:**
+```json
+{
+  "dark_mode": {
+    "detected": true,
+    "method": "class-based | media-query | css-variables",
+    "toggle_ui": true,
+    "colors_dark": {
+      "background": { "main": "#0F172A", "alt": "#1E293B" },
+      "text": { "primary": "#F8FAFC", "secondary": "#94A3B8" },
+      "border": "#334155"
+    }
+  }
+}
+```
+
+### カラーパレットのデュアル定義
+ライト/ダーク両モードのカラーを CSS カスタムプロパティで定義:
+```css
+:root {
+  --color-bg: #FFFFFF;
+  --color-text: #1E293B;
+}
+.dark {
+  --color-bg: #0F172A;
+  --color-text: #F8FAFC;
+}
+```
+
+### CSS カスタムプロパティによるテーマ切り替え
+Tailwind CSS v4 での推奨実装パターン:
+- `@theme` ディレクティブでカスタムプロパティを定義
+- `dark:` バリアントで上書き
+- `next-themes` ライブラリとの連携方法を記録
+
+## マイクロインタラクションスタイル
+
+### 微細な UI フィードバックパターン
+参考サイトで使用されている繊細なインタラクションフィードバックを検出・記録する:
+
+**ボタンフィードバック:**
+- プレス時の `scale(0.98)` / `translateY(1px)` 効果
+- リップルエフェクト（Material Design風）
+- ローディング中のスピナー表示
+
+**入力フィードバック:**
+- フォーカス時のボーダーカラー変化 + `ring` エフェクト
+- フローティングラベル（placeholder → label 遷移）
+- 入力値の有無によるスタイル変化
+
+### ローディング状態デザイン
+- **スピナー**: サイズ、色、回転速度
+- **プログレスバー**: 幅、色、アニメーション
+- **パルスアニメーション**: ボタンの「処理中」表示パターン
+
+### スケルトンスクリーン
+コンテンツ読み込み中のプレースホルダー表示パターン:
+- スケルトンの形状（テキスト行、画像矩形、カード）
+- アニメーション（パルス / シマー / ウェーブ）
+- 背景色とハイライト色の組み合わせ
+
+### エンプティステートデザイン
+データが存在しない場合の表示パターン:
+- イラスト/アイコンの使用
+- メッセージテキストのスタイル
+- アクションボタン（「データを追加」等）の配置
