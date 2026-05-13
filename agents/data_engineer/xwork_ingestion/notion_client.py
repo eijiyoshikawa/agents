@@ -58,6 +58,11 @@ class NotionClient:
             },
         })
 
+    def update_properties(self, page_id: str, properties: dict[str, Any]) -> None:
+        if not properties:
+            return
+        self._request("PATCH", f"/pages/{page_id}", json={"properties": properties})
+
     def create_customer(self, props: dict[str, Any]) -> dict:
         return self._request("POST", "/pages", json={
             "parent": {"database_id": self.db_id},

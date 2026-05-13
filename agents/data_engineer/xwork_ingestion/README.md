@@ -7,10 +7,12 @@ x-work.jp（クロスワーク）の検索結果に掲載されている企業�
 | ファイル | 役割 |
 |---|---|
 | `normalize.py` | 会社名・電話・URLの正規化。Notion `顧客名（正規化）` formula と同期 |
-| `notion_client.py` | Notion REST API クライアント（fetch all / multi_select 追記 / create） |
+| `notion_client.py` | Notion REST API クライアント（fetch all / 追記 / create） |
 | `scrape_xwork.py` | Playwright で x-work.jp の検索結果を巡回し JSON 出力 |
 | `gbiz_enrich.py` | 経産省 gBizINFO API で電話・URL を補完 |
 | `import_to_notion.py` | JSON を読み込み、重複判定 → 既存追記 or 新規作成 |
+| `prefecture_cities.py` | 大阪/京都/兵庫/奈良の市町村リスト |
+| `run_batch.py` | 4府県一括取得→マージ→投入のオーケストレータ |
 
 ## 前提
 
@@ -91,6 +93,39 @@ gBizINFO 補完を無効にしたい場合:
 ```bash
 python import_to_notion.py --input companies.json --no-gbiz
 ```
+
+## 一括実行（大阪・京都・兵庫・奈良の施工管理7職種）
+
+```bash
+export $(grep -v '^#' .env | xargs)
+python run_batch.py
+```
+
+このコマンド1発で:
+
+1. 4府県（大阪・京都・兵庫・奈良）の市町村 × 7職種 を順次スクレイプ
+2. `batch/{osaka,kyoto,hyogo,nara}.json` に府県別 JSON を出力
+3. 会社名でデデュプして `batch/all.json` にマージ
+4. Notion 既存DB と突合して **dry-run 統計を表示**
+5. そのまま本実行 → 既存マッチ29社にタグ追記 + 新規追加
+
+オプション:
+
+```bash
+python run_batch.py --dry-run                   # 投入前で停止
+python run_batch.py --prefectures osaka kyoto   # 府県を絞る
+python run_batch.py --skip-scrape               # 既存JSONを再利用
+python run_batch.py --use-gbiz                  # gBizINFOで電話・URL補完
+```
+
+### マッチした既存ページの挙動
+
+既存DBにある会社名にマッチした場合:
+- `掲載元メディア` に「クロスワーク」を追記（既存値は維持）
+- `代表者名 / 部署/役職 / 住所 / 法人番号 / 従業員数 / 資本金 / 業種` の
+  **空フィールドのみ** を x-work の値で埋める（既存値は上書きしない）
+
+統計 JSON の `fields_filled` がフィールド埋め対象の件数を示す。
 
 ## マッピング表（取得項目 → Notion DB プロパティ）
 

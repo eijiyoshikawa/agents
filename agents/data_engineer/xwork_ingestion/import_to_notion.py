@@ -91,6 +91,45 @@ def append_media(client: NotionClient, page: dict, dry_run: bool) -> bool:
     return True
 
 
+def _page_number(page: dict, key: str) -> float | int | None:
+    return page.get("properties", {}).get(key, {}).get("number")
+
+
+def _page_select(page: dict, key: str) -> str:
+    sel = page.get("properties", {}).get(key, {}).get("select")
+    return sel.get("name") if sel else ""
+
+
+def fill_empty_on_match(item: dict, page: dict, db_props: set[str]) -> dict:
+    """マッチした既存ページの空フィールドだけ x-work の値で埋める。
+
+    既存値が入っている場合は触らない。
+    """
+    additions: dict = {}
+    pairs = [
+        ("代表者名", "representative", "rich_text"),
+        ("部署/役職", "representative_title", "rich_text"),
+        ("住所", "address", "rich_text"),
+        ("法人番号", "hello_work_company_id", "rich_text"),
+        ("資本金", "capital", "rich_text"),
+    ]
+    for prop_name, item_key, _kind in pairs:
+        if prop_name not in db_props:
+            continue
+        value = item.get(item_key)
+        if not value:
+            continue
+        if text_prop(page, prop_name):
+            continue
+        additions[prop_name] = _rich(value)
+    if "従業員数" in db_props and item.get("employee_count_total") is not None:
+        if _page_number(page, "従業員数") is None:
+            additions["従業員数"] = {"number": item["employee_count_total"]}
+    if "業種" in db_props and not _page_select(page, "業種"):
+        additions["業種"] = {"select": {"name": DEFAULT_INDUSTRY}}
+    return additions
+
+
 def _rich(content: str) -> dict:
     return {"rich_text": [{"text": {"content": content}}]}
 
@@ -172,7 +211,8 @@ def run(input_path: Path, dry_run: bool, use_gbiz: bool) -> dict:
               file=sys.stderr)
         gbiz = None
     stats = {"match_name": 0, "partial_phone": 0, "partial_host": 0,
-             "new": 0, "media_appended": 0, "gbiz_ok": 0, "gbiz_miss": 0}
+             "new": 0, "media_appended": 0, "fields_filled": 0,
+             "gbiz_ok": 0, "gbiz_miss": 0}
     for item in items:
         if gbiz:
             enrich(item, gbiz)
@@ -182,6 +222,11 @@ def run(input_path: Path, dry_run: bool, use_gbiz: bool) -> dict:
         if kind == "match_name" and page is not None:
             if append_media(client, page, dry_run):
                 stats["media_appended"] += 1
+            additions = fill_empty_on_match(item, page, db_props)
+            if additions:
+                stats["fields_filled"] += 1
+                if not dry_run:
+                    client.update_properties(page["id"], additions)
             continue
         needs_review = kind in ("partial_phone", "partial_host")
         if dry_run:
