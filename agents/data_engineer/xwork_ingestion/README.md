@@ -127,6 +127,55 @@ python run_batch.py --use-gbiz                  # gBizINFOで電話・URL補完
 
 統計 JSON の `fields_filled` がフィールド埋め対象の件数を示す。
 
+## データクリーニング（重複検出）
+
+DB 内の重複を多面的に検出して JSON レポートを出力する。判定は機械的に行い、
+最終的な「残す/捨てる」判断は Notion UI + Notion AI に委ねるハイブリッド設計。
+
+### 検出キー
+
+| キー | 信頼度 | 例 |
+|---|---|---|
+| 法人番号（13桁） | 高 | 「(株)ABC」と「ABC建設」が同番号 → 同会社 |
+| 電話番号（数字化） | 高 | `03-1234-5678` と `(03)1234-5678` |
+| 会社URLホスト | 高 | `example.com` と `www.example.com` |
+| 正規化名（厳格） | 中 | 「株式会社ABC」と「(株)ABC」 |
+| 正規化名（緩い） | 低 | 「ABC建設」と「ABC建設工業」（false positive あり） |
+
+### 実行
+
+```bash
+# レポート出力のみ（推奨）
+python find_duplicates.py --report duplicates_report.json
+
+# 低信頼度（緩い名前マッチ）を除外
+python find_duplicates.py --report duplicates_report.json --skip-loose
+
+# Notion で「重複確認必要」フラグを実際に立てる
+python find_duplicates.py --apply
+```
+
+### canonical（正本）の自動選定
+
+各グループで以下の順序で最高スコアのページを残し、他にフラグを立てる:
+
+1. ステータスが「契約中/契約終了/アポイント獲得/商談中」等の「進行中・確定」状態
+2. 入力済みフィールド数が多い
+3. 作成日時が古い
+
+### 推奨ワークフロー
+
+```
+[Python] find_duplicates.py --apply
+  ↓ 非正本に `重複確認必要 = ON` + `確認状況 = 重複（統合/既存に追記）`
+[Notion UI でフィルタ]
+  重複確認必要 = ☑
+[Notion AI / 手動]
+  契約中を優先、メモ統合、不要ページをアーカイブ
+```
+
+メモは絶対に上書きしない設計のため、過去の手入力情報は保護される。
+
 ## マッピング表（取得項目 → Notion DB プロパティ）
 
 | JSON フィールド | Notion プロパティ | 補足 |
