@@ -30,17 +30,29 @@ cp .env.example .env  # NOTION_TOKEN を埋める
 ## 実行手順
 
 ### 1. 検索結果を収集
+
+x-work.jp は Next.js で構築されており、`<script id="__NEXT_DATA__">` に
+求人一覧の構造化データが埋め込まれている。本ツールは DOM セレクタではなく
+この JSON を直接パースする方式のため、見た目の変更には強い。
+
 ```bash
 export $(cat .env | xargs)
 python scrape_xwork.py \
   --url "https://x-work.jp/search?occupations=...&cities=..." \
   --out companies.json \
   --max-pages 50 \
-  --delay 3 \
-  --headed   # 初回はセレクタ確認のためヘッド付きで実行
+  --delay 3
 ```
 
-> **初回はセレクタの実HTMLを確認すること。** `scrape_xwork.py` の `extract_companies_on_page` のセレクタはプレースホルダのため、x-work.jp の実DOMに合わせて調整が必要。`--headed` でブラウザを表示し、DevToolsで確認したのち書き換える。
+初回や、ヒット件数が想定と合わない場合は構造ダンプを取って確認する:
+
+```bash
+python scrape_xwork.py --url "..." --out companies.json --debug-dir ./debug --max-pages 1
+# ./debug/next_data_p1.json に __NEXT_DATA__ の生JSONが保存される
+```
+
+抽出ロジックの当たり判定キー（`COMPANY_NAME_KEYS` 等）は
+`scrape_xwork.py` 冒頭の定数で調整できる。
 
 ### 2. 重複判定 + Notion 取り込み
 

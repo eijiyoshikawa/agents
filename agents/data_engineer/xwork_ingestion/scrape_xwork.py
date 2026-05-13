@@ -1,9 +1,14 @@
 """x-work.jp 検索結果ページから企業情報を収集して JSON に書き出す。
 
+x-work.jp は Next.js 製で、ページ内の `<script id="__NEXT_DATA__">` に
+求人一覧の構造化データが埋め込まれている。DOM セレクタに頼らず
+この JSON を直接パースする方が変更に強い。
+
 利用規約の確認後に実行すること。レート制限はデフォルト 3 秒/ページ。
 
 CLI:
     python scrape_xwork.py --url "<検索結果URL>" --out companies.json
+    python scrape_xwork.py --url "..." --out companies.json --debug-dir ./debug
 """
 from __future__ import annotations
 
@@ -12,64 +17,134 @@ import asyncio
 import json
 import sys
 from pathlib import Path
+from typing import Any
+from urllib.parse import urljoin, urlparse, urlunparse
 
 from playwright.async_api import Page, async_playwright
 
 DEFAULT_DELAY_SEC = 3.0
 DEFAULT_TIMEOUT_MS = 30_000
 
+COMPANY_NAME_KEYS = ("companyName", "company_name", "corporationName", "法人名", "company")
+ADDRESS_KEYS = ("address", "workAddress", "location", "勤務地", "所在地", "addressText")
+PHONE_KEYS = ("phone", "phoneNumber", "tel", "電話番号")
+URL_KEYS = ("companyUrl", "homepage", "website", "url", "会社URL")
+OCCUPATION_KEYS = ("occupation", "occupationName", "jobCategory", "職種")
+JOB_ID_KEYS = ("id", "jobId", "slug", "detailUrl")
 
-async def extract_companies_on_page(page: Page) -> list[dict]:
-    """1ページ分の求人カードから企業情報を抽出する。
 
-    NOTE: x-work.jp のセレクタは変更されうるため、最初の数件で要素を確認してから
-    本番運用に入ること。現在のセレクタはプレースホルダで、初回実行時に
-    --selector-debug で実HTMLを保存し、必要なら調整すること。
+async def fetch_next_data(page: Page) -> dict[str, Any]:
+    """`__NEXT_DATA__` の JSON を取得する。"""
+    text = await page.locator("script#__NEXT_DATA__").inner_text()
+    return json.loads(text)
+
+
+def walk_for_jobs(node: Any) -> list[dict]:
+    """`__NEXT_DATA__` を再帰的に走査し、会社名キーを持つ辞書の配列を見つける。
+
+    最も大きな「会社名キーを持つ辞書のリスト」を求人一覧とみなす。
     """
-    cards = await page.locator("[data-testid='job-card'], article, .job-card").all()
-    out: list[dict] = []
-    for card in cards:
-        name = (await _text_or_empty(card, ".company-name, [data-company]")).strip()
-        if not name:
-            continue
-        out.append({
-            "company_name": name,
-            "address": (await _text_or_empty(card, ".company-address, .location")).strip(),
-            "occupation": (await _text_or_empty(card, ".occupation, .job-title")).strip(),
-            "source_url": page.url,
-        })
-    return out
+    best: list[dict] = []
+
+    def looks_like_job(d: dict) -> bool:
+        return any(k in d for k in COMPANY_NAME_KEYS)
+
+    def visit(x: Any) -> None:
+        nonlocal best
+        if isinstance(x, list):
+            jobs = [v for v in x if isinstance(v, dict) and looks_like_job(v)]
+            if len(jobs) > len(best):
+                best = jobs
+            for v in x:
+                visit(v)
+        elif isinstance(x, dict):
+            for v in x.values():
+                visit(v)
+
+    visit(node)
+    return best
 
 
-async def _text_or_empty(loc, selector: str) -> str:
-    target = loc.locator(selector).first
-    if await target.count() == 0:
-        return ""
-    return await target.inner_text()
+def pick(d: dict, keys: tuple[str, ...]) -> str:
+    for k in keys:
+        v = d.get(k)
+        if isinstance(v, str) and v.strip():
+            return v.strip()
+        if isinstance(v, dict):
+            for inner in ("name", "label", "text"):
+                if isinstance(v.get(inner), str) and v[inner].strip():
+                    return v[inner].strip()
+    return ""
 
 
-async def crawl(start_url: str, max_pages: int, delay: float, headed: bool) -> list[dict]:
+def normalize_record(raw: dict, base_url: str) -> dict:
+    detail = pick(raw, JOB_ID_KEYS)
+    detail_url = ""
+    if detail:
+        if detail.startswith("http"):
+            detail_url = detail
+        elif detail.startswith("/"):
+            detail_url = urljoin(base_url, detail)
+        else:
+            detail_url = urljoin(base_url, f"/jobs/{detail}")
+    return {
+        "company_name": pick(raw, COMPANY_NAME_KEYS),
+        "address": pick(raw, ADDRESS_KEYS),
+        "phone": pick(raw, PHONE_KEYS),
+        "company_url": pick(raw, URL_KEYS),
+        "occupation": pick(raw, OCCUPATION_KEYS),
+        "detail_url": detail_url,
+        "source_url": base_url,
+    }
+
+
+def with_page_param(url: str, page_no: int) -> str:
+    parsed = urlparse(url)
+    query = [p for p in parsed.query.split("&") if p and not p.startswith("page=")]
+    query.append(f"page={page_no}")
+    return urlunparse(parsed._replace(query="&".join(query)))
+
+
+def dump_debug(debug_dir: Path | None, page_no: int, data: dict) -> None:
+    if not debug_dir:
+        return
+    debug_dir.mkdir(parents=True, exist_ok=True)
+    (debug_dir / f"next_data_p{page_no}.json").write_text(
+        json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+
+
+async def crawl(start_url: str, max_pages: int, delay: float, headed: bool,
+                debug_dir: Path | None) -> list[dict]:
     results: list[dict] = []
-    seen_names: set[str] = set()
+    seen: set[str] = set()
     async with async_playwright() as pw:
         browser = await pw.chromium.launch(headless=not headed)
         ctx = await browser.new_context(locale="ja-JP")
         page = await ctx.new_page()
         page.set_default_timeout(DEFAULT_TIMEOUT_MS)
-        await page.goto(start_url, wait_until="domcontentloaded")
         for i in range(max_pages):
+            url = start_url if i == 0 else with_page_param(start_url, i + 1)
+            await page.goto(url, wait_until="domcontentloaded")
             await page.wait_for_load_state("networkidle")
-            page_items = await extract_companies_on_page(page)
-            for item in page_items:
-                if item["company_name"] in seen_names:
-                    continue
-                seen_names.add(item["company_name"])
-                results.append(item)
-            print(f"[page {i + 1}] +{len(page_items)} (total {len(results)})", file=sys.stderr)
-            next_link = page.locator("a[rel='next'], .pagination-next, a:has-text('次へ')").first
-            if await next_link.count() == 0:
+            try:
+                next_data = await fetch_next_data(page)
+            except Exception as e:
+                print(f"[page {i + 1}] __NEXT_DATA__ not found: {e}", file=sys.stderr)
                 break
-            await next_link.click()
+            dump_debug(debug_dir, i + 1, next_data)
+            jobs = walk_for_jobs(next_data)
+            new_count = 0
+            for raw in jobs:
+                rec = normalize_record(raw, url)
+                if not rec["company_name"] or rec["company_name"] in seen:
+                    continue
+                seen.add(rec["company_name"])
+                results.append(rec)
+                new_count += 1
+            print(f"[page {i + 1}] +{new_count} (total {len(results)})", file=sys.stderr)
+            if new_count == 0:
+                break
             await asyncio.sleep(delay)
         await browser.close()
     return results
@@ -82,9 +157,11 @@ def main() -> int:
     ap.add_argument("--max-pages", type=int, default=50)
     ap.add_argument("--delay", type=float, default=DEFAULT_DELAY_SEC)
     ap.add_argument("--headed", action="store_true", help="ブラウザを表示する（初回検証用）")
+    ap.add_argument("--debug-dir", type=Path, default=None,
+                    help="__NEXT_DATA__ の生JSONをページごとに保存（構造調査用）")
     args = ap.parse_args()
 
-    data = asyncio.run(crawl(args.url, args.max_pages, args.delay, args.headed))
+    data = asyncio.run(crawl(args.url, args.max_pages, args.delay, args.headed, args.debug_dir))
     args.out.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"wrote {len(data)} companies → {args.out}", file=sys.stderr)
     return 0
