@@ -121,13 +121,43 @@ def dump_debug(debug_dir: Path | None, page_no: int, data: dict) -> None:
     )
 
 
+STEALTH_INIT = """
+Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
+Object.defineProperty(navigator, 'languages', {get: () => ['ja-JP', 'ja', 'en-US', 'en']});
+Object.defineProperty(navigator, 'plugins', {get: () => [1, 2, 3, 4, 5]});
+window.chrome = window.chrome || { runtime: {} };
+"""
+
+REAL_UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+           "AppleWebKit/537.36 (KHTML, like Gecko) "
+           "Chrome/147.0.0.0 Safari/537.36")
+
+
+async def _launch_browser(pw, headed: bool, use_real_chrome: bool):
+    args = ["--disable-blink-features=AutomationControlled"]
+    if use_real_chrome:
+        try:
+            return await pw.chromium.launch(channel="chrome", headless=not headed, args=args)
+        except Exception as e:
+            print(f"[warn] installed Chrome not available ({e}); falling back to Chromium",
+                  file=sys.stderr)
+    return await pw.chromium.launch(headless=not headed, args=args)
+
+
 async def crawl(start_url: str, max_pages: int, delay: float, headed: bool,
-                debug_dir: Path | None) -> list[dict]:
+                debug_dir: Path | None, use_real_chrome: bool) -> list[dict]:
     results: list[dict] = []
     seen: set[str] = set()
     async with async_playwright() as pw:
-        browser = await pw.chromium.launch(headless=not headed)
-        ctx = await browser.new_context(locale="ja-JP")
+        browser = await _launch_browser(pw, headed, use_real_chrome)
+        ctx = await browser.new_context(
+            locale="ja-JP",
+            timezone_id="Asia/Tokyo",
+            user_agent=REAL_UA,
+            viewport={"width": 1280, "height": 800},
+            extra_http_headers={"Accept-Language": "ja,en-US;q=0.9,en;q=0.8"},
+        )
+        await ctx.add_init_script(STEALTH_INIT)
         page = await ctx.new_page()
         page.set_default_timeout(DEFAULT_TIMEOUT_MS)
         for i in range(max_pages):
@@ -169,12 +199,20 @@ def main() -> int:
     ap.add_argument("--out", required=True, type=Path)
     ap.add_argument("--max-pages", type=int, default=50)
     ap.add_argument("--delay", type=float, default=DEFAULT_DELAY_SEC)
-    ap.add_argument("--headed", action="store_true", help="ブラウザを表示する（初回検証用）")
+    ap.add_argument("--headless", action="store_true",
+                    help="ブラウザを表示せずに実行する。既定は headed（CloudFront対策）")
+    ap.add_argument("--no-real-chrome", action="store_true",
+                    help="インストール済み Chrome ではなく Playwright 同梱の Chromium を使う")
     ap.add_argument("--debug-dir", type=Path, default=None,
                     help="__NEXT_DATA__ の生JSONをページごとに保存（構造調査用）")
     args = ap.parse_args()
 
-    data = asyncio.run(crawl(args.url, args.max_pages, args.delay, args.headed, args.debug_dir))
+    data = asyncio.run(crawl(
+        args.url, args.max_pages, args.delay,
+        headed=not args.headless,
+        debug_dir=args.debug_dir,
+        use_real_chrome=not args.no_real_chrome,
+    ))
     args.out.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"wrote {len(data)} companies → {args.out}", file=sys.stderr)
     return 0
