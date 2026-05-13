@@ -8,11 +8,15 @@
 挙動:
   - マッチあり → 既存ページの `掲載元メディア` に「クロスワーク」を追記
   - マッチなし → 新規ページ作成（掲載元メディア=クロスワーク, 業種=建設,
-    確認状況=未確認）
+    確認状況=未確認）。gBizINFO トークンがあれば法人番号で補完を試みる
   - 部分一致のみ → 新規作成 + `重複確認必要` を ON
+
+DB に存在しないプロパティへの書き込みは Notion API が 400 を返すので、
+事前に schema を fetch して該当する場合のみセットする。
 
 CLI:
     python import_to_notion.py --input companies.json [--dry-run]
+    python import_to_notion.py --input companies.json --no-gbiz
 """
 from __future__ import annotations
 
@@ -22,7 +26,9 @@ import os
 import sys
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
+from gbiz_enrich import GBizClient, enrich
 from normalize import normalize_company_name, normalize_phone, normalize_url_host
 from notion_client import NotionClient, media_of, text_prop, title_of
 
@@ -57,6 +63,11 @@ def build_index(client: NotionClient) -> ExistingIndex:
     return ExistingIndex(by_name, by_phone, by_host)
 
 
+def fetch_db_properties(client: NotionClient) -> set[str]:
+    db = client._request("GET", f"/databases/{client.db_id}")
+    return set((db.get("properties") or {}).keys())
+
+
 def classify(item: dict, idx: ExistingIndex) -> tuple[str, dict | None]:
     name_key = normalize_company_name(item.get("company_name", ""))
     if name_key and name_key in idx.by_name:
@@ -80,40 +91,92 @@ def append_media(client: NotionClient, page: dict, dry_run: bool) -> bool:
     return True
 
 
-def build_new_props(item: dict, needs_review: bool) -> dict:
-    props: dict = {
+def _rich(content: str) -> dict:
+    return {"rich_text": [{"text": {"content": content}}]}
+
+
+def build_memo(item: dict) -> str:
+    lines: list[str] = []
+    if item.get("detail_url"):
+        lines.append(f"クロスワーク求人: {item['detail_url']}")
+    if item.get("hello_work_company_id"):
+        lines.append(f"法人番号: {item['hello_work_company_id']}")
+    if item.get("representative_title"):
+        lines.append(f"代表者役職: {item['representative_title']}")
+    if item.get("occupation"):
+        lines.append(f"職種: {item['occupation']}")
+    if item.get("business_content"):
+        lines.append(f"事業内容: {item['business_content']}")
+    if item.get("company_feature"):
+        lines.append(f"会社の特長: {item['company_feature']}")
+    if item.get("business_summary_gbiz"):
+        lines.append(f"事業概要(gBizINFO): {item['business_summary_gbiz']}")
+    parts = []
+    for key, label in [("employee_count_workplace", "就業場所"),
+                       ("employee_count_female", "うち女性"),
+                       ("employee_count_part_time", "うちパート")]:
+        v = item.get(key)
+        if v is not None:
+            parts.append(f"{label}{v}人")
+    if parts:
+        lines.append("従業員内訳: " + " / ".join(parts))
+    if item.get("gbiz_status"):
+        lines.append(f"gBizINFO: {item['gbiz_status']}")
+    return "\n".join(lines)
+
+
+def build_new_props(item: dict, needs_review: bool, db_props: set[str]) -> dict[str, Any]:
+    props: dict[str, Any] = {
         "顧客名": {"title": [{"text": {"content": item.get("company_name", "")}}]},
         "掲載元メディア": {"multi_select": [{"name": MEDIA_TAG}]},
         "業種": {"select": {"name": DEFAULT_INDUSTRY}},
         "確認状況": {"select": {"name": "未確認"}},
         "重複確認必要": {"checkbox": needs_review},
     }
+    optional: dict[str, Any] = {}
     if item.get("address"):
-        props["住所"] = {"rich_text": [{"text": {"content": item["address"]}}]}
+        optional["住所"] = _rich(item["address"])
     if item.get("company_url"):
-        props["会社URL"] = {"url": item["company_url"]}
+        optional["会社URL"] = {"url": item["company_url"]}
     if item.get("phone"):
-        props["電話番号"] = {"phone_number": item["phone"]}
+        optional["電話番号"] = {"phone_number": item["phone"]}
     if item.get("representative"):
-        props["代表者名"] = {"rich_text": [{"text": {"content": item["representative"]}}]}
-    memo_lines = []
-    if item.get("detail_url"):
-        memo_lines.append(f"クロスワーク求人: {item['detail_url']}")
+        optional["代表者名"] = _rich(item["representative"])
+    if item.get("representative_title"):
+        optional["部署/役職"] = _rich(item["representative_title"])
     if item.get("hello_work_company_id"):
-        memo_lines.append(f"法人番号(HW): {item['hello_work_company_id']}")
-    if item.get("occupation"):
-        memo_lines.append(f"職種: {item['occupation']}")
-    if memo_lines:
-        props["メモ"] = {"rich_text": [{"text": {"content": "\n".join(memo_lines)}}]}
+        optional["法人番号"] = _rich(item["hello_work_company_id"])
+    if item.get("employee_count_total") is not None:
+        optional["従業員数"] = {"number": item["employee_count_total"]}
+    if item.get("capital"):
+        optional["資本金"] = _rich(item["capital"])
+    memo = build_memo(item)
+    if memo:
+        optional["メモ"] = _rich(memo)
+    for key, val in optional.items():
+        if key in db_props:
+            props[key] = val
+        else:
+            print(f"[warn] DB property {key!r} not found; skipped", file=sys.stderr)
     return props
 
 
-def run(input_path: Path, dry_run: bool) -> dict:
+def run(input_path: Path, dry_run: bool, use_gbiz: bool) -> dict:
     client = NotionClient()
+    db_props = fetch_db_properties(client)
     idx = build_index(client)
     items = json.loads(input_path.read_text(encoding="utf-8"))
-    stats = {"match_name": 0, "partial_phone": 0, "partial_host": 0, "new": 0, "media_appended": 0}
+    gbiz = GBizClient() if use_gbiz else None
+    if use_gbiz and not (gbiz and gbiz.token):
+        print("[warn] GBIZ_API_TOKEN not set; gBizINFO enrichment disabled",
+              file=sys.stderr)
+        gbiz = None
+    stats = {"match_name": 0, "partial_phone": 0, "partial_host": 0,
+             "new": 0, "media_appended": 0, "gbiz_ok": 0, "gbiz_miss": 0}
     for item in items:
+        if gbiz:
+            enrich(item, gbiz)
+            stats["gbiz_ok" if item.get("gbiz_status") == "ok" else "gbiz_miss"] += 1
         kind, page = classify(item, idx)
         stats[kind] += 1
         if kind == "match_name" and page is not None:
@@ -123,7 +186,7 @@ def run(input_path: Path, dry_run: bool) -> dict:
         needs_review = kind in ("partial_phone", "partial_host")
         if dry_run:
             continue
-        client.create_customer(build_new_props(item, needs_review))
+        client.create_customer(build_new_props(item, needs_review, db_props))
     return stats
 
 
@@ -131,11 +194,13 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", required=True, type=Path)
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--no-gbiz", action="store_true",
+                    help="gBizINFO による電話・URL 補完を無効化")
     args = ap.parse_args()
     if "NOTION_TOKEN" not in os.environ:
         print("error: NOTION_TOKEN env var is required", file=sys.stderr)
         return 2
-    stats = run(args.input, args.dry_run)
+    stats = run(args.input, args.dry_run, use_gbiz=not args.no_gbiz)
     print(json.dumps(stats, ensure_ascii=False, indent=2))
     return 0
 

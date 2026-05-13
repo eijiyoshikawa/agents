@@ -28,7 +28,11 @@ DEFAULT_DELAY_SEC = 3.0
 DEFAULT_TIMEOUT_MS = 30_000
 BASE_URL = "https://x-work.jp"
 
-REP_NAME_RE = re.compile(r"代表者名[：:\s]*([^\n]+)")
+# company.detail は「・項目名：値\n」の繰り返し。汎用的な行パーサを用意する。
+COMPANY_DETAIL_LINE_RE = re.compile(r"^[・･]?\s*([^：:]+)[：:]\s*(.+?)\s*$")
+
+# 数値抽出：「11人」「5,000万円」など
+INT_FROM_TEXT_RE = re.compile(r"([\d,]+)")
 
 
 async def fetch_next_data(page: Page) -> dict[str, Any]:
@@ -56,30 +60,57 @@ def extract_records(next_data: dict) -> list[dict]:
             .get("records", []) or [])
 
 
-def extract_representative(detail_text: str) -> str:
-    if not detail_text:
-        return ""
-    m = REP_NAME_RE.search(detail_text)
-    return m.group(1).strip() if m else ""
+def parse_company_detail(text: str) -> dict[str, str]:
+    """`company.detail` の「・項目名：値」行をキー化して dict にする。"""
+    out: dict[str, str] = {}
+    if not text:
+        return out
+    for raw_line in text.splitlines():
+        m = COMPANY_DETAIL_LINE_RE.match(raw_line)
+        if not m:
+            continue
+        key = m.group(1).strip()
+        value = m.group(2).strip()
+        if key and value:
+            out[key] = value
+    return out
+
+
+def _to_int(text: str) -> int | None:
+    m = INT_FROM_TEXT_RE.search(text or "")
+    if not m:
+        return None
+    try:
+        return int(m.group(1).replace(",", ""))
+    except ValueError:
+        return None
 
 
 def normalize_record(raw: dict, source_url: str) -> dict:
     company = raw.get("company") or {}
     location = raw.get("location") or {}
-    name = (company.get("name") or "").strip()
-    address = (location.get("detail")
-               or company.get("location")
-               or "").strip()
+    company_detail_text = company.get("detail") or ""
+    detail = parse_company_detail(company_detail_text)
     pk = raw.get("pk") or ""
-    detail_url = f"{BASE_URL}/jobs/{pk}" if pk else ""
     return {
-        "company_name": name,
-        "address": address,
+        "company_name": (company.get("name") or "").strip(),
+        "address": (location.get("detail") or company.get("location") or "").strip(),
+        "zip_code": (location.get("zipCode") or "").strip(),
+        "prefecture": (location.get("prefecture") or "").strip(),
+        "city": (location.get("city") or "").strip(),
         "phone": "",
         "company_url": "",
         "occupation": (raw.get("helloWorkOccupationName") or "").strip(),
-        "representative": extract_representative(company.get("detail") or ""),
-        "detail_url": detail_url,
+        "representative": detail.get("代表者名", ""),
+        "representative_title": detail.get("代表者役職", ""),
+        "business_content": detail.get("事業内容", ""),
+        "company_feature": detail.get("会社の特長", ""),
+        "employee_count_total": _to_int(detail.get("従業員数企業全体", "")),
+        "employee_count_workplace": _to_int(detail.get("従業員数就業場所", "")),
+        "employee_count_female": _to_int(detail.get("従業員数うち女性", "")),
+        "employee_count_part_time": _to_int(detail.get("従業員数うちパート", "")),
+        "capital": detail.get("資本金", ""),
+        "detail_url": f"{BASE_URL}/jobs/{pk}" if pk else "",
         "hello_work_company_id": (raw.get("helloWorkCompanyId") or "").strip(),
         "source_url": source_url,
     }

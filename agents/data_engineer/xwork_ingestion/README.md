@@ -9,6 +9,7 @@ x-work.jp（クロスワーク）の検索結果に掲載されている企業�
 | `normalize.py` | 会社名・電話・URLの正規化。Notion `顧客名（正規化）` formula と同期 |
 | `notion_client.py` | Notion REST API クライアント（fetch all / multi_select 追記 / create） |
 | `scrape_xwork.py` | Playwright で x-work.jp の検索結果を巡回し JSON 出力 |
+| `gbiz_enrich.py` | 経産省 gBizINFO API で電話・URL を補完 |
 | `import_to_notion.py` | JSON を読み込み、重複判定 → 既存追記 or 新規作成 |
 
 ## 前提
@@ -16,6 +17,13 @@ x-work.jp（クロスワーク）の検索結果に掲載されている企業�
 1. **利用規約を確認済みであること**（x-work.jp / X Mile 株式会社）
 2. Notion インテグレーションを `DB_顧客管理` に接続済みで、token を取得していること
 3. Python 3.10+
+4. **DB_顧客管理 に以下プロパティが追加されていること**（無い場合はインポート時に
+   `[warn] DB property '...' not found; skipped` が出てスキップされる）:
+   - `法人番号` (text)
+   - `従業員数` (number)
+   - `資本金` (text)
+5. （任意）電話番号・公式URL補完を行う場合は経産省 gBizINFO の API トークン
+   （https://info.gbiz.go.jp/api/index.html から申請、即時発行）
 
 ## セットアップ
 
@@ -68,7 +76,9 @@ python import_to_notion.py --input companies.json --dry-run
   "partial_phone": 3,  // 部分一致 → 新規 + 重複確認必要✅
   "partial_host": 1,
   "new": 84,
-  "media_appended": 12
+  "media_appended": 12,
+  "gbiz_ok": 78,        // gBizINFO で補完成功（電話・URL 等）
+  "gbiz_miss": 22       // 法人番号が gBizINFO に未登録 or トークン未設定
 }
 ```
 
@@ -76,6 +86,27 @@ python import_to_notion.py --input companies.json --dry-run
 ```bash
 python import_to_notion.py --input companies.json
 ```
+
+gBizINFO 補完を無効にしたい場合:
+```bash
+python import_to_notion.py --input companies.json --no-gbiz
+```
+
+## マッピング表（取得項目 → Notion DB プロパティ）
+
+| JSON フィールド | Notion プロパティ | 補足 |
+|---|---|---|
+| `company_name` | 顧客名（title） | |
+| `address` | 住所（text） | |
+| `phone` | 電話番号（phone） | gBizINFO 由来（x-work には無い） |
+| `company_url` | 会社URL（url） | gBizINFO 由来 |
+| `representative` | 代表者名（text） | |
+| `representative_title` | 部署/役職（text） | 例：代表取締役 |
+| `hello_work_company_id` | 法人番号（text） | 13桁 |
+| `employee_count_total` | 従業員数（number） | |
+| `capital` | 資本金（text） | 例：5,000万円 |
+| `detail_url` / `occupation` / `business_content` / `company_feature` / 内訳 | メモ（text） | 集約 |
+| -（固定） | 業種＝建設 / 掲載元メディア＝クロスワーク / 確認状況＝未確認 | |
 
 ## 重複判定ルール
 
