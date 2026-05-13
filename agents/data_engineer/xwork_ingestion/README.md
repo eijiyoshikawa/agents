@@ -1,0 +1,89 @@
+# xwork_ingestion
+
+x-work.jp（クロスワーク）の検索結果に掲載されている企業を、`💼 DB_顧客管理` に重複排除しながら取り込むためのローカル実行ツール。
+
+## 構成
+
+| ファイル | 役割 |
+|---|---|
+| `normalize.py` | 会社名・電話・URLの正規化。Notion `顧客名（正規化）` formula と同期 |
+| `notion_client.py` | Notion REST API クライアント（fetch all / multi_select 追記 / create） |
+| `scrape_xwork.py` | Playwright で x-work.jp の検索結果を巡回し JSON 出力 |
+| `import_to_notion.py` | JSON を読み込み、重複判定 → 既存追記 or 新規作成 |
+
+## 前提
+
+1. **利用規約を確認済みであること**（x-work.jp / X Mile 株式会社）
+2. Notion インテグレーションを `DB_顧客管理` に接続済みで、token を取得していること
+3. Python 3.10+
+
+## セットアップ
+
+```bash
+cd agents/data_engineer/xwork_ingestion
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+playwright install chromium
+cp .env.example .env  # NOTION_TOKEN を埋める
+```
+
+## 実行手順
+
+### 1. 検索結果を収集
+```bash
+export $(cat .env | xargs)
+python scrape_xwork.py \
+  --url "https://x-work.jp/search?occupations=...&cities=..." \
+  --out companies.json \
+  --max-pages 50 \
+  --delay 3 \
+  --headed   # 初回はセレクタ確認のためヘッド付きで実行
+```
+
+> **初回はセレクタの実HTMLを確認すること。** `scrape_xwork.py` の `extract_companies_on_page` のセレクタはプレースホルダのため、x-work.jp の実DOMに合わせて調整が必要。`--headed` でブラウザを表示し、DevToolsで確認したのち書き換える。
+
+### 2. 重複判定 + Notion 取り込み
+
+まず dry-run で件数を確認:
+```bash
+python import_to_notion.py --input companies.json --dry-run
+```
+
+出力例:
+```json
+{
+  "match_name": 12,    // 既存ページに「クロスワーク」追記対象
+  "partial_phone": 3,  // 部分一致 → 新規 + 重複確認必要✅
+  "partial_host": 1,
+  "new": 84,
+  "media_appended": 12
+}
+```
+
+問題なければ本実行:
+```bash
+python import_to_notion.py --input companies.json
+```
+
+## 重複判定ルール
+
+1. **正規化会社名** が一致 → **マッチ**（既存ページの `掲載元メディア` に「クロスワーク」を追記、`新規ページは作成しない`）
+2. **電話番号**（数字のみ）が一致 → 部分一致（新規作成 + `重複確認必要=✅`）
+3. **会社URLのホスト** が一致 → 部分一致（同上）
+4. いずれも該当なし → 新規作成（`業種=建設`, `確認状況=未確認`）
+
+`normalize.py` の `normalize_company_name` を改修した場合は Notion 側の `顧客名（正規化）` formula と必ず同期させること。
+
+## レート制限・倫理ガイド
+
+- **3秒/ページ以上**のディレイを既定値とする（`--delay 3`）
+- 並列実行はしない（Playwright 1ブラウザ）
+- 個人情報（応募者氏名・電話など）は取得しない
+- 取得対象は法人として公開されている企業名・所在地・採用URLのみ
+
+## 関連エージェント
+
+- **Data Engineer**: 本ツールのオーナー、品質管理
+- **Legal Agent**: 利用規約・著作権の最終チェック
+- **Sales Agent**: 取り込まれた新規リードの活用
+- **QA Reviewer**: 投入後のデータ品質レビュー
