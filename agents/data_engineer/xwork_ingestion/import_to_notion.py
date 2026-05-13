@@ -101,27 +101,31 @@ def _page_select(page: dict, key: str) -> str:
 
 
 def fill_empty_on_match(item: dict, page: dict, db_props: set[str]) -> dict:
-    """マッチした既存ページの空フィールドだけ x-work の値で埋める。
+    """マッチした既存ページの空フィールドだけ x-work / gBizINFO の値で埋める。
 
     既存値が入っている場合は触らない。
     """
     additions: dict = {}
-    pairs = [
-        ("代表者名", "representative", "rich_text"),
-        ("部署/役職", "representative_title", "rich_text"),
-        ("住所", "address", "rich_text"),
-        ("法人番号", "hello_work_company_id", "rich_text"),
-        ("資本金", "capital", "rich_text"),
+    rich_pairs = [
+        ("代表者名", "representative"),
+        ("部署/役職", "representative_title"),
+        ("住所", "address"),
+        ("法人番号", "hello_work_company_id"),
+        ("資本金", "capital"),
     ]
-    for prop_name, item_key, _kind in pairs:
+    for prop_name, item_key in rich_pairs:
         if prop_name not in db_props:
             continue
         value = item.get(item_key)
-        if not value:
-            continue
-        if text_prop(page, prop_name):
+        if not value or text_prop(page, prop_name):
             continue
         additions[prop_name] = _rich(value)
+    if "会社URL" in db_props and item.get("company_url"):
+        if not page.get("properties", {}).get("会社URL", {}).get("url"):
+            additions["会社URL"] = {"url": item["company_url"]}
+    if "電話番号" in db_props and item.get("phone"):
+        if not page.get("properties", {}).get("電話番号", {}).get("phone_number"):
+            additions["電話番号"] = {"phone_number": item["phone"]}
     if "従業員数" in db_props and item.get("employee_count_total") is not None:
         if _page_number(page, "従業員数") is None:
             additions["従業員数"] = {"number": item["employee_count_total"]}
