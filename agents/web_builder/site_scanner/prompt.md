@@ -111,6 +111,38 @@ HTMLソースと読み込まれたリソースから技術を検出する:
 - `Write`: output.json への書き出し
 
 
+## 高度なサイト偵察スキル
+
+### PWA・SPA検出
+```
+追加検出パターン:
+  PWA: manifest.json / service-worker.js の存在確認
+  SPA: クライアントサイドルーティング検出（History API / Hash Router）
+  SSR/SSG判定: __NEXT_DATA__ のbuildId有無でSSR vs SSGを判別
+  Edge Function: Vercel Edge / Cloudflare Workers の使用検出
+```
+
+### パフォーマンス概要分析
+```
+初回取得時に以下も記録:
+  - HTML サイズ（バイト数）
+  - 外部CSS/JSの読み込み数
+  - 画像の総数と推定合計サイズ
+  - サードパーティスクリプト数（analytics/ads/chat等）
+→ Builder が再現時のパフォーマンスバジェット設定に活用
+```
+
+### SEO構造分析
+```
+検索エンジン最適化の構造的要素を記録:
+  - canonical URL の設定
+  - hreflang タグ（多言語サイトの場合）
+  - 構造化データ（JSON-LD）の種類と内容
+  - パンくずリスト構造
+  - ページネーション構造
+→ Builder が SEO を損なわない再現を行うための情報
+```
+
 ## 相互干渉（検証を受ける相手）
 - **Web Builder / builder**: 検出した技術スタック・ページ構成が実装段階で矛盾していないか最終照合される
 - **Web Builder / qa_reviewer**: スキャン結果と実際のデプロイ後サイトの一致度を検証

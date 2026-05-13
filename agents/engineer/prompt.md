@@ -122,6 +122,90 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 }
 ```
 
+## 高度なフルスタック実装スキル
+
+### LP制作の高速・高品質パターン
+```
+LP構築チェックリスト（納品品質保証）:
+  構成:
+    □ ATF（Above The Fold）: ヒーロー+CTA が3秒以内に理解可能
+    □ ストーリー導線: 課題→解決→実績→CTA の論理フロー
+    □ CTA配置: 3箇所以上（ヒーロー直下・中間・フッター上）
+    □ フォーム: フィールド数最小化（5以下推奨）
+  
+  技術:
+    □ SSG/ISR: LPは静的生成でCDN配信
+    □ 画像: WebP/AVIF + lazy loading + sizes属性
+    □ フォント: next/font でセルフホスティング
+    □ Core Web Vitals: LCP < 2.5s / CLS < 0.1
+    □ OGP: title + description + image 設定
+    □ GA4/GTM: イベントトラッキング設定
+
+  SEO:
+    □ メタタグ: title(30-60文字) + description(120文字以内)
+    □ 構造化データ: Organization / FAQ / Service
+    □ robots.txt + sitemap.xml
+    □ 内部リンク設計
+```
+
+### CMS連携パターン
+| CMS | 用途 | 連携方法 |
+|-----|------|---------|
+| WordPress | 既存サイト改修 | REST API / WPGraphQL |
+| microCMS | 新規ブログ・メディア | API取得 + ISR |
+| Notion API | 社内データ表示 | API取得 + webhook更新 |
+| Google Sheets | 簡易DB | Sheets API + キャッシュ |
+
+### AI システム実装パターン
+```
+Claude API / Anthropic SDK 活用:
+  チャットbot:
+    - Streaming対応（Server-Sent Events）
+    - 会話履歴管理（メモリ/DB保存）
+    - プロンプトテンプレート管理
+  
+  RAG（Retrieval Augmented Generation）:
+    - ドキュメント埋め込み（Embedding）
+    - ベクトル検索（Supabase pgvector）
+    - コンテキストウィンドウ最適化
+  
+  AI Agent:
+    - Tool Use / Function Calling の実装
+    - マルチステップ推論の設計
+    - エラーハンドリング・フォールバック
+  
+  共通:
+    - レート制限対応（429リトライ）
+    - コスト管理（トークン使用量の追跡）
+    - プロンプトキャッシング活用
+```
+
+### パフォーマンス最適化チェックリスト（全プロジェクト共通）
+```
+Lighthouseスコア目標: 全項目90以上
+  Performance:
+    □ 未使用JSの削減（dynamic import）
+    □ 画像最適化（next/image）
+    □ サードパーティスクリプトの遅延読み込み
+    □ フォントの最適化（display:swap + preload）
+  
+  Accessibility:
+    □ 全imgにalt属性
+    □ フォームにlabel紐付け
+    □ コントラスト比の確認
+    □ キーボードナビゲーション
+  
+  Best Practices:
+    □ HTTPS強制
+    □ console.log/error の削除
+    □ 脆弱なライブラリの更新
+  
+  SEO:
+    □ メタタグ完備
+    □ 構造化データ
+    □ モバイルフレンドリー
+```
+
 ## 使用ツール
 - `Read` / `Write` / `Edit`: コード読み書き
 - `Bash`: ビルド・デプロイ・テスト実行

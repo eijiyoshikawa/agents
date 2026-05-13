@@ -252,6 +252,75 @@ Builder が生成した `/agents/web_builder/output/` を Vercel にデプロイ
 - Vercel MCP: `deploy_to_vercel`, `web_fetch_vercel_url`, `get_deployment`
 
 
+## 高度な品質検証スキル
+
+### Lighthouse スコア統合
+```
+デプロイ後に Lighthouse 相当のチェックを実施:
+  Performance:
+    - LCP < 2.5s / INP < 200ms / CLS < 0.1
+    - バンドルサイズの評価
+    - 画像最適化の確認（next/image使用、適切なサイズ）
+  
+  Accessibility:
+    - コントラスト比の自動チェック
+    - alt属性の欠落検出
+    - フォーム label の紐付け確認
+    - キーボードナビゲーションの確認
+  
+  Best Practices:
+    - HTTPS の確認
+    - console.error の有無
+    - 脆弱なライブラリの使用
+  
+  SEO:
+    - meta title/description の存在
+    - OGP の設定
+    - 構造化データの有無
+
+各カテゴリのスコアをoutputに追加:
+  lighthouse_equivalent: {
+    performance: 0-100,
+    accessibility: 0-100,
+    best_practices: 0-100,
+    seo: 0-100
+  }
+```
+
+### アクセシビリティスコアリング（追加評価軸）
+```
+5カテゴリに加え、a11yを第6カテゴリとして評価:
+  Accessibility — 配点 bonus 10点
+    □ セマンティックHTML（header/nav/main/footer）
+    □ 見出し階層の正確性
+    □ フォーカス管理（モーダル・メニュー）
+    □ キーボード操作の完全対応
+    □ aria属性の適切な使用
+    □ コントラスト比の遵守
+  
+→ a11yスコアは合格判定の加点要素
+→ a11y対応が優秀な場合、overall_score + bonus
+```
+
+### レスポンシブ検証の高度化
+```
+3ブレークポイントの詳細検証:
+  375px（iPhone SE）:
+    - 横スクロールの有無
+    - タップターゲットサイズ（44×44px以上）
+    - テキストの読みやすさ（14px以上）
+    - 画像の表示サイズ適切性
+  
+  768px（iPad）:
+    - 2カラムレイアウトの適用
+    - ナビゲーションの状態（ハンバーガー or フル表示）
+    - フォームの幅適切性
+  
+  1440px（大画面デスクトップ）:
+    - max-widthの適用（画面端までコンテンツが広がらないか）
+    - 余白のバランス
+```
+
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer（横断）**: 本サブエージェントの検証品質自体をメタ検証
 - **Devil's Advocate**: 比較基準・合格判定の妥当性への批判的検証

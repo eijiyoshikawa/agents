@@ -153,6 +153,99 @@
 }
 ```
 
+## 高度なインフラスキル
+
+### オブザーバビリティ（可観測性）スタック
+```
+3つの柱:
+  Metrics（メトリクス）:
+    - Vercel Analytics: CWV・レスポンスタイム・エラー率
+    - カスタムメトリクス: ビジネスKPI連動（売上・コンバージョン）
+  
+  Logs（ログ）:
+    - 構造化ログ: JSON形式で統一（timestamp, level, message, context）
+    - ログレベル: ERROR→WARNING→INFO→DEBUG（本番はINFO以上）
+    - 相関ID: リクエスト横断の追跡（X-Request-ID）
+  
+  Traces（トレース）:
+    - Sentry Performance: トランザクション→スパンの階層追跡
+    - ボトルネック特定: 遅いDB クエリ・外部API呼び出しの可視化
+
+アラート設計:
+  Critical → PagerDuty/Slack即時通知 + 自動ロールバック検討
+  Warning → Slack通知（15分以内に確認）
+  Info → ダッシュボード表示のみ
+```
+
+### ディザスタリカバリ（DR）
+```
+RPO/RTO設計:
+  RPO（データ損失許容）: 1時間以内
+  RTO（復旧時間目標）: 30分以内
+
+バックアップ戦略:
+  - Supabase: 日次自動バックアップ + Point-in-Time Recovery
+  - Vercel: Git連携によるコードの完全復元性
+  - 環境変数: 暗号化された別保管場所に定期バックアップ
+
+フェイルオーバー手順:
+  1. 障害検知（自動アラート）
+  2. 影響範囲の特定（該当サービス・ユーザー数）
+  3. ロールバック or ホットフィックスの判断（5分以内）
+  4. 実行と検証
+  5. ポストモーテム（48時間以内に文書化）
+```
+
+### ゼロトラストセキュリティ
+```
+原則: 「Never Trust, Always Verify」
+  - 全リクエストを認証・認可（内部通信も含む）
+  - 最小権限原則: 各サービスは必要最小限のアクセス権のみ
+  - ネットワークセグメンテーション: 環境間の完全分離
+  - シークレットの有効期限: 最大90日でローテーション
+
+セキュリティヘッダーの必須設定:
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-eval'
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+```
+
+### コスト最適化
+```
+月次コスト分析と最適化:
+  Vercel:
+    - 不要なプレビューデプロイの自動削除
+    - Image Optimization の使用量監視
+    - Edge Function の実行回数最適化
+  
+  Supabase:
+    - 不要なリアルタイムサブスクリプションの整理
+    - Storage の不要ファイル定期削除
+    - DB接続プーリングの最適化
+  
+  コスト予測: 月末の予測コストが予算の80%を超えたらアラート
+```
+
+### CI/CDパイプラインの高度化
+```
+品質ゲート（全てPASS必須）:
+  1. 型チェック: tsc --noEmit
+  2. リンター: ESLint (error = 0)
+  3. ユニットテスト: Jest (coverage >= 80%)
+  4. E2Eテスト: Playwright (critical path)
+  5. バンドルサイズ: size-limit チェック
+  6. セキュリティ: npm audit (high/critical = 0)
+  7. Lighthouse: CWV基準達成
+
+デプロイ戦略:
+  - 通常: Git push → 自動デプロイ
+  - 大規模変更: Feature Flag → 段階的ロールアウト
+  - 緊急修正: Instant Rollback → 直前バージョンに即時復帰
+```
+
 ## 使用ツール
 - Vercel MCP（デプロイ・プロジェクト管理・ログ確認）
 - ファイル読み書き（CI/CD 設定・環境変数管理）

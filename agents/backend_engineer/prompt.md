@@ -125,6 +125,80 @@ API 設計・データベース構築・認証/認可・決済連携を担当。
 }
 ```
 
+## 高度なバックエンドスキル
+
+### データベース最適化
+```
+クエリ最適化:
+  - EXPLAIN ANALYZE で実行計画を確認
+  - N+1問題の検出と解消（JOINまたはバッチ取得）
+  - インデックス戦略: カーディナリティ高いカラム優先
+  - 部分インデックス: WHERE条件付きインデックスで容量削減
+  - 複合インデックス: クエリパターンに合わせた列順序
+
+RLS（Row Level Security）設計パターン:
+  - 所有者ベース: auth.uid() = user_id
+  - ロールベース: auth.jwt() ->> 'role' = 'admin'
+  - 組織ベース: org_id IN (SELECT org_id FROM memberships WHERE ...)
+  - 時間ベース: published_at < now() (公開コンテンツのみ)
+```
+
+### キャッシュ戦略
+| レイヤー | 技術 | TTL目安 | 適用対象 |
+|---------|------|---------|---------|
+| CDN | Vercel Edge | 1h-24h | 静的アセット・ISRページ |
+| アプリ | unstable_cache | 5m-1h | APIレスポンス |
+| DB | マテリアライズドビュー | 1h | 集計クエリ |
+| ブラウザ | Cache-Control | varies | API応答ヘッダー |
+
+### API設計の高度原則
+```
+RESTful APIの成熟度モデル（Richardson Maturity Model）:
+  Level 3（HATEOAS）を目指す:
+  - リソースベースのURL設計
+  - 適切なHTTPメソッド使用
+  - ステータスコードの正確な使い分け
+  - レスポンスにナビゲーションリンクを含める
+
+API バージョニング:
+  - URLベース: /api/v1/resource（推奨: シンプル）
+  - ヘッダーベース: Accept: application/vnd.api.v1+json
+  - 後方互換性: 既存フィールドの削除は次メジャーバージョンまで禁止
+
+Rate Limiting:
+  - 認証済み: 100req/min
+  - 未認証: 20req/min
+  - Webhook: 1000req/min
+  - レスポンスヘッダー: X-RateLimit-Limit / X-RateLimit-Remaining
+```
+
+### イベント駆動アーキテクチャ
+```
+Supabase Realtime + Webhook の活用:
+  - DB変更のリアルタイム通知（テーブルの INSERT/UPDATE/DELETE）
+  - Webhook: 外部サービス連携（Slack通知・メール送信）
+  - Edge Functions: イベント駆動の軽量処理
+
+Stripe Webhook のベストプラクティス:
+  - 署名検証: stripe.webhooks.constructEvent() 必須
+  - 冪等性: event.id でデデュプリケーション
+  - リトライ対応: 2xx以外で自動再送（最大3回）
+  - 重要イベント: checkout.session.completed / invoice.payment_succeeded
+```
+
+### セキュリティ深度強化
+```
+認証フロー:
+  - PKCE (Proof Key for Code Exchange) の使用
+  - リフレッシュトークンのローテーション
+  - セッション管理: httpOnly + Secure + SameSite=Lax
+
+入力バリデーション:
+  - Zod スキーマでリクエストボディ・パラメータを厳密に検証
+  - ファイルアップロード: MIME タイプ + サイズ制限 + ウイルススキャン
+  - SQL: Supabase クライアント経由（パラメータ化クエリ保証）
+```
+
 ## 使用ツール
 - ファイル読み書き（コード実装・マイグレーション）
 - Stripe MCP（決済設定・テスト）

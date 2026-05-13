@@ -141,6 +141,39 @@
 - `Write`: output.json への書き出し
 
 
+## 高度な構造解析スキル
+
+### セマンティクス分析
+```
+HTML5 セマンティック要素の使用状況を記録:
+  - 適切な見出し階層（h1→h2→h3の正しいネスト）
+  - landmark要素: header/nav/main/aside/footer
+  - article/section の使い分け
+  - figure/figcaption の使用
+→ Builder に対して「再現すべきセマンティクス」を明示
+```
+
+### アクセシビリティ構造パターン
+```
+参考サイトのa11y対応状況を記録:
+  - aria属性の使用箇所と種類
+  - skip-to-content リンクの有無
+  - フォーカス管理のパターン（モーダル内トラップ等）
+  - ランドマーク構成の適切性
+→ 参考サイトのa11y対応が不十分な場合、Builder に改善指示を付与
+```
+
+### レイアウトパターンの精密解析
+```
+CSSレイアウト手法の詳細記録:
+  - Grid Template: grid-template-columns/rows の具体的な値
+  - Flexbox: 配置方向・折り返し・配置ルール
+  - Position: sticky/fixed 要素の挙動条件
+  - overflow: スクロール領域の特定
+  - aspect-ratio: メディア要素のアスペクト比
+→ Tailwind CSS のユーティリティクラスに直接マッピング可能な精度
+```
+
 ## 相互干渉（検証を受ける相手）
 - **Web Builder / builder**: 解析した HTML 構造が再現実装に十分な粒度で表現されているか検証
 - **Web Builder / design_analyzer**: レイアウトとデザイントークンの整合性を相互検証

@@ -164,6 +164,55 @@ JS ソースから以下のパターンを検出する:
 - `Write`: output.json への書き出し
 
 
+## 高度なモーション解析スキル
+
+### パフォーマンス影響分析
+```
+アニメーションのパフォーマンスコスト評価:
+  低コスト（GPU accelerated）:
+    - transform: translate/scale/rotate
+    - opacity
+    → 60fps 維持可能。自由に使用可
+  
+  中コスト（レイアウト影響なし）:
+    - color / background-color / border-color
+    - box-shadow
+    → 適度に使用。大量の同時アニメーションは避ける
+  
+  高コスト（リフロー発生）:
+    - width / height / margin / padding
+    - top / left / right / bottom
+    → 避ける。transform で代替可能か検討
+
+各アニメーションにコスト分類を付与:
+  cost: "low" | "medium" | "high"
+→ Builder が高コストアニメーションを回避/代替する判断材料
+```
+
+### 60fps保証ガイドライン
+```
+同時アニメーション数の推奨上限:
+  - GPU accelerated のみ: 最大20要素同時
+  - mixed (GPU + CPU): 最大10要素同時
+  - CPU heavy: 最大3要素同時
+
+stagger アニメーションの最適化:
+  - 画面外の要素はアニメーション開始を遅延
+  - IntersectionObserver で可視領域のみアニメーション
+  - will-change プロパティの適切な使用と解除
+```
+
+### アニメーションの意味論的分析
+```
+各アニメーションの「意図」を推定し記録:
+  - 誘導: ユーザーの視線をCTAに導くアニメーション
+  - フィードバック: 操作結果を伝えるアニメーション
+  - 状態遷移: UIの状態変化を滑らかにするアニメーション
+  - ブランディング: ブランドの個性を表現するアニメーション
+  - デコレーション: 見栄えのみの装飾的アニメーション
+→ 「デコレーション」のみの場合、再現優先度を下げる判断材料
+```
+
 ## 相互干渉（検証を受ける相手）
 - **Web Builder / builder**: アニメーション仕様が Framer Motion / CSS で再現可能か検証
 - **Web Builder / interaction_analyzer**: インタラクションとアニメーションの重複・競合を相互検証

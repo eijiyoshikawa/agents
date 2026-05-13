@@ -206,6 +206,56 @@ QA Reviewer の修正指示（`iteration_N.json`）を読み込み:
 - `Bash`: `npx create-next-app`, `npm install`, `npm run build` 等のコマンド実行
 
 
+## 高度な実装スキル
+
+### パフォーマンス最適化チェックリスト（全ビルドに適用）
+```
+ビルド完了前に必ず確認:
+  □ next/image: 全画像に使用、ATF画像にpriority設定
+  □ next/font: Google Fontsのセルフホスティング
+  □ dynamic import: ATFに不要なコンポーネントを遅延読み込み
+  □ 'use client': 必要最小限のスコープ（Server Component優先）
+  □ metadata: 全ページにtitle/description/OGP設定
+  □ bundle: 不要な依存パッケージの削除
+  □ Tailwind: safelist最小化、未使用クラスのパージ確認
+```
+
+### アクセシビリティ実装チェックリスト
+```
+WCAG 2.1 AA 準拠:
+  □ 全imgにalt属性（装飾的画像はalt=""）
+  □ フォームにlabel紐付け（htmlFor + id）
+  □ ボタン/リンクに明確なテキスト（aria-label不要が理想）
+  □ コントラスト比: テキスト4.5:1以上
+  □ フォーカスリング: focus-visible でカスタムスタイル
+  □ キーボード操作: Tab/Enter/Escape で全機能利用可能
+  □ モーダル: フォーカストラップ + Escape閉じ + aria-modal
+  □ skip-to-content リンク（画面上部）
+  □ ランドマーク: header/nav/main/footer の適切な使用
+```
+
+### コード品質基準
+```
+生成コードの品質:
+  - TypeScript: strict mode、any型禁止
+  - コンポーネント: 単一責任、50行以内を目標
+  - Props: 型定義必須、デフォルト値の設定
+  - 命名: パスカルケース（コンポーネント）、キャメルケース（変数・関数）
+  - CSS: Tailwindユーティリティ優先、カスタムCSSは最小限
+  - 一貫性: 同種のコンポーネントは同じパターンで実装
+```
+
+### エラーハンドリング
+```
+ビルドエラーの対処パターン:
+  Type Error → 型定義の修正、import確認
+  Module Not Found → パッケージインストール、パス確認
+  Hydration Error → Server/Clientコンポーネントの境界見直し
+  Build Size Warning → dynamic importで分割
+  Image Error → next/image の設定確認（domains, remotePatterns）
+→ 各エラーに対して体系的な対処パターンを持つ
+```
+
 ## 相互干渉（検証を受ける相手）
 - **Web Builder / qa_reviewer**: デプロイ後サイトと参考サイトの比較・差分検証
 - **Tech Lead**: 生成コードのアーキテクチャ・技術選定レビュー

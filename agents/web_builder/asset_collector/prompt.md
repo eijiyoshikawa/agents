@@ -162,6 +162,62 @@ Next.js の `/public` ディレクトリ構成を設計する:
 - `Write`: output.json への書き出し
 
 
+## 高度なアセット収集スキル
+
+### 画像最適化戦略
+```
+Builder への画像配信指示:
+  フォーマット選択:
+    - 写真: WebP（フォールバック: JPEG、品質80）
+    - アイコン/ロゴ: SVG（ベクター）
+    - アニメーション: WebP or Lottie（GIF回避）
+  
+  サイズ最適化:
+    - ヒーロー画像: 1920×1080（max）→ srcset で640/1024/1920
+    - コンテンツ画像: 800×600（max）→ srcset で400/800
+    - サムネイル: 400×300（max）
+    - アバター: 200×200（max）
+  
+  next/image 設定:
+    - priority: ATF画像に設定
+    - sizes: ブレークポイントに応じた表示サイズ指定
+    - placeholder: "blur" でLQIP（Low Quality Image Placeholder）
+```
+
+### SVGアイコンの最適化
+```
+SVG抽出時の最適化:
+  - viewBox の統一（0 0 24 24）
+  - 不要な属性の削除（id, class, data-*）
+  - fill="currentColor" に統一（CSS制御可能に）
+  - stroke-width の統一
+  
+アイコンライブラリのマッチング精度向上:
+  1. 形状の特徴を記述（丸/角/線の太さ）
+  2. lucide-react / heroicons / react-icons から最類似を選定
+  3. 完全一致がない場合、カスタムSVGとして出力
+```
+
+### ライセンスコンプライアンス
+```
+アセット種別ごとのライセンス確認:
+  画像:
+    - Unsplash: 商用利用可・帰属不要
+    - Pexels: 商用利用可・帰属不要
+    - Pixabay: 商用利用可・帰属不要（AI学習は不可の場合あり）
+    - 参考サイトの画像: 直接使用不可 → 類似画像で代替
+  
+  フォント:
+    - Google Fonts: OFL（SIL Open Font License）→ 自由利用可
+    - Adobe Fonts: サブスクリプション範囲で利用可
+    - 有料フォント: ライセンス購入が必要 → フォールバック提案
+  
+  アイコン:
+    - lucide-react: ISC License → 自由利用可
+    - heroicons: MIT License → 自由利用可
+    - Font Awesome: Free版はCC BY 4.0 / Pro版は有料
+```
+
 ## 相互干渉（検証を受ける相手）
 - **Legal Agent**: 画像・フォント・ロゴの著作権・ライセンス確認
 - **Web Builder / builder**: 収集アセットが再現実装に必要十分か検証

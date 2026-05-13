@@ -184,6 +184,42 @@ CSS変数、インラインスタイル、クラス名から色情報を抽出�
 - `Write`: output.json への書き出し
 
 
+## 高度なデザイン解析スキル
+
+### ダークモード検出
+```
+ダークモード対応の検出:
+  - prefers-color-scheme メディアクエリの使用
+  - data-theme / class="dark" によるテーマ切替
+  - CSS変数のライト/ダーク値定義
+  - トグルスイッチUIの有無
+→ ダークモード対応サイトの場合、両テーマのトークンを抽出
+```
+
+### マイクロインタラクションの視覚的変化
+```
+通常のホバーエフェクトを超えた細かい視覚変化:
+  - 入力フィールドのフォーカス状態（ボーダー色変化、ラベル移動）
+  - ボタンの押下状態（scale, translateY）
+  - リンクの下線アニメーション（左から右への展開等）
+  - チェックボックス/ラジオのカスタムスタイル
+  - スクロールバーのカスタマイズ
+```
+
+### デザイントークンの Tailwind CSS 自動マッピング
+```
+抽出したトークンを直接 tailwind.config.ts で使える形式に変換:
+  colors:
+    primary: '#3B82F6'     → colors: { primary: { DEFAULT: '#3B82F6', dark: '#2563EB' } }
+  typography:
+    h1: 48px/700           → fontSize: { '4xl': ['48px', { lineHeight: '1.2', fontWeight: '700' }] }
+  spacing:
+    section_gap: 120px     → spacing: { 'section': '120px' }
+  borderRadius:
+    card: 12px             → borderRadius: { 'card': '12px' }
+→ Builder が設定ファイルにそのまま貼り付け可能な形式
+```
+
 ## 相互干渉（検証を受ける相手）
 - **Web Builder / builder**: 抽出したデザイントークン（カラー・タイポ・スペース）が実装で正しく使えるか検証
 - **UI/UX Designer**: デザインシステム観点での妥当性・一貫性レビュー

@@ -91,6 +91,49 @@
 - **ソースコード**: `/agents/web_builder/output/` にNext.jsプロジェクト一式
 - **品質レポート**: `qa_reviewer/output.json` に最終スコアと残課題
 
+## 高度なオーケストレーションスキル
+
+### 品質メトリクスの詳細管理
+```
+サブエージェント別の品質追跡:
+  Site Scanner: 技術検出精度（手動検証との一致率）
+  Structure Analyzer: セクション同定精度（実際のセクション数との比）
+  Design Analyzer: カラーコード精度（実測値との色差 ΔE < 3）
+  Motion Analyzer: アニメーション検出率（実装後の再現率で検証）
+  Interaction Analyzer: UI要素検出率（見落とし数）
+  Asset Collector: アセット網羅率（実装時の不足アセット数）
+  Builder: ビルド成功率・コード品質スコア
+  QA Reviewer: スコアリング精度（手動検証との相関）
+```
+
+### イテレーション最適化戦略
+```
+Iteration 1 → 2 の修正効率最大化:
+  1. 修正指示を影響範囲でグルーピング
+     - グローバル修正（tailwind.config, layout）: 先に実行
+     - セクション固有修正: グローバル修正後に実行
+  2. high priority から着手（品質インパクト最大の修正を先に）
+  3. 依存関係の考慮: デザイントークン修正→コンポーネント修正の順
+
+3回目以降のイテレーション判断:
+  - Score 80-84: 特定カテゴリのみ低い → 該当箇所のみ修正
+  - Score 70-79: 全体的に不足 → ルール上は2周で打ち切り、手動修正リスト出力
+  - Score 70未満: 根本的な設計ミス → 再解析からやり直し検討
+```
+
+### コンポーネント再利用ライブラリ
+```
+過去のビルド成果から共通コンポーネントを蓄積:
+  /agents/web_builder/component_library/
+    - HeroSection: 5バリエーション（動画BG/画像/グラデーション/Split/Minimal）
+    - FeatureGrid: 3/4カラム対応
+    - TestimonialSlider: Swiper統合済み
+    - FAQ Accordion: アニメーション付き
+    - ContactForm: バリデーション統合済み
+    - PricingTable: 3プラン対応
+→ 新規ビルド時に類似コンポーネントがあれば流用し、開発速度を向上
+```
+
 ## 使用ツール
 - `Read`: 全サブエージェントの output.json
 - `Write`: 統合レポート

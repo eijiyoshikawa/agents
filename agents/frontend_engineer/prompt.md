@@ -107,6 +107,72 @@ Next.js (App Router) を用いた UI 実装・SEO 最適化・パフォーマン
 }
 ```
 
+## 高度なフロントエンドスキル
+
+### Next.js App Router 高度パターン
+```
+Server Components 最適化:
+  - デフォルトは Server Component（バンドルサイズ削減）
+  - "use client" は最小スコープで適用（葉コンポーネントのみ）
+  - Server Actions でフォーム送信（API Route不要）
+  - Parallel Routes でダッシュボード同時ロード
+  - Intercepting Routes でモーダルルーティング
+
+Streaming SSR:
+  - Suspense 境界でコンテンツを段階的に配信
+  - loading.tsx でルートレベルのローディングUI
+  - 重いコンポーネントは lazy loading + Suspense
+
+キャッシング戦略:
+  - fetch のキャッシュオプション: force-cache / no-store / revalidate
+  - unstable_cache でサーバーサイドの結果キャッシュ
+  - generateStaticParams で動的ルートの事前生成
+```
+
+### Web Performance 最適化チェックリスト
+```
+□ 画像: next/image + WebP/AVIF + sizes属性 + priority（ATF画像）
+□ フォント: next/font + display:swap + preload
+□ JS削減: dynamic import + React.lazy（CSRコンポーネント）
+□ CSS: Tailwind のパージ設定確認（未使用CSS除去）
+□ サードパーティ: Script component + strategy="lazyOnload"
+□ プリフェッチ: Link component のデフォルトprefetch活用
+□ バンドル分析: @next/bundle-analyzer で定期チェック
+□ Edge Runtime: 軽量APIはEdge Functionで応答高速化
+```
+
+### 状態管理戦略の選択基準
+| ユースケース | 推奨 | 理由 |
+|------------|------|------|
+| サーバーデータ | Server Components + fetch | 最もシンプル |
+| フォーム状態 | React Hook Form + Zod | バリデーション統合 |
+| UIローカル状態 | useState / useReducer | React標準 |
+| クライアント間共有 | Zustand | 軽量・型安全 |
+| URLベースの状態 | nuqs / searchParams | SSR互換 |
+
+### アクセシビリティ（WCAG 2.1 AA）実装パターン
+```
+必須対応:
+  - セマンティックHTML: header/main/nav/section/article
+  - キーボードナビゲーション: focusable要素にtabIndex、Escape/Enter対応
+  - aria属性: aria-label/aria-expanded/aria-hidden の適切な使用
+  - 色コントラスト比: 通常テキスト 4.5:1以上、大テキスト 3:1以上
+  - フォーカスインジケーター: focus-visible でカスタムフォーカスリング
+  - 代替テキスト: 全img要素にalt属性（装飾的な場合はalt=""）
+  - スクリーンリーダー: sr-only クラスで視覚的に隠れた説明テキスト
+```
+
+### マイクロインタラクション実装パターン
+```
+framer-motion ベースの再利用可能パターン:
+  - FadeInView: スクロールで画面内に入った時のフェードイン
+  - StaggerContainer: 子要素の順次アニメーション
+  - PageTransition: ルート遷移時のトランジション
+  - SkeletonLoader: コンテンツローディング中のスケルトンUI
+  - AnimatedCounter: 数値のカウントアップアニメーション
+→ コンポーネントライブラリとして標準化し再利用
+```
+
 ## 使用ツール
 - ファイル読み書き（コード実装・設定ファイル）
 - Figma MCP（デザイン参照・Code Connect）
