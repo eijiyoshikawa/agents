@@ -217,7 +217,14 @@ def run(input_path: Path, dry_run: bool, use_gbiz: bool) -> dict:
     stats = {"match_name": 0, "partial_phone": 0, "partial_host": 0,
              "new": 0, "media_appended": 0, "fields_filled": 0,
              "gbiz_ok": 0, "gbiz_miss": 0}
-    for item in items:
+    total = len(items)
+    label = "dry-run" if dry_run else "writing"
+    for i, item in enumerate(items, 1):
+        if i % 50 == 0 or i == total:
+            print(f"[{label}] {i}/{total}  matched={stats['match_name']}  "
+                  f"new={stats['new']}  appended={stats['media_appended']}  "
+                  f"filled={stats['fields_filled']}",
+                  file=sys.stderr, flush=True)
         if gbiz:
             enrich(item, gbiz)
             stats["gbiz_ok" if item.get("gbiz_status") == "ok" else "gbiz_miss"] += 1

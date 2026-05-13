@@ -27,14 +27,24 @@ class NotionClient:
         })
 
     def _request(self, method: str, path: str, **kw) -> dict:
-        for attempt in range(5):
-            r = self.session.request(method, f"{BASE}{path}", timeout=30, **kw)
+        last_exc: Exception | None = None
+        for attempt in range(6):
+            try:
+                r = self.session.request(method, f"{BASE}{path}", timeout=60, **kw)
+            except (requests.Timeout, requests.ConnectionError) as e:
+                last_exc = e
+                time.sleep(2 ** attempt)
+                continue
             if r.status_code == 429:
                 time.sleep(float(r.headers.get("Retry-After", "1")))
                 continue
+            if 500 <= r.status_code < 600:
+                last_exc = requests.HTTPError(f"{r.status_code} {r.text[:200]}")
+                time.sleep(2 ** attempt)
+                continue
             r.raise_for_status()
             return r.json()
-        raise RuntimeError(f"Notion API exhausted retries: {method} {path}")
+        raise RuntimeError(f"Notion API exhausted retries: {method} {path}: {last_exc}")
 
     def iter_pages(self) -> Iterable[dict]:
         cursor: str | None = None
