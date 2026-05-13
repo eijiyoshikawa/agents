@@ -94,6 +94,17 @@ def build_new_props(item: dict, needs_review: bool) -> dict:
         props["会社URL"] = {"url": item["company_url"]}
     if item.get("phone"):
         props["電話番号"] = {"phone_number": item["phone"]}
+    if item.get("representative"):
+        props["代表者名"] = {"rich_text": [{"text": {"content": item["representative"]}}]}
+    memo_lines = []
+    if item.get("detail_url"):
+        memo_lines.append(f"クロスワーク求人: {item['detail_url']}")
+    if item.get("hello_work_company_id"):
+        memo_lines.append(f"法人番号(HW): {item['hello_work_company_id']}")
+    if item.get("occupation"):
+        memo_lines.append(f"職種: {item['occupation']}")
+    if memo_lines:
+        props["メモ"] = {"rich_text": [{"text": {"content": "\n".join(memo_lines)}}]}
     return props
 
 

@@ -1,8 +1,9 @@
 """x-work.jp 検索結果ページから企業情報を収集して JSON に書き出す。
 
 x-work.jp は Next.js 製で、ページ内の `<script id="__NEXT_DATA__">` に
-求人一覧の構造化データが埋め込まれている。DOM セレクタに頼らず
-この JSON を直接パースする方が変更に強い。
+求人一覧の構造化データが埋め込まれている。`props.pageProps.data.records[]`
+が検索結果（各レコードは1求人。同一会社の複数求人が並ぶことがあるので
+会社名で重複排除する）。
 
 利用規約の確認後に実行すること。レート制限はデフォルト 3 秒/ページ。
 
@@ -15,22 +16,19 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import re
 import sys
 from pathlib import Path
 from typing import Any
-from urllib.parse import urljoin, urlparse, urlunparse
+from urllib.parse import urlparse, urlunparse
 
 from playwright.async_api import Page, async_playwright
 
 DEFAULT_DELAY_SEC = 3.0
 DEFAULT_TIMEOUT_MS = 30_000
+BASE_URL = "https://x-work.jp"
 
-COMPANY_NAME_KEYS = ("companyName", "company_name", "corporationName", "法人名", "company")
-ADDRESS_KEYS = ("address", "workAddress", "location", "勤務地", "所在地", "addressText")
-PHONE_KEYS = ("phone", "phoneNumber", "tel", "電話番号")
-URL_KEYS = ("companyUrl", "homepage", "website", "url", "会社URL")
-OCCUPATION_KEYS = ("occupation", "occupationName", "jobCategory", "職種")
-JOB_ID_KEYS = ("id", "jobId", "slug", "detailUrl")
+REP_NAME_RE = re.compile(r"代表者名[：:\s]*([^\n]+)")
 
 
 async def fetch_next_data(page: Page) -> dict[str, Any]:
@@ -46,62 +44,44 @@ async def fetch_next_data(page: Page) -> dict[str, Any]:
     return json.loads(text)
 
 
-def walk_for_jobs(node: Any) -> list[dict]:
-    """`__NEXT_DATA__` を再帰的に走査し、会社名キーを持つ辞書の配列を見つける。
+def extract_records(next_data: dict) -> list[dict]:
+    """`props.pageProps.data.records[]` を取り出す。
 
-    最も大きな「会社名キーを持つ辞書のリスト」を求人一覧とみなす。
+    見つからない場合は空配列を返す。x-work.jp 側で構造が変わったときは
+    debug-dir に保存された生 JSON を見て path を調整する。
     """
-    best: list[dict] = []
-
-    def looks_like_job(d: dict) -> bool:
-        return any(k in d for k in COMPANY_NAME_KEYS)
-
-    def visit(x: Any) -> None:
-        nonlocal best
-        if isinstance(x, list):
-            jobs = [v for v in x if isinstance(v, dict) and looks_like_job(v)]
-            if len(jobs) > len(best):
-                best = jobs
-            for v in x:
-                visit(v)
-        elif isinstance(x, dict):
-            for v in x.values():
-                visit(v)
-
-    visit(node)
-    return best
+    return (next_data.get("props", {})
+            .get("pageProps", {})
+            .get("data", {})
+            .get("records", []) or [])
 
 
-def pick(d: dict, keys: tuple[str, ...]) -> str:
-    for k in keys:
-        v = d.get(k)
-        if isinstance(v, str) and v.strip():
-            return v.strip()
-        if isinstance(v, dict):
-            for inner in ("name", "label", "text"):
-                if isinstance(v.get(inner), str) and v[inner].strip():
-                    return v[inner].strip()
-    return ""
+def extract_representative(detail_text: str) -> str:
+    if not detail_text:
+        return ""
+    m = REP_NAME_RE.search(detail_text)
+    return m.group(1).strip() if m else ""
 
 
-def normalize_record(raw: dict, base_url: str) -> dict:
-    detail = pick(raw, JOB_ID_KEYS)
-    detail_url = ""
-    if detail:
-        if detail.startswith("http"):
-            detail_url = detail
-        elif detail.startswith("/"):
-            detail_url = urljoin(base_url, detail)
-        else:
-            detail_url = urljoin(base_url, f"/jobs/{detail}")
+def normalize_record(raw: dict, source_url: str) -> dict:
+    company = raw.get("company") or {}
+    location = raw.get("location") or {}
+    name = (company.get("name") or "").strip()
+    address = (location.get("detail")
+               or company.get("location")
+               or "").strip()
+    pk = raw.get("pk") or ""
+    detail_url = f"{BASE_URL}/jobs/{pk}" if pk else ""
     return {
-        "company_name": pick(raw, COMPANY_NAME_KEYS),
-        "address": pick(raw, ADDRESS_KEYS),
-        "phone": pick(raw, PHONE_KEYS),
-        "company_url": pick(raw, URL_KEYS),
-        "occupation": pick(raw, OCCUPATION_KEYS),
+        "company_name": name,
+        "address": address,
+        "phone": "",
+        "company_url": "",
+        "occupation": (raw.get("helloWorkOccupationName") or "").strip(),
+        "representative": extract_representative(company.get("detail") or ""),
         "detail_url": detail_url,
-        "source_url": base_url,
+        "hello_work_company_id": (raw.get("helloWorkCompanyId") or "").strip(),
+        "source_url": source_url,
     }
 
 
@@ -176,16 +156,17 @@ async def crawl(start_url: str, max_pages: int, delay: float, headed: bool,
                           file=sys.stderr)
                 break
             dump_debug(debug_dir, i + 1, next_data)
-            jobs = walk_for_jobs(next_data)
+            records = extract_records(next_data)
             new_count = 0
-            for raw in jobs:
+            for raw in records:
                 rec = normalize_record(raw, url)
                 if not rec["company_name"] or rec["company_name"] in seen:
                     continue
                 seen.add(rec["company_name"])
                 results.append(rec)
                 new_count += 1
-            print(f"[page {i + 1}] +{new_count} (total {len(results)})", file=sys.stderr)
+            print(f"[page {i + 1}] +{new_count} (records={len(records)}, total={len(results)})",
+                  file=sys.stderr)
             if new_count == 0:
                 break
             await asyncio.sleep(delay)
