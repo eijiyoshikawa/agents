@@ -32,6 +32,8 @@ from gbiz_enrich import GBizClient, enrich
 from normalize import normalize_company_name, normalize_phone, normalize_url_host
 from notion_client import NotionClient, media_of, text_prop, title_of
 
+import requests
+
 MEDIA_TAG = "クロスワーク"
 DEFAULT_INDUSTRY = "建設"
 
@@ -48,7 +50,11 @@ def build_index(client: NotionClient) -> ExistingIndex:
     by_phone: dict[str, dict] = {}
     by_host: dict[str, dict] = {}
     total = 0
+    skipped_archived = 0
     for page in client.iter_pages():
+        if page.get("archived") or page.get("in_trash"):
+            skipped_archived += 1
+            continue
         total += 1
         name_key = normalize_company_name(title_of(page))
         if name_key:
@@ -59,7 +65,8 @@ def build_index(client: NotionClient) -> ExistingIndex:
         host_key = normalize_url_host(text_prop(page, "会社URL"))
         if host_key:
             by_host.setdefault(host_key, page)
-    print(f"[index] fetched {total} existing customers", file=sys.stderr)
+    print(f"[index] fetched {total} existing customers "
+          f"(skipped {skipped_archived} archived)", file=sys.stderr)
     return ExistingIndex(by_name, by_phone, by_host)
 
 
@@ -218,34 +225,49 @@ def run(input_path: Path, dry_run: bool, use_gbiz: bool,
         gbiz = None
     stats = {"match_name": 0, "partial_phone": 0, "partial_host": 0,
              "new": 0, "media_appended": 0, "fields_filled": 0,
-             "gbiz_ok": 0, "gbiz_miss": 0}
+             "gbiz_ok": 0, "gbiz_miss": 0, "errors": 0}
     total = len(items)
     label = "dry-run" if dry_run else "writing"
     for i, item in enumerate(items, 1):
         if i % 50 == 0 or i == total:
             print(f"[{label}] {i}/{total}  matched={stats['match_name']}  "
                   f"new={stats['new']}  appended={stats['media_appended']}  "
-                  f"filled={stats['fields_filled']}",
+                  f"filled={stats['fields_filled']}  errors={stats['errors']}",
                   file=sys.stderr, flush=True)
         if gbiz:
             enrich(item, gbiz)
             stats["gbiz_ok" if item.get("gbiz_status") == "ok" else "gbiz_miss"] += 1
         kind, page = classify(item, idx)
         stats[kind] += 1
-        if kind == "match_name" and page is not None:
-            if append_media(client, page, dry_run):
-                stats["media_appended"] += 1
-            additions = fill_empty_on_match(item, page, db_props, industry)
-            if additions:
-                stats["fields_filled"] += 1
-                if not dry_run:
-                    client.update_properties(page["id"], additions)
-            continue
-        needs_review = kind in ("partial_phone", "partial_host")
-        if dry_run:
-            continue
-        client.create_customer(build_new_props(item, needs_review, db_props, industry))
+        try:
+            _process_item(client, item, kind, page, db_props, industry,
+                          dry_run, stats)
+        except (requests.HTTPError, RuntimeError) as e:
+            stats["errors"] += 1
+            body = ""
+            if isinstance(e, requests.HTTPError) and e.response is not None:
+                body = e.response.text[:200]
+            print(f"[error] {item.get('company_name', '?')!r}: {e} {body}",
+                  file=sys.stderr, flush=True)
     return stats
+
+
+def _process_item(client: NotionClient, item: dict, kind: str, page: dict | None,
+                  db_props: set[str], industry: str, dry_run: bool,
+                  stats: dict) -> None:
+    if kind == "match_name" and page is not None:
+        if append_media(client, page, dry_run):
+            stats["media_appended"] += 1
+        additions = fill_empty_on_match(item, page, db_props, industry)
+        if additions:
+            stats["fields_filled"] += 1
+            if not dry_run:
+                client.update_properties(page["id"], additions)
+        return
+    if dry_run:
+        return
+    needs_review = kind in ("partial_phone", "partial_host")
+    client.create_customer(build_new_props(item, needs_review, db_props, industry))
 
 
 def main() -> int:
