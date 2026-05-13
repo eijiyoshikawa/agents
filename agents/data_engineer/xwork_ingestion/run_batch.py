@@ -74,10 +74,8 @@ def main() -> int:
     ap.add_argument("--delay", type=float, default=3.0)
     ap.add_argument("--dry-run", action="store_true",
                     help="Notion 投入直前で停止して dry-run 統計を出す")
-    ap.add_argument("--no-gbiz", action="store_true", default=True,
-                    help="gBizINFO 補完を無効化 (既定: 無効)")
     ap.add_argument("--use-gbiz", action="store_true",
-                    help="gBizINFO 補完を有効化（GBIZ_API_TOKEN 必須）")
+                    help="gBizINFO で電話・公式URL・代表者・資本金等を補完（GBIZ_API_TOKEN 必須）")
     ap.add_argument("--skip-scrape", action="store_true",
                     help="既存の JSON を使い、scrape を飛ばす")
     args = ap.parse_args()
@@ -101,7 +99,7 @@ def main() -> int:
     merged_path = args.out_dir / "all.json"
     total = merge_jsons(pref_paths, merged_path)
 
-    use_gbiz = args.use_gbiz and not args.no_gbiz
+    use_gbiz = args.use_gbiz
     print(f"\n=== [import] dry-run on {total} companies ===", file=sys.stderr)
     dry_stats = import_run(merged_path, dry_run=True, use_gbiz=use_gbiz)
     print(json.dumps(dry_stats, ensure_ascii=False, indent=2))
