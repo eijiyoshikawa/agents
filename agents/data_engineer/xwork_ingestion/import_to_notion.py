@@ -100,7 +100,7 @@ def _page_select(page: dict, key: str) -> str:
     return sel.get("name") if sel else ""
 
 
-def fill_empty_on_match(item: dict, page: dict, db_props: set[str]) -> dict:
+def fill_empty_on_match(item: dict, page: dict, db_props: set[str], industry: str) -> dict:
     """マッチした既存ページの空フィールドだけ x-work / gBizINFO の値で埋める。
 
     既存値が入っている場合は触らない。
@@ -130,7 +130,7 @@ def fill_empty_on_match(item: dict, page: dict, db_props: set[str]) -> dict:
         if _page_number(page, "従業員数") is None:
             additions["従業員数"] = {"number": item["employee_count_total"]}
     if "業種" in db_props and not _page_select(page, "業種"):
-        additions["業種"] = {"select": {"name": DEFAULT_INDUSTRY}}
+        additions["業種"] = {"select": {"name": industry}}
     return additions
 
 
@@ -168,11 +168,12 @@ def build_memo(item: dict) -> str:
     return "\n".join(lines)
 
 
-def build_new_props(item: dict, needs_review: bool, db_props: set[str]) -> dict[str, Any]:
+def build_new_props(item: dict, needs_review: bool, db_props: set[str],
+                    industry: str) -> dict[str, Any]:
     props: dict[str, Any] = {
         "顧客名": {"title": [{"text": {"content": item.get("company_name", "")}}]},
         "掲載元メディア": {"multi_select": [{"name": MEDIA_TAG}]},
-        "業種": {"select": {"name": DEFAULT_INDUSTRY}},
+        "業種": {"select": {"name": industry}},
         "確認状況": {"select": {"name": "未確認"}},
         "重複確認必要": {"checkbox": needs_review},
     }
@@ -204,7 +205,8 @@ def build_new_props(item: dict, needs_review: bool, db_props: set[str]) -> dict[
     return props
 
 
-def run(input_path: Path, dry_run: bool, use_gbiz: bool) -> dict:
+def run(input_path: Path, dry_run: bool, use_gbiz: bool,
+        industry: str = DEFAULT_INDUSTRY) -> dict:
     client = NotionClient()
     db_props = fetch_db_properties(client)
     idx = build_index(client)
@@ -233,7 +235,7 @@ def run(input_path: Path, dry_run: bool, use_gbiz: bool) -> dict:
         if kind == "match_name" and page is not None:
             if append_media(client, page, dry_run):
                 stats["media_appended"] += 1
-            additions = fill_empty_on_match(item, page, db_props)
+            additions = fill_empty_on_match(item, page, db_props, industry)
             if additions:
                 stats["fields_filled"] += 1
                 if not dry_run:
@@ -242,7 +244,7 @@ def run(input_path: Path, dry_run: bool, use_gbiz: bool) -> dict:
         needs_review = kind in ("partial_phone", "partial_host")
         if dry_run:
             continue
-        client.create_customer(build_new_props(item, needs_review, db_props))
+        client.create_customer(build_new_props(item, needs_review, db_props, industry))
     return stats
 
 
