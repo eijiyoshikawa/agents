@@ -34,8 +34,15 @@ JOB_ID_KEYS = ("id", "jobId", "slug", "detailUrl")
 
 
 async def fetch_next_data(page: Page) -> dict[str, Any]:
-    """`__NEXT_DATA__` の JSON を取得する。"""
-    text = await page.locator("script#__NEXT_DATA__").inner_text()
+    """`__NEXT_DATA__` の JSON を取得する。
+
+    script 要素は非表示なので inner_text() ではなく text_content() を使う。
+    """
+    locator = page.locator("script#__NEXT_DATA__")
+    await locator.wait_for(state="attached", timeout=DEFAULT_TIMEOUT_MS)
+    text = await locator.text_content()
+    if not text:
+        raise RuntimeError("__NEXT_DATA__ found but empty")
     return json.loads(text)
 
 
@@ -131,6 +138,12 @@ async def crawl(start_url: str, max_pages: int, delay: float, headed: bool,
                 next_data = await fetch_next_data(page)
             except Exception as e:
                 print(f"[page {i + 1}] __NEXT_DATA__ not found: {e}", file=sys.stderr)
+                if debug_dir:
+                    debug_dir.mkdir(parents=True, exist_ok=True)
+                    html = await page.content()
+                    (debug_dir / f"page_p{i + 1}.html").write_text(html, encoding="utf-8")
+                    print(f"[page {i + 1}] saved HTML to {debug_dir}/page_p{i + 1}.html",
+                          file=sys.stderr)
                 break
             dump_debug(debug_dir, i + 1, next_data)
             jobs = walk_for_jobs(next_data)
