@@ -11,8 +11,10 @@ x-work.jp（クロスワーク）の検索結果に掲載されている企業�
 | `scrape_xwork.py` | Playwright で x-work.jp の検索結果を巡回し JSON 出力 |
 | `gbiz_enrich.py` | 経産省 gBizINFO API で電話・URL を補完 |
 | `import_to_notion.py` | JSON を読み込み、重複判定 → 既存追記 or 新規作成 |
-| `prefecture_cities.py` | 大阪/京都/兵庫/奈良の市町村リスト |
-| `run_batch.py` | 4府県一括取得→マージ→投入のオーケストレータ |
+| `prefecture_cities.py` | 全47都道府県の市町村リスト + 業種定義 |
+| `run_batch.py` | 都道府県×業種を一括取得→マージ→投入するオーケストレータ |
+| `find_duplicates.py` | DB全体の重複候補を検出してJSONレポート / 重複確認必要フラグ立て |
+| `enrich_phones.py` | 会社URLから電話番号を抽出して Notion 電話番号フィールドを補完 |
 
 ## 前提
 
@@ -175,6 +177,37 @@ python find_duplicates.py --apply
 ```
 
 メモは絶対に上書きしない設計のため、過去の手入力情報は保護される。
+
+## 電話番号の補完（enrich_phones.py）
+
+x-work.jp と gBizINFO はどちらも法人電話番号を提供しない。
+会社URL が取れた会社のみ、公式サイトを軽くクロールして電話番号を抽出する。
+
+抽出ロジック:
+1. `<a href="tel:...">` リンクを最優先
+2. 「電話 / TEL / Tel / ＴＥＬ / ☎」ラベル付き番号
+3. ベタ書きの 0XX-YYY-ZZZZ 形式
+4. FAX ラベル直近の番号は除外
+5. 携帯 (070/080/090) と フリーダイヤル (0120/0570/0800) は最後の手段
+
+```bash
+# 抽出のみ（dry-run, レポート出力）
+python enrich_phones.py --report phone_report.json
+
+# Notion に書き込み
+python enrich_phones.py --apply
+
+# 上限指定、並列ワーカ数調整
+python enrich_phones.py --max-targets 500 --workers 3 --apply
+```
+
+対象は「会社URL あり / 電話番号 なし」のページのみ。
+ポライトに並列5、タイムアウト10秒。
+
+期待カバレッジ:
+- 会社URL がある会社の **約 50〜70% で電話番号抽出成功**
+- 全DBに対しては約 20〜40% カバー
+- 残りは IS が架電前に手動で調べる運用が現実的
 
 ## マッピング表（取得項目 → Notion DB プロパティ）
 
