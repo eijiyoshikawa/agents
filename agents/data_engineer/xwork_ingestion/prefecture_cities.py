@@ -225,29 +225,194 @@ OKINAWA_CITIES: list[str] = [
     "豊見城市", "うるま市", "宮古島市", "南城市",
 ]
 
+# ---------- 東北（宮城以外）----------
+AOMORI_CITIES: list[str] = [
+    "青森市", "弘前市", "八戸市", "黒石市", "五所川原市", "十和田市",
+    "三沢市", "むつ市", "つがる市", "平川市",
+]
+
+IWATE_CITIES: list[str] = [
+    "盛岡市", "宮古市", "大船渡市", "花巻市", "北上市", "久慈市", "遠野市",
+    "一関市", "陸前高田市", "釜石市", "二戸市", "八幡平市", "奥州市",
+    "滝沢市",
+]
+
+AKITA_CITIES: list[str] = [
+    "秋田市", "能代市", "横手市", "大館市", "男鹿市", "湯沢市", "鹿角市",
+    "由利本荘市", "潟上市", "大仙市", "北秋田市", "にかほ市", "仙北市",
+]
+
+YAMAGATA_CITIES: list[str] = [
+    "山形市", "米沢市", "鶴岡市", "酒田市", "新庄市", "寒河江市", "上山市",
+    "村山市", "長井市", "天童市", "東根市", "尾花沢市", "南陽市",
+]
+
+FUKUSHIMA_CITIES: list[str] = [
+    "福島市", "会津若松市", "郡山市", "いわき市", "白河市", "須賀川市",
+    "喜多方市", "相馬市", "二本松市", "田村市", "南相馬市", "伊達市",
+    "本宮市",
+]
+
+# ---------- 関東（東京/埼玉/神奈川/千葉以外）----------
+IBARAKI_CITIES: list[str] = [
+    "水戸市", "日立市", "土浦市", "古河市", "石岡市", "結城市", "龍ケ崎市",
+    "下妻市", "常総市", "常陸太田市", "高萩市", "北茨城市", "笠間市",
+    "取手市", "牛久市", "つくば市", "ひたちなか市", "鹿嶋市", "潮来市",
+    "守谷市", "常陸大宮市", "那珂市", "筑西市", "坂東市", "稲敷市",
+    "かすみがうら市", "桜川市", "神栖市", "行方市", "鉾田市",
+    "つくばみらい市", "小美玉市",
+]
+
+TOCHIGI_CITIES: list[str] = [
+    "宇都宮市", "足利市", "栃木市", "佐野市", "鹿沼市", "日光市", "小山市",
+    "真岡市", "大田原市", "矢板市", "那須塩原市", "さくら市", "那須烏山市",
+    "下野市",
+]
+
+GUNMA_CITIES: list[str] = [
+    "前橋市", "高崎市", "桐生市", "伊勢崎市", "太田市", "沼田市", "館林市",
+    "渋川市", "藤岡市", "富岡市", "安中市", "みどり市",
+]
+
+# ---------- 北陸 ----------
+NIIGATA_CITIES: list[str] = [
+    # 新潟市8区
+    "新潟市北区", "新潟市東区", "新潟市中央区", "新潟市江南区",
+    "新潟市秋葉区", "新潟市南区", "新潟市西区", "新潟市西蒲区",
+    # 主要市
+    "長岡市", "三条市", "柏崎市", "新発田市", "小千谷市", "加茂市",
+    "十日町市", "見附市", "村上市", "燕市", "糸魚川市", "妙高市",
+    "五泉市", "上越市", "阿賀野市", "佐渡市", "魚沼市", "南魚沼市",
+    "胎内市",
+]
+
+TOYAMA_CITIES: list[str] = [
+    "富山市", "高岡市", "魚津市", "氷見市", "滑川市", "黒部市", "砺波市",
+    "小矢部市", "南砺市", "射水市",
+]
+
+ISHIKAWA_CITIES: list[str] = [
+    "金沢市", "七尾市", "小松市", "輪島市", "珠洲市", "加賀市", "羽咋市",
+    "かほく市", "白山市", "能美市", "野々市市",
+]
+
+FUKUI_CITIES: list[str] = [
+    "福井市", "敦賀市", "小浜市", "大野市", "勝山市", "鯖江市", "あわら市",
+    "越前市", "坂井市",
+]
+
+# ---------- 中部（静岡/愛知以外）----------
+YAMANASHI_CITIES: list[str] = [
+    "甲府市", "富士吉田市", "都留市", "山梨市", "大月市", "韮崎市",
+    "南アルプス市", "北杜市", "甲斐市", "笛吹市", "上野原市", "甲州市",
+    "中央市",
+]
+
+NAGANO_CITIES: list[str] = [
+    "長野市", "松本市", "上田市", "岡谷市", "飯田市", "諏訪市", "須坂市",
+    "小諸市", "伊那市", "駒ヶ根市", "中野市", "大町市", "飯山市", "茅野市",
+    "塩尻市", "佐久市", "千曲市", "東御市", "安曇野市",
+]
+
+GIFU_CITIES: list[str] = [
+    "岐阜市", "大垣市", "高山市", "多治見市", "関市", "中津川市", "美濃市",
+    "瑞浪市", "羽島市", "恵那市", "美濃加茂市", "土岐市", "各務原市",
+    "可児市", "山県市", "瑞穂市", "飛騨市", "本巣市", "郡上市", "下呂市",
+    "海津市",
+]
+
+MIE_CITIES: list[str] = [
+    "津市", "四日市市", "伊勢市", "松阪市", "桑名市", "鈴鹿市", "名張市",
+    "尾鷲市", "亀山市", "鳥羽市", "熊野市", "いなべ市", "志摩市", "伊賀市",
+]
+
+# ---------- 中国（広島/岡山以外）----------
+TOTTORI_CITIES: list[str] = [
+    "鳥取市", "米子市", "倉吉市", "境港市",
+]
+
+SHIMANE_CITIES: list[str] = [
+    "松江市", "浜田市", "出雲市", "益田市", "大田市", "安来市", "江津市",
+    "雲南市",
+]
+
+YAMAGUCHI_CITIES: list[str] = [
+    "下関市", "宇部市", "山口市", "萩市", "防府市", "下松市", "岩国市",
+    "光市", "長門市", "柳井市", "美祢市", "周南市", "山陽小野田市",
+]
+
+# ---------- 四国（香川以外）----------
+TOKUSHIMA_CITIES: list[str] = [
+    "徳島市", "鳴門市", "小松島市", "阿南市", "吉野川市", "阿波市",
+    "美馬市", "三好市",
+]
+
+EHIME_CITIES: list[str] = [
+    "松山市", "今治市", "宇和島市", "八幡浜市", "新居浜市", "西条市",
+    "大洲市", "伊予市", "四国中央市", "西予市", "東温市",
+]
+
+KOCHI_CITIES: list[str] = [
+    "高知市", "室戸市", "安芸市", "南国市", "土佐市", "須崎市", "宿毛市",
+    "土佐清水市", "四万十市", "香南市", "香美市",
+]
+
+# ---------- 九州（福岡/熊本/鹿児島/沖縄以外）----------
+SAGA_CITIES: list[str] = [
+    "佐賀市", "唐津市", "鳥栖市", "多久市", "伊万里市", "武雄市", "鹿島市",
+    "小城市", "嬉野市", "神埼市",
+]
+
+NAGASAKI_CITIES: list[str] = [
+    "長崎市", "佐世保市", "島原市", "諫早市", "大村市", "平戸市", "松浦市",
+    "対馬市", "壱岐市", "五島市", "西海市", "雲仙市", "南島原市",
+]
+
+OITA_CITIES: list[str] = [
+    "大分市", "別府市", "中津市", "日田市", "佐伯市", "臼杵市", "津久見市",
+    "竹田市", "豊後高田市", "杵築市", "宇佐市", "豊後大野市", "由布市",
+    "国東市",
+]
+
+MIYAZAKI_CITIES: list[str] = [
+    "宮崎市", "都城市", "延岡市", "日南市", "小林市", "日向市", "串間市",
+    "西都市", "えびの市",
+]
+
 
 ALL_PREFECTURES: dict[str, list[str]] = {
-    "osaka": OSAKA_CITIES,
-    "kyoto": KYOTO_CITIES,
-    "hyogo": HYOGO_CITIES,
-    "nara": NARA_CITIES,
-    "wakayama": WAKAYAMA_CITIES,
-    "shiga": SHIGA_CITIES,
-    "tokyo": TOKYO_CITIES,
-    "saitama": SAITAMA_CITIES,
-    "kanagawa": KANAGAWA_CITIES,
-    "aichi": AICHI_CITIES,
-    "hiroshima": HIROSHIMA_CITIES,
-    "fukuoka": FUKUOKA_CITIES,
-    "hokkaido": HOKKAIDO_CITIES,
-    "miyagi": MIYAGI_CITIES,
-    "chiba": CHIBA_CITIES,
-    "shizuoka": SHIZUOKA_CITIES,
-    "okayama": OKAYAMA_CITIES,
-    "kagawa": KAGAWA_CITIES,
-    "kumamoto": KUMAMOTO_CITIES,
-    "kagoshima": KAGOSHIMA_CITIES,
-    "okinawa": OKINAWA_CITIES,
+    # 関西
+    "osaka": OSAKA_CITIES, "kyoto": KYOTO_CITIES, "hyogo": HYOGO_CITIES,
+    "nara": NARA_CITIES, "wakayama": WAKAYAMA_CITIES, "shiga": SHIGA_CITIES,
+    # 関東
+    "tokyo": TOKYO_CITIES, "saitama": SAITAMA_CITIES,
+    "kanagawa": KANAGAWA_CITIES, "chiba": CHIBA_CITIES,
+    "ibaraki": IBARAKI_CITIES, "tochigi": TOCHIGI_CITIES,
+    "gunma": GUNMA_CITIES,
+    # 中部
+    "aichi": AICHI_CITIES, "shizuoka": SHIZUOKA_CITIES,
+    "yamanashi": YAMANASHI_CITIES, "nagano": NAGANO_CITIES,
+    "gifu": GIFU_CITIES, "mie": MIE_CITIES,
+    # 北陸
+    "niigata": NIIGATA_CITIES, "toyama": TOYAMA_CITIES,
+    "ishikawa": ISHIKAWA_CITIES, "fukui": FUKUI_CITIES,
+    # 中国
+    "hiroshima": HIROSHIMA_CITIES, "okayama": OKAYAMA_CITIES,
+    "tottori": TOTTORI_CITIES, "shimane": SHIMANE_CITIES,
+    "yamaguchi": YAMAGUCHI_CITIES,
+    # 四国
+    "kagawa": KAGAWA_CITIES, "tokushima": TOKUSHIMA_CITIES,
+    "ehime": EHIME_CITIES, "kochi": KOCHI_CITIES,
+    # 九州・沖縄
+    "fukuoka": FUKUOKA_CITIES, "saga": SAGA_CITIES,
+    "nagasaki": NAGASAKI_CITIES, "kumamoto": KUMAMOTO_CITIES,
+    "oita": OITA_CITIES, "miyazaki": MIYAZAKI_CITIES,
+    "kagoshima": KAGOSHIMA_CITIES, "okinawa": OKINAWA_CITIES,
+    # 北海道・東北
+    "hokkaido": HOKKAIDO_CITIES, "aomori": AOMORI_CITIES,
+    "iwate": IWATE_CITIES, "miyagi": MIYAGI_CITIES,
+    "akita": AKITA_CITIES, "yamagata": YAMAGATA_CITIES,
+    "fukushima": FUKUSHIMA_CITIES,
 }
 
 
