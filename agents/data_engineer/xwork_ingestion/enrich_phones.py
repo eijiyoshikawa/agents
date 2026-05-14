@@ -159,11 +159,20 @@ def process_one(page: dict) -> dict:
     }
 
 
-def collect_targets(client: NotionClient, max_targets: int) -> list[dict]:
+def collect_targets(client: NotionClient, max_targets: int,
+                    industry: str = "", media: str = "") -> list[dict]:
     targets: list[dict] = []
     for page in client.iter_pages():
         if page.get("archived") or page.get("in_trash"):
             continue
+        if industry:
+            sel = page.get("properties", {}).get("業種", {}).get("select")
+            if not sel or sel.get("name") != industry:
+                continue
+        if media:
+            items = page.get("properties", {}).get("掲載元メディア", {}).get("multi_select", [])
+            if not any(m.get("name") == media for m in items):
+                continue
         url = text_prop(page, "会社URL")
         phone = text_prop(page, "電話番号")
         if url and not phone:
@@ -182,6 +191,10 @@ def main() -> int:
     ap.add_argument("--max-targets", type=int, default=0,
                     help="対象上限（0=無制限）")
     ap.add_argument("--workers", type=int, default=DEFAULT_WORKERS)
+    ap.add_argument("--industry", default="",
+                    help="業種で対象を絞る（例: 建設, 運輸・物流）")
+    ap.add_argument("--media", default="",
+                    help="掲載元メディアで対象を絞る（例: クロスワーク）")
     args = ap.parse_args()
 
     if "NOTION_TOKEN" not in os.environ:
@@ -189,8 +202,15 @@ def main() -> int:
         return 2
 
     client = NotionClient()
-    targets = collect_targets(client, args.max_targets)
-    print(f"[targets] {len(targets)} pages with URL but no phone",
+    targets = collect_targets(client, args.max_targets,
+                              industry=args.industry, media=args.media)
+    filter_desc = []
+    if args.industry:
+        filter_desc.append(f"業種={args.industry}")
+    if args.media:
+        filter_desc.append(f"メディア={args.media}")
+    suffix = f" (filter: {', '.join(filter_desc)})" if filter_desc else ""
+    print(f"[targets] {len(targets)} pages with URL but no phone{suffix}",
           file=sys.stderr)
     if not targets:
         return 0
