@@ -139,28 +139,43 @@ def fetch_html(url: str, timeout: float = DEFAULT_TIMEOUT) -> Optional[str]:
 def process_one(page: dict) -> dict:
     url = text_prop(page, "会社URL")
     title = title_of(page)
+    existing_phone = text_prop(page, "電話番号")
+    existing_fax = text_prop(page, "FAX")
     if not url:
         return {"id": page["id"], "title": title, "url": "",
-                "phone": "", "status": "no_url"}
+                "phone": "", "fax": "", "status": "no_url",
+                "existing_phone": existing_phone, "existing_fax": existing_fax}
     html = fetch_html(url)
     if html is None:
         return {"id": page["id"], "title": title, "url": url,
-                "phone": "", "status": "fetch_failed"}
-    phones, fax = extract_phones(html)
-    phone = pick_best(phones, set(fax))
+                "phone": "", "fax": "", "status": "fetch_failed",
+                "existing_phone": existing_phone, "existing_fax": existing_fax}
+    phones, fax_list = extract_phones(html)
+    phone = pick_best(phones, set(fax_list))
+    fax = fax_list[0] if fax_list else ""
+    has_any = bool(phone) or bool(fax)
     return {
         "id": page["id"],
         "title": title,
         "url": url,
         "phone": phone,
+        "fax": fax,
         "candidates": phones[:5],
-        "fax_candidates": fax[:3],
-        "status": "ok" if phone else "no_phone",
+        "fax_candidates": fax_list[:3],
+        "existing_phone": existing_phone,
+        "existing_fax": existing_fax,
+        "status": "ok" if has_any else "no_phone",
     }
 
 
 def collect_targets(client: NotionClient, max_targets: int,
-                    industry: str = "", media: str = "") -> list[dict]:
+                    industry: str = "", media: str = "",
+                    include_phone_filled: bool = False) -> list[dict]:
+    """会社URL が入っていて、(電話 or FAX) のどちらかが空のページを返す。
+
+    include_phone_filled=True なら、電話あり/FAX空 のページも対象に含める
+    （FAX のみの補完目的に使う）。
+    """
     targets: list[dict] = []
     for page in client.iter_pages():
         if page.get("archived") or page.get("in_trash"):
@@ -174,8 +189,12 @@ def collect_targets(client: NotionClient, max_targets: int,
             if not any(m.get("name") == media for m in items):
                 continue
         url = text_prop(page, "会社URL")
+        if not url:
+            continue
         phone = text_prop(page, "電話番号")
-        if url and not phone:
+        fax = text_prop(page, "FAX")
+        if not phone or not fax:
+            # どちらか空ならクロール対象（後段で実際に空のフィールドのみ書き込み）
             targets.append(page)
             if max_targets and len(targets) >= max_targets:
                 break
@@ -210,7 +229,7 @@ def main() -> int:
     if args.media:
         filter_desc.append(f"メディア={args.media}")
     suffix = f" (filter: {', '.join(filter_desc)})" if filter_desc else ""
-    print(f"[targets] {len(targets)} pages with URL but no phone{suffix}",
+    print(f"[targets] {len(targets)} pages with URL and (no phone or no FAX){suffix}",
           file=sys.stderr)
     if not targets:
         return 0
@@ -221,8 +240,9 @@ def main() -> int:
         for i, fut in enumerate(as_completed(futures), 1):
             report.append(fut.result())
             if i % 50 == 0 or i == len(targets):
-                ok = sum(1 for r in report if r.get("phone"))
-                print(f"[progress] {i}/{len(targets)}  phones_found={ok}",
+                ok_p = sum(1 for r in report if r.get("phone"))
+                ok_f = sum(1 for r in report if r.get("fax"))
+                print(f"[progress] {i}/{len(targets)}  phones_found={ok_p}  fax_found={ok_f}",
                       file=sys.stderr, flush=True)
 
     args.report.write_text(json.dumps(report, ensure_ascii=False, indent=2),
@@ -230,6 +250,7 @@ def main() -> int:
     summary = {
         "targets": len(targets),
         "phones_found": sum(1 for r in report if r.get("phone")),
+        "fax_found": sum(1 for r in report if r.get("fax")),
         "no_phone": sum(1 for r in report if r["status"] == "no_phone"),
         "fetch_failed": sum(1 for r in report if r["status"] == "fetch_failed"),
     }
@@ -240,21 +261,28 @@ def main() -> int:
         print("\n[dry-run] use --apply to write to Notion")
         return 0
 
-    print(f"\n[apply] writing phones to Notion...")
-    applied = 0
+    print(f"\n[apply] writing phones/FAX to Notion (only when fields are empty)...")
+    applied_phone = 0
+    applied_fax = 0
     errors = 0
     for r in report:
-        if not r.get("phone"):
+        props: dict = {}
+        if r.get("phone") and not r.get("existing_phone"):
+            props["電話番号"] = {"phone_number": r["phone"]}
+        if r.get("fax") and not r.get("existing_fax"):
+            props["FAX"] = {"phone_number": r["fax"]}
+        if not props:
             continue
         try:
-            client.update_properties(r["id"], {
-                "電話番号": {"phone_number": r["phone"]},
-            })
-            applied += 1
+            client.update_properties(r["id"], props)
+            if "電話番号" in props:
+                applied_phone += 1
+            if "FAX" in props:
+                applied_fax += 1
         except Exception as e:
             errors += 1
             print(f"[error] {r['title']}: {e}", file=sys.stderr)
-    print(f"[apply] applied={applied}, errors={errors}")
+    print(f"[apply] phones_applied={applied_phone}  fax_applied={applied_fax}  errors={errors}")
     return 0
 
 
