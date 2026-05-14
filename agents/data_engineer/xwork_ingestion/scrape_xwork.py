@@ -174,7 +174,8 @@ async def crawl(start_url: str, max_pages: int, delay: float, headed: bool,
         for i in range(max_pages):
             url = start_url if i == 0 else with_page_param(start_url, i + 1)
             await page.goto(url, wait_until="domcontentloaded")
-            await page.wait_for_load_state("networkidle")
+            # networkidle は x-work.jp の常時 beacon で到達しないため待たない。
+            # __NEXT_DATA__ は SSR 済みで domcontentloaded 時点で取得可能。
             try:
                 next_data = await fetch_next_data(page)
             except Exception as e:
