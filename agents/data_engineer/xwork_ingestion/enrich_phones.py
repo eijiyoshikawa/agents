@@ -170,11 +170,11 @@ def process_one(page: dict) -> dict:
 
 def collect_targets(client: NotionClient, max_targets: int,
                     industry: str = "", media: str = "",
-                    include_phone_filled: bool = False) -> list[dict]:
+                    only_no_phone: bool = False) -> list[dict]:
     """会社URL が入っていて、(電話 or FAX) のどちらかが空のページを返す。
 
-    include_phone_filled=True なら、電話あり/FAX空 のページも対象に含める
-    （FAX のみの補完目的に使う）。
+    only_no_phone=True なら電話番号が空のページだけに絞る
+    （FAX が空でも電話があれば対象外）。
     """
     targets: list[dict] = []
     for page in client.iter_pages():
@@ -193,11 +193,15 @@ def collect_targets(client: NotionClient, max_targets: int,
             continue
         phone = text_prop(page, "電話番号")
         fax = text_prop(page, "FAX")
-        if not phone or not fax:
-            # どちらか空ならクロール対象（後段で実際に空のフィールドのみ書き込み）
+        if only_no_phone:
+            if phone:
+                continue
             targets.append(page)
-            if max_targets and len(targets) >= max_targets:
-                break
+        else:
+            if not phone or not fax:
+                targets.append(page)
+        if max_targets and len(targets) >= max_targets:
+            break
     return targets
 
 
@@ -214,6 +218,8 @@ def main() -> int:
                     help="業種で対象を絞る（例: 建設, 運輸・物流）")
     ap.add_argument("--media", default="",
                     help="掲載元メディアで対象を絞る（例: クロスワーク）")
+    ap.add_argument("--only-no-phone", action="store_true",
+                    help="電話番号が空のページだけを対象にする（FAX空のみは除外）")
     args = ap.parse_args()
 
     if "NOTION_TOKEN" not in os.environ:
@@ -222,14 +228,18 @@ def main() -> int:
 
     client = NotionClient()
     targets = collect_targets(client, args.max_targets,
-                              industry=args.industry, media=args.media)
+                              industry=args.industry, media=args.media,
+                              only_no_phone=args.only_no_phone)
     filter_desc = []
     if args.industry:
         filter_desc.append(f"業種={args.industry}")
     if args.media:
         filter_desc.append(f"メディア={args.media}")
+    if args.only_no_phone:
+        filter_desc.append("only-no-phone")
     suffix = f" (filter: {', '.join(filter_desc)})" if filter_desc else ""
-    print(f"[targets] {len(targets)} pages with URL and (no phone or no FAX){suffix}",
+    target_kind = "no phone" if args.only_no_phone else "(no phone or no FAX)"
+    print(f"[targets] {len(targets)} pages with URL and {target_kind}{suffix}",
           file=sys.stderr)
     if not targets:
         return 0
