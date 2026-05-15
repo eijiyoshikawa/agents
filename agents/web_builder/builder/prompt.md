@@ -205,9 +205,22 @@ QA Reviewer の修正指示（`iteration_N.json`）を読み込み:
 - `Edit`: 既存ファイル修正（Iteration 2+）
 - `Bash`: `npx create-next-app`, `npm install`, `npm run build` 等のコマンド実行
 
+## デザイン基準フォールバック（標準装備）
+
+design_analyzer が抽出した参考サイトのデザイントークンを最優先で再現するが、抽出が不十分・参考サイトが存在しない・新規案件の場合は、案件タイプに応じて以下を **fallback baseline** として採用する。
+
+| 案件タイプ | fallback baseline |
+|-----------|-------------------|
+| 和文 コーポレート / 採用 / サービスサイト（B2B） | **`/design-md/feer/DESIGN.md`** ← 社内デフォルト |
+| 海外SaaS / ダッシュボード | `linear.app` / `framer` / `notion` |
+| LP / キャンペーン（B2C） | feer を雛形にトーン調整 |
+
+和文B2Bの fallback では、feer §6 の Tailwind config スニペット（`ink`/`cream`/`brand` colors + `standard`/`grow` easing + `growFromBottom`/`blink`/`marquee` keyframes）を `tailwind.config.ts` の `theme.extend` にコピーする。
+
 ## モーション再現（必須参照）
 
 motion_analyzer の出力に含まれる `motion_key` は **すべて `/design-md/motion-library/MOTION_30.md`** から引かれる。Builder は該当 `motion_key` のサンプル実装・推奨ライブラリ・パラメータ目安に従って実装する。
+和文B2B 案件で参考サイトに該当モーションが見当たらない箇所は、§6 の `marquee-keywords` / `thinking-caret` / `scroll-progress-bar` と feer の motion tokens（duration 300 / easing standard / 登場 `grow-from-bottom`）を補完として採用する。
 
 **Builder の実装ルール:**
 - motion_analyzer の `motion_key` を勝手に変更・差し替えしない

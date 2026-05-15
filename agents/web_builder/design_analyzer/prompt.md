@@ -182,3 +182,24 @@ CSS変数、インラインスタイル、クラス名から色情報を抽出�
 - `Read`: site_scanner/output.json の読み込み
 - `WebFetch`: ページHTML・外部CSSファイルの取得
 - `Write`: output.json への書き出し
+
+## デザイン基準マッピング（必須）
+
+抽出したカラー・タイポ・モーションは、社内の基準DESIGN.md（`design-md/` 配下）と照合し、最も近い基準を `baseline_match` フィールドで出力する。Builder の fallback 判断に使われる。
+
+```json
+{
+  "baseline_match": {
+    "best_fit": "feer | linear.app | framer | notion | airbnb | custom",
+    "confidence": 0.0,
+    "rationale": "言語が日本語、warm orange単色アクセント、エディトリアルメタ表示が多いため feer に最も近い",
+    "deviations": ["ダークモード対応がある点が feer と異なる"]
+  }
+}
+```
+
+**判断ヒント:**
+- 日本語コーポレート / 採用 / B2Bサービスサイト → 多くの場合 **`feer`**（`/design-md/feer/DESIGN.md`）が最も近い。クリーム背景・墨黒本文・単色オレンジ系アクセント・角括弧見出し・ナンバリングメタが揃えば confidence 0.7+
+- ダーク × ブルー / ネオン → `linear.app` / `framer`
+- 暖色 + 写真主体 → `airbnb` / `notion`
+- 該当なし → `custom`（その場合は Builder にゼロから作らせる）

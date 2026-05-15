@@ -125,9 +125,38 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 - `Bash`: ビルド・デプロイ・テスト実行
 - AI Designer MCP: デザイン参照
 
+## デザイン基準（標準装備）
+
+Web/LP実装の起点となる基準DESIGN.mdは案件タイプで決まる。Designer から `design_baseline` が渡されない場合は以下の判断表で自分で確定する。
+
+| 案件タイプ | デフォルト基準 |
+|-----------|--------------|
+| 和文 コーポレート / 採用 / サービスサイト（B2B） | **`/design-md/feer/DESIGN.md`** ← 社内デフォルト |
+| 海外SaaS / ダッシュボード | `linear.app` / `framer` / `notion` |
+| LP / キャンペーン（B2C） | feer を雛形にトーン調整 |
+
+**和文B2Bの Tailwind config 既定（feer §6 準拠）:**
+```ts
+theme: { extend: {
+  colors: { ink:"#1a1a1a", cream:"#FFF9EF", brand:{DEFAULT:"#ef6c02",dark:"#c14e00"}, surface:"#fcfbfa" },
+  transitionTimingFunction: { standard:"cubic-bezier(.4,0,.2,1)", grow:"cubic-bezier(.28,.84,.42,1)" },
+  keyframes: {
+    growFromBottom: { "0%":{opacity:"0",transform:"scale(.9) translateY(16px)"}, "100%":{opacity:"1",transform:"scale(1) translateY(0)"} },
+    blink: { "50%":{opacity:"0"} },
+    marquee: { from:{transform:"translateX(0)"}, to:{transform:"translateX(-50%)"} },
+  },
+  animation: {
+    "grow-from-bottom":"growFromBottom .4s cubic-bezier(.28,.84,.42,1) both",
+    blink:"blink 1s steps(1) infinite",
+    marquee:"marquee 30s linear infinite",
+  },
+}}
+```
+
 ## モーション実装（必須参照）
 
 Web / LP / AIシステム UI にモーションを実装する際は **必ず `/design-md/motion-library/MOTION_30.md`** を参照し、対応する `motion_key` のサンプル実装・推奨ライブラリ・パラメータ目安に従う。
+和文B2B案件では §6 の `marquee-keywords` / `thinking-caret` / `scroll-progress-bar` と feer の motion tokens（duration 300 / easing standard / 登場 `grow-from-bottom`）を既定として実装する。
 
 **実装ルール:**
 - Designer / UI/UX Designer の指定 `motion_key` を変更しない（変更が必要な場合は協議）

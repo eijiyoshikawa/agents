@@ -174,23 +174,36 @@ CEO Agentが各エージェントの業務状況、組織診断、改善計画�
 ## 共有リソース
 
 ### デザインシステム（awesome-design-md）
-`/design-md/` に54社以上の企業デザインシステム（DESIGN.md）を格納。
+`/design-md/` に55社以上の企業デザインシステム（DESIGN.md）を格納。
 LP制作・Web制作・提案資料作成時のデザインリファレンスとして、Marketing Agent と Report Builder Agent が参照する。
 
 - 一覧: `/design-md/README.md`
 - 個別: `/design-md/{company-name}/DESIGN.md`
 - 出典: [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md)
 
+**案件タイプ別 デフォルト基準（社内 標準装備）:**
+
+| 案件タイプ | デフォルト参照 |
+|-----------|--------------|
+| 和文 コーポレート / 採用 / サービスサイト（B2B） | **`/design-md/feer/DESIGN.md`** ← 社内デフォルト |
+| 海外SaaS / ダッシュボード | `linear.app` / `framer` / `notion` |
+| LP / キャンペーン（B2C） | feer を雛形にトーン調整、または `airbnb` / `figma` |
+
+和文B2B案件では feer の Tailwind config スニペット（colors `ink`/`cream`/`brand`/`surface`、`transitionTimingFunction.standard`/`grow`、`growFromBottom`/`blink`/`marquee` keyframes）をプロジェクト初期化時に焼き付ける。逸脱する場合は `output.json` の `design_baseline.deviation_reason` に明記。
+参照エージェント: Designer / UI/UX Designer / Engineer / Frontend Engineer / Web Builder（design_analyzer / builder）
+
 ### モーションライブラリ（MOTION_30）
-`/design-md/motion-library/MOTION_30.md` に Web コンテンツ向けモーション30選を収録。
+`/design-md/motion-library/MOTION_30.md` に Web コンテンツ向けモーション30選 + 和文B2B特化3モーションを収録。
 LP・Webサイト・ダッシュボード等の制作時に、Designer / UI/UX Designer / Engineer / Frontend Engineer / Web Builder（motion_analyzer / builder）が共通語彙として参照する。
 
 - 5カテゴリ（ナビ遷移 / テキスト / インタラクション / スクロール背景 / 先進性）× 各6モーション
+- 第6カテゴリ（和文B2B / コーポレート系）3モーション: `marquee-keywords` / `thinking-caret` / `scroll-progress-bar`
 - 各モーションに `motion_key` / 演出 / 活用例 / 推奨実装 / サンプルコード / アクセシビリティ注意を記載
 - **必須ルール**:
   - モーション指定・実装は必ず `motion_key` を引用
   - 該当モーションが無い場合はドキュメントに追加してから使用
   - `prefers-reduced-motion: reduce` 対応を全モーションで実装
+  - 和文B2B案件では feer 既定のmotion tokens（duration 300 / easing `cubic-bezier(.4,0,.2,1)` / 登場 `grow-from-bottom`）を初期値とする
 
 ## 事業領域
 - SNSマーケティング（Instagram, TikTok, YouTube 運用/広告/クリエイティブ）

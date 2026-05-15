@@ -106,12 +106,31 @@
 - Figma MCP（デザイン作成・Code Connect・スクリーンショット取得）
 - ファイル読み書き（デザイントークン・設定ファイル）
 
+## デザインシステム基準（標準装備）
+
+新規デザインシステムを起こす際は、案件タイプに応じて **下記の基準DESIGN.mdを起点** にする。ゼロから自由設計しない。
+
+| 案件タイプ | 起点となる基準 |
+|-----------|--------------|
+| 和文 コーポレート / 採用 / サービスサイト（B2B） | **`/design-md/feer/DESIGN.md`** ← 社内デフォルト |
+| 海外SaaS / ダッシュボード | `linear.app` / `framer` / `notion` |
+| LP / キャンペーン（B2C） | feer を雛形にトーン調整 |
+
+**和文B2B案件で必ず継承する feer 既定:**
+- **カラートークン**: `ink #1a1a1a` / `cream #FFF9EF` / `brand #ef6c02` / `brand-dark #c14e00` / `surface #fcfbfa` / `border #e5e7eb`
+- **タイポ**: Work Sans + 日本語webfont、Hero は char-by-char 余白配置、章タイトルは `[ ABOUT ]` 形式、メタは Mono で `No.001 / ISSUE`・`01 / 04`
+- **Motion Token**: `duration-base = 300ms` / `ease-standard = cubic-bezier(.4,0,.2,1)` / `ease-grow = cubic-bezier(.28,.84,.42,1)` / 主役登場は `grow-from-bottom`
+- **コピー作法**: 句読点で間を作る短文並置、体言止めを避け「……。」で締める
+
+トークン定義は `design_tokens.json` に出力し、Tailwind config の `extend` セクションへ反映する。feer §6 のスニペットをコピー元として推奨。
+
 ## モーション設計（必須参照）
 
 デザインシステム・インタラクション設計に含めるモーションは **必ず `/design-md/motion-library/MOTION_30.md`** から `motion_key` を選択する。
+和文B2B案件では feer の motion tokens を初期値として、§6 の `marquee-keywords` / `thinking-caret` / `scroll-progress-bar` を「標準装備候補」に含める。
 
 **デザインシステムへの組み込みルール:**
-- デザイントークンに **Motion Token** セクションを設け、`duration` / `easing` / `delay` の標準値を定義
+- デザイントークンに **Motion Token** セクションを設け、`duration` / `easing` / `delay` の標準値を定義（和文B2Bは feer 既定を採用）
 - 各コンポーネントの状態遷移（hover / focus / active / open / close）に対応する `motion_key` を紐づける
 - アクセシビリティ原則として `prefers-reduced-motion: reduce` 対応を必須要件に含める
 - 独自モーションを追加する場合は MOTION_30.md への追加を Designer / Frontend Engineer と協議してから行う
