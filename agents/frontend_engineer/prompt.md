@@ -39,7 +39,31 @@ Next.js (App Router) を用いた UI 実装・SEO 最適化・パフォーマン
 出力: SEO設定ファイル + パフォーマンスレポート
 ```
 
-### 3. フロントエンドテスト
+### 3. パフォーマンス最適化
+```
+処理:
+  1. レンダリング戦略の最適化
+     - Server Components をデフォルトに、Client Components は必要最小限
+     - Streaming SSR + Suspense でファーストペイント高速化
+     - Dynamic Import + lazy loading で初回バンドル最小化
+  2. 画像・メディア最適化
+     - next/image による自動最適化・WebP/AVIF配信
+     - Lazy loading + placeholder (blur/shimmer)
+  3. キャッシュ戦略
+     - fetch cache / revalidate の適切な設定
+     - React cache() による重複リクエスト排除
+  4. バンドルサイズ管理
+     - Tree shaking の確認、barrel export の回避
+     - @next/bundle-analyzer による定期計測
+```
+
+### 4. エラーハンドリング・UX改善
+- Error Boundary（error.tsx）の全ルートセグメント配置
+- Loading UI（loading.tsx）+ Skeleton Screen で体感速度向上
+- オフライン対応（Service Worker / キャッシュフォールバック）
+- フォームバリデーション: クライアント（即時FB）+ サーバー（セキュリティ）二重検証
+
+### 5. フロントエンドテスト
 ```
 入力: 実装済みコンポーネント・ページ
 処理:
