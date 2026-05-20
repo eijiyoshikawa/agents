@@ -57,10 +57,29 @@ Agent 3（Market Researcher）、Agent 4（Analogy Finder）と **並列で実�
 - 季節性やイベントとの連動パターン
 - 業界のプロモーション傾向・ベストプラクティス
 
-### Step 6: 自社への示唆まとめ（actionable_insights）
-事業領域を考慮し、実行可能な示唆を整理する:
-- **クイックウィン**: すぐに実行できる施策（1-2ヶ月以内）
-- **中長期施策**: 3ヶ月以上かけて取り組むべき施策
+### Step 6: SEO競合分析（seo_competitive）
+- 主要キーワードの検索ボリュームと競合の推定順位
+- コンテンツSEO戦略（ブログ頻度、キーワードクラスター、内部リンク構造）
+- 被リンクプロファイルの傾向（業界メディア、ゲストポスト、PR記事）
+- 技術的SEO観点（サイト速度、Core Web Vitals、構造化データ）
+
+### Step 7: 競合マーテックスタック推定
+- 利用推定ツール（MA、CRM、分析、広告管理）
+- オートメーション活用の度合い（メール自動配信、チャットボット、リターゲティング）
+- データ活用の高度さ（パーソナライゼーション、レコメンデーション）
+
+### Step 8: 予算・リソース配分推定
+- 競合の推定広告費（SimilarWeb、Meta Ad Library等から推計）
+- チャネル別の推定配分比率
+- 人員体制の推定（採用情報、組織規模から）
+- 自社が同等の成果を出すために必要な最低投資額の試算
+
+### Step 9: 自社への示唆まとめ（actionable_insights）
+事業領域を考慮し、実行可能な示唆を**優先度・期待ROI付き**で整理:
+- **クイックウィン**: すぐに実行できる施策（1-2ヶ月以内）+ 期待効果
+- **中長期施策**: 3ヶ月以上かけて取り組むべき施策 + 必要投資額
+- **差別化機会**: 競合が未着手 or 弱い領域（ブルーオーシャン施策）
+- **避けるべき施策**: 競合が先行しすぎて正面衝突すべきでない領域
 
 事業領域:
 - SNSマーケティング（Instagram, TikTok, YouTube 運用/広告/クリエイティブ）
@@ -124,15 +143,28 @@ Agent 3（Market Researcher）、Agent 4（Analogy Finder）と **並列で実�
       "source": "情報源URL"
     }
   ],
+  "seo_competitive": {
+    "target_keywords": [{"keyword": "キーワード", "volume": "月間検索数", "competitor_rank": "競合順位"}],
+    "content_strategy": "競合のコンテンツSEO概要",
+    "technical_seo": "技術的SEO評価"
+  },
+  "competitor_martech": [
+    {"competitor": "競合名", "estimated_tools": ["GA4", "HubSpot"], "automation_level": "high | medium | low"}
+  ],
+  "budget_estimation": {
+    "competitor_estimated_spend": "競合推定広告費（月額）",
+    "channel_allocation": {"SNS": "40%", "search": "30%", "display": "20%", "other": "10%"},
+    "minimum_investment_needed": "同等成果に必要な最低投資額"
+  },
   "actionable_insights": {
     "quick_wins": [
-      "すぐに実行可能な施策1",
-      "すぐに実行可能な施策2"
+      {"tactic": "施策内容", "expected_roi": "期待ROI", "effort": "low | medium | high"}
     ],
     "mid_long_term": [
-      "中長期で取り組むべき施策1",
-      "中長期で取り組むべき施策2"
-    ]
+      {"tactic": "施策内容", "investment_needed": "必要投資額", "timeline": "3-6ヶ月"}
+    ],
+    "differentiation_opportunities": ["競合が弱い差別化ポイント"],
+    "avoid": ["正面衝突を避けるべき領域"]
   }
 }
 ```

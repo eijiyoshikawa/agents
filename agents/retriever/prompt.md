@@ -22,14 +22,33 @@ Google Drive に過去の提案資料がある場合、関連資料を検索・�
 ```
 - 会議タイトル
 - 会議日時
-- 参加者一覧
+- 参加者一覧（役職・意思決定権限レベル付き）
+- 会議タイプ分類（initial_hearing / proposal / negotiation / follow_up / review）
 - 議題一覧（箇条書き）
 - 重要ポイント（議論の核心となった内容）
-- アクションアイテム（誰が何をいつまでに）
+- 意思決定事項（合意に至った事項を明確に分離）
+- 未解決課題（次回持ち越し事項）
+- アクションアイテム（誰が何をいつまでに / 優先度付き）
 - クライアント名
 - 業界
+- キーエンティティ（言及された企業名・金額・日付・KPI数値を全て抽出）
+- 会議のトーン・温度感（positive / neutral / cautious / negative）
 - 過去の提案との関連性（過去資料がある場合）
 ```
+
+### Step 4: データ品質セルフチェック
+構造化後、出力前に以下を自動検証:
+- **完全性チェック**: 必須フィールド（title, date, participants, key_points）に空値がないか
+- **整合性チェック**: 日付フォーマット統一（ISO 8601）、参加者名の表記ゆれ検出
+- **重複チェック**: 同一会議の過去output.jsonが存在する場合、差分のみ更新
+- **アクションアイテム精度**: 「誰が・何を・いつまでに」の3要素が揃っているか
+品質スコアが自己評価70未満の場合、不足箇所を明記して再取得を試行。
+
+### Step 5: コンテキストエンリッチメント
+取得データに以下の付加情報を追加:
+- 同一クライアントの過去会議履歴サマリー（Notion検索で直近5件を確認）
+- 前回アクションアイテムの完了/未完了ステータス（追跡可能な場合）
+- 業界トレンド情報との関連付け（Market Researcherの直近output参照）
 
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer**: 取得データの完全性・構造化品質の検証
@@ -50,14 +69,33 @@ Google Drive に過去の提案資料がある場合、関連資料を検索・�
 {
   "title": "会議タイトル",
   "date": "2026-03-23",
-  "participants": ["山田太郎", "佐藤花子"],
+  "meeting_type": "initial_hearing | proposal | negotiation | follow_up | review",
+  "participants": [
+    {"name": "山田太郎", "role": "部長", "decision_authority": "high | medium | low"}
+  ],
   "agenda_items": ["議題1", "議題2"],
   "key_points": ["ポイント1", "ポイント2"],
-  "action_items": ["アクション1", "アクション2"],
+  "decisions_made": ["合意事項1"],
+  "open_issues": ["未解決課題1"],
+  "action_items": [
+    {"owner": "山田太郎", "task": "内容", "deadline": "2026-04-01", "priority": "high"}
+  ],
+  "key_entities": {
+    "companies": ["株式会社XX"],
+    "amounts": ["500万円"],
+    "dates": ["2026-Q2"],
+    "kpis": ["CVR 3%"]
+  },
+  "meeting_sentiment": "positive | neutral | cautious | negative",
   "client_name": "株式会社〇〇",
   "industry": "不動産",
   "raw_text": "議事録全文...",
-  "past_proposals_context": "過去提案の要約（あれば）"
+  "past_proposals_context": "過去提案の要約（あれば）",
+  "previous_action_status": [
+    {"task": "前回アクション", "status": "completed | in_progress | not_started"}
+  ],
+  "quality_score": 85,
+  "retrieval_version": 1
 }
 ```
 
