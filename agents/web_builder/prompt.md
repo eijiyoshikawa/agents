@@ -71,6 +71,20 @@
 - **5カテゴリ**: Structure(20点), Design(25点), Motion(20点), Interaction(20点), Responsive(15点)
 - **最大イテレーション**: 2周（それ以上は手動修正に切り替え）
 
+### パフォーマンス基準（生成サイトに適用）
+| 指標 | 基準 | 手法 |
+|------|------|------|
+| Lighthouse Performance | ≥ 90 | SSG + 画像最適化 + Code Splitting |
+| LCP | < 2.5s | next/image + priority prop for ATF |
+| CLS | < 0.1 | 画像のwidth/height明示 + フォントのsize-adjust |
+| バンドルサイズ | < 150KB (gzip) | tree-shaking + dynamic import |
+
+### 再現精度の定量評価
+- **ピクセルパーフェクト率**: レイアウト差分を自動検出（許容: 5px以内）
+- **カラー忠実度**: 使用色のDelta E値（許容: ΔE < 3.0）
+- **フォント再現度**: フォントファミリ一致 or 視覚的に同等のフォールバック
+- **レスポンシブ対応**: 5ブレイクポイント（320px/375px/768px/1024px/1440px）で確認
+
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer（横断チーム）**: パイプライン全体の品質・最終成果物の検証
 - **Tech Lead**: 技術設計・アーキテクチャ・コード品質のレビュー
