@@ -60,7 +60,15 @@ HTMLから全 `<img>` タグと CSS `background-image` を抽出する:
 - ファビコン: 形状・色の説明とプレースホルダー生成方針
 - OGP画像: サイズ・デザインの説明
 
-### Step 5: ローカルファイルパス設計
+### Step 5: 画像最適化戦略
+各画像に対して最適な配信戦略を決定:
+- **ATF（Above the Fold）画像**: `priority` prop + preload（LCP対策）
+- **BTF（Below the Fold）画像**: `loading="lazy"` + placeholder="blur"
+- **アイコン・ロゴ**: SVG推奨（スケーラブル＋軽量）
+- **写真系**: next/image で自動WebP/AVIF変換
+- **装飾用背景**: CSS background-image + WebP with fallback
+
+### Step 6: ローカルファイルパス設計
 Next.js の `/public` ディレクトリ構成を設計する:
 
 ```

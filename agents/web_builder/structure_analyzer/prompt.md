@@ -57,7 +57,14 @@
 - ヘッダー高さ
 - 共通パディング
 
-### Step 6: ページ間の共通/固有要素の整理
+### Step 6: セマンティクス・アクセシビリティ構造の記録
+- ARIA ランドマーク（`role="banner"`, `role="navigation"`, `role="main"`, `role="contentinfo"`）の使用状況
+- 見出し階層（h1→h2→h3）のスキップがないか記録
+- `<nav>`, `<article>`, `<section>`, `<aside>` 等のセマンティックタグ使用状況
+- フォームの `<label>` 紐づけ状況
+→ Builderはこの情報を基に、参考サイト以上のアクセシビリティを実現する。
+
+### Step 7: ページ間の共通/固有要素の整理
 - 共通コンポーネント: Header, Footer, CTA Section 等
 - ページ固有のセクション構成
 

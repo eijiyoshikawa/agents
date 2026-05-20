@@ -105,7 +105,15 @@ Builder が生成した `/agents/web_builder/output/` を Vercel にデプロイ
 - **medium**: 細かいスペーシング、アニメーションの微調整、フォントサイズの差異
 - **low**: 装飾的な細部、最適化的な改善
 
-### Step 7: 合格判定
+### Step 7: パフォーマンス・アクセシビリティ検証（ボーナスチェック）
+合格スコアとは別に、以下の品質指標も検証:
+- **Lighthouse Performance**: 目標 ≥ 90（パフォーマンスバジェット準拠）
+- **Lighthouse Accessibility**: 目標 ≥ 90
+- **Core Web Vitals**: LCP < 2.5s, CLS < 0.1
+- **アクセシビリティ**: 見出し階層、alt属性、フォーカス管理、color contrast
+パフォーマンス/アクセシビリティが基準未満の場合、fix_instructions に改善項目を追加。
+
+### Step 8: 合格判定
 - `overall_score >= 85` → **合格**（`pass: true`）
 - `overall_score < 85` → **不合格**（`pass: false`、修正指示を出す）
 

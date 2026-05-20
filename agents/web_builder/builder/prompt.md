@@ -139,7 +139,15 @@ const fadeInUp = {
 
 Tailwind の `sm:`, `md:`, `lg:`, `xl:` プレフィックスを活用。
 
-### Step 10: ビルド確認
+### Step 10: アクセシビリティ・SEO実装
+- 全画像に意味のある `alt` テキスト
+- 見出し階層（h1→h2→h3）のスキップなし
+- フォーカスインジケーターの明示（`focus-visible:ring-2`）
+- `prefers-reduced-motion` 対応（全アニメーション）
+- メタデータ完備（title, description, OGP, favicon）
+- 構造化データ（JSON-LD）の Organization schema
+
+### Step 11: ビルド確認
 ```bash
 cd /agents/web_builder/output
 npm run build

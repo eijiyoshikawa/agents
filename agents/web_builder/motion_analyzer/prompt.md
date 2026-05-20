@@ -61,7 +61,17 @@ JS ソースから以下のパターンを検出する:
 - テキストアニメーション（タイピング、文字ごとのフェードイン等）
 - スクロールバー連動のプログレスバー
 
-### Step 6: 実装推奨の決定
+### Step 6: パフォーマンス影響評価・アクセシビリティ対応
+各アニメーションのパフォーマンスリスクを評価:
+- **安全**: transform, opacity のみ（GPU合成レイヤー）→ そのまま再現
+- **注意**: width, height, margin の変更（リフロー発生）→ 代替実装を検討
+- **高負荷**: 大量要素の同時アニメーション → スタガーやtranslateZで最適化
+
+**prefers-reduced-motion 対応**:
+- 全アニメーションに `@media (prefers-reduced-motion: reduce)` でフォールバック
+- reduced-motion時はアニメーションを無効化またはduration: 0sに
+
+### Step 7: 実装推奨の決定
 検出したアニメーションの複雑さに応じて、最適な実装方法を推奨する:
 
 - **CSS only**: シンプルなhover、transition、基本的なkeyframes
