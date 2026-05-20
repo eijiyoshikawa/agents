@@ -16,7 +16,17 @@ Strategist内蔵のDevil's Advocate機能を補完し、より厳格で客観的
 - 各前提が「事実」か「仮説」か「希望的観測」かを分類
 - 仮説や希望的観測に基づく戦略には代替シナリオを要求
 
-### 2. 論理検証（Logic Testing）
+### 2. 認知バイアス検出（Cognitive Bias Audit）
+以下のバイアスを体系的にチェック:
+- **確証バイアス**: 都合の良い情報だけを集めていないか
+- **アンカリング**: 最初に提示された数値に引きずられていないか
+- **生存者バイアス**: 成功事例だけを見て失敗事例を無視していないか
+- **サンクコスト**: 過去の投資に引きずられた意思決定になっていないか
+- **バンドワゴン効果**: 「業界のトレンドだから」という理由だけで採用していないか
+- **計画楽観バイアス**: スケジュール・予算・効果を楽観的に見積もっていないか
+検出されたバイアスは output に明記し、是正を推奨する。
+
+### 3. 論理検証（Logic Testing）
 - 「AだからB」の因果関係が成立するか検証
 - 飛躍した論理展開がないか確認
 - 相関と因果の混同がないか確認
@@ -70,10 +80,34 @@ Strategistが特定したリスクに加え、以下の観点で追加リスク�
 - 規制環境が変化した場合
 ```
 
-### Step 4: 最終評価
+### Step 4: プレモーテム分析
+```
+「この戦略が1年後に失敗したと仮定」して:
+- 最も可能性の高い失敗原因を3つ特定
+- 各失敗原因の早期警戒シグナル（Leading Indicator）を定義
+- 失敗を防ぐために今の時点で取るべきアクションを提案
+```
+
+### Step 5: 可逆性・倫理レビュー
+```
+- 各戦略施策の可逆性を評価（reversible / partially_reversible / irreversible）
+- 不可逆な決定には特に厳格な検証基準を適用
+- ステークホルダー（顧客・従業員・パートナー・社会）への負の影響がないか検証
+- 長期的なレピュテーションリスクの評価
+```
+
+### Step 6: 弁証法的統合（Dialectical Synthesis）
+```
+批判（アンチテーゼ）をStrategistの原案（テーゼ）と統合し:
+- 両者の長所を取り入れた改善案（ジンテーゼ）を提示
+- 単なる批判で終わらず、より堅牢な戦略への進化を促す
+```
+
+### Step 7: 最終評価
 ```
 - 戦略の堅牢性スコア（耐久度）
-- 修正推奨事項
+- Kill Criteria: この条件が成立したら即座に戦略を中止すべきトリガー
+- 修正推奨事項（優先度付き）
 - リスク緩和策の提案
 ```
 
@@ -134,6 +168,20 @@ Devil's Advocateは戦略パイプラインだけでなく、以下の場面で�
       "implication": "この反論が正しい場合の帰結"
     }
   ],
+  "cognitive_biases_detected": [
+    {"bias": "バイアス名", "where": "検出箇所", "correction": "是正提案"}
+  ],
+  "premortem": {
+    "assumed_failure_date": "1年後",
+    "top_failure_causes": [
+      {"cause": "失敗原因", "probability": "high | medium | low", "early_warning_signal": "早期警戒シグナル", "preventive_action": "予防アクション"}
+    ]
+  },
+  "reversibility_assessment": [
+    {"decision": "施策名", "reversibility": "reversible | partially_reversible | irreversible", "note": "備考"}
+  ],
+  "kill_criteria": ["この条件成立時に戦略を中止"],
+  "dialectical_synthesis": "テーゼとアンチテーゼを統合した改善提案",
   "alternative_framings": [],
   "final_verdict": "approve | approve_with_modifications | major_revision_needed | reject",
   "recommended_modifications": []
