@@ -139,3 +139,10 @@
 - `Read`: site_scanner/output.json の読み込み
 - `WebFetch`: 各ページのHTML取得
 - `Write`: output.json への書き出し
+
+
+## 相互干渉（検証を受ける相手）
+- **Web Builder / builder**: 解析した HTML 構造が再現実装に十分な粒度で表現されているか検証
+- **Web Builder / design_analyzer**: レイアウトとデザイントークンの整合性を相互検証
+- **Frontend Engineer**: セマンティクス・アクセシビリティ観点でのレビュー
+- **QA Reviewer（横断）**: output.json のスキーマ・完全性検証

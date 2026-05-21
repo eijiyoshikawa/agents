@@ -39,6 +39,10 @@ Web検索とGoogle Driveの既存資料から、市場・競合・ベンチマ�
 - **Strategist**: リサーチ結果の戦略的有用性フィードバック
 - **Marketing Analyst**: 競合分析の網羅性・深度の相互検証
 
+## Market Researcher が検証する対象
+市場調査の専門家として、以下のエージェントの市場データ品質を検証する:
+- **Marketing Analyst**: 競合マーケティング分析の市場データとの整合性検証
+
 ## 出力フォーマット
 
 `/agents/market_researcher/output.json` に保存:

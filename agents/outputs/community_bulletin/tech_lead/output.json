@@ -1,0 +1,103 @@
+{
+  "project_name": "まちボード（地域回覧板デジタル化サービス）",
+  "updated_at": "2026-04-15",
+  "tech_stack": {
+    "frontend": "Next.js 15 (App Router) + TypeScript + Tailwind CSS v4",
+    "backend": "Next.js API Routes (Route Handlers) + Server Actions",
+    "database": "Supabase (PostgreSQL 15 + Row Level Security)",
+    "auth": "Supabase Auth (Magic Link + LINE OAuth)",
+    "payment": "Stripe (Subscriptions + Checkout + Webhooks + konbini)",
+    "infrastructure": "Vercel (Edge Functions + CDN)",
+    "notifications": "Web Push (FCM) + Resend (Email) + Twilio (SMS)",
+    "pdf": "@react-pdf/renderer (Server-side PDF generation)",
+    "i18n": "next-intl (ja / en / pt / zh / vi)",
+    "monitoring": "Vercel Analytics + Sentry",
+    "testing": "Vitest + Testing Library + Playwright + axe-core"
+  },
+  "architecture_decisions": [
+    {
+      "decision": "マルチテナントをSupabase RLSで実装（organization_idベースの行レベル分離）",
+      "rationale": "自治会・管理組合ごとのデータ完全分離を、アプリケーション層ではなくDB層で保証。RLSにより誤ったクエリでも他テナントのデータに絶対にアクセスできない。共有テーブル方式でインフラコストを抑制",
+      "alternatives_considered": ["スキーマ分離（テナントごとに別スキーマ）", "データベース分離（テナントごとに別DB）"],
+      "date": "2026-04-15"
+    },
+    {
+      "decision": "認証にマジックリンク（メール）をデフォルト採用。パスワード認証は提供しない",
+      "rationale": "高齢者ユーザーにとってパスワードの記憶・管理は最大の障壁。メールアドレスのみでログインできるマジックリンクにより、認証の摩擦を最小化。LINE OAuthも補助的に提供し、LINE利用率の高い高齢者層もカバー",
+      "alternatives_considered": ["パスワード + 2FA", "SMS OTP認証", "LINE OAuth のみ"],
+      "date": "2026-04-15"
+    },
+    {
+      "decision": "通知パイプラインを3チャネル（Web Push + Email + LINE）で構成。SMSはv2で追加",
+      "rationale": "LINE連携によるメッセージ配信をMVPに含めることで、アプリ未インストールでもLINE経由で通知を受信可能。Web Pushはアプリ利用者向け、EmailはLINE未利用者向けのフォールバック。SMS（Twilio）は追加コストが高いためv2以降",
+      "alternatives_considered": ["SMS優先（高コスト）", "Web Push のみ（到達率に不安）", "LINE のみ（プラットフォーム依存）"],
+      "date": "2026-04-15"
+    },
+    {
+      "decision": "PDF生成に@react-pdf/rendererを採用（サーバーサイド）",
+      "rationale": "React コンポーネントとしてPDFレイアウトを定義でき、フロントエンドチームのスキルセットと統一。puppeteer（ヘッドレスブラウザ）と比較してメモリ消費が少なく、Vercel Serverless Functionsでも実行可能",
+      "alternatives_considered": ["puppeteer / Playwright PDF出力", "jsPDF (クライアントサイド)", "外部PDF APIサービス"],
+      "date": "2026-04-15"
+    },
+    {
+      "decision": "PWA（Progressive Web App）として構築。ネイティブアプリは開発しない",
+      "rationale": "インストール不要（ブラウザでアクセス可能）で高齢者の導入障壁を最小化。Service Workerによるオフライン閲覧・プッシュ通知も実現。App Store / Google Play の審査・手数料を回避。ホーム画面追加で擬似ネイティブ体験を提供",
+      "alternatives_considered": ["React Native（ネイティブアプリ）", "Flutter", "Capacitor / Ionic"],
+      "date": "2026-04-15"
+    },
+    {
+      "decision": "next-intlでi18n実装。5言語（ja/en/pt/zh/vi）対応",
+      "rationale": "在留外国人上位の母語をカバー。next-intlはApp Router対応が成熟しており、動的ルートベースのロケール切替・サーバーコンポーネント内でのメッセージ解決が可能。AI翻訳（Claude API）による翻訳支援はv2で検討",
+      "alternatives_considered": ["next-i18next", "react-intl", "カスタム実装"],
+      "date": "2026-04-15"
+    },
+    {
+      "decision": "Stripe Checkoutによるサブスクリプション管理。konbini（コンビニ決済）対応を含む",
+      "rationale": "自治会はクレジットカードを持たない場合が多い。Stripeのkonbini決済対応により、コンビニ払い・銀行振込にも対応可能。Stripe Billing Portalでサブスクリプション管理のUI構築コストを削減",
+      "alternatives_considered": ["独自決済実装", "PAY.JP", "GMOペイメントゲートウェイ"],
+      "date": "2026-04-15"
+    }
+  ],
+  "non_functional_requirements": {
+    "performance": {
+      "lcp": "< 2.5s（3G回線でも達成。地方のモバイル回線を考慮）",
+      "fid": "< 100ms",
+      "cls": "< 0.1",
+      "api_response": "< 500ms（p95）",
+      "pdf_generation": "< 10s（A4 1ページの回覧板PDF）"
+    },
+    "availability": {
+      "uptime": "99.9%（月間ダウンタイム43分以内）",
+      "disaster_mode": "99.99%（緊急アラート配信時の可用性。CDN + Edge Functionsで冗長化）"
+    },
+    "security": {
+      "compliance": "OWASP Top 10対応、個人情報保護法準拠",
+      "certification_target": "ISMAP登録（12ヶ月以内）",
+      "data_encryption": "AES-256（保存時）、TLS 1.3（通信時）",
+      "rls": "全テーブルにorganization_idベースのRLSポリシー適用",
+      "audit_log": "管理者操作の全ログ記録"
+    },
+    "scalability": {
+      "target_users": "Year 1: 10,000ユーザー → Year 3: 300,000ユーザー",
+      "target_organizations": "Year 1: 100組織 → Year 3: 3,000組織",
+      "concurrent_notifications": "1,000件/秒の通知配信（緊急アラート時）"
+    },
+    "accessibility": {
+      "standard": "WCAG 2.1 AA必須（一部AAA対応）",
+      "min_font_size": "18px（本文）",
+      "min_touch_target": "48px × 48px",
+      "color_contrast": "7:1以上（AAA基準）",
+      "screen_reader": "ARIA labels全コンポーネント",
+      "keyboard_navigation": "Tab/Enter/Escで全操作可能"
+    }
+  },
+  "system_architecture": {
+    "overview": "Next.js App Router (Vercel) → Supabase (PostgreSQL + Auth + Realtime + Storage) → Stripe (Billing) / Resend (Email) / LINE Messaging API / FCM (Push)",
+    "data_flow": {
+      "bulletin_creation": "Admin → Server Action → Supabase INSERT → Supabase Realtime → Edge Function (notification dispatch) → Web Push + Email + LINE",
+      "read_confirmation": "User tap '読みました' → Server Action → Supabase INSERT read_confirmations → Realtime update dashboard",
+      "pdf_generation": "Admin request → API Route → @react-pdf/renderer → Supabase Storage → Download URL",
+      "subscription": "Admin → Stripe Checkout → Stripe Webhook → Supabase subscription UPDATE → Feature unlock"
+    }
+  }
+}

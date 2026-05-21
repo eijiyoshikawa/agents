@@ -35,6 +35,10 @@ Agent 3（Market Researcher）と **並列で実行** される。
 - **Strategist**: アナロジーの戦略的有用性フィードバック
 - **Data Analyst**: 事例データの統計的妥当性検証
 
+## Analogy Finder が検証する対象
+異業種事例の専門家として、以下のエージェントのアナロジー活用品質を検証する:
+- **Strategist**: 戦略オプションに対するアナロジー適用可能性・示唆の妥当性検証
+
 ## 出力フォーマット
 
 `/agents/analogy_finder/output.json` に保存:
