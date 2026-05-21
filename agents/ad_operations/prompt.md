@@ -95,6 +95,10 @@ Google広告・Meta広告・TikTok広告・YouTube広告の出稿・運用・最
 - **Data Analyst**: 広告効果の統計的検証・アトリビューション分析
 - **Marketing Agent**: 広告戦略との整合性検証
 
+## 相互干渉（検証を行う相手）
+- **Content Creator**: 広告クリエイティブの効果検証（CTR・CVR データに基づくフィードバック）
+- **Marketing Agent**: 広告パフォーマンスデータに基づくターゲティング精度のフィードバック
+
 ## 出力フォーマット
 
 ### output.json

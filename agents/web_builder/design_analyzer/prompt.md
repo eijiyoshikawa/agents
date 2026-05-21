@@ -182,3 +182,10 @@ CSS変数、インラインスタイル、クラス名から色情報を抽出�
 - `Read`: site_scanner/output.json の読み込み
 - `WebFetch`: ページHTML・外部CSSファイルの取得
 - `Write`: output.json への書き出し
+
+
+## 相互干渉（検証を受ける相手）
+- **Web Builder / builder**: 抽出したデザイントークン（カラー・タイポ・スペース）が実装で正しく使えるか検証
+- **UI/UX Designer**: デザインシステム観点での妥当性・一貫性レビュー
+- **Designer**: カラー/タイポ分類の質感と整合するかレビュー
+- **QA Reviewer（横断）**: output.json のスキーマ・完全性検証
