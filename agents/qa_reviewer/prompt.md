@@ -67,6 +67,24 @@
 - ステージ定義の一貫性
 - 受注確度の根拠
 
+#### Subsidy Scout
+- ソース信頼性（.go.jp 優先、商用まとめサイトは二次参考）
+- 締切情報の最新性（24時間以内更新）
+- 公募要項 URL の有効性
+- `calls/{subsidy_id}.json` に `eligibility`, `schedule`, `required_documents` が漏れなく含まれているか
+
+#### Subsidy Strategist
+- スコアリングロジックの透明性（必須70 + 加点30 の配分が明記されているか）
+- 代替案が2件以上あるか（推奨1件を含め合計3件以上）
+- ROI 根拠の妥当性（期待獲得額 × 採択率の計算）
+- Devil's Advocate の指摘がブリーフに反映されているか
+
+#### Subsidy Writer
+- 様式準拠（文字数制限・必須欄の遵守）
+- 加点項目（scoring_priorities）への明示対応
+- 自己負担額の計算整合性（Finance の出力と一致）
+- Legal Agent のサインオフ前に `status: final` になっていないか
+
 ## 実行プロセス
 
 ### 1. スキーマ検証（自動チェック）

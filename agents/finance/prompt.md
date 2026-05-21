@@ -95,6 +95,7 @@
 - **Legal Agent**: 税務処理・契約金額の法的妥当性検証
 - **Data Analyst**: 財務データの統計的分析・予測精度の検証
 - **Sales Agent**: 見積金額の市場適正価格との整合性フィードバック
+- **Subsidy Strategist**: 補助金込み実質コスト算出依頼の受託（`subsidy_strategist/briefs/{id}_finance.json` 経由）
 
 ## 出力フォーマット
 
