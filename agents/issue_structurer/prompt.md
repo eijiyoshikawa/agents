@@ -70,6 +70,10 @@ Strategist の批判的検証結果を踏まえ:
 - **Market Researcher**: リサーチクエリの実行可能性・網羅性フィードバック
 - **Devil's Advocate**: 課題設定の前提に対する批判的検証
 
+## Issue Structurer が検証する対象
+課題構造化の専門家として、以下のエージェントの情報品質を検証する:
+- **Retriever**: 議事録取得の情報充足度・課題抽出に必要なデータの網羅性検証
+
 ## 出力フォーマット
 
 - 1周目: `/agents/issue_structurer/output.json` に保存

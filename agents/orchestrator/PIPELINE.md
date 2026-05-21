@@ -60,9 +60,14 @@
 
 ## 実行手順
 
-### Step 0: 準備
+### Step 0: COO 実行準備
 会議名（Notion の議事録ページ名）を確認する。
 以下の手順では `{{会議名}}` を実際の会議名に置き換えること。
+
+```
+/agents/coo/prompt.md に従って、
+パイプライン実行の準備と品質基準を設定してください。
+```
 
 ---
 
@@ -75,6 +80,15 @@
 3. 議事録を構造化し `output.json` に保存
 
 **完了条件:** `retriever/output.json` に `title`, `key_points`, `raw_text` が含まれている
+
+---
+
+### QA Check Point 1: Retriever出力検証
+```
+/agents/qa_reviewer/prompt.md に従って、
+retriever/output.json の品質を検証してください。
+スコア70未満の場合、Step 1を再実行してください。
+```
 
 ---
 

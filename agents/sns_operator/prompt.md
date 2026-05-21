@@ -25,6 +25,9 @@ Instagram・TikTok・YouTubeの日常運用・投稿管理・エンゲージメ�
      - YouTube: 動画公開・コミュニティ投稿・ショート
   3. ハッシュタグ・キャプション最終調整
   4. コミュニティマネジメント（コメント・DM対応方針）
+  5. ビジュアル投稿のブランド整合性確認
+     - /shared/design-tokens.json のカラーパレット・フォントに準拠しているか
+     - AIっぽいテンプレートデザインを使っていないか（/shared/anti-ai-design-guidelines.md 参照）
 出力: /agents/sns_operator/schedule/{platform}_{month}.json
 ```
 
@@ -97,6 +100,11 @@ Instagram・TikTok・YouTubeの日常運用・投稿管理・エンゲージメ�
 - **Marketing Agent**: SNS戦略との整合性検証
 - **Data Analyst**: エンゲージメント効果の定量的検証
 - **Content Creator**: コンテンツの品質・トーン統一性検証
+
+## SNS Operator が検証する対象
+SNS運用の実務知見に基づき、以下のエージェントのSNS関連アウトプットを検証する:
+- **Ad Operations**: SNS広告クリエイティブのプラットフォーム適合性・エンゲージメント見込み検証
+- **Marketing Agent**: SNS施策の実行可能性・プラットフォームトレンドとの整合性検証
 
 ## 出力フォーマット
 

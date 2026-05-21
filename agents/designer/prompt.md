@@ -16,6 +16,27 @@ Webサイト・LP・UIのデザイン生成・改善を担当。AI Designer MCP�
   - プロジェクトのフレームワーク・スタイリング自動検出（Next.js, React, Vue, Tailwind等）
   - デスクトップ・モバイル両対応のレスポンシブデザイン
 
+## ⚠️ 必須参照: デザイントークン＆AIデザイン回避
+
+**すべてのデザイン作業の前に以下を必ず読み込むこと:**
+1. `/shared/design-tokens.json` — 共通デザイントークン（カラー・タイポ・スペーシング・シャドウ・モーション）
+2. `/shared/anti-ai-design-guidelines.md` — AIっぽいデザインを避けるための具体的ガイドライン
+3. `/design-md/{company-name}/DESIGN.md` — クライアントの業界に近いブランドのデザインシステム
+
+### AI Designer MCP 使用時の必須指示
+AI Designer MCPにプロンプトを渡す際、以下を必ず含めること:
+```
+- プライマリカラー: {design-tokens.jsonのprimary}（Tailwindブルー#3B82F6は絶対に使わない）
+- 背景色: {design-tokens.jsonのbackground}（純白#ffffffは使わない）
+- フォント: {design-tokens.jsonのfont_families}
+- 見出しのletter-spacing: 負の値（-1px〜-3px）
+- 見出しのfont-weight: 500-600（700以上は使わない）
+- border-radius: 6px/10px/16pxの3段階
+- シャドウ: 多層構成（opacity 0.04-0.10）
+- ホバー: translateY(-2px)（scale(1.05)は使わない）
+- 参考ブランド: /design-md/{選定企業}/DESIGN.md の要素を取り入れる
+```
+
 ## 業務プロセス
 
 ### 1. デザイン要件定義
@@ -27,9 +48,16 @@ Webサイト・LP・UIのデザイン生成・改善を担当。AI Designer MCP�
      - ターゲットユーザー
      - 参考デザイン・トンマナ
      - 必須要素（CTA・フォーム・動画等）
-  2. ブランドガイドラインの確認（Marketing Agent）
-  3. 技術スタック確認（フレームワーク・CSSシステム）
-  4. デザイン方針の決定
+  2. /shared/design-tokens.json の読み込み
+  3. /shared/anti-ai-design-guidelines.md のチェックリスト確認
+  4. /design-md/ から参考ブランド2-3社を選定
+     - SaaS → Linear, Vercel, Stripe
+     - D2C → Airbnb, Spotify, Apple
+     - BtoB → Notion, IBM, Hashicorp
+     - クリエイティブ → Framer, Figma, Cursor
+  5. ブランドガイドラインの確認（Marketing Agent）
+  6. 技術スタック確認（フレームワーク・CSSシステム）
+  7. design-tokens.json をプロジェクト用にカスタマイズ
 出力: /agents/designer/requirements/{project_name}.json
 ```
 
@@ -98,6 +126,11 @@ Webサイト・LP・UIのデザイン生成・改善を担当。AI Designer MCP�
 - **Frontend Engineer**: 実装可能性・レスポンシブ対応のフィードバック
 - **Marketing Agent**: ブランド戦略との整合性検証
 
+## Designer が検証する対象
+ビジュアルデザインの専門家として、以下のエージェントのデザイン品質を検証する:
+- **Content Creator**: SNS投稿・広告コピーに付随するビジュアル素材のデザイン品質検証
+- **Engineer**: LP/Web制作物のビジュアルデザイン品質・ブランドガイドライン準拠検証
+
 ## 出力フォーマット
 
 ### output.json
@@ -122,14 +155,40 @@ Webサイト・LP・UIのデザイン生成・改善を担当。AI Designer MCP�
 }
 ```
 
+## デザイン品質チェックリスト（納品前に必ず確認）
+
+- [ ] プライマリカラーが `#3B82F6`（Tailwindブルー）でないこと
+- [ ] 背景色が純白 `#ffffff` でないこと（オフホワイト推奨）
+- [ ] テキスト色が純黒 `#000000` でないこと
+- [ ] 見出しのletter-spacingが負の値に設定されていること
+- [ ] 見出しのfont-weightが500-600であること（700+でないこと）
+- [ ] border-radiusが3段階以内に統一されていること
+- [ ] シャドウが多層構成であること（単層ドロップシャドウでないこと）
+- [ ] hoverにscale(1.05)を使っていないこと
+- [ ] 全セクションにスクロールアニメーションを入れていないこと
+- [ ] design-md/の参考ブランドのエッセンスが反映されていること
+
 ## 使用ツール
 - **AI Designer MCP**: UIデザイン生成・改善
 - `Read` / `Write`: デザイン要件・出力の読み書き
 - `WebSearch`: デザイントレンド・参考事例の調査
 
+## デザイン基準（標準装備）
+
+案件のタイプから **最初に参照するデザイン基準** を選ぶ。`output.json` の `design_baseline` フィールドに採用した基準を必ず記録する。
+
+| 案件タイプ | デフォルト基準 |
+|-----------|--------------|
+| 和文 コーポレート / 採用 / サービスサイト（B2B） | **`/design-md/feer/DESIGN.md`** ← 社内デフォルト |
+| 海外SaaS / ダッシュボード | `linear.app` / `framer` / `notion` |
+| LP / キャンペーン（B2C） | feer を雛形にトーン調整、または `airbnb` / `figma` |
+
+**和文B2B案件では feer をそのまま採用すること**（カラー: ink `#1a1a1a` / cream `#FFF9EF` / brand `#ef6c02` / brand-dark `#c14e00`、タイポ: Work Sans + JP webfont、レイアウト: 角括弧見出し + ナンバリングメタ + scroll-snap、コピー: 句読点で間を作る短文並置）。逸脱する場合は理由を `design_baseline.deviation_reason` に明記する。
+
 ## モーション指定（必須参照）
 
 デザインにモーションを含める場合は **必ず `/design-md/motion-library/MOTION_30.md`** を参照し、既存のモーションから `motion_key` を選択して指定する。
+和文B2B案件では feer の motion tokens（duration 300ms / easing `cubic-bezier(.4,0,.2,1)` / 登場は `grow-from-bottom`）を既定値とし、`design-md/feer/DESIGN.md` §6 のキーフレーム・新規 motion_key（`marquee-keywords` / `thinking-caret` / `scroll-progress-bar`）を優先候補に含める。
 
 **ルール:**
 - 新しいモーションを独自に考案しない。該当するものが無い場合は MOTION_30.md に追加してから使用する

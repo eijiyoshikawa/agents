@@ -45,6 +45,10 @@ Web検索とGoogle Driveの既存資料から、市場・競合・ベンチマ�
 - **Marketing Analyst**: 競合分析の網羅性・深度の相互検証
 - **Subsidy Scout**: 業界動向・補助金関連の市場情報の相互補完
 
+## Market Researcher が検証する対象
+市場調査の専門家として、以下のエージェントの市場データ品質を検証する:
+- **Marketing Analyst**: 競合マーケティング分析の市場データとの整合性検証
+
 ## 出力フォーマット
 
 - 1周目: `/agents/market_researcher/output.json` に保存
