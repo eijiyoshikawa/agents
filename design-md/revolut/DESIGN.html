@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Revolut</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-revolut">Design System: Revolut</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Revolut's website is fintech confidence distilled into pixels — a design system that communicates "your money is in capable hands" through massive typography, generous whitespace, and a disciplined neutral palette. The visual language is built on Aeonik Pro, a geometric grotesque that creates billboard-scale headlines at 136px with weight 500 and aggressive negative tracking (-2.72px). This isn't subtle branding; it's fintech at stadium scale.</p>
+<p>The color system is built on a comprehensive <code>--rui-*</code> (Revolut UI) token architecture with semantic naming for every state: danger (<code>#e23b4a</code>), warning (<code>#ec7e00</code>), teal (<code>#00a87e</code>), blue (<code>#494fdf</code>), deep-pink (<code>#e61e49</code>), and more. But the marketing surface itself is remarkably restrained — near-black (<code>#191c1f</code>) and pure white (<code>#ffffff</code>) dominate, with the colorful semantic tokens reserved for the product interface, not the marketing page.</p>
+<p>What distinguishes Revolut is its pill-everything button system. Every button uses 9999px radius — primary dark (<code>#191c1f</code>), secondary light (<code>#f4f4f4</code>), outlined (<code>transparent + 2px solid</code>), and ghost on dark (<code>rgba(244,244,244,0.1) + 2px solid</code>). The padding is generous (14px 32px–34px), creating large, confident touch targets. Combined with Inter for body text at various weights and positive letter-spacing (0.16px–0.24px), the result is a design that feels both premium and accessible — banking for the modern era.</p>
+<p><strong>Key Characteristics:</strong>
+- Aeonik Pro display at 136px weight 500 — billboard-scale fintech headlines
+- Near-black (<code>#191c1f</code>) + white binary with comprehensive <code>--rui-*</code> semantic tokens
+- Universal pill buttons (9999px radius) with generous padding (14px 32px)
+- Inter for body text with positive letter-spacing (0.16px–0.24px)
+- Rich semantic color system: blue, teal, pink, yellow, green, brown, danger, warning
+- Zero shadows detected — depth through color contrast only
+- Tight display line-heights (1.00) with relaxed body (1.50–1.56)</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>Revolut Dark</strong> (<code>#191c1f</code>): Primary dark surface, button background, near-black text</li>
+<li><strong>Pure White</strong> (<code>#ffffff</code>): <code>--rui-color-action-label</code>, primary light surface</li>
+<li><strong>Light Surface</strong> (<code>#f4f4f4</code>): Secondary button background, subtle surface</li>
+</ul>
+<h3 id="brand-interactive">Brand / Interactive</h3>
+<ul>
+<li><strong>Revolut Blue</strong> (<code>#494fdf</code>): <code>--rui-color-blue</code>, primary brand blue</li>
+<li><strong>Action Blue</strong> (<code>#4f55f1</code>): <code>--rui-color-action-photo-header-text</code>, header accent</li>
+<li><strong>Blue Text</strong> (<code>#376cd5</code>): <code>--website-color-blue-text</code>, link blue</li>
+</ul>
+<h3 id="semantic">Semantic</h3>
+<ul>
+<li><strong>Danger Red</strong> (<code>#e23b4a</code>): <code>--rui-color-danger</code>, error/destructive</li>
+<li><strong>Deep Pink</strong> (<code>#e61e49</code>): <code>--rui-color-deep-pink</code>, critical accent</li>
+<li><strong>Warning Orange</strong> (<code>#ec7e00</code>): <code>--rui-color-warning</code>, warning states</li>
+<li><strong>Yellow</strong> (<code>#b09000</code>): <code>--rui-color-yellow</code>, attention</li>
+<li><strong>Teal</strong> (<code>#00a87e</code>): <code>--rui-color-teal</code>, success/positive</li>
+<li><strong>Light Green</strong> (<code>#428619</code>): <code>--rui-color-light-green</code>, secondary success</li>
+<li><strong>Green Text</strong> (<code>#006400</code>): <code>--website-color-green-text</code>, green text</li>
+<li><strong>Light Blue</strong> (<code>#007bc2</code>): <code>--rui-color-light-blue</code>, informational</li>
+<li><strong>Brown</strong> (<code>#936d62</code>): <code>--rui-color-brown</code>, warm neutral accent</li>
+<li><strong>Red Text</strong> (<code>#8b0000</code>): <code>--website-color-red-text</code>, dark red text</li>
+</ul>
+<h3 id="neutral-scale">Neutral Scale</h3>
+<ul>
+<li><strong>Mid Slate</strong> (<code>#505a63</code>): Secondary text</li>
+<li><strong>Cool Gray</strong> (<code>#8d969e</code>): Muted text, tertiary</li>
+<li><strong>Gray Tone</strong> (<code>#c9c9cd</code>): <code>--rui-color-grey-tone-20</code>, borders/dividers</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-families">Font Families</h3>
+<ul>
+<li><strong>Display</strong>: <code>Aeonik Pro</code> — geometric grotesque, no detected fallbacks</li>
+<li><strong>Body / UI</strong>: <code>Inter</code> — standard system sans</li>
+<li><strong>Fallback</strong>: <code>Arial</code> for specific button contexts</li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display Mega</td>
+<td>Aeonik Pro</td>
+<td>136px (8.50rem)</td>
+<td>500</td>
+<td>1.00 (tight)</td>
+<td>-2.72px</td>
+<td>Stadium-scale hero</td>
+</tr>
+<tr>
+<td>Display Hero</td>
+<td>Aeonik Pro</td>
+<td>80px (5.00rem)</td>
+<td>500</td>
+<td>1.00 (tight)</td>
+<td>-0.8px</td>
+<td>Primary hero</td>
+</tr>
+<tr>
+<td>Section Heading</td>
+<td>Aeonik Pro</td>
+<td>48px (3.00rem)</td>
+<td>500</td>
+<td>1.21 (tight)</td>
+<td>-0.48px</td>
+<td>Feature sections</td>
+</tr>
+<tr>
+<td>Sub-heading</td>
+<td>Aeonik Pro</td>
+<td>40px (2.50rem)</td>
+<td>500</td>
+<td>1.20 (tight)</td>
+<td>-0.4px</td>
+<td>Sub-sections</td>
+</tr>
+<tr>
+<td>Card Title</td>
+<td>Aeonik Pro</td>
+<td>32px (2.00rem)</td>
+<td>500</td>
+<td>1.19 (tight)</td>
+<td>-0.32px</td>
+<td>Card headings</td>
+</tr>
+<tr>
+<td>Feature Title</td>
+<td>Aeonik Pro</td>
+<td>24px (1.50rem)</td>
+<td>400</td>
+<td>1.33</td>
+<td>normal</td>
+<td>Light headings</td>
+</tr>
+<tr>
+<td>Nav / UI</td>
+<td>Aeonik Pro</td>
+<td>20px (1.25rem)</td>
+<td>500</td>
+<td>1.40</td>
+<td>normal</td>
+<td>Navigation, buttons</td>
+</tr>
+<tr>
+<td>Body Large</td>
+<td>Inter</td>
+<td>18px (1.13rem)</td>
+<td>400</td>
+<td>1.56</td>
+<td>-0.09px</td>
+<td>Introductions</td>
+</tr>
+<tr>
+<td>Body</td>
+<td>Inter</td>
+<td>16px (1.00rem)</td>
+<td>400</td>
+<td>1.50</td>
+<td>0.24px</td>
+<td>Standard reading</td>
+</tr>
+<tr>
+<td>Body Semibold</td>
+<td>Inter</td>
+<td>16px (1.00rem)</td>
+<td>600</td>
+<td>1.50</td>
+<td>0.16px</td>
+<td>Emphasized body</td>
+</tr>
+<tr>
+<td>Body Bold Link</td>
+<td>Inter</td>
+<td>16px (1.00rem)</td>
+<td>700</td>
+<td>1.50</td>
+<td>0.24px</td>
+<td>Bold links</td>
+</tr>
+</tbody>
+</table>
+<h3 id="principles">Principles</h3>
+<ul>
+<li><strong>Weight 500 as display default</strong>: Aeonik Pro uses medium (500) for ALL headings — no bold. This creates authority through size and tracking, not weight.</li>
+<li><strong>Billboard tracking</strong>: -2.72px at 136px is extremely compressed — text designed to be read at a glance, like airport signage.</li>
+<li><strong>Positive tracking on body</strong>: Inter uses +0.16px to +0.24px, creating airy, well-spaced reading text that contrasts with the compressed headings.</li>
+</ul>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<p><strong>Primary Dark Pill</strong>
+- Background: <code>#191c1f</code>
+- Text: <code>#ffffff</code>
+- Padding: 14px 32px
+- Radius: 9999px (full pill)
+- Hover: opacity 0.85
+- Focus: <code>0 0 0 0.125rem</code> ring</p>
+<p><strong>Secondary Light Pill</strong>
+- Background: <code>#f4f4f4</code>
+- Text: <code>#000000</code>
+- Padding: 14px 34px
+- Radius: 9999px
+- Hover: opacity 0.85</p>
+<p><strong>Outlined Pill</strong>
+- Background: transparent
+- Text: <code>#191c1f</code>
+- Border: <code>2px solid #191c1f</code>
+- Padding: 14px 32px
+- Radius: 9999px</p>
+<p><strong>Ghost on Dark</strong>
+- Background: <code>rgba(244, 244, 244, 0.1)</code>
+- Text: <code>#f4f4f4</code>
+- Border: <code>2px solid #f4f4f4</code>
+- Padding: 14px 32px
+- Radius: 9999px</p>
+<h3 id="cards-containers">Cards &amp; Containers</h3>
+<ul>
+<li>Radius: 12px (small), 20px (cards)</li>
+<li>No shadows — flat surfaces with color contrast</li>
+<li>Dark and light section alternation</li>
+</ul>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li>Aeonik Pro 20px weight 500</li>
+<li>Clean header, hamburger toggle at 12px radius</li>
+<li>Pill CTAs right-aligned</li>
+</ul>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-system">Spacing System</h3>
+<ul>
+<li>Base unit: 8px</li>
+<li>Scale: 4px, 6px, 8px, 14px, 16px, 20px, 24px, 32px, 40px, 48px, 80px, 88px, 120px</li>
+<li>Large section spacing: 80px–120px</li>
+</ul>
+<h3 id="border-radius-scale">Border Radius Scale</h3>
+<ul>
+<li>Standard (12px): Navigation, small buttons</li>
+<li>Card (20px): Feature cards</li>
+<li>Pill (9999px): All buttons</li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Treatment</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flat (Level 0)</td>
+<td>No shadow</td>
+<td>Everything — Revolut uses zero shadows</td>
+</tr>
+<tr>
+<td>Focus</td>
+<td><code>0 0 0 0.125rem</code> ring</td>
+<td>Accessibility focus</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Shadow Philosophy</strong>: Revolut uses ZERO shadows. Depth comes entirely from the dark/light section contrast and the generous whitespace between elements.</p>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use Aeonik Pro weight 500 for all display headings</li>
+<li>Apply 9999px radius to all buttons — pill shape is universal</li>
+<li>Use generous button padding (14px 32px)</li>
+<li>Keep the palette to near-black + white for marketing surfaces</li>
+<li>Apply positive letter-spacing on Inter body text</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Don't use shadows — Revolut is flat by design</li>
+<li>Don't use bold (700) for Aeonik Pro headings — 500 is the weight</li>
+<li>Don't use small buttons — the generous padding is intentional</li>
+<li>Don't apply semantic colors to marketing surfaces — they're for the product</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<h3 id="breakpoints">Breakpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Width</th>
+<th>Key Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mobile Small</td>
+<td>&lt;400px</td>
+<td>Compact, single column</td>
+</tr>
+<tr>
+<td>Mobile</td>
+<td>400–720px</td>
+<td>Standard mobile</td>
+</tr>
+<tr>
+<td>Tablet</td>
+<td>720–1024px</td>
+<td>2-column layouts</td>
+</tr>
+<tr>
+<td>Desktop</td>
+<td>1024–1280px</td>
+<td>Standard desktop</td>
+</tr>
+<tr>
+<td>Large</td>
+<td>1280–1920px</td>
+<td>Full layout</td>
+</tr>
+</tbody>
+</table>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Dark: Revolut Dark (<code>#191c1f</code>)</li>
+<li>Light: White (<code>#ffffff</code>)</li>
+<li>Surface: Light (<code>#f4f4f4</code>)</li>
+<li>Blue: Revolut Blue (<code>#494fdf</code>)</li>
+<li>Danger: Red (<code>#e23b4a</code>)</li>
+<li>Success: Teal (<code>#00a87e</code>)</li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create a hero: white background. Headline at 136px Aeonik Pro weight 500, line-height 1.00, letter-spacing -2.72px, #191c1f text. Dark pill CTA (#191c1f, 9999px, 14px 32px). Outlined pill secondary (transparent, 2px solid #191c1f)."</li>
+<li>"Build a pill button: #191c1f background, white text, 9999px radius, 14px 32px padding, 20px Aeonik Pro weight 500. Hover: opacity 0.85."</li>
+</ul>
+<h3 id="iteration-guide">Iteration Guide</h3>
+<ol>
+<li>Aeonik Pro 500 for headings — never bold</li>
+<li>All buttons are pills (9999px) with generous padding</li>
+<li>Zero shadows — flat is the Revolut identity</li>
+<li>Near-black + white for marketing, semantic colors for product</li>
+</ol>
+</main>
+</body>
+</html>

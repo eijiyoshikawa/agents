@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: IBM</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-ibm">Design System: IBM</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>IBM's website is the digital embodiment of enterprise authority built on the Carbon Design System — a design language so methodically structured it reads like an engineering specification rendered as a webpage. The page operates on a stark duality: a bright white (<code>#ffffff</code>) canvas with near-black (<code>#161616</code>) text, punctuated by a single, unwavering accent — IBM Blue 60 (<code>#0f62fe</code>). This isn't playful tech-startup minimalism; it's corporate precision distilled into pixels. Every element exists within Carbon's rigid 2x grid, every color maps to a semantic token, every spacing value snaps to the 8px base unit.</p>
+<p>The IBM Plex type family is the system's backbone. IBM Plex Sans at light weight (300) for display headlines creates an unexpectedly airy, almost delicate quality at large sizes — a deliberate counterpoint to IBM's corporate gravity. At body sizes, regular weight (400) with 0.16px letter-spacing on 14px captions introduces the meticulous micro-tracking that makes Carbon text feel engineered rather than designed. IBM Plex Mono serves code, data, and technical labels, completing the family trinity alongside the rarely-surfaced IBM Plex Serif.</p>
+<p>What defines IBM's visual identity beyond monochrome-plus-blue is the reliance on Carbon's component token system. Every interactive state maps to a CSS custom property prefixed with <code>--cds-</code> (Carbon Design System). Buttons don't have hardcoded colors; they reference <code>--cds-button-primary</code>, <code>--cds-button-primary-hover</code>, <code>--cds-button-primary-active</code>. This tokenized architecture means the entire visual layer is a thin skin over a deeply systematic foundation — the design equivalent of a well-typed API.</p>
+<p><strong>Key Characteristics:</strong>
+- IBM Plex Sans at weight 300 (Light) for display — corporate gravitas through typographic restraint
+- IBM Plex Mono for code and technical content with consistent 0.16px letter-spacing at small sizes
+- Single accent color: IBM Blue 60 (<code>#0f62fe</code>) — every interactive element, every CTA, every link
+- Carbon token system (<code>--cds-*</code>) driving all semantic colors, enabling theme-switching at the variable level
+- 8px spacing grid with strict adherence — no arbitrary values, everything aligns
+- Flat, borderless cards on <code>#f4f4f4</code> Gray 10 surface — depth through background-color layering, not shadows
+- Bottom-border inputs (not boxed) — the signature Carbon form pattern
+- 0px border-radius on primary buttons — unapologetically rectangular, no softening</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>IBM Blue 60</strong> (<code>#0f62fe</code>): The singular interactive color. Primary buttons, links, focus states, active indicators. This is the only chromatic hue in the core UI palette.</li>
+<li><strong>White</strong> (<code>#ffffff</code>): Page background, card surfaces, button text on blue, <code>--cds-background</code>.</li>
+<li><strong>Gray 100</strong> (<code>#161616</code>): Primary text, headings, dark surface backgrounds, nav bar, footer. <code>--cds-text-primary</code>.</li>
+</ul>
+<h3 id="neutral-scale-gray-family">Neutral Scale (Gray Family)</h3>
+<ul>
+<li><strong>Gray 100</strong> (<code>#161616</code>): Primary text, headings, dark UI chrome, footer background.</li>
+<li><strong>Gray 90</strong> (<code>#262626</code>): Secondary dark surfaces, hover states on dark backgrounds.</li>
+<li><strong>Gray 80</strong> (<code>#393939</code>): Tertiary dark, active states.</li>
+<li><strong>Gray 70</strong> (<code>#525252</code>): Secondary text, helper text, descriptions. <code>--cds-text-secondary</code>.</li>
+<li><strong>Gray 60</strong> (<code>#6f6f6f</code>): Placeholder text, disabled text.</li>
+<li><strong>Gray 50</strong> (<code>#8d8d8d</code>): Disabled icons, muted labels.</li>
+<li><strong>Gray 30</strong> (<code>#c6c6c6</code>): Borders, divider lines, input bottom-borders. <code>--cds-border-subtle</code>.</li>
+<li><strong>Gray 20</strong> (<code>#e0e0e0</code>): Subtle borders, card outlines.</li>
+<li><strong>Gray 10</strong> (<code>#f4f4f4</code>): Secondary surface background, card fills, alternating rows. <code>--cds-layer-01</code>.</li>
+<li><strong>Gray 10 Hover</strong> (<code>#e8e8e8</code>): Hover state for Gray 10 surfaces.</li>
+</ul>
+<h3 id="interactive">Interactive</h3>
+<ul>
+<li><strong>Blue 60</strong> (<code>#0f62fe</code>): Primary interactive — buttons, links, focus. <code>--cds-link-primary</code>, <code>--cds-button-primary</code>.</li>
+<li><strong>Blue 70</strong> (<code>#0043ce</code>): Link hover state. <code>--cds-link-primary-hover</code>.</li>
+<li><strong>Blue 80</strong> (<code>#002d9c</code>): Active/pressed state for blue elements.</li>
+<li><strong>Blue 10</strong> (<code>#edf5ff</code>): Blue tint surface, selected row background.</li>
+<li><strong>Focus Blue</strong> (<code>#0f62fe</code>): <code>--cds-focus</code> — 2px inset border on focused elements.</li>
+<li><strong>Focus Inset</strong> (<code>#ffffff</code>): <code>--cds-focus-inset</code> — white inner ring for focus on dark backgrounds.</li>
+</ul>
+<h3 id="support-status">Support &amp; Status</h3>
+<ul>
+<li><strong>Red 60</strong> (<code>#da1e28</code>): Error, danger. <code>--cds-support-error</code>.</li>
+<li><strong>Green 50</strong> (<code>#24a148</code>): Success. <code>--cds-support-success</code>.</li>
+<li><strong>Yellow 30</strong> (<code>#f1c21b</code>): Warning. <code>--cds-support-warning</code>.</li>
+<li><strong>Blue 60</strong> (<code>#0f62fe</code>): Informational. <code>--cds-support-info</code>.</li>
+</ul>
+<h3 id="dark-theme-gray-100-theme">Dark Theme (Gray 100 Theme)</h3>
+<ul>
+<li><strong>Background</strong>: Gray 100 (<code>#161616</code>). <code>--cds-background</code>.</li>
+<li><strong>Layer 01</strong>: Gray 90 (<code>#262626</code>). Card and container surfaces.</li>
+<li><strong>Layer 02</strong>: Gray 80 (<code>#393939</code>). Elevated surfaces.</li>
+<li><strong>Text Primary</strong>: Gray 10 (<code>#f4f4f4</code>). <code>--cds-text-primary</code>.</li>
+<li><strong>Text Secondary</strong>: Gray 30 (<code>#c6c6c6</code>). <code>--cds-text-secondary</code>.</li>
+<li><strong>Border Subtle</strong>: Gray 80 (<code>#393939</code>). <code>--cds-border-subtle</code>.</li>
+<li><strong>Interactive</strong>: Blue 40 (<code>#78a9ff</code>). Links and interactive elements shift lighter for contrast.</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-family">Font Family</h3>
+<ul>
+<li><strong>Primary</strong>: <code>IBM Plex Sans</code>, with fallbacks: <code>Helvetica Neue, Arial, sans-serif</code></li>
+<li><strong>Monospace</strong>: <code>IBM Plex Mono</code>, with fallbacks: <code>Menlo, Courier, monospace</code></li>
+<li><strong>Serif</strong> (limited use): <code>IBM Plex Serif</code>, for editorial/expressive contexts</li>
+<li><strong>Icon Font</strong>: <code>ibm_icons</code> — proprietary icon glyphs at 20px</li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display 01</td>
+<td>IBM Plex Sans</td>
+<td>60px (3.75rem)</td>
+<td>300 (Light)</td>
+<td>1.17 (70px)</td>
+<td>0</td>
+<td>Maximum impact, light weight for elegance</td>
+</tr>
+<tr>
+<td>Display 02</td>
+<td>IBM Plex Sans</td>
+<td>48px (3.00rem)</td>
+<td>300 (Light)</td>
+<td>1.17 (56px)</td>
+<td>0</td>
+<td>Secondary hero, responsive fallback</td>
+</tr>
+<tr>
+<td>Heading 01</td>
+<td>IBM Plex Sans</td>
+<td>42px (2.63rem)</td>
+<td>300 (Light)</td>
+<td>1.19 (50px)</td>
+<td>0</td>
+<td>Expressive heading</td>
+</tr>
+<tr>
+<td>Heading 02</td>
+<td>IBM Plex Sans</td>
+<td>32px (2.00rem)</td>
+<td>400 (Regular)</td>
+<td>1.25 (40px)</td>
+<td>0</td>
+<td>Section headings</td>
+</tr>
+<tr>
+<td>Heading 03</td>
+<td>IBM Plex Sans</td>
+<td>24px (1.50rem)</td>
+<td>400 (Regular)</td>
+<td>1.33 (32px)</td>
+<td>0</td>
+<td>Sub-section titles</td>
+</tr>
+<tr>
+<td>Heading 04</td>
+<td>IBM Plex Sans</td>
+<td>20px (1.25rem)</td>
+<td>600 (Semibold)</td>
+<td>1.40 (28px)</td>
+<td>0</td>
+<td>Card titles, feature headers</td>
+</tr>
+<tr>
+<td>Heading 05</td>
+<td>IBM Plex Sans</td>
+<td>20px (1.25rem)</td>
+<td>400 (Regular)</td>
+<td>1.40 (28px)</td>
+<td>0</td>
+<td>Lighter card headings</td>
+</tr>
+<tr>
+<td>Body Long 01</td>
+<td>IBM Plex Sans</td>
+<td>16px (1.00rem)</td>
+<td>400 (Regular)</td>
+<td>1.50 (24px)</td>
+<td>0</td>
+<td>Standard reading text</td>
+</tr>
+<tr>
+<td>Body Long 02</td>
+<td>IBM Plex Sans</td>
+<td>16px (1.00rem)</td>
+<td>600 (Semibold)</td>
+<td>1.50 (24px)</td>
+<td>0</td>
+<td>Emphasized body, labels</td>
+</tr>
+<tr>
+<td>Body Short 01</td>
+<td>IBM Plex Sans</td>
+<td>14px (0.88rem)</td>
+<td>400 (Regular)</td>
+<td>1.29 (18px)</td>
+<td>0.16px</td>
+<td>Compact body, captions</td>
+</tr>
+<tr>
+<td>Body Short 02</td>
+<td>IBM Plex Sans</td>
+<td>14px (0.88rem)</td>
+<td>600 (Semibold)</td>
+<td>1.29 (18px)</td>
+<td>0.16px</td>
+<td>Bold captions, nav items</td>
+</tr>
+<tr>
+<td>Caption 01</td>
+<td>IBM Plex Sans</td>
+<td>12px (0.75rem)</td>
+<td>400 (Regular)</td>
+<td>1.33 (16px)</td>
+<td>0.32px</td>
+<td>Metadata, timestamps</td>
+</tr>
+<tr>
+<td>Code 01</td>
+<td>IBM Plex Mono</td>
+<td>14px (0.88rem)</td>
+<td>400 (Regular)</td>
+<td>1.43 (20px)</td>
+<td>0.16px</td>
+<td>Inline code, terminal</td>
+</tr>
+<tr>
+<td>Code 02</td>
+<td>IBM Plex Mono</td>
+<td>16px (1.00rem)</td>
+<td>400 (Regular)</td>
+<td>1.50 (24px)</td>
+<td>0</td>
+<td>Code blocks</td>
+</tr>
+<tr>
+<td>Mono Display</td>
+<td>IBM Plex Mono</td>
+<td>42px (2.63rem)</td>
+<td>400 (Regular)</td>
+<td>1.19 (50px)</td>
+<td>0</td>
+<td>Hero mono decorative</td>
+</tr>
+</tbody>
+</table>
+<h3 id="principles">Principles</h3>
+<ul>
+<li><strong>Light weight at display sizes</strong>: Carbon's expressive type set uses weight 300 (Light) at 42px+. This creates a distinctive tension — the content speaks with corporate authority while the letterforms whisper with typographic lightness.</li>
+<li><strong>Micro-tracking at small sizes</strong>: 0.16px letter-spacing at 14px and 0.32px at 12px. These seemingly negligible values are Carbon's secret weapon for readability at compact sizes — they open up the tight IBM Plex letterforms just enough.</li>
+<li><strong>Three functional weights</strong>: 300 (display/expressive), 400 (body/reading), 600 (emphasis/UI labels). Weight 700 is intentionally absent from the production type scale.</li>
+<li><strong>Productive vs. Expressive</strong>: Productive sets use tighter line-heights (1.29) for dense UI. Expressive sets breathe more (1.40-1.50) for marketing and editorial content.</li>
+</ul>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<p><strong>Primary Button (Blue)</strong>
+- Background: <code>#0f62fe</code> (Blue 60) → <code>--cds-button-primary</code>
+- Text: <code>#ffffff</code> (White)
+- Padding: 14px 63px 14px 15px (asymmetric — room for trailing icon)
+- Border: 1px solid transparent
+- Border-radius: 0px (sharp rectangle — the Carbon signature)
+- Height: 48px (default), 40px (compact), 64px (expressive)
+- Hover: <code>#0353e9</code> (Blue 60 Hover) → <code>--cds-button-primary-hover</code>
+- Active: <code>#002d9c</code> (Blue 80) → <code>--cds-button-primary-active</code>
+- Focus: <code>2px solid #0f62fe</code> inset + <code>1px solid #ffffff</code> inner</p>
+<p><strong>Secondary Button (Gray)</strong>
+- Background: <code>#393939</code> (Gray 80)
+- Text: <code>#ffffff</code>
+- Hover: <code>#4c4c4c</code> (Gray 70)
+- Active: <code>#6f6f6f</code> (Gray 60)
+- Same padding/radius as primary</p>
+<p><strong>Tertiary Button (Ghost Blue)</strong>
+- Background: transparent
+- Text: <code>#0f62fe</code> (Blue 60)
+- Border: 1px solid <code>#0f62fe</code>
+- Hover: <code>#0353e9</code> text + Blue 10 background tint
+- Border-radius: 0px</p>
+<p><strong>Ghost Button</strong>
+- Background: transparent
+- Text: <code>#0f62fe</code> (Blue 60)
+- Padding: 14px 16px
+- Border: none
+- Hover: <code>#e8e8e8</code> background tint</p>
+<p><strong>Danger Button</strong>
+- Background: <code>#da1e28</code> (Red 60)
+- Text: <code>#ffffff</code>
+- Hover: <code>#b81921</code> (Red 70)</p>
+<h3 id="cards-containers">Cards &amp; Containers</h3>
+<ul>
+<li>Background: <code>#ffffff</code> on white theme, <code>#f4f4f4</code> (Gray 10) for elevated cards</li>
+<li>Border: none (flat design — no border or shadow on most cards)</li>
+<li>Border-radius: 0px (matching the rectangular button aesthetic)</li>
+<li>Hover: background shifts to <code>#e8e8e8</code> (Gray 10 Hover) for clickable cards</li>
+<li>Content padding: 16px</li>
+<li>Separation: background-color layering (white → gray 10 → white) rather than shadows</li>
+</ul>
+<h3 id="inputs-forms">Inputs &amp; Forms</h3>
+<ul>
+<li>Background: <code>#f4f4f4</code> (Gray 10) — <code>--cds-field</code></li>
+<li>Text: <code>#161616</code> (Gray 100)</li>
+<li>Padding: 0px 16px (horizontal only)</li>
+<li>Height: 40px (default), 48px (large)</li>
+<li>Border: none on sides/top — <code>2px solid transparent</code> bottom</li>
+<li>Bottom-border active: <code>2px solid #161616</code> (Gray 100)</li>
+<li>Focus: <code>2px solid #0f62fe</code> (Blue 60) bottom-border — <code>--cds-focus</code></li>
+<li>Error: <code>2px solid #da1e28</code> (Red 60) bottom-border</li>
+<li>Label: 12px IBM Plex Sans, 0.32px letter-spacing, Gray 70</li>
+<li>Helper text: 12px, Gray 60</li>
+<li>Placeholder: Gray 60 (<code>#6f6f6f</code>)</li>
+<li>Border-radius: 0px (top) — inputs are sharp-cornered</li>
+</ul>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li>Background: <code>#161616</code> (Gray 100) — full-width dark masthead</li>
+<li>Height: 48px</li>
+<li>Logo: IBM 8-bar logo, white on dark, left-aligned</li>
+<li>Links: 14px IBM Plex Sans, weight 400, <code>#c6c6c6</code> (Gray 30) default</li>
+<li>Link hover: <code>#ffffff</code> text</li>
+<li>Active link: <code>#ffffff</code> with bottom-border indicator</li>
+<li>Platform switcher: left-aligned horizontal tabs</li>
+<li>Search: icon-triggered slide-out search field</li>
+<li>Mobile: hamburger with left-sliding panel</li>
+</ul>
+<h3 id="links">Links</h3>
+<ul>
+<li>Default: <code>#0f62fe</code> (Blue 60) with no underline</li>
+<li>Hover: <code>#0043ce</code> (Blue 70) with underline</li>
+<li>Visited: remains Blue 60 (no visited state change)</li>
+<li>Inline links: underlined by default in body copy</li>
+</ul>
+<h3 id="distinctive-components">Distinctive Components</h3>
+<p><strong>Content Block (Hero/Feature)</strong>
+- Full-width alternating white/gray-10 background bands
+- Headline left-aligned with 60px or 48px display type
+- CTA as blue primary button with arrow icon
+- Image/illustration right-aligned or below on mobile</p>
+<p><strong>Tile (Clickable Card)</strong>
+- Background: <code>#f4f4f4</code> or <code>#ffffff</code>
+- Full-width bottom-border or background-shift hover
+- Arrow icon bottom-right on hover
+- No shadow — flatness is the identity</p>
+<p><strong>Tag / Label</strong>
+- Background: contextual color at 10% opacity (e.g., Blue 10, Red 10)
+- Text: corresponding 60-grade color
+- Padding: 4px 8px
+- Border-radius: 24px (pill — exception to the 0px rule)
+- Font: 12px weight 400</p>
+<p><strong>Notification Banner</strong>
+- Full-width bar, typically Blue 60 or Gray 100 background
+- White text, 14px
+- Close/dismiss icon right-aligned</p>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-system">Spacing System</h3>
+<ul>
+<li>Base unit: 8px (Carbon 2x grid)</li>
+<li>Component spacing scale: 2px, 4px, 8px, 12px, 16px, 24px, 32px, 40px, 48px</li>
+<li>Layout spacing scale: 16px, 24px, 32px, 48px, 64px, 80px, 96px, 160px</li>
+<li>Mini unit: 8px (smallest usable spacing)</li>
+<li>Padding within components: typically 16px</li>
+<li>Gap between cards/tiles: 1px (hairline) or 16px (standard)</li>
+</ul>
+<h3 id="grid-container">Grid &amp; Container</h3>
+<ul>
+<li>16-column grid (Carbon's 2x grid system)</li>
+<li>Max content width: 1584px (max breakpoint)</li>
+<li>Column gutters: 32px (16px on mobile)</li>
+<li>Margin: 16px (mobile), 32px (tablet+)</li>
+<li>Content typically spans 8-12 columns for readable line lengths</li>
+<li>Full-bleed sections alternate with contained content</li>
+</ul>
+<h3 id="whitespace-philosophy">Whitespace Philosophy</h3>
+<ul>
+<li><strong>Functional density</strong>: Carbon favors productive density over expansive whitespace. Sections are tightly packed compared to consumer design systems — this reflects IBM's enterprise DNA.</li>
+<li><strong>Background-color zoning</strong>: Instead of massive padding between sections, IBM uses alternating background colors (white → gray 10 → white) to create visual separation with minimal vertical space.</li>
+<li><strong>Consistent 48px rhythm</strong>: Major section transitions use 48px vertical spacing. Hero sections may use 80px–96px.</li>
+</ul>
+<h3 id="border-radius-scale">Border Radius Scale</h3>
+<ul>
+<li><strong>0px</strong>: Primary buttons, inputs, tiles, cards — the dominant treatment. Carbon is fundamentally rectangular.</li>
+<li><strong>2px</strong>: Occasionally on small interactive elements (tags)</li>
+<li><strong>24px</strong>: Tags/labels (pill shape — the sole rounded exception)</li>
+<li><strong>50%</strong>: Avatar circles, icon containers</li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Treatment</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flat (Level 0)</td>
+<td>No shadow, <code>#ffffff</code> background</td>
+<td>Default page surface</td>
+</tr>
+<tr>
+<td>Layer 01</td>
+<td>No shadow, <code>#f4f4f4</code> background</td>
+<td>Cards, tiles, alternating sections</td>
+</tr>
+<tr>
+<td>Layer 02</td>
+<td>No shadow, <code>#e0e0e0</code> background</td>
+<td>Elevated panels within Layer 01</td>
+</tr>
+<tr>
+<td>Raised</td>
+<td><code>0 2px 6px rgba(0,0,0,0.3)</code></td>
+<td>Dropdowns, tooltips, overflow menus</td>
+</tr>
+<tr>
+<td>Overlay</td>
+<td><code>0 2px 6px rgba(0,0,0,0.3)</code> + dark scrim</td>
+<td>Modal dialogs, side panels</td>
+</tr>
+<tr>
+<td>Focus</td>
+<td><code>2px solid #0f62fe</code> inset + <code>1px solid #ffffff</code></td>
+<td>Keyboard focus ring</td>
+</tr>
+<tr>
+<td>Bottom-border</td>
+<td><code>2px solid #161616</code> on bottom edge</td>
+<td>Active input, active tab indicator</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Shadow Philosophy</strong>: Carbon is deliberately shadow-averse. IBM achieves depth primarily through background-color layering — stacking surfaces of progressively darker grays rather than adding box-shadows. This creates a flat, print-inspired aesthetic where hierarchy is communicated through color value, not simulated light. Shadows are reserved exclusively for floating elements (dropdowns, tooltips, modals) where the element genuinely overlaps content. This restraint gives the rare shadow meaningful impact — when something floats in Carbon, it matters.</p>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use IBM Plex Sans at weight 300 for display sizes (42px+) — the lightness is intentional</li>
+<li>Apply 0.16px letter-spacing on 14px body text and 0.32px on 12px captions</li>
+<li>Use 0px border-radius on buttons, inputs, cards, and tiles — rectangles are the system</li>
+<li>Reference <code>--cds-*</code> token names when implementing (e.g., <code>--cds-button-primary</code>, <code>--cds-text-primary</code>)</li>
+<li>Use background-color layering (white → gray 10 → gray 20) for depth instead of shadows</li>
+<li>Use bottom-border (not box) for input field indicators</li>
+<li>Maintain the 48px default button height and asymmetric padding for icon accommodation</li>
+<li>Apply Blue 60 (<code>#0f62fe</code>) as the sole accent — one blue to rule them all</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Don't round button corners — 0px radius is the Carbon identity</li>
+<li>Don't use shadows on cards or tiles — flatness is the point</li>
+<li>Don't introduce additional accent colors — IBM's system is monochromatic + blue</li>
+<li>Don't use weight 700 (Bold) — the scale stops at 600 (Semibold)</li>
+<li>Don't add letter-spacing to display-size text — tracking is only for 14px and below</li>
+<li>Don't box inputs with full borders — Carbon inputs use bottom-border only</li>
+<li>Don't use gradient backgrounds — IBM's surfaces are flat, solid colors</li>
+<li>Don't deviate from the 8px spacing grid — every value should be divisible by 8 (with 2px and 4px for micro-adjustments)</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<h3 id="breakpoints">Breakpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Width</th>
+<th>Key Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Small (sm)</td>
+<td>320px</td>
+<td>Single column, hamburger nav, 16px margins</td>
+</tr>
+<tr>
+<td>Medium (md)</td>
+<td>672px</td>
+<td>2-column grids begin, expanded content</td>
+</tr>
+<tr>
+<td>Large (lg)</td>
+<td>1056px</td>
+<td>Full navigation visible, 3-4 column grids</td>
+</tr>
+<tr>
+<td>X-Large (xlg)</td>
+<td>1312px</td>
+<td>Maximum content density, wide layouts</td>
+</tr>
+<tr>
+<td>Max</td>
+<td>1584px</td>
+<td>Maximum content width, centered with margins</td>
+</tr>
+</tbody>
+</table>
+<h3 id="touch-targets">Touch Targets</h3>
+<ul>
+<li>Button height: 48px default, minimum 40px (compact)</li>
+<li>Navigation links: 48px row height for touch</li>
+<li>Input height: 40px default, 48px large</li>
+<li>Icon buttons: 48px square touch target</li>
+<li>Mobile menu items: full-width 48px rows</li>
+</ul>
+<h3 id="collapsing-strategy">Collapsing Strategy</h3>
+<ul>
+<li>Hero: 60px display → 42px → 32px heading as viewport narrows</li>
+<li>Navigation: full horizontal masthead → hamburger with slide-out panel</li>
+<li>Grid: 4-column → 2-column → single column</li>
+<li>Tiles/cards: horizontal grid → vertical stack</li>
+<li>Images: maintain aspect ratio, max-width 100%</li>
+<li>Footer: multi-column link groups → stacked single column</li>
+<li>Section padding: 48px → 32px → 16px</li>
+</ul>
+<h3 id="image-behavior">Image Behavior</h3>
+<ul>
+<li>Responsive images with <code>max-width: 100%</code></li>
+<li>Product illustrations scale proportionally</li>
+<li>Hero images may shift from side-by-side to stacked below</li>
+<li>Data visualizations maintain aspect ratio with horizontal scroll on mobile</li>
+</ul>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Primary CTA: IBM Blue 60 (<code>#0f62fe</code>)</li>
+<li>Background: White (<code>#ffffff</code>)</li>
+<li>Heading text: Gray 100 (<code>#161616</code>)</li>
+<li>Body text: Gray 100 (<code>#161616</code>)</li>
+<li>Secondary text: Gray 70 (<code>#525252</code>)</li>
+<li>Surface/Card: Gray 10 (<code>#f4f4f4</code>)</li>
+<li>Border: Gray 30 (<code>#c6c6c6</code>)</li>
+<li>Link: Blue 60 (<code>#0f62fe</code>)</li>
+<li>Link hover: Blue 70 (<code>#0043ce</code>)</li>
+<li>Focus ring: Blue 60 (<code>#0f62fe</code>)</li>
+<li>Error: Red 60 (<code>#da1e28</code>)</li>
+<li>Success: Green 50 (<code>#24a148</code>)</li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create a hero section on white background. Headline at 60px IBM Plex Sans weight 300, line-height 1.17, color #161616. Subtitle at 16px weight 400, line-height 1.50, color #525252, max-width 640px. Blue CTA button (#0f62fe background, #ffffff text, 0px border-radius, 48px height, 14px 63px 14px 15px padding)."</li>
+<li>"Design a card tile: #f4f4f4 background, 0px border-radius, 16px padding. Title at 20px IBM Plex Sans weight 600, line-height 1.40, color #161616. Body at 14px weight 400, letter-spacing 0.16px, line-height 1.29, color #525252. Hover: background shifts to #e8e8e8."</li>
+<li>"Build a form field: #f4f4f4 background, 0px border-radius, 40px height, 16px horizontal padding. Label above at 12px weight 400, letter-spacing 0.32px, color #525252. Bottom-border: 2px solid transparent default, 2px solid #0f62fe on focus. Placeholder: #6f6f6f."</li>
+<li>"Create a dark navigation bar: #161616 background, 48px height. IBM logo white left-aligned. Links at 14px IBM Plex Sans weight 400, color #c6c6c6. Hover: #ffffff text. Active: #ffffff with 2px bottom border."</li>
+<li>"Build a tag component: Blue 10 (#edf5ff) background, Blue 60 (#0f62fe) text, 4px 8px padding, 24px border-radius, 12px IBM Plex Sans weight 400."</li>
+</ul>
+<h3 id="iteration-guide">Iteration Guide</h3>
+<ol>
+<li>Always use 0px border-radius on buttons, inputs, and cards — this is non-negotiable in Carbon</li>
+<li>Letter-spacing only at small sizes: 0.16px at 14px, 0.32px at 12px — never on display text</li>
+<li>Three weights: 300 (display), 400 (body), 600 (emphasis) — no bold</li>
+<li>Blue 60 is the only accent color — do not introduce secondary accent hues</li>
+<li>Depth comes from background-color layering (white → #f4f4f4 → #e0e0e0), not shadows</li>
+<li>Inputs have bottom-border only, never fully boxed</li>
+<li>Use <code>--cds-</code> prefix for token naming to stay Carbon-compatible</li>
+<li>48px is the universal interactive element height</li>
+</ol>
+</main>
+</body>
+</html>

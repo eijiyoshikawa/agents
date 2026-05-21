@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Web Builder パイプライン実行手順書</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="web-builder">Web Builder パイプライン実行手順書</h1>
+<h2 id="_1">概要</h2>
+<p>参考サイトのURLから高再現度のWebサイトを自動生成する8エージェント + 2周イテレーションパイプライン。
+Claude Code 上で順番に実行する。</p>
+<h2 id="_2">前提条件</h2>
+<ul>
+<li>Claude Code（Max プラン）で実行</li>
+<li>以下の MCP サーバーが接続済みであること:</li>
+<li><strong>Vercel</strong> — デプロイ・実機確認に使用</li>
+<li>Node.js 18+ がインストール済み</li>
+</ul>
+<h2 id="_3">パイプライン全体像</h2>
+<pre class="codehilite"><code>[参考サイト URL]
+      │
+      ▼
+┌──────────────────┐
+│ 0. Site Scanner  │  ← 技術検出・ページ構成把握
+└─────┬────────────┘
+      │
+      ├─────────────┬──────────────┬──────────────┐
+      ▼             ▼              ▼              ▼
+┌───────────┐ ┌───────────┐ ┌───────────┐ ┌──────────────┐
+│1. Structure│ │2. Design  │ │3. Motion  │ │4. Interaction│  ← 並列実行
+│  Analyzer │ │  Analyzer │ │  Analyzer │ │   Analyzer   │
+└─────┬─────┘ └─────┬─────┘ └─────┬─────┘ └──────┬───────┘
+      └───────┬─────┘              │               │
+              ▼                    │               │
+        ┌──────────────┐           │               │
+        │5. Asset      │           │               │
+        │   Collector  │           │               │
+        └──────┬───────┘           │               │
+               └──────────┬────────┴───────────────┘
+                          ▼
+              ┌──── Iteration 1 ────┐
+              │  6. Builder         │  ← 全結果統合して初版実装
+              │  7. QA Reviewer     │  ← デプロイ → 比較 → 修正指示
+              └──────────┬──────────┘
+                         ▼
+              ┌──── Iteration 2 ────┐
+              │  6. Builder (修正)   │  ← 修正指示を実装
+              │  7. QA Reviewer     │  ← 再デプロイ → 最終確認
+              └──────────┬──────────┘
+                         ▼
+              [完成サイト Vercel URL]
+</code></pre>
+
+<h2 id="_4">実行手順</h2>
+<h3 id="step-0">Step 0: 準備</h3>
+<p>参考サイトの URL を確認する。
+以下の手順では <code>{{参考URL}}</code> を実際のURLに置き換えること。
+複数ページサイトの場合はトップページURLを指定する。</p>
+<hr />
+<h3 id="step-1-site-scanner">Step 1: Site Scanner（サイト偵察）</h3>
+<p><strong>プロンプト:</strong> <code>/agents/web_builder/site_scanner/prompt.md</code>
+<strong>出力:</strong> <code>/agents/web_builder/site_scanner/output.json</code></p>
+<ol>
+<li><code>WebFetch</code> で <code>{{参考URL}}</code> のトップページを取得</li>
+<li>技術スタック・ページ一覧・外部ライブラリを検出</li>
+<li><code>output.json</code> に保存</li>
+</ol>
+<p><strong>完了条件:</strong> <code>site_type</code>, <code>pages</code>, <code>tech_stack</code> が含まれている</p>
+<hr />
+<h3 id="step-25-4">Step 2〜5: 4エージェント並列解析</h3>
+<p><strong>並列で 4 つのエージェントを同時実行する。</strong></p>
+<h4 id="2-structure-analyzer">2. Structure Analyzer（構造解析）</h4>
+<p><strong>プロンプト:</strong> <code>/agents/web_builder/structure_analyzer/prompt.md</code>
+<strong>入力:</strong> <code>/agents/web_builder/site_scanner/output.json</code>
+<strong>出力:</strong> <code>/agents/web_builder/structure_analyzer/output.json</code></p>
+<ul>
+<li>各ページのセクション構成・レイアウト・ナビゲーション・フッターを解析</li>
+</ul>
+<h4 id="3-design-analyzer">3. Design Analyzer（デザイン解析）</h4>
+<p><strong>プロンプト:</strong> <code>/agents/web_builder/design_analyzer/prompt.md</code>
+<strong>入力:</strong> <code>/agents/web_builder/site_scanner/output.json</code>
+<strong>出力:</strong> <code>/agents/web_builder/design_analyzer/output.json</code></p>
+<ul>
+<li>カラーパレット・タイポグラフィ・スペーシング・UIコンポーネントスタイルを抽出</li>
+</ul>
+<h4 id="4-motion-analyzer">4. Motion Analyzer（モーション解析）</h4>
+<p><strong>プロンプト:</strong> <code>/agents/web_builder/motion_analyzer/prompt.md</code>
+<strong>入力:</strong> <code>/agents/web_builder/site_scanner/output.json</code>
+<strong>出力:</strong> <code>/agents/web_builder/motion_analyzer/output.json</code></p>
+<ul>
+<li>アニメーション・トランジション・スクロールエフェクトを特定</li>
+</ul>
+<h4 id="5-interaction-analyzer">5. Interaction Analyzer（インタラクション解析）</h4>
+<p><strong>プロンプト:</strong> <code>/agents/web_builder/interaction_analyzer/prompt.md</code>
+<strong>入力:</strong> <code>/agents/web_builder/site_scanner/output.json</code>
+<strong>出力:</strong> <code>/agents/web_builder/interaction_analyzer/output.json</code></p>
+<ul>
+<li>フォーム・モーダル・タブ・アコーディオン・スライダー等を解析</li>
+</ul>
+<p><strong>完了条件:</strong> 4つの <code>output.json</code> が全て保存されている</p>
+<hr />
+<h3 id="step-6-asset-collector">Step 6: Asset Collector（アセット収集）</h3>
+<p><strong>プロンプト:</strong> <code>/agents/web_builder/asset_collector/prompt.md</code>
+<strong>入力:</strong> <code>site_scanner/output.json</code> + <code>design_analyzer/output.json</code>
+<strong>出力:</strong> <code>/agents/web_builder/asset_collector/output.json</code></p>
+<ol>
+<li>画像・フォント・アイコンのURL収集</li>
+<li>代替アセット（プレースホルダー）の戦略決定</li>
+<li>ローカルファイルパスの設計</li>
+</ol>
+<p><strong>完了条件:</strong> <code>images</code>, <code>fonts</code>, <code>icons</code> が含まれている</p>
+<hr />
+<h3 id="step-7-builder-iteration-1">Step 7: Builder — Iteration 1（初版実装）</h3>
+<p><strong>プロンプト:</strong> <code>/agents/web_builder/builder/prompt.md</code>
+<strong>入力:</strong> Agent 0〜5 の全 output.json
+<strong>出力:</strong> <code>/agents/web_builder/output/</code>（Next.js プロジェクト）+ <code>builder/output.json</code></p>
+<ol>
+<li>Next.js プロジェクト初期化</li>
+<li>Tailwind CSS 設定</li>
+<li>共通コンポーネント実装</li>
+<li>各ページ・セクション実装</li>
+<li>モーション実装</li>
+<li>インタラクティブ要素実装</li>
+<li>レスポンシブ対応</li>
+<li><code>npm run build</code> で確認</li>
+</ol>
+<p><strong>完了条件:</strong> <code>npm run build</code> が成功し、<code>builder/output.json</code> に <code>build_status: "success"</code> が含まれている</p>
+<hr />
+<h3 id="step-8-qa-reviewer-iteration-1">Step 8: QA Reviewer — Iteration 1（初回検証）</h3>
+<p><strong>プロンプト:</strong> <code>/agents/web_builder/qa_reviewer/prompt.md</code>
+<strong>入力:</strong> <code>builder/output.json</code> + 全解析結果 + 参考サイトHTML
+<strong>出力:</strong> <code>/agents/web_builder/qa_reviewer/iteration_1.json</code></p>
+<ol>
+<li>Vercel にデプロイ</li>
+<li>5カテゴリで比較検証（Structure, Design, Motion, Interaction, Responsive）</li>
+<li>スコアリング + 修正指示生成</li>
+</ol>
+<p><strong>完了条件:</strong> <code>iteration_1.json</code> に <code>overall_score</code> と <code>fix_instructions</code> が含まれている</p>
+<hr />
+<h3 id="step-9-builder-iteration-2">Step 9: Builder — Iteration 2（修正実装）</h3>
+<p><strong>プロンプト:</strong> <code>/agents/web_builder/builder/prompt.md</code>
+<strong>入力:</strong> 全 output.json + <code>qa_reviewer/iteration_1.json</code>
+<strong>出力:</strong> 修正されたプロジェクト + 更新された <code>builder/output.json</code></p>
+<ol>
+<li><code>iteration_1.json</code> の <code>fix_instructions</code> を priority 順に対応</li>
+<li>high → medium → low の順に修正</li>
+<li><code>npm run build</code> で確認</li>
+</ol>
+<p><strong>完了条件:</strong> <code>npm run build</code> が成功</p>
+<hr />
+<h3 id="step-10-qa-reviewer-iteration-2">Step 10: QA Reviewer — Iteration 2（最終検証）</h3>
+<p><strong>プロンプト:</strong> <code>/agents/web_builder/qa_reviewer/prompt.md</code>
+<strong>入力:</strong> 更新された <code>builder/output.json</code> + 全解析結果
+<strong>出力:</strong> <code>/agents/web_builder/qa_reviewer/iteration_2.json</code> + <code>qa_reviewer/output.json</code></p>
+<ol>
+<li>Vercel に再デプロイ</li>
+<li>再度5カテゴリで比較検証</li>
+<li>最終スコア + 残課題レポート</li>
+</ol>
+<p><strong>完了条件:</strong> <code>iteration_2.json</code> と <code>output.json</code>（最終サマリー）が保存されている</p>
+<hr />
+<h2 id="_5">エラー時の対応</h2>
+<table>
+<thead>
+<tr>
+<th>問題</th>
+<th>対応</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>WebFetch でページが取得できない</td>
+<td>URLを確認。JavaScript レンダリングが必要なSPAの場合はその旨を記録</td>
+</tr>
+<tr>
+<td>npm run build でエラー</td>
+<td>エラーメッセージを読み、TypeScript/JSX のエラーを修正</td>
+</tr>
+<tr>
+<td>Vercel デプロイ失敗</td>
+<td>ビルドログを確認し、依存関係やNode.jsバージョンの問題を解決</td>
+</tr>
+<tr>
+<td>外部ライブラリの検出漏れ</td>
+<td>参考サイトを手動確認し、site_scanner/output.json を修正</td>
+</tr>
+<tr>
+<td>スコアが低い（&lt; 60）</td>
+<td>fix_instructions の high 項目に集中して対応</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_6">完了時の成果物</h2>
+<ol>
+<li><strong>デプロイ済みサイト</strong>: Vercel URL（プレビュー確認可能）</li>
+<li><strong>ソースコード</strong>: <code>/agents/web_builder/output/</code> に Next.js プロジェクト一式</li>
+<li><strong>品質レポート</strong>: <code>qa_reviewer/output.json</code> に最終スコアと残課題</li>
+<li><strong>解析データ</strong>: 各エージェントの <code>output.json</code>（再利用可能）</li>
+</ol>
+</main>
+</body>
+</html>

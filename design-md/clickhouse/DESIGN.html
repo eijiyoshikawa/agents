@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: ClickHouse</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-clickhouse">Design System: ClickHouse</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>ClickHouse's interface is a high-performance cockpit rendered in acid yellow-green on obsidian black — a design that screams "speed" before you read a single word. The entire experience lives in darkness: pure black backgrounds (<code>#000000</code>) with dark charcoal cards (<code>#414141</code> borders) creating a terminal-grade aesthetic where the only chromatic interruption is the signature neon yellow-green (<code>#faff69</code>) that slashes across CTAs, borders, and highlighted moments like a highlighter pen on a dark console.</p>
+<p>The typography is aggressively heavy — Inter at weight 900 (Black) for the hero headline at 96px creates text blocks that feel like they have physical mass. This "database for AI" site communicates raw power through visual weight: thick type, high-contrast neon accents, and performance stats displayed as oversized numbers. There's nothing subtle about ClickHouse's design, and that's entirely the point — it mirrors the product's promise of extreme speed and performance.</p>
+<p>What makes ClickHouse distinctive is the electrifying tension between the near-black canvas and the neon yellow-green accent. This color combination (<code>#faff69</code> on <code>#000000</code>) creates one of the highest-contrast pairings in any tech brand, making every CTA button, every highlighted card, and every accent border impossible to miss. Supporting this is a forest green (<code>#166534</code>) for secondary CTAs that adds depth to the action hierarchy without competing with the neon.</p>
+<p><strong>Key Characteristics:</strong>
+- Pure black canvas (#000000) with neon yellow-green (#faff69) accent — maximum contrast
+- Extra-heavy display typography: Inter at weight 900 (Black) up to 96px
+- Dark charcoal card system with #414141 borders at 80% opacity
+- Forest green (#166534) secondary CTA buttons
+- Performance stats as oversized display numbers
+- Uppercase labels with wide letter-spacing (1.4px) for navigation structure
+- Active/pressed state shifts text to pale yellow (#f4f692)
+- All links hover to neon yellow-green — unified interactive signal
+- Inset shadows on select elements creating "pressed into the surface" depth</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>Neon Volt</strong> (<code>#faff69</code>): The signature brand color — a vivid acid yellow-green that's the sole chromatic accent on the black canvas. Used for primary CTAs, accent borders, link hovers, and highlighted moments.</li>
+<li><strong>Forest Green</strong> (<code>#166534</code>): Secondary CTA color — a deep, saturated green for "Get Started" and primary action buttons that need distinction from the neon.</li>
+<li><strong>Dark Forest</strong> (<code>#14572f</code>): A darker green variant for borders and secondary accents.</li>
+</ul>
+<h3 id="secondary-accent">Secondary &amp; Accent</h3>
+<ul>
+<li><strong>Pale Yellow</strong> (<code>#f4f692</code>): Active/pressed state text color — a softer, more muted version of Neon Volt for state feedback.</li>
+<li><strong>Border Olive</strong> (<code>#4f5100</code>): A dark olive-yellow for ghost button borders — the neon's muted sibling.</li>
+<li><strong>Olive Dark</strong> (<code>#161600</code>): The darkest neon-tinted color for subtle brand text.</li>
+</ul>
+<h3 id="surface-background">Surface &amp; Background</h3>
+<ul>
+<li><strong>Pure Black</strong> (<code>#000000</code>): The primary page background — absolute black for maximum contrast.</li>
+<li><strong>Near Black</strong> (<code>#141414</code>): Button backgrounds and slightly elevated dark surfaces.</li>
+<li><strong>Charcoal</strong> (<code>#414141</code>): The primary border color at 80% opacity — the workhorse for card and container containment.</li>
+<li><strong>Deep Charcoal</strong> (<code>#343434</code>): Darker border variant for subtle division lines.</li>
+<li><strong>Hover Gray</strong> (<code>#3a3a3a</code>): Button hover state background — slightly lighter than Near Black.</li>
+</ul>
+<h3 id="neutrals-text">Neutrals &amp; Text</h3>
+<ul>
+<li><strong>Pure White</strong> (<code>#ffffff</code>): Primary text on dark surfaces.</li>
+<li><strong>Silver</strong> (<code>#a0a0a0</code>): Secondary body text and muted content.</li>
+<li><strong>Mid Gray</strong> (<code>#585858</code> at 28%): Subtle gray overlay for depth effects.</li>
+<li><strong>Border Gray</strong> (<code>#e5e7eb</code>): Light border variant (used in rare light contexts).</li>
+</ul>
+<h3 id="gradient-system">Gradient System</h3>
+<ul>
+<li><strong>None in the traditional sense.</strong> ClickHouse uses flat color blocks and high-contrast borders. The "gradient" is the contrast itself — neon yellow-green against pure black creates a visual intensity that gradients would dilute.</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-family">Font Family</h3>
+<ul>
+<li><strong>Primary</strong>: <code>Inter</code> (Next.js optimized variant <code>__Inter_d1b8ee</code>)</li>
+<li><strong>Secondary Display</strong>: <code>Basier</code> (<code>__basier_a58b65</code>), with fallbacks: <code>Arial, Helvetica</code></li>
+<li><strong>Code</strong>: <code>Inconsolata</code> (<code>__Inconsolata_a25f62</code>)</li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display Mega</td>
+<td>Inter</td>
+<td>96px (6rem)</td>
+<td>900</td>
+<td>1.00 (tight)</td>
+<td>normal</td>
+<td>Maximum impact, extra-heavy</td>
+</tr>
+<tr>
+<td>Display / Hero</td>
+<td>Inter</td>
+<td>72px (4.5rem)</td>
+<td>700</td>
+<td>1.00 (tight)</td>
+<td>normal</td>
+<td>Section hero titles</td>
+</tr>
+<tr>
+<td>Feature Heading</td>
+<td>Basier</td>
+<td>36px (2.25rem)</td>
+<td>600</td>
+<td>1.30 (tight)</td>
+<td>normal</td>
+<td>Feature section anchors</td>
+</tr>
+<tr>
+<td>Sub-heading</td>
+<td>Inter / Basier</td>
+<td>24px (1.5rem)</td>
+<td>600–700</td>
+<td>1.17–1.38</td>
+<td>normal</td>
+<td>Card headings</td>
+</tr>
+<tr>
+<td>Feature Title</td>
+<td>Inter / Basier</td>
+<td>20px (1.25rem)</td>
+<td>600–700</td>
+<td>1.40</td>
+<td>normal</td>
+<td>Small feature titles</td>
+</tr>
+<tr>
+<td>Body Large</td>
+<td>Inter</td>
+<td>18px (1.13rem)</td>
+<td>400–700</td>
+<td>1.56</td>
+<td>normal</td>
+<td>Intro paragraphs, button text</td>
+</tr>
+<tr>
+<td>Body / Button</td>
+<td>Inter</td>
+<td>16px (1rem)</td>
+<td>400–700</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Standard body, nav, buttons</td>
+</tr>
+<tr>
+<td>Caption</td>
+<td>Inter</td>
+<td>14px (0.88rem)</td>
+<td>400–700</td>
+<td>1.43</td>
+<td>normal</td>
+<td>Metadata, descriptions, links</td>
+</tr>
+<tr>
+<td>Uppercase Label</td>
+<td>Inter</td>
+<td>14px (0.88rem)</td>
+<td>600</td>
+<td>1.43</td>
+<td>1.4px</td>
+<td>Section overlines, wide-tracked</td>
+</tr>
+<tr>
+<td>Code</td>
+<td>Inconsolata</td>
+<td>16px (1rem)</td>
+<td>600</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Code blocks, commands</td>
+</tr>
+<tr>
+<td>Small</td>
+<td>Inter</td>
+<td>12px (0.75rem)</td>
+<td>500</td>
+<td>1.33</td>
+<td>normal</td>
+<td>Smallest text</td>
+</tr>
+<tr>
+<td>Micro</td>
+<td>Inter</td>
+<td>11.2px (0.7rem)</td>
+<td>500</td>
+<td>1.79 (relaxed)</td>
+<td>normal</td>
+<td>Tags, tiny labels</td>
+</tr>
+</tbody>
+</table>
+<h3 id="principles">Principles</h3>
+<ul>
+<li><strong>Weight 900 is the weapon</strong>: The display headline uses Inter Black (900) — a weight most sites never touch. Combined with 96px size, this creates text with a physical, almost architectural presence.</li>
+<li><strong>Full weight spectrum</strong>: The system uses 400, 500, 600, 700, and 900 — covering the full gamut. Weight IS hierarchy.</li>
+<li><strong>Uppercase with maximum tracking</strong>: Section overlines use 1.4px letter-spacing — wider than most systems — creating bold structural labels that stand out against the dense dark background.</li>
+<li><strong>Dual sans-serif</strong>: Inter handles display and body; Basier handles feature section headings at 600 weight. This creates a subtle personality shift between "data/performance" (Inter) and "product/feature" (Basier) contexts.</li>
+</ul>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<p><strong>Neon Primary</strong>
+- Background: Neon Volt (<code>#faff69</code>)
+- Text: Near Black (<code>#151515</code>)
+- Padding: 0px 16px
+- Radius: sharp (4px)
+- Border: <code>1px solid #faff69</code>
+- Hover: background shifts to dark (<code>rgb(29, 29, 29)</code>), text stays
+- Active: text shifts to Pale Yellow (<code>#f4f692</code>)
+- The eye-catching CTA — neon on black</p>
+<p><strong>Dark Solid</strong>
+- Background: Near Black (<code>#141414</code>)
+- Text: Pure White (<code>#ffffff</code>)
+- Padding: 12px 16px
+- Radius: 4px or 8px
+- Border: <code>1px solid #141414</code>
+- Hover: bg shifts to Hover Gray (<code>#3a3a3a</code>), text to 80% opacity
+- Active: text to Pale Yellow
+- The standard action button</p>
+<p><strong>Forest Green</strong>
+- Background: Forest Green (<code>#166534</code>)
+- Text: Pure White (<code>#ffffff</code>)
+- Padding: 12px 16px
+- Border: <code>1px solid #141414</code>
+- Hover: same dark shift
+- Active: Pale Yellow text
+- The "Get Started" / primary conversion button</p>
+<p><strong>Ghost / Outlined</strong>
+- Background: transparent
+- Text: Pure White (<code>#ffffff</code>)
+- Padding: 0px 32px
+- Radius: 4px
+- Border: <code>1px solid #4f5100</code> (olive-tinted)
+- Hover: dark bg shift
+- Active: Pale Yellow text
+- Secondary actions with neon-tinted border</p>
+<p><strong>Pill Toggle</strong>
+- Background: transparent
+- Radius: pill (9999px)
+- Used for toggle/switch elements</p>
+<h3 id="cards-containers">Cards &amp; Containers</h3>
+<ul>
+<li>Background: transparent or Near Black</li>
+<li>Border: <code>1px solid rgba(65, 65, 65, 0.8)</code> — the signature charcoal containment</li>
+<li>Radius: 4px (small elements) or 8px (cards, containers)</li>
+<li>Shadow Level 1: subtle (<code>rgba(0,0,0,0.1) 0px 1px 3px, rgba(0,0,0,0.1) 0px 1px 2px -1px</code>)</li>
+<li>Shadow Level 2: medium (<code>rgba(0,0,0,0.1) 0px 10px 15px -3px, rgba(0,0,0,0.1) 0px 4px 6px -4px</code>)</li>
+<li>Shadow Level 3: inset (<code>rgba(0,0,0,0.06) 0px 4px 4px, rgba(0,0,0,0.14) 0px 4px 25px inset</code>) — the "pressed" effect</li>
+<li>Neon-highlighted cards: selected/active cards get neon yellow-green border or accent</li>
+</ul>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li>Dark nav on black background</li>
+<li>Logo: ClickHouse wordmark + icon in yellow/neon</li>
+<li>Links: white text, hover to Neon Volt (#faff69)</li>
+<li>CTA: Neon Volt button or Forest Green button</li>
+<li>Uppercase labels for categories</li>
+</ul>
+<h3 id="distinctive-components">Distinctive Components</h3>
+<p><strong>Performance Stats</strong>
+- Oversized numbers (72px+, weight 700–900)
+- Brief descriptions beneath
+- High-contrast neon accents on key metrics
+- The primary visual proof of performance claims</p>
+<p><strong>Neon-Highlighted Card</strong>
+- Standard dark card with neon yellow-green border highlight
+- Creates "selected" or "featured" treatment
+- The accent border makes the card pop against the dark canvas</p>
+<p><strong>Code Blocks</strong>
+- Dark surface with Inconsolata at weight 600
+- Neon and white syntax highlighting
+- Terminal-like aesthetic</p>
+<p><strong>Trust Bar</strong>
+- Company logos on dark background
+- Monochrome/white logo treatment
+- Horizontal layout</p>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-system">Spacing System</h3>
+<ul>
+<li>Base unit: 8px</li>
+<li>Scale: 2px, 6px, 7px, 8px, 10px, 12px, 16px, 20px, 24px, 25px, 32px, 40px, 44px, 48px, 64px</li>
+<li>Button padding: 12px 16px (standard), 0px 16px (compact), 0px 32px (wide ghost)</li>
+<li>Section vertical spacing: generous (48–64px)</li>
+</ul>
+<h3 id="grid-container">Grid &amp; Container</h3>
+<ul>
+<li>Max container width: up to 2200px (extra-wide) with responsive scaling</li>
+<li>Hero: full-width dark with massive typography</li>
+<li>Feature sections: multi-column card grids with dark borders</li>
+<li>Stats: horizontal metric bar</li>
+<li>Full-dark page — no light sections</li>
+</ul>
+<h3 id="whitespace-philosophy">Whitespace Philosophy</h3>
+<ul>
+<li><strong>Dark void as canvas</strong>: The pure black background provides infinite depth — elements float in darkness.</li>
+<li><strong>Dense information</strong>: Feature cards and stats are packed with data, reflecting the database product's performance focus.</li>
+<li><strong>Neon highlights as wayfinding</strong>: Yellow-green accents guide the eye through the dark interface like runway lights.</li>
+</ul>
+<h3 id="border-radius-scale">Border Radius Scale</h3>
+<ul>
+<li>Sharp (4px): Buttons, badges, small elements, code blocks</li>
+<li>Comfortable (8px): Cards, containers, dividers</li>
+<li>Pill (9999px): Toggle buttons, status indicators</li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Treatment</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flat (Level 0)</td>
+<td>No shadow</td>
+<td>Black background, text blocks</td>
+</tr>
+<tr>
+<td>Bordered (Level 1)</td>
+<td><code>1px solid rgba(65,65,65,0.8)</code></td>
+<td>Standard cards, containers</td>
+</tr>
+<tr>
+<td>Subtle (Level 2)</td>
+<td><code>0px 1px 3px rgba(0,0,0,0.1)</code></td>
+<td>Subtle card lift</td>
+</tr>
+<tr>
+<td>Elevated (Level 3)</td>
+<td><code>0px 10px 15px -3px rgba(0,0,0,0.1)</code></td>
+<td>Feature cards, hover states</td>
+</tr>
+<tr>
+<td>Pressed/Inset (Level 4)</td>
+<td><code>0px 4px 25px rgba(0,0,0,0.14) inset</code></td>
+<td>Active/pressed elements — "sunk into the surface"</td>
+</tr>
+<tr>
+<td>Neon Highlight (Level 5)</td>
+<td>Neon Volt border (<code>#faff69</code>)</td>
+<td>Featured/selected cards, maximum emphasis</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Shadow Philosophy</strong>: ClickHouse uses shadows on a black canvas, where they're barely visible — they exist more for subtle dimensionality than obvious elevation. The most distinctive depth mechanism is the <strong>inset shadow</strong> (Level 4), which creates a "pressed into the surface" effect unique to ClickHouse. The neon border highlight (Level 5) is the primary attention-getting depth mechanism.</p>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use Neon Volt (#faff69) as the sole chromatic accent — it must pop against pure black</li>
+<li>Use Inter at weight 900 for hero display text — the extreme weight IS the personality</li>
+<li>Keep everything on pure black (#000000) — never use dark gray as the page background</li>
+<li>Use charcoal borders (rgba(65,65,65,0.8)) for all card containment</li>
+<li>Apply Forest Green (#166534) for primary CTA buttons — distinct from neon for action hierarchy</li>
+<li>Show performance stats as oversized display numbers — it's the core visual argument</li>
+<li>Use uppercase with wide letter-spacing (1.4px) for section labels</li>
+<li>Apply Pale Yellow (#f4f692) for active/pressed text states</li>
+<li>Link hovers should ALWAYS shift to Neon Volt — unified interactive feedback</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Don't introduce additional colors — the palette is strictly black, neon, green, and gray</li>
+<li>Don't use the neon as a background fill — it's an accent and border color only (except on CTA buttons)</li>
+<li>Don't reduce display weight below 700 — heavy weight is core to the personality</li>
+<li>Don't use light/white backgrounds anywhere — the entire experience is dark</li>
+<li>Don't round corners beyond 8px — the sharp geometry reflects database precision</li>
+<li>Don't use soft/diffused shadows on black — they're invisible. Use border-based depth instead</li>
+<li>Don't skip the inset shadow on active states — the "pressed" effect is distinctive</li>
+<li>Don't use warm neutrals — all grays are perfectly neutral</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<h3 id="breakpoints">Breakpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Width</th>
+<th>Key Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mobile</td>
+<td>&lt;640px</td>
+<td>Single column, stacked cards</td>
+</tr>
+<tr>
+<td>Small Tablet</td>
+<td>640–768px</td>
+<td>Minor adjustments</td>
+</tr>
+<tr>
+<td>Tablet</td>
+<td>768–1024px</td>
+<td>2-column grids</td>
+</tr>
+<tr>
+<td>Desktop</td>
+<td>1024–1280px</td>
+<td>Standard layout</td>
+</tr>
+<tr>
+<td>Large Desktop</td>
+<td>1280–1536px</td>
+<td>Expanded content</td>
+</tr>
+<tr>
+<td>Ultra-wide</td>
+<td>1536–2200px</td>
+<td>Maximum container width</td>
+</tr>
+</tbody>
+</table>
+<h3 id="touch-targets">Touch Targets</h3>
+<ul>
+<li>Buttons with 12px 16px padding minimum</li>
+<li>Card surfaces as touch targets</li>
+<li>Adequate nav link spacing</li>
+</ul>
+<h3 id="collapsing-strategy">Collapsing Strategy</h3>
+<ul>
+<li><strong>Hero text</strong>: 96px → 72px → 48px → 36px</li>
+<li><strong>Feature grids</strong>: Multi-column → 2 → 1 column</li>
+<li><strong>Stats</strong>: Horizontal → stacked</li>
+<li><strong>Navigation</strong>: Full → hamburger</li>
+</ul>
+<h3 id="image-behavior">Image Behavior</h3>
+<ul>
+<li>Product screenshots maintain aspect ratio</li>
+<li>Code blocks use horizontal scroll on narrow screens</li>
+<li>All images on dark backgrounds</li>
+</ul>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Brand Accent: "Neon Volt (#faff69)"</li>
+<li>Page Background: "Pure Black (#000000)"</li>
+<li>CTA Green: "Forest Green (#166534)"</li>
+<li>Card Border: "Charcoal (rgba(65,65,65,0.8))"</li>
+<li>Primary Text: "Pure White (#ffffff)"</li>
+<li>Secondary Text: "Silver (#a0a0a0)"</li>
+<li>Active State: "Pale Yellow (#f4f692)"</li>
+<li>Button Surface: "Near Black (#141414)"</li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create a hero section on Pure Black (#000000) with a massive headline at 96px Inter weight 900, line-height 1.0. Pure White text. Add a Neon Volt (#faff69) CTA button (dark text, 4px radius, 0px 16px padding) and a ghost button (transparent, 1px solid #4f5100 border)."</li>
+<li>"Design a feature card on black with 1px solid rgba(65,65,65,0.8) border and 8px radius. Title at 24px Inter weight 700, body at 16px in Silver (#a0a0a0). Add a neon-highlighted variant with 1px solid #faff69 border."</li>
+<li>"Build a performance stats bar: large numbers at 72px Inter weight 700 in Pure White. Brief descriptions at 14px in Silver. On black background."</li>
+<li>"Create a Forest Green (#166534) CTA button: white text, 12px 16px padding, 4px radius, 1px solid #141414 border. Hover: bg shifts to #3a3a3a, text to 80% opacity."</li>
+<li>"Design an uppercase section label: 14px Inter weight 600, letter-spacing 1.4px, uppercase. Silver (#a0a0a0) text on black background."</li>
+</ul>
+<h3 id="iteration-guide">Iteration Guide</h3>
+<ol>
+<li>Keep everything on pure black — no dark gray alternatives</li>
+<li>Neon Volt (#faff69) is for accents and CTAs only — never large backgrounds</li>
+<li>Weight 900 for hero, 700 for headings, 600 for labels, 400-500 for body</li>
+<li>Active states use Pale Yellow (#f4f692) — not just opacity changes</li>
+<li>All links hover to Neon Volt — consistent interactive feedback</li>
+<li>Charcoal borders (rgba(65,65,65,0.8)) are the primary depth mechanism</li>
+</ol>
+</main>
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Coinbase</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-coinbase">Design System: Coinbase</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Coinbase's website is a clean, trustworthy crypto platform that communicates financial reliability through a blue-and-white binary palette. The design uses Coinbase Blue (<code>#0052ff</code>) — a deep, saturated blue — as the singular brand accent against white and near-black surfaces. The proprietary font family includes CoinbaseDisplay for hero headlines, CoinbaseSans for UI text, CoinbaseText for body reading, and CoinbaseIcons for iconography — a comprehensive four-font system.</p>
+<p>The button system uses a distinctive 56px radius for pill-shaped CTAs with hover transitions to a lighter blue (<code>#578bfa</code>). The design alternates between white content sections and dark (<code>#0a0b0d</code>, <code>#282b31</code>) feature sections, creating a professional, financial-grade interface.</p>
+<p><strong>Key Characteristics:</strong>
+- Coinbase Blue (<code>#0052ff</code>) as singular brand accent
+- Four-font proprietary family: Display, Sans, Text, Icons
+- 56px radius pill buttons with blue hover transition
+- Near-black (<code>#0a0b0d</code>) dark sections + white light sections
+- 1.00 line-height on display headings — ultra-tight
+- Cool gray secondary surface (<code>#eef0f3</code>) with blue tint
+- <code>text-transform: lowercase</code> on some button labels — unusual</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>Coinbase Blue</strong> (<code>#0052ff</code>): Primary brand, links, CTA borders</li>
+<li><strong>Pure White</strong> (<code>#ffffff</code>): Primary light surface</li>
+<li><strong>Near Black</strong> (<code>#0a0b0d</code>): Text, dark section backgrounds</li>
+<li><strong>Cool Gray Surface</strong> (<code>#eef0f3</code>): Secondary button background</li>
+</ul>
+<h3 id="interactive">Interactive</h3>
+<ul>
+<li><strong>Hover Blue</strong> (<code>#578bfa</code>): Button hover background</li>
+<li><strong>Link Blue</strong> (<code>#0667d0</code>): Secondary link color</li>
+<li><strong>Muted Blue</strong> (<code>#5b616e</code>): Border color at 20% opacity</li>
+</ul>
+<h3 id="surface">Surface</h3>
+<ul>
+<li><strong>Dark Card</strong> (<code>#282b31</code>): Dark button/card backgrounds</li>
+<li><strong>Light Surface</strong> (<code>rgba(247,247,247,0.88)</code>): Subtle surface</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-families">Font Families</h3>
+<ul>
+<li><strong>Display</strong>: <code>CoinbaseDisplay</code> — hero headlines</li>
+<li><strong>UI / Sans</strong>: <code>CoinbaseSans</code> — buttons, headings, nav</li>
+<li><strong>Body</strong>: <code>CoinbaseText</code> — reading text</li>
+<li><strong>Icons</strong>: <code>CoinbaseIcons</code> — icon font</li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display Hero</td>
+<td>CoinbaseDisplay</td>
+<td>80px</td>
+<td>400</td>
+<td>1.00 (tight)</td>
+<td>Maximum impact</td>
+</tr>
+<tr>
+<td>Display Secondary</td>
+<td>CoinbaseDisplay</td>
+<td>64px</td>
+<td>400</td>
+<td>1.00</td>
+<td>Sub-hero</td>
+</tr>
+<tr>
+<td>Display Third</td>
+<td>CoinbaseDisplay</td>
+<td>52px</td>
+<td>400</td>
+<td>1.00</td>
+<td>Third tier</td>
+</tr>
+<tr>
+<td>Section Heading</td>
+<td>CoinbaseSans</td>
+<td>36px</td>
+<td>400</td>
+<td>1.11 (tight)</td>
+<td>Feature sections</td>
+</tr>
+<tr>
+<td>Card Title</td>
+<td>CoinbaseSans</td>
+<td>32px</td>
+<td>400</td>
+<td>1.13</td>
+<td>Card headings</td>
+</tr>
+<tr>
+<td>Feature Title</td>
+<td>CoinbaseSans</td>
+<td>18px</td>
+<td>600</td>
+<td>1.33</td>
+<td>Feature emphasis</td>
+</tr>
+<tr>
+<td>Body Bold</td>
+<td>CoinbaseSans</td>
+<td>16px</td>
+<td>700</td>
+<td>1.50</td>
+<td>Strong body</td>
+</tr>
+<tr>
+<td>Body Semibold</td>
+<td>CoinbaseSans</td>
+<td>16px</td>
+<td>600</td>
+<td>1.25</td>
+<td>Buttons, nav</td>
+</tr>
+<tr>
+<td>Body</td>
+<td>CoinbaseText</td>
+<td>18px</td>
+<td>400</td>
+<td>1.56</td>
+<td>Standard reading</td>
+</tr>
+<tr>
+<td>Body Small</td>
+<td>CoinbaseText</td>
+<td>16px</td>
+<td>400</td>
+<td>1.50</td>
+<td>Secondary reading</td>
+</tr>
+<tr>
+<td>Button</td>
+<td>CoinbaseSans</td>
+<td>16px</td>
+<td>600</td>
+<td>1.20</td>
+<td>+0.16px tracking</td>
+</tr>
+<tr>
+<td>Caption</td>
+<td>CoinbaseSans</td>
+<td>14px</td>
+<td>600–700</td>
+<td>1.50</td>
+<td>Metadata</td>
+</tr>
+<tr>
+<td>Small</td>
+<td>CoinbaseSans</td>
+<td>13px</td>
+<td>600</td>
+<td>1.23</td>
+<td>Tags</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<p><strong>Primary Pill (56px radius)</strong>
+- Background: <code>#eef0f3</code> or <code>#282b31</code>
+- Radius: 56px
+- Border: <code>1px solid</code> matching background
+- Hover: <code>#578bfa</code> (light blue)
+- Focus: <code>2px solid black</code> outline</p>
+<p><strong>Full Pill (100000px radius)</strong>
+- Used for maximum pill shape</p>
+<p><strong>Blue Bordered</strong>
+- Border: <code>1px solid #0052ff</code>
+- Background: transparent</p>
+<h3 id="cards-containers">Cards &amp; Containers</h3>
+<ul>
+<li>Radius: 8px–40px range</li>
+<li>Borders: <code>1px solid rgba(91,97,110,0.2)</code></li>
+</ul>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-system">Spacing System</h3>
+<ul>
+<li>Base: 8px</li>
+<li>Scale: 1px, 3px, 4px, 5px, 6px, 8px, 10px, 12px, 15px, 16px, 20px, 24px, 25px, 32px, 48px</li>
+</ul>
+<h3 id="border-radius-scale">Border Radius Scale</h3>
+<ul>
+<li>Small (4px–8px): Article links, small cards</li>
+<li>Standard (12px–16px): Cards, menus</li>
+<li>Large (24px–32px): Feature containers</li>
+<li>XL (40px): Large buttons/containers</li>
+<li>Pill (56px): Primary CTAs</li>
+<li>Full (100000px): Maximum pill</li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<p>Minimal shadow system — depth from color contrast between dark/light sections.</p>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use Coinbase Blue (#0052ff) for primary interactive elements</li>
+<li>Apply 56px radius for all CTA buttons</li>
+<li>Use CoinbaseDisplay for hero headings only</li>
+<li>Alternate dark (#0a0b0d) and white sections</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Don't use the blue decoratively — it's functional only</li>
+<li>Don't use sharp corners on CTAs — 56px minimum</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<p>Breakpoints: 400px, 576px, 640px, 768px, 896px, 1280px, 1440px, 1600px</p>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Brand: Coinbase Blue (<code>#0052ff</code>)</li>
+<li>Background: White (<code>#ffffff</code>)</li>
+<li>Dark surface: <code>#0a0b0d</code></li>
+<li>Secondary surface: <code>#eef0f3</code></li>
+<li>Hover: <code>#578bfa</code></li>
+<li>Text: <code>#0a0b0d</code></li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create hero: white background. CoinbaseDisplay 80px, line-height 1.00. Pill CTA (#eef0f3, 56px radius). Hover: #578bfa."</li>
+<li>"Build dark section: #0a0b0d background. CoinbaseDisplay 64px white text. Blue accent link (#0052ff)."</li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Uber</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-uber">Design System: Uber</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Uber's design language is a masterclass in confident minimalism -- a black-and-white universe where every pixel serves a purpose and nothing decorates without earning its place. The entire experience is built on a stark duality: jet black (<code>#000000</code>) and pure white (<code>#ffffff</code>), with virtually no mid-tone grays diluting the message. This isn't the sterile minimalism of a startup that hasn't finished designing -- it's the deliberate restraint of a brand so established it can afford to whisper.</p>
+<p>The signature typeface, UberMove, is a proprietary geometric sans-serif with a distinctly square, engineered quality. Headlines in UberMove Bold at 52px carry the weight of a billboard -- authoritative, direct, unapologetic. The companion face UberMoveText handles body copy and buttons with a slightly softer, more readable character at medium weight (500). Together, they create a typographic system that feels like a transit map: clear, efficient, built for scanning at speed.</p>
+<p>What makes Uber's design truly distinctive is its use of full-bleed photography and illustration paired with pill-shaped interactive elements (999px border-radius). Navigation chips, CTA buttons, and category selectors all share this capsule shape, creating a tactile, thumb-friendly interface language that's unmistakably Uber. The illustrations -- warm, slightly stylized scenes of drivers, riders, and cityscapes -- inject humanity into what could otherwise be a cold, monochrome system. The site alternates between white content sections and a full-black footer, with card-based layouts using the gentlest possible shadows (rgba(0,0,0,0.12-0.16)) to create subtle lift without breaking the flat aesthetic.</p>
+<p><strong>Key Characteristics:</strong>
+- Pure black-and-white foundation with virtually no mid-tone grays in the UI chrome
+- UberMove (headlines) + UberMoveText (body/UI) -- proprietary geometric sans-serif family
+- Pill-shaped everything: buttons, chips, nav items all use 999px border-radius
+- Warm, human illustrations contrasting the stark monochrome interface
+- Card-based layout with whisper-soft shadows (0.12-0.16 opacity)
+- 8px spacing grid with compact, information-dense layouts
+- Bold photography integrated as full-bleed hero backgrounds
+- Black footer anchoring the page with a dark, high-contrast environment</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>Uber Black</strong> (<code>#000000</code>): The defining brand color -- used for primary buttons, headlines, navigation text, and the footer. Not "near-black" or "off-black," but true, uncompromising black.</li>
+<li><strong>Pure White</strong> (<code>#ffffff</code>): The primary surface color and inverse text. Used for page backgrounds, card surfaces, and text on black elements.</li>
+</ul>
+<h3 id="interactive-button-states">Interactive &amp; Button States</h3>
+<ul>
+<li><strong>Hover Gray</strong> (<code>#e2e2e2</code>): White button hover state -- a clean, cool light gray that provides clear feedback without warmth.</li>
+<li><strong>Hover Light</strong> (<code>#f3f3f3</code>): Subtle hover for elevated white buttons -- barely-there gray for gentle interaction feedback.</li>
+<li><strong>Chip Gray</strong> (<code>#efefef</code>): Background for secondary/filter buttons and navigation chips -- a neutral, ultra-light gray.</li>
+</ul>
+<h3 id="text-content">Text &amp; Content</h3>
+<ul>
+<li><strong>Body Gray</strong> (<code>#4b4b4b</code>): Secondary text and footer links -- a true mid-gray with no warm or cool bias.</li>
+<li><strong>Muted Gray</strong> (<code>#afafaf</code>): Tertiary text, de-emphasized footer links, and placeholder content.</li>
+</ul>
+<h3 id="borders-separation">Borders &amp; Separation</h3>
+<ul>
+<li><strong>Border Black</strong> (<code>#000000</code>): Thin 1px borders for structural containment -- used sparingly on dividers and form containers.</li>
+</ul>
+<h3 id="shadows-depth">Shadows &amp; Depth</h3>
+<ul>
+<li><strong>Shadow Light</strong> (<code>rgba(0, 0, 0, 0.12)</code>): Standard card elevation -- a featherweight lift for content cards.</li>
+<li><strong>Shadow Medium</strong> (<code>rgba(0, 0, 0, 0.16)</code>): Slightly stronger elevation for floating action buttons and overlays.</li>
+<li><strong>Button Press</strong> (<code>rgba(0, 0, 0, 0.08)</code>): Inset shadow for active/pressed states on secondary buttons.</li>
+</ul>
+<h3 id="link-states">Link States</h3>
+<ul>
+<li><strong>Default Link Blue</strong> (<code>#0000ee</code>): Standard browser blue for text links with underline -- used in body content.</li>
+<li><strong>Link White</strong> (<code>#ffffff</code>): Links on dark surfaces -- used in footer and dark sections.</li>
+<li><strong>Link Black</strong> (<code>#000000</code>): Links on light surfaces with underline decoration.</li>
+</ul>
+<h3 id="gradient-system">Gradient System</h3>
+<ul>
+<li>Uber's design is <strong>entirely gradient-free</strong>. The black/white duality and flat color blocks create all visual hierarchy. No gradients appear anywhere in the system -- every surface is a solid color, every transition is a hard edge or a shadow.</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-family">Font Family</h3>
+<ul>
+<li><strong>Headline / Display</strong>: <code>UberMove</code>, with fallbacks: <code>UberMoveText, system-ui, Helvetica Neue, Helvetica, Arial, sans-serif</code></li>
+<li><strong>Body / UI</strong>: <code>UberMoveText</code>, with fallbacks: <code>system-ui, Helvetica Neue, Helvetica, Arial, sans-serif</code></li>
+</ul>
+<p><em>Note: UberMove and UberMoveText are proprietary typefaces. For external implementations, use <code>system-ui</code> or Inter as the closest available substitute. The geometric, square-proportioned character of UberMove can be approximated with Inter or DM Sans.</em></p>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display / Hero</td>
+<td>UberMove</td>
+<td>52px (3.25rem)</td>
+<td>700</td>
+<td>1.23 (tight)</td>
+<td>Maximum impact, billboard presence</td>
+</tr>
+<tr>
+<td>Section Heading</td>
+<td>UberMove</td>
+<td>36px (2.25rem)</td>
+<td>700</td>
+<td>1.22 (tight)</td>
+<td>Major section anchors</td>
+</tr>
+<tr>
+<td>Card Title</td>
+<td>UberMove</td>
+<td>32px (2rem)</td>
+<td>700</td>
+<td>1.25 (tight)</td>
+<td>Card and feature headings</td>
+</tr>
+<tr>
+<td>Sub-heading</td>
+<td>UberMove</td>
+<td>24px (1.5rem)</td>
+<td>700</td>
+<td>1.33</td>
+<td>Secondary section headers</td>
+</tr>
+<tr>
+<td>Small Heading</td>
+<td>UberMove</td>
+<td>20px (1.25rem)</td>
+<td>700</td>
+<td>1.40</td>
+<td>Compact headings, list titles</td>
+</tr>
+<tr>
+<td>Nav / UI Large</td>
+<td>UberMoveText</td>
+<td>18px (1.13rem)</td>
+<td>500</td>
+<td>1.33</td>
+<td>Navigation links, prominent UI text</td>
+</tr>
+<tr>
+<td>Body / Button</td>
+<td>UberMoveText</td>
+<td>16px (1rem)</td>
+<td>400-500</td>
+<td>1.25-1.50</td>
+<td>Standard body text, button labels</td>
+</tr>
+<tr>
+<td>Caption</td>
+<td>UberMoveText</td>
+<td>14px (0.88rem)</td>
+<td>400-500</td>
+<td>1.14-1.43</td>
+<td>Metadata, descriptions, small links</td>
+</tr>
+<tr>
+<td>Micro</td>
+<td>UberMoveText</td>
+<td>12px (0.75rem)</td>
+<td>400</td>
+<td>1.67 (relaxed)</td>
+<td>Fine print, legal text</td>
+</tr>
+</tbody>
+</table>
+<h3 id="principles">Principles</h3>
+<ul>
+<li><strong>Bold headlines, medium body</strong>: UberMove headings are exclusively weight 700 (bold) -- every headline hits with billboard force. UberMoveText body and UI text uses 400-500, creating a clear visual hierarchy through weight contrast.</li>
+<li><strong>Tight heading line-heights</strong>: All headlines use line-heights between 1.22-1.40 -- compact and punchy, designed for scanning rather than reading.</li>
+<li><strong>Functional typography</strong>: There is no decorative type treatment anywhere. No letter-spacing, no text-transform, no ornamental sizing. Every text element serves a direct communication purpose.</li>
+<li><strong>Two fonts, strict roles</strong>: UberMove is exclusively for headings. UberMoveText is exclusively for body, buttons, links, and UI. The boundary is never crossed.</li>
+</ul>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<p><strong>Primary Black (CTA)</strong>
+- Background: Uber Black (<code>#000000</code>)
+- Text: Pure White (<code>#ffffff</code>)
+- Padding: 10px 12px
+- Radius: 999px (full pill)
+- Outline: none
+- Focus: inset ring <code>rgb(255,255,255) 0px 0px 0px 2px</code>
+- The primary action button -- bold, high-contrast, unmissable</p>
+<p><strong>Secondary White</strong>
+- Background: Pure White (<code>#ffffff</code>)
+- Text: Uber Black (<code>#000000</code>)
+- Padding: 10px 12px
+- Radius: 999px (full pill)
+- Hover: background shifts to Hover Gray (<code>#e2e2e2</code>)
+- Focus: background shifts to Hover Gray, inset ring appears
+- Used on dark surfaces or as a secondary action alongside Primary Black</p>
+<p><strong>Chip / Filter</strong>
+- Background: Chip Gray (<code>#efefef</code>)
+- Text: Uber Black (<code>#000000</code>)
+- Padding: 14px 16px
+- Radius: 999px (full pill)
+- Active: inset shadow <code>rgba(0,0,0,0.08)</code>
+- Navigation chips, category selectors, filter toggles</p>
+<p><strong>Floating Action</strong>
+- Background: Pure White (<code>#ffffff</code>)
+- Text: Uber Black (<code>#000000</code>)
+- Padding: 14px
+- Radius: 999px (full pill)
+- Shadow: <code>rgba(0,0,0,0.16) 0px 2px 8px 0px</code>
+- Transform: <code>translateY(2px)</code> slight offset
+- Hover: background shifts to <code>#f3f3f3</code>
+- Map controls, scroll-to-top, floating CTAs</p>
+<h3 id="cards-containers">Cards &amp; Containers</h3>
+<ul>
+<li>Background: Pure White (<code>#ffffff</code>) on white pages; no distinct card background differentiation</li>
+<li>Border: none by default -- cards are defined by shadow, not stroke</li>
+<li>Radius: 8px for standard content cards; 12px for featured/promoted cards</li>
+<li>Shadow: <code>rgba(0,0,0,0.12) 0px 4px 16px 0px</code> for standard lift</li>
+<li>Cards are content-dense with minimal internal padding</li>
+<li>Image-led cards use full-bleed imagery with text overlay or below</li>
+</ul>
+<h3 id="inputs-forms">Inputs &amp; Forms</h3>
+<ul>
+<li>Text: Uber Black (<code>#000000</code>)</li>
+<li>Background: Pure White (<code>#ffffff</code>)</li>
+<li>Border: 1px solid Black (<code>#000000</code>) -- the only place visible borders appear prominently</li>
+<li>Radius: 8px</li>
+<li>Padding: standard comfortable spacing</li>
+<li>Focus: no extracted custom focus state -- relies on standard browser focus ring</li>
+</ul>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li>Sticky top navigation with white background</li>
+<li>Logo: Uber wordmark/icon at 24x24px in black</li>
+<li>Links: UberMoveText at 14-18px, weight 500, in Uber Black</li>
+<li>Pill-shaped nav chips with Chip Gray (<code>#efefef</code>) background for category navigation ("Ride", "Drive", "Business", "Uber Eats")</li>
+<li>Menu toggle: circular button with 50% border-radius</li>
+<li>Mobile: hamburger menu pattern</li>
+</ul>
+<h3 id="image-treatment">Image Treatment</h3>
+<ul>
+<li>Warm, hand-illustrated scenes (not photographs for feature sections)</li>
+<li>Illustration style: slightly stylized people, warm color palette within illustrations, contemporary vibe</li>
+<li>Hero sections use bold photography or illustration as full-width backgrounds</li>
+<li>QR codes for app download CTAs</li>
+<li>All imagery uses standard 8px or 12px border-radius when contained in cards</li>
+</ul>
+<h3 id="distinctive-components">Distinctive Components</h3>
+<p><strong>Category Pill Navigation</strong>
+- Horizontal row of pill-shaped buttons for top-level navigation ("Ride", "Drive", "Business", "Uber Eats", "About")
+- Each pill: Chip Gray background, black text, 999px radius
+- Active state indicated by black background with white text (inversion)</p>
+<p><strong>Hero with Dual Action</strong>
+- Split hero: text/CTA on left, map/illustration on right
+- Two input fields side by side for pickup/destination
+- "See prices" CTA button in black pill</p>
+<p><strong>Plan-Ahead Cards</strong>
+- Cards promoting features like "Uber Reserve" and trip planning
+- Illustration-heavy with warm, human-centric imagery
+- Black CTA buttons with white text at bottom</p>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-system">Spacing System</h3>
+<ul>
+<li>Base unit: 8px</li>
+<li>Scale: 4px, 6px, 8px, 10px, 12px, 14px, 16px, 18px, 20px, 24px, 32px</li>
+<li>Button padding: 10px 12px (compact) or 14px 16px (comfortable)</li>
+<li>Card internal padding: approximately 24-32px</li>
+<li>Section vertical spacing: generous but efficient -- approximately 64-96px between major sections</li>
+</ul>
+<h3 id="grid-container">Grid &amp; Container</h3>
+<ul>
+<li>Max container width: approximately 1136px, centered</li>
+<li>Hero: split layout with text left, visual right</li>
+<li>Feature sections: 2-column card grids or full-width single-column</li>
+<li>Footer: multi-column link grid on black background</li>
+<li>Full-width sections extending to viewport edges</li>
+</ul>
+<h3 id="whitespace-philosophy">Whitespace Philosophy</h3>
+<ul>
+<li><strong>Efficient, not airy</strong>: Uber's whitespace is functional -- enough to separate, never enough to feel empty. This is transit-system spacing: compact, clear, purpose-driven.</li>
+<li><strong>Content-dense cards</strong>: Cards pack information tightly with minimal internal spacing, relying on shadow and radius to define boundaries.</li>
+<li><strong>Section breathing room</strong>: Major sections get generous vertical spacing, but within sections, elements are closely grouped.</li>
+</ul>
+<h3 id="border-radius-scale">Border Radius Scale</h3>
+<ul>
+<li>Sharp (0px): No square corners used in interactive elements</li>
+<li>Standard (8px): Content cards, input fields, listboxes</li>
+<li>Comfortable (12px): Featured cards, larger containers, link cards</li>
+<li>Full Pill (999px): All buttons, chips, navigation items, pills</li>
+<li>Circle (50%): Avatar images, icon containers, circular controls</li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Treatment</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flat (Level 0)</td>
+<td>No shadow, solid background</td>
+<td>Page background, inline content, text sections</td>
+</tr>
+<tr>
+<td>Subtle (Level 1)</td>
+<td><code>rgba(0,0,0,0.12) 0px 4px 16px</code></td>
+<td>Standard content cards, feature blocks</td>
+</tr>
+<tr>
+<td>Medium (Level 2)</td>
+<td><code>rgba(0,0,0,0.16) 0px 4px 16px</code></td>
+<td>Elevated cards, overlay elements</td>
+</tr>
+<tr>
+<td>Floating (Level 3)</td>
+<td><code>rgba(0,0,0,0.16) 0px 2px 8px</code> + translateY(2px)</td>
+<td>Floating action buttons, map controls</td>
+</tr>
+<tr>
+<td>Pressed (Level 4)</td>
+<td><code>rgba(0,0,0,0.08) inset</code> (999px spread)</td>
+<td>Active/pressed button states</td>
+</tr>
+<tr>
+<td>Focus Ring</td>
+<td><code>rgb(255,255,255) 0px 0px 0px 2px inset</code></td>
+<td>Keyboard focus indicators</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Shadow Philosophy</strong>: Uber uses shadow purely as a structural tool, never decoratively. Shadows are always black at very low opacity (0.08-0.16), creating the bare minimum lift needed to separate content layers. The blur radii are moderate (8-16px) -- enough to feel natural but never dramatic. There are no colored shadows, no layered shadow stacks, and no ambient glow effects. Depth is communicated more through the black/white section contrast than through shadow elevation.</p>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use true black (<code>#000000</code>) and pure white (<code>#ffffff</code>) as the primary palette -- the stark contrast IS Uber</li>
+<li>Use 999px border-radius for all buttons, chips, and pill-shaped navigation elements</li>
+<li>Keep all headings in UberMove Bold (700) for billboard-level impact</li>
+<li>Use whisper-soft shadows (0.12-0.16 opacity) for card elevation -- barely visible</li>
+<li>Maintain the compact, information-dense layout style -- Uber prioritizes efficiency over airiness</li>
+<li>Use warm, human-centric illustrations to soften the monochrome interface</li>
+<li>Apply 8px radius for content cards and 12px for featured containers</li>
+<li>Use UberMoveText at weight 500 for navigation and prominent UI text</li>
+<li>Pair black primary buttons with white secondary buttons for dual-action layouts</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Don't introduce color into the UI chrome -- Uber's interface is strictly black, white, and gray</li>
+<li>Don't use rounded corners less than 999px on buttons -- the full-pill shape is a core identity element</li>
+<li>Don't apply heavy shadows or drop shadows with high opacity -- depth is whisper-subtle</li>
+<li>Don't use serif fonts anywhere -- Uber's typography is exclusively geometric sans-serif</li>
+<li>Don't create airy, spacious layouts with excessive whitespace -- Uber's density is intentional</li>
+<li>Don't use gradients or color overlays -- every surface is a flat, solid color</li>
+<li>Don't mix UberMove into body text or UberMoveText into headlines -- the hierarchy is strict</li>
+<li>Don't use decorative borders -- borders are functional (inputs, dividers) or absent entirely</li>
+<li>Don't soften the black/white contrast with off-whites or near-blacks -- the duality is deliberate</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<h3 id="breakpoints">Breakpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Width</th>
+<th>Key Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mobile Small</td>
+<td>320px</td>
+<td>Minimum layout, single column, stacked inputs, compact typography</td>
+</tr>
+<tr>
+<td>Mobile</td>
+<td>600px</td>
+<td>Standard mobile, stacked layout, hamburger nav</td>
+</tr>
+<tr>
+<td>Tablet Small</td>
+<td>768px</td>
+<td>Two-column grids begin, expanded card layouts</td>
+</tr>
+<tr>
+<td>Tablet</td>
+<td>1119px</td>
+<td>Full tablet layout, side-by-side hero content</td>
+</tr>
+<tr>
+<td>Desktop Small</td>
+<td>1120px</td>
+<td>Desktop grid activates, horizontal nav pills</td>
+</tr>
+<tr>
+<td>Desktop</td>
+<td>1136px</td>
+<td>Full desktop layout, maximum container width, split hero</td>
+</tr>
+</tbody>
+</table>
+<h3 id="touch-targets">Touch Targets</h3>
+<ul>
+<li>All pill buttons: minimum 44px height (10-14px vertical padding + line-height)</li>
+<li>Navigation chips: generous 14px 16px padding for comfortable thumb tapping</li>
+<li>Circular controls (menu, close): 50% radius ensures large, easy-to-hit targets</li>
+<li>Card surfaces serve as full-area touch targets on mobile</li>
+</ul>
+<h3 id="collapsing-strategy">Collapsing Strategy</h3>
+<ul>
+<li><strong>Navigation</strong>: Horizontal pill nav collapses to hamburger menu with circular toggle</li>
+<li><strong>Hero</strong>: Split layout (text + map/visual) stacks to single column -- text above, visual below</li>
+<li><strong>Input fields</strong>: Side-by-side pickup/destination inputs stack vertically</li>
+<li><strong>Feature cards</strong>: 2-column grid collapses to full-width stacked cards</li>
+<li><strong>Headings</strong>: 52px display scales down through 36px, 32px, 24px, 20px</li>
+<li><strong>Footer</strong>: Multi-column link grid collapses to accordion or stacked single column</li>
+<li><strong>Category pills</strong>: Horizontal scroll with overflow on smaller screens</li>
+</ul>
+<h3 id="image-behavior">Image Behavior</h3>
+<ul>
+<li>Illustrations scale proportionally within their containers</li>
+<li>Hero imagery maintains aspect ratio, may crop on smaller screens</li>
+<li>QR code sections hide on mobile (app download shifts to direct store links)</li>
+<li>Card imagery maintains 8-12px border radius at all sizes</li>
+</ul>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Primary Button: "Uber Black (#000000)"</li>
+<li>Page Background: "Pure White (#ffffff)"</li>
+<li>Button Text (on black): "Pure White (#ffffff)"</li>
+<li>Button Text (on white): "Uber Black (#000000)"</li>
+<li>Secondary Text: "Body Gray (#4b4b4b)"</li>
+<li>Tertiary Text: "Muted Gray (#afafaf)"</li>
+<li>Chip Background: "Chip Gray (#efefef)"</li>
+<li>Hover State: "Hover Gray (#e2e2e2)"</li>
+<li>Card Shadow: "rgba(0,0,0,0.12) 0px 4px 16px"</li>
+<li>Footer Background: "Uber Black (#000000)"</li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create a hero section on Pure White (#ffffff) with a headline at 52px UberMove Bold (700), line-height 1.23. Use Uber Black (#000000) text. Add a subtitle in Body Gray (#4b4b4b) at 16px UberMoveText weight 400 with 1.50 line-height. Place an Uber Black (#000000) pill CTA button with Pure White text, 999px radius, padding 10px 12px."</li>
+<li>"Design a category navigation bar with horizontal pill buttons. Each pill: Chip Gray (#efefef) background, Uber Black (#000000) text, 14px 16px padding, 999px border-radius. Active pill inverts to Uber Black background with Pure White text. Use UberMoveText at 14px weight 500."</li>
+<li>"Build a feature card on Pure White (#ffffff) with 8px border-radius and shadow rgba(0,0,0,0.12) 0px 4px 16px. Title in UberMove at 24px weight 700, description in Body Gray (#4b4b4b) at 16px UberMoveText. Add a black pill CTA button at the bottom."</li>
+<li>"Create a dark footer on Uber Black (#000000) with Pure White (#ffffff) heading text in UberMove at 20px weight 700. Footer links in Muted Gray (#afafaf) at 14px UberMoveText. Links hover to Pure White. Multi-column grid layout."</li>
+<li>"Design a floating action button with Pure White (#ffffff) background, 999px radius, 14px padding, and shadow rgba(0,0,0,0.16) 0px 2px 8px. Hover shifts background to #f3f3f3. Use for scroll-to-top or map controls."</li>
+</ul>
+<h3 id="iteration-guide">Iteration Guide</h3>
+<ol>
+<li>Focus on ONE component at a time</li>
+<li>Reference the strict black/white palette -- "use Uber Black (#000000)" not "make it dark"</li>
+<li>Always specify 999px radius for buttons and pills -- this is non-negotiable for the Uber identity</li>
+<li>Describe the font family explicitly -- "UberMove Bold for the heading, UberMoveText Medium for the label"</li>
+<li>For shadows, use "whisper shadow (rgba(0,0,0,0.12) 0px 4px 16px)" -- never heavy drop shadows</li>
+<li>Keep layouts compact and information-dense -- Uber is efficient, not airy</li>
+<li>Illustrations should be warm and human -- describe "stylized people in warm tones" not abstract shapes</li>
+<li>Pair black CTAs with white secondaries for balanced dual-action layouts</li>
+</ol>
+</main>
+</body>
+</html>

@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent Organization — 法人経営エージェント群</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="ai-agent-organization">AI Agent Organization — 法人経営エージェント群</h1>
+<h2 id="_1">プロジェクト概要</h2>
+<p>法人経営を0から100まで遂行可能なAIエージェント組織。
+CEO Agentを頂点とし、COO Agentが業務執行を統括する35体のエージェント（+ Web Builder サブエージェント8体）が、相互に検証（チェック&amp;バランス）しながら経営全機能をカバーする。
+企画・戦略立案から実際のプロダクト開発・サービス化まで一気通貫で実行可能。
+Claude Code の Maxプラン内で動作し、追加API費用なし。</p>
+<h2 id="_2">組織図</h2>
+<pre class="codehilite"><code>                         ┌──────────────┐
+                         │  CEO Agent   │ ← 経営戦略・最終意思決定・対外
+                         └──────┬───────┘
+                                │
+                         ┌──────▼───────┐
+                         │  COO Agent   │ ← 業務執行統括・オペレーション・対内
+                         └──────┬───────┘
+                                │
+     ┌──────────┬───────────────┼───────────────┬──────────┐
+     │          │               │               │          │
+┌────▼────┐┌────▼─────┐ ┌──────▼──────┐ ┌──────▼────┐┌────▼────────┐
+│ 営業部門 ││ 管理部門  │ │コンサル事業部│ │ 開発部門   ││ 横断チーム   │
+└────┬────┘└────┬─────┘ └──────┬──────┘ └──────┬────┘└────┬────────┘
+     │          │              │               │          │
+  Sales      Finance     Retriever        Tech Lead    QA Reviewer
+  Marketing  HR          Issue Str.       Frontend E.  KPI Dashboard
+  CS         Legal       Market Res.      Backend E.   Project Manager
+  SNS Op.                Analogy F.       Infrastructure Data Analyst
+  Ad Ops.                Marketing An.    QA Engineer   Devil's Advocate
+  Content C.             Strategist       UI/UX Designer
+  PR                     Devil's Adv.     Data Engineer
+                         Report B.        Designer
+                         Document B.      Engineer
+                                          Web Builder
+                                            └─ 8 sub-agents
+</code></pre>
+
+<h2 id="35-8-43-50">エージェント構成（全35体 + サブ8体 = 43名 / 上限50名）</h2>
+<p>各エージェントのプロンプトは <code>/agents/&lt;agent_name&gt;/prompt.md</code> に定義。
+出力は <code>/agents/&lt;agent_name&gt;/output.json</code> に保存される。</p>
+<h3 id="2">統括（2名）</h3>
+<ol>
+<li><strong>CEO Agent</strong> (<code>ceo</code>) — 経営戦略・最終意思決定・投資判断・組織最適化</li>
+<li><strong>COO Agent</strong> (<code>coo</code>) — 業務執行統括・プロセス管理・エージェント間調整</li>
+</ol>
+<h3 id="9">コンサルティング事業部（9名）</h3>
+<ol start="3">
+<li><strong>Retriever</strong> (<code>retriever</code>) — Notion議事録取得・構造化</li>
+<li><strong>Issue Structurer</strong> (<code>issue_structurer</code>) — ビジネス課題の言語化・構造化</li>
+<li><strong>Market Researcher</strong> (<code>market_researcher</code>) — 市場・競合・顧客分析（並列実行）</li>
+<li><strong>Analogy Finder</strong> (<code>analogy_finder</code>) — 異業種アナロジー事例収集（並列実行）</li>
+<li><strong>Marketing Analyst</strong> (<code>marketing_analyst</code>) — 競合マーケティング施策の深掘り分析（並列実行）</li>
+<li><strong>Strategist</strong> (<code>strategist</code>) — 戦略構築</li>
+<li><strong>Devil's Advocate</strong> (<code>devils_advocate</code>) — 独立した批判的検証（全部門の重要意思決定対象）</li>
+<li><strong>Report Builder</strong> (<code>report_builder</code>) — Google Slides提案資料の構成作成</li>
+<li><strong>Document Builder</strong> (<code>document_builder</code>) — 対話型提案資料作成（テンプレート活用）</li>
+</ol>
+<h3 id="7">営業・マーケティング部門（7名）</h3>
+<ol start="12">
+<li><strong>Sales Agent</strong> (<code>sales</code>) — リード管理・商談パイプライン・受注管理</li>
+<li><strong>Marketing Agent</strong> (<code>marketing</code>) — 自社マーケティング・ブランディング・リード獲得</li>
+<li><strong>Customer Success Agent</strong> (<code>customer_success</code>) — 顧客満足度・リテンション・アップセル</li>
+<li><strong>SNS Operator</strong> (<code>sns_operator</code>) — Instagram/TikTok/YouTube日常運用・エンゲージメント管理</li>
+<li><strong>Ad Operations</strong> (<code>ad_operations</code>) — Google/Meta/TikTok広告運用・ROAS最適化</li>
+<li><strong>Content Creator</strong> (<code>content_creator</code>) — SNS投稿・ブログ・動画脚本・広告コピー制作</li>
+<li><strong>PR Agent</strong> (<code>pr</code>) — 広報・プレスリリース・メディア対応・危機管理広報</li>
+</ol>
+<h3 id="3">管理部門（3名）</h3>
+<ol start="19">
+<li><strong>Finance Agent</strong> (<code>finance</code>) — 経理・財務・見積・請求・PL管理・補助金</li>
+<li><strong>HR Agent</strong> (<code>hr</code>) — 組織設計・採用・評価・エージェント組織管理</li>
+<li><strong>Legal Agent</strong> (<code>legal</code>) — 契約書・コンプライアンス・知財・リスク法務</li>
+</ol>
+<h3 id="10-8">開発部門（10名 + サブ8名）</h3>
+<ol start="22">
+<li><strong>Tech Lead</strong> (<code>tech_lead</code>) — CTO的技術統括・アーキテクチャ設計・技術選定</li>
+<li><strong>Frontend Engineer</strong> (<code>frontend_engineer</code>) — Next.js App Router UI実装・SEO最適化</li>
+<li><strong>Backend Engineer</strong> (<code>backend_engineer</code>) — API設計・DB・認証・Stripe決済連携</li>
+<li><strong>Infrastructure</strong> (<code>infrastructure</code>) — デプロイ・CI/CD・監視・セキュリティ・コスト管理</li>
+<li><strong>QA Engineer</strong> (<code>qa_engineer</code>) — テスト自動化・品質保証（Jest/Playwright）</li>
+<li><strong>UI/UX Designer</strong> (<code>ui_ux_designer</code>) — デザインシステム構築・Figma連携・ユーザビリティ改善</li>
+<li><strong>Data Engineer</strong> (<code>data_engineer</code>) — クローラー・データパイプライン・データ品質管理</li>
+<li><strong>Designer</strong> (<code>designer</code>) — Web/LP/UIデザイン生成（AI Designer MCP活用）</li>
+<li><strong>Engineer</strong> (<code>engineer</code>) — LP/Web/AIシステム実装（Next.js/Python/WordPress）</li>
+<li><strong>Web Builder</strong> (<code>web_builder</code>) — 参考サイト分析→Next.js再現パイプライン<ul>
+<li><code>site_scanner</code> — サイト偵察・技術検出</li>
+<li><code>structure_analyzer</code> — HTML構造・レイアウトパターン解析</li>
+<li><code>design_analyzer</code> — カラー・タイポグラフィ・スペーシング抽出</li>
+<li><code>motion_analyzer</code> — アニメーション・トランジション特定</li>
+<li><code>interaction_analyzer</code> — フォーム・モーダル・タブ等UI要素解析</li>
+<li><code>asset_collector</code> — 画像・フォント・アイコン収集（著作権配慮）</li>
+<li><code>builder</code> — 全解析結果統合→Next.js + Tailwind CSS実装</li>
+<li><code>qa_reviewer</code> — Vercelデプロイ後の比較検証・修正指示</li>
+</ul>
+</li>
+</ol>
+<h3 id="4">横断チーム（4名）</h3>
+<ol start="32">
+<li><strong>Project Manager Agent</strong> (<code>project_manager</code>) — プロジェクト進捗・リソース配分・納期管理</li>
+<li><strong>QA Reviewer Agent</strong> (<code>qa_reviewer</code>) — 全出力の品質検証・相互整合性チェック（Quality Assurance機能統合済み）</li>
+<li><strong>KPI Dashboard Agent</strong> (<code>kpi_dashboard</code>) — 全社KPI集計・異常検知・レポーティング</li>
+<li><strong>Data Analyst</strong> (<code>data_analyst</code>) — 横断データ分析・インサイト抽出・意思決定支援</li>
+</ol>
+<h3 id="_3">廃止済み</h3>
+<ul>
+<li>~~Quality Assurance (<code>quality_assurance</code>)~~ — 2026-04-08 QA Reviewer に統合</li>
+</ul>
+<h2 id="_4">相互干渉（チェック&amp;バランス）</h2>
+<p>全エージェントはQA Reviewerによる品質チェックを受ける。
+さらに各エージェントは最低3体以上の他エージェントからの検証を受ける（<code>prompt.md</code> 内の「相互干渉」セクション参照）。
+平均干渉数は4.3体/エージェント（2026-04-09時点）。</p>
+<h3 id="ceocoo">CEO/COO の役割分担</h3>
+<ul>
+<li><strong>CEO</strong>: 経営戦略・最終意思決定・投資判断・対外コミュニケーション</li>
+<li><strong>COO</strong>: 業務執行・オペレーション管理・エージェント間調整・日常品質運用</li>
+</ul>
+<h3 id="_5">検証の独立性</h3>
+<ul>
+<li><strong>Devil's Advocate</strong>: 全部門の重要意思決定に対し独立した批判的検証を実施</li>
+<li><strong>QA Reviewer</strong>: 全エージェント出力のスキーマ・コンテンツ・クロスリファレンス・ビジネス妥当性を検証</li>
+<li><strong>Data Analyst</strong>: 定量データに基づく施策効果検証</li>
+</ul>
+<h3 id="_6">主要な相互連携</h3>
+<table>
+<thead>
+<tr>
+<th>連携</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CEO ↔ COO</td>
+<td>経営方針 ↔ 実行状況報告</td>
+</tr>
+<tr>
+<td>CEO ↔ Devil's Advocate</td>
+<td>戦略判断 ↔ 批判的検証</td>
+</tr>
+<tr>
+<td>Sales → Retriever</td>
+<td>商談ヒアリング議事録の取得トリガー</td>
+</tr>
+<tr>
+<td>Sales ↔ Finance</td>
+<td>見積依頼・受注通知 ↔ 請求・入金管理</td>
+</tr>
+<tr>
+<td>Sales → PM</td>
+<td>受注後プロジェクト立ち上げ</td>
+</tr>
+<tr>
+<td>PM → Tech Lead</td>
+<td>開発プロジェクトの技術方針決定</td>
+</tr>
+<tr>
+<td>Tech Lead ↔ Frontend/Backend/Infra</td>
+<td>開発タスク振り分け ↔ 技術レビュー</td>
+</tr>
+<tr>
+<td>Designer → Frontend Engineer</td>
+<td>デザイン→実装ハンドオフ</td>
+</tr>
+<tr>
+<td>UI/UX Designer → Designer</td>
+<td>デザインシステム・トークン提供</td>
+</tr>
+<tr>
+<td>Backend Engineer ↔ Infrastructure</td>
+<td>デプロイ依頼 ↔ インフラ構成検証</td>
+</tr>
+<tr>
+<td>QA Engineer → Frontend/Backend</td>
+<td>テスト結果・バグ報告</td>
+</tr>
+<tr>
+<td>Data Engineer → KPI Dashboard</td>
+<td>データパイプライン→集計基盤</td>
+</tr>
+<tr>
+<td>PM ↔ Finance</td>
+<td>工数実績・請求トリガー ↔ 予算検証</td>
+</tr>
+<tr>
+<td>PM → CS</td>
+<td>納品後ハンドオフ</td>
+</tr>
+<tr>
+<td>CS ↔ Sales</td>
+<td>アップセル機会・リファラル ↔ 顧客情報</td>
+</tr>
+<tr>
+<td>Marketing → Content Creator → SNS Op.</td>
+<td>コンテンツ企画→制作→配信</td>
+</tr>
+<tr>
+<td>Marketing → Ad Operations</td>
+<td>広告戦略→運用実行</td>
+</tr>
+<tr>
+<td>Marketing ↔ Sales</td>
+<td>リード引き渡し ↔ リード品質FB</td>
+</tr>
+<tr>
+<td>PR ↔ Marketing</td>
+<td>広報戦略 ↔ ブランドメッセージ整合</td>
+</tr>
+<tr>
+<td>PR → Legal</td>
+<td>プレスリリース法的チェック</td>
+</tr>
+<tr>
+<td>Data Analyst → CEO</td>
+<td>分析レポート・意思決定支援</td>
+</tr>
+<tr>
+<td>Finance → CEO</td>
+<td>週次PL・キャッシュフロー</td>
+</tr>
+<tr>
+<td>KPI Dashboard → CEO</td>
+<td>日次KPI・異常アラート</td>
+</tr>
+<tr>
+<td>QA Reviewer → 全体</td>
+<td>品質差し戻し・改善指示</td>
+</tr>
+<tr>
+<td>Devil's Advocate → 全体</td>
+<td>重要意思決定への批判的検証</td>
+</tr>
+<tr>
+<td>CEO → COO → 全体</td>
+<td>優先度指示・リソース配分・最終承認</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_7">エージェント定義</h2>
+<p>各エージェントのプロンプトは <code>/agents/&lt;agent_name&gt;/prompt.md</code> に定義。
+出力は <code>/agents/&lt;agent_name&gt;/output.json</code> に保存される。
+各エージェントのプロンプトには「相互干渉（検証を受ける相手）」セクションが含まれ、チェック&amp;バランスが明文化されている。</p>
+<h2 id="_8">実行方法</h2>
+<h3 id="_9">戦略提案パイプライン</h3>
+<pre class="codehilite"><code>/agents/orchestrator/PIPELINE.md の手順に従って、
+Notion の議事録ページ「会議名」からパイプラインを実行してください。
+</code></pre>
+
+<h3 id="_10">ワンショット実行（コピペ用プロンプト）</h3>
+<p><code>/agents/orchestrator/run.md</code> にコピペ用プロンプトを用意。
+<code>{{会議名}}</code> を置き換えて Claude Code に貼り付けるだけで全ステップが実行される。</p>
+<h3 id="_11">日次レポート</h3>
+<p><code>/daily_reports/YYYY-MM-DD.md</code> に全エージェントの稼働状況・組織診断を記録。
+CEO Agentが各エージェントの業務状況、組織診断、改善計画を管理。</p>
+<h3 id="_12">他の人と共有する場合</h3>
+<ol>
+<li>このリポジトリを <code>git clone</code> する</li>
+<li>Claude Code（Max プラン）を開く</li>
+<li>MCP サーバーを設定する（Notion / Google Drive）</li>
+<li>上記いずれかの方法で実行</li>
+</ol>
+<h2 id="_13">共有リソース</h2>
+<h3 id="awesome-design-md">デザインシステム（awesome-design-md）</h3>
+<p><code>/design-md/</code> に54社以上の企業デザインシステム（DESIGN.md）を格納。
+LP制作・Web制作・提案資料作成時のデザインリファレンスとして、Marketing Agent と Report Builder Agent が参照する。</p>
+<ul>
+<li>一覧: <code>/design-md/README.md</code></li>
+<li>個別: <code>/design-md/{company-name}/DESIGN.md</code></li>
+<li>出典: <a href="https://github.com/VoltAgent/awesome-design-md">VoltAgent/awesome-design-md</a></li>
+</ul>
+<h3 id="motion_30">モーションライブラリ（MOTION_30）</h3>
+<p><code>/design-md/motion-library/MOTION_30.md</code> に Web コンテンツ向けモーション30選を収録。
+LP・Webサイト・ダッシュボード等の制作時に、Designer / UI/UX Designer / Engineer / Frontend Engineer / Web Builder（motion_analyzer / builder）が共通語彙として参照する。</p>
+<ul>
+<li>5カテゴリ（ナビ遷移 / テキスト / インタラクション / スクロール背景 / 先進性）× 各6モーション</li>
+<li>各モーションに <code>motion_key</code> / 演出 / 活用例 / 推奨実装 / サンプルコード / アクセシビリティ注意を記載</li>
+<li><strong>必須ルール</strong>:</li>
+<li>モーション指定・実装は必ず <code>motion_key</code> を引用</li>
+<li>該当モーションが無い場合はドキュメントに追加してから使用</li>
+<li><code>prefers-reduced-motion: reduce</code> 対応を全モーションで実装</li>
+</ul>
+<h2 id="_14">事業領域</h2>
+<ul>
+<li>SNSマーケティング（Instagram, TikTok, YouTube 運用/広告/クリエイティブ）</li>
+<li>不動産業界特化型BPO（AIエージェント活用）</li>
+<li>AIシステム制作（補助金活用）</li>
+<li>LP等のWeb制作</li>
+</ul>
+<h2 id="_15">ゴール</h2>
+<p>全ての業務に対してプロのエージェントが存在し、法人経営を0から100まで行える組織配置と、マネジメント力のある統括エージェント（CEO Agent）の育成。
+エージェント上限は50名。追加が必要な場合はその根拠と提案をCEOに上申する。</p>
+<h2 id="development-standards">開発標準（Development Standards）</h2>
+<h3 id="_16">コード品質基準</h3>
+<p>全開発エージェント（Tech Lead / Frontend / Backend / Infrastructure / QA / Engineer）が準拠する基準。</p>
+<table>
+<thead>
+<tr>
+<th>基準</th>
+<th>ルール</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>関数の行数</td>
+<td><strong>50行以内</strong>（超過時は分割を検討）</td>
+</tr>
+<tr>
+<td>ファイルの行数</td>
+<td><strong>800行以内</strong>（超過時はモジュール分割）</td>
+</tr>
+<tr>
+<td>ネストの深さ</td>
+<td><strong>4段階以内</strong>（早期リターンで解消）</td>
+</tr>
+<tr>
+<td>テストカバレッジ</td>
+<td><strong>ステートメント80%以上</strong>（ユニット + 結合 + E2E）</td>
+</tr>
+<tr>
+<td>命名</td>
+<td>明確で意図が伝わる名前。略語は一般的なもののみ</td>
+</tr>
+<tr>
+<td>コメント</td>
+<td>ロジックが自明でない箇所のみ。WHYを書く</td>
+</tr>
+<tr>
+<td>エラーハンドリング</td>
+<td>システム境界（ユーザー入力・外部API）で必ずバリデーション</td>
+</tr>
+<tr>
+<td>不変性</td>
+<td>既存オブジェクトを直接変更しない。新しいオブジェクトを生成</td>
+</tr>
+</tbody>
+</table>
+<h3 id="tdd">TDD（テスト駆動開発）ワークフロー</h3>
+<p>開発部門は以下のサイクルを標準とする:</p>
+<pre class="codehilite"><code>1. RED    — 失敗するテストを先に書く
+2. GREEN  — テストを通す最小限のコードを実装
+3. REFACTOR — テストを維持しつつリファクタリング
+</code></pre>
+
+<p><strong>テストピラミッド</strong>:
+- ユニットテスト: 70%（ビジネスロジック・ユーティリティ）
+- 結合テスト: 20%（API・サービス間連携）
+- E2Eテスト: 10%（クリティカルユーザーフロー / Playwright）</p>
+<h3 id="git">Git ワークフロー</h3>
+<h4 id="conventional-commits">コミットメッセージ規約（Conventional Commits）</h4>
+<pre class="codehilite"><code>&lt;type&gt;(&lt;scope&gt;): &lt;description&gt;
+
+feat:     新機能
+fix:      バグ修正
+refactor: リファクタリング（機能変更なし）
+test:     テスト追加・修正
+docs:     ドキュメントのみの変更
+style:    コードスタイル修正（動作に影響なし）
+chore:    ビルド・補助ツール・設定の変更
+perf:     パフォーマンス改善
+ci:       CI/CD設定の変更
+</code></pre>
+
+<h4 id="_17">ブランチ命名規則</h4>
+<pre class="codehilite"><code>feature/&lt;短い説明&gt;   — 新機能
+fix/&lt;短い説明&gt;       — バグ修正
+refactor/&lt;短い説明&gt;  — リファクタリング
+hotfix/&lt;短い説明&gt;    — 緊急修正
+</code></pre>
+
+<h4 id="pr">PRワークフロー</h4>
+<ol>
+<li>機能ブランチで開発</li>
+<li>テスト通過を確認</li>
+<li>PR作成（タイトル70文字以内 + Summary + Test Plan）</li>
+<li>QA Reviewer / Tech Lead のレビュー</li>
+<li>CI通過後にマージ</li>
+</ol>
+<h2 id="security-standards">セキュリティ基準（Security Standards）</h2>
+<h3 id="_18">コミット前の必須チェック</h3>
+<p>全開発エージェントはコミット前に以下を確認する:</p>
+<ul>
+<li>[ ] <strong>シークレット漏洩なし</strong> — APIキー・パスワード・トークンのハードコードがないこと</li>
+<li>[ ] <strong>入力バリデーション</strong> — ユーザー入力は必ずサニタイズ</li>
+<li>[ ] <strong>SQLインジェクション対策</strong> — パラメータ化クエリを使用</li>
+<li>[ ] <strong>XSS対策</strong> — HTMLは必ずエスケープ / サニタイズ</li>
+<li>[ ] <strong>CSRF対策</strong> — 状態変更リクエストにCSRFトークンを付与</li>
+<li>[ ] <strong>認証・認可</strong> — エンドポイントに適切なアクセス制御</li>
+<li>[ ] <strong>レート制限</strong> — 公開APIにレート制限を実装</li>
+<li>[ ] <strong>エラーメッセージ</strong> — 内部情報を漏洩しない安全なメッセージ</li>
+</ul>
+<h3 id="_19">シークレット管理</h3>
+<pre class="codehilite"><code>・ハードコード禁止 → 環境変数 or シークレットマネージャー使用
+・.env ファイルは .gitignore に含めること
+・シークレット漏洩が疑われた場合 → 即座にローテーション
+・起動時にシークレットの存在チェックを実行
+</code></pre>
+
+<h3 id="agentshield">セキュリティスキャン（AgentShield ライト版）</h3>
+<p>ECC の AgentShield を参考に構築したプロジェクト専用スキャナ。</p>
+<pre class="codehilite"><code class="language-bash">bash scripts/security-scan.sh          # ターミナル出力
+bash scripts/security-scan.sh --json   # JSON出力（CI/CD統合用）
+bash scripts/security-scan.sh --report # security-report.json 生成
+</code></pre>
+
+<p><strong>5つのスキャンカテゴリ:</strong>
+1. シークレット検出（12パターン: AWS/OpenAI/Anthropic/GitHub/Slack等）
+2. 設定ファイル監査（.claude/settings.json のHook設定検証）
+3. Hookスクリプト検査（インジェクション・外部通信・破壊的操作の検出）
+4. .gitignore検証（必須パターンの存在確認）
+5. エージェントプロンプト検査（相互干渉・セキュリティ記述の確認）</p>
+<p><strong>グレード:</strong> A(90-100) / B(75-89) / C(60-74) / D(40-59) / F(0-39)</p>
+<p><strong>推奨実行タイミング:</strong> リリース前・月次レビュー・新エージェント追加時</p>
+<h3 id="_20">セキュリティインシデント対応</h3>
+<ol>
+<li>作業を中断</li>
+<li>該当エージェント + Tech Lead + Infrastructure に報告</li>
+<li>クリティカルな脆弱性は修正完了まで他作業を停止</li>
+<li>漏洩したシークレットを即ローテーション</li>
+<li>同種の脆弱性がないかコードベース全体をスキャン</li>
+</ol>
+<h2 id="_21">トークン最適化・コンテキスト管理</h2>
+<h3 id="_22">コンテキスト管理の原則</h3>
+<p>Claude Code のMaxプラン内で効率的に動作するための指針。</p>
+<table>
+<thead>
+<tr>
+<th>原則</th>
+<th>説明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>必要な情報だけ渡す</strong></td>
+<td>エージェント間の受け渡しは output.json のみ。不要な中間データは渡さない</td>
+</tr>
+<tr>
+<td><strong>大きなファイルは部分読み込み</strong></td>
+<td>ファイル全体ではなく必要な行範囲のみ読む</td>
+</tr>
+<tr>
+<td><strong>並列実行の活用</strong></td>
+<td>独立したエージェント（Market Researcher / Analogy Finder / Marketing Analyst）は並列実行</td>
+</tr>
+<tr>
+<td><strong>戦略的コンパクション</strong></td>
+<td>長いセッションでは論理的な区切りで <code>/compact</code> を活用</td>
+</tr>
+<tr>
+<td><strong>出力のJSON標準化</strong></td>
+<td>全エージェントがJSON形式で出力し、後工程の解析コストを最小化</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_23">コンテキスト予算の閾値</h3>
+<p>各コンポーネントのサイズ上限（超過時は最適化を検討）:</p>
+<table>
+<thead>
+<tr>
+<th>コンポーネント</th>
+<th>上限目安</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CLAUDE.md</td>
+<td><strong>300行</strong></td>
+<td>セッション開始時に全量読み込まれる</td>
+</tr>
+<tr>
+<td>エージェントプロンプト</td>
+<td><strong>200行/体</strong></td>
+<td>実行時に毎回読み込まれる</td>
+</tr>
+<tr>
+<td>output.json</td>
+<td><strong>2000トークン</strong></td>
+<td>後工程に受け渡す際に消費</td>
+</tr>
+<tr>
+<td>MCP サーバー</td>
+<td><strong>10個以内</strong></td>
+<td>各ツールスキーマ ≈ 500トークン消費</td>
+</tr>
+<tr>
+<td>アクティブツール</td>
+<td><strong>80個以内</strong></td>
+<td>超過するとコンテキスト圧迫</td>
+</tr>
+</tbody>
+</table>
+<p><strong>MCP は最大のコンテキスト消費源。</strong> 不要な MCP サーバーの無効化が最も効果的な最適化。</p>
+<h3 id="compact">戦略的コンパクション（/compact）のタイミング</h3>
+<p><strong>コンパクションすべきタイミング:</strong></p>
+<pre class="codehilite"><code>・リサーチ完了 → 実装開始（リサーチコンテキストは大量消費）
+・計画完了 → 実装開始（計画はファイルに書き出してからコンパクト）
+・デバッグ完了 → 次の機能開発（エラートレースをクリア）
+・失敗したアプローチ → 新しいアプローチ（推論をリセット）
+・マイルストーン完了 → 次のマイルストーン
+</code></pre>
+
+<p><strong>コンパクションを避けるべきタイミング:</strong></p>
+<pre class="codehilite"><code>・実装途中（変数名・ファイルパス・部分的な状態を失う）
+・直前のコンテキストを参照するコードレビュー中
+</code></pre>
+
+<p><strong>コンパクション前のベストプラクティス:</strong>
+- 重要な情報をファイルに書き出してから <code>/compact</code>
+- TodoWrite で計画を確定してから <code>/compact</code>
+- カスタムサマリーメッセージ付きで <code>/compact</code> 実行</p>
+<p><strong>自動リマインド:</strong> ツール呼び出し50回ごとに Hook がコンパクション提案を表示</p>
+<h3 id="_24">コンテキスト予算監査</h3>
+<pre class="codehilite"><code class="language-bash">bash scripts/context-budget.sh           # 通常出力
+bash scripts/context-budget.sh --verbose # ファイル別詳細
+bash scripts/context-budget.sh --json    # JSON出力
+</code></pre>
+
+<h3 id="_25">パイプライン効率化</h3>
+<pre class="codehilite"><code>・QAチェックポイントはパイプラインの要所（5箇所）に配置
+・差し戻しは即座に実行し、後工程の無駄な計算を防ぐ
+・リサーチ系エージェント（3体）は常に並列実行
+</code></pre>
+
+<h2 id="_26">ナレッジ管理</h2>
+<h3 id="_27">セッション間のナレッジ蓄積</h3>
+<p>以下の情報を組織的に蓄積・共有する:</p>
+<table>
+<thead>
+<tr>
+<th>蓄積対象</th>
+<th>保存先</th>
+<th>管理者</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>品質レビュー結果</td>
+<td><code>/agents/qa_reviewer/reviews/</code></td>
+<td>QA Reviewer</td>
+</tr>
+<tr>
+<td>日次レポート</td>
+<td><code>/daily_reports/YYYY-MM-DD.md</code></td>
+<td>CEO / COO</td>
+</tr>
+<tr>
+<td>技術選定の記録</td>
+<td><code>/agents/tech_lead/tech_decisions.json</code></td>
+<td>Tech Lead</td>
+</tr>
+<tr>
+<td>KPIトレンド</td>
+<td><code>/agents/kpi_dashboard/output.json</code></td>
+<td>KPI Dashboard</td>
+</tr>
+<tr>
+<td>バグパターン</td>
+<td><code>/agents/qa_engineer/output.json</code></td>
+<td>QA Engineer</td>
+</tr>
+<tr>
+<td><strong>学習済みパターン</strong></td>
+<td><code>/learnings/instincts/</code></td>
+<td><strong>COO</strong></td>
+</tr>
+<tr>
+<td><strong>セッション学習ログ</strong></td>
+<td><code>/learnings/sessions/</code></td>
+<td><strong>各セッション実行者</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="continuous-learning">継続学習（Continuous Learning）</h3>
+<p>ECC の Continuous Learning v2 を参考にした、セッション間のパターン学習:</p>
+<ul>
+<li><strong>インスティンクト</strong>: 繰り返し確認されたパターンを <code>learnings/instincts/</code> に蓄積</li>
+<li><strong>確信度</strong>: 初回 0.3 → 繰り返し確認で上昇 → 0.9以上で CLAUDE.md ルール昇格</li>
+<li><strong>セッションログ</strong>: 各セッション終了時に <code>learnings/sessions/</code> に決定事項・学びを記録</li>
+<li><strong>月次レビュー</strong>: COO Agent がインスティンクトの確信度を精査し、昇格・廃止を判断</li>
+<li>詳細: <code>/learnings/README.md</code></li>
+</ul>
+<h3 id="_28">ベストプラクティスの共有</h3>
+<ul>
+<li>QA Reviewer の月次品質トレンド分析で頻出パターンを特定</li>
+<li>Tech Lead がコーディング規約・ADR（Architecture Decision Records）を更新</li>
+<li>COO がプロセス改善提案を各エージェントに反映</li>
+<li><strong>確立されたインスティンクト（confidence ≥ 0.9）を各エージェントプロンプトに反映</strong></li>
+</ul>
+<h2 id="plan-first-principle">計画ファースト原則（Plan-First Principle）</h2>
+<p>複雑なタスク（新機能開発・アーキテクチャ変更・大規模リファクタリング）は、
+必ず以下の手順を踏む:</p>
+<pre class="codehilite"><code>1. PM Agent: 要件定義・スコープ確定
+2. Tech Lead: アーキテクチャ設計・技術選定
+3. Devil's Advocate: 計画への批判的検証
+4. 承認後に実装フェーズへ移行
+</code></pre>
+
+<p>小規模な修正（バグ修正・コピー変更・設定変更）はこのプロセスを省略可。</p>
+<h2 id="7_1">組織拡張の予備枠（残り7名）</h2>
+<table>
+<thead>
+<tr>
+<th>候補</th>
+<th>理由</th>
+<th>優先度</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Security Reviewer</td>
+<td>全開発成果物のセキュリティ専門レビュー・脆弱性スキャン・OWASP準拠検証</td>
+<td><strong>高</strong></td>
+</tr>
+<tr>
+<td>Knowledge Manager</td>
+<td>エージェント間ナレッジ蓄積・ベストプラクティス共有・継続学習</td>
+<td>中</td>
+</tr>
+<tr>
+<td>BizDev Agent（事業開発）</td>
+<td>新規事業探索・パートナーシップ・M&amp;A</td>
+<td>中</td>
+</tr>
+<tr>
+<td>予備枠 x4</td>
+<td>事業拡大時の追加枠（海外展開、新規事業等）</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+</main>
+</body>
+</html>

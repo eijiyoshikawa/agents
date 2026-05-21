@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>採用SNS テレアポ アウト返しスクリプト集</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="sns">採用SNS テレアポ アウト返しスクリプト集</h1>
+<blockquote>
+<p>建設業向け SNS 採用支援サービスのテレアポにおいて、商談フェーズで頻出する「他媒体／人材紹介／リファラル採用」との比較アウトに対する切り返しトーク全 50 項目。
+agents 側の sales エージェント参照用 + rollplay 側の評価エンジン参照用の両方を兼ねるマスタデータ。</p>
+</blockquote>
+<hr />
+<h2 id="1">1. 目的</h2>
+<ul>
+<li><strong>agents エージェント</strong>: sales 担当エージェントが商談中の一次反論時にそのまま読める形のスクリプト集として参照</li>
+<li><strong>rollplay 評価エンジン</strong>: ロープレ評価時に Claude Opus 4.7 が「objection」スコアの根拠提示・improvements 引用元として参照</li>
+<li><strong>トレーナー / 営業マン</strong>: フィードバック教材としての継続学習資料</li>
+</ul>
+<hr />
+<h2 id="2">2. 成果物（本リポジトリ内）</h2>
+<table>
+<thead>
+<tr>
+<th>パス</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>agents/sales/recruitment_sns_objection_scripts.md</code></td>
+<td>スクリプト本体 50 項目（マスタデータ）</td>
+</tr>
+<tr>
+<td><code>agents/sales/README.md</code></td>
+<td>本サマリ（このファイル）</td>
+</tr>
+<tr>
+<td><code>daily_reports/2026-05-08-recruitment-objection-scripts.md</code></td>
+<td>作業ログ</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3">3. スクリプト構成</h2>
+<h3 id="_1">共通スタンス（全アウト共通の構え）</h3>
+<ol>
+<li><strong>否定しない</strong>: 「おっしゃる通りで」「確かに○○ですよね」で一旦受ける</li>
+<li><strong>比較ではなく補完</strong>: 「代わりに」ではなく「掛け合わせると」で語る</li>
+<li><strong>数字で返す</strong>: 月次応募数・採用単価・歩留まり・定着率の3つを必ず1つは差し込む</li>
+<li><strong>建設業の文脈</strong>: 施工管理／職人／若手定着／2024年問題／3K払拭、を一語以上織り込む</li>
+<li><strong>即決させない</strong>: 切り返し後は必ず質問で終わらせ、ヒアリングに戻す</li>
+</ol>
+<h3 id="_2">カテゴリ内訳</h3>
+<table>
+<thead>
+<tr>
+<th>カテゴリ</th>
+<th>テーマ</th>
+<th style="text-align: right;">項目数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>他媒体（求人広告媒体）との比較</td>
+<td style="text-align: right;">20</td>
+</tr>
+<tr>
+<td>B</td>
+<td>人材紹介会社との比較</td>
+<td style="text-align: right;">15</td>
+</tr>
+<tr>
+<td>C</td>
+<td>リファラル採用との比較</td>
+<td style="text-align: right;">15</td>
+</tr>
+<tr>
+<td><strong>合計</strong></td>
+<td></td>
+<td style="text-align: right;"><strong>50</strong></td>
+</tr>
+</tbody>
+</table>
+<p>各項目の構造: <strong>アウト（顧客発言） / 顧客心理 / 切り返しトーク / フォロー質問</strong> の4ブロック。</p>
+<hr />
+<h2 id="4-rollplay">4. rollplay 連携</h2>
+<table>
+<thead>
+<tr>
+<th>連携項目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>公開ページ</td>
+<td>https://rollplay-tau.vercel.app/manual</td>
+</tr>
+<tr>
+<td>マニュアル本体（rollplay 内）</td>
+<td><a href="https://github.com/eijiyoshikawa/rollplay/blob/main/docs/recruitment-objection-manual.md"><code>docs/recruitment-objection-manual.md</code></a></td>
+</tr>
+<tr>
+<td>評価プロンプト</td>
+<td><a href="https://github.com/eijiyoshikawa/rollplay/blob/main/prompts/evaluation-prompt.ts"><code>prompts/evaluation-prompt.ts</code></a>（マニュアル全文を <code>EVALUATION_SYSTEM</code> に埋め込み）</td>
+</tr>
+<tr>
+<td>評価活用ガイド</td>
+<td>objection 採点時にマニュアル番号で根拠提示、improvements / bestQuotes へのマニュアル準拠引用</td>
+</tr>
+</tbody>
+</table>
+<p><code>/manual</code> ページには 50 項目のスクリプトに加え、以下の比較表も実装済み:
+- 採用手法 総合比較（10軸 × 求人媒体／人材紹介／リファラル／SNS採用支援）
+- 主要求人媒体 比較（Indeed / Engage / ハローワーク / タウンワーク / doda / 工事の現場ワーク / 自社）
+- 費用シミュレーション（年5名採用想定 × 5パターン）</p>
+<hr />
+<h2 id="5-pr">5. ブランチ・PR 履歴</h2>
+<table>
+<thead>
+<tr>
+<th>ブランチ</th>
+<th>PR</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>claude/recruitment-objection-scripts-RnIfQ</code></td>
+<td><a href="https://github.com/eijiyoshikawa/agents/pull/5">#5</a></td>
+<td>採用SNSテレアポのアウト返しスクリプト50項目を追加</td>
+</tr>
+<tr>
+<td><code>docs/objection-manual-summary</code></td>
+<td>本PR</td>
+<td>サマリ README を追加</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6">6. 更新フロー</h2>
+<p>スクリプトを修正・追加する場合:</p>
+<ol>
+<li>本リポジトリの <code>agents/sales/recruitment_sns_objection_scripts.md</code> を更新</li>
+<li>同内容を rollplay リポジトリの <code>docs/recruitment-objection-manual.md</code> に反映</li>
+<li>rollplay 側のデプロイで <code>/manual</code> ページと評価プロンプトに自動反映される</li>
+</ol>
+<blockquote>
+<p><strong>Note</strong>: rollplay 側のマニュアルが評価エンジンの実体になるため、マスタは agents 側に置きつつも、rollplay 側のファイルが運用上のソース・オブ・トゥルース。両者を必ず同期すること。</p>
+</blockquote>
+<hr />
+<p><strong>最終更新</strong>: 2026-05-08
+<strong>対象商材</strong>: 建設業向け SNS 採用支援サービス（Instagram / TikTok / 採用 LP / 応募者初期対応）</p>
+</main>
+</body>
+</html>

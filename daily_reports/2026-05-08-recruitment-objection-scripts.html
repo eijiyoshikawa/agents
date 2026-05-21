@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>作業ログ — 2026-05-08</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="2026-05-08">作業ログ — 2026-05-08</h1>
+<h2 id="_1">タスク</h2>
+<p>採用SNS テレアポにおける「他媒体／人材紹介／リファラル採用との比較」アウトに対する切り返しトークスクリプト50項目の作成と、agents / rollplay 両リポジトリへの格納。</p>
+<h2 id="_2">実施内容</h2>
+<ul>
+<li>カテゴリ A（他媒体との比較）: 20項目</li>
+<li>カテゴリ B（人材紹介との比較）: 15項目</li>
+<li>カテゴリ C（リファラル採用との比較）: 15項目</li>
+<li>各項目: 「アウト／顧客心理／切り返しトーク／フォロー質問」の4ブロック構造</li>
+<li>共通スタンス（5原則）と評価活用ガイドを併記</li>
+</ul>
+<h2 id="url">成果物 URL</h2>
+<h3 id="eijiyoshikawaagents">eijiyoshikawa/agents</h3>
+<p>ブランチ: <code>claude/recruitment-objection-scripts-RnIfQ</code></p>
+<ul>
+<li>マニュアル: https://github.com/eijiyoshikawa/agents/blob/claude/recruitment-objection-scripts-RnIfQ/agents/sales/recruitment_sns_objection_scripts.md</li>
+<li>作業ログ（本ファイル）: https://github.com/eijiyoshikawa/agents/blob/claude/recruitment-objection-scripts-RnIfQ/daily_reports/2026-05-08-recruitment-objection-scripts.md</li>
+<li>ブランチ全体差分: https://github.com/eijiyoshikawa/agents/tree/claude/recruitment-objection-scripts-RnIfQ</li>
+</ul>
+<h3 id="eijiyoshikawarollplay">eijiyoshikawa/rollplay</h3>
+<p>ブランチ: <code>claude/recruitment-objection-scripts-RnIfQ</code></p>
+<ul>
+<li>マニュアル: https://github.com/eijiyoshikawa/rollplay/blob/claude/recruitment-objection-scripts-RnIfQ/docs/recruitment-objection-manual.md</li>
+<li>表示ページ: https://github.com/eijiyoshikawa/rollplay/blob/claude/recruitment-objection-scripts-RnIfQ/app/history/page.tsx</li>
+<li>評価プロンプト更新: https://github.com/eijiyoshikawa/rollplay/blob/claude/recruitment-objection-scripts-RnIfQ/prompts/evaluation-prompt.ts</li>
+<li>ブランチ全体差分: https://github.com/eijiyoshikawa/rollplay/tree/claude/recruitment-objection-scripts-RnIfQ</li>
+<li><strong>公開URL（Vercel デプロイ後）</strong>: https://rollplay-tau.vercel.app/history</li>
+</ul>
+<h2 id="_3">評価エンジン連携</h2>
+<p><code>prompts/evaluation-prompt.ts</code> の <code>EVALUATION_SYSTEM</code> に本マニュアル全文を埋め込み済み（Next.js サーバ起動時に <code>fs</code> で読み込む実装）。</p>
+<ul>
+<li>objection 採点時にマニュアル番号で根拠提示</li>
+<li>improvements には未対応アウトのマニュアル番号を明記</li>
+<li>bestQuotes はマニュアル準拠箇所を引用</li>
+</ul>
+<h2 id="_4">次のアクション</h2>
+<ol>
+<li>rollplay の Vercel デプロイで <code>/history</code> ページが表示されることを確認</li>
+<li>評価エンジンが新システムプロンプトで JSON 出力を維持できるか QA</li>
+<li>ロープレ実行 → 評価でマニュアル参照が effective か確認</li>
+<li>必要に応じて <code>react-markdown</code> 等を導入し、表示ページの視認性を強化</li>
+</ol>
+</main>
+</body>
+</html>

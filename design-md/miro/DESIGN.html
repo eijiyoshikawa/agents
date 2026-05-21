@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Miro</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-miro">Design System: Miro</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Miro's website is a clean, collaborative-tool-forward platform that communicates "visual thinking" through generous whitespace, pastel accent colors, and a confident geometric font. The design uses a predominantly white canvas with near-black text (<code>#1c1c1e</code>) and a distinctive pastel color palette — coral, rose, teal, orange, yellow, moss — each representing different collaboration contexts.</p>
+<p>The typography uses Roobert PRO Medium as the primary display font with OpenType character variants (<code>"blwf", "cv03", "cv04", "cv09", "cv11"</code>) and negative letter-spacing (-1.68px at 56px). Noto Sans handles body text with its own stylistic set (<code>"liga" 0, "ss01", "ss04", "ss05"</code>). The design is built with Framer, giving it smooth animations and modern component patterns.</p>
+<p><strong>Key Characteristics:</strong>
+- White canvas with near-black (<code>#1c1c1e</code>) text
+- Roobert PRO Medium with multiple OpenType character variants
+- Pastel accent palette: coral, rose, teal, orange, yellow, moss (light + dark pairs)
+- Blue 450 (<code>#5b76fe</code>) as primary interactive color
+- Success green (<code>#00b473</code>) for positive states
+- Generous border-radius: 8px–50px range
+- Framer-built with smooth motion patterns
+- Ring shadow border: <code>rgb(224,226,232) 0px 0px 0px 1px</code></p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>Near Black</strong> (<code>#1c1c1e</code>): Primary text</li>
+<li><strong>White</strong> (<code>#ffffff</code>): <code>--tw-color-white</code>, primary surface</li>
+<li><strong>Blue 450</strong> (<code>#5b76fe</code>): <code>--tw-color-blue-450</code>, primary interactive</li>
+<li><strong>Actionable Pressed</strong> (<code>#2a41b6</code>): <code>--tw-color-actionable-pressed</code></li>
+</ul>
+<h3 id="pastel-accents-lightdark-pairs">Pastel Accents (Light/Dark pairs)</h3>
+<ul>
+<li><strong>Coral</strong>: Light <code>#ffc6c6</code> / Dark <code>#600000</code></li>
+<li><strong>Rose</strong>: Light <code>#ffd8f4</code> / Dark (implied)</li>
+<li><strong>Teal</strong>: Light <code>#c3faf5</code> / Dark <code>#187574</code></li>
+<li><strong>Orange</strong>: Light <code>#ffe6cd</code></li>
+<li><strong>Yellow</strong>: Dark <code>#746019</code></li>
+<li><strong>Moss</strong>: Dark <code>#187574</code></li>
+<li><strong>Pink</strong> (<code>#fde0f0</code>): Soft pink surface</li>
+<li><strong>Red</strong> (<code>#fbd4d4</code>): Light red surface</li>
+<li><strong>Dark Red</strong> (<code>#e3c5c5</code>): Muted red</li>
+</ul>
+<h3 id="semantic">Semantic</h3>
+<ul>
+<li><strong>Success</strong> (<code>#00b473</code>): <code>--tw-color-success-accent</code></li>
+</ul>
+<h3 id="neutral">Neutral</h3>
+<ul>
+<li><strong>Slate</strong> (<code>#555a6a</code>): Secondary text</li>
+<li><strong>Input Placeholder</strong> (<code>#a5a8b5</code>): <code>--tw-color-input-placeholder</code></li>
+<li><strong>Border</strong> (<code>#c7cad5</code>): Button borders</li>
+<li><strong>Ring</strong> (<code>rgb(224,226,232)</code>): Shadow-as-border</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-families">Font Families</h3>
+<ul>
+<li><strong>Display</strong>: <code>Roobert PRO Medium</code>, fallback: Placeholder — <code>"blwf", "cv03", "cv04", "cv09", "cv11"</code></li>
+<li><strong>Display Variants</strong>: <code>Roobert PRO SemiBold</code>, <code>Roobert PRO SemiBold Italic</code>, <code>Roobert PRO</code></li>
+<li><strong>Body</strong>: <code>Noto Sans</code> — <code>"liga" 0, "ss01", "ss04", "ss05"</code></li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display Hero</td>
+<td>Roobert PRO Medium</td>
+<td>56px</td>
+<td>400</td>
+<td>1.15</td>
+<td>-1.68px</td>
+</tr>
+<tr>
+<td>Section Heading</td>
+<td>Roobert PRO Medium</td>
+<td>48px</td>
+<td>400</td>
+<td>1.15</td>
+<td>-1.44px</td>
+</tr>
+<tr>
+<td>Card Title</td>
+<td>Roobert PRO Medium</td>
+<td>24px</td>
+<td>400</td>
+<td>1.15</td>
+<td>-0.72px</td>
+</tr>
+<tr>
+<td>Sub-heading</td>
+<td>Noto Sans</td>
+<td>22px</td>
+<td>400</td>
+<td>1.35</td>
+<td>-0.44px</td>
+</tr>
+<tr>
+<td>Feature</td>
+<td>Roobert PRO Medium</td>
+<td>18px</td>
+<td>600</td>
+<td>1.35</td>
+<td>normal</td>
+</tr>
+<tr>
+<td>Body</td>
+<td>Noto Sans</td>
+<td>18px</td>
+<td>400</td>
+<td>1.45</td>
+<td>normal</td>
+</tr>
+<tr>
+<td>Body Standard</td>
+<td>Noto Sans</td>
+<td>16px</td>
+<td>400–600</td>
+<td>1.50</td>
+<td>-0.16px</td>
+</tr>
+<tr>
+<td>Button</td>
+<td>Roobert PRO Medium</td>
+<td>17.5px</td>
+<td>700</td>
+<td>1.29</td>
+<td>0.175px</td>
+</tr>
+<tr>
+<td>Caption</td>
+<td>Roobert PRO Medium</td>
+<td>14px</td>
+<td>400</td>
+<td>1.71</td>
+<td>normal</td>
+</tr>
+<tr>
+<td>Small</td>
+<td>Roobert PRO Medium</td>
+<td>12px</td>
+<td>400</td>
+<td>1.15</td>
+<td>-0.36px</td>
+</tr>
+<tr>
+<td>Micro Uppercase</td>
+<td>Roobert PRO</td>
+<td>10.5px</td>
+<td>400</td>
+<td>0.90</td>
+<td>uppercase</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<ul>
+<li>Outlined: transparent bg, <code>1px solid #c7cad5</code>, 8px radius, 7px 12px padding</li>
+<li>White circle: 50% radius, white bg with shadow</li>
+<li>Blue primary (implied from interactive color)</li>
+</ul>
+<h3 id="cards-12px24px-radius-pastel-backgrounds">Cards: 12px–24px radius, pastel backgrounds</h3>
+<h3 id="inputs-white-bg-1px-solid-e9eaef-8px-radius-16px-padding">Inputs: white bg, <code>1px solid #e9eaef</code>, 8px radius, 16px padding</h3>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<ul>
+<li>Spacing: 1–24px base scale</li>
+<li>Radius: 8px (buttons), 10px–12px (cards), 20px–24px (panels), 40px–50px (large containers)</li>
+<li>Ring shadow: <code>rgb(224,226,232) 0px 0px 0px 1px</code></li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<p>Minimal — ring shadow + pastel surface contrast</p>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use pastel light/dark pairs for feature sections</li>
+<li>Apply Roobert PRO with OpenType character variants</li>
+<li>Use Blue 450 (#5b76fe) for interactive elements</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Don't use heavy shadows</li>
+<li>Don't mix more than 2 pastel accents per section</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<p>Breakpoints: 425px, 576px, 768px, 896px, 1024px, 1200px, 1280px, 1366px, 1700px, 1920px</p>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Text: Near Black (<code>#1c1c1e</code>)</li>
+<li>Background: White (<code>#ffffff</code>)</li>
+<li>Interactive: Blue 450 (<code>#5b76fe</code>)</li>
+<li>Success: <code>#00b473</code></li>
+<li>Border: <code>#c7cad5</code></li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create hero: white background. Roobert PRO Medium 56px, line-height 1.15, letter-spacing -1.68px. Blue CTA (#5b76fe). Outlined secondary (1px solid #c7cad5, 8px radius)."</li>
+</ul>
+</main>
+</body>
+</html>

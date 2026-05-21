@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Intercom</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-intercom">Design System: Intercom</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Intercom's website is a warm, confident customer service platform that communicates "AI-first helpdesk" through a clean, editorial design language. The page operates on a warm off-white canvas (<code>#faf9f6</code>) with off-black (<code>#111111</code>) text, creating an intimate, magazine-like reading experience. The signature Fin Orange (<code>#ff5600</code>) — named after Intercom's AI agent — serves as the singular vibrant accent against the warm neutral palette.</p>
+<p>The typography uses Saans — a custom geometric sans-serif with aggressive negative letter-spacing (-2.4px at 80px, -0.48px at 24px) and a consistent 1.00 line-height across all heading sizes. This creates ultra-compressed, billboard-like headlines that feel engineered and precise. Serrif provides the serif companion for editorial moments, and SaansMono handles code and uppercase technical labels. MediumLL and LLMedium appear for specific UI contexts, creating a rich five-font ecosystem.</p>
+<p>What distinguishes Intercom is its remarkably sharp geometry — 4px border-radius on buttons creates near-rectangular interactive elements that feel industrial and precise, contrasting with the warm surface colors. Button hover states use <code>scale(1.1)</code> expansion, creating a physical "growing" interaction. The border system uses warm oat tones (<code>#dedbd6</code>) and oklab-based opacity values for sophisticated color management.</p>
+<p><strong>Key Characteristics:</strong>
+- Warm off-white canvas (<code>#faf9f6</code>) with oat-toned borders (<code>#dedbd6</code>)
+- Saans font with extreme negative tracking (-2.4px at 80px) and 1.00 line-height
+- Fin Orange (<code>#ff5600</code>) as singular brand accent
+- Sharp 4px border-radius — near-rectangular buttons and elements
+- Scale(1.1) hover with scale(0.85) active — physical button interaction
+- SaansMono uppercase labels with wide tracking (0.6px–1.2px)
+- Rich multi-color report palette (blue, green, red, pink, lime, orange)
+- oklab color values for sophisticated opacity management</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>Off Black</strong> (<code>#111111</code>): <code>--color-off-black</code>, primary text, button backgrounds</li>
+<li><strong>Pure White</strong> (<code>#ffffff</code>): <code>--wsc-color-content-primary</code>, primary surface</li>
+<li><strong>Warm Cream</strong> (<code>#faf9f6</code>): Button backgrounds, card surfaces</li>
+<li><strong>Fin Orange</strong> (<code>#ff5600</code>): <code>--color-fin</code>, primary brand accent</li>
+<li><strong>Report Orange</strong> (<code>#fe4c02</code>): <code>--color-report-orange</code>, data visualization</li>
+</ul>
+<h3 id="report-palette">Report Palette</h3>
+<ul>
+<li><strong>Report Blue</strong> (<code>#65b5ff</code>): <code>--color-report-blue</code></li>
+<li><strong>Report Green</strong> (<code>#0bdf50</code>): <code>--color-report-green</code></li>
+<li><strong>Report Red</strong> (<code>#c41c1c</code>): <code>--color-report-red</code></li>
+<li><strong>Report Pink</strong> (<code>#ff2067</code>): <code>--color-report-pink</code></li>
+<li><strong>Report Lime</strong> (<code>#b3e01c</code>): <code>--color-report-lime-300</code></li>
+<li><strong>Green</strong> (<code>#00da00</code>): <code>--color-green</code></li>
+<li><strong>Deep Blue</strong> (<code>#0007cb</code>): Deep blue accent</li>
+</ul>
+<h3 id="neutral-scale-warm">Neutral Scale (Warm)</h3>
+<ul>
+<li><strong>Black 80</strong> (<code>#313130</code>): <code>--wsc-color-black-80</code>, dark neutral</li>
+<li><strong>Black 60</strong> (<code>#626260</code>): <code>--wsc-color-black-60</code>, mid neutral</li>
+<li><strong>Black 50</strong> (<code>#7b7b78</code>): <code>--wsc-color-black-50</code>, muted text</li>
+<li><strong>Content Tertiary</strong> (<code>#9c9fa5</code>): <code>--wsc-color-content-tertiary</code></li>
+<li><strong>Oat Border</strong> (<code>#dedbd6</code>): Warm border color</li>
+<li><strong>Warm Sand</strong> (<code>#d3cec6</code>): Light warm neutral</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-families">Font Families</h3>
+<ul>
+<li><strong>Primary</strong>: <code>Saans</code>, fallbacks: <code>Saans Fallback, ui-sans-serif, system-ui</code></li>
+<li><strong>Serif</strong>: <code>Serrif</code>, fallbacks: <code>Serrif Fallback, ui-serif, Georgia</code></li>
+<li><strong>Monospace</strong>: <code>SaansMono</code>, fallbacks: <code>SaansMono Fallback, ui-monospace</code></li>
+<li><strong>UI</strong>: <code>MediumLL</code> / <code>LLMedium</code>, fallbacks: <code>system-ui, -apple-system</code></li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display Hero</td>
+<td>Saans</td>
+<td>80px</td>
+<td>400</td>
+<td>1.00 (tight)</td>
+<td>-2.4px</td>
+</tr>
+<tr>
+<td>Section Heading</td>
+<td>Saans</td>
+<td>54px</td>
+<td>400</td>
+<td>1.00</td>
+<td>-1.6px</td>
+</tr>
+<tr>
+<td>Sub-heading</td>
+<td>Saans</td>
+<td>40px</td>
+<td>400</td>
+<td>1.00</td>
+<td>-1.2px</td>
+</tr>
+<tr>
+<td>Card Title</td>
+<td>Saans</td>
+<td>32px</td>
+<td>400</td>
+<td>1.00</td>
+<td>-0.96px</td>
+</tr>
+<tr>
+<td>Feature Title</td>
+<td>Saans</td>
+<td>24px</td>
+<td>400</td>
+<td>1.00</td>
+<td>-0.48px</td>
+</tr>
+<tr>
+<td>Body Emphasis</td>
+<td>Saans</td>
+<td>20px</td>
+<td>400</td>
+<td>0.95</td>
+<td>-0.2px</td>
+</tr>
+<tr>
+<td>Nav / UI</td>
+<td>Saans</td>
+<td>18px</td>
+<td>400</td>
+<td>1.00</td>
+<td>normal</td>
+</tr>
+<tr>
+<td>Body</td>
+<td>Saans</td>
+<td>16px</td>
+<td>400</td>
+<td>1.50</td>
+<td>normal</td>
+</tr>
+<tr>
+<td>Body Light</td>
+<td>Saans</td>
+<td>14px</td>
+<td>300</td>
+<td>1.40</td>
+<td>normal</td>
+</tr>
+<tr>
+<td>Button</td>
+<td>Saans</td>
+<td>16px / 14px</td>
+<td>400</td>
+<td>1.50 / 1.43</td>
+<td>normal</td>
+</tr>
+<tr>
+<td>Button Bold</td>
+<td>LLMedium</td>
+<td>16px</td>
+<td>700</td>
+<td>1.20</td>
+<td>0.16px</td>
+</tr>
+<tr>
+<td>Serif Body</td>
+<td>Serrif</td>
+<td>16px</td>
+<td>300</td>
+<td>1.40</td>
+<td>-0.16px</td>
+</tr>
+<tr>
+<td>Mono Label</td>
+<td>SaansMono</td>
+<td>12px</td>
+<td>400–500</td>
+<td>1.00–1.30</td>
+<td>0.6px–1.2px uppercase</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<p><strong>Primary Dark</strong>
+- Background: <code>#111111</code>
+- Text: <code>#ffffff</code>
+- Padding: 0px 14px
+- Radius: 4px
+- Hover: white background, dark text, scale(1.1)
+- Active: green background (<code>#2c6415</code>), scale(0.85)</p>
+<p><strong>Outlined</strong>
+- Background: transparent
+- Text: <code>#111111</code>
+- Border: <code>1px solid #111111</code>
+- Radius: 4px
+- Same scale hover/active behavior</p>
+<p><strong>Warm Card Button</strong>
+- Background: <code>#faf9f6</code>
+- Text: <code>#111111</code>
+- Padding: 16px
+- Border: <code>1px solid oklab(... / 0.1)</code></p>
+<h3 id="cards-containers">Cards &amp; Containers</h3>
+<ul>
+<li>Background: <code>#faf9f6</code> (warm cream)</li>
+<li>Border: <code>1px solid #dedbd6</code> (warm oat)</li>
+<li>Radius: 8px</li>
+<li>No visible shadows</li>
+</ul>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li>Saans 16px for links</li>
+<li>Off-black text on white</li>
+<li>Small 4px–6px radius buttons</li>
+<li>Orange Fin accent for AI features</li>
+</ul>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-8px-10px-12px-14px-16px-20px-24px-32px-40px-48px-60px-64px-80px-96px">Spacing: 8px, 10px, 12px, 14px, 16px, 20px, 24px, 32px, 40px, 48px, 60px, 64px, 80px, 96px</h3>
+<h3 id="border-radius-4px-buttons-6px-nav-items-8px-cards-containers">Border Radius: 4px (buttons), 6px (nav items), 8px (cards, containers)</h3>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<p>Minimal shadows. Depth through warm border colors and surface tints.</p>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use Saans with 1.00 line-height and negative tracking on all headings</li>
+<li>Apply 4px radius on buttons — sharp geometry is the identity</li>
+<li>Use Fin Orange (#ff5600) for AI/brand accent only</li>
+<li>Apply scale(1.1) hover on buttons</li>
+<li>Use warm neutrals (#faf9f6, #dedbd6)</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Don't round buttons beyond 4px</li>
+<li>Don't use Fin Orange decoratively</li>
+<li>Don't use cool gray borders — always warm oat tones</li>
+<li>Don't skip the negative tracking on headings</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<p>Breakpoints: 425px, 530px, 600px, 640px, 768px, 896px</p>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Text: Off Black (<code>#111111</code>)</li>
+<li>Background: Warm Cream (<code>#faf9f6</code>)</li>
+<li>Accent: Fin Orange (<code>#ff5600</code>)</li>
+<li>Border: Oat (<code>#dedbd6</code>)</li>
+<li>Muted: <code>#7b7b78</code></li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create hero: warm cream (#faf9f6) background. Saans 80px weight 400, line-height 1.00, letter-spacing -2.4px, #111111. Dark button (#111111, 4px radius). Hover: scale(1.1), white bg."</li>
+</ul>
+</main>
+</body>
+</html>

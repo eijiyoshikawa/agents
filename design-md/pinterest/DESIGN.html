@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Pinterest</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-pinterest">Design System: Pinterest</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Pinterest's website is a warm, inspiration-driven canvas that treats visual discovery like a lifestyle magazine. The design operates on a soft, slightly warm white background with Pinterest Red (<code>#e60023</code>) as the singular, bold brand accent. Unlike the cool blues of most tech platforms, Pinterest's neutral scale has a distinctly warm undertone — grays lean toward olive/sand (<code>#91918c</code>, <code>#62625b</code>, <code>#e5e5e0</code>) rather than cool steel, creating a cozy, craft-like atmosphere that invites browsing.</p>
+<p>The typography uses Pin Sans — a custom proprietary font with a broad fallback stack including Japanese fonts, reflecting Pinterest's global reach. At display scale (70px, weight 600), Pin Sans creates large, inviting headlines. At smaller sizes, the system is compact: buttons at 12px, captions at 12–14px. The CSS variable naming system (<code>--comp-*</code>, <code>--sema-*</code>, <code>--base-*</code>) reveals a sophisticated three-tier design token architecture: component-level, semantic-level, and base-level tokens.</p>
+<p>What distinguishes Pinterest is its generous border-radius system (12px–40px, plus 50% for circles) and warm-tinted button backgrounds. The secondary button (<code>#e5e5e0</code>) has a distinctly warm, sand-like tone rather than cold gray. The primary red button uses 16px radius — rounded but not pill-shaped. Combined with warm badge backgrounds (<code>hsla(60,20%,98%,.5)</code> — a subtle yellow-warm wash) and photography-dominant layouts, the result is a design that feels handcrafted and personal, not corporate and sterile.</p>
+<p><strong>Key Characteristics:</strong>
+- Warm white canvas with olive/sand-toned neutrals — cozy, not clinical
+- Pinterest Red (<code>#e60023</code>) as singular bold accent — never subtle, always confident
+- Pin Sans custom font with global fallback stack (including CJK)
+- Three-tier token architecture: <code>--comp-*</code> / <code>--sema-*</code> / <code>--base-*</code>
+- Warm secondary surfaces: sand gray (<code>#e5e5e0</code>), warm badge (<code>hsla(60,20%,98%,.5)</code>)
+- Generous border-radius: 16px standard, up to 40px for large containers
+- Photography-first content — pins/images are the primary visual element
+- Dark near-purple text (<code>#211922</code>) — warm, with a hint of plum</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary-brand">Primary Brand</h3>
+<ul>
+<li><strong>Pinterest Red</strong> (<code>#e60023</code>): Primary CTA, brand accent — bold, confident red</li>
+<li><strong>Green 700</strong> (<code>#103c25</code>): <code>--base-color-green-700</code>, success/nature accent</li>
+<li><strong>Green 700 Hover</strong> (<code>#0b2819</code>): <code>--base-color-hover-green-700</code>, pressed green</li>
+</ul>
+<h3 id="text">Text</h3>
+<ul>
+<li><strong>Plum Black</strong> (<code>#211922</code>): Primary text — warm near-black with plum undertone</li>
+<li><strong>Black</strong> (<code>#000000</code>): Secondary text, button text</li>
+<li><strong>Olive Gray</strong> (<code>#62625b</code>): Secondary descriptions, muted text</li>
+<li><strong>Warm Silver</strong> (<code>#91918c</code>): <code>--comp-button-color-text-transparent-disabled</code>, disabled text, input borders</li>
+<li><strong>White</strong> (<code>#ffffff</code>): Text on dark/colored surfaces</li>
+</ul>
+<h3 id="interactive">Interactive</h3>
+<ul>
+<li><strong>Focus Blue</strong> (<code>#435ee5</code>): <code>--comp-button-color-border-focus-outer-transparent</code>, focus rings</li>
+<li><strong>Performance Purple</strong> (<code>#6845ab</code>): <code>--sema-color-hover-icon-performance-plus</code>, performance features</li>
+<li><strong>Recommendation Purple</strong> (<code>#7e238b</code>): <code>--sema-color-hover-text-recommendation</code>, AI recommendation</li>
+<li><strong>Link Blue</strong> (<code>#2b48d4</code>): Link text color</li>
+<li><strong>Facebook Blue</strong> (<code>#0866ff</code>): <code>--facebook-background-color</code>, social login</li>
+<li><strong>Pressed Blue</strong> (<code>#617bff</code>): <code>--base-color-pressed-blue-200</code>, pressed state</li>
+</ul>
+<h3 id="surface-border">Surface &amp; Border</h3>
+<ul>
+<li><strong>Sand Gray</strong> (<code>#e5e5e0</code>): Secondary button background — warm, craft-like</li>
+<li><strong>Warm Light</strong> (<code>#e0e0d9</code>): Circular button backgrounds, badges</li>
+<li><strong>Warm Wash</strong> (<code>hsla(60, 20%, 98%, 0.5)</code>): <code>--comp-badge-color-background-wash-light</code>, subtle warm badge bg</li>
+<li><strong>Fog</strong> (<code>#f6f6f3</code>): Light surface (at 50% opacity)</li>
+<li><strong>Border Disabled</strong> (<code>#c8c8c1</code>): <code>--sema-color-border-disabled</code>, disabled borders</li>
+<li><strong>Hover Gray</strong> (<code>#bcbcb3</code>): <code>--base-color-hover-grayscale-150</code>, hover border</li>
+<li><strong>Dark Surface</strong> (<code>#33332e</code>): Dark section backgrounds</li>
+</ul>
+<h3 id="semantic">Semantic</h3>
+<ul>
+<li><strong>Error Red</strong> (<code>#9e0a0a</code>): Checkbox/form error states</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-family">Font Family</h3>
+<ul>
+<li><strong>Primary</strong>: <code>Pin Sans</code>, fallbacks: <code>-apple-system, system-ui, Segoe UI, Roboto, Oxygen-Sans, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, Helvetica, ヒラギノ角ゴ Pro W3, メイリオ, Meiryo, ＭＳ Ｐゴシック, Arial</code></li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display Hero</td>
+<td>Pin Sans</td>
+<td>70px (4.38rem)</td>
+<td>600</td>
+<td>normal</td>
+<td>normal</td>
+<td>Maximum impact</td>
+</tr>
+<tr>
+<td>Section Heading</td>
+<td>Pin Sans</td>
+<td>28px (1.75rem)</td>
+<td>700</td>
+<td>normal</td>
+<td>-1.2px</td>
+<td>Negative tracking</td>
+</tr>
+<tr>
+<td>Body</td>
+<td>Pin Sans</td>
+<td>16px (1.00rem)</td>
+<td>400</td>
+<td>1.40</td>
+<td>normal</td>
+<td>Standard reading</td>
+</tr>
+<tr>
+<td>Caption Bold</td>
+<td>Pin Sans</td>
+<td>14px (0.88rem)</td>
+<td>700</td>
+<td>normal</td>
+<td>normal</td>
+<td>Strong metadata</td>
+</tr>
+<tr>
+<td>Caption</td>
+<td>Pin Sans</td>
+<td>12px (0.75rem)</td>
+<td>400–500</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Small text, tags</td>
+</tr>
+<tr>
+<td>Button</td>
+<td>Pin Sans</td>
+<td>12px (0.75rem)</td>
+<td>400</td>
+<td>normal</td>
+<td>normal</td>
+<td>Button labels</td>
+</tr>
+</tbody>
+</table>
+<h3 id="principles">Principles</h3>
+<ul>
+<li><strong>Compact type scale</strong>: The range is 12px–70px with a dramatic jump — most functional text is 12–16px, creating a dense, app-like information hierarchy.</li>
+<li><strong>Warm weight distribution</strong>: 600–700 for headings, 400–500 for body. No ultra-light weights — the type always feels substantial.</li>
+<li><strong>Negative tracking on headings</strong>: -1.2px on 28px headings creates cozy, intimate section titles.</li>
+<li><strong>Single font family</strong>: Pin Sans handles everything — no secondary display or monospace font detected.</li>
+</ul>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<p><strong>Primary Red</strong>
+- Background: <code>#e60023</code> (Pinterest Red)
+- Text: <code>#000000</code> (black — unusual choice for contrast on red)
+- Padding: 6px 14px
+- Radius: 16px (generously rounded, not pill)
+- Border: <code>2px solid rgba(255, 255, 255, 0)</code> (transparent)
+- Focus: semantic border + outline via CSS variables</p>
+<p><strong>Secondary Sand</strong>
+- Background: <code>#e5e5e0</code> (warm sand gray)
+- Text: <code>#000000</code>
+- Padding: 6px 14px
+- Radius: 16px
+- Focus: same semantic border system</p>
+<p><strong>Circular Action</strong>
+- Background: <code>#e0e0d9</code> (warm light)
+- Text: <code>#211922</code> (plum black)
+- Radius: 50% (circle)
+- Use: Pin actions, navigation controls</p>
+<p><strong>Ghost / Transparent</strong>
+- Background: transparent
+- Text: <code>#000000</code>
+- No border
+- Use: Tertiary actions</p>
+<h3 id="cards-containers">Cards &amp; Containers</h3>
+<ul>
+<li>Photography-first pin cards with generous radius (12px–20px)</li>
+<li>No traditional box-shadow on most cards</li>
+<li>White or warm fog backgrounds</li>
+<li>8px white thick border on some image containers</li>
+</ul>
+<h3 id="inputs">Inputs</h3>
+<ul>
+<li>Email input: white background, <code>1px solid #91918c</code> border, 16px radius, 11px 15px padding</li>
+<li>Focus: semantic border + outline system via CSS variables</li>
+</ul>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li>Clean header on white or warm background</li>
+<li>Pinterest logo + search bar centered</li>
+<li>Pin Sans 16px for nav links</li>
+<li>Pinterest Red accents for active states</li>
+</ul>
+<h3 id="image-treatment">Image Treatment</h3>
+<ul>
+<li>Pin-style masonry grid (signature Pinterest layout)</li>
+<li>Rounded corners: 12px–20px on images</li>
+<li>Photography as primary content — every pin is an image</li>
+<li>Thick white borders (8px) on featured image containers</li>
+</ul>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-system">Spacing System</h3>
+<ul>
+<li>Base unit: 8px</li>
+<li>Scale: 4px, 6px, 7px, 8px, 10px, 11px, 12px, 16px, 18px, 20px, 22px, 24px, 32px, 80px, 100px</li>
+<li>Large jumps: 32px → 80px → 100px for section spacing</li>
+</ul>
+<h3 id="grid-container">Grid &amp; Container</h3>
+<ul>
+<li>Masonry grid for pin content (signature layout)</li>
+<li>Centered content sections with generous max-width</li>
+<li>Full-width dark footer</li>
+<li>Search bar as primary navigation element</li>
+</ul>
+<h3 id="whitespace-philosophy">Whitespace Philosophy</h3>
+<ul>
+<li><strong>Inspiration density</strong>: The masonry grid packs pins tightly — the content density IS the value proposition. Whitespace exists between sections, not within the grid.</li>
+<li><strong>Breathing above, density below</strong>: Hero/feature sections get generous padding; the pin grid is compact and immersive.</li>
+</ul>
+<h3 id="border-radius-scale">Border Radius Scale</h3>
+<ul>
+<li>Standard (12px): Small cards, links</li>
+<li>Button (16px): Buttons, inputs, medium cards</li>
+<li>Comfortable (20px): Feature cards</li>
+<li>Large (28px): Large containers</li>
+<li>Section (32px): Tab elements, large panels</li>
+<li>Hero (40px): Hero containers, large feature blocks</li>
+<li>Circle (50%): Action buttons, tab indicators</li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Treatment</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flat (Level 0)</td>
+<td>No shadow</td>
+<td>Default — pins rely on content, not shadow</td>
+</tr>
+<tr>
+<td>Subtle (Level 1)</td>
+<td>Minimal shadow (from tokens)</td>
+<td>Elevated overlays, dropdowns</td>
+</tr>
+<tr>
+<td>Focus (Accessibility)</td>
+<td><code>--sema-color-border-focus-outer-default</code> ring</td>
+<td>Focus states</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Shadow Philosophy</strong>: Pinterest uses minimal shadows. The masonry grid relies on content (photography) to create visual interest rather than elevation effects. Depth comes from the warmth of surface colors and the generous rounding of containers.</p>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use warm neutrals (<code>#e5e5e0</code>, <code>#e0e0d9</code>, <code>#91918c</code>) — the warm olive/sand tone is the identity</li>
+<li>Apply Pinterest Red (<code>#e60023</code>) only for primary CTAs — it's bold and singular</li>
+<li>Use Pin Sans exclusively — one font for everything</li>
+<li>Apply generous border-radius: 16px for buttons/inputs, 20px+ for cards</li>
+<li>Keep the masonry grid dense — content density is the value</li>
+<li>Use warm badge backgrounds (<code>hsla(60,20%,98%,.5)</code>) for subtle warm washes</li>
+<li>Use <code>#211922</code> (plum black) for primary text — it's warmer than pure black</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Don't use cool gray neutrals — always warm/olive-toned</li>
+<li>Don't use pure black (<code>#000000</code>) as primary text — use plum black (<code>#211922</code>)</li>
+<li>Don't use pill-shaped buttons — 16px radius is rounded but not pill</li>
+<li>Don't add heavy shadows — Pinterest is flat by design, depth from content</li>
+<li>Don't use small border-radius (&lt;12px) on cards — the generous rounding is core</li>
+<li>Don't introduce additional brand colors — red + warm neutrals is the complete palette</li>
+<li>Don't use thin font weights — Pin Sans at 400 minimum</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<h3 id="breakpoints">Breakpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Width</th>
+<th>Key Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mobile</td>
+<td>&lt;576px</td>
+<td>Single column, compact layout</td>
+</tr>
+<tr>
+<td>Mobile Large</td>
+<td>576–768px</td>
+<td>2-column pin grid</td>
+</tr>
+<tr>
+<td>Tablet</td>
+<td>768–890px</td>
+<td>Expanded grid</td>
+</tr>
+<tr>
+<td>Desktop Small</td>
+<td>890–1312px</td>
+<td>Standard masonry grid</td>
+</tr>
+<tr>
+<td>Desktop</td>
+<td>1312–1440px</td>
+<td>Full layout</td>
+</tr>
+<tr>
+<td>Large Desktop</td>
+<td>1440–1680px</td>
+<td>Expanded grid columns</td>
+</tr>
+<tr>
+<td>Ultra-wide</td>
+<td>&gt;1680px</td>
+<td>Maximum grid density</td>
+</tr>
+</tbody>
+</table>
+<h3 id="collapsing-strategy">Collapsing Strategy</h3>
+<ul>
+<li>Pin grid: 5+ columns → 3 → 2 → 1</li>
+<li>Navigation: search bar + icons → simplified mobile nav</li>
+<li>Feature sections: side-by-side → stacked</li>
+<li>Hero: 70px → scales down proportionally</li>
+<li>Footer: dark multi-column → stacked</li>
+</ul>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Brand: Pinterest Red (<code>#e60023</code>)</li>
+<li>Background: White (<code>#ffffff</code>)</li>
+<li>Text: Plum Black (<code>#211922</code>)</li>
+<li>Secondary text: Olive Gray (<code>#62625b</code>)</li>
+<li>Button surface: Sand Gray (<code>#e5e5e0</code>)</li>
+<li>Border: Warm Silver (<code>#91918c</code>)</li>
+<li>Focus: Focus Blue (<code>#435ee5</code>)</li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create a hero: white background. Headline at 70px Pin Sans weight 600, plum black (#211922). Red CTA button (#e60023, 16px radius, 6px 14px padding). Secondary sand button (#e5e5e0, 16px radius)."</li>
+<li>"Design a pin card: white background, 16px radius, no shadow. Photography fills top, 16px Pin Sans weight 400 description below in #62625b."</li>
+<li>"Build a circular action button: #e0e0d9 background, 50% radius, #211922 icon."</li>
+<li>"Create an input field: white background, 1px solid #91918c, 16px radius, 11px 15px padding. Focus: blue outline via semantic tokens."</li>
+<li>"Design the dark footer: #33332e background. Pinterest script logo in white. 12px Pin Sans links in #91918c."</li>
+</ul>
+<h3 id="iteration-guide">Iteration Guide</h3>
+<ol>
+<li>Warm neutrals everywhere — olive/sand grays, never cool steel</li>
+<li>Pinterest Red for CTAs only — bold and singular</li>
+<li>16px radius on buttons/inputs, 20px+ on cards — generous but not pill</li>
+<li>Pin Sans is the only font — compact at 12px for UI, 70px for display</li>
+<li>Photography carries the design — the UI stays warm and minimal</li>
+<li>Plum black (#211922) for text — warmer than pure black</li>
+</ol>
+</main>
+</body>
+</html>

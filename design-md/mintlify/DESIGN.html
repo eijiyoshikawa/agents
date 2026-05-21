@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Mintlify</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-mintlify">Design System: Mintlify</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Mintlify's website is a study in documentation-as-product design — a white, airy, information-rich surface that treats clarity as its highest aesthetic value. The page opens with a luminous white (<code>#ffffff</code>) background, near-black (<code>#0d0d0d</code>) text, and a signature green brand accent (<code>#18E299</code>) that signals freshness and intelligence without dominating the palette. The overall mood is calm, confident, and engineered for legibility — a design system that whispers "we care about your developer experience" in every pixel.</p>
+<p>The Inter font family carries the entire typographic load. At display sizes (40–64px), it uses tight negative letter-spacing (-0.8px to -1.28px) and semibold weight (600), creating headlines that feel focused and compressed like well-written documentation headers. Body text at 16–18px with 150% line-height provides generous reading comfort. Geist Mono appears exclusively for code and technical labels — uppercase, tracked-out, small — the voice of the terminal inside the marketing page.</p>
+<p>What distinguishes Mintlify from other documentation platforms is its atmospheric gradient hero. A soft, cloud-like green-to-white gradient wash behind the hero content creates a sense of ethereal intelligence — documentation that floats above the noise. Below the hero, the page settles into a disciplined alternation of white sections separated by subtle 5% opacity borders. Cards use generous padding (24px+) with large radii (16px–24px) and whisper-thin borders, creating containers that feel open rather than boxed.</p>
+<p><strong>Key Characteristics:</strong>
+- Inter with tight negative tracking at display sizes (-0.8px to -1.28px) — compressed yet readable
+- Geist Mono for code labels: uppercase, 12px, tracked-out, the terminal voice
+- Brand green (<code>#18E299</code>) used sparingly — CTAs, hover states, focus rings, and accent touches
+- Atmospheric gradient hero with cloud-like green-white wash
+- Ultra-round corners: 16px for containers, 24px for featured cards, full-round (9999px) for buttons and pills
+- Subtle 5% opacity borders (<code>rgba(0,0,0,0.05)</code>) creating barely-there separation
+- 8px base spacing system with generous section padding (48px–96px)
+- Clean white canvas — no gray backgrounds, no color sections, depth through borders and whitespace alone</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>Near Black</strong> (<code>#0d0d0d</code>): Primary text, headings, dark surfaces. Not pure black — the micro-softness improves reading comfort.</li>
+<li><strong>Pure White</strong> (<code>#ffffff</code>): Page background, card surfaces, input backgrounds.</li>
+<li><strong>Brand Green</strong> (<code>#18E299</code>): The signature accent — CTAs, links on hover, focus rings, brand identity.</li>
+</ul>
+<h3 id="secondary-accents">Secondary Accents</h3>
+<ul>
+<li><strong>Brand Green Light</strong> (<code>#d4fae8</code>): Tinted green surface for badges, hover states, subtle backgrounds.</li>
+<li><strong>Brand Green Deep</strong> (<code>#0fa76e</code>): Darker green for text on light-green badges, hover states on brand elements.</li>
+<li><strong>Warm Amber</strong> (<code>#c37d0d</code>): Warning states, caution badges — <code>--twoslash-warn-bg</code>.</li>
+<li><strong>Soft Blue</strong> (<code>#3772cf</code>): Tag backgrounds, informational annotations — <code>--twoslash-tag-bg</code>.</li>
+<li><strong>Error Red</strong> (<code>#d45656</code>): Error states, destructive actions — <code>--twoslash-error-bg</code>.</li>
+</ul>
+<h3 id="neutral-scale">Neutral Scale</h3>
+<ul>
+<li><strong>Gray 900</strong> (<code>#0d0d0d</code>): Primary heading text, nav links.</li>
+<li><strong>Gray 700</strong> (<code>#333333</code>): Secondary text, descriptions, body copy.</li>
+<li><strong>Gray 500</strong> (<code>#666666</code>): Tertiary text, muted labels.</li>
+<li><strong>Gray 400</strong> (<code>#888888</code>): Placeholder text, disabled states, code annotations.</li>
+<li><strong>Gray 200</strong> (<code>#e5e5e5</code>): Borders, dividers, card outlines.</li>
+<li><strong>Gray 100</strong> (<code>#f5f5f5</code>): Subtle surface backgrounds, hover states.</li>
+<li><strong>Gray 50</strong> (<code>#fafafa</code>): Near-white surface tint.</li>
+</ul>
+<h3 id="interactive">Interactive</h3>
+<ul>
+<li><strong>Link Default</strong> (<code>#0d0d0d</code>): Links match text color, relying on underline/context.</li>
+<li><strong>Link Hover</strong> (<code>#18E299</code>): Brand green on hover — <code>var(--color-brand)</code>.</li>
+<li><strong>Focus Ring</strong> (<code>#18E299</code>): Brand green focus outline for inputs and interactive elements.</li>
+</ul>
+<h3 id="surface-overlay">Surface &amp; Overlay</h3>
+<ul>
+<li><strong>Card Background</strong> (<code>#ffffff</code>): White cards on white background, separated by borders.</li>
+<li><strong>Border Subtle</strong> (<code>rgba(0,0,0,0.05)</code>): 5% black opacity borders — the primary separation mechanism.</li>
+<li><strong>Border Medium</strong> (<code>rgba(0,0,0,0.08)</code>): Slightly stronger borders for interactive elements.</li>
+<li><strong>Input Border Focus</strong> (<code>var(--color-brand)</code>): Green ring on focused inputs.</li>
+</ul>
+<h3 id="shadows-depth">Shadows &amp; Depth</h3>
+<ul>
+<li><strong>Card Shadow</strong> (<code>rgba(0,0,0,0.03) 0px 2px 4px</code>): Barely-there ambient shadow for subtle lift.</li>
+<li><strong>Button Shadow</strong> (<code>rgba(0,0,0,0.06) 0px 1px 2px</code>): Micro-shadow for button depth.</li>
+<li><strong>No heavy shadows</strong>: Mintlify relies on borders, not shadows, for depth.</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-family">Font Family</h3>
+<ul>
+<li><strong>Primary</strong>: <code>Inter</code>, with fallback: <code>Inter Fallback, system-ui, -apple-system, sans-serif</code></li>
+<li><strong>Monospace</strong>: <code>Geist Mono</code>, with fallback: <code>Geist Mono Fallback, ui-monospace, SFMono-Regular, monospace</code></li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display Hero</td>
+<td>Inter</td>
+<td>64px (4.00rem)</td>
+<td>600</td>
+<td>1.15 (tight)</td>
+<td>-1.28px</td>
+<td>Maximum impact, hero headlines</td>
+</tr>
+<tr>
+<td>Section Heading</td>
+<td>Inter</td>
+<td>40px (2.50rem)</td>
+<td>600</td>
+<td>1.10 (tight)</td>
+<td>-0.8px</td>
+<td>Feature section titles</td>
+</tr>
+<tr>
+<td>Sub-heading</td>
+<td>Inter</td>
+<td>24px (1.50rem)</td>
+<td>500</td>
+<td>1.30 (tight)</td>
+<td>-0.24px</td>
+<td>Card headings, sub-sections</td>
+</tr>
+<tr>
+<td>Card Title</td>
+<td>Inter</td>
+<td>20px (1.25rem)</td>
+<td>600</td>
+<td>1.30 (tight)</td>
+<td>-0.2px</td>
+<td>Feature card titles</td>
+</tr>
+<tr>
+<td>Card Title Light</td>
+<td>Inter</td>
+<td>20px (1.25rem)</td>
+<td>500</td>
+<td>1.30 (tight)</td>
+<td>-0.2px</td>
+<td>Secondary card headings</td>
+</tr>
+<tr>
+<td>Body Large</td>
+<td>Inter</td>
+<td>18px (1.13rem)</td>
+<td>400</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Hero descriptions, introductions</td>
+</tr>
+<tr>
+<td>Body</td>
+<td>Inter</td>
+<td>16px (1.00rem)</td>
+<td>400</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Standard reading text</td>
+</tr>
+<tr>
+<td>Body Medium</td>
+<td>Inter</td>
+<td>16px (1.00rem)</td>
+<td>500</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Navigation, emphasized text</td>
+</tr>
+<tr>
+<td>Button</td>
+<td>Inter</td>
+<td>15px (0.94rem)</td>
+<td>500</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Button labels</td>
+</tr>
+<tr>
+<td>Link</td>
+<td>Inter</td>
+<td>14px (0.88rem)</td>
+<td>500</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Navigation links, small CTAs</td>
+</tr>
+<tr>
+<td>Caption</td>
+<td>Inter</td>
+<td>14px (0.88rem)</td>
+<td>400–500</td>
+<td>1.50–1.71</td>
+<td>normal</td>
+<td>Metadata, descriptions</td>
+</tr>
+<tr>
+<td>Label Uppercase</td>
+<td>Inter</td>
+<td>13px (0.81rem)</td>
+<td>500</td>
+<td>1.50</td>
+<td>0.65px</td>
+<td><code>text-transform: uppercase</code>, section labels</td>
+</tr>
+<tr>
+<td>Small</td>
+<td>Inter</td>
+<td>13px (0.81rem)</td>
+<td>400–500</td>
+<td>1.50</td>
+<td>-0.26px</td>
+<td>Small body text</td>
+</tr>
+<tr>
+<td>Mono Code</td>
+<td>Geist Mono</td>
+<td>12px (0.75rem)</td>
+<td>500</td>
+<td>1.50</td>
+<td>0.6px</td>
+<td><code>text-transform: uppercase</code>, technical labels</td>
+</tr>
+<tr>
+<td>Mono Badge</td>
+<td>Geist Mono</td>
+<td>12px (0.75rem)</td>
+<td>600</td>
+<td>1.50</td>
+<td>0.6px</td>
+<td><code>text-transform: uppercase</code>, status badges</td>
+</tr>
+<tr>
+<td>Mono Micro</td>
+<td>Geist Mono</td>
+<td>10px (0.63rem)</td>
+<td>500</td>
+<td>1.50</td>
+<td>normal</td>
+<td><code>text-transform: uppercase</code>, tiny labels</td>
+</tr>
+</tbody>
+</table>
+<h3 id="principles">Principles</h3>
+<ul>
+<li><strong>Tight tracking at display sizes</strong>: Inter at 40–64px uses -0.8px to -1.28px letter-spacing. This compression creates headlines that feel deliberate and space-efficient — documentation headings, not billboard copy.</li>
+<li><strong>Relaxed reading at body sizes</strong>: 16–18px body text uses normal tracking with 150% line-height, creating generous reading lanes. Documentation demands comfort.</li>
+<li><strong>Two-font system</strong>: Inter for all human-readable content, Geist Mono exclusively for technical/code contexts. The boundary is strict — no mixing.</li>
+<li><strong>Uppercase as hierarchy signal</strong>: Section labels and technical tags use uppercase + positive tracking (0.6px–0.65px) as a clear visual delimiter between content types.</li>
+<li><strong>Three weights</strong>: 400 (body/reading), 500 (UI/navigation/emphasis), 600 (headings/titles). No bold (700) in the system.</li>
+</ul>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<p><strong>Primary Brand (Full-round)</strong>
+- Background: <code>#0d0d0d</code> (near-black)
+- Text: <code>#ffffff</code>
+- Padding: 8px 24px
+- Radius: 9999px (full pill)
+- Font: Inter 15px weight 500
+- Shadow: <code>rgba(0,0,0,0.06) 0px 1px 2px</code>
+- Hover: opacity 0.9
+- Use: Primary CTA ("Get Started", "Start Building")</p>
+<p><strong>Secondary / Ghost (Full-round)</strong>
+- Background: <code>#ffffff</code>
+- Text: <code>#0d0d0d</code>
+- Padding: 4.5px 12px
+- Radius: 9999px (full pill)
+- Border: <code>1px solid rgba(0,0,0,0.08)</code>
+- Font: Inter 15px weight 500
+- Hover: opacity 0.9
+- Use: Secondary actions ("Request Demo", "View Docs")</p>
+<p><strong>Transparent / Nav Button</strong>
+- Background: transparent
+- Text: <code>#0d0d0d</code>
+- Padding: 5px 6px
+- Radius: 8px
+- Border: none or <code>1px solid rgba(0,0,0,0.05)</code>
+- Use: Navigation items, icon buttons</p>
+<p><strong>Brand Accent Button</strong>
+- Background: <code>#18E299</code>
+- Text: <code>#0d0d0d</code>
+- Padding: 8px 24px
+- Radius: 9999px
+- Use: Special promotional CTAs</p>
+<h3 id="cards-containers">Cards &amp; Containers</h3>
+<p><strong>Standard Card</strong>
+- Background: <code>#ffffff</code>
+- Border: <code>1px solid rgba(0,0,0,0.05)</code>
+- Radius: 16px
+- Padding: 24px
+- Shadow: <code>rgba(0,0,0,0.03) 0px 2px 4px</code>
+- Hover: subtle border darkening to <code>rgba(0,0,0,0.08)</code></p>
+<p><strong>Featured Card</strong>
+- Background: <code>#ffffff</code>
+- Border: <code>1px solid rgba(0,0,0,0.05)</code>
+- Radius: 24px
+- Padding: 32px
+- Inner content areas may have their own 16px radius containers</p>
+<p><strong>Logo/Trust Card</strong>
+- Background: <code>#fafafa</code> or <code>#ffffff</code>
+- Border: <code>1px solid rgba(0,0,0,0.05)</code>
+- Radius: 16px
+- Centered logo/icon with consistent sizing</p>
+<h3 id="inputs-forms">Inputs &amp; Forms</h3>
+<p><strong>Email Input</strong>
+- Background: transparent or <code>#ffffff</code>
+- Text: <code>#0d0d0d</code>
+- Padding: 0px 12px (height controlled by line-height)
+- Border: <code>1px solid rgba(0,0,0,0.08)</code>
+- Radius: 9999px (full pill, matching buttons)
+- Focus: <code>1px solid var(--color-brand)</code> + <code>outline: 1px solid var(--color-brand)</code>
+- Placeholder: <code>#888888</code></p>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li>Clean horizontal nav on white, sticky with backdrop blur</li>
+<li>Brand logotype left-aligned</li>
+<li>Links: Inter 14–15px weight 500, <code>#0d0d0d</code> text</li>
+<li>Hover: color shifts to brand green <code>var(--color-brand)</code></li>
+<li>CTA: dark pill button right-aligned ("Get Started")</li>
+<li>Mobile: hamburger menu collapse at 768px</li>
+</ul>
+<h3 id="image-treatment">Image Treatment</h3>
+<ul>
+<li>Product screenshots with subtle 1px borders</li>
+<li>Rounded containers: 16px–24px radius</li>
+<li>Atmospheric gradient backgrounds behind hero images</li>
+<li>Cloud/sky imagery with soft green tinting</li>
+</ul>
+<h3 id="distinctive-components">Distinctive Components</h3>
+<p><strong>Atmospheric Hero</strong>
+- Full-width gradient wash: soft green-to-white cloud-like gradient
+- Centered headline with tight tracking
+- Subtitle in muted gray
+- Dual CTA buttons (dark primary + ghost secondary)
+- The gradient creates a sense of elevation and intelligence</p>
+<p><strong>Trust Bar / Logo Grid</strong>
+- "Loved by your favorite companies" section
+- Company logos in muted grayscale
+- Grid or horizontal layout with consistent sizing
+- Subtle border separation between logos</p>
+<p><strong>Feature Cards with Icons</strong>
+- Icon or illustration at top
+- Title at 20px weight 600
+- Description at 14–16px in gray
+- Consistent padding and border treatment
+- Grid layout: 2–3 columns on desktop</p>
+<p><strong>CTA Footer Section</strong>
+- Dark or gradient background
+- Large headline: "Make documentation your winning advantage"
+- Email input with pill styling
+- Brand green accent on CTAs</p>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-system">Spacing System</h3>
+<ul>
+<li>Base unit: 8px</li>
+<li>Scale: 2px, 4px, 5px, 6px, 7px, 8px, 10px, 12px, 16px, 24px, 32px, 48px, 64px</li>
+<li>Section padding: 48px–96px vertical</li>
+<li>Card padding: 24px–32px</li>
+<li>Component gaps: 8px–16px</li>
+</ul>
+<h3 id="grid-container">Grid &amp; Container</h3>
+<ul>
+<li>Max content width: approximately 1200px</li>
+<li>Hero: centered single-column with generous top padding (96px+)</li>
+<li>Feature sections: 2–3 column CSS Grid for cards</li>
+<li>Full-width sections with contained content</li>
+<li>Consistent horizontal padding: 24px (mobile) to 32px (desktop)</li>
+</ul>
+<h3 id="whitespace-philosophy">Whitespace Philosophy</h3>
+<ul>
+<li><strong>Documentation-grade breathing room</strong>: Every element has generous surrounding whitespace. Mintlify sells documentation, so the marketing page itself demonstrates reading comfort.</li>
+<li><strong>Sections as chapters</strong>: Each feature section is a self-contained unit with 48px–96px vertical padding, creating clear "chapter breaks."</li>
+<li><strong>Content density is low</strong>: Unlike developer tools that pack the page, Mintlify uses 1–2 key messages per section with supporting imagery.</li>
+</ul>
+<h3 id="border-radius-scale">Border Radius Scale</h3>
+<ul>
+<li>Small (4px): Inline code, small tags, tooltips</li>
+<li>Medium (8px): Nav buttons, transparent buttons, small containers</li>
+<li>Standard (16px): Cards, content containers, image wrappers</li>
+<li>Large (24px): Featured cards, hero containers, section panels</li>
+<li>Full Pill (9999px): Buttons, inputs, badges, pills — the signature shape</li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Treatment</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flat (Level 0)</td>
+<td>No shadow, no border</td>
+<td>Page background, text blocks</td>
+</tr>
+<tr>
+<td>Subtle Border (Level 1)</td>
+<td><code>1px solid rgba(0,0,0,0.05)</code></td>
+<td>Standard card borders, dividers</td>
+</tr>
+<tr>
+<td>Medium Border (Level 1b)</td>
+<td><code>1px solid rgba(0,0,0,0.08)</code></td>
+<td>Interactive elements, input borders</td>
+</tr>
+<tr>
+<td>Ambient Shadow (Level 2)</td>
+<td><code>rgba(0,0,0,0.03) 0px 2px 4px</code></td>
+<td>Cards with subtle lift</td>
+</tr>
+<tr>
+<td>Button Shadow (Level 2b)</td>
+<td><code>rgba(0,0,0,0.06) 0px 1px 2px</code></td>
+<td>Button micro-depth</td>
+</tr>
+<tr>
+<td>Focus Ring (Accessibility)</td>
+<td><code>1px solid #18E299</code> outline</td>
+<td>Focused inputs, active interactive elements</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Shadow Philosophy</strong>: Mintlify barely uses shadows. The depth system is almost entirely border-driven — ultra-subtle 5% opacity borders create separation without visual weight. When shadows appear, they're atmospheric whispers (<code>0.03 opacity, 2px blur, 4px spread</code>) that add the barest sense of lift. This restraint keeps the page feeling flat and paper-like — appropriate for a documentation company whose product is about clarity and readability.</p>
+<h3 id="decorative-depth">Decorative Depth</h3>
+<ul>
+<li>Hero gradient: atmospheric green-white cloud gradient behind hero content</li>
+<li>No background color alternation — white on white throughout</li>
+<li>Depth comes from border opacity variation (5% → 8%) and whitespace</li>
+</ul>
+<h2 id="7-dark-mode">7. Dark Mode</h2>
+<h3 id="color-inversions">Color Inversions</h3>
+<ul>
+<li><strong>Background</strong>: <code>#0d0d0d</code> (near-black)</li>
+<li><strong>Text Primary</strong>: <code>#ededed</code> (near-white)</li>
+<li><strong>Text Secondary</strong>: <code>#a0a0a0</code> (muted gray)</li>
+<li><strong>Brand Green</strong>: <code>#18E299</code> (unchanged — the green works on both backgrounds)</li>
+<li><strong>Border</strong>: <code>rgba(255,255,255,0.08)</code> (white at 8% opacity)</li>
+<li><strong>Card Background</strong>: <code>#141414</code> (slightly lighter than page)</li>
+<li><strong>Shadow</strong>: <code>rgba(0,0,0,0.4) 0px 2px 4px</code> (stronger shadow for contrast)</li>
+</ul>
+<h3 id="key-adjustments">Key Adjustments</h3>
+<ul>
+<li>Buttons invert: white background dark text becomes dark background light text</li>
+<li>Badge backgrounds shift to deeper tones with lighter text</li>
+<li>Focus ring remains brand green</li>
+<li>Hero gradient shifts to dark-tinted green atmospheric wash</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<h3 id="breakpoints">Breakpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Width</th>
+<th>Key Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mobile</td>
+<td>&lt;768px</td>
+<td>Single column, stacked layout, hamburger nav</td>
+</tr>
+<tr>
+<td>Tablet</td>
+<td>768–1024px</td>
+<td>Two-column grids begin, expanded padding</td>
+</tr>
+<tr>
+<td>Desktop</td>
+<td>&gt;1024px</td>
+<td>Full layout, 3-column grids, maximum content width</td>
+</tr>
+</tbody>
+</table>
+<h3 id="touch-targets">Touch Targets</h3>
+<ul>
+<li>Buttons with full-pill shape have comfortable 8px+ vertical padding</li>
+<li>Navigation links spaced with adequate 16px+ gaps</li>
+<li>Mobile menu provides full-width tap targets</li>
+</ul>
+<h3 id="collapsing-strategy">Collapsing Strategy</h3>
+<ul>
+<li>Hero: 64px → 40px headline, maintains tight tracking proportionally</li>
+<li>Navigation: horizontal links + CTA → hamburger menu at 768px</li>
+<li>Feature cards: 3-column → 2-column → single column stacked</li>
+<li>Section spacing: 96px → 48px on mobile</li>
+<li>Footer: multi-column → stacked single column</li>
+<li>Trust bar: grid → horizontal scroll or stacked</li>
+</ul>
+<h3 id="image-behavior">Image Behavior</h3>
+<ul>
+<li>Product screenshots maintain aspect ratio with responsive containers</li>
+<li>Hero gradient simplifies on mobile</li>
+<li>Full-width sections maintain edge-to-edge treatment</li>
+</ul>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Primary CTA: Near Black (<code>#0d0d0d</code>)</li>
+<li>Background: Pure White (<code>#ffffff</code>)</li>
+<li>Heading text: Near Black (<code>#0d0d0d</code>)</li>
+<li>Body text: Gray 700 (<code>#333333</code>)</li>
+<li>Border: <code>rgba(0,0,0,0.05)</code> (5% opacity)</li>
+<li>Brand accent: Green (<code>#18E299</code>)</li>
+<li>Link hover: Brand Green (<code>#18E299</code>)</li>
+<li>Focus ring: Brand Green (<code>#18E299</code>)</li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create a hero section on white background with atmospheric green-white gradient wash. Headline at 64px Inter weight 600, line-height 1.15, letter-spacing -1.28px, color #0d0d0d. Subtitle at 18px Inter weight 400, line-height 1.50, color #666666. Dark pill CTA (#0d0d0d, 9999px radius, 8px 24px padding) and ghost pill button (white, 1px solid rgba(0,0,0,0.08), 9999px radius)."</li>
+<li>"Design a card: white background, 1px solid rgba(0,0,0,0.05) border, 16px radius, 24px padding, shadow rgba(0,0,0,0.03) 0px 2px 4px. Title at 20px Inter weight 600, letter-spacing -0.2px. Body at 14px weight 400, #666666."</li>
+<li>"Build a pill badge: #d4fae8 background, #0fa76e text, 9999px radius, 4px 12px padding, 13px Inter weight 500, uppercase."</li>
+<li>"Create navigation: white sticky header with backdrop-filter blur(12px). Inter 15px weight 500 for links, #0d0d0d text. Dark pill CTA 'Get Started' right-aligned, 9999px radius. Bottom border: 1px solid rgba(0,0,0,0.05)."</li>
+<li>"Design a trust section showing company logos in muted gray. Grid layout with 16px radius containers, 1px border at 5% opacity. Label above: 'Loved by your favorite companies' at 13px Inter weight 500, uppercase, tracking 0.65px."</li>
+</ul>
+<h3 id="iteration-guide">Iteration Guide</h3>
+<ol>
+<li>Always use full-pill radius (9999px) for buttons and inputs — this is Mintlify's signature shape</li>
+<li>Keep borders at 5% opacity (<code>rgba(0,0,0,0.05)</code>) — stronger borders break the airy feeling</li>
+<li>Letter-spacing scales with font size: -1.28px at 64px, -0.8px at 40px, -0.24px at 24px, normal at 16px</li>
+<li>Three weights only: 400 (read), 500 (interact), 600 (announce)</li>
+<li>Brand green (<code>#18E299</code>) is used sparingly — CTAs and hover states only, never for decorative fills</li>
+<li>Geist Mono uppercase for technical labels, Inter for everything else</li>
+<li>Section padding is generous: 64px–96px on desktop, 48px on mobile</li>
+<li>No gray background sections — white throughout, separation through borders and whitespace</li>
+</ol>
+</main>
+</body>
+</html>
