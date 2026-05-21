@@ -1,0 +1,26 @@
+{
+  "name": "まちボード",
+  "short_name": "まちボード",
+  "description": "回覧板を、もっとかんたんに。自治会・町内会向けデジタル回覧板サービス",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFFFFF",
+  "theme_color": "#2980B9",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["government", "utilities", "social"]
+}

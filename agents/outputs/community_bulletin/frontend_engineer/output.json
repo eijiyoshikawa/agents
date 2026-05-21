@@ -1,0 +1,208 @@
+{
+  "project_name": "まちボード（地域回覧板デジタル化サービス）",
+  "updated_at": "2026-04-15",
+  "pages_implemented": [
+    {
+      "path": "/login",
+      "rendering": "SSG",
+      "components": ["MagicLinkForm", "LineOAuthButton", "Logo", "AppDescription"],
+      "seo": {
+        "title": "ログイン | まちボード",
+        "description": "まちボードにログイン。メールアドレスだけでかんたんにアクセス。",
+        "structured_data": false
+      },
+      "status": "planned"
+    },
+    {
+      "path": "/onboarding",
+      "rendering": "CSR",
+      "components": ["OnboardingWizard", "StepIndicator", "NameInput", "InviteCodeInput", "NotificationPermission"],
+      "seo": {
+        "title": "はじめての設定 | まちボード",
+        "description": "",
+        "structured_data": false
+      },
+      "status": "planned"
+    },
+    {
+      "path": "/",
+      "rendering": "SSR",
+      "components": ["BulletinFeed", "BulletinCard", "CategoryFilter", "UnreadBadge", "EmptyState", "PullToRefresh"],
+      "seo": {
+        "title": "ホーム | まちボード",
+        "description": "自治会の最新のお知らせを確認",
+        "structured_data": false
+      },
+      "status": "planned"
+    },
+    {
+      "path": "/bulletin/[id]",
+      "rendering": "SSR",
+      "components": ["BulletinDetail", "ReadConfirmButton", "ImageGallery", "AttachmentList", "CategoryBadge", "AuthorInfo"],
+      "seo": {
+        "title": "[回覧板タイトル] | まちボード",
+        "description": "",
+        "structured_data": false
+      },
+      "status": "planned"
+    },
+    {
+      "path": "/new",
+      "rendering": "CSR",
+      "components": ["BulletinEditor", "TemplateSelector", "ImageUploader", "CategorySelect", "SchedulePicker", "PreviewModal"],
+      "seo": {
+        "title": "新しいお知らせを作成 | まちボード",
+        "description": "",
+        "structured_data": false
+      },
+      "status": "planned"
+    },
+    {
+      "path": "/admin/dashboard",
+      "rendering": "SSR",
+      "components": ["ReadRateChart", "RecentBulletinsList", "UnreadMembersList", "RemindButton", "SummaryCards", "ReadRateTrend"],
+      "seo": {
+        "title": "管理ダッシュボード | まちボード",
+        "description": "",
+        "structured_data": false
+      },
+      "status": "planned"
+    },
+    {
+      "path": "/admin/members",
+      "rendering": "SSR",
+      "components": ["MemberTable", "InviteForm", "RoleToggle", "MemberActions", "SearchInput"],
+      "seo": {
+        "title": "メンバー管理 | まちボード",
+        "description": "",
+        "structured_data": false
+      },
+      "status": "planned"
+    },
+    {
+      "path": "/admin/subscription",
+      "rendering": "SSR",
+      "components": ["CurrentPlanCard", "PricingTable", "CheckoutButton", "BillingHistory", "TrialBanner"],
+      "seo": {
+        "title": "プラン管理 | まちボード",
+        "description": "",
+        "structured_data": false
+      },
+      "status": "planned"
+    },
+    {
+      "path": "/settings",
+      "rendering": "CSR",
+      "components": ["NotificationSettings", "DisplaySettings", "FontSizeSlider", "HighContrastToggle", "LanguageSelector", "AccountSettings"],
+      "seo": {
+        "title": "設定 | まちボード",
+        "description": "",
+        "structured_data": false
+      },
+      "status": "planned"
+    },
+    {
+      "path": "/bulletin/[id]/pdf",
+      "rendering": "SSR",
+      "components": ["PdfPreview", "DownloadButton", "PrintButton"],
+      "seo": {
+        "title": "PDF プレビュー | まちボード",
+        "description": "",
+        "structured_data": false
+      },
+      "status": "planned"
+    }
+  ],
+  "project_structure": {
+    "src_app": {
+      "(auth)": {
+        "login/page.tsx": "ログイン画面",
+        "onboarding/page.tsx": "初回設定ウィザード",
+        "layout.tsx": "認証レイアウト（センタリング・ロゴ）"
+      },
+      "(main)": {
+        "page.tsx": "ホーム（回覧板フィード）",
+        "bulletin/[id]/page.tsx": "回覧板詳細 + 既読確認",
+        "bulletin/[id]/pdf/page.tsx": "PDFプレビュー",
+        "new/page.tsx": "新規投稿（管理者）",
+        "admin/dashboard/page.tsx": "管理ダッシュボード",
+        "admin/members/page.tsx": "メンバー管理",
+        "admin/subscription/page.tsx": "サブスク管理",
+        "settings/page.tsx": "設定",
+        "layout.tsx": "メインレイアウト（BottomNav + Header）"
+      },
+      "api": {
+        "auth/magic-link/route.ts": "マジックリンク送信",
+        "bulletins/route.ts": "回覧板CRUD",
+        "bulletins/[id]/read/route.ts": "既読確認",
+        "bulletins/[id]/pdf/route.ts": "PDF生成",
+        "subscriptions/checkout/route.ts": "Stripe Checkout",
+        "webhooks/stripe/route.ts": "Stripe Webhook"
+      },
+      "layout.tsx": "ルートレイアウト（フォント・メタデータ・Providers）",
+      "globals.css": "Tailwind CSS + カスタムプロパティ"
+    },
+    "src_components": {
+      "ui/": "共通UIコンポーネント（Button, Card, Input, Badge, Modal, Toast）",
+      "bulletin/": "回覧板関連コンポーネント（BulletinCard, BulletinDetail, BulletinEditor）",
+      "admin/": "管理者関連コンポーネント（ReadRateChart, MemberTable）",
+      "layout/": "レイアウトコンポーネント（Header, BottomNav, Sidebar）",
+      "auth/": "認証関連コンポーネント（MagicLinkForm, LineOAuthButton）"
+    },
+    "src_lib": {
+      "supabase/": "Supabaseクライアント設定（server.ts, client.ts, middleware.ts）",
+      "stripe/": "Stripe設定・ヘルパー",
+      "notifications/": "通知ディスパッチャー（push.ts, email.ts, line.ts）",
+      "pdf/": "PDF生成テンプレート",
+      "utils/": "ユーティリティ関数",
+      "types/": "TypeScript型定義（database.ts, api.ts）",
+      "validations/": "Zodスキーマ（bulletin.ts, organization.ts）"
+    }
+  },
+  "key_libraries": [
+    {"name": "next", "version": "^15.0", "purpose": "フレームワーク"},
+    {"name": "tailwindcss", "version": "^4.0", "purpose": "スタイリング"},
+    {"name": "@supabase/supabase-js", "version": "^2.0", "purpose": "Supabaseクライアント"},
+    {"name": "@supabase/ssr", "version": "^0.5", "purpose": "SSR用Supabaseヘルパー"},
+    {"name": "stripe", "version": "^17.0", "purpose": "Stripe SDK（サーバー）"},
+    {"name": "@stripe/stripe-js", "version": "^4.0", "purpose": "Stripe SDK（クライアント）"},
+    {"name": "next-intl", "version": "^4.0", "purpose": "国際化"},
+    {"name": "@react-pdf/renderer", "version": "^4.0", "purpose": "PDF生成"},
+    {"name": "zod", "version": "^3.0", "purpose": "バリデーション"},
+    {"name": "react-hook-form", "version": "^7.0", "purpose": "フォーム管理"},
+    {"name": "@hookform/resolvers", "version": "^3.0", "purpose": "Zod + React Hook Form連携"},
+    {"name": "recharts", "version": "^2.0", "purpose": "既読率チャート"},
+    {"name": "lucide-react", "version": "^0.400", "purpose": "アイコン"},
+    {"name": "date-fns", "version": "^4.0", "purpose": "日付処理"},
+    {"name": "sonner", "version": "^2.0", "purpose": "トースト通知"}
+  ],
+  "performance": {
+    "lcp": "< 2.5s (target)",
+    "fid": "< 100ms (target)",
+    "cls": "< 0.1 (target)",
+    "strategies": [
+      "Server Componentsをデフォルトに。Client Componentsは対話が必要な箇所のみ",
+      "画像はnext/image + Supabase Storage CDNで最適化",
+      "フォントはnext/fontでNoto Sans JPをサブセット化（CJK文字最適化）",
+      "Service Workerでオフライン閲覧対応（PWA）",
+      "Route Groupsで認証ページと本体ページのバンドルを分離",
+      "Suspenseでストリーミングレンダリング（回覧板フィードのローディングUX改善）"
+    ]
+  },
+  "pwa_config": {
+    "manifest": {
+      "name": "まちボード",
+      "short_name": "まちボード",
+      "theme_color": "#2980B9",
+      "background_color": "#FFFFFF",
+      "display": "standalone",
+      "orientation": "portrait",
+      "start_url": "/",
+      "icons": ["192x192", "512x512"]
+    },
+    "service_worker": {
+      "caching_strategy": "Network-first for API, Cache-first for static assets",
+      "offline_page": "最後に取得した回覧板一覧をIndexedDBからオフライン表示"
+    }
+  }
+}
