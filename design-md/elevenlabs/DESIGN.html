@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: ElevenLabs</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-elevenlabs">Design System: ElevenLabs</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>ElevenLabs' website is a study in restrained elegance — a near-white canvas (<code>#ffffff</code>, <code>#f5f5f5</code>) where typography and subtle shadows do all the heavy lifting. The design feels like a premium audio product brochure: clean, spacious, and confident enough to let the content speak (literally, given ElevenLabs makes voice AI). There's an almost Apple-like quality to the whitespace strategy, but warmer — the occasional warm stone tint (<code>#f5f2ef</code>, <code>#777169</code>) prevents the purity from feeling clinical.</p>
+<p>The typography system is built on a fascinating duality: Waldenburg at weight 300 (light) for display headings creates ethereal, whisper-thin titles that feel like sound waves rendered in type — delicate, precise, and surprisingly impactful at large sizes. This light-weight display approach is the design's signature — where most sites use bold headings to grab attention, ElevenLabs uses lightness to create intrigue. Inter handles all body and UI text with workmanlike reliability, using slight positive letter-spacing (0.14px–0.18px) that gives body text an airy, well-spaced quality. WaldenburgFH appears as a bold uppercase variant for specific button labels.</p>
+<p>What makes ElevenLabs distinctive is its multi-layered shadow system. Rather than simple box-shadows, elements use complex stacks: inset border-shadows (<code>rgba(0,0,0,0.075) 0px 0px 0px 0.5px inset</code>), outline shadows (<code>rgba(0,0,0,0.06) 0px 0px 0px 1px</code>), and soft elevation shadows (<code>rgba(0,0,0,0.04) 0px 4px 4px</code>) — all at remarkably low opacities. The result is a design where surfaces seem to barely exist, floating just above the page with the lightest possible touch. Pill-shaped buttons (9999px) with warm-tinted backgrounds (<code>rgba(245,242,239,0.8)</code>) and warm shadows (<code>rgba(78,50,23,0.04)</code>) add a tactile, physical quality.</p>
+<p><strong>Key Characteristics:</strong>
+- Near-white canvas with warm undertones (<code>#f5f5f5</code>, <code>#f5f2ef</code>)
+- Waldenburg weight 300 (light) for display — ethereal, whisper-thin headings
+- Inter with positive letter-spacing (0.14–0.18px) for body — airy readability
+- Multi-layered shadow stacks at sub-0.1 opacity — surfaces barely exist
+- Pill buttons (9999px) with warm stone-tinted backgrounds
+- WaldenburgFH bold uppercase for specific CTA labels
+- Warm shadow tints: <code>rgba(78, 50, 23, 0.04)</code> — shadows have color, not just darkness
+- Geist Mono / ui-monospace for code snippets</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>Pure White</strong> (<code>#ffffff</code>): Primary background, card surfaces, button backgrounds</li>
+<li><strong>Light Gray</strong> (<code>#f5f5f5</code>): Secondary surface, subtle section differentiation</li>
+<li><strong>Warm Stone</strong> (<code>#f5f2ef</code>): Button background (at 80% opacity) — the warm signature</li>
+<li><strong>Black</strong> (<code>#000000</code>): Primary text, headings, dark buttons</li>
+</ul>
+<h3 id="neutral-scale">Neutral Scale</h3>
+<ul>
+<li><strong>Dark Gray</strong> (<code>#4e4e4e</code>): Secondary text, descriptions</li>
+<li><strong>Warm Gray</strong> (<code>#777169</code>): Tertiary text, muted links, decorative underlines</li>
+<li><strong>Near White</strong> (<code>#f6f6f6</code>): Alternate light surface</li>
+</ul>
+<h3 id="interactive">Interactive</h3>
+<ul>
+<li><strong>Grid Cyan</strong> (<code>#7fffff</code>): <code>--grid-column-bg</code>, at 25% opacity — decorative grid overlay</li>
+<li><strong>Ring Blue</strong> (<code>rgb(147 197 253 / 0.5)</code>): <code>--tw-ring-color</code>, focus ring</li>
+<li><strong>Border Light</strong> (<code>#e5e5e5</code>): Explicit borders</li>
+<li><strong>Border Subtle</strong> (<code>rgba(0, 0, 0, 0.05)</code>): Ultra-subtle bottom borders</li>
+</ul>
+<h3 id="shadows">Shadows</h3>
+<ul>
+<li><strong>Inset Border</strong> (<code>rgba(0,0,0,0.075) 0px 0px 0px 0.5px inset</code>): Internal edge definition</li>
+<li><strong>Inset Dark</strong> (<code>rgba(0,0,0,0.1) 0px 0px 0px 0.5px inset</code>): Stronger inset variant</li>
+<li><strong>Outline Ring</strong> (<code>rgba(0,0,0,0.06) 0px 0px 0px 1px</code>): Shadow-as-border</li>
+<li><strong>Soft Elevation</strong> (<code>rgba(0,0,0,0.04) 0px 4px 4px</code>): Gentle lift</li>
+<li><strong>Card Shadow</strong> (<code>rgba(0,0,0,0.4) 0px 0px 1px, rgba(0,0,0,0.04) 0px 4px 4px</code>): Button/card elevation</li>
+<li><strong>Warm Shadow</strong> (<code>rgba(78,50,23,0.04) 0px 6px 16px</code>): Warm-tinted button shadow</li>
+<li><strong>Edge Shadow</strong> (<code>rgba(0,0,0,0.08) 0px 0px 0px 0.5px</code>): Subtle edge definition</li>
+<li><strong>Inset Ring</strong> (<code>rgba(0,0,0,0.1) 0px 0px 0px 1px inset</code>): Strong inset border</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-families">Font Families</h3>
+<ul>
+<li><strong>Display</strong>: <code>Waldenburg</code>, fallback: <code>Waldenburg Fallback</code></li>
+<li><strong>Display Bold</strong>: <code>WaldenburgFH</code>, fallback: <code>WaldenburgFH Fallback</code></li>
+<li><strong>Body / UI</strong>: <code>Inter</code>, fallback: <code>Inter Fallback</code></li>
+<li><strong>Monospace</strong>: <code>Geist Mono</code> or <code>ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas</code></li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display Hero</td>
+<td>Waldenburg</td>
+<td>48px (3.00rem)</td>
+<td>300</td>
+<td>1.08 (tight)</td>
+<td>-0.96px</td>
+<td>Whisper-thin, ethereal</td>
+</tr>
+<tr>
+<td>Section Heading</td>
+<td>Waldenburg</td>
+<td>36px (2.25rem)</td>
+<td>300</td>
+<td>1.17 (tight)</td>
+<td>normal</td>
+<td>Light display</td>
+</tr>
+<tr>
+<td>Card Heading</td>
+<td>Waldenburg</td>
+<td>32px (2.00rem)</td>
+<td>300</td>
+<td>1.13 (tight)</td>
+<td>normal</td>
+<td>Light card titles</td>
+</tr>
+<tr>
+<td>Body Large</td>
+<td>Inter</td>
+<td>20px (1.25rem)</td>
+<td>400</td>
+<td>1.35</td>
+<td>normal</td>
+<td>Introductions</td>
+</tr>
+<tr>
+<td>Body</td>
+<td>Inter</td>
+<td>18px (1.13rem)</td>
+<td>400</td>
+<td>1.44–1.60</td>
+<td>0.18px</td>
+<td>Standard reading text</td>
+</tr>
+<tr>
+<td>Body Standard</td>
+<td>Inter</td>
+<td>16px (1.00rem)</td>
+<td>400</td>
+<td>1.50</td>
+<td>0.16px</td>
+<td>UI text</td>
+</tr>
+<tr>
+<td>Body Medium</td>
+<td>Inter</td>
+<td>16px (1.00rem)</td>
+<td>500</td>
+<td>1.50</td>
+<td>0.16px</td>
+<td>Emphasized body</td>
+</tr>
+<tr>
+<td>Nav / UI</td>
+<td>Inter</td>
+<td>15px (0.94rem)</td>
+<td>500</td>
+<td>1.33–1.47</td>
+<td>0.15px</td>
+<td>Navigation links</td>
+</tr>
+<tr>
+<td>Button</td>
+<td>Inter</td>
+<td>15px (0.94rem)</td>
+<td>500</td>
+<td>1.47</td>
+<td>normal</td>
+<td>Button labels</td>
+</tr>
+<tr>
+<td>Button Uppercase</td>
+<td>WaldenburgFH</td>
+<td>14px (0.88rem)</td>
+<td>700</td>
+<td>1.10 (tight)</td>
+<td>0.7px</td>
+<td><code>text-transform: uppercase</code></td>
+</tr>
+<tr>
+<td>Caption</td>
+<td>Inter</td>
+<td>14px (0.88rem)</td>
+<td>400–500</td>
+<td>1.43–1.50</td>
+<td>0.14px</td>
+<td>Metadata</td>
+</tr>
+<tr>
+<td>Small</td>
+<td>Inter</td>
+<td>13px (0.81rem)</td>
+<td>500</td>
+<td>1.38</td>
+<td>normal</td>
+<td>Tags, badges</td>
+</tr>
+<tr>
+<td>Code</td>
+<td>Geist Mono</td>
+<td>13px (0.81rem)</td>
+<td>400</td>
+<td>1.85 (relaxed)</td>
+<td>normal</td>
+<td>Code blocks</td>
+</tr>
+<tr>
+<td>Micro</td>
+<td>Inter</td>
+<td>12px (0.75rem)</td>
+<td>500</td>
+<td>1.33</td>
+<td>normal</td>
+<td>Tiny labels</td>
+</tr>
+<tr>
+<td>Tiny</td>
+<td>Inter</td>
+<td>10px (0.63rem)</td>
+<td>400</td>
+<td>1.60 (relaxed)</td>
+<td>normal</td>
+<td>Fine print</td>
+</tr>
+</tbody>
+</table>
+<h3 id="principles">Principles</h3>
+<ul>
+<li><strong>Light as the hero weight</strong>: Waldenburg at 300 is the defining typographic choice. Where other design systems use bold for impact, ElevenLabs uses lightness — thin strokes that feel like audio waveforms, creating intrigue through restraint.</li>
+<li><strong>Positive letter-spacing on body</strong>: Inter uses +0.14px to +0.18px tracking across body text, creating an airy, well-spaced reading rhythm that contrasts with the tight display tracking (-0.96px).</li>
+<li><strong>WaldenburgFH for emphasis</strong>: A bold (700) uppercase variant of Waldenburg appears only in specific CTA button labels with 0.7px letter-spacing — the one place where the type system gets loud.</li>
+<li><strong>Monospace as ambient</strong>: Geist Mono at relaxed line-height (1.85) for code blocks feels unhurried and readable.</li>
+</ul>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<p><strong>Primary Black Pill</strong>
+- Background: <code>#000000</code>
+- Text: <code>#ffffff</code>
+- Padding: 0px 14px
+- Radius: 9999px (full pill)
+- Use: Primary CTA</p>
+<p><strong>White Pill (Shadow-bordered)</strong>
+- Background: <code>#ffffff</code>
+- Text: <code>#000000</code>
+- Radius: 9999px
+- Shadow: <code>rgba(0,0,0,0.4) 0px 0px 1px, rgba(0,0,0,0.04) 0px 4px 4px</code>
+- Use: Secondary CTA on white</p>
+<p><strong>Warm Stone Pill</strong>
+- Background: <code>rgba(245, 242, 239, 0.8)</code> (warm translucent)
+- Text: <code>#000000</code>
+- Padding: 12px 20px 12px 14px (asymmetric)
+- Radius: 30px
+- Shadow: <code>rgba(78, 50, 23, 0.04) 0px 6px 16px</code> (warm-tinted)
+- Use: Featured CTA, hero action — the signature warm button</p>
+<p><strong>Uppercase Waldenburg Button</strong>
+- Font: WaldenburgFH 14px weight 700
+- Text-transform: uppercase
+- Letter-spacing: 0.7px
+- Use: Specific bold CTA labels</p>
+<h3 id="cards-containers">Cards &amp; Containers</h3>
+<ul>
+<li>Background: <code>#ffffff</code></li>
+<li>Border: <code>1px solid #e5e5e5</code> or shadow-as-border</li>
+<li>Radius: 16px–24px</li>
+<li>Shadow: multi-layer stack (inset + outline + elevation)</li>
+<li>Content: product screenshots, code examples, audio waveform previews</li>
+</ul>
+<h3 id="inputs-forms">Inputs &amp; Forms</h3>
+<ul>
+<li>Textarea: padding 12px 20px, transparent text at default</li>
+<li>Select: white background, standard styling</li>
+<li>Radio: standard with tw-ring focus</li>
+<li>Focus: <code>var(--tw-ring-offset-shadow)</code> ring system</li>
+</ul>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li>Clean white sticky header</li>
+<li>Inter 15px weight 500 for nav links</li>
+<li>Pill CTAs right-aligned (black primary, white secondary)</li>
+<li>Mobile: hamburger collapse at 1024px</li>
+</ul>
+<h3 id="image-treatment">Image Treatment</h3>
+<ul>
+<li>Product screenshots and audio waveform visualizations</li>
+<li>Warm gradient backgrounds in feature sections</li>
+<li>20px–24px radius on image containers</li>
+<li>Full-width sections alternating white and light gray</li>
+</ul>
+<h3 id="distinctive-components">Distinctive Components</h3>
+<p><strong>Audio Waveform Sections</strong>
+- Colorful gradient backgrounds showcasing voice AI capabilities
+- Warm amber, blue, and green gradients behind product demos
+- Screenshots of the ElevenLabs product interface</p>
+<p><strong>Warm Stone CTA Block</strong>
+- <code>rgba(245,242,239,0.8)</code> background with warm shadow
+- Asymmetric padding (more right padding)
+- Creates a physical, tactile quality unique to ElevenLabs</p>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-system">Spacing System</h3>
+<ul>
+<li>Base unit: 8px</li>
+<li>Scale: 1px, 3px, 4px, 8px, 9px, 10px, 11px, 12px, 16px, 18px, 20px, 24px, 28px, 32px, 40px</li>
+</ul>
+<h3 id="grid-container">Grid &amp; Container</h3>
+<ul>
+<li>Centered content with generous max-width</li>
+<li>Single-column hero, expanding to feature grids</li>
+<li>Full-width gradient sections for product showcases</li>
+<li>White card grids on light gray backgrounds</li>
+</ul>
+<h3 id="whitespace-philosophy">Whitespace Philosophy</h3>
+<ul>
+<li><strong>Apple-like generosity</strong>: Massive vertical spacing between sections creates a premium, unhurried pace. Each section is an exhibit.</li>
+<li><strong>Warm emptiness</strong>: The whitespace isn't cold — the warm stone undertones and warm shadows give empty space a tactile, physical quality.</li>
+<li><strong>Typography-led rhythm</strong>: The light-weight Waldenburg headings create visual "whispers" that draw the eye through vast white space.</li>
+</ul>
+<h3 id="border-radius-scale">Border Radius Scale</h3>
+<ul>
+<li>Minimal (2px): Small links, inline elements</li>
+<li>Subtle (4px): Nav items, tab panels, tags</li>
+<li>Standard (8px): Small containers</li>
+<li>Comfortable (10px–12px): Medium cards, dropdowns</li>
+<li>Card (16px): Standard cards, articles</li>
+<li>Large (18px–20px): Featured cards, code panels</li>
+<li>Section (24px): Large panels, section containers</li>
+<li>Warm Button (30px): Warm stone CTA</li>
+<li>Pill (9999px): Primary buttons, navigation pills</li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Treatment</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flat (Level 0)</td>
+<td>No shadow</td>
+<td>Page background, text blocks</td>
+</tr>
+<tr>
+<td>Inset Edge (Level 0.5)</td>
+<td><code>rgba(0,0,0,0.075) 0px 0px 0px 0.5px inset, #fff 0px 0px 0px 0px inset</code></td>
+<td>Internal border definition</td>
+</tr>
+<tr>
+<td>Outline Ring (Level 1)</td>
+<td><code>rgba(0,0,0,0.06) 0px 0px 0px 1px</code> + <code>rgba(0,0,0,0.04) 0px 1px 2px</code> + <code>rgba(0,0,0,0.04) 0px 2px 4px</code></td>
+<td>Shadow-as-border for cards</td>
+</tr>
+<tr>
+<td>Card (Level 2)</td>
+<td><code>rgba(0,0,0,0.4) 0px 0px 1px, rgba(0,0,0,0.04) 0px 4px 4px</code></td>
+<td>Button elevation, prominent cards</td>
+</tr>
+<tr>
+<td>Warm Lift (Level 3)</td>
+<td><code>rgba(78,50,23,0.04) 0px 6px 16px</code></td>
+<td>Featured CTAs — warm-tinted</td>
+</tr>
+<tr>
+<td>Focus (Accessibility)</td>
+<td><code>var(--tw-ring-offset-shadow)</code> blue ring</td>
+<td>Keyboard focus</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Shadow Philosophy</strong>: ElevenLabs uses the most refined shadow system of any design system analyzed. Every shadow is at sub-0.1 opacity, many include both outward cast AND inward inset components, and the warm CTA shadows use an actual warm color (<code>rgba(78,50,23,...)</code>) rather than neutral black. The inset half-pixel borders (<code>0px 0px 0px 0.5px inset</code>) create edges so subtle they're felt rather than seen — surfaces define themselves through the lightest possible touch.</p>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use Waldenburg weight 300 for all display headings — the lightness IS the brand</li>
+<li>Apply multi-layer shadows (inset + outline + elevation) at sub-0.1 opacity</li>
+<li>Use warm stone tints (<code>#f5f2ef</code>, <code>rgba(245,242,239,0.8)</code>) for featured elements</li>
+<li>Apply positive letter-spacing (+0.14px to +0.18px) on Inter body text</li>
+<li>Use 9999px radius for primary buttons — pill shape is standard</li>
+<li>Use warm-tinted shadows (<code>rgba(78,50,23,0.04)</code>) on featured CTAs</li>
+<li>Keep the page predominantly white with subtle gray section differentiation</li>
+<li>Use WaldenburgFH bold uppercase ONLY for specific CTA button labels</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Don't use bold (700) Waldenburg for headings — weight 300 is non-negotiable</li>
+<li>Don't use heavy shadows (&gt;0.1 opacity) — the ethereal quality requires whisper-level depth</li>
+<li>Don't use cool gray borders — the system is warm-tinted throughout</li>
+<li>Don't skip the inset shadow component — half-pixel inset borders define edges</li>
+<li>Don't apply negative letter-spacing to body text — Inter uses positive tracking</li>
+<li>Don't use sharp corners (&lt;8px) on cards — the generous radius is structural</li>
+<li>Don't introduce brand colors — the palette is intentionally achromatic with warm undertones</li>
+<li>Don't make buttons opaque and heavy — the warm translucent stone treatment is the signature</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<h3 id="breakpoints">Breakpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Width</th>
+<th>Key Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mobile</td>
+<td>&lt;1024px</td>
+<td>Single column, hamburger nav, stacked sections</td>
+</tr>
+<tr>
+<td>Desktop</td>
+<td>&gt;1024px</td>
+<td>Full layout, horizontal nav, multi-column grids</td>
+</tr>
+</tbody>
+</table>
+<h3 id="touch-targets">Touch Targets</h3>
+<ul>
+<li>Pill buttons with generous padding (12px–20px)</li>
+<li>Navigation links at 15px with adequate spacing</li>
+<li>Select dropdowns maintain comfortable sizing</li>
+</ul>
+<h3 id="collapsing-strategy">Collapsing Strategy</h3>
+<ul>
+<li>Navigation: horizontal → hamburger at 1024px</li>
+<li>Feature grids: multi-column → stacked</li>
+<li>Hero: maintains centered layout, font scales proportionally</li>
+<li>Gradient sections: full-width maintained, content stacks</li>
+<li>Spacing compresses proportionally</li>
+</ul>
+<h3 id="image-behavior">Image Behavior</h3>
+<ul>
+<li>Product screenshots scale responsively</li>
+<li>Gradient backgrounds simplify on mobile</li>
+<li>Audio waveform previews maintain aspect ratio</li>
+<li>Rounded corners maintained across breakpoints</li>
+</ul>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Background: Pure White (<code>#ffffff</code>) or Light Gray (<code>#f5f5f5</code>)</li>
+<li>Text: Black (<code>#000000</code>)</li>
+<li>Secondary text: Dark Gray (<code>#4e4e4e</code>)</li>
+<li>Muted text: Warm Gray (<code>#777169</code>)</li>
+<li>Warm surface: Warm Stone (<code>rgba(245, 242, 239, 0.8)</code>)</li>
+<li>Border: <code>#e5e5e5</code> or <code>rgba(0,0,0,0.05)</code></li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create a hero on white background. Headline at 48px Waldenburg weight 300, line-height 1.08, letter-spacing -0.96px, black text. Subtitle at 18px Inter weight 400, line-height 1.60, letter-spacing 0.18px, #4e4e4e text. Two pill buttons: black (9999px, 0px 14px padding) and warm stone (rgba(245,242,239,0.8), 30px radius, 12px 20px padding, warm shadow rgba(78,50,23,0.04) 0px 6px 16px)."</li>
+<li>"Design a card: white background, 20px radius. Shadow: rgba(0,0,0,0.06) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 1px 2px, rgba(0,0,0,0.04) 0px 2px 4px. Title at 32px Waldenburg weight 300, body at 16px Inter weight 400 letter-spacing 0.16px, #4e4e4e."</li>
+<li>"Build a white pill button: white bg, 9999px radius. Shadow: rgba(0,0,0,0.4) 0px 0px 1px, rgba(0,0,0,0.04) 0px 4px 4px. Text at 15px Inter weight 500."</li>
+<li>"Create an uppercase CTA label: 14px WaldenburgFH weight 700, text-transform uppercase, letter-spacing 0.7px."</li>
+<li>"Design navigation: white sticky header. Inter 15px weight 500. Black pill CTA right-aligned. Border-bottom: rgba(0,0,0,0.05)."</li>
+</ul>
+<h3 id="iteration-guide">Iteration Guide</h3>
+<ol>
+<li>Start with white — the warm undertone comes from shadows and stone surfaces, not backgrounds</li>
+<li>Waldenburg 300 for headings — never bold, the lightness is the identity</li>
+<li>Multi-layer shadows: always include inset + outline + elevation at sub-0.1 opacity</li>
+<li>Positive letter-spacing on Inter body (+0.14px to +0.18px) — the airy reading quality</li>
+<li>Warm stone CTA is the signature — <code>rgba(245,242,239,0.8)</code> with <code>rgba(78,50,23,0.04)</code> shadow</li>
+<li>Pill (9999px) for buttons, generous radius (16px–24px) for cards</li>
+</ol>
+</main>
+</body>
+</html>

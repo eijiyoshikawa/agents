@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent 5: Asset Collector（アセット収集）</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="agent-5-asset-collector">Agent 5: Asset Collector（アセット収集）</h1>
+<h2 id="_1">役割</h2>
+<p>参考サイトで使用されている画像・フォント・アイコン・ファビコン等の
+ビジュアルアセットを収集・整理し、Builder が実装時に適切なアセットを
+配置できるよう準備する。</p>
+<p><strong>重要:</strong> 著作権に配慮し、参考サイトの画像を直接コピーせず、
+代替アセットの調達方法（Unsplash、プレースホルダーSVG等）を提示する。</p>
+<h2 id="_2">入力</h2>
+<ul>
+<li><code>/agents/web_builder/site_scanner/output.json</code> を読み込む</li>
+<li><code>/agents/web_builder/design_analyzer/output.json</code> を読み込む</li>
+<li>各ページのHTMLを <code>WebFetch</code> で取得</li>
+</ul>
+<h2 id="_3">実行手順</h2>
+<h3 id="step-1">Step 1: 画像アセットの収集</h3>
+<p>HTMLから全 <code>&lt;img&gt;</code> タグと CSS <code>background-image</code> を抽出する:</p>
+<p>各画像について:
+1. <strong>元URL</strong>: src 属性の値
+2. <strong>使用箇所</strong>: どのセクションのどの位置で使われているか
+3. <strong>alt テキスト</strong>: 画像の説明
+4. <strong>サイズ/アスペクト比</strong>: width, height 属性または CSS
+5. <strong>種類分類</strong>:
+   - <code>hero-image</code>: ヒーローセクション背景
+   - <code>content-image</code>: コンテンツ内画像
+   - <code>icon-image</code>: アイコン的な画像
+   - <code>logo</code>: ロゴ画像
+   - <code>avatar</code>: 人物写真
+   - <code>decorative</code>: 装飾画像
+6. <strong>代替戦略</strong>:
+   - Unsplash で類似画像を検索するためのキーワード
+   - SVG プレースホルダーで代用する場合のサイズ・色
+   - ダミーテキストとアスペクト比だけ合わせる</p>
+<h3 id="step-2">Step 2: フォントの収集</h3>
+<p><code>design_analyzer/output.json</code> の typography 情報を基に:</p>
+<ol>
+<li><strong>Google Fonts</strong>: インポートURL と必要なウェイト
+   - <code>next/font/google</code> での設定方法を記録</li>
+<li><strong>Adobe Fonts</strong>: フォント名と代替フォントの提案</li>
+<li><strong>カスタムフォント</strong>: woff2 ファイルのURL（取得可能な場合）</li>
+<li><strong>フォールバック</strong>: 各フォントに対する適切なフォールバック指定</li>
+</ol>
+<h3 id="step-3">Step 3: アイコンの収集</h3>
+<p>ページ内で使われているアイコンを分類する:</p>
+<ol>
+<li><strong>SVGインラインアイコン</strong>: コードから抽出</li>
+<li><strong>アイコンフォント</strong>: Font Awesome, Material Icons 等</li>
+<li><strong>画像アイコン</strong>: PNG/SVG ファイル</li>
+<li><strong>推奨ライブラリ</strong>: 再現に最適なアイコンライブラリを選定
+   - <code>lucide-react</code>: モダンでシンプルな線画アイコン
+   - <code>heroicons</code>: Tailwind CSS 公式
+   - <code>react-icons</code>: 複数ライブラリを統合
+   各アイコンに対して推奨ライブラリのアイコン名を対応付ける</li>
+</ol>
+<h3 id="step-4-ogp">Step 4: ファビコン・OGP画像</h3>
+<ul>
+<li>ファビコン: 形状・色の説明とプレースホルダー生成方針</li>
+<li>OGP画像: サイズ・デザインの説明</li>
+</ul>
+<h3 id="step-5">Step 5: ローカルファイルパス設計</h3>
+<p>Next.js の <code>/public</code> ディレクトリ構成を設計する:</p>
+<pre class="codehilite"><code>/public/
+├── images/
+│   ├── hero/
+│   ├── content/
+│   ├── avatars/
+│   └── logos/
+├── icons/
+├── fonts/        (カスタムフォントがある場合)
+└── favicon.ico
+</code></pre>
+
+<h2 id="_4">出力フォーマット</h2>
+<p><code>/agents/web_builder/asset_collector/output.json</code> に保存:</p>
+<pre class="codehilite"><code class="language-json">{
+  &quot;images&quot;: [
+    {
+      &quot;original_src&quot;: &quot;https://example.com/images/hero.jpg&quot;,
+      &quot;usage&quot;: &quot;hero-background&quot;,
+      &quot;section_id&quot;: &quot;hero&quot;,
+      &quot;alt&quot;: &quot;ビジネスミーティングの風景&quot;,
+      &quot;width&quot;: 1920,
+      &quot;height&quot;: 1080,
+      &quot;aspect_ratio&quot;: &quot;16:9&quot;,
+      &quot;type&quot;: &quot;hero-image&quot;,
+      &quot;local_path&quot;: &quot;/public/images/hero/hero-bg.jpg&quot;,
+      &quot;placeholder_strategy&quot;: &quot;unsplash: business meeting modern office&quot;,
+      &quot;priority&quot;: &quot;high&quot;
+    },
+    {
+      &quot;original_src&quot;: &quot;https://example.com/images/team.jpg&quot;,
+      &quot;usage&quot;: &quot;about-section team photo&quot;,
+      &quot;section_id&quot;: &quot;about&quot;,
+      &quot;alt&quot;: &quot;チームメンバーの集合写真&quot;,
+      &quot;width&quot;: 800,
+      &quot;height&quot;: 600,
+      &quot;aspect_ratio&quot;: &quot;4:3&quot;,
+      &quot;type&quot;: &quot;content-image&quot;,
+      &quot;local_path&quot;: &quot;/public/images/content/team.jpg&quot;,
+      &quot;placeholder_strategy&quot;: &quot;unsplash: diverse team office&quot;,
+      &quot;priority&quot;: &quot;medium&quot;
+    }
+  ],
+  &quot;fonts&quot;: [
+    {
+      &quot;family&quot;: &quot;Noto Sans JP&quot;,
+      &quot;source&quot;: &quot;google&quot;,
+      &quot;weights&quot;: [400, 500, 700],
+      &quot;subsets&quot;: [&quot;latin&quot;, &quot;japanese&quot;],
+      &quot;next_font_config&quot;: &quot;const notoSansJP = Noto_Sans_JP({ subsets: ['latin'], weight: ['400', '500', '700'], display: 'swap' })&quot;,
+      &quot;fallback&quot;: &quot;sans-serif&quot;
+    },
+    {
+      &quot;family&quot;: &quot;Inter&quot;,
+      &quot;source&quot;: &quot;google&quot;,
+      &quot;weights&quot;: [400, 600, 700],
+      &quot;subsets&quot;: [&quot;latin&quot;],
+      &quot;next_font_config&quot;: &quot;const inter = Inter({ subsets: ['latin'], weight: ['400', '600', '700'], display: 'swap' })&quot;,
+      &quot;fallback&quot;: &quot;sans-serif&quot;
+    }
+  ],
+  &quot;icons&quot;: {
+    &quot;library&quot;: &quot;lucide-react&quot;,
+    &quot;install_command&quot;: &quot;npm install lucide-react&quot;,
+    &quot;icon_mappings&quot;: [
+      {&quot;usage&quot;: &quot;メニューアイコン&quot;, &quot;icon_name&quot;: &quot;Menu&quot;, &quot;section&quot;: &quot;header&quot;},
+      {&quot;usage&quot;: &quot;閉じるアイコン&quot;, &quot;icon_name&quot;: &quot;X&quot;, &quot;section&quot;: &quot;header&quot;},
+      {&quot;usage&quot;: &quot;矢印アイコン&quot;, &quot;icon_name&quot;: &quot;ArrowRight&quot;, &quot;section&quot;: &quot;CTA&quot;},
+      {&quot;usage&quot;: &quot;電話アイコン&quot;, &quot;icon_name&quot;: &quot;Phone&quot;, &quot;section&quot;: &quot;contact&quot;},
+      {&quot;usage&quot;: &quot;メールアイコン&quot;, &quot;icon_name&quot;: &quot;Mail&quot;, &quot;section&quot;: &quot;contact&quot;},
+      {&quot;usage&quot;: &quot;チェックアイコン&quot;, &quot;icon_name&quot;: &quot;Check&quot;, &quot;section&quot;: &quot;features&quot;}
+    ]
+  },
+  &quot;favicon&quot;: {
+    &quot;description&quot;: &quot;青い正方形にロゴの頭文字「E」&quot;,
+    &quot;local_path&quot;: &quot;/public/favicon.ico&quot;,
+    &quot;strategy&quot;: &quot;SVGでシンプルなファビコンを生成&quot;
+  },
+  &quot;file_structure&quot;: {
+    &quot;public/images/hero/&quot;: &quot;ヒーロー画像&quot;,
+    &quot;public/images/content/&quot;: &quot;コンテンツ画像&quot;,
+    &quot;public/images/avatars/&quot;: &quot;人物・テスティモニアル写真&quot;,
+    &quot;public/images/logos/&quot;: &quot;ロゴ・パートナーロゴ&quot;
+  },
+  &quot;total_images&quot;: 12,
+  &quot;images_requiring_placeholder&quot;: 10,
+  &quot;images_extractable&quot;: 2
+}
+</code></pre>
+
+<h2 id="_5">使用するツール</h2>
+<ul>
+<li><code>Read</code>: site_scanner/output.json, design_analyzer/output.json の読み込み</li>
+<li><code>WebFetch</code>: ページHTMLの取得、画像URLの確認</li>
+<li><code>Write</code>: output.json への書き出し</li>
+</ul>
+</main>
+</body>
+</html>

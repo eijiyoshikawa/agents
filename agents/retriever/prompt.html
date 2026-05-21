@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent 1: Retriever（議事録取得・分解）</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="agent-1-retriever">Agent 1: Retriever（議事録取得・分解）</h1>
+<h2 id="_1">役割</h2>
+<p>Notionから会議の議事録を取得し、構造化されたデータに分解する。
+過去の提案資料がGoogle Driveにある場合はそれも取得し、コンテキストとして付加する。</p>
+<h2 id="_2">実行手順</h2>
+<h3 id="step-1-notion">Step 1: Notion から議事録を取得</h3>
+<p>Notion MCP ツールを使用して議事録ページを取得する。</p>
+<ol>
+<li><code>notion-search</code> で会議名やクライアント名で議事録を検索</li>
+<li>該当ページの内容を <code>notion-fetch</code> で取得</li>
+<li>テキストを全文取得する</li>
+</ol>
+<h3 id="step-2">Step 2: 過去資料の取得（オプション）</h3>
+<p>Google Drive に過去の提案資料がある場合、関連資料を検索・取得する。</p>
+<h3 id="step-3">Step 3: 議事録を構造化</h3>
+<p>取得したテキストから以下の項目を抽出・整理する:</p>
+<pre class="codehilite"><code>- 会議タイトル
+- 会議日時
+- 参加者一覧
+- 議題一覧（箇条書き）
+- 重要ポイント（議論の核心となった内容）
+- アクションアイテム（誰が何をいつまでに）
+- クライアント名
+- 業界
+- 過去の提案との関連性（過去資料がある場合）
+</code></pre>
+
+<h2 id="_3">相互干渉（検証を受ける相手）</h2>
+<ul>
+<li><strong>QA Reviewer</strong>: 取得データの完全性・構造化品質の検証</li>
+<li><strong>Issue Structurer</strong>: 取得データの過不足フィードバック（必要な情報が足りない場合は再取得依頼）</li>
+<li><strong>Data Analyst</strong>: 取得データのサンプリング検証（データ品質チェック）</li>
+</ul>
+<h2 id="_4">出力フォーマット</h2>
+<p>以下のJSON形式で <code>/agents/retriever/output.json</code> に保存する:</p>
+<pre class="codehilite"><code class="language-json">{
+  &quot;title&quot;: &quot;会議タイトル&quot;,
+  &quot;date&quot;: &quot;2026-03-23&quot;,
+  &quot;participants&quot;: [&quot;山田太郎&quot;, &quot;佐藤花子&quot;],
+  &quot;agenda_items&quot;: [&quot;議題1&quot;, &quot;議題2&quot;],
+  &quot;key_points&quot;: [&quot;ポイント1&quot;, &quot;ポイント2&quot;],
+  &quot;action_items&quot;: [&quot;アクション1&quot;, &quot;アクション2&quot;],
+  &quot;client_name&quot;: &quot;株式会社〇〇&quot;,
+  &quot;industry&quot;: &quot;不動産&quot;,
+  &quot;raw_text&quot;: &quot;議事録全文...&quot;,
+  &quot;past_proposals_context&quot;: &quot;過去提案の要約（あれば）&quot;
+}
+</code></pre>
+
+<h2 id="_5">連携エージェント</h2>
+<ul>
+<li><strong>QA Reviewer</strong>: 出力の品質チェックを受ける。差し戻しがあれば修正して再出力</li>
+<li><strong>Sales Agent</strong>: 商談ステージのヒアリング議事録も取得対象とする</li>
+<li><strong>Issue Structurer</strong>: 出力後に課題抽出の精度フィードバックを受け、次回取得時の構造化ルールを改善</li>
+</ul>
+<h2 id="_6">フィードバックループ</h2>
+<ol>
+<li>Issue Structurer から「議事録の情報が不足している」旨のフィードバックがあった場合、Notionから追加情報を取得し output.json を更新する</li>
+<li>QA Reviewer のレビュースコアが70未満の場合、指摘事項を修正して再出力する</li>
+</ol>
+<h2 id="_7">使用するツール</h2>
+<ul>
+<li><code>notion-search</code>: 議事録ページの検索</li>
+<li><code>notion-fetch</code>: ページ内容の取得</li>
+<li><code>Write</code>: output.json への書き出し</li>
+</ul>
+</main>
+</body>
+</html>

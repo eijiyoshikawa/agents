@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent Organization — 法人経営エージェント群</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="ai-agent-organization">AI Agent Organization — 法人経営エージェント群</h1>
+<p>法人経営を0から100まで遂行可能な<strong>32体のAIエージェント</strong>（+ Web Builderサブ8体）。
+企画・戦略立案からプロダクト開発・サービス化まで一気通貫で実行可能。
+Claude Code の Maxプラン内で動作し、追加API費用なし。</p>
+<h2 id="_1">組織図</h2>
+<pre class="codehilite"><code>                         ┌──────────────┐
+                         │  CEO Agent   │ ← 統括・意思決定・品質管理
+                         └──────┬───────┘
+                                │
+     ┌──────────┬───────────────┼───────────────┬──────────┐
+     │          │               │               │          │
+ 営業部門    管理部門     コンサル事業部      開発部門     横断チーム
+  (6体)      (3体)         (8体)           (10体)       (4体)
+</code></pre>
+
+<h2 id="32-8">エージェント一覧（全32体 + サブ8体）</h2>
+<h3 id="_2">統括</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>呼び出し名</th>
+<th>役割</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><code>ceo</code></td>
+<td>全体統括・意思決定・品質ゲート・組織最適化</td>
+</tr>
+</tbody>
+</table>
+<h3 id="8">コンサルティング事業部（8体）</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>呼び出し名</th>
+<th>役割</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2</td>
+<td><code>retriever</code></td>
+<td>Notion議事録取得・構造化</td>
+</tr>
+<tr>
+<td>3</td>
+<td><code>issue_structurer</code></td>
+<td>ビジネス課題の言語化・構造化</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>market_researcher</code></td>
+<td>市場・競合・顧客分析（並列実行）</td>
+</tr>
+<tr>
+<td>5</td>
+<td><code>analogy_finder</code></td>
+<td>異業種アナロジー事例収集（並列実行）</td>
+</tr>
+<tr>
+<td>6</td>
+<td><code>marketing_analyst</code></td>
+<td>競合マーケティング施策の深掘り分析（並列実行）</td>
+</tr>
+<tr>
+<td>7</td>
+<td><code>strategist</code></td>
+<td>戦略構築 + Devil's Advocate批判的検証</td>
+</tr>
+<tr>
+<td>8</td>
+<td><code>report_builder</code></td>
+<td>Google Slides提案資料の構成作成</td>
+</tr>
+<tr>
+<td>9</td>
+<td><code>document_builder</code></td>
+<td>対話型提案資料作成（テンプレート活用）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="6">営業・マーケティング部門（6体）</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>呼び出し名</th>
+<th>役割</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10</td>
+<td><code>sales</code></td>
+<td>リード管理・商談パイプライン・受注管理</td>
+</tr>
+<tr>
+<td>11</td>
+<td><code>marketing</code></td>
+<td>自社マーケティング・ブランディング・リード獲得</td>
+</tr>
+<tr>
+<td>12</td>
+<td><code>customer_success</code></td>
+<td>顧客満足度・リテンション・アップセル</td>
+</tr>
+<tr>
+<td>13</td>
+<td><code>sns_operator</code></td>
+<td>Instagram/TikTok/YouTube日常運用・エンゲージメント管理</td>
+</tr>
+<tr>
+<td>14</td>
+<td><code>ad_operations</code></td>
+<td>Google/Meta/TikTok広告運用・ROAS最適化</td>
+</tr>
+<tr>
+<td>15</td>
+<td><code>content_creator</code></td>
+<td>SNS投稿・ブログ・動画脚本・広告コピー制作</td>
+</tr>
+</tbody>
+</table>
+<h3 id="3">管理部門（3体）</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>呼び出し名</th>
+<th>役割</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>16</td>
+<td><code>finance</code></td>
+<td>経理・財務・見積・請求・PL管理・補助金</td>
+</tr>
+<tr>
+<td>17</td>
+<td><code>hr</code></td>
+<td>組織設計・採用・評価・エージェント組織管理</td>
+</tr>
+<tr>
+<td>18</td>
+<td><code>legal</code></td>
+<td>契約書・コンプライアンス・知財・リスク法務</td>
+</tr>
+</tbody>
+</table>
+<h3 id="10">開発部門（10体）</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>呼び出し名</th>
+<th>役割</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>19</td>
+<td><code>tech_lead</code></td>
+<td>CTO的技術統括・アーキテクチャ設計・技術選定</td>
+</tr>
+<tr>
+<td>20</td>
+<td><code>frontend_engineer</code></td>
+<td>Next.js App Router UI実装・SEO最適化</td>
+</tr>
+<tr>
+<td>21</td>
+<td><code>backend_engineer</code></td>
+<td>API設計・DB・認証・Stripe決済連携</td>
+</tr>
+<tr>
+<td>22</td>
+<td><code>infrastructure</code></td>
+<td>デプロイ・CI/CD・監視・セキュリティ・コスト管理</td>
+</tr>
+<tr>
+<td>23</td>
+<td><code>qa_engineer</code></td>
+<td>テスト自動化・品質保証（Jest/Playwright）</td>
+</tr>
+<tr>
+<td>24</td>
+<td><code>ui_ux_designer</code></td>
+<td>デザインシステム構築・Figma連携・ユーザビリティ改善</td>
+</tr>
+<tr>
+<td>25</td>
+<td><code>data_engineer</code></td>
+<td>クローラー・データパイプライン・データ品質管理</td>
+</tr>
+<tr>
+<td>26</td>
+<td><code>designer</code></td>
+<td>Web/LP/UIデザイン生成（AI Designer MCP活用）</td>
+</tr>
+<tr>
+<td>27</td>
+<td><code>engineer</code></td>
+<td>LP/Web/AIシステム実装（Next.js/Python/WordPress）</td>
+</tr>
+<tr>
+<td>28</td>
+<td><code>web_builder</code></td>
+<td>参考サイト分析→Next.js再現パイプライン</td>
+</tr>
+</tbody>
+</table>
+<h3 id="web-builder-8">Web Builder サブエージェント（8体）</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>呼び出し名</th>
+<th>役割</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-</td>
+<td><code>web_builder/site_scanner</code></td>
+<td>サイト偵察・技術検出</td>
+</tr>
+<tr>
+<td>-</td>
+<td><code>web_builder/structure_analyzer</code></td>
+<td>HTML構造・レイアウトパターン解析</td>
+</tr>
+<tr>
+<td>-</td>
+<td><code>web_builder/design_analyzer</code></td>
+<td>カラー・タイポグラフィ・スペーシング抽出</td>
+</tr>
+<tr>
+<td>-</td>
+<td><code>web_builder/motion_analyzer</code></td>
+<td>アニメーション・トランジション特定</td>
+</tr>
+<tr>
+<td>-</td>
+<td><code>web_builder/interaction_analyzer</code></td>
+<td>フォーム・モーダル・タブ等UI要素解析</td>
+</tr>
+<tr>
+<td>-</td>
+<td><code>web_builder/asset_collector</code></td>
+<td>画像・フォント・アイコン収集（著作権配慮）</td>
+</tr>
+<tr>
+<td>-</td>
+<td><code>web_builder/builder</code></td>
+<td>全解析結果統合→Next.js + Tailwind CSS実装</td>
+</tr>
+<tr>
+<td>-</td>
+<td><code>web_builder/qa_reviewer</code></td>
+<td>Vercelデプロイ後の比較検証・修正指示</td>
+</tr>
+</tbody>
+</table>
+<h3 id="4">横断チーム（4体）</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>呼び出し名</th>
+<th>役割</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>29</td>
+<td><code>project_manager</code></td>
+<td>プロジェクト進捗・リソース配分・納期管理</td>
+</tr>
+<tr>
+<td>30</td>
+<td><code>qa_reviewer</code></td>
+<td>全出力の品質検証・相互整合性チェック</td>
+</tr>
+<tr>
+<td>31</td>
+<td><code>kpi_dashboard</code></td>
+<td>全社KPI集計・異常検知・レポーティング</td>
+</tr>
+<tr>
+<td>32</td>
+<td><code>data_analyst</code></td>
+<td>横断データ分析・インサイト抽出・意思決定支援</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_3">戦略提案パイプライン</h2>
+<pre class="codehilite"><code>Step 1: Retriever            → 議事録取得・分解 (Notion)
+Step 2: Issue Structurer     → イシュー言語化・構造化
+Step 3: Market Researcher  ┐
+        Analogy Finder     ├ 並列実行
+        Marketing Analyst  ┘
+Step 4: Strategist           → 戦略構築 + Devil's Advocate批判的検証
+Step 5: Report Builder       → Google Slides提案資料の構成作成
+</code></pre>
+
+<h2 id="_4">共有リソース</h2>
+<h3 id="awesome-design-md">デザインシステム（awesome-design-md）</h3>
+<p><code>/design-md/</code> に54社以上の企業デザインシステム（DESIGN.md）を格納。
+LP制作・Web制作・提案資料作成時のデザインリファレンスとして活用。</p>
+<ul>
+<li>一覧: <code>/design-md/README.md</code></li>
+<li>個別: <code>/design-md/{company-name}/DESIGN.md</code></li>
+<li>出典: <a href="https://github.com/VoltAgent/awesome-design-md">VoltAgent/awesome-design-md</a></li>
+</ul>
+<h2 id="_5">ディレクトリ構成</h2>
+<pre class="codehilite"><code>agents/
+├── CLAUDE.md                              # プロジェクト設定
+├── README.md                              # このファイル
+├── orchestrator/                          # パイプライン実行ガイド
+├── design-md/                             # 54社デザインシステム
+│   ├── README.md
+│   └── {company-name}/DESIGN.md
+├── daily_reports/                         # 日次レポート
+└── agents/
+    ├── ceo/prompt.md                      # 統括
+    ├── retriever/prompt.md                # コンサル事業部
+    ├── issue_structurer/prompt.md
+    ├── market_researcher/prompt.md
+    ├── analogy_finder/prompt.md
+    ├── marketing_analyst/prompt.md
+    ├── strategist/prompt.md
+    ├── report_builder/prompt.md
+    ├── document_builder/prompt.md
+    ├── sales/prompt.md                    # 営業・マーケティング部門
+    ├── marketing/prompt.md
+    ├── customer_success/prompt.md
+    ├── sns_operator/prompt.md
+    ├── ad_operations/prompt.md
+    ├── content_creator/prompt.md
+    ├── finance/prompt.md                  # 管理部門
+    ├── hr/prompt.md
+    ├── legal/prompt.md
+    ├── tech_lead/prompt.md                # 開発部門
+    ├── frontend_engineer/prompt.md
+    ├── backend_engineer/prompt.md
+    ├── infrastructure/prompt.md
+    ├── qa_engineer/prompt.md
+    ├── ui_ux_designer/prompt.md
+    ├── data_engineer/prompt.md
+    ├── designer/prompt.md
+    ├── engineer/prompt.md
+    ├── web_builder/                       # Web Builder パイプライン
+    │   ├── orchestrator/
+    │   ├── site_scanner/prompt.md
+    │   ├── structure_analyzer/prompt.md
+    │   ├── design_analyzer/prompt.md
+    │   ├── motion_analyzer/prompt.md
+    │   ├── interaction_analyzer/prompt.md
+    │   ├── asset_collector/prompt.md
+    │   ├── builder/prompt.md
+    │   └── qa_reviewer/prompt.md
+    ├── project_manager/prompt.md          # 横断チーム
+    ├── qa_reviewer/prompt.md
+    ├── kpi_dashboard/prompt.md
+    └── data_analyst/prompt.md
+</code></pre>
+
+<h2 id="_6">事業領域</h2>
+<ul>
+<li>SNSマーケティング（Instagram, TikTok, YouTube 運用/広告/クリエイティブ）</li>
+<li>不動産業界特化型BPO（AIエージェント活用）</li>
+<li>AIシステム制作（補助金活用）</li>
+<li>LP等のWeb制作</li>
+</ul>
+<h2 id="_7">前提条件</h2>
+<ol>
+<li><strong>Claude Code</strong> の Maxプランに加入していること</li>
+<li><strong>Notion MCP</strong> が Claude Code に接続されていること</li>
+<li><strong>Web検索</strong> が Claude Code で使用可能であること</li>
+</ol>
+<h2 id="_8">セットアップ</h2>
+<ol>
+<li>このリポジトリを <code>git clone</code> する</li>
+<li>Claude Code（Max プラン）を開く</li>
+<li>MCP サーバーを設定する（Notion / Google Drive / Figma 等）</li>
+<li>パイプラインまたは個別エージェントを実行</li>
+</ol>
+<h2 id="_9">使い方</h2>
+<h3 id="_10">戦略提案パイプライン</h3>
+<pre class="codehilite"><code>/agents/orchestrator/PIPELINE.md の手順に従って、
+Notion の議事録ページ「〇〇会議」からパイプラインを実行してください。
+</code></pre>
+
+<h3 id="web-builder">Web Builder パイプライン</h3>
+<pre class="codehilite"><code>/agents/web_builder/orchestrator/run.md の手順に従って、
+参考サイトのURLからWeb制作パイプラインを実行してください。
+</code></pre>
+
+<h3 id="_11">個別エージェント</h3>
+<pre class="codehilite"><code>/agents/{agent_name}/prompt.md を読み込んで実行してください。
+</code></pre>
+</main>
+</body>
+</html>

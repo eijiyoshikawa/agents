@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Runway</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-runway">Design System: Runway</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Runway's interface is a cinematic reel brought to life as a website — a dark, editorial, film-production-grade design where full-bleed photography and video ARE the primary UI elements. This is not a typical tech product page; it's a visual manifesto for AI-powered creativity. Every section feels like a frame from a film: dramatic lighting, sweeping landscapes, and intimate human moments captured in high-quality imagery that dominates the viewport.</p>
+<p>The design language is built on a single typeface — abcNormal — a clean, geometric sans-serif that handles everything from 48px display headlines to 11px uppercase labels. This single-font commitment creates an extreme typographic uniformity that lets the visual content speak louder than the text. Headlines use tight line-heights (1.0) with negative letter-spacing (-0.9px to -1.2px), creating compressed text blocks that feel like film titles rather than marketing copy.</p>
+<p>What makes Runway distinctive is its complete commitment to visual content as design. Rather than illustrating features with icons or diagrams, Runway shows actual AI-generated and AI-enhanced imagery — cars driving through cinematic landscapes, artistic portraits, architectural renders. The interface itself retreats into near-invisibility: minimal borders, zero shadows, subtle cool-gray text, and a dark palette that puts maximum focus on the photography.</p>
+<p><strong>Key Characteristics:</strong>
+- Cinematic full-bleed photography and video as primary UI elements
+- Single typeface system: abcNormal for everything from display to micro labels
+- Dark-dominant palette with cool-toned neutrals (#767d88, #7d848e)
+- Zero shadows, minimal borders — the interface is intentionally invisible
+- Tight display typography (line-height 1.0) with negative tracking (-0.9px to -1.2px)
+- Uppercase labels with positive letter-spacing for navigational structure
+- Weight 450 (unusual intermediate) for small uppercase text — precision craft
+- Editorial magazine layout with mixed-size image grids</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>Runway Black</strong> (<code>#000000</code>): The primary page background and maximum-emphasis text.</li>
+<li><strong>Deep Black</strong> (<code>#030303</code>): A near-imperceptible variant for layered dark surfaces.</li>
+<li><strong>Dark Surface</strong> (<code>#1a1a1a</code>): Card backgrounds and elevated dark containers.</li>
+<li><strong>Pure White</strong> (<code>#ffffff</code>): Primary text on dark surfaces and light-section backgrounds.</li>
+</ul>
+<h3 id="surface-background">Surface &amp; Background</h3>
+<ul>
+<li><strong>Near White</strong> (<code>#fefefe</code>): The lightest surface — barely distinguishable from pure white.</li>
+<li><strong>Cool Cloud</strong> (<code>#e9ecf2</code>): Light section backgrounds with a cool blue-gray tint.</li>
+<li><strong>Border Dark</strong> (<code>#27272a</code>): The single dark-mode border color — barely visible containment.</li>
+</ul>
+<h3 id="neutrals-text">Neutrals &amp; Text</h3>
+<ul>
+<li><strong>Charcoal</strong> (<code>#404040</code>): Primary body text on light surfaces and secondary text.</li>
+<li><strong>Near Charcoal</strong> (<code>#3f3f3f</code>): Slightly lighter variant for dark-section secondary text.</li>
+<li><strong>Cool Slate</strong> (<code>#767d88</code>): Secondary body text — a distinctly blue-gray cool neutral.</li>
+<li><strong>Mid Slate</strong> (<code>#7d848e</code>): Tertiary text, metadata descriptions.</li>
+<li><strong>Muted Gray</strong> (<code>#a7a7a7</code>): De-emphasized content, timestamps.</li>
+<li><strong>Cool Silver</strong> (<code>#c9ccd1</code>): Light borders and dividers.</li>
+<li><strong>Light Silver</strong> (<code>#d0d4d4</code>): The lightest border/divider variant.</li>
+<li><strong>Tailwind Gray</strong> (<code>#6b7280</code>): Standard Tailwind neutral for supplementary text.</li>
+<li><strong>Dark Link</strong> (<code>#0c0c0c</code>): Darkest link text — nearly black.</li>
+<li><strong>Footer Gray</strong> (<code>#999999</code>): Footer links and deeply muted content.</li>
+</ul>
+<h3 id="gradient-system">Gradient System</h3>
+<ul>
+<li><strong>None in the interface.</strong> Visual richness comes entirely from photographic content — AI-generated and enhanced imagery provides all the color and gradient the design needs. The interface itself is intentionally colorless.</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-family">Font Family</h3>
+<ul>
+<li><strong>Universal</strong>: <code>abcNormal</code>, with fallback: <code>abcNormal Fallback</code></li>
+</ul>
+<p><em>Note: abcNormal is a custom geometric sans-serif. For external implementations, Inter or DM Sans serve as close substitutes.</em></p>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display / Hero</td>
+<td>abcNormal</td>
+<td>48px (3rem)</td>
+<td>400</td>
+<td>1.00 (tight)</td>
+<td>-1.2px</td>
+<td>Maximum size, film-title presence</td>
+</tr>
+<tr>
+<td>Section Heading</td>
+<td>abcNormal</td>
+<td>40px (2.5rem)</td>
+<td>400</td>
+<td>1.00–1.10</td>
+<td>-1px to 0px</td>
+<td>Feature section titles</td>
+</tr>
+<tr>
+<td>Sub-heading</td>
+<td>abcNormal</td>
+<td>36px (2.25rem)</td>
+<td>400</td>
+<td>1.00 (tight)</td>
+<td>-0.9px</td>
+<td>Secondary section markers</td>
+</tr>
+<tr>
+<td>Card Title</td>
+<td>abcNormal</td>
+<td>24px (1.5rem)</td>
+<td>400</td>
+<td>1.00 (tight)</td>
+<td>normal</td>
+<td>Article and card headings</td>
+</tr>
+<tr>
+<td>Feature Title</td>
+<td>abcNormal</td>
+<td>20px (1.25rem)</td>
+<td>400</td>
+<td>1.00 (tight)</td>
+<td>normal</td>
+<td>Small headings</td>
+</tr>
+<tr>
+<td>Body / Button</td>
+<td>abcNormal</td>
+<td>16px (1rem)</td>
+<td>400–600</td>
+<td>1.30–1.50</td>
+<td>-0.16px to normal</td>
+<td>Standard body, nav links</td>
+</tr>
+<tr>
+<td>Caption / Label</td>
+<td>abcNormal</td>
+<td>14px (0.88rem)</td>
+<td>500–600</td>
+<td>1.25–1.43</td>
+<td>0.35px (uppercase)</td>
+<td>Metadata, section labels</td>
+</tr>
+<tr>
+<td>Small</td>
+<td>abcNormal</td>
+<td>13px (0.81rem)</td>
+<td>400</td>
+<td>1.30 (tight)</td>
+<td>-0.16px to -0.26px</td>
+<td>Compact descriptions</td>
+</tr>
+<tr>
+<td>Micro / Tag</td>
+<td>abcNormal</td>
+<td>11px (0.69rem)</td>
+<td>450</td>
+<td>1.30 (tight)</td>
+<td>normal</td>
+<td>Uppercase tags, tiny labels</td>
+</tr>
+</tbody>
+</table>
+<h3 id="principles">Principles</h3>
+<ul>
+<li><strong>One typeface, complete expression</strong>: abcNormal handles every text role. The design achieves variety through size, weight, case, and letter-spacing rather than font-family switching.</li>
+<li><strong>Tight everywhere</strong>: Nearly every size uses line-height 1.0–1.30 — even body text is relatively compressed. This creates a dense, editorial feel.</li>
+<li><strong>Weight 450 — the precision detail</strong>: Some small uppercase labels use weight 450, an uncommon intermediate between regular (400) and medium (500). This micro-craft signals typographic sophistication.</li>
+<li><strong>Negative tracking as default</strong>: Even body text uses -0.16px to -0.26px letter-spacing, keeping everything slightly tighter than default.</li>
+<li><strong>Uppercase as structure</strong>: Labels at 14px and 11px use <code>text-transform: uppercase</code> with positive letter-spacing (0.35px) to create navigational signposts that contrast with the tight lowercase text.</li>
+</ul>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<ul>
+<li>Text: weight 600 at 14px abcNormal</li>
+<li>Background: likely transparent or dark, with minimal border</li>
+<li>Radius: small (4px) for button-like links</li>
+<li>The button design is extremely restrained — no heavy fills or borders detected</li>
+<li>Interactive elements blend into the editorial flow</li>
+</ul>
+<h3 id="cards-containers">Cards &amp; Containers</h3>
+<ul>
+<li>Background: transparent or Dark Surface (<code>#1a1a1a</code>)</li>
+<li>Border: <code>1px solid #27272a</code> (dark mode) — barely visible containment</li>
+<li>Radius: small (4–8px) for functional elements; 16px for alert-style containers</li>
+<li>Shadow: zero — no shadows on any element</li>
+<li>Cards are primarily photographic — the image IS the card</li>
+</ul>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li>Minimal horizontal nav — transparent over hero content</li>
+<li>Logo: Runway wordmark in white/black</li>
+<li>Links: abcNormal at 16px, weight 400–600</li>
+<li>Hover: text shifts to white or higher opacity</li>
+<li>Extremely subtle — designed to not compete with visual content</li>
+</ul>
+<h3 id="image-treatment">Image Treatment</h3>
+<ul>
+<li>Full-bleed cinematic photography and video dominate</li>
+<li>AI-generated content shown at large scale as primary visual elements</li>
+<li>Mixed-size image grids creating editorial magazine layouts</li>
+<li>Dark overlays on hero images for text readability</li>
+<li>Product screenshots with subtle rounded corners (8px)</li>
+</ul>
+<h3 id="distinctive-components">Distinctive Components</h3>
+<p><strong>Cinematic Hero</strong>
+- Full-viewport image or video with text overlay
+- Headline in 48px abcNormal, white on dark imagery
+- The image is always cinematic quality — film-grade composition</p>
+<p><strong>Research Article Cards</strong>
+- Photographic thumbnails with article titles
+- Mixed-size grid layout (large feature + smaller supporting)
+- Clean text overlay or below-image caption style</p>
+<p><strong>Trust Bar</strong>
+- Company logos (leading organizations across industries)
+- Clean, monochrome treatment
+- Horizontal layout with generous spacing</p>
+<p><strong>Mission Statement</strong>
+- "We are building AI to simulate the world through imagination, art and aesthetics"
+- On a dark background with white text
+- The emotional close — artistic and philosophical</p>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-system">Spacing System</h3>
+<ul>
+<li>Base unit: 8px</li>
+<li>Scale: 4px, 6px, 8px, 12px, 16px, 20px, 24px, 28px, 32px, 48px, 64px, 78px</li>
+<li>Section vertical spacing: generous (48–78px)</li>
+<li>Component gaps: 16–24px</li>
+</ul>
+<h3 id="grid-container">Grid &amp; Container</h3>
+<ul>
+<li>Max container width: up to 1600px (cinema-wide)</li>
+<li>Hero: full-viewport, edge-to-edge</li>
+<li>Content sections: centered with generous margins</li>
+<li>Image grids: asymmetric, magazine-style mixed sizes</li>
+<li>Footer: full-width dark section</li>
+</ul>
+<h3 id="whitespace-philosophy">Whitespace Philosophy</h3>
+<ul>
+<li><strong>Cinema-grade breathing</strong>: Large vertical gaps between sections create a scrolling experience that feels like watching scenes change.</li>
+<li><strong>Images replace whitespace</strong>: Where other sites use empty space, Runway fills it with photography. The visual content IS the breathing room.</li>
+<li><strong>Editorial grid asymmetry</strong>: The image grid uses intentionally varied sizes — large hero images paired with smaller supporting images, creating visual rhythm.</li>
+</ul>
+<h3 id="border-radius-scale">Border Radius Scale</h3>
+<ul>
+<li>Sharp (4px): Buttons, small interactive elements</li>
+<li>Subtle (6px): Links, small containers</li>
+<li>Comfortable (8px): Standard containers, image cards</li>
+<li>Generous (16px): Alert-style containers, featured elements</li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Treatment</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flat (Level 0)</td>
+<td>No shadow, no border</td>
+<td>Everything — the dominant state</td>
+</tr>
+<tr>
+<td>Bordered (Level 1)</td>
+<td><code>1px solid #27272a</code></td>
+<td>Alert containers only</td>
+</tr>
+<tr>
+<td>Dark Section (Level 2)</td>
+<td>Dark bg (#000000 / #1a1a1a) with light text</td>
+<td>Hero, features, footer</td>
+</tr>
+<tr>
+<td>Light Section (Level 3)</td>
+<td>White/Cool Cloud bg with dark text</td>
+<td>Content sections, research</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Shadow Philosophy</strong>: Runway uses <strong>zero shadows</strong>. This is a film-production design decision — in cinema, depth comes from lighting, focus, and composition, not drop shadows. The interface mirrors this philosophy: depth is communicated through dark/light section alternation, photographic depth-of-field, and overlay transparency — never through CSS box-shadow.</p>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use full-bleed cinematic photography as the primary visual element</li>
+<li>Use abcNormal for all text — maintain the single-typeface commitment</li>
+<li>Keep display line-heights at 1.0 with negative letter-spacing for film-title density</li>
+<li>Use the cool-gray neutral palette (#767d88, #7d848e) for secondary text</li>
+<li>Maintain zero shadows — depth comes from photography and section backgrounds</li>
+<li>Use uppercase with letter-spacing for navigational labels (14px, 0.35px spacing)</li>
+<li>Apply small border-radius (4–8px) — the design is NOT pill-shaped</li>
+<li>Let visual content (photos, videos) dominate — the UI should be invisible</li>
+<li>Use weight 450 for micro labels — the precision matters</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Don't add decorative colors to the interface — the only color comes from photography</li>
+<li>Don't use heavy borders or shadows — the interface must be nearly invisible</li>
+<li>Don't use pill-shaped radius — Runway's geometry is subtly rounded, not circular</li>
+<li>Don't use bold (700+) weight — 400–600 is the full range, with 450 as a precision tool</li>
+<li>Don't compete with the visual content — text overlays should be minimal and restrained</li>
+<li>Don't use gradient backgrounds in the interface — gradients exist only in photography</li>
+<li>Don't use more than one typeface — abcNormal handles everything</li>
+<li>Don't use body line-height above 1.50 — the tight, editorial feel is core</li>
+<li>Don't reduce image quality — cinematic photography IS the design</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<h3 id="breakpoints">Breakpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Width</th>
+<th>Key Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mobile</td>
+<td>&lt;640px</td>
+<td>Single column, stacked images, reduced hero text</td>
+</tr>
+<tr>
+<td>Tablet</td>
+<td>640–768px</td>
+<td>2-column image grids begin</td>
+</tr>
+<tr>
+<td>Small Desktop</td>
+<td>768–1024px</td>
+<td>Standard layout</td>
+</tr>
+<tr>
+<td>Desktop</td>
+<td>1024–1280px</td>
+<td>Full layout, expanded hero</td>
+</tr>
+<tr>
+<td>Large Desktop</td>
+<td>1280–1600px</td>
+<td>Maximum cinema-width container</td>
+</tr>
+</tbody>
+</table>
+<h3 id="touch-targets">Touch Targets</h3>
+<ul>
+<li>Navigation links at comfortable 16px</li>
+<li>Article cards serve as large touch targets</li>
+<li>Buttons at 14px weight 600 with adequate padding</li>
+</ul>
+<h3 id="collapsing-strategy">Collapsing Strategy</h3>
+<ul>
+<li><strong>Navigation</strong>: Collapses to hamburger on mobile</li>
+<li><strong>Hero</strong>: Full-bleed maintained, text scales down</li>
+<li><strong>Image grids</strong>: Multi-column → 2-column → single column</li>
+<li><strong>Research articles</strong>: Feature-size cards → stacked full-width</li>
+<li><strong>Trust logos</strong>: Horizontal scroll or reduced grid</li>
+</ul>
+<h3 id="image-behavior">Image Behavior</h3>
+<ul>
+<li>Cinematic images scale proportionally</li>
+<li>Full-bleed hero maintained across all sizes</li>
+<li>Image grids reflow to fewer columns</li>
+<li>Video content maintains aspect ratio</li>
+</ul>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Background Dark: "Runway Black (#000000)"</li>
+<li>Background Light: "Pure White (#ffffff)"</li>
+<li>Primary Text Dark: "Charcoal (#404040)"</li>
+<li>Secondary Text: "Cool Slate (#767d88)"</li>
+<li>Muted Text: "Muted Gray (#a7a7a7)"</li>
+<li>Light Border: "Cool Silver (#c9ccd1)"</li>
+<li>Dark Border: "Border Dark (#27272a)"</li>
+<li>Card Surface: "Dark Surface (#1a1a1a)"</li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create a cinematic hero section: full-bleed dark background with a cinematic image overlay. Headline at 48px abcNormal weight 400, line-height 1.0, letter-spacing -1.2px in white. Minimal text below in Cool Slate (#767d88) at 16px."</li>
+<li>"Design a research article grid: one large card (50% width) with a cinematic image and 24px title, next to two smaller cards stacked. All images with 8px border-radius. Titles in white (dark bg) or Charcoal (#404040, light bg)."</li>
+<li>"Build a section label: 14px abcNormal weight 500, uppercase, letter-spacing 0.35px in Cool Slate (#767d88). No border, no background."</li>
+<li>"Create a trust bar: company logos in monochrome, horizontal layout with generous spacing. On dark background with white/gray logo treatments."</li>
+<li>"Design a mission statement section: Runway Black background, white text at 36px abcNormal, line-height 1.0, letter-spacing -0.9px. Centered, with generous vertical padding."</li>
+</ul>
+<h3 id="iteration-guide">Iteration Guide</h3>
+<ol>
+<li>Visual content first — always include cinematic photography</li>
+<li>Use abcNormal for everything — specify size and weight, never change the font</li>
+<li>Keep the interface invisible — no heavy borders, no shadows, no bright colors</li>
+<li>Use the cool slate grays (#767d88, #7d848e) for secondary text — not warm grays</li>
+<li>Uppercase labels need letter-spacing (0.35px) — never tight uppercase</li>
+<li>Dark sections should be truly dark (#000000 or #1a1a1a) — no medium grays as surfaces</li>
+</ol>
+</main>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent 6: Builder（実装エージェント）</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="agent-6-builder">Agent 6: Builder（実装エージェント）</h1>
+<h2 id="_1">役割</h2>
+<p>全解析エージェント（Agent 0〜5）の出力を統合し、Next.js + Tailwind CSS で
+参考サイトを高再現度で実装する。イテレーション2以降では QA Reviewer の
+修正指示に基づいて改善を行う。</p>
+<h2 id="_2">入力</h2>
+<h3 id="iteration-1">初回ビルド（Iteration 1）</h3>
+<p>以下の全ファイルを読み込む:
+- <code>/agents/web_builder/site_scanner/output.json</code>
+- <code>/agents/web_builder/structure_analyzer/output.json</code>
+- <code>/agents/web_builder/design_analyzer/output.json</code>
+- <code>/agents/web_builder/motion_analyzer/output.json</code>
+- <code>/agents/web_builder/interaction_analyzer/output.json</code>
+- <code>/agents/web_builder/asset_collector/output.json</code></p>
+<h3 id="iteration-2">修正ビルド（Iteration 2+）</h3>
+<p>上記に加えて:
+- <code>/agents/web_builder/qa_reviewer/iteration_N.json</code>（前回のQA結果）</p>
+<h2 id="_3">実行手順</h2>
+<h3 id="step-1">Step 1: プロジェクト初期化</h3>
+<p><code>/agents/web_builder/output/</code> に Next.js プロジェクトを作成する:</p>
+<pre class="codehilite"><code class="language-bash">npx create-next-app@latest output --typescript --tailwind --app --src-dir --no-eslint --no-import-alias
+</code></pre>
+
+<p><strong>注意:</strong> 既にプロジェクトが存在する場合（Iteration 2+）はこのステップをスキップ。</p>
+<h3 id="step-2">Step 2: 依存パッケージのインストール</h3>
+<p>解析結果に基づいて必要なパッケージをインストール:</p>
+<pre class="codehilite"><code class="language-bash">cd /agents/web_builder/output
+npm install framer-motion    # motion_analyzer で推奨された場合
+npm install lucide-react     # asset_collector で指定されたアイコンライブラリ
+npm install swiper           # interaction_analyzer でスライダーが検出された場合
+# その他、解析で必要と判断されたパッケージ
+</code></pre>
+
+<h3 id="step-3">Step 3: グローバル設定</h3>
+<p><code>design_analyzer/output.json</code> を基に以下を設定:</p>
+<p><strong>tailwind.config.ts:</strong>
+- カラーパレットをカスタムカラーとして定義
+- フォントファミリーを定義
+- スペーシング・border-radius のカスタム値
+- ブレークポイント（必要に応じてカスタマイズ）</p>
+<p><strong>src/app/layout.tsx:</strong>
+- Google Fonts の設定（<code>next/font/google</code>）
+- メタデータ設定
+- 共通レイアウト（Header + main + Footer）</p>
+<p><strong>src/app/globals.css:</strong>
+- CSS変数の定義
+- ベースリセット・スタイル
+- スクロールバーのスタイル（必要に応じて）</p>
+<h3 id="step-4">Step 4: 共通コンポーネントの実装</h3>
+<p><code>structure_analyzer/output.json</code> の <code>shared_components</code> を基に:</p>
+<ol>
+<li>
+<p><strong>Header コンポーネント</strong> (<code>src/components/Header.tsx</code>):
+   - ナビゲーション項目の実装
+   - ロゴ配置
+   - モバイルハンバーガーメニュー（<code>interaction_analyzer</code> の仕様に従う）
+   - スクロール時のスタイル変化（<code>motion_analyzer</code> の仕様に従う）</p>
+</li>
+<li>
+<p><strong>Footer コンポーネント</strong> (<code>src/components/Footer.tsx</code>):
+   - カラム構成の実装
+   - ロゴ・著作権・SNSリンク</p>
+</li>
+<li>
+<p><strong>その他共通コンポーネント</strong>:
+   - SectionHeading: 共通の見出しパターン
+   - Button: プライマリ/セカンダリボタン
+   - Card: 共通カードコンポーネント
+   - Container: max-width ラッパー</p>
+</li>
+</ol>
+<h3 id="step-5">Step 5: ページ・セクションの実装</h3>
+<p><code>structure_analyzer/output.json</code> の各ページ・セクションを順に実装する。</p>
+<p><strong>実装順序（優先度順）:</strong>
+1. トップページのヒーローセクション
+2. トップページの各セクション（上から順に）
+3. サブページ（コーポレートサイトの場合）
+4. レスポンシブ対応（各セクション実装時に同時に対応）</p>
+<p><strong>各セクション実装時の参照先:</strong>
+- レイアウト → <code>structure_analyzer/output.json</code>
+- カラー・タイポグラフィ → <code>design_analyzer/output.json</code>
+- アニメーション → <code>motion_analyzer/output.json</code>
+- インタラクション → <code>interaction_analyzer/output.json</code>
+- 画像・アイコン → <code>asset_collector/output.json</code></p>
+<h3 id="step-6">Step 6: モーション実装</h3>
+<p><code>motion_analyzer/output.json</code> に基づいてアニメーションを実装:</p>
+<ol>
+<li><strong>スクロールアニメーション</strong>: framer-motion の <code>useInView</code> + <code>motion.div</code></li>
+<li><strong>ホバーエフェクト</strong>: Tailwind の <code>hover:</code> + CSS transition</li>
+<li><strong>ページ遷移</strong>: <code>AnimatePresence</code>（必要な場合のみ）</li>
+<li><strong>特殊アニメーション</strong>: カウントアップ、テキストアニメーション等</li>
+</ol>
+<p><strong>共通のアニメーション Variants 定義例:</strong></p>
+<pre class="codehilite"><code class="language-tsx">const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+};
+</code></pre>
+
+<h3 id="step-7">Step 7: インタラクティブ要素の実装</h3>
+<p><code>interaction_analyzer/output.json</code> に基づいて:</p>
+<ol>
+<li><strong>フォーム</strong>: React Hook Form or ネイティブ form + バリデーション</li>
+<li><strong>モーダル</strong>: Dialog コンポーネント（framer-motion でアニメーション）</li>
+<li><strong>アコーディオン</strong>: useState + アニメーション</li>
+<li><strong>タブ</strong>: useState + コンテンツ切り替え</li>
+<li><strong>スライダー</strong>: Swiper React コンポーネント</li>
+<li><strong>モバイルメニュー</strong>: useState + framer-motion</li>
+</ol>
+<h3 id="step-8">Step 8: 画像・アセットの配置</h3>
+<p><code>asset_collector/output.json</code> に基づいて:</p>
+<ul>
+<li>プレースホルダー画像の配置（Unsplash から類似画像を取得、または SVG プレースホルダー）</li>
+<li><code>next/image</code> コンポーネントの使用（最適化）</li>
+<li>アイコンの配置（lucide-react 等）</li>
+<li>ファビコンの設定</li>
+</ul>
+<h3 id="step-9">Step 9: レスポンシブ最終調整</h3>
+<p>全ページを通してレスポンシブ対応を確認・調整:</p>
+<ul>
+<li>モバイル（〜640px）</li>
+<li>タブレット（641px〜1024px）</li>
+<li>デスクトップ（1025px〜）</li>
+</ul>
+<p>Tailwind の <code>sm:</code>, <code>md:</code>, <code>lg:</code>, <code>xl:</code> プレフィックスを活用。</p>
+<h3 id="step-10">Step 10: ビルド確認</h3>
+<pre class="codehilite"><code class="language-bash">cd /agents/web_builder/output
+npm run build
+</code></pre>
+
+<p>ビルドエラーがあれば修正する。</p>
+<h2 id="iteration-2_1">Iteration 2+ の修正手順</h2>
+<p>QA Reviewer の修正指示（<code>iteration_N.json</code>）を読み込み:</p>
+<ol>
+<li><code>fix_instructions</code> を priority 順（high → medium → low）にソート</li>
+<li>各指示について:
+   - 対象ファイルを開く
+   - 指摘された問題を確認
+   - <code>fix_suggestion</code> に従って修正（ただし全体の一貫性も考慮）</li>
+<li>修正完了後、再度 <code>npm run build</code> で確認</li>
+</ol>
+<h2 id="_4">出力フォーマット</h2>
+<p><code>/agents/web_builder/builder/output.json</code> に保存:</p>
+<pre class="codehilite"><code class="language-json">{
+  &quot;iteration&quot;: 1,
+  &quot;project_path&quot;: &quot;/agents/web_builder/output&quot;,
+  &quot;tech_stack&quot;: {
+    &quot;framework&quot;: &quot;Next.js 15 (App Router)&quot;,
+    &quot;styling&quot;: &quot;Tailwind CSS 4&quot;,
+    &quot;language&quot;: &quot;TypeScript&quot;,
+    &quot;animation&quot;: &quot;framer-motion&quot;,
+    &quot;icons&quot;: &quot;lucide-react&quot;,
+    &quot;slider&quot;: &quot;swiper&quot;
+  },
+  &quot;pages_built&quot;: [
+    {&quot;path&quot;: &quot;/&quot;, &quot;sections&quot;: 8, &quot;status&quot;: &quot;complete&quot;},
+    {&quot;path&quot;: &quot;/about&quot;, &quot;sections&quot;: 5, &quot;status&quot;: &quot;complete&quot;},
+    {&quot;path&quot;: &quot;/contact&quot;, &quot;sections&quot;: 3, &quot;status&quot;: &quot;complete&quot;}
+  ],
+  &quot;components_built&quot;: [
+    &quot;Header&quot;, &quot;Footer&quot;, &quot;Container&quot;, &quot;SectionHeading&quot;,
+    &quot;Button&quot;, &quot;Card&quot;, &quot;Modal&quot;, &quot;Accordion&quot;, &quot;MobileMenu&quot;
+  ],
+  &quot;files_created&quot;: [
+    &quot;src/app/layout.tsx&quot;,
+    &quot;src/app/page.tsx&quot;,
+    &quot;src/app/about/page.tsx&quot;,
+    &quot;src/components/Header.tsx&quot;,
+    &quot;src/components/Footer.tsx&quot;
+  ],
+  &quot;build_status&quot;: &quot;success&quot;,
+  &quot;build_errors&quot;: [],
+  &quot;known_limitations&quot;: [
+    &quot;ヒーロー画像はUnsplashのプレースホルダーを使用&quot;,
+    &quot;お問い合わせフォームは送信先APIが未設定&quot;
+  ]
+}
+</code></pre>
+
+<h2 id="_5">使用するツール</h2>
+<ul>
+<li><code>Read</code>: 全エージェントの output.json、QA の iteration_N.json</li>
+<li><code>Write</code>: 新規ファイル作成</li>
+<li><code>Edit</code>: 既存ファイル修正（Iteration 2+）</li>
+<li><code>Bash</code>: <code>npx create-next-app</code>, <code>npm install</code>, <code>npm run build</code> 等のコマンド実行</li>
+</ul>
+<h2 id="_6">モーション再現（必須参照）</h2>
+<p>motion_analyzer の出力に含まれる <code>motion_key</code> は <strong>すべて <code>/design-md/motion-library/MOTION_30.md</code></strong> から引かれる。Builder は該当 <code>motion_key</code> のサンプル実装・推奨ライブラリ・パラメータ目安に従って実装する。</p>
+<p><strong>Builder の実装ルール:</strong>
+- motion_analyzer の <code>motion_key</code> を勝手に変更・差し替えしない
+- サンプル実装はプロジェクト構成（Next.js App Router + Tailwind）に合わせて微調整して構わないが、演出の本質（duration / easing / 発火条件）は MOTION_30.md のパラメータ目安を尊重
+- <code>prefers-reduced-motion: reduce</code> グローバル CSS を <code>src/app/globals.css</code> に必ず配置（MOTION_30.md「アクセシビリティ共通ルール」参照）
+- <code>motion_key: "custom"</code> が指定された場合は、<code>proposed_motion</code> の内容に沿って実装し、実装後に MOTION_30.md への追加提案を出力に含める
+- 1ページあたり同時発火モーションは2件以内（CLS / INP 悪化防止）</p>
+<p><strong>globals.css への必須追記:</strong></p>
+<pre class="codehilite"><code class="language-css">@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</code></pre>
+
+<p><strong>motion_key → パッケージ インストール判断:</strong>
+- <code>framer-motion</code> 系（masking-reveal / stack-card / droste-zoom / inbound-slide など）→ <code>npm install framer-motion</code>
+- GSAP 系（kinetic-flow の複雑版 / path-animation の高度版）→ <code>npm install gsap</code>
+- tsParticles（particle-connect）→ <code>npm install @tsparticles/react @tsparticles/engine</code>
+- WebGL（liquid-hover）→ <code>npm install three</code> または <code>npm install ogl</code></p>
+</main>
+</body>
+</html>

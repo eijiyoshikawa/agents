@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Framer</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-framer">Design System: Framer</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Framer's website is a cinematic, tool-obsessed dark canvas that radiates the confidence of a design tool built by designers who worship craft. The entire experience is drenched in pure black — not a warm charcoal or a cozy dark gray, but an absolute void (<code>#000000</code>) that makes every element, every screenshot, every typographic flourish feel like it's floating in deep space. This is a website that treats its own product UI as the hero art, embedding full-fidelity screenshots and interactive demos directly into the narrative flow.</p>
+<p>The typography is the signature move: GT Walsheim with aggressively tight letter-spacing (as extreme as -5.5px on 110px display text) creates headlines that feel compressed, kinetic, almost spring-loaded — like words under pressure that might expand at any moment. The transition to Inter for body text is seamless, with extensive OpenType feature usage (<code>cv01</code>, <code>cv05</code>, <code>cv09</code>, <code>cv11</code>, <code>ss03</code>, <code>ss07</code>) that gives even small text a refined, custom feel. Framer Blue (<code>#0099ff</code>) is deployed sparingly but decisively — as link color, border accents, and subtle ring shadows — creating a cold, electric throughline against the warm-less black.</p>
+<p>The overall effect is a nightclub for web designers: dark, precise, seductive, and unapologetically product-forward. Every section exists to showcase what the tool can do, with the website itself serving as proof of concept.</p>
+<p><strong>Key Characteristics:</strong>
+- Pure black (<code>#000000</code>) void canvas — absolute dark, not warm or gray-tinted
+- GT Walsheim display font with extreme negative letter-spacing (-5.5px at 110px)
+- Framer Blue (<code>#0099ff</code>) as the sole accent color — cold, electric, precise
+- Pill-shaped buttons (40px–100px radius) — no sharp corners on interactive elements
+- Product screenshots as hero art — the tool IS the marketing
+- Frosted glass button variants using <code>rgba(255, 255, 255, 0.1)</code> on dark surfaces
+- Extensive OpenType feature usage across Inter for refined micro-typography</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>Pure Black</strong> (<code>#000000</code>): Primary background, the void canvas that defines Framer's dark-first identity</li>
+<li><strong>Pure White</strong> (<code>#ffffff</code>): Primary text color on dark surfaces, button text on accent backgrounds</li>
+<li><strong>Framer Blue</strong> (<code>#0099ff</code>): Primary accent color — links, borders, ring shadows, interactive highlights</li>
+</ul>
+<h3 id="secondary-accent">Secondary &amp; Accent</h3>
+<ul>
+<li><strong>Muted Silver</strong> (<code>#a6a6a6</code>): Secondary text, subdued labels, dimmed descriptions on dark surfaces</li>
+<li><strong>Near Black</strong> (<code>#090909</code>): Elevated dark surface, shadow ring color for subtle depth separation</li>
+</ul>
+<h3 id="surface-background">Surface &amp; Background</h3>
+<ul>
+<li><strong>Void Black</strong> (<code>#000000</code>): Page background, primary canvas</li>
+<li><strong>Frosted White</strong> (<code>rgba(255, 255, 255, 0.1)</code>): Translucent button backgrounds, glass-effect surfaces on dark</li>
+<li><strong>Subtle White</strong> (<code>rgba(255, 255, 255, 0.5)</code>): Slightly more opaque frosted elements for hover states</li>
+</ul>
+<h3 id="neutrals-text">Neutrals &amp; Text</h3>
+<ul>
+<li><strong>Pure White</strong> (<code>#ffffff</code>): Heading text, high-emphasis body text</li>
+<li><strong>Muted Silver</strong> (<code>#a6a6a6</code>): Body text, descriptions, secondary information</li>
+<li><strong>Ghost White</strong> (<code>rgba(255, 255, 255, 0.6)</code>): Tertiary text, placeholders on dark surfaces</li>
+</ul>
+<h3 id="semantic-accent">Semantic &amp; Accent</h3>
+<ul>
+<li><strong>Framer Blue</strong> (<code>#0099ff</code>): Links, interactive borders, focus rings</li>
+<li><strong>Blue Glow</strong> (<code>rgba(0, 153, 255, 0.15)</code>): Focus ring shadow, subtle blue halo around interactive elements</li>
+<li><strong>Default Link Blue</strong> (<code>#0000ee</code>): Standard browser link color (used sparingly in content areas)</li>
+</ul>
+<h3 id="gradient-system">Gradient System</h3>
+<ul>
+<li>No prominent gradient usage — Framer relies on pure flat black surfaces with occasional blue-tinted glows for depth</li>
+<li>Subtle radial glow effects behind product screenshots using Framer Blue at very low opacity</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-family">Font Family</h3>
+<ul>
+<li><strong>Display</strong>: <code>GT Walsheim Framer Medium</code> / <code>GT Walsheim Medium</code> — custom geometric sans-serif, weight 500. Fallbacks: <code>GT Walsheim Framer Medium Placeholder</code>, system sans-serif</li>
+<li><strong>Body/UI</strong>: <code>Inter Variable</code> / <code>Inter</code> — variable sans-serif with extensive OpenType features. Fallbacks: <code>Inter Placeholder</code>, <code>-apple-system</code>, <code>system-ui</code></li>
+<li><strong>Accent</strong>: <code>Mona Sans</code> — GitHub's open-source font, used for select elements at ultra-light weight (100)</li>
+<li><strong>Monospace</strong>: <code>Azeret Mono</code> — companion mono for code and technical labels</li>
+<li><strong>Rounded</strong>: <code>Open Runde</code> — small rounded companion font for micro-labels</li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display Hero</td>
+<td>GT Walsheim Framer Medium</td>
+<td>110px</td>
+<td>500</td>
+<td>0.85</td>
+<td>-5.5px</td>
+<td>Extreme negative tracking, compressed impact</td>
+</tr>
+<tr>
+<td>Section Display</td>
+<td>GT Walsheim Medium</td>
+<td>85px</td>
+<td>500</td>
+<td>0.95</td>
+<td>-4.25px</td>
+<td>OpenType: ss02, tnum</td>
+</tr>
+<tr>
+<td>Section Heading</td>
+<td>GT Walsheim Medium</td>
+<td>62px</td>
+<td>500</td>
+<td>1.00</td>
+<td>-3.1px</td>
+<td>OpenType: ss02</td>
+</tr>
+<tr>
+<td>Feature Heading</td>
+<td>GT Walsheim Medium</td>
+<td>32px</td>
+<td>500</td>
+<td>1.13</td>
+<td>-1px</td>
+<td>Tightest of the smaller headings</td>
+</tr>
+<tr>
+<td>Accent Display</td>
+<td>Mona Sans</td>
+<td>61.5px</td>
+<td>100</td>
+<td>1.00</td>
+<td>-3.1px</td>
+<td>Ultra-light weight, ethereal</td>
+</tr>
+<tr>
+<td>Card Title</td>
+<td>Inter Variable</td>
+<td>24px</td>
+<td>400</td>
+<td>1.30</td>
+<td>-0.01px</td>
+<td>OpenType: cv01, cv05, cv09, cv11, ss03, ss07</td>
+</tr>
+<tr>
+<td>Feature Title</td>
+<td>Inter</td>
+<td>22px</td>
+<td>700</td>
+<td>1.20</td>
+<td>-0.8px</td>
+<td>OpenType: cv05</td>
+</tr>
+<tr>
+<td>Sub-heading</td>
+<td>Inter</td>
+<td>20px</td>
+<td>600</td>
+<td>1.20</td>
+<td>-0.8px</td>
+<td>OpenType: cv01, cv09</td>
+</tr>
+<tr>
+<td>Body Large</td>
+<td>Inter Variable</td>
+<td>18px</td>
+<td>400</td>
+<td>1.30</td>
+<td>-0.01px</td>
+<td>OpenType: cv01, cv05, cv09, cv11, ss03, ss07</td>
+</tr>
+<tr>
+<td>Body</td>
+<td>Inter Variable</td>
+<td>15px</td>
+<td>400</td>
+<td>1.30</td>
+<td>-0.01px</td>
+<td>OpenType: cv11</td>
+</tr>
+<tr>
+<td>Nav/UI</td>
+<td>Inter Variable</td>
+<td>15px</td>
+<td>400</td>
+<td>1.00</td>
+<td>-0.15px</td>
+<td>OpenType: cv06, cv11, dlig, ss03</td>
+</tr>
+<tr>
+<td>Body Readable</td>
+<td>Inter Framer Regular</td>
+<td>14px</td>
+<td>400</td>
+<td>1.60</td>
+<td>normal</td>
+<td>Long-form body text</td>
+</tr>
+<tr>
+<td>Caption</td>
+<td>Inter Variable</td>
+<td>14px</td>
+<td>400</td>
+<td>1.40</td>
+<td>normal</td>
+<td>OpenType: cv01, cv06, cv09, cv11, ss03, ss07</td>
+</tr>
+<tr>
+<td>Label</td>
+<td>Inter</td>
+<td>13px</td>
+<td>500</td>
+<td>1.60</td>
+<td>normal</td>
+<td>OpenType: cv06, cv11, ss03</td>
+</tr>
+<tr>
+<td>Small Caption</td>
+<td>Inter Variable</td>
+<td>12px</td>
+<td>400</td>
+<td>1.40</td>
+<td>normal</td>
+<td>OpenType: cv01, cv06, cv09, cv11, ss03, ss07</td>
+</tr>
+<tr>
+<td>Micro Code</td>
+<td>Azeret Mono</td>
+<td>10.4px</td>
+<td>400</td>
+<td>1.60</td>
+<td>normal</td>
+<td>OpenType: cv06, cv11, ss03</td>
+</tr>
+<tr>
+<td>Badge</td>
+<td>Open Runde</td>
+<td>9px</td>
+<td>600</td>
+<td>1.11</td>
+<td>normal</td>
+<td>OpenType: cv01, cv09</td>
+</tr>
+<tr>
+<td>Micro Uppercase</td>
+<td>Inter Variable</td>
+<td>7px</td>
+<td>400</td>
+<td>1.00</td>
+<td>0.21px</td>
+<td>uppercase transform</td>
+</tr>
+</tbody>
+</table>
+<h3 id="principles">Principles</h3>
+<ul>
+<li><strong>Compression as personality</strong>: GT Walsheim's extreme negative letter-spacing (-5.5px at 110px) is the defining typographic gesture — headlines feel spring-loaded, urgent, almost breathless</li>
+<li><strong>OpenType maximalism</strong>: Inter is deployed with 6+ OpenType features simultaneously (<code>cv01</code>, <code>cv05</code>, <code>cv09</code>, <code>cv11</code>, <code>ss03</code>, <code>ss07</code>), creating a subtly custom feel even at body sizes</li>
+<li><strong>Weight restraint on display</strong>: All GT Walsheim usage is weight 500 (medium) — never bold, never regular. This creates a confident-but-not-aggressive display tone</li>
+<li><strong>Ultra-tight line heights</strong>: Display text at 0.85 line-height means letters nearly overlap vertically — intentional density that rewards reading at arm's length</li>
+</ul>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<ul>
+<li><strong>Frosted Pill</strong>: <code>rgba(255, 255, 255, 0.1)</code> background, black text (<code>#000000</code>), pill shape (40px radius). The glass-effect button that lives on dark surfaces — translucent, ambient, subtle</li>
+<li><strong>Solid White Pill</strong>: <code>rgb(255, 255, 255)</code> background, black text (<code>#000000</code>), full pill shape (100px radius), padding <code>10px 15px</code>. The primary CTA — clean, high-contrast on dark, unmissable</li>
+<li><strong>Ghost</strong>: No visible background, white text, relies on text styling alone. Hover reveals subtle frosted background</li>
+<li><strong>Transition</strong>: Scale-based animations (matrix transform with 0.85 scale factor), opacity transitions for reveal effects</li>
+</ul>
+<h3 id="cards-containers">Cards &amp; Containers</h3>
+<ul>
+<li><strong>Dark Surface Card</strong>: Black or near-black (<code>#090909</code>) background, <code>rgba(0, 153, 255, 0.15) 0px 0px 0px 1px</code> blue ring shadow border, rounded corners (10px–15px radius)</li>
+<li><strong>Elevated Card</strong>: Multi-layer shadow — <code>rgba(255, 255, 255, 0.1) 0px 0.5px 0px 0.5px</code> (subtle top highlight) + <code>rgba(0, 0, 0, 0.25) 0px 10px 30px</code> (deep ambient shadow)</li>
+<li><strong>Product Screenshots</strong>: Full-width or padded within dark containers, 8px–12px border-radius for software UI previews</li>
+<li><strong>Hover</strong>: Subtle glow increase on Framer Blue ring shadow, or brightness shift on frosted surfaces</li>
+</ul>
+<h3 id="inputs-forms">Inputs &amp; Forms</h3>
+<ul>
+<li>Minimal form presence on the marketing site</li>
+<li>Input fields follow dark theme: dark background, subtle border, white text</li>
+<li>Focus state: Framer Blue (<code>#0099ff</code>) ring border, <code>1px solid #0099ff</code></li>
+<li>Placeholder text in <code>rgba(255, 255, 255, 0.4)</code></li>
+</ul>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li><strong>Dark floating nav bar</strong>: Black background with frosted glass effect, white text links</li>
+<li><strong>Nav links</strong>: Inter at 15px, weight 400, white text with subtle hover opacity change</li>
+<li><strong>CTA button</strong>: Pill-shaped, white or frosted, positioned at right end of nav</li>
+<li><strong>Mobile</strong>: Collapses to hamburger menu, maintains dark theme</li>
+<li><strong>Sticky behavior</strong>: Nav remains fixed at top on scroll</li>
+</ul>
+<h3 id="image-treatment">Image Treatment</h3>
+<ul>
+<li><strong>Product screenshots as hero art</strong>: Full-width embedded UI screenshots with rounded corners (8px–12px)</li>
+<li><strong>Dark-on-dark composition</strong>: Screenshots placed on black backgrounds with subtle shadow for depth separation</li>
+<li><strong>16:9 and custom aspect ratios</strong>: Product demos fill their containers</li>
+<li><strong>No decorative imagery</strong>: All images are functional — showing the tool, the output, or the workflow</li>
+</ul>
+<h3 id="trust-social-proof">Trust &amp; Social Proof</h3>
+<ul>
+<li>Customer logos and testimonials in muted gray on dark surfaces</li>
+<li>Minimal ornamentation — the product screenshots serve as the trust signal</li>
+</ul>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-system">Spacing System</h3>
+<ul>
+<li><strong>Base unit</strong>: 8px</li>
+<li><strong>Scale</strong>: 1px, 2px, 3px, 4px, 5px, 6px, 8px, 10px, 12px, 15px, 20px, 30px, 35px</li>
+<li><strong>Section padding</strong>: Large vertical spacing (80px–120px between sections)</li>
+<li><strong>Card padding</strong>: 15px–30px internal padding</li>
+<li><strong>Component gaps</strong>: 8px–20px between related elements</li>
+</ul>
+<h3 id="grid-container">Grid &amp; Container</h3>
+<ul>
+<li><strong>Max width</strong>: ~1200px container, centered</li>
+<li><strong>Column patterns</strong>: Full-width hero, 2-column feature sections, single-column product showcases</li>
+<li><strong>Asymmetric layouts</strong>: Feature sections often pair text (40%) with screenshot (60%)</li>
+</ul>
+<h3 id="whitespace-philosophy">Whitespace Philosophy</h3>
+<ul>
+<li><strong>Breathe through darkness</strong>: Generous vertical spacing between sections — the black background means whitespace manifests as void, creating dramatic pauses between content blocks</li>
+<li><strong>Dense within, spacious between</strong>: Individual components are tightly composed (tight line-heights, compressed text) but float in generous surrounding space</li>
+<li><strong>Product-first density</strong>: Screenshot areas are allowed to be dense and information-rich, contrasting with the sparse marketing text</li>
+</ul>
+<h3 id="border-radius-scale">Border Radius Scale</h3>
+<ul>
+<li><strong>1px</strong>: Micro-elements, nearly squared precision edges</li>
+<li><strong>5px–7px</strong>: Small UI elements, image thumbnails — subtly softened</li>
+<li><strong>8px</strong>: Standard component radius — code blocks, buttons, interactive elements</li>
+<li><strong>10px–12px</strong>: Cards, product screenshots — comfortably rounded</li>
+<li><strong>15px–20px</strong>: Large containers, feature cards — generously rounded</li>
+<li><strong>30px–40px</strong>: Navigation pills, pagination — noticeably rounded</li>
+<li><strong>100px</strong>: Full pill shape — primary CTAs, tag elements</li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Treatment</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Level 0 (Flat)</td>
+<td>No shadow, pure black surface</td>
+<td>Page background, empty areas</td>
+</tr>
+<tr>
+<td>Level 1 (Ring)</td>
+<td><code>rgba(0, 153, 255, 0.15) 0px 0px 0px 1px</code></td>
+<td>Card borders, interactive element outlines — Framer Blue glow ring</td>
+</tr>
+<tr>
+<td>Level 2 (Contained)</td>
+<td><code>rgb(9, 9, 9) 0px 0px 0px 2px</code></td>
+<td>Near-black ring for subtle containment on dark surfaces</td>
+</tr>
+<tr>
+<td>Level 3 (Floating)</td>
+<td><code>rgba(255, 255, 255, 0.1) 0px 0.5px 0px 0.5px, rgba(0, 0, 0, 0.25) 0px 10px 30px</code></td>
+<td>Elevated cards, floating elements — subtle white top-edge highlight + deep ambient shadow</td>
+</tr>
+</tbody>
+</table>
+<h3 id="shadow-philosophy">Shadow Philosophy</h3>
+<p>Framer's elevation system is inverted from traditional light-theme designs. Instead of darker shadows on light backgrounds, Framer uses:
+- <strong>Blue-tinted ring shadows</strong> at very low opacity (0.15) for containment — a signature move that subtly brands every bordered element
+- <strong>White edge highlights</strong> (0.5px) on the top edge of elevated elements — simulating light hitting the top surface
+- <strong>Deep ambient shadows</strong> for true floating elements — <code>rgba(0, 0, 0, 0.25)</code> at large spread (30px)</p>
+<h3 id="decorative-depth">Decorative Depth</h3>
+<ul>
+<li><strong>Blue glow auras</strong>: Subtle Framer Blue (<code>#0099ff</code>) radial gradients behind key interactive areas</li>
+<li><strong>No background blur/glassmorphism</strong>: Despite the frosted button effect, there's no heavy glass blur usage — the translucency is achieved through simple rgba opacity</li>
+</ul>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use pure black (<code>#000000</code>) as the primary background — not dark gray, not charcoal</li>
+<li>Apply extreme negative letter-spacing on GT Walsheim display text (-3px to -5.5px)</li>
+<li>Keep all buttons pill-shaped (40px+ radius) — never use squared or slightly-rounded buttons</li>
+<li>Use Framer Blue (<code>#0099ff</code>) exclusively for interactive accents — links, borders, focus states</li>
+<li>Deploy <code>rgba(255, 255, 255, 0.1)</code> for frosted glass surfaces on dark backgrounds</li>
+<li>Maintain GT Walsheim at weight 500 only — the medium weight IS the brand</li>
+<li>Use extensive OpenType features on Inter text (cv01, cv05, cv09, cv11, ss03, ss07)</li>
+<li>Let product screenshots be the visual centerpiece — the tool markets itself</li>
+<li>Apply blue ring shadows (<code>rgba(0, 153, 255, 0.15) 0px 0px 0px 1px</code>) for card containment</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Use warm dark backgrounds (no <code>#1a1a1a</code>, <code>#2d2d2d</code>, or brownish blacks)</li>
+<li>Apply bold (700+) weight to GT Walsheim display text — medium 500 only</li>
+<li>Introduce additional accent colors beyond Framer Blue — this is a one-accent-color system</li>
+<li>Use large border-radius on non-interactive elements (cards use 10px–15px, only buttons get 40px+)</li>
+<li>Add decorative imagery, illustrations, or icons — the product IS the illustration</li>
+<li>Use positive letter-spacing on headlines — everything is compressed, negative tracking</li>
+<li>Create heavy drop shadows — depth is communicated through subtle rings and minimal ambients</li>
+<li>Place light/white backgrounds behind content sections — the void is sacred</li>
+<li>Use serif or display-weight fonts — the system is geometric sans-serif only</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<h3 id="breakpoints">Breakpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Width</th>
+<th>Key Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mobile</td>
+<td>&lt;809px</td>
+<td>Single column, stacked feature sections, reduced hero text (62px→40px), hamburger nav</td>
+</tr>
+<tr>
+<td>Tablet</td>
+<td>809px–1199px</td>
+<td>2-column features begin, nav links partially visible, screenshots scale down</td>
+</tr>
+<tr>
+<td>Desktop</td>
+<td>&gt;1199px</td>
+<td>Full layout, expanded nav with all links + CTA, 110px display hero, side-by-side features</td>
+</tr>
+</tbody>
+</table>
+<h3 id="touch-targets">Touch Targets</h3>
+<ul>
+<li>Pill buttons: minimum 40px height with 10px vertical padding — exceeds 44px WCAG minimum</li>
+<li>Nav links: 15px text with generous padding for touch accessibility</li>
+<li>Mobile CTA buttons: Full-width pills on mobile for easy thumb reach</li>
+</ul>
+<h3 id="collapsing-strategy">Collapsing Strategy</h3>
+<ul>
+<li><strong>Navigation</strong>: Full horizontal nav → hamburger menu at mobile breakpoint</li>
+<li><strong>Hero text</strong>: 110px display → 85px → 62px → ~40px across breakpoints, maintaining extreme negative tracking proportionally</li>
+<li><strong>Feature sections</strong>: Side-by-side (text + screenshot) → stacked vertically on mobile</li>
+<li><strong>Product screenshots</strong>: Scale responsively within containers, maintaining aspect ratios</li>
+<li><strong>Section spacing</strong>: Reduces proportionally — 120px desktop → 60px mobile</li>
+</ul>
+<h3 id="image-behavior">Image Behavior</h3>
+<ul>
+<li>Product screenshots are responsive, scaling within their container boundaries</li>
+<li>No art direction changes — same crops across breakpoints</li>
+<li>Dark background ensures screenshots maintain visual impact at any size</li>
+<li>Screenshots lazy-load as user scrolls into view</li>
+</ul>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Primary Background: Void Black (<code>#000000</code>)</li>
+<li>Primary Text: Pure White (<code>#ffffff</code>)</li>
+<li>Accent/CTA: Framer Blue (<code>#0099ff</code>)</li>
+<li>Secondary Text: Muted Silver (<code>#a6a6a6</code>)</li>
+<li>Frosted Surface: Translucent White (<code>rgba(255, 255, 255, 0.1)</code>)</li>
+<li>Elevation Ring: Blue Glow (<code>rgba(0, 153, 255, 0.15)</code>)</li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create a hero section on pure black background with 110px GT Walsheim heading in white, letter-spacing -5.5px, line-height 0.85, and a pill-shaped white CTA button (100px radius) with black text"</li>
+<li>"Design a feature card on black background with a 1px Framer Blue ring shadow border (rgba(0,153,255,0.15)), 12px border-radius, white heading in Inter at 22px weight 700, and muted silver (a6a6a6) body text"</li>
+<li>"Build a navigation bar with black background, white Inter text links at 15px, and a frosted pill button (rgba(255,255,255,0.1) background, 40px radius) as the CTA"</li>
+<li>"Create a product showcase section with a full-width screenshot embedded on black, 10px border-radius, subtle multi-layer shadow (white 0.5px top highlight + rgba(0,0,0,0.25) 30px ambient)"</li>
+<li>"Design a pricing card using pure black surface, Framer Blue (#0099ff) accent for the selected plan border, white text hierarchy (24px Inter bold heading, 14px regular body), and a solid white pill CTA button"</li>
+</ul>
+<h3 id="iteration-guide">Iteration Guide</h3>
+<p>When refining existing screens generated with this design system:
+1. Focus on ONE component at a time — the dark canvas makes each element precious
+2. Always verify letter-spacing on GT Walsheim headings — the extreme negative tracking is non-negotiable
+3. Check that Framer Blue appears ONLY on interactive elements — never as decorative background or text color for non-links
+4. Ensure all buttons are pill-shaped — any squared corner immediately breaks the Framer aesthetic
+5. Test frosted glass surfaces by checking they have exactly <code>rgba(255, 255, 255, 0.1)</code> — too opaque looks like a bug, too transparent disappears</p>
+</main>
+</body>
+</html>

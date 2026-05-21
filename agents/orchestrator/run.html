@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>パイプライン一括実行プロンプト</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="_1">パイプライン一括実行プロンプト</h1>
+<p>以下のプロンプトを Claude Code にそのまま貼り付けて実行してください。
+<code>{{会議名}}</code> を実際の Notion 議事録ページ名に置き換えてから使ってください。</p>
+<hr />
+<h2 id="_2">実行プロンプト</h2>
+<pre class="codehilite"><code>以下の6段階パイプラインを順に実行し、Notionの議事録「{{会議名}}」から
+戦略提案資料を自動生成してください。
+
+各エージェントのプロンプトは /agents/&lt;agent_name&gt;/prompt.md に定義されています。
+各ステップで prompt.md を読み、指示に従って output.json を生成してください。
+
+### 実行順序:
+
+1. **Retriever**: Notion MCPで「{{会議名}}」を検索・取得し、構造化して
+   /agents/retriever/output.json に保存
+
+2. **Issue Structurer**: retriever/output.json を読み込み、
+   ビジネス課題を構造化して /agents/issue_structurer/output.json に保存
+
+3. **Market Researcher** と **Analogy Finder** を並列実行:
+   - Market Researcher: WebSearchで市場調査 → /agents/market_researcher/output.json
+   - Analogy Finder: WebSearchで異業種事例収集 → /agents/analogy_finder/output.json
+
+4. **Strategist**: 全リサーチ結果を統合し、戦略オプション構築 + Devil's Advocate検証
+   → /agents/strategist/output.json
+
+5. **Report Builder**: スライド構成を設計
+   → /agents/report_builder/output.json
+
+6. **Google Slides 作成**: report_builder/output.json を基に
+   Google Slides MCPで実際のプレゼンテーションを作成
+
+各ステップ完了後、output.json の内容を簡潔に報告してから次に進んでください。
+</code></pre>
+</main>
+</body>
+</html>

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: OpenCode</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-opencode">Design System: OpenCode</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>OpenCode's website embodies a terminal-native, monospace-first aesthetic that reflects its identity as an open source AI coding agent. The entire visual system is built on a stark dark-on-light contrast using a near-black background (<code>#201d1d</code>) with warm off-white text (<code>#fdfcfc</code>). This isn't a generic dark theme -- it's a warm, slightly reddish-brown dark that feels like a sophisticated terminal emulator rather than a cold IDE. The warm undertone in both the darks and lights (notice the subtle red channel in <code>#201d1d</code> -- rgb(32, 29, 29)) creates a cohesive, lived-in quality.</p>
+<p>Berkeley Mono is the sole typeface, establishing an unapologetic monospace identity. Every element -- headings, body text, buttons, navigation -- shares this single font family, creating a unified "everything is code" philosophy. The heading at 38px bold with 1.50 line-height is generous and readable, while body text at 16px with weight 500 provides a slightly heavier-than-normal reading weight that enhances legibility on screen. The monospace grid naturally enforces alignment and rhythm across the layout.</p>
+<p>The color system is deliberately minimal. The primary palette consists of just three functional tones: the warm near-black (<code>#201d1d</code>), a medium warm gray (<code>#9a9898</code>), and a bright off-white (<code>#fdfcfc</code>). Semantic colors borrow from the Apple HIG palette -- blue accent (<code>#007aff</code>), red danger (<code>#ff3b30</code>), green success (<code>#30d158</code>), orange warning (<code>#ff9f0a</code>) -- giving the interface familiar, trustworthy signal colors without adding brand complexity. Borders use a subtle warm transparency (<code>rgba(15, 0, 0, 0.12)</code>) that ties into the warm undertone of the entire system.</p>
+<p><strong>Key Characteristics:</strong>
+- Berkeley Mono as the sole typeface -- monospace everywhere, no sans-serif or serif voices
+- Warm near-black primary (<code>#201d1d</code>) with reddish-brown undertone, not pure black
+- Off-white text (<code>#fdfcfc</code>) with warm tint, not pure white
+- Minimal 4px border radius throughout -- sharp, utilitarian corners
+- 8px base spacing system scaling up to 96px
+- Apple HIG-inspired semantic colors (blue, red, green, orange)
+- Transparent warm borders using <code>rgba(15, 0, 0, 0.12)</code>
+- Email input with generous 20px padding and 6px radius -- the most generous component radius
+- Single button variant: dark background, light text, tight vertical padding (4px 20px)
+- Underlined links as default link style, reinforcing the text-centric identity</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>OpenCode Dark</strong> (<code>#201d1d</code>): Primary background, button fills, link text. A warm near-black with subtle reddish-brown warmth -- rgb(32, 29, 29).</li>
+<li><strong>OpenCode Light</strong> (<code>#fdfcfc</code>): Primary text on dark surfaces, button text. A barely-warm off-white that avoids clinical pure white.</li>
+<li><strong>Mid Gray</strong> (<code>#9a9898</code>): Secondary text, muted links. A neutral warm gray that bridges dark and light.</li>
+</ul>
+<h3 id="secondary">Secondary</h3>
+<ul>
+<li><strong>Dark Surface</strong> (<code>#302c2c</code>): Slightly lighter than primary dark, used for elevated surfaces and subtle differentiation.</li>
+<li><strong>Border Gray</strong> (<code>#646262</code>): Stronger borders, outline rings on interactive elements.</li>
+<li><strong>Light Surface</strong> (<code>#f1eeee</code>): Light mode surface, subtle background variation.</li>
+</ul>
+<h3 id="accent">Accent</h3>
+<ul>
+<li><strong>Accent Blue</strong> (<code>#007aff</code>): Primary accent, links, interactive highlights. Apple system blue.</li>
+<li><strong>Accent Blue Hover</strong> (<code>#0056b3</code>): Darker blue for hover states.</li>
+<li><strong>Accent Blue Active</strong> (<code>#004085</code>): Deepest blue for pressed/active states.</li>
+</ul>
+<h3 id="semantic">Semantic</h3>
+<ul>
+<li><strong>Danger Red</strong> (<code>#ff3b30</code>): Error states, destructive actions. Apple system red.</li>
+<li><strong>Danger Hover</strong> (<code>#d70015</code>): Darker red for hover on danger elements.</li>
+<li><strong>Danger Active</strong> (<code>#a50011</code>): Deepest red for pressed danger states.</li>
+<li><strong>Success Green</strong> (<code>#30d158</code>): Success states, positive feedback. Apple system green.</li>
+<li><strong>Warning Orange</strong> (<code>#ff9f0a</code>): Warning states, caution signals. Apple system orange.</li>
+<li><strong>Warning Hover</strong> (<code>#cc7f08</code>): Darker orange for hover on warning elements.</li>
+<li><strong>Warning Active</strong> (<code>#995f06</code>): Deepest orange for pressed warning states.</li>
+</ul>
+<h3 id="text-scale">Text Scale</h3>
+<ul>
+<li><strong>Text Muted</strong> (<code>#6e6e73</code>): Muted labels, disabled text, placeholder content.</li>
+<li><strong>Text Secondary</strong> (<code>#424245</code>): Secondary text on light backgrounds, captions.</li>
+</ul>
+<h3 id="border">Border</h3>
+<ul>
+<li><strong>Border Warm</strong> (<code>rgba(15, 0, 0, 0.12)</code>): Primary border color, warm transparent black with red tint.</li>
+<li><strong>Border Tab</strong> (<code>#9a9898</code>): Tab underline border, 2px solid bottom.</li>
+<li><strong>Border Outline</strong> (<code>#646262</code>): 1px solid outline border for containers.</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-family">Font Family</h3>
+<ul>
+<li><strong>Universal</strong>: <code>Berkeley Mono</code>, with fallbacks: <code>IBM Plex Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace</code></li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Heading 1</td>
+<td>38px (2.38rem)</td>
+<td>700</td>
+<td>1.50</td>
+<td>Hero headlines, page titles</td>
+</tr>
+<tr>
+<td>Heading 2</td>
+<td>16px (1.00rem)</td>
+<td>700</td>
+<td>1.50</td>
+<td>Section titles, bold emphasis</td>
+</tr>
+<tr>
+<td>Body</td>
+<td>16px (1.00rem)</td>
+<td>400</td>
+<td>1.50</td>
+<td>Standard body text, paragraphs</td>
+</tr>
+<tr>
+<td>Body Medium</td>
+<td>16px (1.00rem)</td>
+<td>500</td>
+<td>1.50</td>
+<td>Links, button text, nav items</td>
+</tr>
+<tr>
+<td>Body Tight</td>
+<td>16px (1.00rem)</td>
+<td>500</td>
+<td>1.00 (tight)</td>
+<td>Compact labels, tab items</td>
+</tr>
+<tr>
+<td>Caption</td>
+<td>14px (0.88rem)</td>
+<td>400</td>
+<td>2.00 (relaxed)</td>
+<td>Footnotes, metadata, small labels</td>
+</tr>
+</tbody>
+</table>
+<h3 id="principles">Principles</h3>
+<ul>
+<li><strong>One font, one voice</strong>: Berkeley Mono is used exclusively. There is no typographic variation between display, body, and code -- everything speaks in the same monospace register. Hierarchy is achieved through size and weight alone.</li>
+<li><strong>Weight as hierarchy</strong>: 700 for headings, 500 for interactive/medium emphasis, 400 for body text. Three weight levels create the entire hierarchy.</li>
+<li><strong>Generous line-height</strong>: 1.50 as the standard line-height gives text room to breathe within the monospace grid. The relaxed 2.00 line-height on captions creates clear visual separation.</li>
+<li><strong>Tight for interaction</strong>: Interactive elements (tabs, compact labels) use 1.00 line-height for dense, clickable targets.</li>
+</ul>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<p><strong>Primary (Dark Fill)</strong>
+- Background: <code>#201d1d</code> (OpenCode Dark)
+- Text: <code>#fdfcfc</code> (OpenCode Light)
+- Padding: 4px 20px
+- Radius: 4px
+- Font: 16px Berkeley Mono, weight 500, line-height 2.00 (relaxed)
+- Outline: <code>rgb(253, 252, 252) none 0px</code>
+- Use: Primary CTAs, main actions</p>
+<h3 id="inputs">Inputs</h3>
+<p><strong>Email Input</strong>
+- Background: <code>#f8f7f7</code> (light neutral)
+- Text: <code>#201d1d</code>
+- Border: <code>1px solid rgba(15, 0, 0, 0.12)</code>
+- Padding: 20px
+- Radius: 6px
+- Font: Berkeley Mono, standard size
+- Use: Form fields, email capture</p>
+<h3 id="links">Links</h3>
+<p><strong>Default Link</strong>
+- Color: <code>#201d1d</code>
+- Decoration: underline 1px
+- Font-weight: 500
+- Use: Primary text links in body content</p>
+<p><strong>Light Link</strong>
+- Color: <code>#fdfcfc</code>
+- Decoration: none
+- Use: Links on dark backgrounds, navigation</p>
+<p><strong>Muted Link</strong>
+- Color: <code>#9a9898</code>
+- Decoration: none
+- Use: Footer links, secondary navigation</p>
+<h3 id="tabs">Tabs</h3>
+<p><strong>Tab Navigation</strong>
+- Border-bottom: <code>2px solid #9a9898</code> (active tab indicator)
+- Font: 16px, weight 500, line-height 1.00
+- Use: Section switching, content filtering</p>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li>Clean horizontal layout with Berkeley Mono throughout</li>
+<li>Brand logotype left-aligned in monospace</li>
+<li>Links at 16px weight 500 with underline decoration</li>
+<li>Dark background matching page background</li>
+<li>No backdrop blur or transparency -- solid surfaces only</li>
+</ul>
+<h3 id="image-treatment">Image Treatment</h3>
+<ul>
+<li>Terminal/code screenshots as hero imagery</li>
+<li>Dark terminal aesthetic with monospace type</li>
+<li>Minimal borders, content speaks for itself</li>
+</ul>
+<h3 id="distinctive-components">Distinctive Components</h3>
+<p><strong>Terminal Hero</strong>
+- Full-width dark terminal window as hero element
+- ASCII art / stylized logo within terminal frame
+- Monospace command examples with syntax highlighting
+- Reinforces the CLI-first identity of the product</p>
+<p><strong>Feature List</strong>
+- Bulleted feature items with Berkeley Mono text
+- Weight 500 for feature names, 400 for descriptions
+- Tight vertical spacing between items
+- No cards or borders -- pure text layout</p>
+<p><strong>Email Capture</strong>
+- Light background input (<code>#f8f7f7</code>) contrasting dark page
+- Generous 20px padding for comfortable typing
+- 6px radius -- the roundest element in the system
+- Newsletter/waitlist pattern</p>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-system">Spacing System</h3>
+<ul>
+<li>Base unit: 8px</li>
+<li>Fine scale: 1px, 2px, 4px (sub-8px for borders and micro-adjustments)</li>
+<li>Standard scale: 8px, 12px, 16px, 20px, 24px</li>
+<li>Extended scale: 32px, 40px, 48px, 64px, 80px, 96px</li>
+<li>The system follows a clean 4/8px grid with consistent doubling</li>
+</ul>
+<h3 id="grid-container">Grid &amp; Container</h3>
+<ul>
+<li>Max content width: approximately 800-900px (narrow, reading-optimized)</li>
+<li>Single-column layout as the primary pattern</li>
+<li>Centered content with generous horizontal margins</li>
+<li>Hero section: full-width dark terminal element</li>
+<li>Feature sections: single-column text blocks</li>
+<li>Footer: multi-column link grid</li>
+</ul>
+<h3 id="whitespace-philosophy">Whitespace Philosophy</h3>
+<ul>
+<li><strong>Monospace rhythm</strong>: The fixed-width nature of Berkeley Mono creates a natural vertical grid. Line-heights of 1.50 and 2.00 maintain consistent rhythm.</li>
+<li><strong>Narrow and focused</strong>: Content is constrained to a narrow column, creating generous side margins that focus attention on the text.</li>
+<li><strong>Sections through spacing</strong>: No decorative dividers. Sections are separated by generous vertical spacing (48-96px) rather than borders or background changes.</li>
+</ul>
+<h3 id="border-radius-scale">Border Radius Scale</h3>
+<ul>
+<li>Micro (4px): Default for all elements -- buttons, containers, badges</li>
+<li>Input (6px): Form inputs get slightly more roundness</li>
+<li>The entire system uses just two radius values, reinforcing the utilitarian aesthetic</li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Treatment</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flat (Level 0)</td>
+<td>No shadow, no border</td>
+<td>Default state for most elements</td>
+</tr>
+<tr>
+<td>Border Subtle (Level 1)</td>
+<td><code>1px solid rgba(15, 0, 0, 0.12)</code></td>
+<td>Section dividers, input borders, horizontal rules</td>
+</tr>
+<tr>
+<td>Border Tab (Level 2)</td>
+<td><code>2px solid #9a9898</code> bottom only</td>
+<td>Active tab indicator</td>
+</tr>
+<tr>
+<td>Border Outline (Level 3)</td>
+<td><code>1px solid #646262</code></td>
+<td>Container outlines, elevated elements</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Shadow Philosophy</strong>: OpenCode's depth system is intentionally flat. There are no box-shadows in the extracted tokens -- zero shadow values were detected. Depth is communicated exclusively through border treatments and background color shifts. This flatness is consistent with the terminal aesthetic: terminals don't have shadows, and neither does OpenCode. The three border levels (transparent warm, tab indicator, solid outline) create sufficient visual hierarchy without any elevation illusion.</p>
+<h3 id="decorative-depth">Decorative Depth</h3>
+<ul>
+<li>Background color shifts between <code>#201d1d</code> and <code>#302c2c</code> create subtle surface differentiation</li>
+<li>Transparent borders at 12% opacity provide barely-visible structure</li>
+<li>The warm reddish tint in border colors (<code>rgba(15, 0, 0, 0.12)</code>) ties borders to the overall warm dark palette</li>
+<li>No gradients, no blurs, no ambient effects -- pure flat terminal aesthetic</li>
+</ul>
+<h2 id="7-interaction-motion">7. Interaction &amp; Motion</h2>
+<h3 id="hover-states">Hover States</h3>
+<ul>
+<li>Links: color shift from default to accent blue (<code>#007aff</code>) or underline style change</li>
+<li>Buttons: subtle background lightening or border emphasis</li>
+<li>Accent blue provides a three-stage hover sequence: <code>#007aff</code> → <code>#0056b3</code> → <code>#004085</code> (default → hover → active)</li>
+<li>Danger red: <code>#ff3b30</code> → <code>#d70015</code> → <code>#a50011</code></li>
+<li>Warning orange: <code>#ff9f0a</code> → <code>#cc7f08</code> → <code>#995f06</code></li>
+</ul>
+<h3 id="focus-states">Focus States</h3>
+<ul>
+<li>Border-based focus: increased border opacity or solid border color</li>
+<li>No shadow-based focus rings -- consistent with the flat, no-shadow aesthetic</li>
+<li>Keyboard focus likely uses outline or border color shift to accent blue</li>
+</ul>
+<h3 id="transitions">Transitions</h3>
+<ul>
+<li>Minimal transitions expected -- terminal-inspired interfaces favor instant state changes</li>
+<li>Color transitions: 100-150ms for subtle state feedback</li>
+<li>No scale, rotate, or complex transform animations</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<h3 id="breakpoints">Breakpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Width</th>
+<th>Key Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mobile</td>
+<td>&lt;640px</td>
+<td>Single column, reduced padding, heading scales down</td>
+</tr>
+<tr>
+<td>Tablet</td>
+<td>640-1024px</td>
+<td>Content width expands, slight padding increase</td>
+</tr>
+<tr>
+<td>Desktop</td>
+<td>&gt;1024px</td>
+<td>Full content width (~800-900px centered), maximum whitespace</td>
+</tr>
+</tbody>
+</table>
+<h3 id="touch-targets">Touch Targets</h3>
+<ul>
+<li>Buttons with 4px 20px padding provide adequate horizontal touch area</li>
+<li>Input fields with 20px padding ensure comfortable mobile typing</li>
+<li>Tab items at 16px with tight line-height may need mobile adaptation</li>
+</ul>
+<h3 id="collapsing-strategy">Collapsing Strategy</h3>
+<ul>
+<li>Hero heading: 38px → 28px → 24px on smaller screens</li>
+<li>Navigation: horizontal links → hamburger/drawer on mobile</li>
+<li>Feature lists: maintain single-column, reduce horizontal padding</li>
+<li>Terminal hero: maintain full-width, reduce internal padding</li>
+<li>Footer columns: multi-column → stacked single column</li>
+<li>Section spacing: 96px → 64px → 48px on mobile</li>
+</ul>
+<h3 id="image-behavior">Image Behavior</h3>
+<ul>
+<li>Terminal screenshots maintain aspect ratio and border treatment</li>
+<li>Full-width elements scale proportionally</li>
+<li>Monospace type maintains readability at all sizes due to fixed-width nature</li>
+</ul>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Page background: <code>#201d1d</code> (warm near-black)</li>
+<li>Primary text: <code>#fdfcfc</code> (warm off-white)</li>
+<li>Secondary text: <code>#9a9898</code> (warm gray)</li>
+<li>Muted text: <code>#6e6e73</code></li>
+<li>Accent: <code>#007aff</code> (blue)</li>
+<li>Danger: <code>#ff3b30</code> (red)</li>
+<li>Success: <code>#30d158</code> (green)</li>
+<li>Warning: <code>#ff9f0a</code> (orange)</li>
+<li>Button bg: <code>#201d1d</code>, button text: <code>#fdfcfc</code></li>
+<li>Border: <code>rgba(15, 0, 0, 0.12)</code> (warm transparent)</li>
+<li>Input bg: <code>#f8f7f7</code>, input border: <code>rgba(15, 0, 0, 0.12)</code></li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create a hero section on <code>#201d1d</code> warm dark background. Headline at 38px Berkeley Mono weight 700, line-height 1.50, color <code>#fdfcfc</code>. Subtitle at 16px weight 400, color <code>#9a9898</code>. Primary CTA button (<code>#201d1d</code> bg with <code>1px solid #646262</code> border, 4px radius, 4px 20px padding, <code>#fdfcfc</code> text at weight 500)."</li>
+<li>"Design a feature list: single-column on <code>#201d1d</code> background. Feature name at 16px Berkeley Mono weight 700, color <code>#fdfcfc</code>. Description at 16px weight 400, color <code>#9a9898</code>. No cards, no borders -- pure text with 16px vertical gap between items."</li>
+<li>"Build an email capture form: <code>#f8f7f7</code> background input, <code>1px solid rgba(15, 0, 0, 0.12)</code> border, 6px radius, 20px padding. Adjacent dark button (<code>#201d1d</code> bg, <code>#fdfcfc</code> text, 4px radius, 4px 20px padding). Berkeley Mono throughout."</li>
+<li>"Create navigation: sticky <code>#201d1d</code> background. 16px Berkeley Mono weight 500 for links, <code>#fdfcfc</code> text. Brand name left-aligned in monospace. Links with underline decoration. No blur, no transparency -- solid dark surface."</li>
+<li>"Design a footer: <code>#201d1d</code> background, multi-column link grid. Links at 16px Berkeley Mono weight 400, color <code>#9a9898</code>. Section headers at weight 700. Border-top <code>1px solid rgba(15, 0, 0, 0.12)</code> separator."</li>
+</ul>
+<h3 id="iteration-guide">Iteration Guide</h3>
+<ol>
+<li>Berkeley Mono is the only font -- never introduce a second typeface. Size and weight create all hierarchy.</li>
+<li>Keep surfaces flat: no shadows, no gradients, no blur effects. Use borders and background shifts only.</li>
+<li>The warm undertone matters: use <code>#201d1d</code> not <code>#000000</code>, use <code>#fdfcfc</code> not <code>#ffffff</code>. The reddish warmth is subtle but essential.</li>
+<li>Border radius is 4px everywhere except inputs (6px). Never use rounded pills or large radii.</li>
+<li>Semantic colors follow Apple HIG: <code>#007aff</code> blue, <code>#ff3b30</code> red, <code>#30d158</code> green, <code>#ff9f0a</code> orange. Each has hover and active darkened variants.</li>
+<li>Three-stage interaction: default → hover (darkened) → active (deeply darkened) for all semantic colors.</li>
+<li>Borders use <code>rgba(15, 0, 0, 0.12)</code> -- a warm transparent dark, not neutral gray. This ties borders to the warm palette.</li>
+<li>Spacing follows an 8px grid: 8, 16, 24, 32, 40, 48, 64, 80, 96px. Use 4px for fine adjustments only.</li>
+</ol>
+</main>
+</body>
+</html>

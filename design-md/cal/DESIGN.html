@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Cal.com</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-calcom">Design System: Cal.com</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Cal.com's website is a masterclass in monochromatic restraint — a grayscale world where boldness comes not from color but from the sheer confidence of black text on white space. Inspired by Uber's minimal aesthetic, the palette is deliberately stripped of hue: near-black headings (<code>#242424</code>), mid-gray secondary text (<code>#898989</code>), and pure white surfaces. Color is treated as a foreign substance — when it appears (a rare blue link, a green trust badge), it feels like a controlled accent in an otherwise black-and-white photograph.</p>
+<p>Cal Sans, the brand's custom geometric display typeface designed by Mark Davis, is the visual centerpiece. Letters are intentionally spaced extremely close at large sizes, creating dense, architectural headlines that feel like they're carved into the page. At 64px and 48px, Cal Sans headings sit at weight 600 with a tight 1.10 line-height — confident, compressed, and immediately recognizable. For body text, the system switches to Inter, providing "rock-solid" readability that complements Cal Sans's display personality. The typography pairing creates a clear division: Cal Sans speaks, Inter explains.</p>
+<p>The elevation system is notably sophisticated for a minimal site — 11 shadow definitions create a nuanced depth hierarchy using multi-layered shadows that combine ring borders (<code>0px 0px 0px 1px</code>), soft diffused shadows, and inset highlights. This shadow-first approach to depth (rather than border-first) gives surfaces a subtle three-dimensionality that feels modern and polished. Built on Framer with a border-radius scale from 2px to 9999px (pill), Cal.com balances geometric precision with soft, rounded interactive elements.</p>
+<p><strong>Key Characteristics:</strong>
+- Purely grayscale brand palette — no brand colors, boldness through monochrome
+- Cal Sans custom geometric display font with extremely tight default letter-spacing
+- Multi-layered shadow system (11 definitions) with ring borders + diffused shadows + inset highlights
+- Cal Sans for headings, Inter for body — clean typographic division
+- Wide border-radius scale from 2px to 9999px (pill) — versatile rounding
+- White canvas with near-black (#242424) text — maximum contrast, zero decoration
+- Product screenshots as primary visual content — the scheduling UI sells itself
+- Built on Framer platform</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>Charcoal</strong> (<code>#242424</code>): Primary heading and button text — Cal.com's signature near-black, warmer than pure black</li>
+<li><strong>Midnight</strong> (<code>#111111</code>): Deepest text/overlay color — used at 50% opacity for subtle overlays</li>
+<li><strong>White</strong> (<code>#ffffff</code>): Primary background and surface — the dominant canvas</li>
+</ul>
+<h3 id="secondary-accent">Secondary &amp; Accent</h3>
+<ul>
+<li><strong>Link Blue</strong> (<code>#0099ff</code>): In-text links with underline decoration — the only blue in the system, reserved strictly for hyperlinks</li>
+<li><strong>Focus Ring</strong> (<code>#3b82f6</code> at 50% opacity): Keyboard focus indicator — accessibility-only, invisible in normal interaction</li>
+<li><strong>Default Link</strong> (<code>#0000ee</code>): Browser-default link color on some elements — unmodified, signaling openness</li>
+</ul>
+<h3 id="surface-background">Surface &amp; Background</h3>
+<ul>
+<li><strong>Pure White</strong> (<code>#ffffff</code>): Primary page background and card surfaces</li>
+<li><strong>Light Gray</strong> (approx <code>#f5f5f5</code>): Subtle section differentiation — barely visible tint</li>
+<li><strong>Mid Gray</strong> (<code>#898989</code>): Secondary text, descriptions, and muted labels</li>
+</ul>
+<h3 id="neutrals-text">Neutrals &amp; Text</h3>
+<ul>
+<li><strong>Charcoal</strong> (<code>#242424</code>): Headlines, buttons, primary UI text</li>
+<li><strong>Midnight</strong> (<code>#111111</code>): Deep black for high-contrast links and nav text</li>
+<li><strong>Mid Gray</strong> (<code>#898989</code>): Descriptions, secondary labels, muted content</li>
+<li><strong>Pure Black</strong> (<code>#000000</code>): Certain link text elements</li>
+<li><strong>Border Gray</strong> (approx <code>rgba(34, 42, 53, 0.08–0.10)</code>): Shadow-based borders using ring shadows instead of CSS borders</li>
+</ul>
+<h3 id="semantic-accent">Semantic &amp; Accent</h3>
+<ul>
+<li>Cal.com is deliberately colorless for brand elements — "a grayscale brand to emphasise on boldness and professionalism"</li>
+<li>Product UI screenshots show color (blues, greens in the scheduling interface), but the marketing site itself stays monochrome</li>
+<li>The philosophy mirrors Uber's approach: let the content carry color, the frame stays neutral</li>
+</ul>
+<h3 id="gradient-system">Gradient System</h3>
+<ul>
+<li>No gradients on the marketing site — the design is fully flat and monochrome</li>
+<li>Depth is achieved entirely through shadows, not color transitions</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-family">Font Family</h3>
+<ul>
+<li><strong>Display</strong>: <code>Cal Sans</code> — custom geometric sans-serif by Mark Davis. Open-source, available on Google Fonts and GitHub. Extremely tight default letter-spacing designed for large headlines. Has 6 character variants (Cc, j, t, u, 0, 1)</li>
+<li><strong>Body</strong>: <code>Inter</code> — "rock-solid" standard body font. Fallback: <code>Inter Placeholder</code></li>
+<li><strong>UI Light</strong>: <code>Cal Sans UI Variable Light</code> — light-weight variant (300) for softer UI text with -0.2px letter-spacing</li>
+<li><strong>UI Medium</strong>: <code>Cal Sans UI Medium</code> — medium-weight variant (500) for emphasized captions</li>
+<li><strong>Mono</strong>: <code>Roboto Mono</code> — for code blocks and technical content</li>
+<li><strong>Tertiary</strong>: <code>Matter Regular</code> / <code>Matter SemiBold</code> / <code>Matter Medium</code> — additional body fonts for specific contexts</li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display Hero</td>
+<td>Cal Sans</td>
+<td>64px</td>
+<td>600</td>
+<td>1.10</td>
+<td>0px</td>
+<td>Maximum impact, tight default spacing</td>
+</tr>
+<tr>
+<td>Section Heading</td>
+<td>Cal Sans</td>
+<td>48px</td>
+<td>600</td>
+<td>1.10</td>
+<td>0px</td>
+<td>Large section titles</td>
+</tr>
+<tr>
+<td>Feature Heading</td>
+<td>Cal Sans</td>
+<td>24px</td>
+<td>600</td>
+<td>1.30</td>
+<td>0px</td>
+<td>Feature block headlines</td>
+</tr>
+<tr>
+<td>Sub-heading</td>
+<td>Cal Sans</td>
+<td>20px</td>
+<td>600</td>
+<td>1.20</td>
+<td>+0.2px</td>
+<td>Positive spacing for readability at smaller size</td>
+</tr>
+<tr>
+<td>Sub-heading Alt</td>
+<td>Cal Sans</td>
+<td>20px</td>
+<td>600</td>
+<td>1.50</td>
+<td>0px</td>
+<td>Relaxed line-height variant</td>
+</tr>
+<tr>
+<td>Card Title</td>
+<td>Cal Sans</td>
+<td>16px</td>
+<td>600</td>
+<td>1.10</td>
+<td>0px</td>
+<td>Smallest Cal Sans usage</td>
+</tr>
+<tr>
+<td>Caption Label</td>
+<td>Cal Sans</td>
+<td>12px</td>
+<td>600</td>
+<td>1.50</td>
+<td>0px</td>
+<td>Small labels in Cal Sans</td>
+</tr>
+<tr>
+<td>Body Light</td>
+<td>Cal Sans UI Light</td>
+<td>18px</td>
+<td>300</td>
+<td>1.30</td>
+<td>-0.2px</td>
+<td>Light-weight body intro text</td>
+</tr>
+<tr>
+<td>Body Light Standard</td>
+<td>Cal Sans UI Light</td>
+<td>16px</td>
+<td>300</td>
+<td>1.50</td>
+<td>-0.2px</td>
+<td>Light-weight body text</td>
+</tr>
+<tr>
+<td>Caption Light</td>
+<td>Cal Sans UI Light</td>
+<td>14px</td>
+<td>300</td>
+<td>1.40–1.50</td>
+<td>-0.2 to -0.28px</td>
+<td>Light captions and descriptions</td>
+</tr>
+<tr>
+<td>UI Label</td>
+<td>Inter</td>
+<td>16px</td>
+<td>600</td>
+<td>1.00</td>
+<td>0px</td>
+<td>UI buttons and nav labels</td>
+</tr>
+<tr>
+<td>Caption Inter</td>
+<td>Inter</td>
+<td>14px</td>
+<td>500</td>
+<td>1.14</td>
+<td>0px</td>
+<td>Small UI text</td>
+</tr>
+<tr>
+<td>Micro</td>
+<td>Inter</td>
+<td>12px</td>
+<td>500</td>
+<td>1.00</td>
+<td>0px</td>
+<td>Smallest Inter text</td>
+</tr>
+<tr>
+<td>Code</td>
+<td>Roboto Mono</td>
+<td>14px</td>
+<td>600</td>
+<td>1.00</td>
+<td>0px</td>
+<td>Code snippets, technical text</td>
+</tr>
+<tr>
+<td>Body Matter</td>
+<td>Matter Regular</td>
+<td>14px</td>
+<td>400</td>
+<td>1.14</td>
+<td>0px</td>
+<td>Alternate body text (product UI)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="principles">Principles</h3>
+<ul>
+<li><strong>Cal Sans at large, Inter at small</strong>: Cal Sans is exclusively for headings and display — never for body text. The system enforces this division strictly</li>
+<li><strong>Tight by default, space when small</strong>: Cal Sans letters are "intentionally spaced to be extremely close" at large sizes. At 20px and below, positive letter-spacing (+0.2px) must be applied to prevent cramming</li>
+<li><strong>Weight 300 body variant</strong>: Cal Sans UI Variable Light at 300 weight creates an elegant, airy body text that contrasts with the dense 600-weight headlines</li>
+<li><strong>Weight 600 dominance</strong>: Nearly all Cal Sans usage is at weight 600 (semi-bold) — the font was designed to perform at this weight</li>
+<li><strong>Negative tracking on light text</strong>: Cal Sans UI Light uses -0.2px to -0.28px letter-spacing, subtly tightening the already-compact letterforms</li>
+</ul>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<ul>
+<li><strong>Dark Primary</strong>: <code>#242424</code> (or <code>#1e1f23</code>) background, white text, 6–8px radius. Hover: opacity reduction to 0.7. The signature CTA — maximally dark on white</li>
+<li><strong>White/Ghost</strong>: White background with shadow-ring border, dark text. Uses the multi-layered shadow system for subtle elevation</li>
+<li><strong>Pill</strong>: 9999px radius for rounded pill-shaped actions and badges</li>
+<li><strong>Compact</strong>: 4px padding, small text — utility actions within product UI</li>
+<li><strong>Inset highlight</strong>: Some buttons feature <code>rgba(255, 255, 255, 0.15) 0px 2px 0px inset</code> — a subtle inner-top highlight creating a 3D pressed effect</li>
+</ul>
+<h3 id="cards-containers">Cards &amp; Containers</h3>
+<ul>
+<li><strong>Shadow Card</strong>: White background, multi-layered shadow — <code>rgba(19, 19, 22, 0.7) 0px 1px 5px -4px, rgba(34, 42, 53, 0.08) 0px 0px 0px 1px, rgba(34, 42, 53, 0.05) 0px 4px 8px 0px</code>. The ring shadow (0px 0px 0px 1px) acts as a shadow-border</li>
+<li><strong>Product UI Cards</strong>: Screenshots of the scheduling interface displayed in card containers with shadow elevation</li>
+<li><strong>Radius</strong>: 8px for standard cards, 12px for larger containers, 16px for prominent sections</li>
+<li><strong>Hover</strong>: Likely subtle shadow deepening or scale transform</li>
+</ul>
+<h3 id="inputs-forms">Inputs &amp; Forms</h3>
+<ul>
+<li><strong>Select dropdown</strong>: White background, <code>#000000</code> text, 1px solid <code>rgb(118, 118, 118)</code> border</li>
+<li><strong>Focus</strong>: Uses Framer's focus outline system (<code>--framer-focus-outline</code>)</li>
+<li><strong>Text input</strong>: 8px radius, standard border treatment</li>
+<li><strong>Minimal form presence</strong>: The marketing site prioritizes CTA buttons over complex forms</li>
+</ul>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li><strong>Top nav</strong>: White/transparent background, Cal Sans links at near-black</li>
+<li><strong>Nav text</strong>: <code>#111111</code> (Midnight) for primary links, <code>#000000</code> for emphasis</li>
+<li><strong>CTA button</strong>: Dark Primary in the nav — high contrast call-to-action</li>
+<li><strong>Mobile</strong>: Collapses to hamburger with simplified navigation</li>
+<li><strong>Sticky</strong>: Fixed on scroll</li>
+</ul>
+<h3 id="image-treatment">Image Treatment</h3>
+<ul>
+<li><strong>Product screenshots</strong>: Large scheduling UI screenshots — the product is the primary visual</li>
+<li><strong>Trust logos</strong>: Grayscale company logos in a horizontal trust bar</li>
+<li><strong>Aspect ratios</strong>: Wide landscape for product UI screenshots</li>
+<li><strong>No decorative imagery</strong>: No illustrations, photos, or abstract graphics — pure product + typography</li>
+</ul>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-system">Spacing System</h3>
+<ul>
+<li><strong>Base unit</strong>: 8px</li>
+<li><strong>Scale</strong>: 1px, 2px, 3px, 4px, 6px, 8px, 12px, 16px, 20px, 24px, 28px, 80px, 96px</li>
+<li><strong>Section padding</strong>: 80px–96px vertical between major sections (generous)</li>
+<li><strong>Card padding</strong>: 12px–24px internal</li>
+<li><strong>Component gaps</strong>: 4px–8px between related elements</li>
+<li><strong>Notable jump</strong>: From 28px to 80px — a deliberate gap emphasizing the section-level spacing tier</li>
+</ul>
+<h3 id="grid-container">Grid &amp; Container</h3>
+<ul>
+<li><strong>Max width</strong>: ~1200px content container, centered</li>
+<li><strong>Column patterns</strong>: Full-width hero, centered text blocks, 2-3 column feature grids</li>
+<li><strong>Feature showcase</strong>: Product screenshots flanked by description text</li>
+<li><strong>Breakpoints</strong>: 98px, 640px, 768px, 810px, 1024px, 1199px — Framer-generated</li>
+</ul>
+<h3 id="whitespace-philosophy">Whitespace Philosophy</h3>
+<ul>
+<li><strong>Lavish section spacing</strong>: 80px–96px between sections creates a breathable, premium feel</li>
+<li><strong>Product-first content</strong>: Screenshots dominate the visual space — minimal surrounding decoration</li>
+<li><strong>Centered headlines</strong>: Cal Sans headings centered with generous margins above and below</li>
+</ul>
+<h3 id="border-radius-scale">Border Radius Scale</h3>
+<ul>
+<li><strong>2px</strong>: Subtle rounding on inline elements</li>
+<li><strong>4px</strong>: Small UI components</li>
+<li><strong>6px–7px</strong>: Buttons, small cards, images</li>
+<li><strong>8px</strong>: Standard interactive elements — buttons, inputs, images</li>
+<li><strong>12px</strong>: Medium containers — links, larger cards, images</li>
+<li><strong>16px</strong>: Large section containers</li>
+<li><strong>29px</strong>: Special rounded elements</li>
+<li><strong>100px</strong>: Large rounding — nearly circular on small elements</li>
+<li><strong>1000px</strong>: Very large rounding</li>
+<li><strong>9999px</strong>: Full pill shape — badges, links</li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Treatment</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Level 0 (Flat)</td>
+<td>No shadow</td>
+<td>Page canvas, basic text containers</td>
+</tr>
+<tr>
+<td>Level 1 (Inset)</td>
+<td><code>rgba(0,0,0,0.16) 0px 1px 1.9px 0px inset</code></td>
+<td>Pressed/recessed elements, input wells</td>
+</tr>
+<tr>
+<td>Level 2 (Ring + Soft)</td>
+<td><code>rgba(19,19,22,0.7) 0px 1px 5px -4px, rgba(34,42,53,0.08) 0px 0px 0px 1px, rgba(34,42,53,0.05) 0px 4px 8px</code></td>
+<td>Cards, containers — the workhorse shadow</td>
+</tr>
+<tr>
+<td>Level 3 (Ring + Soft Alt)</td>
+<td><code>rgba(36,36,36,0.7) 0px 1px 5px -4px, rgba(36,36,36,0.05) 0px 4px 8px</code></td>
+<td>Alt card elevation without ring border</td>
+</tr>
+<tr>
+<td>Level 4 (Inset Highlight)</td>
+<td><code>rgba(255,255,255,0.15) 0px 2px 0px inset</code> or <code>rgb(255,255,255) 0px 2px 0px inset</code></td>
+<td>Button inner highlight — 3D pressed effect</td>
+</tr>
+<tr>
+<td>Level 5 (Soft Only)</td>
+<td><code>rgba(34,42,53,0.05) 0px 4px 8px</code></td>
+<td>Subtle ambient shadow</td>
+</tr>
+</tbody>
+</table>
+<h3 id="shadow-philosophy">Shadow Philosophy</h3>
+<p>Cal.com's shadow system is the most sophisticated element of the design — 11 shadow definitions using a multi-layered compositing technique:
+- <strong>Ring borders</strong>: <code>0px 0px 0px 1px</code> shadows act as borders, avoiding CSS <code>border</code> entirely. This creates hairline containment without affecting layout
+- <strong>Diffused soft shadows</strong>: <code>0px 4px 8px</code> at 5% opacity add gentle ambient depth
+- <strong>Sharp contact shadows</strong>: <code>0px 1px 5px -4px</code> at 70% opacity create tight bottom-edge shadows for grounding
+- <strong>Inset highlights</strong>: White inset shadows at the top of buttons create a subtle 3D bevel
+- Shadows are composed in comma-separated stacks — each surface gets 2-3 layered shadow definitions working together</p>
+<h3 id="decorative-depth">Decorative Depth</h3>
+<ul>
+<li>No gradients or glow effects</li>
+<li>All depth comes from the sophisticated shadow compositing system</li>
+<li>The overall effect is subtle but precise — surfaces feel like physical cards sitting on a table</li>
+</ul>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use Cal Sans exclusively for headings (24px+) and never for body text — it's a display font with tight default spacing</li>
+<li>Apply positive letter-spacing (+0.2px) when using Cal Sans below 24px — the font cramps at small sizes without it</li>
+<li>Maintain the grayscale palette — boldness comes from contrast, not color</li>
+<li>Use the multi-layered shadow system for card elevation — ring shadow + diffused shadow + contact shadow</li>
+<li>Keep backgrounds pure white — the monochrome philosophy requires a clean canvas</li>
+<li>Use Inter for all body text at weight 300–600 — it's the reliable counterpart to Cal Sans's display personality</li>
+<li>Let product screenshots be the visual content — no illustrations, no decorative graphics</li>
+<li>Apply generous section spacing (80px–96px) — the breathing room is essential to the premium feel</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Use Cal Sans for body text or text below 16px — it wasn't designed for extended reading</li>
+<li>Add brand colors — Cal.com is intentionally grayscale, color is reserved for links and UI states only</li>
+<li>Use CSS borders when shadows can achieve the same containment — the ring-shadow technique is the system's approach</li>
+<li>Apply negative letter-spacing to Cal Sans at small sizes — it needs positive spacing (+0.2px) below 24px</li>
+<li>Create heavy, dark shadows — Cal.com's shadows are subtle (5% opacity diffused) with sharp contact edges</li>
+<li>Use illustrations, abstract graphics, or decorative elements — the visual language is typography + product UI only</li>
+<li>Mix Cal Sans weights — the font is designed for weight 600, other weights break the intended character</li>
+<li>Reduce section spacing below 48px — the generous whitespace is core to the premium monochrome aesthetic</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<h3 id="breakpoints">Breakpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Width</th>
+<th>Key Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mobile</td>
+<td>&lt;640px</td>
+<td>Single column, hero text ~36px, stacked features, hamburger nav</td>
+</tr>
+<tr>
+<td>Tablet Small</td>
+<td>640px–768px</td>
+<td>2-column begins for some elements</td>
+</tr>
+<tr>
+<td>Tablet</td>
+<td>768px–810px</td>
+<td>Layout adjustments, fuller grid</td>
+</tr>
+<tr>
+<td>Tablet Large</td>
+<td>810px–1024px</td>
+<td>Multi-column feature grids</td>
+</tr>
+<tr>
+<td>Desktop</td>
+<td>1024px–1199px</td>
+<td>Full layout, expanded navigation</td>
+</tr>
+<tr>
+<td>Large Desktop</td>
+<td>&gt;1199px</td>
+<td>Max-width container, centered content</td>
+</tr>
+</tbody>
+</table>
+<h3 id="touch-targets">Touch Targets</h3>
+<ul>
+<li>Buttons: 8px radius with comfortable padding (10px+ vertical)</li>
+<li>Nav links: Dark text with adequate spacing</li>
+<li>Mobile CTAs: Full-width dark buttons for easy thumb access</li>
+<li>Pill badges: 9999px radius creates large, tappable targets</li>
+</ul>
+<h3 id="collapsing-strategy">Collapsing Strategy</h3>
+<ul>
+<li><strong>Navigation</strong>: Full horizontal nav → hamburger on mobile</li>
+<li><strong>Hero</strong>: 64px Cal Sans display → ~36px on mobile</li>
+<li><strong>Feature grids</strong>: Multi-column → 2-column → single stacked column</li>
+<li><strong>Product screenshots</strong>: Scale within containers, maintaining aspect ratios</li>
+<li><strong>Section spacing</strong>: Reduces from 80px–96px to ~48px on mobile</li>
+</ul>
+<h3 id="image-behavior">Image Behavior</h3>
+<ul>
+<li>Product screenshots scale responsively</li>
+<li>Trust logos reflow to multi-row grid on mobile</li>
+<li>No art direction changes — same compositions at all sizes</li>
+<li>Images use 7px–12px border-radius for consistent rounded corners</li>
+</ul>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Primary Text: Charcoal (<code>#242424</code>)</li>
+<li>Deep Text: Midnight (<code>#111111</code>)</li>
+<li>Secondary Text: Mid Gray (<code>#898989</code>)</li>
+<li>Background: Pure White (<code>#ffffff</code>)</li>
+<li>Link: Link Blue (<code>#0099ff</code>)</li>
+<li>CTA Button: Charcoal (<code>#242424</code>) bg, white text</li>
+<li>Shadow Border: <code>rgba(34, 42, 53, 0.08)</code> ring</li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create a hero section with white background, 64px Cal Sans heading at weight 600, line-height 1.10, #242424 text, centered layout with a dark CTA button (#242424, 8px radius, white text)"</li>
+<li>"Design a scheduling card with white background, multi-layered shadow (0px 1px 5px -4px rgba(19,19,22,0.7), 0px 0px 0px 1px rgba(34,42,53,0.08), 0px 4px 8px rgba(34,42,53,0.05)), 12px radius"</li>
+<li>"Build a navigation bar with white background, Inter links at 14px weight 500 in #111111, a dark CTA button (#242424), sticky positioning"</li>
+<li>"Create a trust bar with grayscale company logos, horizontally centered, 16px gap between logos, on white background"</li>
+<li>"Design a feature section with 48px Cal Sans heading (weight 600, #242424), 16px Inter body text (weight 300, #898989, line-height 1.50), and a product screenshot with 12px radius and the card shadow"</li>
+</ul>
+<h3 id="iteration-guide">Iteration Guide</h3>
+<p>When refining existing screens generated with this design system:
+1. Verify headings use Cal Sans at weight 600, body uses Inter — never mix them
+2. Check that the palette is purely grayscale — if you see brand colors, remove them
+3. Ensure card elevation uses the multi-layered shadow stack, not CSS borders
+4. Confirm section spacing is generous (80px+) — if sections feel cramped, add more space
+5. The overall tone should feel like a clean, professional scheduling tool — monochrome confidence without any decorative flourishes</p>
+</main>
+</body>
+</html>

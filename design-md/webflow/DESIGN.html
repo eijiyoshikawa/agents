@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Webflow</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-webflow">Design System: Webflow</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Webflow's website is a visually rich, tool-forward platform that communicates "design without code" through clean white surfaces, the signature Webflow Blue (<code>#146ef5</code>), and a rich secondary color palette (purple, pink, green, orange, yellow, red). The custom WF Visual Sans Variable font creates a confident, precise typographic system with weight 600 for display and 500 for body.</p>
+<p><strong>Key Characteristics:</strong>
+- White canvas with near-black (<code>#080808</code>) text
+- Webflow Blue (<code>#146ef5</code>) as primary brand + interactive color
+- WF Visual Sans Variable — custom variable font with weight 500–600
+- Rich secondary palette: purple <code>#7a3dff</code>, pink <code>#ed52cb</code>, green <code>#00d722</code>, orange <code>#ff6b00</code>, yellow <code>#ffae13</code>, red <code>#ee1d36</code>
+- Conservative 4px–8px border-radius — sharp, not rounded
+- Multi-layer shadow stacks (5-layer cascading shadows)
+- Uppercase labels: 10px–15px, weight 500–600, wide letter-spacing (0.6px–1.5px)
+- translate(6px) hover animation on buttons</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>Near Black</strong> (<code>#080808</code>): Primary text</li>
+<li><strong>Webflow Blue</strong> (<code>#146ef5</code>): <code>--_color---primary--webflow-blue</code>, primary CTA and links</li>
+<li><strong>Blue 400</strong> (<code>#3b89ff</code>): <code>--_color---primary--blue-400</code>, lighter interactive blue</li>
+<li><strong>Blue 300</strong> (<code>#006acc</code>): <code>--_color---blue-300</code>, darker blue variant</li>
+<li><strong>Button Hover Blue</strong> (<code>#0055d4</code>): <code>--mkto-embed-color-button-hover</code></li>
+</ul>
+<h3 id="secondary-accents">Secondary Accents</h3>
+<ul>
+<li><strong>Purple</strong> (<code>#7a3dff</code>): <code>--_color---secondary--purple</code></li>
+<li><strong>Pink</strong> (<code>#ed52cb</code>): <code>--_color---secondary--pink</code></li>
+<li><strong>Green</strong> (<code>#00d722</code>): <code>--_color---secondary--green</code></li>
+<li><strong>Orange</strong> (<code>#ff6b00</code>): <code>--_color---secondary--orange</code></li>
+<li><strong>Yellow</strong> (<code>#ffae13</code>): <code>--_color---secondary--yellow</code></li>
+<li><strong>Red</strong> (<code>#ee1d36</code>): <code>--_color---secondary--red</code></li>
+</ul>
+<h3 id="neutral">Neutral</h3>
+<ul>
+<li><strong>Gray 800</strong> (<code>#222222</code>): Dark secondary text</li>
+<li><strong>Gray 700</strong> (<code>#363636</code>): Mid text</li>
+<li><strong>Gray 300</strong> (<code>#ababab</code>): Muted text, placeholder</li>
+<li><strong>Mid Gray</strong> (<code>#5a5a5a</code>): Link text</li>
+<li><strong>Border Gray</strong> (<code>#d8d8d8</code>): Borders, dividers</li>
+<li><strong>Border Hover</strong> (<code>#898989</code>): Hover border</li>
+</ul>
+<h3 id="shadows">Shadows</h3>
+<ul>
+<li><strong>5-layer cascade</strong>: <code>rgba(0,0,0,0) 0px 84px 24px, rgba(0,0,0,0.01) 0px 54px 22px, rgba(0,0,0,0.04) 0px 30px 18px, rgba(0,0,0,0.08) 0px 13px 13px, rgba(0,0,0,0.09) 0px 3px 7px</code></li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-wf-visual-sans-variable-fallback-arial">Font: <code>WF Visual Sans Variable</code>, fallback: <code>Arial</code></h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display Hero</td>
+<td>80px</td>
+<td>600</td>
+<td>1.04</td>
+<td>-0.8px</td>
+<td></td>
+</tr>
+<tr>
+<td>Section Heading</td>
+<td>56px</td>
+<td>600</td>
+<td>1.04</td>
+<td>normal</td>
+<td></td>
+</tr>
+<tr>
+<td>Sub-heading</td>
+<td>32px</td>
+<td>500</td>
+<td>1.30</td>
+<td>normal</td>
+<td></td>
+</tr>
+<tr>
+<td>Feature Title</td>
+<td>24px</td>
+<td>500–600</td>
+<td>1.30</td>
+<td>normal</td>
+<td></td>
+</tr>
+<tr>
+<td>Body</td>
+<td>20px</td>
+<td>400–500</td>
+<td>1.40–1.50</td>
+<td>normal</td>
+<td></td>
+</tr>
+<tr>
+<td>Body Standard</td>
+<td>16px</td>
+<td>400–500</td>
+<td>1.60</td>
+<td>-0.16px</td>
+<td></td>
+</tr>
+<tr>
+<td>Button</td>
+<td>16px</td>
+<td>500</td>
+<td>1.60</td>
+<td>-0.16px</td>
+<td></td>
+</tr>
+<tr>
+<td>Uppercase Label</td>
+<td>15px</td>
+<td>500</td>
+<td>1.30</td>
+<td>1.5px</td>
+<td>uppercase</td>
+</tr>
+<tr>
+<td>Caption</td>
+<td>14px</td>
+<td>400–500</td>
+<td>1.40–1.60</td>
+<td>normal</td>
+<td></td>
+</tr>
+<tr>
+<td>Badge Uppercase</td>
+<td>12.8px</td>
+<td>550</td>
+<td>1.20</td>
+<td>normal</td>
+<td>uppercase</td>
+</tr>
+<tr>
+<td>Micro Uppercase</td>
+<td>10px</td>
+<td>500–600</td>
+<td>1.30</td>
+<td>1px</td>
+<td>uppercase</td>
+</tr>
+<tr>
+<td>Code: Inconsolata (companion monospace font)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<ul>
+<li>Transparent: text <code>#080808</code>, translate(6px) on hover</li>
+<li>White circle: 50% radius, white bg</li>
+<li>Blue badge: <code>#146ef5</code> bg, 4px radius, weight 550</li>
+</ul>
+<h3 id="cards-1px-solid-d8d8d8-4px8px-radius">Cards: <code>1px solid #d8d8d8</code>, 4px–8px radius</h3>
+<h3 id="badges-blue-tinted-bg-at-10-opacity-4px-radius">Badges: Blue-tinted bg at 10% opacity, 4px radius</h3>
+<h2 id="5-layout">5. Layout</h2>
+<ul>
+<li>Spacing: fractional scale (1px, 2.4px, 3.2px, 4px, 5.6px, 6px, 7.2px, 8px, 9.6px, 12px, 16px, 24px)</li>
+<li>Radius: 2px, 4px, 8px, 50% — conservative, sharp</li>
+<li>Breakpoints: 479px, 768px, 992px</li>
+</ul>
+<h2 id="6-depth-5-layer-cascading-shadow-system">6. Depth: 5-layer cascading shadow system</h2>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<ul>
+<li>Do: Use WF Visual Sans Variable at 500–600. Blue (#146ef5) for CTAs. 4px radius. translate(6px) hover.</li>
+<li>Don't: Round beyond 8px for functional elements. Use secondary colors on primary CTAs.</li>
+</ul>
+<h2 id="8-responsive-479px-768px-992px">8. Responsive: 479px, 768px, 992px</h2>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<ul>
+<li>Text: Near Black (<code>#080808</code>)</li>
+<li>CTA: Webflow Blue (<code>#146ef5</code>)</li>
+<li>Background: White (<code>#ffffff</code>)</li>
+<li>Border: <code>#d8d8d8</code></li>
+<li>Secondary: Purple <code>#7a3dff</code>, Pink <code>#ed52cb</code>, Green <code>#00d722</code></li>
+</ul>
+</main>
+</body>
+</html>

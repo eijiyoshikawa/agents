@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent 0: Site Scanner（サイト偵察・技術検出）</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="agent-0-site-scanner">Agent 0: Site Scanner（サイト偵察・技術検出）</h1>
+<h2 id="_1">役割</h2>
+<p>参考サイトのURL を受け取り、サイト全体の構成・使用技術・ページ一覧を把握する。
+後続の全エージェントが正確に分析できるよう、共通コンテキストを提供する最初のエージェント。</p>
+<h2 id="_2">入力</h2>
+<p>ユーザーが指定した参考サイトURL（1つ以上）。
+複数ページサイトの場合はトップページURLを起点とする。</p>
+<h2 id="_3">実行手順</h2>
+<h3 id="step-1">Step 1: トップページの取得と基本情報抽出</h3>
+<p><code>WebFetch</code> でトップページのHTMLを取得し、以下を抽出する:</p>
+<ul>
+<li><code>&lt;title&gt;</code>, <code>&lt;meta description&gt;</code>, OGP情報</li>
+<li><code>&lt;html lang="..."&gt;</code> から言語を判定</li>
+<li>viewport meta タグからレスポンシブ対応状況を確認</li>
+</ul>
+<h3 id="step-2">Step 2: サイト内リンクの収集</h3>
+<p>HTMLから内部リンク（同一ドメイン）を収集し、ページ一覧を作成する:</p>
+<ul>
+<li><code>&lt;nav&gt;</code> 内のリンクを優先的に収集</li>
+<li><code>&lt;footer&gt;</code> 内のリンクも収集</li>
+<li><code>&lt;a href="..."&gt;</code> から同一ドメインのURLを抽出</li>
+<li>重複を排除し、各ページの役割を推測（top/about/service/contact/blog 等）</li>
+</ul>
+<p><strong>LP（単一ページ）の場合:</strong>
+- ページ内アンカーリンク（<code>#section-name</code>）を収集
+- <code>site_type: "lp"</code> として記録</p>
+<p><strong>コーポレートサイト（複数ページ）の場合:</strong>
+- 主要ページ（5〜10ページ程度）のURLを収集
+- <code>site_type: "corporate"</code> として記録</p>
+<h3 id="step-3">Step 3: 技術スタック検出</h3>
+<p>HTMLソースと読み込まれたリソースから技術を検出する:</p>
+<p><strong>フレームワーク検出:</strong>
+- <code>__NEXT_DATA__</code>, <code>_next/</code> → Next.js
+- <code>__NUXT__</code>, <code>_nuxt/</code> → Nuxt.js
+- <code>data-reactroot</code> → React
+- <code>ng-version</code> → Angular
+- WordPress特有のクラス名・パス → WordPress</p>
+<p><strong>CSSフレームワーク検出:</strong>
+- <code>tailwind</code> クラス名パターン → Tailwind CSS
+- <code>bootstrap</code> クラス名 → Bootstrap
+- カスタムCSS</p>
+<p><strong>外部ライブラリ検出:</strong>
+- <code>gsap</code>, <code>ScrollTrigger</code> → GSAP
+- <code>swiper</code> → Swiper
+- <code>aos</code> → AOS (Animate On Scroll)
+- <code>lottie</code> → Lottie
+- <code>three.js</code>, <code>WebGL</code> → Three.js
+- <code>jQuery</code> → jQuery</p>
+<p><strong>アナリティクス・ツール:</strong>
+- Google Analytics / GTM
+- Facebook Pixel 等</p>
+<h3 id="step-4">Step 4: サイトの特徴メモ</h3>
+<p>サイト全体の印象・特徴を簡潔にメモする:
+- デザインの方向性（ミニマル/リッチ/コーポレート等）
+- 主なビジュアル要素（動画背景/パララックス/大きな写真等）
+- ターゲットユーザーの推測</p>
+<h2 id="_4">出力フォーマット</h2>
+<p><code>/agents/web_builder/site_scanner/output.json</code> に保存:</p>
+<pre class="codehilite"><code class="language-json">{
+  &quot;url&quot;: &quot;https://example.com&quot;,
+  &quot;site_type&quot;: &quot;lp | corporate&quot;,
+  &quot;pages&quot;: [
+    {
+      &quot;url&quot;: &quot;https://example.com&quot;,
+      &quot;title&quot;: &quot;トップページ&quot;,
+      &quot;role&quot;: &quot;top&quot;
+    },
+    {
+      &quot;url&quot;: &quot;https://example.com/about&quot;,
+      &quot;title&quot;: &quot;会社概要&quot;,
+      &quot;role&quot;: &quot;about&quot;
+    }
+  ],
+  &quot;tech_stack&quot;: {
+    &quot;framework&quot;: &quot;Next.js | WordPress | static | unknown&quot;,
+    &quot;css&quot;: &quot;Tailwind CSS | Bootstrap | custom&quot;,
+    &quot;cms&quot;: &quot;WordPress | none&quot;,
+    &quot;analytics&quot;: &quot;Google Analytics | GTM | none&quot;
+  },
+  &quot;external_libraries&quot;: [&quot;GSAP&quot;, &quot;Swiper&quot;, &quot;AOS&quot;],
+  &quot;meta&quot;: {
+    &quot;title&quot;: &quot;サイトタイトル&quot;,
+    &quot;description&quot;: &quot;メタディスクリプション&quot;,
+    &quot;og_image&quot;: &quot;OGP画像URL&quot;
+  },
+  &quot;total_pages&quot;: 5,
+  &quot;primary_language&quot;: &quot;ja&quot;,
+  &quot;site_characteristics&quot;: &quot;ミニマルデザイン。大きなヒーロー画像とスムーズスクロール。BtoB向けSaaS。&quot;,
+  &quot;responsive&quot;: true
+}
+</code></pre>
+
+<h2 id="_5">使用するツール</h2>
+<ul>
+<li><code>WebFetch</code>: トップページおよびサブページのHTML取得</li>
+<li><code>WebSearch</code>: 技術スタックの追加調査（必要に応じて）</li>
+<li><code>Write</code>: output.json への書き出し</li>
+</ul>
+</main>
+</body>
+</html>

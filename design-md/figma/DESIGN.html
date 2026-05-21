@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Figma</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-figma">Design System: Figma</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Figma's interface is the design tool that designed itself — a masterclass in typographic sophistication where a custom variable font (figmaSans) modulates between razor-thin (weight 320) and bold (weight 700) with stops at unusual intermediates (330, 340, 450, 480, 540) that most type systems never explore. This granular weight control gives every text element a precisely calibrated visual weight, creating hierarchy through micro-differences rather than the blunt instrument of "regular vs bold."</p>
+<p>The page presents a fascinating duality: the interface chrome is strictly black-and-white (literally only <code>#000000</code> and <code>#ffffff</code> detected as colors), while the hero section and product showcases explode with vibrant multi-color gradients — electric greens, bright yellows, deep purples, hot pinks. This separation means the design system itself is colorless, treating the product's colorful output as the hero content. Figma's marketing page is essentially a white gallery wall displaying colorful art.</p>
+<p>What makes Figma distinctive beyond the variable font is its circle-and-pill geometry. Buttons use 50px radius (pill) or 50% (perfect circle for icon buttons), creating an organic, tool-palette-like feel. The dashed-outline focus indicator (<code>dashed 2px</code>) is a deliberate design choice that echoes selection handles in the Figma editor itself — the website's UI language references the product's UI language.</p>
+<p><strong>Key Characteristics:</strong>
+- Custom variable font (figmaSans) with unusual weight stops: 320, 330, 340, 450, 480, 540, 700
+- Strictly black-and-white interface chrome — color exists only in product content
+- figmaMono for uppercase technical labels with wide letter-spacing
+- Pill (50px) and circular (50%) button geometry
+- Dashed focus outlines echoing Figma's editor selection handles
+- Vibrant multi-color hero gradients (green, yellow, purple, pink)
+- OpenType <code>"kern"</code> feature enabled globally
+- Negative letter-spacing throughout — even body text at -0.14px to -0.26px</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>Pure Black</strong> (<code>#000000</code>): All text, all solid buttons, all borders. The sole "color" of the interface.</li>
+<li><strong>Pure White</strong> (<code>#ffffff</code>): All backgrounds, white buttons, text on dark surfaces. The other half of the binary.</li>
+</ul>
+<p><em>Note: Figma's marketing site uses ONLY these two colors for its interface layer. All vibrant colors appear exclusively in product screenshots, hero gradients, and embedded content.</em></p>
+<h3 id="surface-background">Surface &amp; Background</h3>
+<ul>
+<li><strong>Pure White</strong> (<code>#ffffff</code>): Primary page background and card surfaces.</li>
+<li><strong>Glass Black</strong> (<code>rgba(0, 0, 0, 0.08)</code>): Subtle dark overlay for secondary circular buttons and glass effects.</li>
+<li><strong>Glass White</strong> (<code>rgba(255, 255, 255, 0.16)</code>): Frosted glass overlay for buttons on dark/colored surfaces.</li>
+</ul>
+<h3 id="gradient-system">Gradient System</h3>
+<ul>
+<li><strong>Hero Gradient</strong>: A vibrant multi-stop gradient using electric green, bright yellow, deep purple, and hot pink. This gradient is the visual signature of the hero section — it represents the creative possibilities of the tool.</li>
+<li><strong>Product Section Gradients</strong>: Individual product areas (Design, Dev Mode, Prototyping) may use distinct color themes in their showcases.</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-family">Font Family</h3>
+<ul>
+<li><strong>Primary</strong>: <code>figmaSans</code>, with fallbacks: <code>figmaSans Fallback, SF Pro Display, system-ui, helvetica</code></li>
+<li><strong>Monospace / Labels</strong>: <code>figmaMono</code>, with fallbacks: <code>figmaMono Fallback, SF Mono, menlo</code></li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display / Hero</td>
+<td>figmaSans</td>
+<td>86px (5.38rem)</td>
+<td>400</td>
+<td>1.00 (tight)</td>
+<td>-1.72px</td>
+<td>Maximum impact, extreme tracking</td>
+</tr>
+<tr>
+<td>Section Heading</td>
+<td>figmaSans</td>
+<td>64px (4rem)</td>
+<td>400</td>
+<td>1.10 (tight)</td>
+<td>-0.96px</td>
+<td>Feature section titles</td>
+</tr>
+<tr>
+<td>Sub-heading</td>
+<td>figmaSans</td>
+<td>26px (1.63rem)</td>
+<td>540</td>
+<td>1.35</td>
+<td>-0.26px</td>
+<td>Emphasized section text</td>
+</tr>
+<tr>
+<td>Sub-heading Light</td>
+<td>figmaSans</td>
+<td>26px (1.63rem)</td>
+<td>340</td>
+<td>1.35</td>
+<td>-0.26px</td>
+<td>Light-weight section text</td>
+</tr>
+<tr>
+<td>Feature Title</td>
+<td>figmaSans</td>
+<td>24px (1.5rem)</td>
+<td>700</td>
+<td>1.45</td>
+<td>normal</td>
+<td>Bold card headings</td>
+</tr>
+<tr>
+<td>Body Large</td>
+<td>figmaSans</td>
+<td>20px (1.25rem)</td>
+<td>330–450</td>
+<td>1.30–1.40</td>
+<td>-0.1px to -0.14px</td>
+<td>Descriptions, intros</td>
+</tr>
+<tr>
+<td>Body / Button</td>
+<td>figmaSans</td>
+<td>16px (1rem)</td>
+<td>330–400</td>
+<td>1.40–1.45</td>
+<td>-0.14px to normal</td>
+<td>Standard body, nav, buttons</td>
+</tr>
+<tr>
+<td>Body Light</td>
+<td>figmaSans</td>
+<td>18px (1.13rem)</td>
+<td>320</td>
+<td>1.45</td>
+<td>-0.26px to normal</td>
+<td>Light-weight body text</td>
+</tr>
+<tr>
+<td>Mono Label</td>
+<td>figmaMono</td>
+<td>18px (1.13rem)</td>
+<td>400</td>
+<td>1.30 (tight)</td>
+<td>0.54px</td>
+<td>Uppercase section labels</td>
+</tr>
+<tr>
+<td>Mono Small</td>
+<td>figmaMono</td>
+<td>12px (0.75rem)</td>
+<td>400</td>
+<td>1.00 (tight)</td>
+<td>0.6px</td>
+<td>Uppercase tiny tags</td>
+</tr>
+</tbody>
+</table>
+<h3 id="principles">Principles</h3>
+<ul>
+<li><strong>Variable font precision</strong>: figmaSans uses weights that most systems never touch — 320, 330, 340, 450, 480, 540. This creates hierarchy through subtle weight differences rather than dramatic jumps. The difference between 330 and 340 is nearly imperceptible but structurally significant.</li>
+<li><strong>Light as the base</strong>: Most body text uses 320–340 (lighter than typical 400 "regular"), creating an ethereal, airy reading experience that matches the design-tool aesthetic.</li>
+<li><strong>Kern everywhere</strong>: Every text element enables OpenType <code>"kern"</code> feature — kerning is not optional, it's structural.</li>
+<li><strong>Negative tracking by default</strong>: Even body text uses -0.1px to -0.26px letter-spacing, creating universally tight text. Display text compresses further to -0.96px and -1.72px.</li>
+<li><strong>Mono for structure</strong>: figmaMono in uppercase with positive letter-spacing (0.54px–0.6px) creates technical signpost labels.</li>
+</ul>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<p><strong>Black Solid (Pill)</strong>
+- Background: Pure Black (<code>#000000</code>)
+- Text: Pure White (<code>#ffffff</code>)
+- Radius: circle (50%) for icon buttons
+- Focus: dashed 2px outline
+- Maximum emphasis</p>
+<p><strong>White Pill</strong>
+- Background: Pure White (<code>#ffffff</code>)
+- Text: Pure Black (<code>#000000</code>)
+- Padding: 8px 18px 10px (asymmetric vertical)
+- Radius: pill (50px)
+- Focus: dashed 2px outline
+- Standard CTA on dark/colored surfaces</p>
+<p><strong>Glass Dark</strong>
+- Background: <code>rgba(0, 0, 0, 0.08)</code> (subtle dark overlay)
+- Text: Pure Black
+- Radius: circle (50%)
+- Focus: dashed 2px outline
+- Secondary action on light surfaces</p>
+<p><strong>Glass Light</strong>
+- Background: <code>rgba(255, 255, 255, 0.16)</code> (frosted glass)
+- Text: Pure White
+- Radius: circle (50%)
+- Focus: dashed 2px outline
+- Secondary action on dark/colored surfaces</p>
+<h3 id="cards-containers">Cards &amp; Containers</h3>
+<ul>
+<li>Background: Pure White</li>
+<li>Border: none or minimal</li>
+<li>Radius: 6px (small containers), 8px (images, cards, dialogs)</li>
+<li>Shadow: subtle to medium elevation effects</li>
+<li>Product screenshots as card content</li>
+</ul>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li>Clean horizontal nav on white</li>
+<li>Logo: Figma wordmark in black</li>
+<li>Product tabs: pill-shaped (50px) tab navigation</li>
+<li>Links: black text, underline 1px decoration</li>
+<li>CTA: Black pill button</li>
+<li>Hover: text color via CSS variable</li>
+</ul>
+<h3 id="distinctive-components">Distinctive Components</h3>
+<p><strong>Product Tab Bar</strong>
+- Horizontal pill-shaped tabs (50px radius)
+- Each tab represents a Figma product area (Design, Dev Mode, Prototyping, etc.)
+- Active tab highlighted</p>
+<p><strong>Hero Gradient Section</strong>
+- Full-width vibrant multi-color gradient background
+- White text overlay with 86px display heading
+- Product screenshots floating within the gradient</p>
+<p><strong>Dashed Focus Indicators</strong>
+- All interactive elements use <code>dashed 2px</code> outline on focus
+- References the selection handles in the Figma editor
+- A meta-design choice connecting website and product</p>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-system">Spacing System</h3>
+<ul>
+<li>Base unit: 8px</li>
+<li>Scale: 1px, 2px, 4px, 4.5px, 8px, 10px, 12px, 16px, 18px, 24px, 32px, 40px, 46px, 48px, 50px</li>
+</ul>
+<h3 id="grid-container">Grid &amp; Container</h3>
+<ul>
+<li>Max container width: up to 1920px</li>
+<li>Hero: full-width gradient with centered content</li>
+<li>Product sections: alternating showcases</li>
+<li>Footer: dark full-width section</li>
+<li>Responsive from 559px to 1920px</li>
+</ul>
+<h3 id="whitespace-philosophy">Whitespace Philosophy</h3>
+<ul>
+<li><strong>Gallery-like pacing</strong>: Generous spacing lets each product section breathe as its own exhibit.</li>
+<li><strong>Color sections as visual breathing</strong>: The gradient hero and product showcases provide chromatic relief between the monochrome interface sections.</li>
+</ul>
+<h3 id="border-radius-scale">Border Radius Scale</h3>
+<ul>
+<li>Minimal (2px): Small link elements</li>
+<li>Subtle (6px): Small containers, dividers</li>
+<li>Comfortable (8px): Cards, images, dialogs</li>
+<li>Pill (50px): Tab buttons, CTAs</li>
+<li>Circle (50%): Icon buttons, circular elements</li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Treatment</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flat (Level 0)</td>
+<td>No shadow</td>
+<td>Page background, most text</td>
+</tr>
+<tr>
+<td>Surface (Level 1)</td>
+<td>White card on gradient/dark section</td>
+<td>Cards, product showcases</td>
+</tr>
+<tr>
+<td>Elevated (Level 2)</td>
+<td>Subtle shadow</td>
+<td>Floating cards, hover states</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Shadow Philosophy</strong>: Figma uses shadows sparingly. The primary depth mechanisms are <strong>background contrast</strong> (white content on colorful/dark sections) and the inherent dimensionality of the product screenshots themselves.</p>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use figmaSans with precise variable weights (320–540) — the granular weight control IS the design</li>
+<li>Keep the interface strictly black-and-white — color comes from product content only</li>
+<li>Use pill (50px) and circular (50%) geometry for all interactive elements</li>
+<li>Apply dashed 2px focus outlines — the signature accessibility pattern</li>
+<li>Enable <code>"kern"</code> feature on all text</li>
+<li>Use figmaMono in uppercase with positive letter-spacing for labels</li>
+<li>Apply negative letter-spacing throughout (-0.1px to -1.72px)</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Don't add interface colors — the monochrome palette is absolute</li>
+<li>Don't use standard font weights (400, 500, 600, 700) — use the variable font's unique stops (320, 330, 340, 450, 480, 540)</li>
+<li>Don't use sharp corners on buttons — pill and circular geometry only</li>
+<li>Don't use solid focus outlines — dashed is the signature</li>
+<li>Don't increase body font weight above 450 — the light-weight aesthetic is core</li>
+<li>Don't use positive letter-spacing on body text — it's always negative</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<h3 id="breakpoints">Breakpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Width</th>
+<th>Key Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Small Mobile</td>
+<td>&lt;560px</td>
+<td>Compact layout, stacked</td>
+</tr>
+<tr>
+<td>Tablet</td>
+<td>560–768px</td>
+<td>Minor adjustments</td>
+</tr>
+<tr>
+<td>Small Desktop</td>
+<td>768–960px</td>
+<td>2-column layouts</td>
+</tr>
+<tr>
+<td>Desktop</td>
+<td>960–1280px</td>
+<td>Standard layout</td>
+</tr>
+<tr>
+<td>Large Desktop</td>
+<td>1280–1440px</td>
+<td>Expanded</td>
+</tr>
+<tr>
+<td>Ultra-wide</td>
+<td>1440–1920px</td>
+<td>Maximum width</td>
+</tr>
+</tbody>
+</table>
+<h3 id="collapsing-strategy">Collapsing Strategy</h3>
+<ul>
+<li>Hero text: 86px → 64px → 48px</li>
+<li>Product tabs: horizontal scroll on mobile</li>
+<li>Feature sections: stacked single column</li>
+<li>Footer: multi-column → stacked</li>
+</ul>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Everything: "Pure Black (#000000)" and "Pure White (#ffffff)"</li>
+<li>Glass Dark: "rgba(0, 0, 0, 0.08)"</li>
+<li>Glass Light: "rgba(255, 255, 255, 0.16)"</li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create a hero on a vibrant multi-color gradient (green, yellow, purple, pink). Headline at 86px figmaSans weight 400, line-height 1.0, letter-spacing -1.72px. White text. White pill CTA button (50px radius, 8px 18px padding)."</li>
+<li>"Design a product tab bar with pill-shaped buttons (50px radius). Active: Black bg, white text. Inactive: transparent, black text. figmaSans at 20px weight 480."</li>
+<li>"Build a section label: figmaMono 18px, uppercase, letter-spacing 0.54px, black text. Kern enabled."</li>
+<li>"Create body text at 20px figmaSans weight 330, line-height 1.40, letter-spacing -0.14px. Pure Black on white."</li>
+</ul>
+<h3 id="iteration-guide">Iteration Guide</h3>
+<ol>
+<li>Use variable font weight stops precisely: 320, 330, 340, 450, 480, 540, 700</li>
+<li>Interface is always black + white — never add colors to chrome</li>
+<li>Dashed focus outlines, not solid</li>
+<li>Letter-spacing is always negative on body, always positive on mono labels</li>
+<li>Pill (50px) for buttons/tabs, circle (50%) for icon buttons</li>
+</ol>
+</main>
+</body>
+</html>
