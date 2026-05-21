@@ -208,6 +208,30 @@
 
 ---
 
+### 独立実行: Web Scraper（会員サイト情報収集）
+**プロンプト:** `/agents/web_scraper/prompt.md`
+**出力:** `/agents/web_scraper/output.json`
+
+このエージェントは上記パイプラインとは独立して実行できる。
+
+1. `/agents/web_scraper/sites/` にサイト設定ファイルを用意
+2. `.env` に認証情報を設定
+3. Playwright MCP が接続済みであることを確認
+4. エージェントを実行:
+   ```
+   /agents/web_scraper/prompt.md の手順に従って、
+   サイト設定「サイト名.json」から情報を収集し、
+   Notionの「収集データ」データベースに保存してください。
+   ```
+
+**完了条件:** `web_scraper/output.json` に `execution_summary` が含まれ、Notionの「収集データ」DBにデータが保存されている
+
+**Market Researcher との連携:**
+収集データは Market Researcher エージェントの追加データソースとして活用可能。
+`notion-search` で「収集データ」DBから関連情報を取得できる。
+
+---
+
 ## エラー時の対応
 
 | 問題 | 対応 |
@@ -216,6 +240,8 @@
 | WebSearch の結果が不十分 | クエリを変更して再実行 |
 | output.json のフォーマット不正 | prompt.md の出力フォーマットに従って修正 |
 | MCP サーバー未接続 | Claude Code の MCP 設定を確認 |
+| Web Scraper ログイン失敗 | .env の認証情報を確認。CAPTCHA/2FAはユーザーが手動対応 |
+| Web Scraper ページ構造変更 | サイト設定のセレクタを更新 |
 
 ## 共有・再利用
 

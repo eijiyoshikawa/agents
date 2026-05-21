@@ -171,6 +171,9 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 出力は `/agents/<agent_name>/output.json` に保存される。
 各エージェントのプロンプトには「相互干渉（検証を受ける相手）」セクションが含まれ、チェック&バランスが明文化されている。
 
+### データ収集
+7. **Web Scraper** — 会員サイト自動ログイン・情報収集・Notion格納
+
 ## 実行方法
 
 ### 戦略提案パイプライン
@@ -197,7 +200,7 @@ CEO Agentが各エージェントの業務状況、組織診断、改善計画�
 ### 他の人と共有する場合
 1. このリポジトリを `git clone` する
 2. Claude Code（Max プラン）を開く
-3. MCP サーバーを設定する（Notion / Google Drive）
+3. MCP サーバーを設定する（Notion / Google Drive / Playwright）
 4. 上記いずれかの方法で実行
 
 ## 共有リソース
