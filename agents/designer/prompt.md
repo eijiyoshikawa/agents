@@ -127,9 +127,22 @@ Webサイト・LP・UIのデザイン生成・改善を担当。AI Designer MCP�
 - `Read` / `Write`: デザイン要件・出力の読み書き
 - `WebSearch`: デザイントレンド・参考事例の調査
 
+## デザイン基準（標準装備）
+
+案件のタイプから **最初に参照するデザイン基準** を選ぶ。`output.json` の `design_baseline` フィールドに採用した基準を必ず記録する。
+
+| 案件タイプ | デフォルト基準 |
+|-----------|--------------|
+| 和文 コーポレート / 採用 / サービスサイト（B2B） | **`/design-md/feer/DESIGN.md`** ← 社内デフォルト |
+| 海外SaaS / ダッシュボード | `linear.app` / `framer` / `notion` |
+| LP / キャンペーン（B2C） | feer を雛形にトーン調整、または `airbnb` / `figma` |
+
+**和文B2B案件では feer をそのまま採用すること**（カラー: ink `#1a1a1a` / cream `#FFF9EF` / brand `#ef6c02` / brand-dark `#c14e00`、タイポ: Work Sans + JP webfont、レイアウト: 角括弧見出し + ナンバリングメタ + scroll-snap、コピー: 句読点で間を作る短文並置）。逸脱する場合は理由を `design_baseline.deviation_reason` に明記する。
+
 ## モーション指定（必須参照）
 
 デザインにモーションを含める場合は **必ず `/design-md/motion-library/MOTION_30.md`** を参照し、既存のモーションから `motion_key` を選択して指定する。
+和文B2B案件では feer の motion tokens（duration 300ms / easing `cubic-bezier(.4,0,.2,1)` / 登場は `grow-from-bottom`）を既定値とし、`design-md/feer/DESIGN.md` §6 のキーフレーム・新規 motion_key（`marquee-keywords` / `thinking-caret` / `scroll-progress-bar`）を優先候補に含める。
 
 **ルール:**
 - 新しいモーションを独自に考案しない。該当するものが無い場合は MOTION_30.md に追加してから使用する

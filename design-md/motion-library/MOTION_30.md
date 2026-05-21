@@ -30,6 +30,17 @@
 3. [インタラクション系](#3-インタラクションホバークリック系)（6）
 4. [スクロール・背景系](#4-スクロール背景系)（6）
 5. [ベンチャー・先進性特化系](#5-ベンチャー先進性特化系)（6）
+6. [和文B2B / コーポレート系（feer 追加）](#6-和文b2b--コーポレート系feer-追加)（3）
+
+## 案件タイプ別 デフォルト基準
+
+| 案件タイプ | デフォルト参照 |
+|-----------|--------------|
+| 和文 コーポレート / 採用 / サービスサイト（B2B） | **`/design-md/feer/DESIGN.md`** をデフォルト採用 |
+| 海外SaaS / ダッシュボード | `linear.app` / `framer` / `notion` 等を選択 |
+| LP / キャンペーン（B2C） | feer を雛形にトーン調整、または `airbnb` / `figma` を参照 |
+
+和文B2B 案件では feer のモーショントークン（`duration` 300ms / `easing` `cubic-bezier(.4,0,.2,1)` / 主要登場演出 `grow-from-bottom`）を Tailwind config の既定にする。詳細は `design-md/feer/DESIGN.md` §6 参照。
 
 ## アクセシビリティ共通ルール
 
@@ -665,8 +676,73 @@ SVG版（JSバンドル増なし）:
 
 ---
 
+## 6. 和文B2B / コーポレート系（feer 追加）
+
+> 和文B2B案件のデフォルト基準である `design-md/feer/DESIGN.md` で多用するモーション群。
+> 30選とは別カテゴリとして登録し、和文コーポレート案件では **まずここから選ぶ**。
+
+### 6.1 マーキー・キーワード (`marquee-keywords`)
+
+- **演出**: ブランドキーワードが横方向にエンドレスでスクロールし続ける
+- **活用例**: コーポレートサイトの章間セパレータ、ブランドフッター、ヒーロー直下のシグネチャ帯
+- **言語化**: 「★ CREATIVE × AI ● FEEL × FREE ●」のようなキーワード列を `translateX` で永続再生
+- **推奨実装**: 同一テキスト2連結 + `transform: translateX(0 → -50%)` を `linear` で無限ループ
+- **パラメータ目安**: 1周 25–40s / easing `linear` / フォントウェイト 600 / `tracking-[0.1em]` / `will-change: transform`
+
+```tsx
+<div className="overflow-hidden whitespace-nowrap py-4 border-y border-current">
+  <div className="inline-flex gap-8 animate-[marquee_30s_linear_infinite] will-change-transform">
+    {Array(8).fill("★ KEYWORDS ● KEYWORDS ●").map((t, i) => <span key={i}>{t}</span>)}
+  </div>
+</div>
+```
+```css
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+```
+
+- **アクセシビリティ**: 装飾用途のため `aria-hidden="true"`。`prefers-reduced-motion` で `animation: none` に切替（静止表示で意味は保たれる）。3Hz以上の点滅を含めない
+
+### 6.2 シンキング・キャレット (`thinking-caret`)
+
+- **演出**: 文末や入力欄にブリンクするテキストカーソルが出現し続ける
+- **活用例**: AI/チャット系コンポーネント、ライブ更新表示、「処理中…」の意思表示
+- **言語化**: コンソール風のカーソル `▍` を `steps(1)` で点滅させ、現在進行形の状態を示唆する
+- **推奨実装**: `animation: blink 1s steps(1) infinite`、`steps(1)` がフェードでなくパチパチした古典的点滅を作る要点
+- **パラメータ目安**: 周期 1s / `steps(1)` / 高さ `1em` / 幅 `0.5em`（または `2px`）
+
+```tsx
+<span aria-hidden
+  className="ml-1 inline-block w-[0.5em] h-[1em] bg-current align-middle"
+  style={{ animation: "blink 1s steps(1) infinite" }} />
+```
+```css
+@keyframes blink { 50% { opacity: 0; } }
+```
+
+- **アクセシビリティ**: 装飾なので `aria-hidden`。状態を伝える場合は別途 `aria-live="polite"` で文言を出す。reduced-motion では非表示 or 静止表示
+
+### 6.3 スクロール・プログレス・バー (`scroll-progress-bar`)
+
+- **演出**: ページ最上部に固定された 2px の細線が、スクロール進行度に応じて左から伸びる
+- **活用例**: 長尺コーポレートサイト・記事ページ・コンテンツマガジンの進捗インジケータ
+- **言語化**: ブランドオレンジ等のアクセント線が `scaleX: 0 → 1` で滑らかに伸び、現在地を視覚化する
+- **推奨実装**: `position: fixed; top: 0; height: 2px; transform-origin: left;` を `scaleX(progress)` で更新。`useScroll` + `useTransform` か手書きの scroll listener
+- **パラメータ目安**: 高さ 2px / 色 ブランドアクセント / `transform: scaleX(0→1)` / transition なし（毎フレーム更新）
+
+```tsx
+const { scrollYProgress } = useScroll();
+return <motion.div aria-hidden
+  className="fixed left-0 top-0 z-50 h-[2px] w-full origin-left bg-brand"
+  style={{ scaleX: scrollYProgress }} />;
+```
+
+- **アクセシビリティ**: 装飾用途のため `aria-hidden`。色のみでなく位置でも進捗が伝わる（バーの長さ）ためコントラストは AA を満たせば十分。reduced-motion でも有効でよい（情報伝達であり、装飾ではない）
+
+---
+
 ## 改訂履歴
 
 | 日付 | 改訂内容 | 担当 |
 |------|---------|------|
 | 2026-04-24 | 初版作成（30モーション収録） | Claude Code |
+| 2026-05-15 | 和文B2B/コーポレート系 3 motion_key 追加（`marquee-keywords` / `thinking-caret` / `scroll-progress-bar`）。`design-md/feer/DESIGN.md` を和文B2Bデフォルト基準として登録 | Claude Code |

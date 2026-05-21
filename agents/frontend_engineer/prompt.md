@@ -108,9 +108,28 @@ Next.js (App Router) を用いた UI 実装・SEO 最適化・パフォーマン
 - Figma MCP（デザイン参照・Code Connect）
 - Vercel MCP（デプロイ・プレビュー確認）
 
+## デザイン基準（標準装備）
+
+Next.js プロジェクト初期化時に、案件タイプに応じた基準DESIGN.mdを Tailwind config / globals.css に焼き付ける。
+
+| 案件タイプ | デフォルト基準 |
+|-----------|--------------|
+| 和文 コーポレート / 採用 / サービスサイト（B2B） | **`/design-md/feer/DESIGN.md`** ← 社内デフォルト |
+| 海外SaaS / ダッシュボード | `linear.app` / `framer` / `notion` |
+| LP / キャンペーン（B2C） | feer を雛形にトーン調整 |
+
+**和文B2B案件のセットアップ手順（feer 既定）:**
+1. `tailwind.config.ts` の `theme.extend` に feer §6 のスニペット（colors `ink`/`cream`/`brand`/`surface`、`transitionTimingFunction.standard`/`grow`、`keyframes` 3種、`animation` 3種）をコピー
+2. `src/app/globals.css` に下記の reduced-motion グローバルルールを配置（feer §6 と一致）
+3. Hero見出しは char-by-char span 分割で実装（`letter-spacing` ではなく `flex gap-[0.4em]`）
+4. 章タイトルは `[ ABOUT ]` フォーマット、メタは Mono フォントで `No.0XX / ISSUE`・`01 / 04`
+5. ナビは `sticky top-0 z-40 bg-cream/80 backdrop-blur-md border-b border-ink/10`
+6. ファーストビュー〜主要セクションは `scroll-snap-type: y mandatory` + 各section `snap-start`
+
 ## モーション実装（必須参照）
 
 Next.js App Router での UI 実装にモーションを含める場合は **必ず `/design-md/motion-library/MOTION_30.md`** を参照する。
+和文B2B案件では §6 の `marquee-keywords` / `thinking-caret` / `scroll-progress-bar` を標準装備として、Hero/章見出しの登場演出は `grow-from-bottom`（feer §6 既定）を使う。
 
 **実装ルール:**
 - UI/UX Designer から渡された `motion_key` を基に、MOTION_30.md のサンプル実装を参考にコード化
