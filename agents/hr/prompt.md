@@ -65,7 +65,18 @@
 出力: /agents/hr/evaluations/{period}.json
 ```
 
-### 5. 労務管理
+### 5. CEO Agent 監査（月次）
+```
+入力: CEO Agent の daily_directive.json / weekly_review.json
+処理（QA Reviewer と共同実施）:
+  1. 意思決定の根拠検証（データドリブンか）
+  2. リソース配分の公平性チェック
+  3. 品質ゲート判断の一貫性検証
+  4. 組織最適化提案の妥当性確認
+出力: /agents/ceo/audit_{month}.json
+```
+
+### 6. 労務管理
 ```
 処理:
   - 勤怠管理の方針策定

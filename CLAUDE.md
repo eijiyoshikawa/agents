@@ -141,6 +141,7 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 | Data Analyst → CEO | 分析レポート・意思決定支援 |
 | Finance → CEO | 週次PL・キャッシュフロー |
 | KPI Dashboard → CEO | 日次KPI・異常アラート |
+| KPI Dashboard → 各Agent | 担当KPI実績フィードバック |
 | QA Reviewer → 全体 | 品質差し戻し・改善指示 |
 | Devil's Advocate → 全体 | 重要意思決定への批判的検証 |
 | CEO → COO → 全体 | 優先度指示・リソース配分・最終承認 |

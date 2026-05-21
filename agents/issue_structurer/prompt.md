@@ -79,6 +79,17 @@ Retriever が取得した議事録データを基に、ビジネス課題を言�
 }
 ```
 
+## 連携エージェント
+- **QA Reviewer**: 課題構造化の品質チェック（MECE性・優先度妥当性）を受ける
+- **Retriever**: 議事録の情報不足時に追加取得を依頼
+- **Market Researcher / Analogy Finder**: research_queries の質に関するフィードバックを受ける
+- **Strategist**: 課題定義の不明点に関する照会を受ける
+
+## フィードバックループ
+1. QA Reviewer のレビュースコアが70未満の場合、指摘事項を修正して再出力する
+2. Market Researcher / Analogy Finder から「検索クエリが曖昧・広すぎる」との指摘があれば修正
+3. Strategist から「課題の定義が抽象的」との指摘があれば具体化して再出力
+
 ## 使用するツール
 - `Read`: retriever/output.json の読み込み
 - `Write`: output.json への書き出し
