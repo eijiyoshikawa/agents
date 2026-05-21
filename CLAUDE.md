@@ -2,7 +2,7 @@
 
 ## プロジェクト概要
 法人経営を0から100まで遂行可能なAIエージェント組織。
-CEO Agentを頂点とし、COO Agentが業務執行を統括する35体のエージェント（+ Web Builder サブエージェント8体）が、相互に検証（チェック&バランス）しながら経営全機能をカバーする。
+CEO Agentを頂点とし、COO Agentが業務執行を統括する38体のエージェント（+ Web Builder サブエージェント8体）が、相互に検証（チェック&バランス）しながら経営全機能をカバーする。
 企画・戦略立案から実際のプロダクト開発・サービス化まで一気通貫で実行可能。
 Claude Code の Maxプラン内で動作し、追加API費用なし。
 開発部門（8体）を擁し、プロダクト開発も組織内で完結可能。
@@ -24,20 +24,20 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 │ 営業部門 ││ 管理部門  │ │コンサル事業部│ │ 開発部門   ││ 横断チーム   │
 └────┬────┘└────┬─────┘ └──────┬──────┘ └──────┬────┘└────┬────────┘
      │          │              │               │          │
-  Sales      Finance     Retriever        Tech Lead    QA Reviewer
-  Marketing  HR          Issue Str.       Frontend E.  KPI Dashboard
-  CS         Legal       Market Res.      Backend E.   Project Manager
-  SNS Op.                Analogy F.       Infrastructure Data Analyst
-  Ad Ops.                Marketing An.    QA Engineer   Devil's Advocate
-  Content C.             Strategist       UI/UX Designer
-  PR                     Devil's Adv.     Data Engineer
-                         Report B.        Designer
-                         Document B.      Engineer
-                                          Web Builder
-                                            └─ 8 sub-agents
+  Sales      Finance         Retriever        Tech Lead    QA Reviewer
+  Marketing  HR              Issue Str.       Frontend E.  KPI Dashboard
+  CS         Legal           Market Res.      Backend E.   Project Manager
+  SNS Op.    Subsidy Scout   Analogy F.       Infrastructure Data Analyst
+  Ad Ops.    Subsidy Strat.  Marketing An.    QA Engineer   Devil's Advocate
+  Content C. Subsidy Writer  Strategist       UI/UX Designer
+  PR                         Devil's Adv.     Data Engineer
+                             Report B.        Designer
+                             Document B.      Engineer
+                                              Web Builder
+                                                └─ 8 sub-agents
 ```
 
-## エージェント構成（全35体 + サブ8体 = 43名 / 上限50名）
+## エージェント構成（全38体 + サブ8体 = 46名 / 上限50名）
 各エージェントのプロンプトは `/agents/<agent_name>/prompt.md` に定義。
 出力は `/agents/<agent_name>/output.json` に保存される。
 
@@ -65,22 +65,25 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 17. **Content Creator** (`content_creator`) — SNS投稿・ブログ・動画脚本・広告コピー制作
 18. **PR Agent** (`pr`) — 広報・プレスリリース・メディア対応・危機管理広報
 
-### 管理部門（3名）
-19. **Finance Agent** (`finance`) — 経理・財務・見積・請求・PL管理・補助金
+### 管理部門（6名）
+19. **Finance Agent** (`finance`) — 経理・財務・見積・請求・PL管理・補助金実質コスト
 20. **HR Agent** (`hr`) — 組織設計・採用・評価・エージェント組織管理
-21. **Legal Agent** (`legal`) — 契約書・コンプライアンス・知財・リスク法務
+21. **Legal Agent** (`legal`) — 契約書・コンプライアンス・知財・リスク法務・補助金法務支援
+22. **Subsidy Scout** (`subsidy_scout`) — 公募要項監視・要件抽出・採択事例蓄積
+23. **Subsidy Strategist** (`subsidy_strategist`) — 適格性判定・戦略選定・法務/財務/執筆への司令塔
+24. **Subsidy Writer** (`subsidy_writer`) — 様式準拠の申請書作成・電子申請フィールドマッピング
 
 ### 開発部門（10名 + サブ8名）
-22. **Tech Lead** (`tech_lead`) — CTO的技術統括・アーキテクチャ設計・技術選定
-23. **Frontend Engineer** (`frontend_engineer`) — Next.js App Router UI実装・SEO最適化
-24. **Backend Engineer** (`backend_engineer`) — API設計・DB・認証・Stripe決済連携
-25. **Infrastructure** (`infrastructure`) — デプロイ・CI/CD・監視・セキュリティ・コスト管理
-26. **QA Engineer** (`qa_engineer`) — テスト自動化・品質保証（Jest/Playwright）
-27. **UI/UX Designer** (`ui_ux_designer`) — デザインシステム構築・Figma連携・ユーザビリティ改善
-28. **Data Engineer** (`data_engineer`) — クローラー・データパイプライン・データ品質管理
-29. **Designer** (`designer`) — Web/LP/UIデザイン生成（AI Designer MCP活用）
-30. **Engineer** (`engineer`) — LP/Web/AIシステム実装（Next.js/Python/WordPress）
-31. **Web Builder** (`web_builder`) — 参考サイト分析→Next.js再現パイプライン
+25. **Tech Lead** (`tech_lead`) — CTO的技術統括・アーキテクチャ設計・技術選定
+26. **Frontend Engineer** (`frontend_engineer`) — Next.js App Router UI実装・SEO最適化
+27. **Backend Engineer** (`backend_engineer`) — API設計・DB・認証・Stripe決済連携
+28. **Infrastructure** (`infrastructure`) — デプロイ・CI/CD・監視・セキュリティ・コスト管理
+29. **QA Engineer** (`qa_engineer`) — テスト自動化・品質保証（Jest/Playwright）
+30. **UI/UX Designer** (`ui_ux_designer`) — デザインシステム構築・Figma連携・ユーザビリティ改善
+31. **Data Engineer** (`data_engineer`) — クローラー・データパイプライン・データ品質管理
+32. **Designer** (`designer`) — Web/LP/UIデザイン生成（AI Designer MCP活用）
+33. **Engineer** (`engineer`) — LP/Web/AIシステム実装（Next.js/Python/WordPress）
+34. **Web Builder** (`web_builder`) — 参考サイト分析→Next.js再現パイプライン
     - `site_scanner` — サイト偵察・技術検出
     - `structure_analyzer` — HTML構造・レイアウトパターン解析
     - `design_analyzer` — カラー・タイポグラフィ・スペーシング抽出
@@ -91,10 +94,10 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
     - `qa_reviewer` — Vercelデプロイ後の比較検証・修正指示
 
 ### 横断チーム（4名）
-32. **Project Manager Agent** (`project_manager`) — プロジェクト進捗・リソース配分・納期管理
-33. **QA Reviewer Agent** (`qa_reviewer`) — 全出力の品質検証・相互整合性チェック（Quality Assurance機能統合済み）
-34. **KPI Dashboard Agent** (`kpi_dashboard`) — 全社KPI集計・異常検知・レポーティング
-35. **Data Analyst** (`data_analyst`) — 横断データ分析・インサイト抽出・意思決定支援
+35. **Project Manager Agent** (`project_manager`) — プロジェクト進捗・リソース配分・納期管理
+36. **QA Reviewer Agent** (`qa_reviewer`) — 全出力の品質検証・相互整合性チェック（Quality Assurance機能統合済み）
+37. **KPI Dashboard Agent** (`kpi_dashboard`) — 全社KPI集計・異常検知・レポーティング
+38. **Data Analyst** (`data_analyst`) — 横断データ分析・インサイト抽出・意思決定支援
 
 ### 廃止済み
 - ~~Quality Assurance (`quality_assurance`)~~ — 2026-04-08 QA Reviewer に統合
@@ -115,7 +118,7 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 
 全エージェントはQA Reviewerによる品質チェックを受ける。
 さらに各エージェントは最低3体以上の他エージェントからの検証を受ける（`prompt.md` 内の「相互干渉」セクション参照）。
-平均干渉数は4.3体/エージェント（2026-04-09時点）。
+平均干渉数は約4.35体/エージェント（2026-04-17時点、Subsidy 3体追加後の再計算値）。
 
 ### CEO/COO の役割分担
 - **CEO**: 経営戦略・最終意思決定・投資判断・対外コミュニケーション
@@ -153,14 +156,36 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 | Data Analyst → CEO | 分析レポート・意思決定支援 |
 | Finance → CEO | 週次PL・キャッシュフロー |
 | KPI Dashboard → CEO | 日次KPI・異常アラート |
+| Copywriter → Ad Operations | 広告コピー納品・A/Bテスト |
+| Copywriter → Designer | LP・バナーのビジュアル連携 |
+| PR → Marketing | ブランド戦略・キャンペーンPR連携 |
+| PR → Legal | プレスリリース法務チェック |
+| CRM → Sales | リードスコアリング・パイプラインデータ提供 |
+| CRM → CS | 顧客ヘルススコア・チャーンリスク共有 |
+| CRM → Marketing | セグメントデータ・キャンペーン対象リスト |
+| Chatbot → CS | FAQ対応・エスカレーション・VoC共有 |
+| Chatbot → Sales | 商談リードの引き渡し |
+| Compliance → Content Creator | コンテンツ法令チェック・修正指示 |
+| Compliance → Ad Operations | 広告出稿前の法令チェック |
+| Compliance → Legal | 法的判断の確認・規制適合チェック |
+| Analytics → Marketing | チャネル戦略・予算配分提案 |
+| Analytics → SEO/AIEO | 検索パフォーマンスデータ連携 |
+| Analytics → KPI Dashboard | 全社KPIへのデータ供給 |
 | QA Reviewer → 全体 | 品質差し戻し・改善指示 |
 | Devil's Advocate → 全体 | 重要意思決定への批判的検証 |
 | CEO → COO → 全体 | 優先度指示・リソース配分・最終承認 |
+| Subsidy Scout → Subsidy Strategist | 公募要件・採択事例の供給 |
+| Subsidy Strategist ↔ Legal / Finance | 法務レビュー依頼 ↔ 実質コスト算出 |
+| Subsidy Strategist → Subsidy Writer | 執筆ブリーフ発行 |
+| Subsidy Writer → Legal / Devil's Advocate | 最終ドラフトの法的サインオフ・審査員視点レビュー |
 
 ## エージェント定義
 各エージェントのプロンプトは `/agents/<agent_name>/prompt.md` に定義。
 出力は `/agents/<agent_name>/output.json` に保存される。
 各エージェントのプロンプトには「相互干渉（検証を受ける相手）」セクションが含まれ、チェック&バランスが明文化されている。
+
+### データ収集
+7. **Web Scraper** — 会員サイト自動ログイン・情報収集・Notion格納
 
 ## 実行方法
 
@@ -169,6 +194,13 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 /agents/orchestrator/PIPELINE.md の手順に従って、
 Notion の議事録ページ「会議名」からパイプラインを実行してください。
 ```
+
+### 補助金申請パイプライン
+```
+/agents/orchestrator/SUBSIDY_PIPELINE.md の手順に従って、
+対象補助金（例: IT導入補助金2026 通常枠）の申請準備を進めてください。
+```
+Subsidy Scout → Strategist → Devil's Advocate → Legal / Finance / Writer 並列 → Writer 最終整形 → CEO 承認までを一気通貫で実行する。
 
 ### ワンショット実行（コピペ用プロンプト）
 `/agents/orchestrator/run.md` にコピペ用プロンプトを用意。
@@ -181,7 +213,7 @@ CEO Agentが各エージェントの業務状況、組織診断、改善計画�
 ### 他の人と共有する場合
 1. このリポジトリを `git clone` する
 2. Claude Code（Max プラン）を開く
-3. MCP サーバーを設定する（Notion / Google Drive）
+3. MCP サーバーを設定する（Notion / Google Drive / Playwright）
 4. 上記いずれかの方法で実行
 
 ## 共有リソース
@@ -402,6 +434,7 @@ bash scripts/context-budget.sh --json    # JSON出力
 | 技術選定の記録 | `/agents/tech_lead/tech_decisions.json` | Tech Lead |
 | KPIトレンド | `/agents/kpi_dashboard/output.json` | KPI Dashboard |
 | バグパターン | `/agents/qa_engineer/output.json` | QA Engineer |
+| 補助金採択パターン | `/learnings/instincts/subsidy_*.json` | Subsidy Strategist |
 | **学習済みパターン** | `/learnings/instincts/` | **COO** |
 | **セッション学習ログ** | `/learnings/sessions/` | **各セッション実行者** |
 
@@ -434,10 +467,13 @@ ECC の Continuous Learning v2 を参考にした、セッション間のパタ�
 
 小規模な修正（バグ修正・コピー変更・設定変更）はこのプロセスを省略可。
 
-## 組織拡張の予備枠（残り7名）
+## 組織拡張の予備枠（残り4名）
 | 候補 | 理由 | 優先度 |
 |------|------|--------|
 | Security Reviewer | 全開発成果物のセキュリティ専門レビュー・脆弱性スキャン・OWASP準拠検証 | **高** |
 | Knowledge Manager | エージェント間ナレッジ蓄積・ベストプラクティス共有・継続学習 | 中 |
 | BizDev Agent（事業開発） | 新規事業探索・パートナーシップ・M&A | 中 |
-| 予備枠 x4 | 事業拡大時の追加枠（海外展開、新規事業等） | - |
+| 予備枠 x1 | 事業拡大時の追加枠（海外展開、新規事業等） | - |
+
+### 採用済み（2026-04-17）
+- Subsidy Scout / Subsidy Strategist / Subsidy Writer — 日本国内の補助金・助成金申請を一気通貫で担当

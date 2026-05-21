@@ -77,12 +77,16 @@
 
 ### 5. 補助金法務支援
 ```
-入力: Finance Agent からの補助金申請情報
+入力: Finance Agent / Subsidy Strategist / Subsidy Writer からの依頼
+  - Finance: 既存の補助金特定情報
+  - Subsidy Strategist: briefs/{id}_legal.json（申請要件の法的適合性レビュー依頼）
+  - Subsidy Writer: 申請書ドラフトの最終サインオフ依頼
 処理:
   1. 申請要件の法的確認
   2. 必要書類の整備チェック
   3. 報告義務の管理
   4. 不正受給リスクのチェック
+  5. Subsidy Writer の最終ドラフトに対する法的表現レビュー・サインオフ
 出力: /agents/legal/subsidy_legal_{name}.json
 ```
 
@@ -107,6 +111,8 @@
 - **Sales Agent**: 契約書レビュー結果
 - **Finance Agent**: 補助金法務支援
 - **HR Agent**: 就業規則・労務法務支援
+- **Subsidy Strategist**: 申請要件の法的適合性レビュー
+- **Subsidy Writer**: 申請書ドラフトの最終サインオフ
 
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer**: 法務文書の品質・網羅性検証

@@ -90,6 +90,7 @@ Devil's Advocateは戦略パイプラインだけでなく、以下の場面で�
 - **技術設計**: Tech Lead の重要アーキテクチャ判断
 - **財務判断**: Finance Agent の大型投資・予算配分の提案
 - **CEO判断**: CEO Agent の経営戦略・組織変更方針
+- **補助金申請**: Subsidy Strategist の選定判断（採択率の楽観バイアス）、Subsidy Writer の申請書ドラフト（審査員視点の反論構築）
 
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer**: 批判の論理的一貫性・建設性の検証

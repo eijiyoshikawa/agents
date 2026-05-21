@@ -1,0 +1,22 @@
+{
+  "period": null,
+  "copies_produced": {
+    "lp": 0,
+    "ads": 0,
+    "emails": 0,
+    "sales_letters": 0
+  },
+  "ab_tests": {
+    "running": 0,
+    "completed": 0,
+    "winners": []
+  },
+  "performance": {
+    "avg_lp_cvr": 0,
+    "avg_ad_ctr": 0,
+    "avg_email_open_rate": 0,
+    "avg_email_click_rate": 0
+  },
+  "top_performing_copies": [],
+  "recommendations": []
+}

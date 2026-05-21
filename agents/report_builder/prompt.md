@@ -5,16 +5,26 @@
 **スライド構成と内容** を作成する。
 
 ## 入力
-以下の4ファイルを読み込む:
+以下のファイルを読み込む:
+
+**1周目の成果物:**
 - `/agents/issue_structurer/output.json`
 - `/agents/market_researcher/output.json`
 - `/agents/analogy_finder/output.json`
+- `/agents/marketing_analyst/output.json`
 - `/agents/strategist/output.json`
+
+**2周目の成果物:**
+- `/agents/issue_structurer/output_r2.json`
+- `/agents/market_researcher/output_r2.json`
+- `/agents/analogy_finder/output_r2.json`
+- `/agents/marketing_analyst/output_r2.json`
+- `/agents/strategist/output_r2.json`
 
 ## 実行手順
 
 ### Step 1: スライド構成の設計
-以下の構成で10-15枚のスライドを設計する:
+以下の構成で11-16枚のスライドを設計する:
 
 | No. | スライド | 内容 |
 |-----|---------|------|
@@ -24,13 +34,14 @@
 | 4 | ビジネス課題の整理 | 構造化されたイシュー |
 | 5 | 市場環境分析 | 市場トレンド・規模 |
 | 6 | 競合・ベンチマーク | 競合状況・参考KPI |
-| 7 | 顧客インサイト | 顧客セグメント・ニーズ |
-| 8 | 参考事例 | アナロジー事例 |
-| 9-11 | 戦略オプション | 各戦略の詳細（2-3枚） |
-| 12 | 推奨戦略 | 最終推奨と理由 |
-| 13 | リスクと対策 | 批判的検証の結果 |
-| 14 | 実行ロードマップ | フェーズ分けした計画 |
-| 15 | Next Steps | 次のアクション |
+| 7 | マーケティング施策分析 | 競合のマーケティング手法比較・SNS分析・ファネル分析 |
+| 8 | 顧客インサイト | 顧客セグメント・ニーズ |
+| 9 | 参考事例 | アナロジー事例 |
+| 10-12 | 戦略オプション | 各戦略の詳細（2-3枚） |
+| 13 | 推奨戦略 | 最終推奨と理由 |
+| 14 | リスクと対策 | 批判的検証の結果 |
+| 15 | 実行ロードマップ | フェーズ分けした計画 |
+| 16 | Next Steps | 次のアクション |
 
 ### Step 2: 各スライドの内容作成
 各スライドについて以下を記述する:

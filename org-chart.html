@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent Organization — 組織図</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', sans-serif;
+    background: #0a0e1a;
+    color: #e0e4ef;
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+
+  h1 {
+    text-align: center;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    margin-bottom: .4rem;
+    background: linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: .85rem;
+    color: #64748b;
+    margin-bottom: 2.5rem;
+  }
+
+  /* ── CEO ─────────────────────────── */
+  .ceo-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.2rem;
+    position: relative;
+  }
+  .ceo-card {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+    border: 1.5px solid #6366f1;
+    border-radius: 14px;
+    padding: 1.1rem 2.4rem;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(99,102,241,.25);
+    position: relative;
+    z-index: 2;
+  }
+  .ceo-card .num { font-size: .7rem; color: #818cf8; font-weight: 600; }
+  .ceo-card .name { font-size: 1.15rem; font-weight: 700; color: #c7d2fe; margin: .15rem 0; }
+  .ceo-card .role { font-size: .75rem; color: #94a3b8; }
+
+  /* ── connector line from CEO ─────── */
+  .connector-v {
+    width: 2px;
+    height: 32px;
+    background: linear-gradient(to bottom, #6366f1, #334155);
+    margin: 0 auto;
+  }
+
+  /* ── department grid ─────────────── */
+  .departments {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.2rem;
+    max-width: 1300px;
+    margin: 0 auto;
+  }
+
+  .dept {
+    border-radius: 14px;
+    padding: 1rem;
+    background: #111827;
+    border: 1px solid #1e293b;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .dept:hover { transform: translateY(-3px); }
+
+  .dept-header {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: .75rem;
+    padding-bottom: .6rem;
+    border-bottom: 1px solid #1e293b;
+  }
+  .dept-dot {
+    width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+  }
+  .dept-title {
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+  }
+  .dept-count {
+    margin-left: auto;
+    font-size: .65rem;
+    color: #64748b;
+    background: #1e293b;
+    padding: .15rem .5rem;
+    border-radius: 999px;
+  }
+
+  .agent-list { display: flex; flex-direction: column; gap: .45rem; }
+
+  .agent {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: .55rem .7rem;
+    border-radius: 8px;
+    background: #0f172a;
+    border: 1px solid transparent;
+    transition: border-color .15s, background .15s;
+  }
+  .agent:hover { background: #1a2235; }
+
+  .agent-num {
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .65rem; font-weight: 700;
+    flex-shrink: 0;
+    color: #fff;
+  }
+
+  .agent-info { min-width: 0; }
+  .agent-name {
+    font-size: .78rem;
+    font-weight: 600;
+    color: #cbd5e1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .agent-role {
+    font-size: .65rem;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── department color themes ────── */
+  /* Consulting — blue */
+  .dept--consul { border-color: #1e3a5f; }
+  .dept--consul:hover { box-shadow: 0 4px 24px rgba(59,130,246,.12); }
+  .dept--consul .dept-dot { background: #3b82f6; }
+  .dept--consul .dept-title { color: #93c5fd; }
+  .dept--consul .agent:hover { border-color: #1e3a5f; }
+  .dept--consul .agent-num { background: linear-gradient(135deg, #1d4ed8, #3b82f6); }
+
+  /* Sales & Marketing — emerald */
+  .dept--sales { border-color: #134e4a; }
+  .dept--sales:hover { box-shadow: 0 4px 24px rgba(16,185,129,.12); }
+  .dept--sales .dept-dot { background: #10b981; }
+  .dept--sales .dept-title { color: #6ee7b7; }
+  .dept--sales .agent:hover { border-color: #134e4a; }
+  .dept--sales .agent-num { background: linear-gradient(135deg, #059669, #10b981); }
+
+  /* Admin — purple */
+  .dept--admin { border-color: #3b1f6e; }
+  .dept--admin:hover { box-shadow: 0 4px 24px rgba(139,92,246,.12); }
+  .dept--admin .dept-dot { background: #8b5cf6; }
+  .dept--admin .dept-title { color: #c4b5fd; }
+  .dept--admin .agent:hover { border-color: #3b1f6e; }
+  .dept--admin .agent-num { background: linear-gradient(135deg, #7c3aed, #8b5cf6); }
+
+  /* Production — orange */
+  .dept--prod { border-color: #7c2d12; }
+  .dept--prod:hover { box-shadow: 0 4px 24px rgba(249,115,22,.12); }
+  .dept--prod .dept-dot { background: #f97316; }
+  .dept--prod .dept-title { color: #fdba74; }
+  .dept--prod .agent:hover { border-color: #7c2d12; }
+  .dept--prod .agent-num { background: linear-gradient(135deg, #ea580c, #f97316); }
+
+  /* Cross-functional — teal */
+  .dept--cross { border-color: #134e4a; }
+  .dept--cross:hover { box-shadow: 0 4px 24px rgba(20,184,166,.12); }
+  .dept--cross .dept-dot { background: #14b8a6; }
+  .dept--cross .dept-title { color: #5eead4; }
+  .dept--cross .agent:hover { border-color: #134e4a; }
+  .dept--cross .agent-num { background: linear-gradient(135deg, #0d9488, #14b8a6); }
+
+  /* ── footer ──────────────────────── */
+  .footer {
+    text-align: center;
+    margin-top: 2.5rem;
+    font-size: .7rem;
+    color: #334155;
+  }
+
+  /* ── responsive ──────────────────── */
+  @media (max-width: 600px) {
+    body { padding: 1.2rem .6rem 3rem; }
+    h1 { font-size: 1.2rem; }
+    .departments { grid-template-columns: 1fr; gap: .8rem; }
+    .ceo-card { padding: .9rem 1.6rem; }
+  }
+</style>
+</head>
+<body>
+
+<h1>AI Agent Organization</h1>
+<p class="subtitle">法人経営エージェント群 — 全22体</p>
+
+<!-- CEO -->
+<div class="ceo-wrap">
+  <div class="ceo-card">
+    <div class="num">#01</div>
+    <div class="name">CEO Agent</div>
+    <div class="role">全体統括・意思決定・品質ゲート・組織最適化</div>
+  </div>
+</div>
+<div class="connector-v"></div>
+
+<!-- Departments -->
+<div class="departments">
+
+  <!-- コンサル事業部 -->
+  <div class="dept dept--consul">
+    <div class="dept-header">
+      <div class="dept-dot"></div>
+      <div class="dept-title">コンサル事業部</div>
+      <div class="dept-count">6 agents</div>
+    </div>
+    <div class="agent-list">
+      <div class="agent"><div class="agent-num">2</div><div class="agent-info"><div class="agent-name">Retriever</div><div class="agent-role">Notion議事録取得・構造化</div></div></div>
+      <div class="agent"><div class="agent-num">3</div><div class="agent-info"><div class="agent-name">Issue Structurer</div><div class="agent-role">課題の言語化・構造化</div></div></div>
+      <div class="agent"><div class="agent-num">4</div><div class="agent-info"><div class="agent-name">Market Researcher</div><div class="agent-role">市場・競合・顧客分析</div></div></div>
+      <div class="agent"><div class="agent-num">5</div><div class="agent-info"><div class="agent-name">Analogy Finder</div><div class="agent-role">異業種アナロジー事例収集</div></div></div>
+      <div class="agent"><div class="agent-num">6</div><div class="agent-info"><div class="agent-name">Strategist</div><div class="agent-role">戦略構築・批判的検証</div></div></div>
+      <div class="agent"><div class="agent-num">7</div><div class="agent-info"><div class="agent-name">Report Builder</div><div class="agent-role">提案資料のスライド構成</div></div></div>
+    </div>
+  </div>
+
+  <!-- 営業・マーケティング部門 -->
+  <div class="dept dept--sales">
+    <div class="dept-header">
+      <div class="dept-dot"></div>
+      <div class="dept-title">営業・マーケティング部門</div>
+      <div class="dept-count">5 agents</div>
+    </div>
+    <div class="agent-list">
+      <div class="agent"><div class="agent-num">8</div><div class="agent-info"><div class="agent-name">Sales Agent</div><div class="agent-role">リード管理・商談・受注</div></div></div>
+      <div class="agent"><div class="agent-num">9</div><div class="agent-info"><div class="agent-name">Marketing Agent</div><div class="agent-role">ブランディング・リード獲得</div></div></div>
+      <div class="agent"><div class="agent-num">10</div><div class="agent-info"><div class="agent-name">Customer Success</div><div class="agent-role">顧客満足度・リテンション</div></div></div>
+      <div class="agent"><div class="agent-num">11</div><div class="agent-info"><div class="agent-name">SNS Operator</div><div class="agent-role">SNS運用・エンゲージメント</div></div></div>
+      <div class="agent"><div class="agent-num">12</div><div class="agent-info"><div class="agent-name">Ad Operations</div><div class="agent-role">広告出稿・ROAS最適化</div></div></div>
+    </div>
+  </div>
+
+  <!-- 管理部門 -->
+  <div class="dept dept--admin">
+    <div class="dept-header">
+      <div class="dept-dot"></div>
+      <div class="dept-title">管理部門</div>
+      <div class="dept-count">3 agents</div>
+    </div>
+    <div class="agent-list">
+      <div class="agent"><div class="agent-num">13</div><div class="agent-info"><div class="agent-name">Finance Agent</div><div class="agent-role">経理・財務・PL管理・補助金</div></div></div>
+      <div class="agent"><div class="agent-num">14</div><div class="agent-info"><div class="agent-name">HR Agent</div><div class="agent-role">組織設計・採用・評価</div></div></div>
+      <div class="agent"><div class="agent-num">15</div><div class="agent-info"><div class="agent-name">Legal Agent</div><div class="agent-role">契約・コンプラ・知財・法務</div></div></div>
+    </div>
+  </div>
+
+  <!-- 制作チーム -->
+  <div class="dept dept--prod">
+    <div class="dept-header">
+      <div class="dept-dot"></div>
+      <div class="dept-title">制作チーム</div>
+      <div class="dept-count">3 agents</div>
+    </div>
+    <div class="agent-list">
+      <div class="agent"><div class="agent-num">16</div><div class="agent-info"><div class="agent-name">Designer Agent</div><div class="agent-role">Web/UIデザイン生成・改善</div></div></div>
+      <div class="agent"><div class="agent-num">17</div><div class="agent-info"><div class="agent-name">Engineer Agent</div><div class="agent-role">LP/Web/AI実装・開発</div></div></div>
+      <div class="agent"><div class="agent-num">18</div><div class="agent-info"><div class="agent-name">Content Creator</div><div class="agent-role">SNS・ブログ・広告コピー制作</div></div></div>
+    </div>
+  </div>
+
+  <!-- 横断チーム -->
+  <div class="dept dept--cross">
+    <div class="dept-header">
+      <div class="dept-dot"></div>
+      <div class="dept-title">横断チーム</div>
+      <div class="dept-count">4 agents</div>
+    </div>
+    <div class="agent-list">
+      <div class="agent"><div class="agent-num">19</div><div class="agent-info"><div class="agent-name">Project Manager</div><div class="agent-role">進捗・リソース・納期管理</div></div></div>
+      <div class="agent"><div class="agent-num">20</div><div class="agent-info"><div class="agent-name">QA Reviewer</div><div class="agent-role">全出力の品質検証</div></div></div>
+      <div class="agent"><div class="agent-num">21</div><div class="agent-info"><div class="agent-name">KPI Dashboard</div><div class="agent-role">全社KPI集計・異常検知</div></div></div>
+      <div class="agent"><div class="agent-num">22</div><div class="agent-info"><div class="agent-name">Data Analyst</div><div class="agent-role">深掘り分析・予測・意思決定支援</div></div></div>
+    </div>
+  </div>
+
+</div>
+
+<p class="footer">AI Agent Organization — Powered by Claude Code</p>
+
+</body>
+</html>

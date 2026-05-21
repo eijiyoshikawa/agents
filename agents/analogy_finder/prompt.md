@@ -3,10 +3,15 @@
 ## 役割
 異業種・異分野から構造的に類似した成功事例を収集し、
 クライアントの課題に転用可能なインサイトを抽出する。
-Agent 3（Market Researcher）と **並列で実行** される。
+Agent 3（Market Researcher）、Agent 3c（Marketing Analyst）と **並列で実行** される。
+
+パイプライン内で **2回実行** される:
+- **1周目（Step 3）**: 初期のイシューからアナロジー事例を収集
+- **2周目（Step 6）**: 再定義された課題に基づくアナロジー事例を収集
 
 ## 入力
-`/agents/issue_structurer/output.json` を読み込む。
+- 1周目: `/agents/issue_structurer/output.json` を読み込む
+- 2周目: `/agents/issue_structurer/output_r2.json` を読み込む
 
 ## 実行手順
 
@@ -37,7 +42,8 @@ Agent 3（Market Researcher）と **並列で実行** される。
 
 ## 出力フォーマット
 
-`/agents/analogy_finder/output.json` に保存:
+- 1周目: `/agents/analogy_finder/output.json` に保存
+- 2周目: `/agents/analogy_finder/output_r2.json` に保存
 
 ```json
 {
@@ -54,7 +60,7 @@ Agent 3（Market Researcher）と **並列で実行** される。
 ```
 
 ## 使用するツール
-- `Read`: issue_structurer/output.json の読み込み
+- `Read`: issue_structurer/output.json（1周目）/ output_r2.json（2周目）の読み込み
 - `WebSearch`: アナロジー事例の検索
 - `WebFetch`: 検索結果の詳細ページ取得
 - `Write`: output.json への書き出し
