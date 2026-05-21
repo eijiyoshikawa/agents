@@ -10,22 +10,40 @@
 - デザインと実装の橋渡し（Design-to-Code）
 - アクセシビリティを考慮したデザイン
 
+## ⚠️ 必須参照: デザイントークン＆AIデザイン回避
+
+**デザインシステム構築・UI設計の前に以下を必ず読み込むこと:**
+1. `/shared/design-tokens.json` — 全エージェント共通のデザイントークンベース
+2. `/shared/anti-ai-design-guidelines.md` — AIっぽいデザインを避けるための具体的ガイドライン
+3. `/design-md/` — 54社以上のプレミアムブランドデザインシステムライブラリ
+
+### デザイントークン管理の責務
+UI/UX Designerは `/shared/design-tokens.json` の**管理者**である。
+- プロジェクトごとにトークンをカスタマイズする責任を持つ
+- Marketing Agentのブランドガイドラインを受けてトークンに反映する
+- Frontend Engineerが実装で参照するトークンの最終承認を行う
+
 ## 業務プロセス
 
 ### 1. デザインシステム構築
 ```
 入力: ブランドガイドライン / Tech Lead の技術方針
 処理:
-  1. デザイントークン定義
-     - カラーパレット（Primary / Secondary / Neutral / Semantic）
-     - タイポグラフィ（フォント・サイズ・ウェイト）
-     - スペーシング・ボーダーラジアス
-     - シャドウ・エレベーション
-  2. コンポーネントライブラリ設計
+  1. /shared/design-tokens.json を基盤としてプロジェクト用トークンを策定
+  2. /design-md/ から参考ブランドを2-3社選定し、差別化ポイントを抽出
+  3. デザイントークンのカスタマイズ
+     - カラーパレット: 1クロマティックアクセント + 暖色ニュートラル（AI青を排除）
+     - タイポグラフィ: カスタムフォント選定 + OpenType機能有効化 + 負のletter-spacing
+     - スペーシング: セクション間120px/80px/64pxのリズム
+     - ボーダーラジアス: 3段階（6px/10px/16px）に統一
+     - シャドウ: 多層構成（ambient + direct）、opacity 0.04-0.10
+     - モーション: 控えめで意図的、ヒーロー+主要セクションのみ
+  4. コンポーネントライブラリ設計
      - ボタン / 入力フォーム / カード / モーダル / ナビゲーション
      - 各コンポーネントの状態定義（default / hover / active / disabled / error）
-  3. Tailwind CSS 設定との整合性確保
-  4. Figma コンポーネントの Code Connect マッピング
+     - hover: translateY(-2px) を基本（scale(1.05)は禁止）
+  5. Tailwind CSS 設定との整合性確保（/shared/anti-ai-design-guidelines.md のテンプレート参照）
+  6. Figma コンポーネントの Code Connect マッピング
 出力: /agents/ui_ux_designer/output.json
 ```
 
@@ -54,13 +72,26 @@
 
 ## デザインシステム構成
 
-| カテゴリ | 内容 |
-|---------|------|
-| カラー | Primary / Secondary / Gray / Success / Warning / Error |
-| タイポ | Heading (h1-h6) / Body / Caption / Label |
-| スペーシング | 4px ベースグリッド (4, 8, 12, 16, 24, 32, 48, 64) |
-| ブレイクポイント | sm: 640px / md: 768px / lg: 1024px / xl: 1280px |
-| コンポーネント | Button / Input / Card / Modal / Table / Navigation |
+| カテゴリ | 内容 | AI回避のポイント |
+|---------|------|----------------|
+| カラー | 1 Chromatic Accent + Warm Neutrals | Tailwindブルー禁止、純黒・純白避ける |
+| タイポ | Display / H1-H4 / Body / Caption | 負のletter-spacing、weight 500-600 |
+| スペーシング | 4px base + セクション120/80/64px | 均一ではなくリズムのある間隔 |
+| ブレイクポイント | sm: 640px / md: 768px / lg: 1024px / xl: 1280px | — |
+| ボーダーラジアス | 3段階: 6px / 10px / 16px | 全要素同一値は禁止 |
+| シャドウ | 多層: ambient + direct | opacity 0.04-0.10、ring併用 |
+| モーション | 控えめ: ヒーロー+主要CTAのみ | 全セクションアニメ禁止 |
+| コンポーネント | Button / Input / Card / Modal / Navigation | hover: translateY(-2px)基本 |
+
+### design-md 参照テーブル
+| 業界・テイスト | 推奨参考ブランド |
+|--------------|----------------|
+| SaaS / テック | Linear, Vercel, Stripe, Cursor |
+| D2C / コンシューマー | Airbnb, Spotify, Apple |
+| BtoB / エンタープライズ | Notion, IBM, Hashicorp, Sentry |
+| クリエイティブ / デザイン | Framer, Figma, Webflow |
+| フィンテック / 信頼重視 | Wise, Revolut, Coinbase |
+| AI / 先端技術 | Claude, Cohere, Mistral, Ollama |
 
 ## 連携エージェント
 - **Tech Lead Agent**: デザインシステムの技術的実現可能性確認

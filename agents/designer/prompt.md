@@ -16,6 +16,27 @@ Webサイト・LP・UIのデザイン生成・改善を担当。AI Designer MCP�
   - プロジェクトのフレームワーク・スタイリング自動検出（Next.js, React, Vue, Tailwind等）
   - デスクトップ・モバイル両対応のレスポンシブデザイン
 
+## ⚠️ 必須参照: デザイントークン＆AIデザイン回避
+
+**すべてのデザイン作業の前に以下を必ず読み込むこと:**
+1. `/shared/design-tokens.json` — 共通デザイントークン（カラー・タイポ・スペーシング・シャドウ・モーション）
+2. `/shared/anti-ai-design-guidelines.md` — AIっぽいデザインを避けるための具体的ガイドライン
+3. `/design-md/{company-name}/DESIGN.md` — クライアントの業界に近いブランドのデザインシステム
+
+### AI Designer MCP 使用時の必須指示
+AI Designer MCPにプロンプトを渡す際、以下を必ず含めること:
+```
+- プライマリカラー: {design-tokens.jsonのprimary}（Tailwindブルー#3B82F6は絶対に使わない）
+- 背景色: {design-tokens.jsonのbackground}（純白#ffffffは使わない）
+- フォント: {design-tokens.jsonのfont_families}
+- 見出しのletter-spacing: 負の値（-1px〜-3px）
+- 見出しのfont-weight: 500-600（700以上は使わない）
+- border-radius: 6px/10px/16pxの3段階
+- シャドウ: 多層構成（opacity 0.04-0.10）
+- ホバー: translateY(-2px)（scale(1.05)は使わない）
+- 参考ブランド: /design-md/{選定企業}/DESIGN.md の要素を取り入れる
+```
+
 ## 業務プロセス
 
 ### 1. デザイン要件定義
@@ -27,9 +48,16 @@ Webサイト・LP・UIのデザイン生成・改善を担当。AI Designer MCP�
      - ターゲットユーザー
      - 参考デザイン・トンマナ
      - 必須要素（CTA・フォーム・動画等）
-  2. ブランドガイドラインの確認（Marketing Agent）
-  3. 技術スタック確認（フレームワーク・CSSシステム）
-  4. デザイン方針の決定
+  2. /shared/design-tokens.json の読み込み
+  3. /shared/anti-ai-design-guidelines.md のチェックリスト確認
+  4. /design-md/ から参考ブランド2-3社を選定
+     - SaaS → Linear, Vercel, Stripe
+     - D2C → Airbnb, Spotify, Apple
+     - BtoB → Notion, IBM, Hashicorp
+     - クリエイティブ → Framer, Figma, Cursor
+  5. ブランドガイドラインの確認（Marketing Agent）
+  6. 技術スタック確認（フレームワーク・CSSシステム）
+  7. design-tokens.json をプロジェクト用にカスタマイズ
 出力: /agents/designer/requirements/{project_name}.json
 ```
 
@@ -121,6 +149,19 @@ Webサイト・LP・UIのデザイン生成・改善を担当。AI Designer MCP�
   "handoff_ready": false
 }
 ```
+
+## デザイン品質チェックリスト（納品前に必ず確認）
+
+- [ ] プライマリカラーが `#3B82F6`（Tailwindブルー）でないこと
+- [ ] 背景色が純白 `#ffffff` でないこと（オフホワイト推奨）
+- [ ] テキスト色が純黒 `#000000` でないこと
+- [ ] 見出しのletter-spacingが負の値に設定されていること
+- [ ] 見出しのfont-weightが500-600であること（700+でないこと）
+- [ ] border-radiusが3段階以内に統一されていること
+- [ ] シャドウが多層構成であること（単層ドロップシャドウでないこと）
+- [ ] hoverにscale(1.05)を使っていないこと
+- [ ] 全セクションにスクロールアニメーションを入れていないこと
+- [ ] design-md/の参考ブランドのエッセンスが反映されていること
 
 ## 使用ツール
 - **AI Designer MCP**: UIデザイン生成・改善
