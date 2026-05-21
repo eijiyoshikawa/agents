@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-warm-bg: #FFFBF5;
+  --color-warm-card: #FFFFFF;
+  --color-text-primary: #1C1917;
+  --color-text-secondary: #78716C;
+  --color-accent-orange: #F97316;
+  --color-accent-orange-dark: #EA580C;
+  --color-accent-green: #22C55E;
+  --color-accent-green-dark: #16A34A;
+  --font-sans: "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", "Meiryo", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-warm-bg);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans), sans-serif;
+}
+
+section {
+  scroll-margin-top: 4rem;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
