@@ -31,6 +31,7 @@
 
 5. **Report Builder**: スライド構成を設計
    → /agents/report_builder/output.json
+   ※ 入力データ仕様・スライド対応表の詳細は PIPELINE.md の Step 6 を参照
 
 6. **Google Slides 作成**: report_builder/output.json を基に
    Google Slides MCPで実際のプレゼンテーションを作成

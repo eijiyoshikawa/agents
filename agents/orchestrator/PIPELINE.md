@@ -123,7 +123,65 @@ Claude Code 上で順番に実行する。
 2. 各スライドのタイトル・箇条書き・スピーカーノートを作成
 3. `output.json` に保存
 
-**完了条件:** `slides` 配列にスライドデータが含まれている
+**完了条件:** `slides` 配列に 10-15 個のスライドオブジェクトがあり、各スライドに `title`, `bullets`, `speaker_notes` が含まれている
+
+#### 情報フロー図
+
+```
+issue_structurer/output.json ──┐
+                               │
+market_researcher/output.json ─┼──→ Report Builder ──→ report_builder/output.json
+                               │     (prompt.md)        ├─ presentation_title
+analogy_finder/output.json ────┤                         ├─ slides[] (10-15枚)
+                               │                         │   ├─ title
+strategist/output.json ────────┘                         │   ├─ bullets[]
+                                                         │   └─ speaker_notes
+                                                         └─ summary
+```
+
+#### 入力データ仕様
+
+| ソースファイル | 使用する主要フィールド |
+|---|---|
+| `issue_structurer/output.json` | `client_name`, `industry`, `core_question`, `issues[]`（各 issue の `title`, `description`, `category`, `priority`） |
+| `market_researcher/output.json` | `insights[]`（各 insight の `category`, `title`, `summary`, `source`, `relevance`）、`customer_segments`, `competitive_landscape` |
+| `analogy_finder/output.json` | `cases[]`（各 case の `source_industry`, `company_or_case`, `summary`, `transferable_insight`, `source`） |
+| `strategist/output.json` | `recommended_strategy`, `options[]`（各 option の `name`, `description`, `pros`, `cons`, `feasibility`, `expected_impact`）、`critical_reviews`, `redefined_issues` |
+
+#### データソース → スライド対応マッピング
+
+| No. | スライド | 主なデータソース |
+|-----|---------|-----------------|
+| 1 | 表紙 | `issue_structurer` → `client_name`, `industry` |
+| 2 | エグゼクティブサマリー | `strategist` → `recommended_strategy` |
+| 3 | アジェンダ | スライド構成から自動生成 |
+| 4 | ビジネス課題の整理 | `issue_structurer` → `core_question`, `issues[]` |
+| 5 | 市場環境分析 | `market_researcher` → `insights[]`（category=market） |
+| 6 | 競合・ベンチマーク | `market_researcher` → `insights[]`（category=benchmark/competitor）、`competitive_landscape` |
+| 7 | 顧客インサイト | `market_researcher` → `insights[]`（category=customer）、`customer_segments` |
+| 8 | 参考事例 | `analogy_finder` → `cases[]` |
+| 9-11 | 戦略オプション | `strategist` → `options[]` |
+| 12 | 推奨戦略 | `strategist` → `recommended_strategy`, `redefined_issues` |
+| 13 | リスクと対策 | `strategist` → `critical_reviews` |
+| 14 | 実行ロードマップ | `strategist` → `options[推奨].expected_impact` |
+| 15 | Next Steps | 全ソースから統合 |
+
+#### 単独実行（パイプライン途中からの呼び出し）
+
+上流ステップが完了済みで output.json が揃っている場合、Report Builder だけを呼び出せる:
+
+```
+以下の4ファイルを読み込み、/agents/report_builder/prompt.md の指示に従って
+10-15枚のスライド構成を作成し、/agents/report_builder/output.json に保存してください。
+
+入力:
+- /agents/issue_structurer/output.json
+- /agents/market_researcher/output.json
+- /agents/analogy_finder/output.json
+- /agents/strategist/output.json
+```
+
+**事前確認:** 4つの入力ファイルが全て存在し、各ファイルの主要フィールド（上記テーブル参照）が含まれていること。
 
 ---
 
