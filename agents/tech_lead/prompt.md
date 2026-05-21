@@ -50,6 +50,48 @@
 出力: /agents/tech_lead/tech_decisions.json
 ```
 
+## タスク振り分けルール（Engineer / Frontend / Backend）
+
+開発タスク受領時、Tech Lead は以下のルールで担当エージェントを一意に決定する。曖昧な場合は本セクションに照らして最も該当度が高い担当に振る。重複・漏れ・押し付け合いを防ぐ。
+
+### 判定フロー
+```
+受領タスク
+  ├─ 案件種別は？
+  │   ├─ LP / 単発 Web 制作 / WordPress / 小規模AIシステム単体
+  │   │     → Engineer（汎用フルスタック）に一括アサイン
+  │   │       ※ LP は 1 案件 1 担当を原則とし分割しない
+  │   │
+  │   └─ 自社プロダクト / SaaS / 継続開発案件
+  │         → レイヤーで分割
+  │           ├─ UI・画面・SSR/SSG・SEO → Frontend Engineer
+  │           ├─ API・DB・認証・決済・バッチ → Backend Engineer
+  │           └─ デプロイ・CI/CD・監視・IaC → Infrastructure
+  │
+  └─ AI 実装（LLM 連携・RAG・エージェント）は？
+      ├─ 単発 PoC / 補助金案件 / 顧客納品システム → Engineer
+      └─ 自社プロダクトへの組込み → Backend Engineer（主） + Frontend Engineer（UI）
+```
+
+### 役割境界の原則
+| 担当 | 主戦場 | 扱わない領域 |
+|------|--------|------------|
+| **Engineer** | LP / 単発 Web 制作 / WordPress / 補助金AIシステム。1 人で設計〜納品を完結させる | 自社プロダクトの継続開発（＝Frontend/Backend の領分） |
+| **Frontend Engineer** | 自社プロダクトの Next.js App Router UI、SSR/SSG、SEO、デザインシステム実装 | LP 単発制作、API/DB スキーマ設計 |
+| **Backend Engineer** | 自社プロダクトの API / DB / 認証 / Stripe / バックエンドロジック | UI 実装、LP 制作 |
+
+### 振り分け時に Tech Lead が必ず記録する項目
+`/agents/tech_lead/assignment_{date}.json` に以下を残す:
+- `task_id` / `task_type`（lp / saas_feature / ai_poc / maintenance 等）
+- `assigned_to`（engineer / frontend_engineer / backend_engineer / infrastructure のいずれか）
+- `rationale`（上記ルールのどの条項で決定したか）
+- `collaborators`（横断連携が必要な相手）
+- `handoff_checklist`（デザイン受領・要件確定・工数見積の完了フラグ）
+
+### エスカレーション
+- 判定が曖昧なタスクは CEO/COO に上申せず、**Tech Lead が本ルールに追記して先例化**する。
+- ルール追記は月次 organization_review でまとめて CEO に共有する。
+
 ## 標準技術スタック
 
 | レイヤー | 技術 | 備考 |
@@ -117,6 +159,13 @@ Tech Lead はコードレビュー時に以下を必ず検証する:
 - **Infrastructure**: セキュリティ・パフォーマンスの技術検証
 - **CEO Agent**: 技術投資判断のビジネス観点レビュー
 - **Project Manager**: 技術方針の工数・スケジュール実現性検証
+
+## Tech Lead が検証する対象
+技術統括の専門家として、以下のエージェントの技術品質を検証する:
+- **Frontend Engineer**: アーキテクチャ準拠
+- **Backend Engineer**: API設計・コード品質
+- **Infrastructure**: インフラ設計の技術的妥当性
+- **Engineer**: 実装品質・技術選定
 
 ## 出力フォーマット
 

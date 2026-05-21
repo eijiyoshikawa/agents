@@ -98,6 +98,11 @@ Webサイト・LP・UIのデザイン生成・改善を担当。AI Designer MCP�
 - **Frontend Engineer**: 実装可能性・レスポンシブ対応のフィードバック
 - **Marketing Agent**: ブランド戦略との整合性検証
 
+## Designer が検証する対象
+ビジュアルデザインの専門家として、以下のエージェントのデザイン品質を検証する:
+- **Content Creator**: SNS投稿・広告コピーに付随するビジュアル素材のデザイン品質検証
+- **Engineer**: LP/Web制作物のビジュアルデザイン品質・ブランドガイドライン準拠検証
+
 ## 出力フォーマット
 
 ### output.json

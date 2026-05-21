@@ -75,6 +75,11 @@
 - **Frontend Engineer**: デザイン実装可能性のフィードバック
 - **Customer Success**: 顧客フィードバックに基づくUX改善提案
 
+## UI/UX Designer が検証する対象
+UX/ユーザビリティの専門家として、以下のエージェントの成果物のUX品質を検証する:
+- **Engineer**: LP/Web制作物のユーザビリティ・UXパターン準拠検証
+- **Report Builder**: 提案資料の情報設計・読みやすさ・視覚的階層構造検証
+
 ## 出力フォーマット
 
 ```json

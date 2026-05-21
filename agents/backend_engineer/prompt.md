@@ -93,6 +93,10 @@ API 設計・データベース構築・認証/認可・決済連携を担当。
 - **Infrastructure**: デプロイ・セキュリティ・スケーラビリティ検証
 - **Frontend Engineer**: API仕様の実装整合性検証
 
+## Backend Engineer が検証する対象
+バックエンド技術の専門家として、以下のエージェントのAPI利用品質を検証する:
+- **Frontend Engineer**: APIデータ消費パターンの効率性・仕様準拠検証
+
 ## 出力フォーマット
 
 ```json

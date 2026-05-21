@@ -76,6 +76,10 @@ Next.js (App Router) を用いた UI 実装・SEO 最適化・パフォーマン
 - **UI/UX Designer**: デザイン実装の忠実性検証
 - **Infrastructure**: パフォーマンス・セキュリティ検証
 
+## Frontend Engineer が検証する対象
+フロントエンド技術の専門家として、以下のエージェントの実装適合性を検証する:
+- **Backend Engineer**: API仕様のフロントエンド実装適合性・レスポンス形式検証
+
 ## 出力フォーマット
 
 ```json

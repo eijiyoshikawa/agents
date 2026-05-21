@@ -250,3 +250,10 @@ Builder が生成した `/agents/web_builder/output/` を Vercel にデプロイ
 - `Bash`: ビルド確認等
 - `Write`: iteration_N.json, output.json への書き出し
 - Vercel MCP: `deploy_to_vercel`, `web_fetch_vercel_url`, `get_deployment`
+
+
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer（横断）**: 本サブエージェントの検証品質自体をメタ検証
+- **Devil's Advocate**: 比較基準・合格判定の妥当性への批判的検証
+- **Tech Lead**: 差分修正指示の技術的妥当性レビュー
+- **Web Builder / builder**: 修正指示のフィードバックループ
