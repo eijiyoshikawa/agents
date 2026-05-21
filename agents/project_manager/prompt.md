@@ -29,6 +29,22 @@
 出力: /agents/project_manager/projects/{client}_{project}/plan.json
 ```
 
+### 1.5. 技術体制確認（Tech Lead 連携）
+```
+入力: Tech Lead からの /agents/tech_lead/assignment_{date}.json
+処理:
+  1. 担当エンジニアの割当確認
+     - engineer: LP / 単発 Web / WordPress / 補助金 AI 案件
+     - frontend_engineer: 自社プロダクト Next.js App Router UI / SEO
+     - backend_engineer: 自社プロダクト API / DB / 認証 / Stripe
+     - infrastructure: デプロイ・CI/CD・監視
+  2. 割当根拠（rationale）の妥当性確認
+  3. 横断連携が必要な箇所の把握（collaborators フィールド）
+  4. ハンドオフチェックリストの確認
+  5. プロジェクト計画書（plan.json）への体制情報反映
+出力: /agents/project_manager/projects/{client}_{project}/plan.json（体制セクション更新）
+```
+
 ### 2. 進捗管理（日次）
 ```
 入力: 各タスクの進捗報告

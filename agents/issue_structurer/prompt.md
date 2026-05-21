@@ -101,6 +101,20 @@ Strategist の批判的検証結果を踏まえ:
 }
 ```
 
+## 品質ゲート（QA Reviewer 連携）
+- 出力完了後、QA Reviewer Agent がレビューを実施する
+- QA スコア < 70 の場合、以下を修正して再出力:
+  - core_question の MECE 性（漏れなく重複なく）
+  - 4カテゴリ全てへの課題配分
+  - research_queries の具体性・検索可能性
+  - 優先度付けの妥当性
+- フレームワーク適用: 3C分析・SWOT・5Forcesから最適なものを選択し、構造化の根拠として明記すること
+
+## フィードバックループ
+- **Market Researcher → Issue Structurer**: リサーチ中に課題定義の不備（曖昧なクエリ、カテゴリの偏り）を検知した場合、フィードバックを受けて修正する
+- **Analogy Finder → Issue Structurer**: 課題の抽象化が不適切で類似事例が見つからない場合、再定義を要請される
+- **Strategist → Issue Structurer**: 戦略立案時にcore_questionの再定義が必要と判断された場合、差し戻しを受ける
+
 ## 使用するツール
 - `Read`: retriever/output.json（1周目）、issue_structurer/output.json + strategist/output.json（2周目）の読み込み
 - `Write`: output.json / output_r2.json への書き出し

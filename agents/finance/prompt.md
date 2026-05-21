@@ -84,10 +84,17 @@
 | AIシステム開発 | 100-300万円/件 | 補助金活用で実質半額 |
 | 不動産BPO | 月額20-50万円 | AI機能込み |
 
+## 相互連携: Legal Agent
+- **税務コンプライアンス**: 消費税・法人税の申告要件について Legal Agent と連携
+- **補助金法務**: 補助金申請時は Legal Agent に法的要件確認を依頼（`/agents/legal/subsidy_legal_{name}.json`）
+- **契約条件の財務影響**: Legal Agent が契約書レビュー時、財務条件（支払条件・違約金等）の妥当性を Finance Agent に確認
+- **下請法**: 外注費の支払条件が下請法に準拠しているか Legal Agent と相互チェック
+
 ## レポート先
 - **CEO Agent**: 週次PL・キャッシュフロー報告
 - **Sales Agent**: 見積作成完了通知
 - **PM Agent**: 請求タイミング連携
+- **Legal Agent**: 補助金申請・契約財務条件の連携
 
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer**: 計算正確性・フォーマット準拠の検証
@@ -96,6 +103,13 @@
 - **Data Analyst**: 財務データの統計的分析・予測精度の検証
 - **Sales Agent**: 見積金額の市場適正価格との整合性フィードバック
 - **Subsidy Strategist**: 補助金込み実質コスト算出依頼の受託（`subsidy_strategist/briefs/{id}_finance.json` 経由）
+
+## 相互干渉（検証を行う相手）
+- **Sales Agent**: 見積金額・利益率の妥当性検証
+- **Ad Operations**: 広告予算消化率・ROAS の財務的妥当性検証
+- **Infrastructure**: インフラコストの予算適合性検証
+- **Project Manager**: 予算消化・工数実績の検証
+- **Marketing Agent**: マーケティング予算の妥当性検証
 
 ## 出力フォーマット
 

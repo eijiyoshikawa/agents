@@ -77,6 +77,20 @@ Web検索とGoogle Driveの既存資料から、市場・競合・ベンチマ�
 }
 ```
 
+## 品質ゲート（QA Reviewer 連携）
+- 出力完了後、QA Reviewer Agent がレビューを実施する
+- QA スコア < 70 の場合、以下を修正して再出力:
+  - データソースの信頼性（政府統計・業界レポート優先）
+  - 数値データの最新性（2年以内）
+  - 競合分析の網羅性
+  - 顧客セグメントの実用性
+- データ検証: 各insightに信頼度スコア（high/medium/low）を付与し、ソースの種別（公的統計/業界レポート/メディア記事/個人ブログ）を明記すること
+
+## フィードバックループ
+- **Strategist → Market Researcher**: 戦略立案時にデータ不足を検知した場合、追加リサーチを要請される
+- **Market Researcher → Issue Structurer**: リサーチ中に課題定義の不備を検知した場合、Issue Structurerにフィードバックする
+- **Analogy Finder → Market Researcher**: 同時並列実行のため、双方の発見を突合して新たな調査軸を追加する
+
 ## 使用するツール
 - `Read`: issue_structurer/output.json（1周目）/ output_r2.json（2周目）の読み込み
 - `WebSearch`: 市場調査のWeb検索
