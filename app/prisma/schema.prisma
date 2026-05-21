@@ -1,0 +1,196 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ========================================
+// 求職者
+// ========================================
+model User {
+  id                String    @id @default(uuid()) @db.Uuid
+  email             String    @unique @db.VarChar(255)
+  passwordHash      String?   @map("password_hash") @db.VarChar(255)
+  name              String?   @db.VarChar(100)
+  phone             String?   @db.VarChar(20)
+  prefecture        String?   @db.VarChar(10)
+  city              String?   @db.VarChar(50)
+  birthDate         DateTime? @map("birth_date") @db.Date
+  desiredCategories String[]  @default([]) @map("desired_categories")
+  desiredSalaryMin  Int?      @map("desired_salary_min")
+  resumeUrl         String?   @map("resume_url") @db.VarChar(500)
+  profilePublic     Boolean   @default(false) @map("profile_public")
+  authProvider      String    @default("email") @map("auth_provider") @db.VarChar(20)
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+
+  applications Application[]
+  scouts       Scout[]
+
+  @@map("users")
+}
+
+// ========================================
+// 掲載企業
+// ========================================
+model Company {
+  id               String   @id @default(uuid()) @db.Uuid
+  name             String   @db.VarChar(200)
+  industry         String?  @db.VarChar(100)
+  prefecture       String?  @db.VarChar(10)
+  city             String?  @db.VarChar(50)
+  address          String?
+  employeeCount    String?  @map("employee_count") @db.VarChar(50)
+  description      String?
+  logoUrl          String?  @map("logo_url") @db.VarChar(500)
+  websiteUrl       String?  @map("website_url") @db.VarChar(500)
+  contactEmail     String?  @map("contact_email") @db.VarChar(255)
+  stripeCustomerId String?  @map("stripe_customer_id") @db.VarChar(100)
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  companyUsers  CompanyUser[]
+  jobs          Job[]
+  scouts        Scout[]
+  billingEvents BillingEvent[]
+  applications  Application[]
+
+  @@map("companies")
+}
+
+// ========================================
+// 企業担当者アカウント
+// ========================================
+model CompanyUser {
+  id           String   @id @default(uuid()) @db.Uuid
+  companyId    String   @map("company_id") @db.Uuid
+  email        String   @unique @db.VarChar(255)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  name         String?  @db.VarChar(100)
+  role         String   @default("member") @db.VarChar(20) // admin | member
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("company_users")
+}
+
+// ========================================
+// 求人情報
+// ========================================
+model Job {
+  id             String    @id @default(uuid()) @db.Uuid
+  companyId      String?   @map("company_id") @db.Uuid
+  source         String    @default("direct") @db.VarChar(20) // direct | hellowork
+  helloworkId    String?   @unique @map("hellowork_id") @db.VarChar(50)
+  title          String    @db.VarChar(200)
+  category       String    @db.VarChar(50) // driver | construction | manufacturing | other
+  subcategory    String?   @db.VarChar(50)
+  employmentType String?   @map("employment_type") @db.VarChar(20) // full_time | part_time | contract
+  description    String?
+  requirements   String?
+  salaryMin      Int?      @map("salary_min")
+  salaryMax      Int?      @map("salary_max")
+  salaryType     String?   @map("salary_type") @db.VarChar(20) // monthly | hourly | annual
+  prefecture     String    @db.VarChar(10)
+  city           String?   @db.VarChar(50)
+  address        String?
+  benefits       String[]  @default([])
+  tags           String[]  @default([])
+  status         String    @default("active") @db.VarChar(20) // draft | active | closed
+  publishedAt    DateTime? @map("published_at") @db.Timestamptz()
+  expiresAt      DateTime? @map("expires_at") @db.Timestamptz()
+  viewCount      Int       @default(0) @map("view_count")
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+
+  company      Company?      @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  applications Application[]
+  scouts       Scout[]
+
+  @@index([prefecture, category, employmentType, status], name: "idx_jobs_search")
+  @@index([salaryMin, salaryMax], name: "idx_jobs_salary")
+  @@index([status, publishedAt(sort: Desc)], name: "idx_jobs_status_published")
+  @@map("jobs")
+}
+
+// ========================================
+// 応募
+// ========================================
+model Application {
+  id        String   @id @default(uuid()) @db.Uuid
+  jobId     String   @map("job_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  companyId String?  @map("company_id") @db.Uuid
+  status    String   @default("applied") @db.VarChar(20) // applied | reviewing | interview | offered | hired | rejected
+  message   String?
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  job          Job           @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company      Company?      @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  billingEvent BillingEvent?
+
+  @@unique([jobId, userId])
+  @@map("applications")
+}
+
+// ========================================
+// スカウト
+// ========================================
+model Scout {
+  id        String    @id @default(uuid()) @db.Uuid
+  companyId String    @map("company_id") @db.Uuid
+  userId    String    @map("user_id") @db.Uuid
+  jobId     String?   @map("job_id") @db.Uuid
+  message   String?
+  status    String    @default("sent") @db.VarChar(20) // sent | read | replied | declined
+  sentAt    DateTime  @default(now()) @map("sent_at") @db.Timestamptz()
+  readAt    DateTime? @map("read_at") @db.Timestamptz()
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job     Job?    @relation(fields: [jobId], references: [id], onDelete: SetNull)
+
+  @@map("scouts")
+}
+
+// ========================================
+// 成果報酬課金
+// ========================================
+model BillingEvent {
+  id              String   @id @default(uuid()) @db.Uuid
+  companyId       String   @map("company_id") @db.Uuid
+  applicationId   String   @unique @map("application_id") @db.Uuid
+  eventType       String   @map("event_type") @db.VarChar(20) // hired
+  amount          Int // 成果報酬金額（円）
+  stripeInvoiceId String?  @map("stripe_invoice_id") @db.VarChar(100)
+  status          String   @default("pending") @db.VarChar(20) // pending | invoiced | paid | failed
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  company     Company     @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("billing_events")
+}
+
+// ========================================
+// SEOランディングページ
+// ========================================
+model SeoPage {
+  id              String   @id @default(uuid()) @db.Uuid
+  slug            String   @unique @db.VarChar(200) // e.g. "tokyo-driver"
+  prefecture      String   @db.VarChar(10)
+  category        String   @db.VarChar(50)
+  title           String   @db.VarChar(200)
+  metaDescription String?  @map("meta_description") @db.VarChar(300)
+  h1Text          String?  @map("h1_text") @db.VarChar(200)
+  bodyContent     String?  @map("body_content")
+  jobCount        Int      @default(0) @map("job_count")
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("seo_pages")
+}

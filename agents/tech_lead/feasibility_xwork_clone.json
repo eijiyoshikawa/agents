@@ -1,0 +1,221 @@
+{
+  "project": "クロスワーク同等求人ポータルサイト構築",
+  "date": "2026-04-05",
+  "requested_by": "CEO Agent",
+  "reviewed_by": "Tech Lead Agent",
+
+  "target_service": {
+    "name": "クロスワーク（X Work / x-work.jp）",
+    "operator": "X Mile株式会社",
+    "industry": "ノンデスク産業（物流・建設・製造）特化型求人ポータル",
+    "scale": {
+      "monthly_users": "100万人以上",
+      "registered_users": "約30万人",
+      "total_jobs": "10万件以上",
+      "driver_jobs": "3万件以上"
+    },
+    "revenue_model": "掲載無料・成果報酬型（採用1人あたり10万円〜）"
+  },
+
+  "feasibility_assessment": {
+    "overall": "feasible",
+    "confidence": "high",
+    "summary": "標準的なWebアプリケーション技術の組み合わせで構築可能。技術的に特殊な要素はなく、Claude Code（Maxプラン）で設計から実装・デプロイまで完結できる。"
+  },
+
+  "tech_stack": {
+    "frontend": {
+      "framework": "Next.js 15 (App Router)",
+      "language": "TypeScript (strict mode)",
+      "styling": "Tailwind CSS v4 + shadcn/ui",
+      "state": "React Server Components + Zustand (client)",
+      "forms": "React Hook Form + Zod",
+      "reason": "SSR/ISRによるSEO最適化、React Server Componentsによる高速表示、豊富なエコシステム"
+    },
+    "backend": {
+      "runtime": "Next.js API Routes (Node.js)",
+      "orm": "Prisma ORM",
+      "validation": "Zod",
+      "auth": "NextAuth.js v5",
+      "payment": "Stripe API",
+      "reason": "フルスタック統一で開発効率最大化、型安全なDB操作"
+    },
+    "database": {
+      "primary": "PostgreSQL (Supabase)",
+      "search": "Meilisearch Cloud",
+      "cache": "Redis (Upstash)",
+      "storage": "Supabase Storage (S3互換)",
+      "reason": "Supabaseで初期コスト最小化、スケール時にAWS RDSへ移行可能"
+    },
+    "infrastructure": {
+      "hosting": "Vercel (Pro Plan)",
+      "ci_cd": "GitHub Actions",
+      "monitoring": "Sentry + Vercel Analytics",
+      "domain": "カスタムドメイン",
+      "reason": "Vercel MCP連携済み、Preview Deploymentsで開発効率向上"
+    },
+    "crawler": {
+      "runtime": "Node.js",
+      "browser": "Playwright",
+      "scheduler": "Vercel Cron / GitHub Actions (scheduled)",
+      "reason": "ハローワーク求人の動的ページ対応にヘッドレスブラウザが必要"
+    },
+    "testing": {
+      "unit": "Vitest + Testing Library",
+      "e2e": "Playwright",
+      "performance": "Lighthouse CI",
+      "reason": "Viteベースの高速テスト実行、Playwrightの安定性"
+    }
+  },
+
+  "monthly_infra_cost": {
+    "currency": "USD",
+    "breakdown": [
+      {"service": "Vercel Pro", "cost": 20, "notes": "Next.jsホスティング"},
+      {"service": "Supabase Pro", "cost": 25, "notes": "PostgreSQL + Storage"},
+      {"service": "Upstash Redis", "cost": 10, "notes": "キャッシュ・セッション"},
+      {"service": "Meilisearch Cloud", "cost": 30, "notes": "検索エンジン"},
+      {"service": "Sentry Team", "cost": 26, "notes": "エラー監視"},
+      {"service": "Domain", "cost": 1, "notes": "年額$15を月割り"}
+    ],
+    "total_usd": 112,
+    "total_jpy_approx": 17000,
+    "notes": "初期フェーズの最小構成。トラフィック増加に応じてスケールアップが必要"
+  },
+
+  "development_phases": [
+    {
+      "phase": 1,
+      "name": "MVP",
+      "duration_months": 3,
+      "goal": "最小限の検証可能なプロダクト。求人検索・閲覧・応募の基本フロー",
+      "features": [
+        "求人検索（地域・職種フィルタ）・一覧・詳細ページ",
+        "ハローワーク求人クローラー（ドライバー職種限定）",
+        "求職者会員登録・ログイン（メール認証）",
+        "求人応募機能",
+        "基本SEO（SSR + 構造化データ + sitemap）",
+        "レスポンシブデザイン（モバイルファースト）",
+        "企業基本情報登録"
+      ],
+      "agents_involved": [
+        "Tech Lead（設計統括）",
+        "Frontend Engineer（UI実装）",
+        "Backend Engineer（API・DB）",
+        "Data Engineer（HWクローラー）",
+        "UI/UX Designer（デザインシステム）",
+        "Infrastructure（環境構築）"
+      ],
+      "estimated_effort": "Claude Code セッション 50-80回"
+    },
+    {
+      "phase": 2,
+      "name": "β版",
+      "duration_months": 2,
+      "goal": "企業向け機能と高度検索の追加。初期ユーザーでのβテスト",
+      "features": [
+        "企業管理画面（求人CRUD・応募者管理）",
+        "スカウト機能（候補者検索・メッセージ送信）",
+        "Meilisearch導入（ファセット検索・全文検索）",
+        "高度検索フィルター（給与帯・こだわり条件）",
+        "メール通知（応募通知・スカウト通知）",
+        "SEOランディングページ大量生成（ISR）",
+        "Google / LINE OAuth認証"
+      ],
+      "agents_involved": [
+        "全開発エージェント",
+        "Marketing Agent（SEO戦略）",
+        "Sales Agent（β企業獲得）"
+      ],
+      "estimated_effort": "Claude Code セッション 40-60回"
+    },
+    {
+      "phase": 3,
+      "name": "正式版",
+      "duration_months": 2,
+      "goal": "課金システムと運用基盤の完成。正式ローンチ",
+      "features": [
+        "Stripe成果報酬課金（採用確定時自動請求）",
+        "管理者ダッシュボード（KPI・課金管理）",
+        "キャリアアドバイザー連携機能",
+        "レコメンドエンジン（類似求人・マッチング）",
+        "パフォーマンス最適化（Core Web Vitals対策）",
+        "全文E2Eテスト・負荷テスト",
+        "セキュリティ監査",
+        "企業向けLP（集客ページ）"
+      ],
+      "agents_involved": [
+        "全開発エージェント",
+        "QA Engineer（テスト網羅）",
+        "Legal Agent（利用規約・プライバシーポリシー）",
+        "Finance Agent（課金テスト・PL計画）",
+        "Devils Advocate Agent（ローンチ前批判的検証）"
+      ],
+      "estimated_effort": "Claude Code セッション 40-60回"
+    }
+  ],
+
+  "risks": [
+    {
+      "category": "technical",
+      "description": "ハローワークのサイト構造変更によるクローラー停止",
+      "impact": "high",
+      "probability": "medium",
+      "mitigation": "クローラーの頑健性確保（セレクタの柔軟化）、異常検知アラート、手動インポート機能の用意"
+    },
+    {
+      "category": "technical",
+      "description": "検索性能の劣化（求人10万件規模）",
+      "impact": "medium",
+      "probability": "low",
+      "mitigation": "Meilisearchで対応可能。50万件超でElasticsearchへの移行を検討"
+    },
+    {
+      "category": "legal",
+      "description": "ハローワーク転載条件の不遵守",
+      "impact": "high",
+      "probability": "low",
+      "mitigation": "Legal Agent による定期コンプライアンスチェック、転載チェックリストの自動検証"
+    },
+    {
+      "category": "business",
+      "description": "初期求人数の不足（鶏と卵問題）",
+      "impact": "high",
+      "probability": "medium",
+      "mitigation": "HW転載で初期3万件確保。並行してSales Agentが企業直接営業"
+    },
+    {
+      "category": "business",
+      "description": "SEO競合（クロスワーク・Indeedの先行者優位）",
+      "impact": "high",
+      "probability": "high",
+      "mitigation": "ニッチキーワード戦略、地域×職種ロングテール、コンテンツマーケティング"
+    },
+    {
+      "category": "operational",
+      "description": "Claude Codeセッションの逐次実行による開発速度制限",
+      "impact": "medium",
+      "probability": "medium",
+      "mitigation": "タスク分解の最適化、各セッションの生産性最大化、並列可能タスクの特定"
+    }
+  ],
+
+  "competitive_advantage": [
+    "AI エージェント組織（24体）による企画→設計→実装→運用→営業の一気通貫",
+    "Devils Advocate Agent による意思決定品質の担保",
+    "既存事業の不動産BPO・SNSマーケティングノウハウの転用",
+    "補助金活用による初期投資の圧縮（Finance Agent + Legal Agent）",
+    "24時間稼働可能なAIエージェントによる高速イテレーション"
+  ],
+
+  "conclusion": "技術的に実現可能であり、Claude Code Maxプラン内で開発を完結できる。推定開発期間は7ヶ月（MVP 3ヶ月 + β 2ヶ月 + 正式版 2ヶ月）。インフラコストは月額約2万円で開始可能。最大のリスクはSEO競合と初期ユーザー獲得であり、技術面ではなくビジネス面の課題が中心。",
+
+  "next_steps": [
+    "CEO Agent による Go/No-Go 判断",
+    "PM Agent によるPhase 1のWBS作成",
+    "UI/UX Designer Agent によるデザインシステム構築開始",
+    "Backend Engineer Agent によるDB スキーマ設計開始",
+    "Data Engineer Agent によるHWクローラーのプロトタイプ作成",
+    "Devils Advocate Agent による本レポートの批判的検証"
+  ]
+}
