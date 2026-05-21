@@ -60,6 +60,10 @@
 - **UI/UX Designer**: 提案資料の情報設計・読みやすさ・視覚的階層構造検証
 - **Finance Agent**: 見積・コスト関連スライドの数値精度検証
 
+## Report Builder が検証する対象
+提案資料構成の専門家として、以下のエージェントの資料品質を検証する:
+- **Document Builder**: ストーリー構成・データ可視化品質
+
 ## 出力フォーマット
 
 `/agents/report_builder/output.json` に保存:

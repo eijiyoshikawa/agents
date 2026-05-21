@@ -94,6 +94,34 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 | 38 | `data_analyst` | 横断データ分析・インサイト抽出・意思決定支援 |
 | 39 | `analytics` | GA4/GSC/広告データ統合分析・マーケティングROI最適化 |
 
+## 相互干渉（チェック&バランス）
+
+全エージェントはQA Reviewerによる品質チェックを受ける。主要な相互連携:
+
+| 連携 | 内容 |
+|------|------|
+| Sales → Retriever | 商談ヒアリング議事録の取得トリガー |
+| Sales → Finance | 見積依頼・受注通知 |
+| Sales → PM | 受注後プロジェクト立ち上げ |
+| PM → Tech Lead | 開発プロジェクトの技術方針決定 |
+| Tech Lead → Frontend/Backend/Infra | 開発タスクの振り分け・技術レビュー |
+| Designer → Frontend Engineer | デザイン→実装ハンドオフ |
+| UI/UX Designer → Designer | デザインシステム・トークン提供 |
+| Backend Engineer → Infrastructure | デプロイ依頼・インフラ構成 |
+| QA Engineer → Frontend/Backend | テスト結果・バグ報告 |
+| Data Engineer → KPI Dashboard | データパイプライン→集計基盤 |
+| PM → Finance | 工数実績・請求トリガー |
+| PM → CS | 納品後ハンドオフ |
+| CS → Sales | アップセル機会・リファラル |
+| Marketing → Content Creator → SNS Op. | コンテンツ企画→制作→配信 |
+| Marketing → Ad Operations | 広告戦略→運用実行 |
+| Marketing → Sales | リード引き渡し |
+| Data Analyst → CEO | 分析レポート・意思決定支援 |
+| Finance → CEO | 週次PL・キャッシュフロー |
+| KPI Dashboard → CEO | 日次KPI・異常アラート |
+| QA Reviewer → 全体 | 品質差し戻し・改善指示 |
+| CEO → 全体 | 優先度指示・リソース配分・最終承認 |
+
 ## 戦略提案パイプライン
 
 ```
@@ -128,6 +156,8 @@ agents/
 │   └── {company-name}/DESIGN.md
 ├── daily_reports/                         # 日次レポート
 └── agents/
+    ├── orchestrator/                      # エージェント間オーケストレーション
+    ├── outputs/                           # エージェント出力保存先
     ├── ceo/prompt.md                      # 統括
     ├── retriever/prompt.md                # コンサル事業部
     ├── issue_structurer/prompt.md

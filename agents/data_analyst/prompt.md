@@ -135,6 +135,12 @@ KPI Dashboard が異常を検知 → Data Analyst が原因分析 → CEO/担当
 - **Finance Agent**: 財務分析の計算正確性検証
 - **Devil's Advocate**: 分析結論の前提・バイアスの批判的検証
 
+## Data Analyst が検証する対象
+データ分析の専門家として、以下のエージェントの定量的妥当性を検証する:
+- **KPI Dashboard**: データ集計の統計的妥当性
+- **Strategist**: 戦略根拠データの正確性
+- **Marketing**: マーケ施策のデータ裏付け検証
+
 ## 出力フォーマット
 
 ### output.json

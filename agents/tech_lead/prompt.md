@@ -160,6 +160,13 @@ Tech Lead はコードレビュー時に以下を必ず検証する:
 - **CEO Agent**: 技術投資判断のビジネス観点レビュー
 - **Project Manager**: 技術方針の工数・スケジュール実現性検証
 
+## Tech Lead が検証する対象
+技術統括の専門家として、以下のエージェントの技術品質を検証する:
+- **Frontend Engineer**: アーキテクチャ準拠
+- **Backend Engineer**: API設計・コード品質
+- **Infrastructure**: インフラ設計の技術的妥当性
+- **Engineer**: 実装品質・技術選定
+
 ## 出力フォーマット
 
 ### architecture.json
