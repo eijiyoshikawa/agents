@@ -1,0 +1,317 @@
+{
+  "project_id": "dance_class_launch",
+  "project_name": "GROOVE 30+ ダンスクラス開講プロジェクト",
+  "updated_at": "2026-04-06",
+  "overall_status": "planning",
+  "target_launch_date": "2026-05-17",
+  "timeline": {
+    "phase_0_preparation": {
+      "name": "準備フェーズ",
+      "period": "Week 1-2（4/7〜4/20）",
+      "tasks": [
+        {
+          "task": "クラス名・コンセプト最終決定",
+          "due": "4/7",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "候補: GROOVE 30+ / Re:DANCE / OTONA GROOVE から選択"
+        },
+        {
+          "task": "レンタルスタジオ調査・見学",
+          "due": "4/13",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "候補エリア: 本町・天王寺・心斎橋。商用利用可・鏡あり・音響OK・2時間3,000-5,000円のスタジオを3-5箇所リストアップ"
+        },
+        {
+          "task": "Instagramプロアカウント開設",
+          "due": "4/9",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "アカウント名・プロフィール・ハイライトカテゴリ設定。Content Creator outputのプロフィールテンプレート参照"
+        },
+        {
+          "task": "LINE公式アカウント開設",
+          "due": "4/9",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "あいさつメッセージ・リッチメニュー設定。Marketing outputのLINE計画参照"
+        },
+        {
+          "task": "Canvaでデザインテンプレート作成",
+          "due": "4/13",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "告知用・レポート用・ストーリーズ用の3テンプレート。カラー: ダークネイビー×ビビッドピンク"
+        },
+        {
+          "task": "ダンス動画3-5本撮影（ストック）",
+          "due": "4/13",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "自己紹介ダンス、振付プレビュー、あるある系。スマホ＋三脚で撮影"
+        },
+        {
+          "task": "撮影・投稿同意書の作成",
+          "due": "4/13",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "参加者のSNS撮影・投稿への同意を取得する簡易書面"
+        }
+      ]
+    },
+    "phase_1_presale": {
+      "name": "事前集客フェーズ",
+      "period": "Week 3-4（4/21〜5/4）",
+      "tasks": [
+        {
+          "task": "Instagram投稿開始（毎日1本×7日間）",
+          "due": "4/21開始",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "アルゴリズム活性化のため初週は毎日投稿。リール＋ストーリーズ中心"
+        },
+        {
+          "task": "レンタルスタジオ予約（初回2回分）",
+          "due": "4/25",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "5月の2回分を予約。平日昼間（10:00-12:00 or 13:00-15:00）推奨"
+        },
+        {
+          "task": "ダンス仲間・知人への個別告知",
+          "due": "4/25",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "10-20人にDM/LINEで直接連絡。最も確実な初期集客手段"
+        },
+        {
+          "task": "ジモティーに募集投稿",
+          "due": "4/25",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "Content Creator outputのジモティーテンプレート使用"
+        },
+        {
+          "task": "Googleビジネスプロフィール作成",
+          "due": "4/30",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "「大阪 大人 ダンス教室」検索対策。無料で作成可能"
+        }
+      ]
+    },
+    "phase_2_prelaunch": {
+      "name": "開講直前フェーズ",
+      "period": "Week 5-6（5/5〜5/16）",
+      "tasks": [
+        {
+          "task": "開講告知投稿（Instagram）",
+          "due": "5/5",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "日時・場所・料金・申込方法を明記したフィード投稿。初回体験無料/500円キャンペーン告知"
+        },
+        {
+          "task": "「なぜこのクラスを作ったか」ストーリー投稿",
+          "due": "5/7",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "カルーセル5枚。Content Creator outputのfeed_02テンプレート参照"
+        },
+        {
+          "task": "LINE公式で初回レッスン情報配信",
+          "due": "5/10",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "友だち登録者全員に日時・場所・持ち物案内を配信"
+        },
+        {
+          "task": "カウントダウンストーリーズ開始",
+          "due": "5/12",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "「初回レッスンまであと○日」を毎日投稿"
+        },
+        {
+          "task": "初回レッスンの選曲・振付準備",
+          "due": "5/14",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "参加者のレベルを考慮し、経験者が楽しめる振付。2時間分の構成（ウォームアップ30分・振付入れ60分・通し20分・クールダウン10分）"
+        },
+        {
+          "task": "参加者へリマインド送信",
+          "due": "5/15",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "LINEで持ち物・アクセス・注意事項を配信"
+        }
+      ]
+    },
+    "phase_3_launch": {
+      "name": "開講フェーズ",
+      "period": "Week 7〜（5/17〜）",
+      "tasks": [
+        {
+          "task": "初回レッスン実施",
+          "due": "5/17",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "レッスン前に撮影同意書取得。レッスン風景を撮影（ストーリーズ用）。レッスン後に5分間の交流タイム"
+        },
+        {
+          "task": "レッスン後のSNS投稿",
+          "due": "5/18",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "レッスンハイライト動画（リール）+ レポート投稿（フィード）。参加者の声もあれば追加"
+        },
+        {
+          "task": "参加者へお礼LINE送信",
+          "due": "5/18",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "「ご参加ありがとうございました！次回は○月○日です」"
+        },
+        {
+          "task": "振り返り・改善点メモ",
+          "due": "5/18",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "参加人数、参加者の反応、レベル感、改善点を記録"
+        },
+        {
+          "task": "2回目レッスン実施",
+          "due": "5/31",
+          "owner": "インストラクター",
+          "status": "pending",
+          "details": "初回のフィードバックを反映。新規参加者の獲得も目指す"
+        }
+      ]
+    },
+    "phase_4_growth": {
+      "name": "成長フェーズ",
+      "period": "Month 2-6（6月〜10月）",
+      "milestones": [
+        {
+          "month": 2,
+          "target": "月4回開催に拡大",
+          "conditions": "安定5名以上/回を2回連続達成",
+          "actions": ["スタジオ月4回予約", "LINE公式で月間スケジュール配信開始", "友達紹介キャンペーン開始"]
+        },
+        {
+          "month": 3,
+          "target": "コミュニティ基盤確立",
+          "conditions": "固定メンバー8名以上",
+          "actions": ["参加者LINEグループ作成", "月1回オープンクラス導入", "価格改定検討（1,000→1,500円）"]
+        },
+        {
+          "month": 4,
+          "target": "安定運営",
+          "conditions": "平均8名/回、月間黒字1万円以上",
+          "actions": ["月額パス導入検討（月4回3,500円）", "ジャンル拡大検討", "2クラス目（平日夜 or 土日）の需要調査"]
+        },
+        {
+          "month": 6,
+          "target": "週1回開催への移行",
+          "conditions": "平均10名/回、月間黒字2万円以上",
+          "actions": ["週1回の定期開催", "曜日固定（毎週○曜日）", "発表会・イベント企画"]
+        }
+      ]
+    }
+  },
+  "checklist": {
+    "before_launch": [
+      {"item": "クラス名・コンセプト決定", "status": "pending"},
+      {"item": "レンタルスタジオ選定・予約", "status": "pending"},
+      {"item": "Instagramアカウント開設・投稿開始", "status": "pending"},
+      {"item": "LINE公式アカウント開設", "status": "pending"},
+      {"item": "Canvaデザインテンプレート作成", "status": "pending"},
+      {"item": "ダンス動画ストック撮影（3-5本）", "status": "pending"},
+      {"item": "撮影・投稿同意書作成", "status": "pending"},
+      {"item": "知人・ダンス仲間への告知（10-20人）", "status": "pending"},
+      {"item": "ジモティー投稿", "status": "pending"},
+      {"item": "初回レッスン選曲・振付準備", "status": "pending"},
+      {"item": "レクリエーション保険加入検討", "status": "pending"},
+      {"item": "Googleビジネスプロフィール作成", "status": "pending"}
+    ],
+    "each_lesson": [
+      {"item": "スタジオ予約確認"},
+      {"item": "選曲・振付準備完了"},
+      {"item": "LINE参加者リマインド送信（2日前）"},
+      {"item": "音源・スピーカー・三脚等の準備"},
+      {"item": "撮影同意書（新規参加者分）"},
+      {"item": "レッスン実施"},
+      {"item": "レッスン後交流タイム"},
+      {"item": "SNS投稿（当日 or 翌日）"},
+      {"item": "参加者へお礼LINE送信"},
+      {"item": "収支記録（参加人数×1,000円 - スタジオ代 - 交通費）"},
+      {"item": "振り返りメモ（良かった点・改善点）"}
+    ]
+  },
+  "kpis": {
+    "month_1": {
+      "lesson_count": 2,
+      "avg_participants": "3-5名",
+      "instagram_followers": "100-200",
+      "line_friends": "20-30",
+      "revenue": "6,000-10,000円",
+      "profit_target": "±0〜+2,000円"
+    },
+    "month_3": {
+      "lesson_count": 4,
+      "avg_participants": "5-7名",
+      "instagram_followers": "300-500",
+      "line_friends": "50-80",
+      "revenue": "20,000-28,000円",
+      "profit_target": "+3,000〜+8,000円"
+    },
+    "month_6": {
+      "lesson_count": 4,
+      "avg_participants": "8-10名",
+      "instagram_followers": "800-1200",
+      "line_friends": "100-150",
+      "revenue": "32,000-40,000円",
+      "profit_target": "+10,000〜+20,000円"
+    }
+  },
+  "risks": [
+    {
+      "risk": "初回参加者が0-2名で赤字",
+      "probability": "medium",
+      "impact": "low",
+      "mitigation": "知人への事前声かけで最低3名を確保。初回無料体験で参加ハードルを下げる"
+    },
+    {
+      "risk": "SNS集客が想定より遅い",
+      "probability": "high",
+      "impact": "medium",
+      "mitigation": "SNSだけに依存しない。ジモティー・知人紹介・ダンスイベント参加を並行"
+    },
+    {
+      "risk": "スタジオが継続的に確保できない",
+      "probability": "low",
+      "impact": "high",
+      "mitigation": "候補スタジオを3箇所以上リストアップ。早め（1ヶ月前）に予約"
+    },
+    {
+      "risk": "参加者の怪我",
+      "probability": "low",
+      "impact": "high",
+      "mitigation": "レクリエーション保険加入（30円/人/回程度）。十分なウォームアップ時間を確保"
+    },
+    {
+      "risk": "インストラクターの燃え尽き",
+      "probability": "medium",
+      "impact": "high",
+      "mitigation": "月2回スタートで無理のない頻度。収益が安定したら価格改定で持続可能性を確保"
+    }
+  ],
+  "budget_summary": {
+    "initial_investment": "約5,000円（音源サブスク初月1,000円 + 予備費4,000円）",
+    "monthly_fixed_cost": "1,000円（音源サブスク）",
+    "per_lesson_cost": "3,000-5,000円（スタジオ代） + 500円（交通費）",
+    "breakeven_per_lesson": "4-6名（スタジオ代による）"
+  }
+}
