@@ -1,0 +1,19 @@
+{
+  "prefecture": "広島県",
+  "collected_at": "2026-04-15",
+  "sources_used": [
+    {"source_name": "企業公式サイト WebSearch結果", "url": "N/A", "records_collected": 4}
+  ],
+  "companies": [
+    {"company_name": "宮田建設株式会社", "prefecture": "広島県", "city": "広島市南区", "address": "広島県広島市南区出島一丁目33番46号", "phone": "082-258-1609", "fax": "082-258-1619", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "http://miyata-con.jp/"},
+    {"company_name": "八光建設工業株式会社", "prefecture": "広島県", "city": "広島市東区", "address": "広島県広島市東区光町2丁目4番23号八光ビル", "phone": "082-262-8166", "fax": "082-263-8189", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://hakkokensetu.co.jp/about/"},
+    {"company_name": "大和建設株式会社", "prefecture": "広島県", "city": "福山市", "address": "広島県福山市若松町8番4号", "phone": "084-924-4411", "fax": "084-925-3931", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.daiwakensetsu.co.jp/?page_id=115"},
+    {"company_name": "復建調査設計株式会社 三次事務所", "prefecture": "広島県", "city": "三次市", "address": "広島県三次市十日市東三丁目10-8", "phone": "0824-65-0760", "fax": "0824-65-0761", "business_category": "設備", "source": "企業公式サイト", "source_url": "https://www.fukken.co.jp/company/office/"}
+  ],
+  "collection_stats": {
+    "total_companies": 4,
+    "companies_with_fax": 4,
+    "companies_without_fax": 0,
+    "fax_coverage_rate": "100%"
+  }
+}

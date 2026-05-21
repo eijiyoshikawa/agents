@@ -1,0 +1,68 @@
+{
+  "updated_at": "2026-04-15",
+  "target_prefectures": ["兵庫県"],
+  "sources_by_prefecture": {
+    "兵庫県": [
+      {
+        "source_name": "兵庫県建設業協会 支部別会員名簿",
+        "url": "https://hyokenkyo.or.jp/branch/",
+        "has_fax": true,
+        "estimated_companies": 664,
+        "access_method": "websearch_index",
+        "reliability": "medium",
+        "robots_allowed": false,
+        "priority": 1,
+        "notes": "16支部・664社。WebFetch 403でブロック。WebSearch検索結果のインデックスデータから部分取得可能"
+      },
+      {
+        "source_name": "兵庫県建設業許可業者名簿 PDF",
+        "url": "https://web.pref.hyogo.lg.jp/ks02/kyokameibo.html",
+        "has_fax": false,
+        "estimated_companies": 15000,
+        "access_method": "pdf_download",
+        "reliability": "high",
+        "robots_allowed": false,
+        "priority": 2,
+        "notes": "許可番号・代表者・住所・電話番号あり。FAX番号は非掲載。WebFetch 403でブロック"
+      },
+      {
+        "source_name": "マピオン電話帳 兵庫県建設業",
+        "url": "https://www.mapion.co.jp/phonebook/M26012TK01/28/",
+        "has_fax": false,
+        "estimated_companies": 500,
+        "access_method": "html_fetch",
+        "reliability": "medium",
+        "robots_allowed": false,
+        "priority": 3,
+        "notes": "電話番号は掲載。FAX番号は不明。WebFetch 403でブロック"
+      },
+      {
+        "source_name": "各企業公式サイト（WebSearch経由）",
+        "url": "N/A",
+        "has_fax": true,
+        "estimated_companies": 100,
+        "access_method": "websearch_index",
+        "reliability": "high",
+        "robots_allowed": true,
+        "priority": 4,
+        "notes": "企業の公式サイト会社概要ページからFAX番号を取得。検索結果のスニペットに含まれる場合に収集可能"
+      },
+      {
+        "source_name": "国交省 建設業者検索",
+        "url": "https://etsuran2.mlit.go.jp/TAKKEN/kensetuKensaku.do",
+        "has_fax": false,
+        "estimated_companies": 15000,
+        "access_method": "javascript_spa",
+        "reliability": "high",
+        "robots_allowed": true,
+        "priority": 5,
+        "notes": "JavaScript SPAのためWebFetchでは取得不可"
+      }
+    ]
+  },
+  "summary": {
+    "total_sources_found": 5,
+    "prefectures_with_sources": 1,
+    "recommended_approach": "WebSearch検索結果のインデックスデータからFAX番号付き企業情報を収集。直接フェッチは全ソースで403ブロック。検索エンジンのキャッシュ・スニペットからのデータ抽出が最も有効。"
+  }
+}

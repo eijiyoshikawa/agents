@@ -1,0 +1,24 @@
+{
+  "prefecture": "福岡県",
+  "normalized_at": "2026-04-15",
+  "companies": [
+    {"company_name": "九州建設株式会社", "prefecture": "福岡県", "city": "福岡市博多区", "address": "福岡県福岡市博多区博多駅南1丁目8番31号 九州ビル5階", "phone": "092-461-1100", "fax": "092-461-1400", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "共栄建設株式会社", "prefecture": "福岡県", "city": "福岡市中央区", "address": "福岡県福岡市中央区舞鶴3丁目2番21号", "phone": "", "fax": "092-739-0100", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "九州総合建設株式会社", "prefecture": "福岡県", "city": "福岡市東区", "address": "福岡県福岡市東区", "phone": "092-631-4040", "fax": "092-631-4043", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "三軌建設株式会社 福岡支店", "prefecture": "福岡県", "city": "福岡市東区", "address": "福岡県福岡市東区", "phone": "", "fax": "092-629-7429", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "若築建設株式会社 北九州支店", "prefecture": "福岡県", "city": "北九州市若松区", "address": "福岡県北九州市若松区浜町1-4-7", "phone": "093-752-3510", "fax": "093-752-1423", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "三軌建設株式会社 北九州支店", "prefecture": "福岡県", "city": "北九州市小倉北区", "address": "福岡県北九州市小倉北区", "phone": "", "fax": "093-583-3712", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "グランド工房 北九州店", "prefecture": "福岡県", "city": "北九州市八幡西区", "address": "福岡県北九州市八幡西区上の原1-9-27", "phone": "093-647-0037", "fax": "093-647-0195", "fax_validated": true, "business_category": "建築", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "グランド工房 本社", "prefecture": "福岡県", "city": "福岡市東区", "address": "福岡県福岡市東区多の津5丁目32-20", "phone": "092-626-7520", "fax": "092-626-7566", "fax_validated": true, "business_category": "建築", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "ヤマト建設株式会社", "prefecture": "福岡県", "city": "久留米市", "address": "福岡県久留米市国分町2025-5", "phone": "0942-21-0138", "fax": "0942-21-0254", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"}
+  ],
+  "stats": {
+    "total_raw": 10,
+    "after_dedup": 9,
+    "duplicates_removed": 0,
+    "no_fax_removed": 1,
+    "confidence_high": 9,
+    "confidence_medium": 0,
+    "confidence_low": 0
+  }
+}

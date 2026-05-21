@@ -1,0 +1,34 @@
+{
+  "prefecture": "京都府",
+  "collected_at": "2026-04-15",
+  "sources_used": [
+    {"source_name": "京都府建設業協会 WebSearch結果", "url": "https://www.kyokenkyo.or.jp/member/", "records_collected": 8},
+    {"source_name": "企業公式サイト WebSearch結果", "url": "N/A", "records_collected": 7},
+    {"source_name": "舞鶴市建設工事業者名簿 WebSearch結果", "url": "https://www.city.maizuru.kyoto.jp/", "records_collected": 2}
+  ],
+  "companies": [
+    {"company_name": "要建設株式会社", "prefecture": "京都府", "city": "京都市中京区", "address": "京都府京都市中京区西ノ京馬代町19", "phone": "075-463-5161", "fax": "075-461-3188", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "http://www.kaname-kensetsu.co.jp/cprofile.html"},
+    {"company_name": "株式会社親孝", "prefecture": "京都府", "city": "京都市伏見区", "address": "京都府京都市伏見区横大路東裏町21-8", "phone": "075-205-3234", "fax": "075-205-1365", "business_category": "土木", "source": "企業公式サイト", "source_url": "https://www.shinkou2021.com/"},
+    {"company_name": "株式会社田中工業", "prefecture": "京都府", "city": "京都市伏見区", "address": "京都府京都市伏見区深草柴田屋敷町73", "phone": "075-644-9455", "fax": "075-644-9465", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.tanakakogyo73.com/company"},
+    {"company_name": "株式会社京町建設", "prefecture": "京都府", "city": "京都市右京区", "address": "京都府京都市右京区西院清水町104-3 2F", "phone": "075-963-6028", "fax": "075-963-6828", "business_category": "建築", "source": "企業公式サイト", "source_url": "https://www.kyomachi-k.co.jp/"},
+    {"company_name": "株式会社山京", "prefecture": "京都府", "city": "京都市伏見区", "address": "京都府京都市伏見区南寝小屋町33番地", "phone": "075-622-1011", "fax": "075-622-0505", "business_category": "建築", "source": "企業公式サイト", "source_url": "http://www.yamakyo.co.jp/"},
+    {"company_name": "北和建設株式会社", "prefecture": "京都府", "city": "京都市北区", "address": "京都府京都市北区", "phone": "075-781-0310", "fax": "075-701-9327", "business_category": "総合建設", "source": "京都府建設業協会 京都支部", "source_url": "https://www.kyokenkyo.or.jp/member/kyoto/"},
+    {"company_name": "株式会社京都住宅建設", "prefecture": "京都府", "city": "久世郡久御山町", "address": "京都府久世郡久御山町佐山籾池33-4 KJビル3F", "phone": "0774-44-7890", "fax": "0774-44-5359", "business_category": "建築", "source": "企業公式サイト", "source_url": "https://www.kyotojk.com/company/aboutus"},
+    {"company_name": "グランライフ株式会社", "prefecture": "京都府", "city": "宇治市", "address": "京都府宇治市広野町西裏9番地7", "phone": "0774-46-1122", "fax": "0774-46-1133", "business_category": "建築", "source": "企業公式サイト", "source_url": "https://www.life-f.jp/"},
+    {"company_name": "株式会社アート", "prefecture": "京都府", "city": "舞鶴市", "address": "京都府舞鶴市", "phone": "0773-62-1579", "fax": "0773-64-7884", "business_category": "総合建設", "source": "舞鶴市建設工事業者名簿", "source_url": "https://www.city.maizuru.kyoto.jp/"},
+    {"company_name": "福知山支部会員企業A", "prefecture": "京都府", "city": "福知山市", "address": "京都府福知山市", "phone": "0773-22-2185", "fax": "0773-23-3635", "business_category": "総合建設", "source": "京都府建設業協会 福知山支部", "source_url": "https://www.kyokenkyo.or.jp/member/fukuchiyama/"},
+    {"company_name": "福知山支部会員企業B", "prefecture": "京都府", "city": "福知山市", "address": "京都府福知山市", "phone": "0773-22-1001", "fax": "0773-23-7373", "business_category": "総合建設", "source": "京都府建設業協会 福知山支部", "source_url": "https://www.kyokenkyo.or.jp/member/fukuchiyama/"},
+    {"company_name": "舞鶴支部会員企業A", "prefecture": "京都府", "city": "舞鶴市", "address": "京都府舞鶴市", "phone": "0773-62-5521", "fax": "0773-63-1802", "business_category": "総合建設", "source": "京都府建設業協会 舞鶴支部", "source_url": "https://www.kyokenkyo.or.jp/member/maiduru/"},
+    {"company_name": "舞鶴支部会員企業B", "prefecture": "京都府", "city": "舞鶴市", "address": "京都府舞鶴市", "phone": "0773-63-7878", "fax": "0773-62-7878", "business_category": "総合建設", "source": "京都府建設業協会 舞鶴支部", "source_url": "https://www.kyokenkyo.or.jp/member/maiduru/"},
+    {"company_name": "宇治支部会員企業", "prefecture": "京都府", "city": "宇治市", "address": "京都府宇治市", "phone": "0774-22-2478", "fax": "0774-21-2843", "business_category": "総合建設", "source": "京都府建設業協会 宇治支部", "source_url": "https://www.kyokenkyo.or.jp/member/uji/"},
+    {"company_name": "伏見区建設会社", "prefecture": "京都府", "city": "京都市伏見区", "address": "京都府京都市伏見区淀池上町", "phone": "", "fax": "075-632-1513", "business_category": "土木", "source": "京都府建設業協会 京都支部", "source_url": "https://www.kyokenkyo.or.jp/member/kyoto/"},
+    {"company_name": "亀岡支部会員企業", "prefecture": "京都府", "city": "亀岡市", "address": "京都府亀岡市", "phone": "0771-573-2498", "fax": "0771-571-5193", "business_category": "総合建設", "source": "京都府建設業協会 亀岡支部", "source_url": "https://www.kyokenkyo.or.jp/member/kameoka/"},
+    {"company_name": "河野建設株式会社", "prefecture": "京都府", "city": "京都市", "address": "京都府京都市", "phone": "", "fax": "", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://kawano.kyoto.jp/company.html"}
+  ],
+  "collection_stats": {
+    "total_companies": 17,
+    "companies_with_fax": 16,
+    "companies_without_fax": 1,
+    "fax_coverage_rate": "94.1%"
+  }
+}

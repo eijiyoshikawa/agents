@@ -1,0 +1,274 @@
+{
+  "project_name": "まちボード（地域回覧板デジタル化サービス）",
+  "updated_at": "2026-04-15",
+  "design_principles": [
+    "高齢者ファースト: 65歳以上が主要ユーザー。迷わない・間違えない・読みやすいを最優先",
+    "ワンタップ完結: 最も頻繁な操作（既読確認）は1タップで完了",
+    "情報の階層化: 重要度に応じた視覚的優先度。緊急>一般連絡>イベント",
+    "エラー防止: 取り消し不能な操作は確認ダイアログ。誤タップを防ぐ十分な間隔",
+    "紙との連続性: 紙の回覧板の馴染みある形式を踏襲したデジタルレイアウト"
+  ],
+  "design_system": {
+    "figma_url": "（Figma作成予定）",
+    "tokens": {
+      "colors": {
+        "primary": {
+          "50": "#EBF5FB",
+          "100": "#D6EAF8",
+          "500": "#2980B9",
+          "600": "#2471A3",
+          "700": "#1A5276",
+          "900": "#0E2F44"
+        },
+        "secondary": {
+          "50": "#FEF5E7",
+          "500": "#E67E22",
+          "600": "#CA6F1E",
+          "700": "#AF601A"
+        },
+        "neutral": {
+          "0": "#FFFFFF",
+          "50": "#F8F9FA",
+          "100": "#F2F3F4",
+          "200": "#E5E7EB",
+          "300": "#D5D8DC",
+          "500": "#6B7280",
+          "700": "#374151",
+          "800": "#1F2937",
+          "900": "#111827"
+        },
+        "semantic": {
+          "success": "#27AE60",
+          "warning": "#F39C12",
+          "error": "#E74C3C",
+          "info": "#3498DB",
+          "emergency": "#C0392B"
+        },
+        "background": {
+          "default": "#FFFFFF",
+          "subtle": "#F8F9FA",
+          "card": "#FFFFFF",
+          "emergency": "#FDEDEC"
+        }
+      },
+      "typography": {
+        "font_family": "'Noto Sans JP', 'Hiragino Kaku Gothic ProN', sans-serif",
+        "scale": {
+          "display": {"size": "32px", "weight": 700, "line_height": 1.4},
+          "h1": {"size": "28px", "weight": 700, "line_height": 1.5},
+          "h2": {"size": "24px", "weight": 700, "line_height": 1.5},
+          "h3": {"size": "20px", "weight": 600, "line_height": 1.6},
+          "body_large": {"size": "18px", "weight": 400, "line_height": 1.8},
+          "body": {"size": "18px", "weight": 400, "line_height": 1.8, "note": "最小サイズ。これ以下のテキストは使用禁止"},
+          "caption": {"size": "16px", "weight": 400, "line_height": 1.6, "note": "補足情報のみに使用"},
+          "label": {"size": "16px", "weight": 600, "line_height": 1.4}
+        }
+      },
+      "spacing": {
+        "base": "8px",
+        "scale": ["4px", "8px", "12px", "16px", "24px", "32px", "48px", "64px"],
+        "component_gap": "16px",
+        "section_gap": "32px",
+        "page_padding": "16px (mobile) / 24px (tablet) / 32px (desktop)"
+      },
+      "border_radius": {
+        "sm": "8px",
+        "md": "12px",
+        "lg": "16px",
+        "full": "9999px"
+      },
+      "shadows": {
+        "card": "0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)",
+        "elevated": "0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06)",
+        "modal": "0 10px 25px rgba(0,0,0,0.15)"
+      }
+    },
+    "components": {
+      "button": {
+        "primary": {
+          "min_height": "56px",
+          "min_width": "120px",
+          "touch_target": "48px × 48px（ボタン内のタッチ可能領域）",
+          "font_size": "18px",
+          "font_weight": 600,
+          "border_radius": "12px",
+          "states": ["default", "hover", "active", "disabled", "loading"]
+        },
+        "read_confirmation": {
+          "description": "「読みました」専用ボタン。画面下部固定。最も目立つCTA",
+          "min_height": "64px",
+          "width": "100%（画面幅 - 32px）",
+          "font_size": "20px",
+          "background": "primary-500",
+          "confirmed_state": "success色 + チェックマーク + 「確認済み」テキスト"
+        }
+      },
+      "card": {
+        "bulletin_card": {
+          "description": "回覧板一覧のカード。未読/既読の視覚的差別化が重要",
+          "padding": "16px",
+          "border_radius": "12px",
+          "unread_indicator": "左ボーダー4px primary-500 + 背景primary-50",
+          "read_indicator": "左ボーダーなし + 背景white",
+          "elements": ["カテゴリバッジ", "タイトル（h3）", "投稿日時", "投稿者名", "既読率バー", "サムネイル（optional）"]
+        }
+      },
+      "navigation": {
+        "type": "BottomNavigation（モバイル）/ Sidebar（デスクトップ）",
+        "items": [
+          {"label": "ホーム", "icon": "home", "path": "/"},
+          {"label": "カレンダー", "icon": "calendar", "path": "/calendar", "badge": "v2"},
+          {"label": "投稿", "icon": "plus-circle", "path": "/new", "admin_only": true},
+          {"label": "管理", "icon": "settings", "path": "/admin", "admin_only": true},
+          {"label": "設定", "icon": "user", "path": "/settings"}
+        ],
+        "icon_size": "28px",
+        "label_size": "14px",
+        "bar_height": "64px",
+        "active_indicator": "primary-500 color + primary-50 background pill"
+      },
+      "badge": {
+        "category_badges": {
+          "一般連絡": {"color": "neutral-700", "bg": "neutral-100"},
+          "ゴミ収集": {"color": "#166534", "bg": "#DCFCE7"},
+          "防災": {"color": "#991B1B", "bg": "#FEE2E2"},
+          "イベント": {"color": "#9333EA", "bg": "#F3E8FF"},
+          "重要": {"color": "#B45309", "bg": "#FEF3C7"}
+        }
+      },
+      "form_input": {
+        "min_height": "56px",
+        "font_size": "18px",
+        "border_radius": "12px",
+        "label_position": "top",
+        "error_display": "below input, red, 16px"
+      }
+    },
+    "components_count": 12,
+    "code_connect_mapped": 0
+  },
+  "pages_designed": [
+    {
+      "page_name": "ログイン / マジックリンク認証",
+      "path": "/login",
+      "figma_url": "（予定）",
+      "status": "wireframe",
+      "responsive": true,
+      "description": "メールアドレス入力 → マジックリンク送信 → 確認メッセージ。LINE OAuthボタンも配置。ロゴ + 「まちボード」タイトル + シンプルなフォーム。入力フィールドは1つのみ（メールアドレス）",
+      "accessibility_notes": "フォーカス管理、エラーメッセージのaria-live、submit後の状態変化をスクリーンリーダーに通知"
+    },
+    {
+      "page_name": "オンボーディング（初回）",
+      "path": "/onboarding",
+      "figma_url": "（予定）",
+      "status": "wireframe",
+      "responsive": true,
+      "description": "初回ログイン時のみ表示。Step 1: 名前入力。Step 2: 招待コードで組織参加 or 新規組織作成。Step 3: 通知許可。3ステップのシンプルなウィザード形式",
+      "accessibility_notes": "ステップインジケーターのaria-label、各ステップの進捗をスクリーンリーダーに通知"
+    },
+    {
+      "page_name": "回覧板フィード（ホーム）",
+      "path": "/",
+      "figma_url": "（予定）",
+      "status": "wireframe",
+      "responsive": true,
+      "description": "最新の回覧板をカード形式で一覧表示。未読は左ボーダー+背景色で強調。上部にカテゴリフィルター（全て/一般/ゴミ/防災/イベント）。未読数バッジをヘッダーに表示。Pull-to-refreshで更新",
+      "accessibility_notes": "カードリストのrole=feed、各カードのaria-label（タイトル+状態）、未読数のaria-live region"
+    },
+    {
+      "page_name": "回覧板詳細 + 既読確認",
+      "path": "/bulletin/[id]",
+      "figma_url": "（予定）",
+      "status": "wireframe",
+      "responsive": true,
+      "description": "投稿の全文表示。画像拡大表示対応。画面下部に固定の「読みました」ボタン（64px高）。確認済みの場合は緑チェック+「確認済み」表示。添付PDFのダウンロードリンク。投稿者名・日時・カテゴリ表示",
+      "accessibility_notes": "「読みました」ボタンの状態変化をaria-pressed属性で管理。画像にalt必須。長文スクロール時もボタンが常に可視"
+    },
+    {
+      "page_name": "新規投稿（管理者）",
+      "path": "/new",
+      "figma_url": "（予定）",
+      "status": "wireframe",
+      "responsive": true,
+      "description": "タイトル入力 + 本文エディタ（シンプルなリッチテキスト：太字・箇条書きのみ）+ 画像添付（最大3枚）+ カテゴリ選択 + 配信予約（日時ピッカー）+ プレビューボタン + 投稿ボタン。テンプレート選択機能あり",
+      "accessibility_notes": "フォームのラベル紐づけ、必須フィールドのaria-required、画像アップロード後のフィードバック"
+    },
+    {
+      "page_name": "管理者ダッシュボード",
+      "path": "/admin/dashboard",
+      "figma_url": "（予定）",
+      "status": "wireframe",
+      "responsive": true,
+      "description": "直近投稿の既読率一覧（棒グラフまたは進捗バー）。未読者リスト + リマインド送信ボタン。全体の既読率推移（折れ線グラフ）。メンバー数・今月の投稿数のサマリーカード",
+      "accessibility_notes": "チャートにaria-label + テキスト代替。データテーブルのアクセシブルなマークアップ"
+    },
+    {
+      "page_name": "メンバー管理（管理者）",
+      "path": "/admin/members",
+      "figma_url": "（予定）",
+      "status": "wireframe",
+      "responsive": true,
+      "description": "メンバー一覧テーブル（名前・メールアドレス・ロール・最終ログイン）。招待フォーム（メールアドレス入力 → マジックリンク招待）。ロール変更（管理者/一般）。メンバー削除",
+      "accessibility_notes": "テーブルのscope属性、ソート状態のaria-sort、モーダル操作のフォーカストラップ"
+    },
+    {
+      "page_name": "サブスクリプション管理（管理者）",
+      "path": "/admin/subscription",
+      "figma_url": "（予定）",
+      "status": "wireframe",
+      "responsive": true,
+      "description": "現在のプラン表示 + プラン比較表 + Stripe Checkout遷移ボタン + 請求履歴。無料トライアル残り日数の表示。プラン変更・解約への動線",
+      "accessibility_notes": "価格テーブルのアクセシブルなマークアップ、外部遷移（Stripe）の事前通知"
+    },
+    {
+      "page_name": "通知・表示設定",
+      "path": "/settings",
+      "figma_url": "（予定）",
+      "status": "wireframe",
+      "responsive": true,
+      "description": "通知設定（プッシュ通知ON/OFF、メール通知ON/OFF、LINE連携設定）。表示設定（文字サイズ調整スライダー、ハイコントラストモード切替）。言語設定（v2: 5言語切替）。アカウント設定（名前変更・ログアウト）",
+      "accessibility_notes": "トグルスイッチのaria-checked、スライダーのaria-valuenow/min/max"
+    },
+    {
+      "page_name": "PDFプレビュー・ダウンロード",
+      "path": "/bulletin/[id]/pdf",
+      "figma_url": "（予定）",
+      "status": "wireframe",
+      "responsive": true,
+      "description": "生成されたPDFのプレビュー表示 + ダウンロードボタン + 印刷ボタン。A4サイズのレイアウトプレビュー。週次まとめPDFの生成・ダウンロードリンク",
+      "accessibility_notes": "PDFプレビューの代替テキスト、ダウンロード状態のフィードバック"
+    }
+  ],
+  "user_flows": [
+    {
+      "flow_name": "住民: 回覧板を読んで確認する",
+      "steps": ["プッシュ通知/LINE通知を受信", "通知タップでアプリ起動（or ブラウザ遷移）", "回覧板詳細画面が表示", "内容を読む", "「読みました」ボタンをタップ", "確認済み表示に切替"],
+      "total_taps": 2,
+      "note": "通知タップ → 既読ボタンの最短2タップで完結"
+    },
+    {
+      "flow_name": "管理者: 回覧板を投稿する",
+      "steps": ["ホーム画面の「投稿」ボタンをタップ", "テンプレート選択（optional）", "タイトル・本文入力", "カテゴリ選択", "画像添付（optional）", "プレビュー確認", "「投稿する」ボタンタップ", "通知配信の確認ダイアログ → 配信"],
+      "total_taps": 5,
+      "note": "テンプレート利用時は入力量を大幅に削減"
+    },
+    {
+      "flow_name": "管理者: 既読状況を確認してリマインドする",
+      "steps": ["管理ダッシュボードを開く", "対象の回覧板の既読率を確認", "未読者リストを展開", "「リマインド送信」ボタンをタップ", "未読者に再通知が配信"],
+      "total_taps": 3,
+      "note": "既読率が低い投稿にはアラートアイコン表示"
+    }
+  ],
+  "accessibility_checklist": [
+    "全テキストの最小サイズ18px（captionのみ16px許容）",
+    "全インタラクティブ要素のタッチターゲット48px×48px以上",
+    "カラーコントラスト比7:1以上（WCAG AAA基準）",
+    "キーボード操作で全機能アクセス可能（Tab/Enter/Esc）",
+    "スクリーンリーダー対応（全要素にARIAラベル）",
+    "フォーカスインジケーター（2px solid primary-500のアウトライン）",
+    "エラーメッセージは色だけでなくテキスト+アイコンで表示",
+    "動きのある要素はprefers-reduced-motionに対応",
+    "画像に必ずalt属性を設定",
+    "フォームのラベルはplaceholderではなく明示的なlabel要素を使用"
+  ]
+}

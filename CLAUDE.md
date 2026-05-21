@@ -5,6 +5,7 @@
 CEO Agentを頂点とし、COO Agentが業務執行を統括する35体のエージェント（+ Web Builder サブエージェント8体）が、相互に検証（チェック&バランス）しながら経営全機能をカバーする。
 企画・戦略立案から実際のプロダクト開発・サービス化まで一気通貫で実行可能。
 Claude Code の Maxプラン内で動作し、追加API費用なし。
+開発部門（8体）を擁し、プロダクト開発も組織内で完結可能。
 
 ## 組織図
 
@@ -97,6 +98,18 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 
 ### 廃止済み
 - ~~Quality Assurance (`quality_assurance`)~~ — 2026-04-08 QA Reviewer に統合
+
+### 開発部門（Tech Lead Agent 配下）
+17. **Tech Lead Agent** — 技術統括・アーキテクチャ設計・技術選定・コー���レビュー方針
+18. **Frontend Engineer Agent** — Next.js/TypeScript UI実装・SEO最適化・レスポンシブ
+19. **Backend Engineer Agent** — API設計・DB設計・認証・課金連携・ビジネスロジック
+20. **Infrastructure Agent** — Vercelデプロイ・CI/CD・監視・セキュリティ基盤
+21. **UI/UX Designer Agent** — デザインシステム・ワイヤーフレーム・ユーザビリティ
+22. **Data Engineer Agent** — ハローワーククローラー・データパイプライ���・検索エンジン
+23. **QA Engineer Agent** — テスト自動化・E2E・パフォーマンス・セキュリティテスト
+
+### 独立監査
+24. **Devil's Advocate Agent** — 全提案・設計の批判的検証・前提の疑問視・リスク顕在化
 
 ## 相互干渉（チェック&バランス）
 

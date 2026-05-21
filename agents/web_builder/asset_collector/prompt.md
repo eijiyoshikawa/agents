@@ -160,3 +160,10 @@ Next.js の `/public` ディレクトリ構成を設計する:
 - `Read`: site_scanner/output.json, design_analyzer/output.json の読み込み
 - `WebFetch`: ページHTMLの取得、画像URLの確認
 - `Write`: output.json への書き出し
+
+
+## 相互干渉（検証を受ける相手）
+- **Legal Agent**: 画像・フォント・ロゴの著作権・ライセンス確認
+- **Web Builder / builder**: 収集アセットが再現実装に必要十分か検証
+- **Designer**: 画像の代替素材生成が必要な場合の判断
+- **QA Reviewer（横断）**: output.json のスキーマ・完全性検証、ライセンス情報の明記

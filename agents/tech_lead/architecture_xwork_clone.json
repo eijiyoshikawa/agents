@@ -1,0 +1,282 @@
+{
+  "project": "クロスワーク同等求人ポータルサイト",
+  "version": "1.0.0",
+  "date": "2026-04-05",
+  "author": "Tech Lead Agent",
+
+  "system_diagram": "┌─────────────────────────────────────────────────────┐\n│                  ユーザー層                           │\n│  求職者(Mobile/PC)  企業担当者  管理者(社内)          │\n└────────────┬────────────┬────────────┬───────────────┘\n             │            │            │\n┌────────────▼────────────▼────────────▼───────────────┐\n│              Vercel Edge Network                      │\n│  ┌─────────────────────────────────────────────────┐  │\n│  │           Next.js Application                    │  │\n│  │  /app (求職者)  /company (企業)  /admin (管理)   │  │\n│  │  /api/* (API Routes)                             │  │\n│  └─────────────────────────────────────────────────┘  │\n└────────────────────────┬─────────────────────────────┘\n                         │\n┌────────────────────────▼─────────────────────────────┐\n│                   データ層                             │\n│  PostgreSQL(Supabase) ←→ Meilisearch ←→ Redis(Upstash)│\n│  Supabase Storage (画像・履歴書)                       │\n└────────────────────────┬─────────────────────────────┘\n                         │\n┌────────────────────────▼─────────────────────────────┐\n│                 外部連携層                              │\n│  Stripe(課金)  SendGrid(メール)  HWクローラー(Cron)   │\n│  LINE Login  Google OAuth  Sentry(監視)               │\n└──────────────────────────────────────────────────────┘",
+
+  "db_schema": {
+    "tables": [
+      {
+        "name": "users",
+        "description": "求職者アカウント",
+        "columns": [
+          {"name": "id", "type": "UUID", "pk": true},
+          {"name": "email", "type": "VARCHAR(255)", "unique": true},
+          {"name": "password_hash", "type": "VARCHAR(255)", "nullable": true},
+          {"name": "name", "type": "VARCHAR(100)"},
+          {"name": "phone", "type": "VARCHAR(20)", "nullable": true},
+          {"name": "prefecture", "type": "VARCHAR(10)"},
+          {"name": "city", "type": "VARCHAR(50)", "nullable": true},
+          {"name": "birth_date", "type": "DATE", "nullable": true},
+          {"name": "desired_categories", "type": "TEXT[]"},
+          {"name": "desired_salary_min", "type": "INTEGER", "nullable": true},
+          {"name": "resume_url", "type": "VARCHAR(500)", "nullable": true},
+          {"name": "profile_public", "type": "BOOLEAN", "default": false},
+          {"name": "auth_provider", "type": "VARCHAR(20)", "default": "email"},
+          {"name": "created_at", "type": "TIMESTAMPTZ"},
+          {"name": "updated_at", "type": "TIMESTAMPTZ"}
+        ]
+      },
+      {
+        "name": "companies",
+        "description": "掲載企業",
+        "columns": [
+          {"name": "id", "type": "UUID", "pk": true},
+          {"name": "name", "type": "VARCHAR(200)"},
+          {"name": "industry", "type": "VARCHAR(100)"},
+          {"name": "prefecture", "type": "VARCHAR(10)"},
+          {"name": "city", "type": "VARCHAR(50)"},
+          {"name": "address", "type": "TEXT"},
+          {"name": "employee_count", "type": "VARCHAR(50)"},
+          {"name": "description", "type": "TEXT"},
+          {"name": "logo_url", "type": "VARCHAR(500)", "nullable": true},
+          {"name": "website_url", "type": "VARCHAR(500)", "nullable": true},
+          {"name": "contact_email", "type": "VARCHAR(255)"},
+          {"name": "stripe_customer_id", "type": "VARCHAR(100)", "nullable": true},
+          {"name": "created_at", "type": "TIMESTAMPTZ"}
+        ]
+      },
+      {
+        "name": "company_users",
+        "description": "企業担当者アカウント",
+        "columns": [
+          {"name": "id", "type": "UUID", "pk": true},
+          {"name": "company_id", "type": "UUID", "fk": "companies.id"},
+          {"name": "email", "type": "VARCHAR(255)", "unique": true},
+          {"name": "password_hash", "type": "VARCHAR(255)"},
+          {"name": "name", "type": "VARCHAR(100)"},
+          {"name": "role", "type": "VARCHAR(20)", "default": "member"},
+          {"name": "created_at", "type": "TIMESTAMPTZ"}
+        ]
+      },
+      {
+        "name": "jobs",
+        "description": "求人情報（直接掲載+HW転載）",
+        "columns": [
+          {"name": "id", "type": "UUID", "pk": true},
+          {"name": "company_id", "type": "UUID", "fk": "companies.id", "nullable": true},
+          {"name": "source", "type": "VARCHAR(20)", "default": "direct", "comment": "direct|hellowork"},
+          {"name": "hellowork_id", "type": "VARCHAR(50)", "nullable": true, "unique": true},
+          {"name": "title", "type": "VARCHAR(200)"},
+          {"name": "category", "type": "VARCHAR(50)", "comment": "driver|construction|manufacturing|other"},
+          {"name": "subcategory", "type": "VARCHAR(50)", "nullable": true},
+          {"name": "employment_type", "type": "VARCHAR(20)", "comment": "full_time|part_time|contract"},
+          {"name": "description", "type": "TEXT"},
+          {"name": "requirements", "type": "TEXT", "nullable": true},
+          {"name": "salary_min", "type": "INTEGER", "nullable": true},
+          {"name": "salary_max", "type": "INTEGER", "nullable": true},
+          {"name": "salary_type", "type": "VARCHAR(20)", "comment": "monthly|hourly|annual"},
+          {"name": "prefecture", "type": "VARCHAR(10)"},
+          {"name": "city", "type": "VARCHAR(50)", "nullable": true},
+          {"name": "address", "type": "TEXT", "nullable": true},
+          {"name": "benefits", "type": "TEXT[]"},
+          {"name": "tags", "type": "TEXT[]"},
+          {"name": "status", "type": "VARCHAR(20)", "default": "active"},
+          {"name": "published_at", "type": "TIMESTAMPTZ"},
+          {"name": "expires_at", "type": "TIMESTAMPTZ", "nullable": true},
+          {"name": "view_count", "type": "INTEGER", "default": 0},
+          {"name": "created_at", "type": "TIMESTAMPTZ"},
+          {"name": "updated_at", "type": "TIMESTAMPTZ"}
+        ],
+        "indexes": [
+          "idx_jobs_search ON (prefecture, category, employment_type, status)",
+          "idx_jobs_salary ON (salary_min, salary_max)",
+          "idx_jobs_source ON (source, hellowork_id)",
+          "idx_jobs_status_published ON (status, published_at DESC)"
+        ]
+      },
+      {
+        "name": "applications",
+        "description": "応募",
+        "columns": [
+          {"name": "id", "type": "UUID", "pk": true},
+          {"name": "job_id", "type": "UUID", "fk": "jobs.id"},
+          {"name": "user_id", "type": "UUID", "fk": "users.id"},
+          {"name": "company_id", "type": "UUID", "fk": "companies.id"},
+          {"name": "status", "type": "VARCHAR(20)", "default": "applied", "comment": "applied|reviewing|interview|offered|hired|rejected"},
+          {"name": "message", "type": "TEXT", "nullable": true},
+          {"name": "created_at", "type": "TIMESTAMPTZ"},
+          {"name": "updated_at", "type": "TIMESTAMPTZ"}
+        ],
+        "constraints": ["UNIQUE(job_id, user_id)"]
+      },
+      {
+        "name": "scouts",
+        "description": "スカウト",
+        "columns": [
+          {"name": "id", "type": "UUID", "pk": true},
+          {"name": "company_id", "type": "UUID", "fk": "companies.id"},
+          {"name": "user_id", "type": "UUID", "fk": "users.id"},
+          {"name": "job_id", "type": "UUID", "fk": "jobs.id", "nullable": true},
+          {"name": "message", "type": "TEXT"},
+          {"name": "status", "type": "VARCHAR(20)", "default": "sent", "comment": "sent|read|replied|declined"},
+          {"name": "sent_at", "type": "TIMESTAMPTZ"},
+          {"name": "read_at", "type": "TIMESTAMPTZ", "nullable": true}
+        ]
+      },
+      {
+        "name": "billing_events",
+        "description": "成果報酬課金イベント",
+        "columns": [
+          {"name": "id", "type": "UUID", "pk": true},
+          {"name": "company_id", "type": "UUID", "fk": "companies.id"},
+          {"name": "application_id", "type": "UUID", "fk": "applications.id"},
+          {"name": "event_type", "type": "VARCHAR(20)", "comment": "hired"},
+          {"name": "amount", "type": "INTEGER", "comment": "成果報酬金額（円）"},
+          {"name": "stripe_invoice_id", "type": "VARCHAR(100)", "nullable": true},
+          {"name": "status", "type": "VARCHAR(20)", "default": "pending", "comment": "pending|invoiced|paid|failed"},
+          {"name": "created_at", "type": "TIMESTAMPTZ"}
+        ]
+      },
+      {
+        "name": "seo_pages",
+        "description": "SEOランディングページ定義",
+        "columns": [
+          {"name": "id", "type": "UUID", "pk": true},
+          {"name": "slug", "type": "VARCHAR(200)", "unique": true, "comment": "e.g. tokyo-driver"},
+          {"name": "prefecture", "type": "VARCHAR(10)"},
+          {"name": "category", "type": "VARCHAR(50)"},
+          {"name": "title", "type": "VARCHAR(200)"},
+          {"name": "meta_description", "type": "VARCHAR(300)"},
+          {"name": "h1_text", "type": "VARCHAR(200)"},
+          {"name": "body_content", "type": "TEXT", "nullable": true},
+          {"name": "job_count", "type": "INTEGER", "default": 0},
+          {"name": "updated_at", "type": "TIMESTAMPTZ"}
+        ]
+      }
+    ],
+    "relationships": [
+      "companies 1:N company_users",
+      "companies 1:N jobs",
+      "users 1:N applications",
+      "jobs 1:N applications",
+      "companies 1:N scouts",
+      "users 1:N scouts",
+      "companies 1:N billing_events",
+      "applications 1:1 billing_events"
+    ]
+  },
+
+  "api_design": {
+    "base_url": "/api",
+    "auth_method": "NextAuth.js JWT Session",
+    "endpoints": [
+      {"method": "GET", "path": "/api/jobs", "auth": false, "description": "求人検索（フィルタ・ページネーション）"},
+      {"method": "GET", "path": "/api/jobs/:id", "auth": false, "description": "求人詳細"},
+      {"method": "GET", "path": "/api/jobs/categories", "auth": false, "description": "職種カテゴリ一覧+件数"},
+      {"method": "GET", "path": "/api/jobs/areas", "auth": false, "description": "地域別求人数"},
+      {"method": "POST", "path": "/api/auth/register", "auth": false, "description": "求職者登録"},
+      {"method": "POST", "path": "/api/auth/[...nextauth]", "auth": false, "description": "NextAuth認証エンドポイント"},
+      {"method": "GET", "path": "/api/users/me", "auth": "seeker", "description": "プロフィール取得"},
+      {"method": "PUT", "path": "/api/users/me", "auth": "seeker", "description": "プロフィール更新"},
+      {"method": "POST", "path": "/api/users/me/resume", "auth": "seeker", "description": "履歴書アップロード"},
+      {"method": "GET", "path": "/api/users/me/applications", "auth": "seeker", "description": "応募履歴"},
+      {"method": "GET", "path": "/api/users/me/scouts", "auth": "seeker", "description": "スカウト一覧"},
+      {"method": "POST", "path": "/api/applications", "auth": "seeker", "description": "求人に応募"},
+      {"method": "POST", "path": "/api/company/auth/register", "auth": false, "description": "企業登録"},
+      {"method": "GET", "path": "/api/company/jobs", "auth": "company", "description": "自社求人一覧"},
+      {"method": "POST", "path": "/api/company/jobs", "auth": "company", "description": "求人作成"},
+      {"method": "PUT", "path": "/api/company/jobs/:id", "auth": "company", "description": "求人更新"},
+      {"method": "DELETE", "path": "/api/company/jobs/:id", "auth": "company", "description": "求人削除"},
+      {"method": "GET", "path": "/api/company/applications", "auth": "company", "description": "応募者一覧"},
+      {"method": "PUT", "path": "/api/company/applications/:id", "auth": "company", "description": "応募ステータス更新"},
+      {"method": "GET", "path": "/api/company/candidates", "auth": "company", "description": "スカウト候補者検索"},
+      {"method": "POST", "path": "/api/company/scouts", "auth": "company", "description": "スカウト送信"},
+      {"method": "GET", "path": "/api/company/billing", "auth": "company", "description": "課金履歴"},
+      {"method": "GET", "path": "/api/admin/dashboard", "auth": "admin", "description": "管理者ダッシュボード"},
+      {"method": "GET", "path": "/api/admin/companies", "auth": "admin", "description": "企業管理"},
+      {"method": "GET", "path": "/api/admin/billing", "auth": "admin", "description": "課金管理"},
+      {"method": "POST", "path": "/api/admin/hellowork/import", "auth": "admin", "description": "HW取込手動実行"},
+      {"method": "POST", "path": "/api/webhooks/stripe", "auth": false, "description": "Stripe Webhook"},
+      {"method": "GET", "path": "/api/health", "auth": false, "description": "ヘルスチェック"}
+    ]
+  },
+
+  "page_structure": {
+    "public": [
+      {"path": "/", "render": "SSR", "description": "トップページ（検索導線・人気カテゴリ・新着求人）"},
+      {"path": "/jobs", "render": "SSR", "description": "求人検索結果"},
+      {"path": "/jobs/[id]", "render": "SSR", "description": "求人詳細"},
+      {"path": "/[prefecture]", "render": "ISR", "description": "都道府県別求人"},
+      {"path": "/[prefecture]/[category]", "render": "ISR", "description": "都道府県×職種SEOページ"},
+      {"path": "/categories/[category]", "render": "ISR", "description": "職種別求人"},
+      {"path": "/about", "render": "Static", "description": "サイト概要"},
+      {"path": "/terms", "render": "Static", "description": "利用規約"},
+      {"path": "/privacy", "render": "Static", "description": "プライバシーポリシー"},
+      {"path": "/for-employers", "render": "Static", "description": "企業向けLP"}
+    ],
+    "auth": [
+      {"path": "/register", "render": "CSR", "description": "求職者登録"},
+      {"path": "/login", "render": "CSR", "description": "ログイン"},
+      {"path": "/mypage", "render": "CSR", "description": "マイページ"},
+      {"path": "/mypage/applications", "render": "CSR", "description": "応募履歴"},
+      {"path": "/mypage/scouts", "render": "CSR", "description": "スカウト一覧"},
+      {"path": "/mypage/profile", "render": "CSR", "description": "プロフィール編集"}
+    ],
+    "company": [
+      {"path": "/company/register", "render": "CSR", "description": "企業登録"},
+      {"path": "/company/dashboard", "render": "CSR", "description": "企業ダッシュボード"},
+      {"path": "/company/jobs", "render": "CSR", "description": "求人管理"},
+      {"path": "/company/jobs/new", "render": "CSR", "description": "求人作成"},
+      {"path": "/company/jobs/[id]/edit", "render": "CSR", "description": "求人編集"},
+      {"path": "/company/applications", "render": "CSR", "description": "応募者管理"},
+      {"path": "/company/scouts", "render": "CSR", "description": "スカウト管理"},
+      {"path": "/company/billing", "render": "CSR", "description": "課金履歴"}
+    ],
+    "admin": [
+      {"path": "/admin", "render": "CSR", "description": "管理者ダッシュボード"},
+      {"path": "/admin/companies", "render": "CSR", "description": "企業管理"},
+      {"path": "/admin/billing", "render": "CSR", "description": "課金管理"},
+      {"path": "/admin/crawler", "render": "CSR", "description": "クローラー管理"}
+    ]
+  },
+
+  "search_index_design": {
+    "engine": "Meilisearch",
+    "index": "jobs",
+    "searchable_attributes": ["title", "description", "company_name", "address", "requirements"],
+    "filterable_attributes": ["prefecture", "city", "category", "subcategory", "employment_type", "salary_min", "salary_max", "tags", "source", "status"],
+    "sortable_attributes": ["published_at", "salary_max", "view_count"],
+    "ranking_rules": ["words", "typo", "proximity", "attribute", "sort", "exactness"],
+    "facets": ["prefecture", "category", "employment_type", "salary_range"],
+    "sync_interval_minutes": 15
+  },
+
+  "non_functional_requirements": {
+    "performance": {
+      "page_load_time": "< 2秒 (LCP)",
+      "api_response_time": "< 500ms (P95)",
+      "search_response_time": "< 200ms",
+      "concurrent_users": "1000+ (初期目標)"
+    },
+    "seo": {
+      "lighthouse_seo_score": ">= 95",
+      "structured_data": "schema.org/JobPosting",
+      "sitemap": "動的生成（ISR連動）",
+      "seo_pages_count": "1000+ (都道府県×職種)"
+    },
+    "security": {
+      "auth": "NextAuth.js JWT + CSRF",
+      "encryption": "HTTPS (Vercel標準)",
+      "data_protection": "個人情報保護法対応",
+      "vulnerability_scan": "週次 npm audit"
+    },
+    "availability": {
+      "uptime_target": "99.9%",
+      "backup": "Supabase 日次自動バックアップ",
+      "disaster_recovery": "Supabase PITR (Point-in-Time Recovery)"
+    }
+  }
+}

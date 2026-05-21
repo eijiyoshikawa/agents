@@ -1,0 +1,204 @@
+{
+  "prefecture": "兵庫県",
+  "collected_at": "2026-04-15",
+  "sources_used": [
+    {
+      "source_name": "兵庫県建設業協会 WebSearch結果",
+      "url": "https://hyokenkyo.or.jp/branch/",
+      "records_collected": 8
+    },
+    {
+      "source_name": "企業公式サイト WebSearch結果",
+      "url": "N/A",
+      "records_collected": 7
+    }
+  ],
+  "companies": [
+    {
+      "company_name": "丸正建設株式会社",
+      "prefecture": "兵庫県",
+      "city": "神戸市長田区",
+      "address": "兵庫県神戸市長田区房王寺町7丁目2番7号",
+      "phone": "078-621-8661",
+      "fax": "078-621-8663",
+      "business_category": "総合建設",
+      "permit_number": "",
+      "source": "企業公式サイト",
+      "source_url": "https://www.marusyo-k.co.jp/"
+    },
+    {
+      "company_name": "株式会社伊吹工務店",
+      "prefecture": "兵庫県",
+      "city": "神戸市長田区",
+      "address": "兵庫県神戸市長田区水笠通1-1-55",
+      "phone": "078-641-6201",
+      "fax": "078-641-3525",
+      "business_category": "建築",
+      "permit_number": "",
+      "source": "企業公式サイト",
+      "source_url": "http://ibuki-con.co.jp/"
+    },
+    {
+      "company_name": "株式会社神戸みなと総合設計",
+      "prefecture": "兵庫県",
+      "city": "神戸市中央区",
+      "address": "兵庫県神戸市中央区海岸通5番地 神戸商船三井ビル",
+      "phone": "078-392-7000",
+      "fax": "078-392-7008",
+      "business_category": "設備",
+      "permit_number": "",
+      "source": "企業公式サイト",
+      "source_url": "https://khsd.co.jp/"
+    },
+    {
+      "company_name": "三協建設株式会社",
+      "prefecture": "兵庫県",
+      "city": "姫路市",
+      "address": "兵庫県姫路市飯田3丁目117",
+      "phone": "079-234-2738",
+      "fax": "079-234-6921",
+      "business_category": "土木",
+      "permit_number": "",
+      "source": "企業公式サイト",
+      "source_url": "https://snkykk.com/"
+    },
+    {
+      "company_name": "有限会社姫路建設工業",
+      "prefecture": "兵庫県",
+      "city": "姫路市",
+      "address": "兵庫県姫路市網干区垣内中町20-12",
+      "phone": "",
+      "fax": "079-273-0919",
+      "business_category": "その他",
+      "permit_number": "",
+      "source": "企業公式サイト",
+      "source_url": "https://www.himejikensetsu.com/"
+    },
+    {
+      "company_name": "ヒラカワ建設株式会社",
+      "prefecture": "兵庫県",
+      "city": "姫路市",
+      "address": "兵庫県姫路市御国野町御着1-9-11",
+      "phone": "079-290-5380",
+      "fax": "079-290-5375",
+      "business_category": "総合建設",
+      "permit_number": "",
+      "source": "企業公式サイト",
+      "source_url": "https://hirakawa8075.com/"
+    },
+    {
+      "company_name": "株式会社ハクロ建設",
+      "prefecture": "兵庫県",
+      "city": "姫路市",
+      "address": "兵庫県姫路市南条430",
+      "phone": "079-282-6611",
+      "fax": "079-281-9534",
+      "business_category": "土木",
+      "permit_number": "",
+      "source": "企業公式サイト",
+      "source_url": "https://www.hakuro-g.co.jp/company/"
+    },
+    {
+      "company_name": "株式会社新井組",
+      "prefecture": "兵庫県",
+      "city": "西宮市",
+      "address": "兵庫県西宮市池田町12番20号",
+      "phone": "0798-26-3111",
+      "fax": "0798-33-6111",
+      "business_category": "総合建設",
+      "permit_number": "",
+      "source": "兵庫県建設業協会 西宮支部",
+      "source_url": "https://hyokenkyo.or.jp/branch/nishinomiya/nishinomiya-member/"
+    },
+    {
+      "company_name": "栄建工業株式会社",
+      "prefecture": "兵庫県",
+      "city": "西宮市",
+      "address": "兵庫県西宮市大島町7番6号",
+      "phone": "0798-64-6410",
+      "fax": "0798-64-6459",
+      "business_category": "建築",
+      "permit_number": "",
+      "source": "兵庫県建設業協会 西宮支部",
+      "source_url": "https://hyokenkyo.or.jp/branch/nishinomiya/nishinomiya-member/"
+    },
+    {
+      "company_name": "川西土木株式会社",
+      "prefecture": "兵庫県",
+      "city": "西宮市",
+      "address": "兵庫県西宮市西宮浜2丁目21番地",
+      "phone": "0798-33-2588",
+      "fax": "0798-33-2313",
+      "business_category": "土木",
+      "permit_number": "",
+      "source": "兵庫県建設業協会 西宮支部",
+      "source_url": "https://hyokenkyo.or.jp/branch/nishinomiya/nishinomiya-member/"
+    },
+    {
+      "company_name": "第一建設機工株式会社",
+      "prefecture": "兵庫県",
+      "city": "西宮市",
+      "address": "兵庫県西宮市今津港町2番30号",
+      "phone": "0798-22-3301",
+      "fax": "0798-33-4580",
+      "business_category": "設備",
+      "permit_number": "",
+      "source": "兵庫県建設業協会 西宮支部",
+      "source_url": "https://hyokenkyo.or.jp/branch/nishinomiya/nishinomiya-member/"
+    },
+    {
+      "company_name": "株式会社川嶋建設",
+      "prefecture": "兵庫県",
+      "city": "豊岡市",
+      "address": "兵庫県豊岡市香住15-1",
+      "phone": "0796-29-5123",
+      "fax": "0796-29-5223",
+      "business_category": "総合建設",
+      "permit_number": "",
+      "source": "企業公式サイト",
+      "source_url": "https://www.kawashima.gr.jp/about/outline.html"
+    },
+    {
+      "company_name": "株式会社マサキ",
+      "prefecture": "兵庫県",
+      "city": "豊岡市",
+      "address": "兵庫県豊岡市庄境137",
+      "phone": "0796-20-2590",
+      "fax": "0796-20-2591",
+      "business_category": "総合建設",
+      "permit_number": "",
+      "source": "企業公式サイト",
+      "source_url": "https://masaki1357.co.jp/aboutus"
+    },
+    {
+      "company_name": "沼田建設工業株式会社",
+      "prefecture": "兵庫県",
+      "city": "神戸市須磨区",
+      "address": "兵庫県神戸市須磨区",
+      "phone": "078-742-0521",
+      "fax": "",
+      "business_category": "総合建設",
+      "permit_number": "",
+      "source": "兵庫県建設業協会 神戸支部",
+      "source_url": "https://hyokenkyo.or.jp/branch/kobe/kobe-member/"
+    },
+    {
+      "company_name": "日興建設株式会社",
+      "prefecture": "兵庫県",
+      "city": "三田市",
+      "address": "兵庫県三田市三輪二丁目4番3号",
+      "phone": "079-562-4681",
+      "fax": "",
+      "business_category": "総合建設",
+      "permit_number": "",
+      "source": "WebSearch結果",
+      "source_url": ""
+    }
+  ],
+  "collection_stats": {
+    "total_companies": 15,
+    "companies_with_fax": 13,
+    "companies_without_fax": 2,
+    "fax_coverage_rate": "86.7%"
+  }
+}

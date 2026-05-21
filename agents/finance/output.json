@@ -1,0 +1,427 @@
+{
+  "agent": "finance",
+  "task": "ダンスクラス開講 収支計画",
+  "generated_at": "2026-04-06",
+  "project": "ダンスクラス開講 収支計画",
+  "pricing": {
+    "lesson_fee": 1000,
+    "currency": "JPY",
+    "lesson_duration_hours": 2,
+    "note": "1回1,000円 / 2時間レッスン"
+  },
+  "cost_scenarios": [
+    {
+      "label": "格安スタジオ",
+      "hourly_rate": 1500,
+      "hours_per_lesson": 2,
+      "cost_per_lesson": 3000,
+      "examples": "公共施設併設スタジオ、区民センター、格安レンタルスペース"
+    },
+    {
+      "label": "標準スタジオ",
+      "hourly_rate": 2000,
+      "hours_per_lesson": 2,
+      "cost_per_lesson": 4000,
+      "examples": "一般的なダンススタジオ、駅近レンタルスタジオ"
+    },
+    {
+      "label": "高めスタジオ",
+      "hourly_rate": 2500,
+      "hours_per_lesson": 2,
+      "cost_per_lesson": 5000,
+      "examples": "設備充実スタジオ、鏡・音響完備、梅田・心斎橋エリア"
+    }
+  ],
+  "breakeven_analysis": {
+    "description": "レッスン料1,000円/人の場合、各スタジオ価格帯でスタジオ代だけを回収するために必要な最低参加人数",
+    "formula": "損益分岐人数 = スタジオ代 / レッスン料",
+    "scenarios": [
+      {
+        "label": "格安スタジオ（3,000円/回）",
+        "studio_cost": 3000,
+        "breakeven_persons": 3,
+        "profit_at_breakeven": 0,
+        "note": "3名で収支トントン。4名以上で黒字"
+      },
+      {
+        "label": "標準スタジオ（4,000円/回）",
+        "studio_cost": 4000,
+        "breakeven_persons": 4,
+        "profit_at_breakeven": 0,
+        "note": "4名で収支トントン。5名以上で黒字"
+      },
+      {
+        "label": "高めスタジオ（5,000円/回）",
+        "studio_cost": 5000,
+        "breakeven_persons": 5,
+        "profit_at_breakeven": 0,
+        "note": "5名で収支トントン。6名以上で黒字"
+      }
+    ],
+    "with_other_expenses": {
+      "description": "交通費・音源サブスク等の雑費を含めた実質損益分岐点（月次ベース）",
+      "monthly_overhead": 2500,
+      "note": "交通費1,500円/月 + 音源サブスク1,000円/月 = 2,500円/月を按分",
+      "scenarios_monthly": [
+        {
+          "label": "Phase1: 月2回 × 格安スタジオ",
+          "studio_cost_monthly": 6000,
+          "overhead_monthly": 2500,
+          "total_cost_monthly": 8500,
+          "revenue_per_person_monthly": 2000,
+          "breakeven_persons_per_lesson": 5,
+          "note": "月あたり総コスト8,500円 / 2回 / 1,000円 = 4.25人 → 切上5名/回"
+        },
+        {
+          "label": "Phase1: 月2回 × 標準スタジオ",
+          "studio_cost_monthly": 8000,
+          "overhead_monthly": 2500,
+          "total_cost_monthly": 10500,
+          "revenue_per_person_monthly": 2000,
+          "breakeven_persons_per_lesson": 6,
+          "note": "月あたり総コスト10,500円 / 2回 / 1,000円 = 5.25人 → 切上6名/回"
+        },
+        {
+          "label": "Phase1: 月2回 × 高めスタジオ",
+          "studio_cost_monthly": 10000,
+          "overhead_monthly": 2500,
+          "total_cost_monthly": 12500,
+          "revenue_per_person_monthly": 2000,
+          "breakeven_persons_per_lesson": 7,
+          "note": "月あたり総コスト12,500円 / 2回 / 1,000円 = 6.25人 → 切上7名/回"
+        }
+      ]
+    }
+  },
+  "monthly_pl_simulation": {
+    "assumptions": {
+      "lesson_fee": 1000,
+      "transportation_per_month": 1500,
+      "music_subscription_per_month": 1000,
+      "instructor_labor": "自己労働のため計上なし（機会費用として別途認識）"
+    },
+    "phase_1": {
+      "label": "Phase 1: 月2回（1〜2ヶ月目）",
+      "frequency": "月2回",
+      "duration": "1〜2ヶ月目",
+      "scenarios": [
+        {
+          "studio_type": "格安（3,000円/回）",
+          "participants_per_lesson": 5,
+          "revenue": {
+            "lesson_fee_total": 10000,
+            "note": "1,000円 × 5名 × 2回 = 10,000円"
+          },
+          "expenses": {
+            "studio_rental": 6000,
+            "transportation": 1500,
+            "music_subscription": 1000,
+            "miscellaneous": 500,
+            "total": 9000
+          },
+          "operating_profit": 1000,
+          "profit_margin_pct": 10.0
+        },
+        {
+          "studio_type": "標準（4,000円/回）",
+          "participants_per_lesson": 6,
+          "revenue": {
+            "lesson_fee_total": 12000,
+            "note": "1,000円 × 6名 × 2回 = 12,000円"
+          },
+          "expenses": {
+            "studio_rental": 8000,
+            "transportation": 1500,
+            "music_subscription": 1000,
+            "miscellaneous": 500,
+            "total": 11000
+          },
+          "operating_profit": 1000,
+          "profit_margin_pct": 8.3
+        },
+        {
+          "studio_type": "高め（5,000円/回）",
+          "participants_per_lesson": 7,
+          "revenue": {
+            "lesson_fee_total": 14000,
+            "note": "1,000円 × 7名 × 2回 = 14,000円"
+          },
+          "expenses": {
+            "studio_rental": 10000,
+            "transportation": 1500,
+            "music_subscription": 1000,
+            "miscellaneous": 500,
+            "total": 13000
+          },
+          "operating_profit": 1000,
+          "profit_margin_pct": 7.1
+        }
+      ]
+    },
+    "phase_2": {
+      "label": "Phase 2: 月4回（3〜5ヶ月目）",
+      "frequency": "月4回",
+      "duration": "3〜5ヶ月目",
+      "scenarios": [
+        {
+          "studio_type": "格安（3,000円/回）",
+          "participants_per_lesson": 5,
+          "revenue": {
+            "lesson_fee_total": 20000,
+            "note": "1,000円 × 5名 × 4回 = 20,000円"
+          },
+          "expenses": {
+            "studio_rental": 12000,
+            "transportation": 2000,
+            "music_subscription": 1000,
+            "miscellaneous": 500,
+            "total": 15500
+          },
+          "operating_profit": 4500,
+          "profit_margin_pct": 22.5
+        },
+        {
+          "studio_type": "標準（4,000円/回）",
+          "participants_per_lesson": 6,
+          "revenue": {
+            "lesson_fee_total": 24000,
+            "note": "1,000円 × 6名 × 4回 = 24,000円"
+          },
+          "expenses": {
+            "studio_rental": 16000,
+            "transportation": 2000,
+            "music_subscription": 1000,
+            "miscellaneous": 500,
+            "total": 19500
+          },
+          "operating_profit": 4500,
+          "profit_margin_pct": 18.8
+        },
+        {
+          "studio_type": "高め（5,000円/回）",
+          "participants_per_lesson": 7,
+          "revenue": {
+            "lesson_fee_total": 28000,
+            "note": "1,000円 × 7名 × 4回 = 28,000円"
+          },
+          "expenses": {
+            "studio_rental": 20000,
+            "transportation": 2000,
+            "music_subscription": 1000,
+            "miscellaneous": 500,
+            "total": 23500
+          },
+          "operating_profit": 4500,
+          "profit_margin_pct": 16.1
+        }
+      ]
+    },
+    "phase_3": {
+      "label": "Phase 3: 週1回（6ヶ月目〜）",
+      "frequency": "月4.3回（週1）",
+      "duration": "6ヶ月目〜",
+      "note": "月4回で計算（端数月は5回の月もあり）",
+      "scenarios": [
+        {
+          "studio_type": "格安（3,000円/回）",
+          "participants_per_lesson": 8,
+          "revenue": {
+            "lesson_fee_total": 32000,
+            "note": "1,000円 × 8名 × 4回 = 32,000円（固定ファン増加を想定）"
+          },
+          "expenses": {
+            "studio_rental": 12000,
+            "transportation": 2000,
+            "music_subscription": 1000,
+            "miscellaneous": 500,
+            "total": 15500
+          },
+          "operating_profit": 16500,
+          "profit_margin_pct": 51.6
+        },
+        {
+          "studio_type": "標準（4,000円/回）",
+          "participants_per_lesson": 8,
+          "revenue": {
+            "lesson_fee_total": 32000,
+            "note": "1,000円 × 8名 × 4回 = 32,000円"
+          },
+          "expenses": {
+            "studio_rental": 16000,
+            "transportation": 2000,
+            "music_subscription": 1000,
+            "miscellaneous": 500,
+            "total": 19500
+          },
+          "operating_profit": 12500,
+          "profit_margin_pct": 39.1
+        },
+        {
+          "studio_type": "高め（5,000円/回）",
+          "participants_per_lesson": 8,
+          "revenue": {
+            "lesson_fee_total": 32000,
+            "note": "1,000円 × 8名 × 4回 = 32,000円"
+          },
+          "expenses": {
+            "studio_rental": 20000,
+            "transportation": 2000,
+            "music_subscription": 1000,
+            "miscellaneous": 500,
+            "total": 23500
+          },
+          "operating_profit": 8500,
+          "profit_margin_pct": 26.6
+        }
+      ]
+    },
+    "cumulative_6month_forecast": {
+      "description": "6ヶ月間の累計損益予測（標準スタジオ、各Phase目標人数達成時）",
+      "phase_1_months_1_2": {
+        "months": 2,
+        "profit_per_month": 1000,
+        "cumulative": 2000
+      },
+      "phase_2_months_3_5": {
+        "months": 3,
+        "profit_per_month": 4500,
+        "cumulative": 13500
+      },
+      "phase_3_month_6": {
+        "months": 1,
+        "profit_per_month": 12500,
+        "cumulative": 12500
+      },
+      "total_6month_profit": 28000,
+      "total_6month_revenue": 132000,
+      "total_6month_expenses": 104000
+    }
+  },
+  "initial_investment": {
+    "total_estimate": 5000,
+    "note": "ほぼゼロ想定。以下は最低限の立ち上げ経費",
+    "items": [
+      {
+        "item": "Bluetooth スピーカー",
+        "cost": 0,
+        "note": "手持ちがあれば不要。なければ3,000〜5,000円程度"
+      },
+      {
+        "item": "音源サブスクリプション初月",
+        "cost": 1000,
+        "note": "Spotify Premium等（月額1,000円）"
+      },
+      {
+        "item": "SNS告知用ビジュアル制作",
+        "cost": 0,
+        "note": "Canva無料プランで自作可能"
+      },
+      {
+        "item": "チラシ印刷（任意）",
+        "cost": 2000,
+        "note": "ラクスル等で100枚程度。SNSのみなら不要"
+      },
+      {
+        "item": "決済手段準備",
+        "cost": 0,
+        "note": "PayPay / 現金集金なら無料。Square等は端末無料・手数料3.25%"
+      },
+      {
+        "item": "予備費",
+        "cost": 2000,
+        "note": "初回レッスンの人数不足リスクへの備え"
+      }
+    ]
+  },
+  "other_expenses": {
+    "monthly_recurring": [
+      {
+        "item": "交通費",
+        "cost_per_month_estimate": 1500,
+        "note": "大阪市内移動。片道約375円 × 往復 × 月2〜4回。定期圏内なら0円"
+      },
+      {
+        "item": "音源サブスクリプション",
+        "cost_per_month": 1000,
+        "note": "Spotify Premium / Apple Music等"
+      },
+      {
+        "item": "雑費（飲料水・消耗品等）",
+        "cost_per_month_estimate": 500,
+        "note": "参加者用の水など。必須ではない"
+      }
+    ],
+    "optional": [
+      {
+        "item": "損害保険（レクリエーション保険）",
+        "cost_estimate": "1回あたり約30円/人",
+        "note": "参加者のケガに備える。加入推奨。年間でも数千円程度"
+      },
+      {
+        "item": "名刺・ショップカード",
+        "cost_estimate": 1500,
+        "note": "100枚程度。ラクスル等"
+      },
+      {
+        "item": "衣装・シューズ",
+        "cost_estimate": 0,
+        "note": "インストラクター個人のため経費計上外。ただし事業用なら按分可能"
+      }
+    ]
+  },
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "category": "コスト管理",
+      "recommendation": "Phase 1 は格安スタジオ（1,500円/時間以下）を強く推奨。公共施設や区民センターの貸しスペースは1,000円/時間以下の場合もあり。大阪市内なら各区の区民センター・生涯学習センターを優先調査すべき"
+    },
+    {
+      "priority": "HIGH",
+      "category": "損益分岐",
+      "recommendation": "格安スタジオで最低3名/回がギリギリ黒字ライン。現実的には5名/回を安定目標とすることで、雑費込みでも黒字を確保できる"
+    },
+    {
+      "priority": "HIGH",
+      "category": "集客リスク対策",
+      "recommendation": "初回〜3回目は赤字覚悟で体験無料 or 500円キャンペーンを検討。赤字幅は最大3,000〜5,000円/回に抑えられるため、集客投資としては極めて低リスク"
+    },
+    {
+      "priority": "MEDIUM",
+      "category": "価格戦略",
+      "recommendation": "月謝制（月4回 3,500円等）の導入をPhase 2以降に検討。ドロップイン1,000円との差額でリピーター確保とキャッシュフロー安定化を両立可能"
+    },
+    {
+      "priority": "MEDIUM",
+      "category": "収益拡大",
+      "recommendation": "Phase 3 で参加者10名以上が安定したら、レッスン料を1,200〜1,500円に改定検討。または上級クラス新設で単価アップ"
+    },
+    {
+      "priority": "MEDIUM",
+      "category": "リスク管理",
+      "recommendation": "レクリエーション保険（1回30円/人程度）への加入を推奨。ダンスは怪我リスクがあり、万一の際の賠償リスクを低コストでヘッジできる"
+    },
+    {
+      "priority": "LOW",
+      "category": "決済",
+      "recommendation": "初期はPayPay or 現金集金で十分。Square等のキャッシュレス決済は参加者10名超安定後に導入検討"
+    },
+    {
+      "priority": "LOW",
+      "category": "税務",
+      "recommendation": "年間売上が事業規模になる場合は開業届を提出し、青色申告で最大65万円の控除を受けること。Phase 3 で月3万円超が安定すれば年間36万円以上となり検討時期"
+    }
+  ],
+  "summary": {
+    "headline": "格安スタジオ × 5名/回で月2回からスタートすれば、月1,000円の黒字で安全に開始可能",
+    "key_numbers": {
+      "minimum_breakeven_per_lesson": "3名（格安スタジオ、スタジオ代のみ）",
+      "realistic_target_per_lesson": "5〜6名（全経費込みで黒字）",
+      "phase1_monthly_profit": "約1,000円（月2回 × 5名 × 格安）",
+      "phase2_monthly_profit": "約4,500円（月4回 × 5名 × 格安）",
+      "phase3_monthly_profit": "約16,500円（月4回 × 8名 × 格安）",
+      "initial_investment": "約5,000円",
+      "6month_cumulative_profit": "約28,000円（標準スタジオ想定）"
+    },
+    "go_nogo": "GO — 初期投資5,000円以下、Phase 1 の赤字リスクも最大数千円/月と極めて低い。集客5名を確保できれば即黒字。段階拡大戦略により、需要を確認しながら安全にスケール可能。"
+  }
+}

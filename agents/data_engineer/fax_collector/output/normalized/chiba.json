@@ -1,0 +1,8 @@
+{
+  "prefecture": "千葉県",
+  "normalized_at": "2026-04-15",
+  "companies": [
+    {"company_name": "株式会社大城組", "prefecture": "千葉県", "city": "市川市", "address": "千葉県市川市真間3-10-23", "phone": "047-322-1166", "fax": "047-321-3490", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"}
+  ],
+  "stats": {"total_raw": 1, "after_dedup": 1, "confidence_high": 1, "confidence_medium": 0}
+}

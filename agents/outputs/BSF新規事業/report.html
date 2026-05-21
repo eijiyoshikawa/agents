@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BSF新規事業 戦略レポート</title>
+<style>
+  :root { --primary: #1a5632; --accent: #2d8a56; --bg: #fafbfc; --card: #fff; --border: #e1e5e9; --text: #24292f; --muted: #57606a; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans JP", sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+  .container { max-width: 900px; margin: 0 auto; padding: 24px; }
+  header { background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; padding: 48px 24px; text-align: center; }
+  header h1 { font-size: 1.8em; margin-bottom: 8px; }
+  header p { opacity: 0.85; font-size: 0.95em; }
+  h2 { color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 8px; margin: 40px 0 16px; font-size: 1.4em; }
+  h3 { color: var(--accent); margin: 24px 0 12px; font-size: 1.1em; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin: 16px 0; }
+  .highlight { background: #f0fdf4; border-left: 4px solid var(--accent); padding: 16px 20px; margin: 16px 0; border-radius: 0 8px 8px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.9em; }
+  th { background: var(--primary); color: #fff; padding: 10px 12px; text-align: left; }
+  td { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  tr:hover td { background: #f6f8fa; }
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 0.8em; font-weight: 600; }
+  .tag-high { background: #fee2e2; color: #991b1b; }
+  .tag-medium { background: #fef3c7; color: #92400e; }
+  .tag-low { background: #dbeafe; color: #1e40af; }
+  ul, ol { margin: 8px 0 8px 24px; }
+  li { margin: 4px 0; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .metric { text-align: center; padding: 16px; }
+  .metric .num { font-size: 2em; font-weight: 700; color: var(--accent); }
+  .metric .label { font-size: 0.85em; color: var(--muted); }
+  .recommend { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 2px solid var(--accent); }
+  footer { text-align: center; color: var(--muted); padding: 32px; font-size: 0.85em; }
+  @media print { body { background: #fff; } .container { max-width: 100%; } header { padding: 24px; } }
+  @media (max-width: 600px) { .grid2 { grid-template-columns: 1fr; } header h1 { font-size: 1.3em; } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>BSF（ブラックソルジャーフライ）新規事業 戦略レポート</h1>
+  <p>デジタル × 昆虫テクノロジーで食品廃棄物を価値に変える</p>
+  <p style="margin-top:12px;opacity:0.7">作成日: 2026-04-03 | Strategy Agents Pipeline</p>
+</header>
+
+<div class="container">
+
+<!-- Section 1 -->
+<h2>1. ビジネスコンテキスト</h2>
+
+<div class="highlight">
+  BSF（アメリカミズアブ）の幼虫が食品残渣を10-14日で高速分解し、昆虫タンパク質・オイル・有機肥料に変換する。食品廃棄物問題 × 飼料輸入依存 × サーキュラーエコノミー政策の3メガトレンドが交差する事業領域。
+</div>
+
+<div class="grid2">
+  <div class="card metric"><div class="num">464万t</div><div class="label">日本の食品ロス（年間）</div></div>
+  <div class="card metric"><div class="num">90%</div><div class="label">飼料原料の輸入依存率</div></div>
+</div>
+
+<h3>BSFの3つの産出物</h3>
+<table>
+  <tr><th>産出物</th><th>用途</th><th>価格帯</th></tr>
+  <tr><td>昆虫ミール（タンパク質50-60%）</td><td>養殖飼料、畜産飼料、ペットフード</td><td>$3,800-6,000/トン</td></tr>
+  <tr><td>昆虫オイル（ラウリン酸最大76%）</td><td>飼料添加、化粧品、バイオ燃料</td><td>最大 &euro;500/リットル</td></tr>
+  <tr><td>フラス（虫糞）</td><td>有機肥料</td><td>加工済み $3-5/kg</td></tr>
+</table>
+
+<!-- Section 2 -->
+<h2>2. 構造化された課題</h2>
+
+<div class="highlight">
+  <strong>中心的な問い:</strong> BSF事業において、既存のデジタル事業ノウハウを活かしつつ、日本市場で持続的な競争優位を築けるビジネスモデルは何か？
+</div>
+
+<table>
+  <tr><th>#</th><th>カテゴリ</th><th>課題</th><th>優先度</th></tr>
+  <tr><td>1</td><td>市場</td><td>日本のBSF市場規模と成長ポテンシャル</td><td><span class="tag tag-high">HIGH</span></td></tr>
+  <tr><td>2</td><td>市場</td><td>規制環境と法的フレームワーク</td><td><span class="tag tag-high">HIGH</span></td></tr>
+  <tr><td>3</td><td>競合</td><td>国内外の競合プレイヤーと差別化ポイント</td><td><span class="tag tag-high">HIGH</span></td></tr>
+  <tr><td>4</td><td>顧客</td><td>ターゲット顧客セグメントの特定</td><td><span class="tag tag-high">HIGH</span></td></tr>
+  <tr><td>5</td><td>内部</td><td>食品廃棄物の原料調達とサプライチェーン構築</td><td><span class="tag tag-high">HIGH</span></td></tr>
+  <tr><td>6</td><td>内部</td><td>収益モデルとユニットエコノミクス</td><td><span class="tag tag-high">HIGH</span></td></tr>
+  <tr><td>7</td><td>内部</td><td>BSF飼育・加工の技術的課題と設備投資</td><td><span class="tag tag-medium">MEDIUM</span></td></tr>
+  <tr><td>8</td><td>内部</td><td>デジタル技術（AI・IoT）による差別化機会</td><td><span class="tag tag-medium">MEDIUM</span></td></tr>
+  <tr><td>9</td><td>市場</td><td>補助金・助成金・ESG投資の活用可能性</td><td><span class="tag tag-medium">MEDIUM</span></td></tr>
+</table>
+
+<!-- Section 3 -->
+<h2>3. 市場調査結果</h2>
+
+<h3>3.1 グローバルBSF市場</h3>
+<div class="grid2">
+  <div class="card metric"><div class="num">$10-15B</div><div class="label">2025年 市場規模</div></div>
+  <div class="card metric"><div class="num">$22B</div><div class="label">2030年 予測</div></div>
+  <div class="card metric"><div class="num">$59B</div><div class="label">2035年 予測</div></div>
+  <div class="card metric"><div class="num">52%</div><div class="label">養殖飼料セグメント比率</div></div>
+</div>
+
+<h3>3.2 日本の規制・政策環境</h3>
+<div class="card">
+  <ul>
+    <li><strong>2023年2月:</strong> ミズアブ生産ガイドライン策定（大阪府立環農水研）</li>
+    <li><strong>2024年:</strong> 食品リサイクル法改正（リサイクル事業者登録要件緩和、焼却・埋立削減目標設定）</li>
+    <li><strong>2024年12月:</strong> 循環経済加速化パッケージ閣議決定
+      <ul>
+        <li>環境省「先進的な資源循環投資促進事業」</li>
+        <li>農水省「農林漁業を核とした循環経済先導地域づくり」（161億円）</li>
+        <li>みどりの食料システム戦略関連（44億円規模）</li>
+      </ul>
+    </li>
+  </ul>
+</div>
+
+<h3>3.3 競合マップ</h3>
+<table>
+  <tr><th>企業</th><th>特徴</th><th>脅威度</th></tr>
+  <tr><td>住友商事 &times; Nutrition Technologies</td><td>2030年に日本で年3万トン目標。東南アジア低コスト生産</td><td><span class="tag tag-high">最大の脅威</span></td></tr>
+  <tr><td>ムスカ（MUSCA）</td><td>イエバエ（BSFではない）、伊藤忠と提携、フランチャイズモデル</td><td><span class="tag tag-medium">中</span></td></tr>
+  <tr><td>パナソニック Nutrosect</td><td>照明技術活用BSF養殖、ペットフードから参入</td><td><span class="tag tag-medium">中</span></td></tr>
+  <tr><td>エコラーバ（生物技研）</td><td>BSF専業の国内先行者、2018年稼働</td><td><span class="tag tag-low">低</span></td></tr>
+  <tr><td>InnovaFeed（仏）</td><td>累計$4.8億調達、年産1.5万トン→10万トン拡大中</td><td><span class="tag tag-low">海外</span></td></tr>
+  <tr><td>Protix（蘭）</td><td>&euro;5,000万調達、Tyson Foodsと合弁</td><td><span class="tag tag-low">海外</span></td></tr>
+</table>
+
+<div class="highlight">
+  <strong>重要な発見:</strong> BSF専業の大規模国内プレイヤーは不在。参入ウィンドウが開いている。
+</div>
+
+<h3>3.4 ユニットエコノミクス（有機廃棄物1トンあたり）</h3>
+<table>
+  <tr><th>収益源</th><th>産出量</th><th>単価</th><th>収益</th></tr>
+  <tr><td>ゲートフィー（廃棄物処理受託）</td><td>1トン受入</td><td>2-7万円/トン</td><td>2-7万円</td></tr>
+  <tr><td>乾燥ラーバ（昆虫ミール）</td><td>70-100kg</td><td>200-500円/kg</td><td>1.4-5万円</td></tr>
+  <tr><td>フラス肥料</td><td>200-400kg</td><td>30-50円/kg</td><td>0.6-2万円</td></tr>
+  <tr><td>昆虫オイル</td><td>20-30kg</td><td>高付加価値</td><td>0.5-1.5万円</td></tr>
+  <tr style="font-weight:700;background:#f0fdf4"><td>合計</td><td></td><td></td><td>4.5-15.5万円</td></tr>
+</table>
+
+<h3>3.5 ターゲット顧客セグメント</h3>
+<div class="card">
+  <ol>
+    <li><strong>水産養殖飼料メーカー</strong> &mdash; 最大需要（市場52%）。魚粉価格高騰で代替ニーズ切迫</li>
+    <li><strong>ペットフードメーカー</strong> &mdash; 規制ハードル低、アレルギー対応・サステナブル需要拡大</li>
+    <li><strong>畜産飼料メーカー</strong> &mdash; 欧州で2021年承認済み、日本でも将来的に規制緩和見込み</li>
+    <li><strong>食品廃棄物排出企業</strong> &mdash; 処理費上昇+法規制強化で低コストリサイクル手段を切望</li>
+    <li><strong>有機農業事業者</strong> &mdash; 肥料高騰の中、フラスは高品質有機肥料として需要あり</li>
+    <li><strong>化粧品・機能性素材メーカー</strong> &mdash; BSFオイル（ラウリン酸76%）の高付加価値用途</li>
+  </ol>
+</div>
+
+<!-- Section 4 -->
+<h2>4. 異業種アナロジー事例</h2>
+
+<h3>4.1 廃棄物 → 価値化モデル</h3>
+<table>
+  <tr><th>事例</th><th>BSFへの転用ポイント</th></tr>
+  <tr><td><strong>ナカダイ</strong><br><span style="color:var(--muted)">産廃リマーケティング</span></td><td>廃棄物の素材分別で価値最大化。食品残渣の種類別最適配合で製品品質・単価を最大化する「原料リマーケティング」</td></tr>
+  <tr><td><strong>JEPLAN</strong><br><span style="color:var(--muted)">ケミカルリサイクル</span></td><td>技術による品質保証でバージン品同等を実現。BSF製品の品質規格化と大手との戦略提携に参考</td></tr>
+</table>
+
+<h3>4.2 テックスケールアップ / 戦略パートナーシップ</h3>
+<table>
+  <tr><th>事例</th><th>BSFへの転用ポイント</th></tr>
+  <tr><td><strong>スプレッド Techno Farm</strong><br><span style="color:var(--muted)">植物工場</span></td><td>IoT+自動化で稼働率99%、40億円調達。モジュール型BSF工場の段階的スケールアップに直結</td></tr>
+  <tr><td><strong>InnovaFeed &times; ADM</strong><br><span style="color:var(--muted)">BSF &times; 穀物メジャー</span></td><td>既存インフラ寄生型のスケール戦略。食品加工大手の施設内にBSF工場を併設</td></tr>
+  <tr><td><strong>Protix &times; Tyson Foods</strong><br><span style="color:var(--muted)">BSF &times; 食肉大手</span></td><td>川下大手顧客を戦略的投資家に。オフテイク契約+資本参加をセットで獲得</td></tr>
+</table>
+
+<h3>4.3 プラットフォーム / ブランディング / FC展開</h3>
+<table>
+  <tr><th>事例</th><th>BSFへの転用ポイント</th></tr>
+  <tr><td><strong>Corning ゴリラガラス</strong><br><span style="color:var(--muted)">B2Bブランディング</span></td><td>B2B素材のイングレディエント・ブランディング。BSFタンパク質のブランド化でコモディティ回避</td></tr>
+  <tr><td><strong>NEC CropScope</strong><br><span style="color:var(--muted)">スマート農業</span></td><td>IT企業の農業参入成功例。データプラットフォームによるBSF飼育最適化に転用</td></tr>
+  <tr><td><strong>ムスカ（MUSCA）</strong><br><span style="color:var(--muted)">フランチャイズモデル</span></td><td>種苗供給+買取保証のフランチャイズ型展開。分散型BSF飼育拠点の全国展開モデル</td></tr>
+</table>
+
+<!-- Section 5 -->
+<h2>5. 戦略オプション</h2>
+
+<h3>5.1 4つの戦略比較</h3>
+<table>
+  <tr><th>戦略</th><th>概要</th><th>実現性</th><th>5年後年商</th></tr>
+  <tr style="background:#f0fdf4;font-weight:600"><td>A: デジタル&times;BSFプラットフォーム</td><td>AI制御スマート飼育 → FC展開</td><td>HIGH</td><td>5-10億円</td></tr>
+  <tr><td>B: 養殖飼料特化・垂直統合</td><td>魚粉代替に一点集中</td><td>MEDIUM</td><td>3-10億円</td></tr>
+  <tr><td>C: ペットフード&times;D2Cブランド</td><td>SNSノウハウでプレミアムブランド</td><td>HIGH</td><td>1-3億円</td></tr>
+  <tr><td>D: 廃棄物処理プラットフォーム</td><td>AIで残渣と処理先を最適マッチング</td><td>MEDIUM</td><td>3-5億円</td></tr>
+</table>
+
+<h3>5.2 推奨戦略: デジタル &times; BSFプラットフォーム</h3>
+<div class="card recommend">
+  <p style="font-size:1.1em;font-weight:700;margin-bottom:12px">コアコンセプト: 「BSF飼育のOS」を提供するプラットフォーマー</p>
+  <p><strong>収益の3本柱:</strong></p>
+  <ol>
+    <li>ゲートフィー（廃棄物処理受託）&mdash; 安定収益基盤</li>
+    <li>BSF製品販売（ミール・オイル・フラス）&mdash; 成長ドライバー</li>
+    <li>技術ライセンス / FC収入 &mdash; スケールレバレッジ</li>
+  </ol>
+  <p style="margin-top:12px"><strong>差別化:</strong> IoTセンサー &times; AI予測制御で飼育効率・品質を最適化。デジタル企業ならではの参入優位性。</p>
+</div>
+
+<h3>5.3 実行ロードマップ</h3>
+<div class="card">
+  <table>
+    <tr><th>フェーズ</th><th>期間</th><th>内容</th></tr>
+    <tr><td><strong>Phase 1</strong></td><td>0-12ヶ月</td><td>パイロット工場建設・稼働。安定原料でBSF飼育技術確立。IoTセンサー設置、飼育データ蓄積</td></tr>
+    <tr><td><strong>Phase 2</strong></td><td>12-24ヶ月</td><td>ゲートフィー収益本格化。ペットフード原料・フラス肥料の販売開始。AI制御v1完成</td></tr>
+    <tr><td><strong>Phase 3</strong></td><td>24-36ヶ月</td><td>モジュール型工場パッケージ標準化。初のフランチャイズ拠点を既存取引先と共同立上げ</td></tr>
+    <tr><td><strong>Phase 4</strong></td><td>36ヶ月〜</td><td>全国展開（3-5拠点）。技術ライセンス事業開始。養殖飼料市場への本格参入</td></tr>
+  </table>
+</div>
+
+<h3>5.4 Devil's Advocate（批判的検証）</h3>
+<table>
+  <tr><th>#</th><th>検証した前提</th><th>リスク</th><th>対策</th></tr>
+  <tr><td>1</td><td>AI制御が差別化要素になる</td><td>BSF飼育は基本ローテク。付加価値が限定的な可能性</td><td>パイロットで「AI有 vs 無」の定量比較</td></tr>
+  <tr><td>2</td><td>ゲートフィーで安定収益確保</td><td>産廃許認可に1-2年、既存業者との関係構築が必要</td><td>安定原料（おから等）からスタート</td></tr>
+  <tr><td>3</td><td>日本市場に参入余地がある</td><td>住商の輸入戦略、大企業の参入</td><td>輸入品にできない価値（処理受託・鮮度）で勝負</td></tr>
+  <tr><td>4</td><td>既存ノウハウが転用できる</td><td>デジタルとBSFは異ドメイン</td><td>独立事業体で運営、転用は限定的スキルのみ</td></tr>
+  <tr><td>5</td><td>FCで全国展開できる</td><td>成功実績が前提、オーナー候補不明</td><td>自社工場黒字化が先。初期FCは既存取引先から</td></tr>
+</table>
+
+<h3>5.5 課題の再定義</h3>
+<div class="card">
+  <ol>
+    <li><strong>「何を売るか」ではなく「バリューチェーンのどこを取るか」</strong> &mdash; デジタル企業の強みが活きるのは、データ・マッチング・品質管理のレイヤー</li>
+    <li><strong>コストで勝つのではなく、サービスで勝つ</strong> &mdash; 輸入品にできない価値（廃棄物処理受託、鮮度、トレーサビリティ）を中心に設計</li>
+    <li><strong>データとアルゴリズムのデファクトスタンダードを押さえる</strong> &mdash; 飼育データの蓄積が参入後発でも逆転可能な武器</li>
+    <li><strong>BSF事業がAI事業のショーケースになる</strong> &mdash; 「自社でAI活用BSF事業を運営」がDXコンサルの信頼性を向上</li>
+  </ol>
+</div>
+
+<!-- Section 6 -->
+<h2>6. Next Steps</h2>
+<div class="card">
+  <ol>
+    <li>パイロット工場の候補地選定（九州・四国推奨: 温暖気候+養殖産地+食品工場集積）</li>
+    <li>BSF飼育技術パートナーの探索（エコラーバ等との技術提携交渉）</li>
+    <li>食品廃棄物排出企業とのヒアリング（処理費用・量・頻度の実態把握）</li>
+    <li>補助金申請の準備（循環経済加速化パッケージ、みどりの食料システム戦略関連）</li>
+    <li>Phase 1の事業計画・投資計画の策定（設備投資額、損益シミュレーション）</li>
+    <li>法務確認（産廃処理業許可、飼料安全法、食品リサイクル法上の再生利用事業者登録）</li>
+  </ol>
+</div>
+
+</div>
+
+<footer>
+  <p>BSF新規事業 戦略レポート | Strategy Agents Pipeline | 2026-04-03</p>
+  <p style="margin-top:4px">ブラウザの印刷機能（Ctrl+P / Cmd+P）でPDFとして保存できます</p>
+</footer>
+
+</body>
+</html>

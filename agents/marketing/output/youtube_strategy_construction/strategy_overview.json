@@ -1,0 +1,138 @@
+{
+  "project_name": "建設系YouTubeチャンネル立ち上げ戦略",
+  "created_at": "2026-04-05",
+  "benchmark_analysis": {
+    "target_channel": "建設チャンネル（@kensetsu_inoshin）",
+    "operator": "井上伸悟（イノシン）/ 株式会社井上技研 代表取締役",
+    "business": "原状回復工事・リフォーム（東京都足立区）",
+    "metrics": {
+      "subscribers": 47000,
+      "monthly_revenue_yen": 400000,
+      "top_video_views": 600000,
+      "years_active": 4,
+      "growth_speed": "2年で35,000人達成"
+    },
+    "strengths": [
+      "現場経営者としての圧倒的な一次情報と当事者性",
+      "歯に衣着せぬ本音トーク = 業界の「共感装置」",
+      "編集外注のみのローコスト運営（社長自ら撮影）",
+      "OJT不足を補う教育コンテンツで「役に立つ」と「面白い」の両立",
+      "若手職人コミュニティのハブとして機能"
+    ],
+    "weaknesses": [
+      "テック/DX領域のコンテンツが未カバー",
+      "経営者・管理職層へのアプローチが薄い",
+      "データや市場分析に基づく解説が少ない",
+      "不動産業界との横断的な視点が欠如",
+      "属人的な運営（イノシン個人に依存）"
+    ],
+    "unreplicable_advantages": [
+      "現場での実務経験に基づくリアルな語り口",
+      "4.7万人の既存視聴者基盤",
+      "建設業界内の人脈・ネットワーク",
+      "「建設チャンネル」というブランド認知"
+    ]
+  },
+  "competitive_landscape": [
+    {
+      "channel": "施工管理チャンネル（株式会社ライズ）",
+      "subscribers": 20000,
+      "videos": 400,
+      "positioning": "人材派遣会社が運営する施工管理特化チャンネル",
+      "threat_level": "low"
+    },
+    {
+      "channel": "石男くんの建設チャンネル",
+      "subscribers": 18500,
+      "videos": 210,
+      "positioning": "山形県砕石工業所の取締役による業界解説",
+      "threat_level": "low"
+    },
+    {
+      "channel": "ジョウ所長の土木技術者サポートチャンネル",
+      "subscribers": null,
+      "videos": null,
+      "positioning": "若手・中堅土木技術者の育成サポート",
+      "threat_level": "low"
+    },
+    {
+      "channel": "七色（外壁塗装）",
+      "subscribers": 100000,
+      "videos": null,
+      "positioning": "職人系トップクラス、外壁塗装特化",
+      "threat_level": "low"
+    },
+    {
+      "channel": "建設業を持ち上げるTV",
+      "subscribers": null,
+      "videos": null,
+      "positioning": "建設業のイメージアップ・PR系",
+      "threat_level": "low"
+    }
+  ],
+  "market_environment_2026": {
+    "key_trends": [
+      "2024年問題（時間外労働規制）の影響が本格化",
+      "就業者の35.5%が55歳以上、29歳以下は12%の超高齢化",
+      "人手不足倒産リスクの急増",
+      "建設投資額は増加しているが就業者数は減少の矛盾",
+      "建設業のAI導入率は9.4%と全産業で最低水準",
+      "DX推進が国策レベルで急務（i-Construction 2.0）",
+      "YouTubeが低品質コンテンツを規制強化、質重視の時代へ"
+    ],
+    "opportunity": "「建設 x テック/DX」は需要が急増しているにも関わらず、専門的に発信するYouTubeチャンネルがほぼ存在しない空白地帯"
+  },
+  "feasibility_judgment": {
+    "verdict": "GO",
+    "rationale": [
+      "「建設テック/DX」という空白ポジションが存在し、先行者優位を確立できる",
+      "既存チャンネルは全て「現場の職人/経営者が語る」形式 → 「外部プロが分析・提案する」視点は唯一無二",
+      "ターゲットを「若手職人」から「経営者・管理職」にシフトすることでイノシンと直接競合しない",
+      "YouTube単体の広告収入ではなく自社事業（SNS運用代行・AI導入支援）のリード獲得装置として設計可能",
+      "自社にSNSマーケティング運用、AI/DX知見、不動産業界接点、動画制作体制が既にある"
+    ],
+    "win_condition": "建設業界の経営者・管理職が『テック/DXの情報ならこのチャンネル』と想起する第一ポジションを12ヶ月以内に確立すること"
+  },
+  "channel_concepts": [
+    {
+      "name": "建設テック最前線",
+      "concept": "建設業界のDX・AI・テクノロジー活用を、マーケティング＆テックのプロが解説",
+      "target_audience": "建設会社の経営者、管理職、DX推進担当",
+      "tone": "データドリブン、知的、実用的（エンタメ < 実用）",
+      "differentiation": "イノシンが「現場の声」なら、こちらは「未来への処方箋」",
+      "revenue_connection": "AI導入コンサル、SNS採用支援への直接リード",
+      "recommended": true
+    },
+    {
+      "name": "建設×不動産 裏側チャンネル",
+      "concept": "建設と不動産の両業界を横断し、業界構造・お金の流れ・ビジネスモデルを解説",
+      "target_audience": "建設業経営者 + 不動産関係者 + 業界志望の就活生",
+      "tone": "ビジネス分析型、暴露系要素あり",
+      "differentiation": "2業界横断の視点は唯一無二",
+      "revenue_connection": "不動産BPO + 建設会社向けSNS運用",
+      "recommended": false
+    },
+    {
+      "name": "建設会社のSNS採用ラボ",
+      "concept": "建設会社の採用難を解決するSNS活用ノウハウに完全特化",
+      "target_audience": "人手不足に悩む建設会社の経営者・人事担当",
+      "tone": "実践的、事例ベース",
+      "differentiation": "「採用 x SNS x 建設」の超ニッチ特化",
+      "revenue_connection": "SNS採用代行への最短ルート",
+      "recommended": false,
+      "risk_note": "テーマが狭すぎて成長の天井が低い"
+    }
+  ],
+  "recommended_concept": {
+    "name": "建設テック最前線",
+    "positioning_statement": "建設業界の変革を外から加速する — マーケティング＆テックのプロが、建設DX・AI活用・採用戦略を経営者目線で解説するチャンネル",
+    "category_mix": {
+      "建設DX_AI活用": "30%",
+      "業界分析_ビジネス解説": "25%",
+      "採用_人材戦略": "20%",
+      "建設x不動産の裏側": "15%",
+      "ゲスト対談_事例": "10%"
+    },
+    "hybrid_note": "案Aをメイン軸に、案B（不動産横断）・案C（SNS採用）の要素を企画単位で取り込むハイブリッド運営を推奨"
+  }
+}

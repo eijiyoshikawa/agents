@@ -1,0 +1,9 @@
+{
+  "prefecture": "静岡県",
+  "normalized_at": "2026-04-15",
+  "companies": [
+    {"company_name": "倉和建設株式会社", "prefecture": "静岡県", "city": "静岡市駿河区", "address": "静岡県静岡市駿河区中島1400番地", "phone": "054-283-2121", "fax": "054-281-7641", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "敬宝興業", "prefecture": "静岡県", "city": "沼津市", "address": "静岡県沼津市市道町4-8", "phone": "055-954-1311", "fax": "055-954-1312", "fax_validated": true, "business_category": "土木", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"}
+  ],
+  "stats": {"total_raw": 2, "after_dedup": 2, "confidence_high": 2}
+}
