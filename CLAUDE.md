@@ -143,6 +143,21 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 | Data Analyst → CEO | 分析レポート・意思決定支援 |
 | Finance → CEO | 週次PL・キャッシュフロー |
 | KPI Dashboard → CEO | 日次KPI・異常アラート |
+| Copywriter → Ad Operations | 広告コピー納品・A/Bテスト |
+| Copywriter → Designer | LP・バナーのビジュアル連携 |
+| PR → Marketing | ブランド戦略・キャンペーンPR連携 |
+| PR → Legal | プレスリリース法務チェック |
+| CRM → Sales | リードスコアリング・パイプラインデータ提供 |
+| CRM → CS | 顧客ヘルススコア・チャーンリスク共有 |
+| CRM → Marketing | セグメントデータ・キャンペーン対象リスト |
+| Chatbot → CS | FAQ対応・エスカレーション・VoC共有 |
+| Chatbot → Sales | 商談リードの引き渡し |
+| Compliance → Content Creator | コンテンツ法令チェック・修正指示 |
+| Compliance → Ad Operations | 広告出稿前の法令チェック |
+| Compliance → Legal | 法的判断の確認・規制適合チェック |
+| Analytics → Marketing | チャネル戦略・予算配分提案 |
+| Analytics → SEO/AIEO | 検索パフォーマンスデータ連携 |
+| Analytics → KPI Dashboard | 全社KPIへのデータ供給 |
 | QA Reviewer → 全体 | 品質差し戻し・改善指示 |
 | Devil's Advocate → 全体 | 重要意思決定への批判的検証 |
 | CEO → COO → 全体 | 優先度指示・リソース配分・最終承認 |
