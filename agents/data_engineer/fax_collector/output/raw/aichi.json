@@ -1,0 +1,22 @@
+{
+  "prefecture": "愛知県",
+  "collected_at": "2026-04-15",
+  "sources_used": [
+    {"source_name": "企業公式サイト WebSearch結果", "url": "N/A", "records_collected": 7}
+  ],
+  "companies": [
+    {"company_name": "矢野建設株式会社", "prefecture": "愛知県", "city": "名古屋市港区", "address": "愛知県名古屋市港区十一屋3丁目63", "phone": "052-384-2800", "fax": "052-382-0030", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.yanokensetu.co.jp/outline/"},
+    {"company_name": "中部土木株式会社", "prefecture": "愛知県", "city": "名古屋市名東区", "address": "愛知県名古屋市名東区", "phone": "", "fax": "052-777-3320", "business_category": "土木", "source": "企業公式サイト", "source_url": "http://www.chubudoboku.co.jp/company/"},
+    {"company_name": "小原建設株式会社", "prefecture": "愛知県", "city": "岡崎市", "address": "愛知県岡崎市明大寺町字西郷中37番地", "phone": "0564-51-2621", "fax": "0564-52-7662", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.obara-group.com/company/"},
+    {"company_name": "丸ヨ建設工業株式会社", "prefecture": "愛知県", "city": "岡崎市", "address": "愛知県岡崎市戸崎町字郷畔20番地", "phone": "0564-51-1802", "fax": "0564-52-3597", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.maruyokk.com/maruyo/"},
+    {"company_name": "株式会社山口土木", "prefecture": "愛知県", "city": "岡崎市", "address": "愛知県岡崎市", "phone": "0564-65-6570", "fax": "0564-65-6575", "business_category": "土木", "source": "企業公式サイト", "source_url": "https://yamaguchidoboku.com/"},
+    {"company_name": "太啓建設株式会社", "prefecture": "愛知県", "city": "豊田市", "address": "愛知県豊田市", "phone": "", "fax": "", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.taikei-con.co.jp/"},
+    {"company_name": "豊橋建設工業株式会社", "prefecture": "愛知県", "city": "豊橋市", "address": "愛知県豊橋市大国町98", "phone": "0532-54-6338", "fax": "", "business_category": "総合建設", "source": "マピオン電話帳", "source_url": "https://www.mapion.co.jp/phonebook/M26012/23201/22330928065/"}
+  ],
+  "collection_stats": {
+    "total_companies": 7,
+    "companies_with_fax": 5,
+    "companies_without_fax": 2,
+    "fax_coverage_rate": "71.4%"
+  }
+}

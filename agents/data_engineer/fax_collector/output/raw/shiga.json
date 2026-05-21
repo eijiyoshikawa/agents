@@ -1,0 +1,25 @@
+{
+  "prefecture": "滋賀県",
+  "collected_at": "2026-04-15",
+  "sources_used": [
+    {"source_name": "滋賀県建設業協会 WebSearch結果", "url": "https://yumeken.or.jp/branch/", "records_collected": 2},
+    {"source_name": "企業公式サイト WebSearch結果", "url": "N/A", "records_collected": 8}
+  ],
+  "companies": [
+    {"company_name": "株式会社内田組", "prefecture": "滋賀県", "city": "大津市", "address": "滋賀県大津市大江2丁目33番3号", "phone": "077-545-3171", "fax": "077-543-0678", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://uchidagumi21.co.jp/company/"},
+    {"company_name": "株式会社笹川組", "prefecture": "滋賀県", "city": "大津市", "address": "滋賀県大津市", "phone": "077-523-2314", "fax": "077-525-7404", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.sasakawa.co.jp/company/profile"},
+    {"company_name": "ミノベ建設株式会社", "prefecture": "滋賀県", "city": "大津市", "address": "滋賀県大津市際川二丁目4番22号", "phone": "077-522-5385", "fax": "077-522-5085", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.minobe.jp/about/profile/"},
+    {"company_name": "長住建設株式会社 彦根事務所", "prefecture": "滋賀県", "city": "彦根市", "address": "滋賀県彦根市松原町1759-140", "phone": "0120-26-1611", "fax": "0749-22-1680", "business_category": "建築", "source": "企業公式サイト", "source_url": "https://www.nagajyu.jp/"},
+    {"company_name": "長住建設株式会社 長浜事務所", "prefecture": "滋賀県", "city": "長浜市", "address": "滋賀県長浜市大戌亥町1001番地", "phone": "0749-63-1611", "fax": "0749-64-0661", "business_category": "建築", "source": "企業公式サイト", "source_url": "https://www.nagajyu.jp/"},
+    {"company_name": "株式会社近江建設", "prefecture": "滋賀県", "city": "近江八幡市", "address": "滋賀県近江八幡市中小森町846番地8", "phone": "0748-28-0111", "fax": "0748-28-0222", "business_category": "土木", "source": "企業公式サイト", "source_url": "https://oumikensetsu.jp/company.html"},
+    {"company_name": "華建築株式会社", "prefecture": "滋賀県", "city": "彦根市", "address": "滋賀県彦根市大藪町21-7", "phone": "0749-23-0871", "fax": "0749-23-8715", "business_category": "建築", "source": "企業公式サイト", "source_url": "https://hanakenchiku.jp/company/"},
+    {"company_name": "株式会社岡山建設", "prefecture": "滋賀県", "city": "蒲生郡竜王町", "address": "滋賀県蒲生郡竜王町大字山之上5205番地", "phone": "0748-57-0461", "fax": "0748-57-0463", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://okayama-kensetsu.biz/"},
+    {"company_name": "株式会社内田組 湖南営業所", "prefecture": "滋賀県", "city": "草津市", "address": "滋賀県草津市笠山1-9-40", "phone": "077-565-1428", "fax": "077-565-1436", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://uchidagumi21.co.jp/company/"}
+  ],
+  "collection_stats": {
+    "total_companies": 9,
+    "companies_with_fax": 9,
+    "companies_without_fax": 0,
+    "fax_coverage_rate": "100%"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "prefecture": "神奈川県",
+  "normalized_at": "2026-04-15",
+  "companies": [
+    {"company_name": "横浜建設株式会社", "prefecture": "神奈川県", "city": "横浜市磯子区", "address": "神奈川県横浜市磯子区岡村8-2-10", "phone": "045-352-7148", "fax": "045-352-7149", "fax_validated": true, "business_category": "建築", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "芙蓉建設株式会社", "prefecture": "神奈川県", "city": "横浜市旭区", "address": "神奈川県横浜市旭区市沢町565-6", "phone": "045-453-8808", "fax": "045-352-5900", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "工藤建設株式会社", "prefecture": "神奈川県", "city": "横浜市青葉区", "address": "神奈川県横浜市青葉区新石川四丁目33番地10", "phone": "045-911-5300", "fax": "045-911-3960", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"}
+  ],
+  "stats": {
+    "total_raw": 5,
+    "after_dedup": 3,
+    "duplicates_removed": 0,
+    "no_fax_removed": 2,
+    "confidence_high": 3,
+    "confidence_medium": 0,
+    "confidence_low": 0
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "prefecture": "福岡県",
+  "collected_at": "2026-04-15",
+  "sources_used": [
+    {"source_name": "企業公式サイト WebSearch結果", "url": "N/A", "records_collected": 8}
+  ],
+  "companies": [
+    {"company_name": "九州建設株式会社", "prefecture": "福岡県", "city": "福岡市博多区", "address": "福岡県福岡市博多区博多駅南1丁目8番31号 九州ビル5階", "phone": "092-461-1100", "fax": "092-461-1400", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.q-shu.co.jp/company/about/"},
+    {"company_name": "共栄建設株式会社", "prefecture": "福岡県", "city": "福岡市中央区", "address": "福岡県福岡市中央区舞鶴3丁目2番21号", "phone": "", "fax": "092-739-0100", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.kyouei-kensetsu.co.jp/"},
+    {"company_name": "九州総合建設株式会社", "prefecture": "福岡県", "city": "福岡市東区", "address": "福岡県福岡市東区", "phone": "092-631-4040", "fax": "092-631-4043", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://kyusyu-gc.co.jp/"},
+    {"company_name": "西部建設株式会社", "prefecture": "福岡県", "city": "福岡市中央区", "address": "福岡県福岡市中央区", "phone": "092-771-1766", "fax": "", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://seibuken.co.jp/"},
+    {"company_name": "三軌建設株式会社 福岡支店", "prefecture": "福岡県", "city": "福岡市東区", "address": "福岡県福岡市東区", "phone": "", "fax": "092-629-7429", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.sankikensetsu.com/company/location.html"},
+    {"company_name": "三軌建設株式会社 北九州支店", "prefecture": "福岡県", "city": "北九州市小倉北区", "address": "福岡県北九州市小倉北区", "phone": "", "fax": "093-583-3712", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.sankikensetsu.com/company/location.html"},
+    {"company_name": "若築建設株式会社 北九州支店", "prefecture": "福岡県", "city": "北九州市若松区", "address": "福岡県北九州市若松区浜町1-4-7", "phone": "093-752-3510", "fax": "093-752-1423", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.wakachiku.co.jp/company/offices.html"},
+    {"company_name": "ヤマト建設株式会社", "prefecture": "福岡県", "city": "久留米市", "address": "福岡県久留米市国分町2025-5", "phone": "0942-21-0138", "fax": "0942-21-0254", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "http://yamato-con.jp/"},
+    {"company_name": "グランド工房 北九州店", "prefecture": "福岡県", "city": "北九州市八幡西区", "address": "福岡県北九州市八幡西区上の原1-9-27", "phone": "093-647-0037", "fax": "093-647-0195", "business_category": "建築", "source": "企業公式サイト", "source_url": "https://www.ground-f.com/company/company.php"},
+    {"company_name": "グランド工房 本社", "prefecture": "福岡県", "city": "福岡市東区", "address": "福岡県福岡市東区多の津5丁目32-20", "phone": "092-626-7520", "fax": "092-626-7566", "business_category": "建築", "source": "企業公式サイト", "source_url": "https://www.ground-f.com/company/company.php"}
+  ],
+  "collection_stats": {
+    "total_companies": 10,
+    "companies_with_fax": 9,
+    "companies_without_fax": 1,
+    "fax_coverage_rate": "90%"
+  }
+}
