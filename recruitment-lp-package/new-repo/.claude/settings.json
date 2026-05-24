@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm run lint:*)",
+      "Bash(npm run start:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx next:*)",
+      "Bash(node:*)",
+      "Bash(jq:*)",
+      "Bash(rsync:*)",
+      "Bash(cp:*)",
+      "Bash(mkdir:*)",
+      "Bash(rm:*)",
+      "Bash(chmod:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(echo:*)",
+      "Bash(pkill:*)",
+      "Bash(curl:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git branch:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(bash scripts/generate-recruitment-lp.sh:*)",
+      "WebFetch(domain:*)",
+      "Read(*)",
+      "Write(*)",
+      "Edit(*)"
+    ],
+    "deny": [
+      "Bash(rm -rf /:*)",
+      "Bash(git push --force:*)",
+      "Bash(git reset --hard:*)"
+    ]
+  }
+}
