@@ -79,7 +79,6 @@ export default function PopTemplate({ data }: { data: CompanyData }) {
           ))}
         </div>
       </div>
-      <style>{`@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }`}</style>
 
       {/* About */}
       <section id="about" className="bg-construction-400 px-5 py-20 sm:px-6 md:py-24">

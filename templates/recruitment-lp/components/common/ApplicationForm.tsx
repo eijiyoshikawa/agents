@@ -51,7 +51,7 @@ export default function ApplicationForm({
       </div>
       <div>
         <label className={labelBase} htmlFor="position">希望職種</label>
-        <input id="position" type="text" required className={inputBase} placeholder="フロントエンドエンジニア" />
+        <input id="position" type="text" required className={inputBase} placeholder="施工管理 / 建築設計 など" />
       </div>
       <div>
         <label className={labelBase} htmlFor="message">志望動機・自己PR</label>
