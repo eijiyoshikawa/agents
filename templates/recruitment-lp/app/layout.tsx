@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { getCompanyData } from "@/lib/data";
 
@@ -7,6 +7,11 @@ const data = getCompanyData();
 export const metadata: Metadata = {
   title: `${data.company.name} 採用情報 | RECRUIT`,
   description: data.company.tagline ?? data.company.description ?? `${data.company.name}の採用ページ`,
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({

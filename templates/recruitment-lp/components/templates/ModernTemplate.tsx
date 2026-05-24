@@ -8,10 +8,10 @@ export default function ModernTemplate({ data }: { data: CompanyData }) {
     <main className="min-h-screen bg-white text-slate-900">
       {/* Header */}
       <header className="fixed top-0 z-50 w-full border-b border-slate-100 bg-white/85 backdrop-blur">
-        <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-3">
-            <span className="inline-block h-6 w-1 bg-safety-500" />
-            <div className="text-sm font-semibold tracking-wide">
+        <nav className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3 sm:px-6 sm:py-4">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+            <span className="inline-block h-5 w-1 bg-safety-500 sm:h-6" />
+            <div className="truncate text-xs font-semibold tracking-wide sm:text-sm">
               {company.name_en ?? company.name}
             </div>
           </div>
@@ -23,7 +23,7 @@ export default function ModernTemplate({ data }: { data: CompanyData }) {
           </div>
           <a
             href="#apply"
-            className="rounded-sm bg-slate-900 px-5 py-2 text-xs font-semibold tracking-wider text-white hover:bg-slate-800"
+            className="ml-3 shrink-0 rounded-sm bg-slate-900 px-4 py-2 text-[10px] font-semibold tracking-wider text-white hover:bg-slate-800 sm:px-5 sm:text-xs"
           >
             ENTRY
           </a>
@@ -31,7 +31,7 @@ export default function ModernTemplate({ data }: { data: CompanyData }) {
       </header>
 
       {/* Hero */}
-      <section className="relative overflow-hidden px-6 pb-24 pt-40 md:pt-48">
+      <section className="relative overflow-hidden px-5 pb-20 pt-32 sm:px-6 sm:pb-24 md:pt-48">
         {/* 図面風グリッド背景 */}
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.04]"
@@ -42,26 +42,26 @@ export default function ModernTemplate({ data }: { data: CompanyData }) {
           }}
         />
         <div className="relative mx-auto max-w-6xl">
-          <p className="mb-6 flex items-center gap-3 text-xs font-medium tracking-[0.3em] text-safety-500">
-            <span className="inline-block h-px w-12 bg-safety-500" />
+          <p className="mb-5 flex items-center gap-3 text-[10px] font-medium tracking-[0.3em] text-safety-500 sm:text-xs">
+            <span className="inline-block h-px w-8 bg-safety-500 sm:w-12" />
             RECRUIT 2026
           </p>
-          <h1 className="mb-8 text-5xl font-bold leading-tight tracking-tight md:text-7xl">
+          <h1 className="mb-6 text-4xl font-bold leading-[1.15] tracking-tight sm:text-5xl md:mb-8 md:text-7xl">
             {company.tagline ?? "確かな技術で、未来をかたちに。"}
           </h1>
-          <p className="max-w-2xl text-lg text-slate-600 md:text-xl">
+          <p className="max-w-2xl text-base text-slate-600 sm:text-lg md:text-xl">
             {company.mission ?? company.description ?? ""}
           </p>
-          <div className="mt-12 flex flex-wrap gap-4">
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4 md:mt-12">
             <a
               href="#jobs"
-              className="rounded-sm bg-slate-900 px-8 py-4 text-sm font-semibold tracking-wider text-white hover:bg-slate-800"
+              className="rounded-sm bg-slate-900 px-6 py-3.5 text-center text-sm font-semibold tracking-wider text-white hover:bg-slate-800 sm:px-8 sm:py-4"
             >
               募集職種を見る
             </a>
             <a
               href="#about"
-              className="rounded-sm border border-slate-300 px-8 py-4 text-sm font-semibold text-slate-700 hover:border-slate-900"
+              className="rounded-sm border border-slate-300 px-6 py-3.5 text-center text-sm font-semibold text-slate-700 hover:border-slate-900 sm:px-8 sm:py-4"
             >
               会社について
             </a>
@@ -71,14 +71,14 @@ export default function ModernTemplate({ data }: { data: CompanyData }) {
       </section>
 
       {/* About */}
-      <section id="about" className="border-t border-slate-100 px-6 py-24">
-        <div className="mx-auto grid max-w-6xl gap-12 md:grid-cols-[1fr_2fr]">
+      <section id="about" className="border-t border-slate-100 px-5 py-20 sm:px-6 md:py-24">
+        <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-[1fr_2fr] md:gap-12">
           <div>
-            <p className="mb-4 flex items-center gap-3 text-xs font-medium tracking-[0.3em] text-safety-500">
+            <p className="mb-3 flex items-center gap-3 text-[10px] font-medium tracking-[0.3em] text-safety-500 sm:text-xs">
               <span className="inline-block h-px w-8 bg-safety-500" />
               ABOUT
             </p>
-            <h2 className="text-3xl font-bold md:text-4xl">私たちについて</h2>
+            <h2 className="text-2xl font-bold sm:text-3xl md:text-4xl">私たちについて</h2>
           </div>
           <div className="space-y-6 text-slate-600">
             <p className="text-lg leading-relaxed">{company.description}</p>
@@ -107,13 +107,13 @@ export default function ModernTemplate({ data }: { data: CompanyData }) {
       </section>
 
       {/* Services */}
-      <section id="services" className="border-t border-slate-100 bg-stone-50 px-6 py-24">
+      <section id="services" className="border-t border-slate-100 bg-stone-50 px-5 py-20 sm:px-6 md:py-24">
         <div className="mx-auto max-w-6xl">
-          <p className="mb-4 flex items-center gap-3 text-xs font-medium tracking-[0.3em] text-safety-500">
+          <p className="mb-3 flex items-center gap-3 text-[10px] font-medium tracking-[0.3em] text-safety-500 sm:text-xs">
             <span className="inline-block h-px w-8 bg-safety-500" />
             BUSINESS
           </p>
-          <h2 className="mb-16 text-3xl font-bold md:text-4xl">事業内容</h2>
+          <h2 className="mb-10 text-2xl font-bold sm:text-3xl md:mb-16 md:text-4xl">事業内容</h2>
           <div className="grid gap-6 md:grid-cols-3">
             {services.map((service, i) => (
               <div
@@ -140,18 +140,18 @@ export default function ModernTemplate({ data }: { data: CompanyData }) {
       </section>
 
       {/* Jobs */}
-      <section id="jobs" className="border-t border-slate-100 px-6 py-24">
+      <section id="jobs" className="border-t border-slate-100 px-5 py-20 sm:px-6 md:py-24">
         <div className="mx-auto max-w-6xl">
-          <p className="mb-4 flex items-center gap-3 text-xs font-medium tracking-[0.3em] text-safety-500">
+          <p className="mb-3 flex items-center gap-3 text-[10px] font-medium tracking-[0.3em] text-safety-500 sm:text-xs">
             <span className="inline-block h-px w-8 bg-safety-500" />
             JOBS
           </p>
-          <h2 className="mb-16 text-3xl font-bold md:text-4xl">募集職種</h2>
+          <h2 className="mb-10 text-2xl font-bold sm:text-3xl md:mb-16 md:text-4xl">募集職種</h2>
           <div className="divide-y divide-slate-200 border-y border-slate-200">
             {jobs.map((job) => (
-              <div key={job.title} className="grid gap-6 py-10 md:grid-cols-[1fr_2fr]">
+              <div key={job.title} className="grid gap-4 py-8 md:grid-cols-[1fr_2fr] md:gap-6 md:py-10">
                 <div>
-                  <h3 className="text-2xl font-bold">{job.title}</h3>
+                  <h3 className="text-xl font-bold sm:text-2xl">{job.title}</h3>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <span className="rounded-sm bg-slate-100 px-3 py-1 text-xs">{job.employment_type}</span>
                     <span className="rounded-sm bg-slate-100 px-3 py-1 text-xs">{job.location}</span>
@@ -183,21 +183,21 @@ export default function ModernTemplate({ data }: { data: CompanyData }) {
       </section>
 
       {/* Apply */}
-      <section id="apply" className="border-t border-slate-100 bg-slate-900 px-6 py-24 text-white">
+      <section id="apply" className="border-t border-slate-100 bg-slate-900 px-5 py-20 text-white sm:px-6 md:py-24">
         {/* オレンジのアクセントライン */}
-        <div className="mx-auto mb-12 max-w-6xl">
+        <div className="mx-auto mb-8 max-w-6xl md:mb-12">
           <div className="h-1 w-16 bg-safety-500" />
         </div>
-        <div className="mx-auto grid max-w-6xl gap-16 md:grid-cols-2">
+        <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-2 md:gap-16">
           <div>
-            <p className="mb-4 text-xs font-medium tracking-[0.3em] text-safety-500">APPLY</p>
-            <h2 className="mb-6 text-3xl font-bold md:text-4xl">エントリー</h2>
-            <p className="text-slate-300">
+            <p className="mb-3 text-[10px] font-medium tracking-[0.3em] text-safety-500 sm:text-xs">APPLY</p>
+            <h2 className="mb-4 text-2xl font-bold sm:text-3xl md:mb-6 md:text-4xl">エントリー</h2>
+            <p className="text-sm text-slate-300 sm:text-base">
               ご興味をお持ちいただきありがとうございます。<br />
               必要事項をご記入のうえ、送信してください。
             </p>
           </div>
-          <div className="rounded-sm bg-white p-8 text-slate-900">
+          <div className="rounded-sm bg-white p-6 text-slate-900 sm:p-8">
             <ApplicationForm
               variant="modern"
               accentClassName="focus:ring-safety-500 focus:border-safety-500"

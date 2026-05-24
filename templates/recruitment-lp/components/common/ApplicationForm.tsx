@@ -21,7 +21,7 @@ export default function ApplicationForm({
   };
 
   const labelBase = variant === "pop" ? "block text-sm font-bold mb-2" : "block text-sm font-medium mb-2";
-  const inputBase = `w-full rounded-md border border-slate-300 px-4 py-3 outline-none transition focus:ring-2 ${accentClassName}`;
+  const inputBase = `w-full rounded-md border border-slate-300 bg-white px-3 py-2.5 text-base outline-none transition focus:ring-2 sm:px-4 sm:py-3 ${accentClassName}`;
 
   if (submitted) {
     return (
@@ -59,7 +59,7 @@ export default function ApplicationForm({
       </div>
       <button
         type="submit"
-        className={`w-full rounded-md px-6 py-4 font-semibold transition ${buttonClassName}`}
+        className={`w-full rounded-md px-5 py-3.5 text-sm font-semibold transition sm:px-6 sm:py-4 sm:text-base ${buttonClassName}`}
       >
         応募する
       </button>
