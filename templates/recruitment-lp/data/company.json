@@ -1,0 +1,69 @@
+{
+  "template": "modern",
+  "company": {
+    "name": "株式会社サンプル",
+    "name_en": "Sample Inc.",
+    "slug": "sample-co",
+    "founded": "2020年4月",
+    "address": "東京都千代田区丸の内1-1-1",
+    "ceo": "山田 太郎",
+    "tagline": "テクノロジーで、働き方を変える。",
+    "mission": "すべての人が、もっと創造的な仕事に集中できる世界へ。",
+    "description": "AIとSaaSを活用し、企業の業務自動化を支援するプロダクトを開発・提供しています。創業以来、500社以上の導入実績があります。"
+  },
+  "services": [
+    {
+      "name": "AutoFlow",
+      "description": "業務プロセスをノーコードで自動化するワークフローSaaS。",
+      "target": "中堅・中小企業"
+    },
+    {
+      "name": "DataSync",
+      "description": "社内システム間のデータ連携を実現するiPaaSプラットフォーム。",
+      "target": "情シス・DX推進部門"
+    },
+    {
+      "name": "InsightAI",
+      "description": "営業データから次のアクションを提示するAIアシスタント。",
+      "target": "B2B SaaS企業"
+    }
+  ],
+  "jobs": [
+    {
+      "title": "フロントエンドエンジニア",
+      "employment_type": "正社員",
+      "location": "東京都千代田区（フルリモート可）",
+      "salary": "年収 500万円 〜 900万円",
+      "description": "Next.js / TypeScript を中心とした自社プロダクトのUI開発を担当。デザイナーと連携し、ユーザーが直感的に使えるインターフェースを設計・実装します。",
+      "requirements": [
+        "Reactベースの実務開発 3年以上",
+        "TypeScript の実務経験",
+        "Webパフォーマンス改善の経験"
+      ]
+    },
+    {
+      "title": "バックエンドエンジニア",
+      "employment_type": "正社員",
+      "location": "東京都千代田区（フルリモート可）",
+      "salary": "年収 550万円 〜 950万円",
+      "description": "Node.js / Go によるAPI開発、データベース設計、認証基盤の構築を担当。マイクロサービス化を進めるフェーズで、技術選定にも携われます。",
+      "requirements": [
+        "サーバーサイド開発 3年以上",
+        "RDB / NoSQL の設計経験",
+        "クラウドインフラ（AWS / GCP）の運用経験"
+      ]
+    },
+    {
+      "title": "プロダクトデザイナー",
+      "employment_type": "正社員",
+      "location": "東京都千代田区（ハイブリッド）",
+      "salary": "年収 500万円 〜 850万円",
+      "description": "ユーザーリサーチからUIデザイン、デザインシステム整備までを一貫して担当。エンジニアと密に連携し、プロダクト全体の体験を設計します。",
+      "requirements": [
+        "SaaSプロダクトのUIデザイン経験 2年以上",
+        "Figma を用いたチーム開発の経験",
+        "ユーザーリサーチの実施経験"
+      ]
+    }
+  ]
+}

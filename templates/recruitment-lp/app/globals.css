@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Inter", "Helvetica Neue", "Hiragino Sans", "Yu Gothic UI", sans-serif;
+  --font-serif: "Noto Serif JP", Georgia, serif;
+}
+
+html,
+body {
+  scroll-behavior: smooth;
+}
