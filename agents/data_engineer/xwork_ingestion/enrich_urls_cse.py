@@ -84,6 +84,10 @@ def search_cse(api_key: str, cse_id: str, company_name: str,
     params = {
         "key": api_key, "cx": cse_id, "q": query,
         "num": 10, "hl": "ja", "gl": "jp",
+        # CSE 側で「ウェブ全体を検索」が ON にできない場合の回避策:
+        # 登録された example.com を除外指定すると、実質的に全ウェブ検索になる
+        "siteSearch": "example.com",
+        "siteSearchFilter": "e",
     }
     for attempt in range(3):
         try:
