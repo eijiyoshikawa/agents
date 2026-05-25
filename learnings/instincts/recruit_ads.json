@@ -101,6 +101,61 @@
       "domain": "operations",
       "created_at": "2026-05-25",
       "updated_at": "2026-05-25"
+    },
+    {
+      "id": "RA-SEED-009",
+      "trigger": "経験者向け法人セールス求人で給与訴求を主軸にしている（年収400-800万レンジ）",
+      "action": "給与訴求は副次的に効くが単独では決定打にならない。商材力・事業魅力・社会課題訴求（HR×AI×建設業）が経験者層には強い仮説。P-eigyo-02（法人営業経験者中堅）の決定軸は『事業魅力 ≧ 年収 > 裁量 > 福利厚生』",
+      "confidence": 0.4,
+      "evidence": { "count": 1, "examples": ["LET案件Sprint1 配信前仮説、実検証必要"] },
+      "scope": "agent",
+      "domain": "marketing",
+      "created_at": "2026-05-25",
+      "updated_at": "2026-05-25"
+    },
+    {
+      "id": "RA-SEED-010",
+      "trigger": "月予算が小規模（5-10万円）で『方程式化』レベルの統計サンプル確保が困難",
+      "action": "7日スプリントでCRTV検証回転数を最大化（週6-12本投入）。CV最適化より訴求方向性の発見を優先。Hook率・CTR・3秒視聴率で早期勝敗判定し、Phase 1で軸の方向性を絞ってからPhase 2本検証へ",
+      "confidence": 0.5,
+      "evidence": { "count": 1, "examples": ["LET案件運用設計"] },
+      "scope": "agent",
+      "domain": "operations",
+      "created_at": "2026-05-25",
+      "updated_at": "2026-05-25"
+    },
+    {
+      "id": "RA-SEED-011",
+      "trigger": "LP に Pixel タグが未設置のまま配信開始の意思決定が降りる",
+      "action": "配信延期を強く推奨。Pixel/CAPI 無しで配信すると媒体側CV計測ゼロ、入札最適化が応募ジャンクや偶発訪問者に向かう、Offline Conversion連携も不可で採用最適化に到達しない。GTM経由のタグ追加は 1-2日で完了可能",
+      "confidence": 0.7,
+      "evidence": { "count": 2, "examples": ["業界共通知見", "LET案件LP分析で実検出"] },
+      "scope": "agent",
+      "domain": "marketing",
+      "created_at": "2026-05-25",
+      "updated_at": "2026-05-25"
+    },
+    {
+      "id": "RA-SEED-012",
+      "trigger": "応募導線が LP→フォーム直送信ではなく LINE 公式アカウント経由",
+      "action": "LINE 友だち追加URLを LP-A/B 別に分けることで、媒体Pixel無しでも『どのLP経由の友だち追加か』を LINE OA 側で記録可能。応募率は LP直送信より高い傾向（LINE内完結で離脱低い）。Conversion API（順次提供）と Webhook→Notion 自動連携で運用効率化",
+      "confidence": 0.5,
+      "evidence": { "count": 1, "examples": ["LET案件LP分析で発見"] },
+      "scope": "agent",
+      "domain": "marketing",
+      "created_at": "2026-05-25",
+      "updated_at": "2026-05-25"
+    },
+    {
+      "id": "RA-SEED-013",
+      "trigger": "3職種混在の汎用採用LPに、特定職種のCRTVから流入させている",
+      "action": "URLパラメータ（?role=corp-sales等）で動的FV切替＋該当セクションへアンカー誘導が必要。既存LPを大きく変えず、専用LP感を出してCVR下落を防ぐ。Phase 2以降は専用LP化を検討",
+      "confidence": 0.5,
+      "evidence": { "count": 1, "examples": ["LET LP-A/B 3職種混在問題"] },
+      "scope": "agent",
+      "domain": "marketing",
+      "created_at": "2026-05-25",
+      "updated_at": "2026-05-25"
     }
   ]
 }

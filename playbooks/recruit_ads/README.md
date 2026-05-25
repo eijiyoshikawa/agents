@@ -55,7 +55,13 @@ playbooks/recruit_ads/
 ```
 
 ### 現在進行中の案件
-- `clients/let/` — 株式会社LET 自社採用広告（intake 中）
+- `clients/let/` — 株式会社LET 自社採用広告（法人セールス3名 / Sprint 1配信 6/3予定）
+
+### 引継ぎ・移行
+- **`HANDOFF.md`** — 新セッション・新メンバー用のマスター引継ぎ文書（最優先で読む）
+- **`MIGRATION_GUIDE.md`** — 独立リポジトリへの移行手順書
+- **`migrate_to_standalone.sh`** — 自動移行スクリプト（`bash migrate_to_standalone.sh ~/let-recruit-ads`）
+- **`STANDALONE_README.md`** / **`STANDALONE_CLAUDE.md`** — 移行後リポジトリ用テンプレ
 
 ## 担当エージェント
 
