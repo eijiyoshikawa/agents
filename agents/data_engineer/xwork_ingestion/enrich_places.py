@@ -109,23 +109,28 @@ def pick_best_place(places: list[dict], target_name: str) -> dict | None:
 def process_one(page: dict, api_key: str) -> dict:
     title = title_of(page)
     address = text_prop(page, "住所")
+    existing_url = text_prop(page, "会社URL")
     if not title:
-        return {"id": page["id"], "title": "", "status": "no_title"}
+        return {"id": page["id"], "title": "", "status": "no_title",
+                "existing_url": existing_url}
     response = search_place(api_key, title, address)
     if response is None or "_error" in (response or {}):
         return {
             "id": page["id"], "title": title, "status": "api_error",
             "error": response.get("_error", "") if response else "",
+            "existing_url": existing_url,
         }
     places = response.get("places", [])
     if not places:
-        return {"id": page["id"], "title": title, "status": "no_match"}
+        return {"id": page["id"], "title": title, "status": "no_match",
+                "existing_url": existing_url}
     best = pick_best_place(places, title)
     if best is None or best.get("_similarity", 0) < NAME_SIMILARITY_THRESHOLD:
         return {
             "id": page["id"], "title": title, "status": "low_similarity",
             "best_name": best.get("displayName", {}).get("text") if best else "",
             "similarity": best.get("_similarity") if best else 0,
+            "existing_url": existing_url,
         }
     phone_raw = best.get("nationalPhoneNumber") or best.get("internationalPhoneNumber") or ""
     phone = normalize_phone(phone_raw)
@@ -241,7 +246,7 @@ def main() -> int:
         print("\n[dry-run] use --apply to write to Notion")
         return 0
 
-    print(f"\n[apply] writing phones/websites to Notion...")
+    print(f"\n[apply] writing phones/websites to Notion (only when empty)...")
     applied_phone = 0
     applied_url = 0
     errors = 0
@@ -249,19 +254,20 @@ def main() -> int:
         props: dict = {}
         if r.get("phone"):
             props["電話番号"] = {"phone_number": r["phone"]}
-        if r.get("website"):
-            # 既存URLは上書きしないので、ここではURLが空のものだけ
-            pass  # URL書き込みは fill 系の上書き禁止ルールを尊重し、別途処理
+        if r.get("website") and not r.get("existing_url"):
+            props["会社URL"] = {"url": r["website"]}
         if not props:
             continue
         try:
             client.update_properties(r["id"], props)
-            if r.get("phone"):
+            if "電話番号" in props:
                 applied_phone += 1
+            if "会社URL" in props:
+                applied_url += 1
         except Exception as e:
             errors += 1
             print(f"[error] {r['title']}: {e}", file=sys.stderr)
-    print(f"[apply] phones_applied={applied_phone}, errors={errors}")
+    print(f"[apply] phones_applied={applied_phone}  urls_applied={applied_url}  errors={errors}")
     return 0
 
 
