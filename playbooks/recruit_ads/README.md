@@ -37,10 +37,23 @@ playbooks/recruit_ads/
 ├── 06_formulas/                    # 方程式（エリア × 業種）
 │   ├── formula_template.md         # 方程式テンプレート
 │   └── formulas/                   # エリア×業種別の方程式（F-{area}-{industry}.md）
-└── 07_runbook/                     # 運用手順
-    ├── quickstart.md               # 30分で1キャンペーン立ち上げ
-    └── weekly_optimization.md      # 週次最適化チェックリスト
+├── 07_runbook/                     # 運用手順
+│   ├── quickstart.md               # 30分で1キャンペーン立ち上げ
+│   └── weekly_optimization.md      # 週次最適化チェックリスト
+├── 08_intake/                      # 案件オンボーディング
+│   ├── intake_template.md          # 新規案件の起票テンプレ
+│   └── data_sharing_guide.md       # データ共有の方法・形式 ★案件開始前必読
+└── clients/                        # 案件別フォルダ
+    └── {client_name}/
+        ├── README.md
+        ├── intake.md               # intake_template からコピー
+        ├── data/                   # 受領データ（カテゴリ別サブフォルダ）
+        ├── assets/                 # 素材（大容量はDrive）
+        └── output/                 # 生成物（戦略案・実験ログ等）
 ```
+
+### 現在進行中の案件
+- `clients/let/` — 株式会社LET 自社採用広告（intake 中）
 
 ## 担当エージェント
 
