@@ -1,0 +1,2 @@
+exp_id,phase,industry,area_code,media,hypothesis_short,start_date,end_date,status,budget_jpy,variable_axis,variant_a,variant_b,primary_kpi,result_winner,result_lift_pct,statistical_power,instinct_id,formula_id,notes
+EXP-20260601-001,1,kaigo,saitama-south,meta,SAMPLE: 夜勤なし vs 給与訴求,2026-06-03,2026-06-17,planned,100000,hook,salary,nokin-nashi,apply_cvr,,,,,,テンプレ参照用サンプル

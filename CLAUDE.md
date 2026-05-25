@@ -250,8 +250,21 @@ LP・Webサイト・ダッシュボード等の制作時に、Designer / UI/UX D
   - `prefers-reduced-motion: reduce` 対応を全モーションで実装
   - 和文B2B案件では feer 既定のmotion tokens（duration 300 / easing `cubic-bezier(.4,0,.2,1)` / 登場 `grow-from-bottom`）を初期値とする
 
+### 採用広告プレイブック（Recruit Ads Playbook）
+`/playbooks/recruit_ads/` に SNS広告（Meta / TikTok / LINE）で求人応募を獲得するための実験設計・命名規則・KPI定義・媒体別ガイド・クリエイティブ・LP雛形・計測・実験管理・方程式テンプレ・運用Runbook を集約。
+
+- エントリ: `/playbooks/recruit_ads/README.md`
+- 必読3点: `00_strategy/experiment_framework.md` / `00_strategy/naming_conventions.md` / `07_runbook/quickstart.md`
+- 実験管理: `05_experiments/experiment_register.csv` で EXP-ID を一元管理。EXP-{YYYYMMDD}-{NNN} 形式で重複厳禁
+- 方程式: `06_formulas/formulas/F-{area}-{industry}.md` にエリア×業種ごとの勝ち筋を集約（confidence≥0.7 のインスティンクト3件以上で起票）
+- ナレッジ蓄積: `/learnings/instincts/recruit_ads.json`（domain: marketing）
+- 参照エージェント: Marketing / Ad Operations / Content Creator / Designer / Engineer / Data Analyst / KPI Dashboard / Legal / Devil's Advocate
+
+**ルール**: 全媒体・全担当者で命名規則（{MEDIA}_{INDUSTRY}_{AREA}_{OBJECTIVE}_{YYYYMM}_{SEQ}）と UTM 規約（`exp_id` / `lp_id` 必須）を遵守。違反は配信前にブロック。
+
 ## 事業領域
 - SNSマーケティング（Instagram, TikTok, YouTube 運用/広告/クリエイティブ）
+- **採用広告（SNS広告→求人応募）— エリア×業種の方程式化を目指す**（プレイブック: `/playbooks/recruit_ads/`）
 - 不動産業界特化型BPO（AIエージェント活用）
 - AIシステム制作（補助金活用）
 - LP等のWeb制作

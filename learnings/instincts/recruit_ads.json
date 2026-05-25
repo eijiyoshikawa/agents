@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.0",
+  "description": "採用広告（SNS広告で求人応募獲得）の学習済みパターン",
+  "domain": "marketing",
+  "scope": "agent",
+  "owner_agents": ["marketing", "ad_operations", "content_creator", "data_analyst"],
+  "playbook_ref": "playbooks/recruit_ads/",
+  "register_ref": "playbooks/recruit_ads/05_experiments/experiment_register.csv",
+  "formulas_ref": "playbooks/recruit_ads/06_formulas/formulas/",
+  "updated_at": "2026-05-25",
+  "promotion_rules": {
+    "to_formula": "confidence >= 0.7 で同 industry x area_code の他インスティンクト2件以上と合算",
+    "to_agent_prompt": "confidence >= 0.8 で該当エージェントの prompt.md に反映検討",
+    "to_claude_md": "confidence >= 0.9 + 異なる業種/エリアで再現 で CLAUDE.md 昇格"
+  },
+  "instincts": [
+    {
+      "id": "RA-SEED-001",
+      "trigger": "新規エリア×業種で配信開始時、CPHやCPRHのベンチマークが不明",
+      "action": "kpi_definitions.md の業種別 CPA 目安レンジを暫定指標とし、Phase 1探索で 50CV溜まるまで停止せず学習させる",
+      "confidence": 0.3,
+      "evidence": { "count": 0, "examples": ["initial seed: 業界標準として設定"] },
+      "scope": "agent",
+      "domain": "marketing",
+      "created_at": "2026-05-25",
+      "updated_at": "2026-05-25"
+    },
+    {
+      "id": "RA-SEED-002",
+      "trigger": "Meta広告でPixelのみ設置しCAPI未設定、iOSユーザー比率が高い案件",
+      "action": "CAPI設定を必須化。Pixel-only運用ではCV過小評価で入札最適化が歪み、応募ジャンクに最適化される。Test Eventsで Match Quality 6.0+ を確認",
+      "confidence": 0.5,
+      "evidence": { "count": 1, "examples": ["業界一般知見: iOS14.5以降のCV計測課題"] },
+      "scope": "agent",
+      "domain": "marketing",
+      "created_at": "2026-05-25",
+      "updated_at": "2026-05-25"
+    },
+    {
+      "id": "RA-SEED-003",
+      "trigger": "媒体側CPA最適化のみで運用、Offline Conversion（採用/定着）未連携",
+      "action": "CRMから Hire / RetainedHire を Offline Conversion として媒体へ送信。応募止まりの最適化から採用最適化に切り替えるとCPHが20-40%改善する事例多数",
+      "confidence": 0.5,
+      "evidence": { "count": 1, "examples": ["業界知見: Offline Conversion連携の効果"] },
+      "scope": "agent",
+      "domain": "marketing",
+      "created_at": "2026-05-25",
+      "updated_at": "2026-05-25"
+    },
+    {
+      "id": "RA-SEED-004",
+      "trigger": "求人LPのフォームが7項目以上、特に自己PR/履歴書添付が必須",
+      "action": "Minimum Viable Form（4項目: 名前/電話/希望勤務地/希望シフト）に絞る。詳細情報は応募後の電話/LINEで取得。CVRが2-3倍になる事例多数",
+      "confidence": 0.6,
+      "evidence": { "count": 2, "examples": ["業界知見", "LP最適化の定番手法"] },
+      "scope": "agent",
+      "domain": "marketing",
+      "created_at": "2026-05-25",
+      "updated_at": "2026-05-25"
+    },
+    {
+      "id": "RA-SEED-005",
+      "trigger": "30-50代主婦パート向け介護/保育/販売求人で給与訴求を主軸にしている",
+      "action": "給与訴求より「夜勤なし」「シフト融通」「子育て両立」等の時間軸訴求を優先。このペルソナは時間 > 賃金の傾向",
+      "confidence": 0.4,
+      "evidence": { "count": 1, "examples": ["ペルソナ仮説（要実検証）"] },
+      "scope": "agent",
+      "domain": "marketing",
+      "created_at": "2026-05-25",
+      "updated_at": "2026-05-25"
+    },
+    {
+      "id": "RA-SEED-006",
+      "trigger": "TikTok広告でMeta用横長動画をそのまま流用、BGMなし",
+      "action": "縦動画9:16、BGM必須、字幕焼き込み、1秒目から動きあり。TikTok特有の素人感UGCフォーマットを採用しないと配信費用がムダになる",
+      "confidence": 0.6,
+      "evidence": { "count": 2, "examples": ["業界知見", "TikTok公式推奨"] },
+      "scope": "agent",
+      "domain": "marketing",
+      "created_at": "2026-05-25",
+      "updated_at": "2026-05-25"
+    },
+    {
+      "id": "RA-SEED-007",
+      "trigger": "1キャンペーンで訴求・ターゲ・LP・CRTVを同時に複数変えてA/Bテスト",
+      "action": "変数を1軸に絞る（Ad Setで訴求/ターゲ、Adでクリエイティブ、URLでLP）。同時変更は探索フェーズのみ許容、検証フェーズでは禁止。原因切り分け不能で方程式化に到達しない",
+      "confidence": 0.7,
+      "evidence": { "count": 3, "examples": ["実験設計の基本原則", "業界共通知見"] },
+      "scope": "agent",
+      "domain": "marketing",
+      "created_at": "2026-05-25",
+      "updated_at": "2026-05-25"
+    },
+    {
+      "id": "RA-SEED-008",
+      "trigger": "命名規則がバラバラで媒体間の横断集計ができない",
+      "action": "{MEDIA}_{INDUSTRY}_{AREA}_{OBJECTIVE}_{YYYYMM}_{SEQ} 形式を全媒体・全担当者で強制。UTMは媒体マクロで自動展開。命名違反は配信前にブロックする運用",
+      "confidence": 0.7,
+      "evidence": { "count": 3, "examples": ["業界共通の運用知見"] },
+      "scope": "agent",
+      "domain": "operations",
+      "created_at": "2026-05-25",
+      "updated_at": "2026-05-25"
+    }
+  ]
+}
