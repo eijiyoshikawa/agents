@@ -79,16 +79,20 @@
 | 採用済社員データ（PIIマスク済） | ☐ | CSV | `data/employees/` |
 | 社員ヒアリング録 | ☐ | MD | `data/interviews/` |
 | 写真・動画素材 | ☐ | Drive URL | Drive または `assets/` |
-| **既存LP（3パターン）** | **☑ あり** | URL | 本ファイル下記欄 |
+| **既存LP（2パターン）** | **☑ あり** | URL | 本ファイル下記欄 |
 | 競合広告スクショ・分析 | ☐ | 画像+MD | `data/competitors/` |
 | CRM全データ | ☐ | API連携 | 別途設計 |
 
-**既存LP URL（3パターン）**:
-- LP-A: ❓ URLとLP方向性（例: 給与訴求 / キャリア訴求 / 働き方訴求）
-- LP-B: ❓
-- LP-C: ❓
+**既存LP URL（2パターン）**:
+- LP-A: https://let-lpsecond001.vercel.app/ — ❓内容分析待ち（環境制約で取得不可）
+- LP-B: https://let-lpsecond002.vercel.app/ — ❓内容分析待ち（環境制約で取得不可）
 
-→ 受領後、`lp_id` を `lp-let-eigyo-a/b/c` のように振り、UTM `utm_content` 連動で計測。
+→ 受領後、`lp_id` を `lp-let-eigyo-a` / `lp-let-eigyo-b` で振り、UTM `utm_content` 連動で計測。
+→ **本リモート環境は外部URLアクセス制限あり**。LP内容は以下いずれかで共有依頼:
+  1. LP内容の要点（FVコピー・訴求軸・フォーム項目数）をチャットで箇条書き共有
+  2. LPのスクリーンショット（PC・スマホ各1枚）を添付
+  3. LPの HTML / Next.js ソースを `clients/let/data/lps/` に配置（既にGitリポジトリ管理ならURL共有）
+  4. ローカルから `curl https://let-lpsecond001.vercel.app/ > lp001.html` で取得して `data/lps/lp-a.html` に push
 
 **LINE 公式アカウント情報**:
 - LINE ID / @ID: ❓
@@ -126,6 +130,7 @@
 | 2026-05-25 | MUST情報受領（職種: 法人セールス / 大阪市中央区 / 月給25-35万 / 予算5万 / 早期開始） |
 | 2026-05-25 | 追加情報: 公式LINE作成済、LP 3パターンあり、CRTV検証回転数優先 |
 | 2026-05-25 | Phase 1戦略案を `output/phase1_strategy.md` に起票 |
+| 2026-05-25 | LP 2本のURL受領（lpsecond001 / lpsecond002）。リモート環境制約で内容取得不可、別形式での共有依頼中 |
 
 ---
 
