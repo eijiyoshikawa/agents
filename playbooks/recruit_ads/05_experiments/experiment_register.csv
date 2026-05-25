@@ -1,2 +1,5 @@
 exp_id,phase,industry,area_code,media,hypothesis_short,start_date,end_date,status,budget_jpy,variable_axis,variant_a,variant_b,primary_kpi,result_winner,result_lift_pct,statistical_power,instinct_id,formula_id,notes
 EXP-20260601-001,1,kaigo,saitama-south,meta,SAMPLE: 夜勤なし vs 給与訴求,2026-06-03,2026-06-17,planned,100000,hook,salary,nokin-nashi,apply_cvr,,,,,,テンプレ参照用サンプル
+EXP-20260525-001,1,eigyo,osaka-city,tt,LET法人セールス: 訴求軸4種(給与/成長/裁量/働き方)比較,2026-06-01,2026-06-28,planned,30000,hook,salary,saryou,ctr+cvr,,,,,,LET案件Phase1 CRTV検証主軸
+EXP-20260525-002,1,eigyo,osaka-city,meta,LET法人セールス: 静止画3形式比較,2026-06-01,2026-06-28,planned,15000,creative_format,static-poster,career-path-diagram,ctr,,,,,,LET案件Phase1 Meta補助
+EXP-20260525-003,1,eigyo,osaka-city,line,LET法人セールス: LINE友だち経由 vs 直接LP応募の有効応募率,2026-06-01,2026-06-28,planned,5000,funnel,direct-lp,line-friend,valid_apply_rate,,,,,,LET案件Phase1 LINE活用テスト
