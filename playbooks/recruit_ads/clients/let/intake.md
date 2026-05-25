@@ -54,8 +54,8 @@
 | 目標採用数 / 月 | 0.3-1名（CPH想定 80-200万 / 業種目安より逆算） |
 | 目標CPH | 80,000-200,000円（営業職レンジから） |
 | 既知の制約 | 月5万円。**最適化より「クリエイティブ検証回転数」を優先** |
-| プロジェクト方針 | CRTVを月15-20本回し、Hook率・CTR・CVRで早期勝敗判定 |
-| **配信前ブロッカー** | **LP-A/B 両方とも Meta/TikTok/LINE Pixel 未設置（GA4のみ）** |
+| プロジェクト方針 | **7日スプリント** で CRTV を週6-12本回し、Hook率・CTR・CVRで早期勝敗判定 |
+| 配信前ブロッカー | LP に Meta/TikTok/LINE Pixel 未設置 → **ユーザー回答: タグ追加可能、GTM経由で対応予定** |
 
 ## 4. 媒体・アカウント
 
@@ -65,10 +65,10 @@
 |---|---|---|
 | Meta Business Manager | ❓（要確認） | 1Password「LET-Meta」（運用開始時） |
 | TikTok Ads | ❓（要確認） | 1Password「LET-TikTok」 |
-| **LINE 公式アカウント** | **☑ 作成済** | 1Password「LET-LINE」 |
+| **LINE 公式アカウント** | **☑ 作成済（1個）** ※lin.ee/QlrbDga(LP-A流入)/lin.ee/Qmxrf8O(LP-B流入)の2URL運用 | 1Password「LET-LINE」 |
 | LINE Ads Platform | ❓（公式アカウントとは別） | |
-| GA4 プロパティ | ❓ | |
-| CRM / ATS | ❓ | |
+| GA4 プロパティ | ☑ 2つ存在（G-FMWMLCKLRZ / G-K2WV422BN8）→ 統合推奨 | |
+| CRM / ATS | **応募管理: LINE or Notion で構築（ユーザー判断、Notion 推奨）** | |
 
 **認証情報はこのファイルに書かないでください**。1Password / Notion秘匿ページに格納、本ファイルには参照キーのみ。
 
@@ -140,6 +140,8 @@
 | 2026-05-25 | ユーザーがLP HTMLをローカルから push 完了。分析結果を `data/lps/lp_analysis.md` に記録 |
 | 2026-05-25 | **重要発見**: 両LPで Meta/TikTok/LINE Pixel 未設置、配信前ブロッカー認定 |
 | 2026-05-25 | LP実値で募集要項を更新（給与・勤務地・勤務時間・休日・選考フロー） |
+| 2026-05-25 | ユーザー回答: タグ追加可能 / 公式LINE 1個 / 応募管理は LINE or Notion / 法人セールス JD は別送 |
+| 2026-05-25 | 7日スプリント運用設計・データパイプライン設計を起票（generic + LET向け） |
 
 ---
 

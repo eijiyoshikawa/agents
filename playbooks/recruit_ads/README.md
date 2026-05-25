@@ -29,7 +29,8 @@ playbooks/recruit_ads/
 │   └── industry_personas.md        # 業種別ペルソナ
 ├── 04_measurement/                 # 計測
 │   ├── tracking_setup.md           # Pixel / Tag / CAPI / GA4 設定
-│   └── utm_conventions.md          # UTM 命名規則 ★必読
+│   ├── utm_conventions.md          # UTM 命名規則 ★必読
+│   └── data_pipeline.md            # 媒体API → Sheets → Looker Studio 連携設計
 ├── 05_experiments/                 # 実験管理
 │   ├── experiment_template.md      # 1実験あたりのテンプレート
 │   ├── experiment_register.csv     # 全実験の一覧マスタ
@@ -39,7 +40,8 @@ playbooks/recruit_ads/
 │   └── formulas/                   # エリア×業種別の方程式（F-{area}-{industry}.md）
 ├── 07_runbook/                     # 運用手順
 │   ├── quickstart.md               # 30分で1キャンペーン立ち上げ
-│   └── weekly_optimization.md      # 週次最適化チェックリスト
+│   ├── weekly_optimization.md      # 週次最適化チェックリスト
+│   └── sprint_7day.md              # ★ 7日スプリント運用（CRTV検証回転重視）
 ├── 08_intake/                      # 案件オンボーディング
 │   ├── intake_template.md          # 新規案件の起票テンプレ
 │   └── data_sharing_guide.md       # データ共有の方法・形式 ★案件開始前必読
