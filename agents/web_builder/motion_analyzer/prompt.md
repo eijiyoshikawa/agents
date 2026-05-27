@@ -158,6 +158,34 @@ JS ソースから以下のパターンを検出する:
 }
 ```
 
+## パフォーマンスを考慮したモーション指針
+
+### GPU アクセラレーションの活用
+Builder への実装指示において、以下のパフォーマンス原則を適用する:
+
+**推奨（GPU アクセラレーション対象、レイアウト再計算なし）:**
+- `transform`（translate, scale, rotate）
+- `opacity`
+- `filter`（blur, brightness 等）
+
+**非推奨（リフローを発生させるプロパティ）:**
+- `width`, `height` — 代わりに `transform: scale()` を使用
+- `top`, `left`, `right`, `bottom` — 代わりに `transform: translate()` を使用
+- `margin`, `padding` — アニメーション対象にしない
+- `border-width` — `box-shadow` や `outline` で代替
+
+### アクセシビリティ対応: prefers-reduced-motion
+全てのアニメーション実装に対し、`prefers-reduced-motion` メディアクエリへの対応を必須とする:
+
+- **CSS 実装**: `@media (prefers-reduced-motion: reduce)` でアニメーションを無効化またはdurationを0にする
+- **framer-motion 実装**: `useReducedMotion()` フックを使用し、reduced の場合は `animate` を省略
+- **出力への反映**: 各アニメーション項目に `reduced_motion_fallback` フィールドを追加（例: `"instant"`, `"fade-only"`, `"none"`）
+
+### ビューポート内同時アニメーション制限
+- **最大同時アニメーション数: 5** — これを超えるとフレームドロップ（jank）のリスクが増大
+- stagger パターンを活用し、同時に動く要素数を制限する
+- 画面外のアニメーションは `IntersectionObserver` / `useInView` で遅延発火させる
+
 ## 使用するツール
 - `Read`: site_scanner/output.json の読み込み
 - `WebFetch`: ページHTML・CSS・JSファイルの取得

@@ -184,6 +184,34 @@
 }
 ```
 
+## インタラクティブ要素のアクセシビリティ要件
+
+Builder への実装指示に、以下のアクセシビリティ要件を必ず含める:
+
+### キーボードナビゲーション
+- 全てのインタラクティブ要素（ボタン、リンク、フォーム、タブ、アコーディオン）が **Tab キーでフォーカス可能** であること
+- カスタム要素（`<div onclick>` 等）が検出された場合、`tabindex="0"` + `role` + `onKeyDown` の実装を指示
+- フォーカスインジケーター（`focus-visible` outline）が視覚的に確認できること
+
+### ARIA パターン
+各インタラクティブ要素に対し、WAI-ARIA の推奨パターンを出力に含める:
+
+| 要素 | 必須 ARIA 属性 |
+|------|--------------|
+| **アコーディオン** | `aria-expanded`, `aria-controls`, ボタン要素でトリガー |
+| **タブ** | `role="tablist"`, `role="tab"`, `role="tabpanel"`, `aria-selected`, `aria-controls` |
+| **モーダル** | `aria-modal="true"`, `role="dialog"`, `aria-labelledby`, フォーカストラップ実装 |
+| **スライダー** | `role="group"`, `aria-roledescription="carousel"`, `aria-label` |
+| **モバイルメニュー** | `aria-expanded`（ハンバーガーボタン）, `aria-hidden`（メニュー本体） |
+| **ドロップダウン** | `aria-haspopup`, `aria-expanded`, Escape キーで閉じる |
+
+### 動的コンテンツの通知
+コンテンツが動的に変化する箇所に対し、スクリーンリーダーへの通知方法を記録する:
+
+- **`aria-live="polite"`**: タブ切り替え、フォームバリデーションメッセージ、検索結果更新
+- **`aria-live="assertive"`**: エラーメッセージ、重要なアラート
+- **フォーカス管理**: モーダルオープン時にモーダル内へフォーカス移動、クローズ時にトリガー要素へ戻す
+
 ## 使用するツール
 - `Read`: site_scanner/output.json の読み込み
 - `WebFetch`: ページHTML・JSファイルの取得

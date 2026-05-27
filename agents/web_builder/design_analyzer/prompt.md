@@ -178,6 +178,33 @@ CSS変数、インラインスタイル、クラス名から色情報を抽出�
 }
 ```
 
+## Tailwind CSS マッピング
+
+抽出したデザイントークンを Tailwind CSS の設定に直接マッピングし、Builder がコピー&ペーストで使えるコンフィグを生成する:
+
+### カラーマッピング
+- 抽出した各色を Tailwind デフォルトパレット（slate, gray, blue, green 等）の最も近い値と対応付ける
+- カスタムカラーが必要な場合は `tailwind.config.ts` の `extend.colors` ブロックとして出力
+- 例: `primary: '#3B82F6'` → `blue-500` 相当、カスタム定義として `primary: '#3B82F6'` も併記
+
+### スペーシングマッピング
+- 抽出したスペーシング値を Tailwind の 4px ベーススケールに変換する
+- 例: `120px` → `spacing[30]`（30 × 4px）, `24px` → `spacing[6]`（6 × 4px）
+- 非標準値は `extend.spacing` に追加
+
+### tailwind.config.ts 生成
+`output.json` に `tailwind_config_extend` フィールドとして、以下のようなコピー可能なブロックを含める:
+
+```typescript
+// output.json の tailwind_config_extend フィールド値
+{
+  "colors": { "primary": "#3B82F6", "secondary": "#10B981" },
+  "fontFamily": { "heading": ["Noto Sans JP", "sans-serif"], "body": ["Noto Sans JP", "sans-serif"] },
+  "spacing": { "section": "120px", "section-mobile": "80px" },
+  "borderRadius": { "card": "12px", "button": "8px" }
+}
+```
+
 ## 使用するツール
 - `Read`: site_scanner/output.json の読み込み
 - `WebFetch`: ページHTML・外部CSSファイルの取得

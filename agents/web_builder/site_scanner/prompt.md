@@ -105,6 +105,58 @@ HTMLソースと読み込まれたリソースから技術を検出する:
 }
 ```
 
+## 高度な検出パターン
+
+### CMS・プラットフォーム検出
+標準的なフレームワーク検出に加え、以下のCMS・プラットフォーム固有のシグナルを確認する:
+
+| プラットフォーム | 検出パターン |
+|---------------|------------|
+| **Shopify** | `Shopify.theme`, `/cdn.shopify.com/`, `shopify-section` クラス |
+| **Webflow** | `data-wf-*` 属性, `webflow.js`, `.w-` プレフィックスクラス |
+| **Wix** | `wix-*` 属性, `_wix_browser_sess`, `static.wixstatic.com` |
+| **Squarespace** | `_sqs*` クラス, `squarespace-cdn.com`, `sqs-block` |
+| **WordPress（追加）** | `wp-content/`, `wp-includes/`, `wp-json` REST API |
+| **Gatsby** | `___gatsby`, `gatsby-image`, `/static/` パターン |
+
+### パフォーマンスヒントの検出
+サイトのパフォーマンス最適化手法を記録する（Builder での再現時に活用）:
+
+- **遅延読み込み**: `loading="lazy"`, `data-src`, Intersection Observer パターン
+- **プリロード/プリフェッチ**: `<link rel="preload">`, `<link rel="prefetch">`, `<link rel="preconnect">`
+- **画像フォーマット**: WebP/AVIF の使用有無、`<picture>` + `<source>` によるフォーマット分岐
+- **クリティカルCSS**: インラインCSS の有無、非同期CSS読み込み（`media="print" onload`）
+
+### アクセシビリティベースライン
+基本的なアクセシビリティ対応状況を記録する:
+
+- **ARIA ランドマーク**: `role="banner"`, `role="navigation"`, `role="main"`, `role="contentinfo"` の使用
+- **スキップナビゲーション**: `<a href="#main-content">` 等のスキップリンクの有無
+- **lang 属性**: `<html lang="ja">` 等の言語指定
+- **alt テキスト**: 画像の alt 属性の充実度（空alt、欠落、適切な記述の割合）
+
+## マルチページクロール戦略
+
+### クロール優先順位
+サイト内リンクの収集は以下の優先順位で行う:
+
+1. **ナビゲーションリンク**（`<nav>` 内）— サイトの主要ページ構成を把握
+2. **フッターリンク**（`<footer>` 内）— 補助的なページを網羅
+3. **ページ内リンク**（`<main>` 内の `<a>`）— コンテンツ内からの遷移先
+4. **sitemap.xml** — 上記で漏れたページの補完（`/sitemap.xml` を `WebFetch` で確認）
+
+### クロール制限と効率化
+- **最大クロールページ数: 15ページ**（テンプレートが異なるページに集中する）
+- 同一テンプレートのページ（ブログ記事一覧など）は代表1ページのみ取得
+- `/blog/page/2`, `/news?page=3` 等のページネーションは除外
+
+### テンプレート重複検出
+クロールしたページのDOM構造を比較し、テンプレートの同一性を判定する:
+
+- **判定基準**: `<main>` 直下のセクション構成（タグ名+クラス名のパターン）が80%以上一致 → 同一テンプレート
+- **グルーピング**: 同一テンプレートのページをグループ化し、`output.json` の `pages` に `template_group` を付与
+- **Builder への指示**: テンプレートグループごとに1つの実装で複数ページをカバーできることを明記
+
 ## 使用するツール
 - `WebFetch`: トップページおよびサブページのHTML取得
 - `WebSearch`: 技術スタックの追加調査（必要に応じて）
