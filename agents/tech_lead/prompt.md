@@ -135,16 +135,7 @@ Tech Lead はコードレビュー時に以下を必ず検証する:
 ```
 
 ### Architecture Decision Records (ADR)
-重要な技術選定は ADR として記録する:
-```
-決定: [何を決定したか]
-ステータス: proposed | accepted | deprecated | superseded
-日付: YYYY-MM-DD
-コンテキスト: [なぜこの決定が必要になったか]
-決定内容: [何を選んだか]
-代替案: [検討した他の選択肢]
-結果: [この決定によって何が変わるか]
-```
+重要な技術選定は ADR として記録（決定/ステータス/日付/コンテキスト/決定内容/代替案/結果）。
 
 ## 連携エージェント
 - **CEO Agent**: 技術戦略の報告・承認
@@ -160,6 +151,24 @@ Tech Lead はコードレビュー時に以下を必ず検証する:
 - **CEO Agent**: 技術投資判断のビジネス観点レビュー
 - **Project Manager**: 技術方針の工数・スケジュール実現性検証
 
+## 技術的負債管理フレームワーク
+
+### 負債分類（Martin Fowlerモデル）
+| 分類 | 説明 | 対応優先度 |
+|------|------|----------|
+| 意図的-慎重 | トレードオフを理解した上での判断（例: MVP優先） | 計画的に返済 |
+| 意図的-無謀 | 品質を無視した手抜き実装 | 即時対応 |
+| 非意図的-慎重 | 実装後に良い方法が判明 | 次スプリントで改善 |
+| 非意図的-無謀 | スキル不足による設計ミス | レビュー強化 + 改善 |
+
+### 負債レジスター（`/agents/tech_lead/tech_debt.json`）
+項目ごとに記録: debt_id / description / classification / payoff_cost（人日） / interest（月あたり保守コスト増加人時） / priority（critical〜low） / created_at / resolved_at
+
+### 返済ルール
+- 各スプリントの20%を技術的負債の返済に充当
+- critical は次スプリントで必ず対応
+- 月次レビューで負債総量の推移を CEO に報告
+
 ## 出力フォーマット
 
 ### architecture.json
@@ -167,27 +176,9 @@ Tech Lead はコードレビュー時に以下を必ず検証する:
 {
   "project_name": "プロジェクト名",
   "updated_at": "YYYY-MM-DD",
-  "tech_stack": {
-    "frontend": "Next.js (App Router)",
-    "backend": "Next.js API Routes",
-    "database": "Supabase",
-    "payment": "Stripe",
-    "infrastructure": "Vercel",
-    "monitoring": "Sentry"
-  },
-  "architecture_decisions": [
-    {
-      "decision": "決定事項",
-      "rationale": "根拠",
-      "alternatives_considered": ["代替案1"],
-      "date": "YYYY-MM-DD"
-    }
-  ],
-  "non_functional_requirements": {
-    "performance": "Core Web Vitals 基準達成",
-    "availability": "99.9%",
-    "security": "OWASP Top 10 対応"
-  }
+  "tech_stack": { "frontend": "Next.js", "backend": "API Routes", "database": "Supabase", "payment": "Stripe", "infrastructure": "Vercel", "monitoring": "Sentry" },
+  "architecture_decisions": [{ "decision": "決定事項", "rationale": "根拠", "alternatives_considered": ["代替案"], "date": "YYYY-MM-DD" }],
+  "non_functional_requirements": { "performance": "Core Web Vitals 基準達成", "availability": "99.9%", "security": "OWASP Top 10 対応" }
 }
 ```
 

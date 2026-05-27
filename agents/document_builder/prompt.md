@@ -135,49 +135,35 @@ Google Slides テンプレートを基に、意思決定者が Phase 1 に合意
   "output_url": "https://docs.google.com/presentation/d/...",
   "created_at": "YYYY-MM-DD",
   "story_structure": {
-    "P1": {
-      "title": "御社の課題は〇〇である",
-      "so_what": "今期中に着手しないと△△のリスクがある",
-      "status": "confirmed"
-    },
-    "P2": {
-      "title": "原因は△△にある",
-      "so_what": "現状の運用では□□が解消できない",
-      "status": "confirmed"
-    },
-    "P3": {
-      "title": "解決策として□□を提案する",
-      "so_what": "Phase1で■■を実現し、効果を検証する",
-      "status": "confirmed"
-    },
-    "P4": {
-      "title": "Phase1のスコープと体制",
-      "so_what": "",
-      "status": "confirmed"
-    },
-    "P5": {
-      "title": "スケジュールとお見積り",
-      "so_what": "",
-      "status": "confirmed"
-    }
+    "P1": { "title": "御社の課題は〇〇である", "so_what": "今期中に着手しないと△△のリスクがある", "status": "confirmed" },
+    "P2": { "title": "原因は△△にある", "so_what": "現状の運用では□□が解消できない", "status": "confirmed" },
+    "P3": { "title": "解決策として□□を提案する", "so_what": "Phase1で■■を実現し、効果を検証する", "status": "confirmed" },
+    "P4": { "title": "Phase1のスコープと体制", "so_what": "", "status": "confirmed" },
+    "P5": { "title": "スケジュールとお見積り", "so_what": "", "status": "confirmed" }
   },
   "body_elements": [
-    {
-      "page": "P1",
-      "element_type": "棒グラフ",
-      "content_summary": "業界別課題発生率（直近3年）",
-      "data_source": "商談議事録 + 市場データ",
-      "status": "inserted"
-    }
+    { "page": "P1", "element_type": "棒グラフ", "content_summary": "業界別課題発生率（直近3年）", "data_source": "商談議事録 + 市場データ", "status": "inserted" }
   ],
-  "steps_completed": {
-    "step1_story_review": "confirmed",
-    "step2_body_design": "confirmed",
-    "step3_template_insert": "confirmed"
-  },
+  "steps_completed": { "step1_story_review": "confirmed", "step2_body_design": "confirmed", "step3_template_insert": "confirmed" },
   "revision_history": []
 }
 ```
+
+## 想定反論への事前準備（Objection Handling）
+各ページ（P1-P5）について、クライアントの想定反論を2-3個事前に特定し対策を準備する:
+- P1（課題提起）: 「その課題は優先度が低い」→ 定量的インパクトで緊急性を証明
+- P2（原因）: 「原因は別にある」→ 複数原因を網羅し、主因の根拠を提示
+- P3（解決策）: 「他の方法もあるのでは」→ 比較表で選定理由を明示
+- P4（スコープ）: 「社内リソースで足りるか」→ 体制図と役割分担で実現性を担保
+- P5（見積）: 「高い」→ ROI試算で投資対効果を提示
+- Appendix に「想定Q&A」スライドをオプションで追加可能
+
+## ROI 試算テンプレート（サービス別）
+| サービス | ROI算出ロジック |
+|---------|---------------|
+| SNSマーケ | フォロワー増 → リード獲得数 → CVR → 売上増分 |
+| AIシステム | 削減時間 × 時給 × 月数 = 年間削減額 vs 投資額 |
+| Web/LP制作 | 流入数 × CVR改善幅 × 平均単価 = 増分売上 |
 
 ## 連携エージェント
 - **Retriever**: Notion から商談議事録・顧客情報を取得

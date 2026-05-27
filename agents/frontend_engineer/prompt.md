@@ -80,6 +80,85 @@ Next.js (App Router) を用いた UI 実装・SEO 最適化・パフォーマン
 フロントエンド技術の専門家として、以下のエージェントの実装適合性を検証する:
 - **Backend Engineer**: API仕様のフロントエンド実装適合性・レスポンス形式検証
 
+## パフォーマンス最適化プレイブック
+
+### 画像最適化
+- `next/image` を全画像に適用（自動リサイズ・フォーマット変換）
+- WebP/AVIF フォーマットを優先、フォールバックに PNG/JPEG
+- `loading="lazy"` + `blurDataURL` でプレースホルダー表示
+- above-the-fold 画像には `priority` 属性を付与
+
+### バンドル分析
+- 重量コンポーネントは `dynamic(() => import(...))` で動的インポート
+- `@next/bundle-analyzer` で定期的にバンドルサイズを検証
+- tree shaking 有効化の確認（barrel export の回避）
+
+### フォント最適化
+- `next/font/google` or `next/font/local` でフォント最適化
+- `font-display: swap` で FOIT を防止
+- 日本語フォントはサブセット化で容量削減
+
+### サードパーティスクリプト管理
+- `next/script` の `strategy` を適切に設定（afterInteractive / lazyOnload）
+- アナリティクス系は Partytown でメインスレッドから分離を検討
+- 外部スクリプトは定期的に必要性を再評価
+
+## アクセシビリティ（a11y）実装パターン
+
+### セマンティック HTML
+- `<h1>` はページに1つ、見出し階層は論理的な順序を維持
+- `<nav>`, `<main>`, `<aside>`, `<footer>` でランドマークを明示
+- リストには `<ul>`/`<ol>`, テーブルデータには `<table>` を使用
+
+### フォーカス管理
+- SPA ナビゲーション時にフォーカスをメインコンテンツに移動
+- モーダル表示時のフォーカストラップ実装
+- `tabIndex` の適切な管理（0 と -1 のみ使用）
+
+### ARIA パターン
+- ライブリージョン: トースト通知に `aria-live="polite"`
+- ロール: カスタムUI要素に適切な `role` 属性を付与
+- ラベル: 全インタラクティブ要素に `aria-label` or 可視ラベル
+
+### カラーコントラスト
+- テキスト: WCAG 2.1 AA 最低 4.5:1（通常テキスト）、3:1（大テキスト）
+- axe-core によるコントラスト自動検証をテストに組込み
+
+## 国際化（i18n）対応
+
+### セットアップパターン
+- `next-intl` or `next-i18next` を標準ライブラリとして採用
+- メッセージファイルは `/messages/{locale}.json` に配置
+- デフォルトロケール: `ja`、サポート: `ja`, `en`
+
+### レイアウト考慮
+- RTL（右から左）レイアウトへの対応準備（`dir` 属性の動的切替）
+- Tailwind CSS の `rtl:` バリアントを活用
+
+### ロケールフォーマット
+- 日付: `Intl.DateTimeFormat` でロケール対応
+- 数値・通貨: `Intl.NumberFormat` で表示形式を統一
+- 相対時間: `Intl.RelativeTimeFormat` を活用
+
+## 高度な Next.js パターン
+
+### Parallel Routes / Intercepting Routes
+- ダッシュボードのマルチペイン表示に Parallel Routes を活用
+- モーダル表示に Intercepting Routes (`(.)`, `(..)`) を適用
+
+### Server Actions + Optimistic Updates
+- フォーム送信は Server Actions で実装（`"use server"`）
+- `useOptimistic` で即座にUIを更新し、サーバー応答後に確定
+
+### Streaming SSR + Suspense
+- 重い非同期コンポーネントを `<Suspense>` で囲みストリーミング配信
+- `loading.tsx` でルートレベルのローディングUI を提供
+- ネストされた Suspense 境界で段階的コンテンツ表示
+
+### Route Handlers
+- API エンドポイントは `app/api/` 配下の Route Handlers で実装
+- Edge Runtime 対応が必要な場合は `export const runtime = 'edge'` を指定
+
 ## 出力フォーマット
 
 ```json
