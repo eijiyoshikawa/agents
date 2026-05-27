@@ -199,6 +199,33 @@ QA Reviewer の修正指示（`iteration_N.json`）を読み込み:
 }
 ```
 
+## コード品質基準
+
+### TypeScript 厳格モード
+- **`any` 型の使用禁止**: 全ての変数・引数・戻り値に適切な型定義を付与する
+- **interface 定義**: コンポーネントの Props は必ず `interface` で定義する（例: `interface CardProps { title: string; description: string; image?: string; }`)
+- **型のエクスポート**: 共有される型は `types/` ディレクトリに集約する
+
+### コンポーネント命名・ファイル構成
+- **命名規則**: PascalCase（例: `HeroSection.tsx`, `FeatureCard.tsx`）
+- **1ファイル1コンポーネント**: 1つのファイルにエクスポートするコンポーネントは1つのみ
+- **ファイル構成**:
+  - `src/components/` — 複数ページで共有するコンポーネント（Header, Footer, Button 等）
+  - `src/app/{route}/_components/` — 特定ページでのみ使用するコンポーネント
+  - `src/lib/` — ユーティリティ関数、定数、アニメーション variants
+
+### CSS クラス記述順序
+Tailwind CSS のクラスは以下の順序で記述する（可読性・一貫性のため）:
+
+```
+1. レイアウト    — flex, grid, block, relative, absolute
+2. スペーシング  — p-*, m-*, gap-*
+3. サイジング    — w-*, h-*, max-w-*
+4. タイポグラフィ — text-*, font-*, leading-*, tracking-*
+5. ビジュアル    — bg-*, text-color, border-*, rounded-*, shadow-*
+6. アニメーション — transition-*, duration-*, hover:*, group-hover:*
+```
+
 ## 使用するツール
 - `Read`: 全エージェントの output.json、QA の iteration_N.json
 - `Write`: 新規ファイル作成

@@ -236,13 +236,26 @@ Builder が生成した `/agents/web_builder/output/` を Vercel にデプロイ
   "final_score": 88,
   "deploy_url": "https://project-name.vercel.app",
   "iterations_completed": 2,
-  "remaining_issues": [
-    "フォーム送信先APIの実装が必要",
-    "本番画像の差し替えが必要"
-  ],
+  "remaining_issues": ["フォーム送信先APIの実装が必要", "本番画像の差し替えが必要"],
   "handoff_notes": "90%再現完了。残りは画像差し替えとフォームバックエンド接続。"
 }
 ```
+
+## 手動レビュー前の自動チェック
+
+手動の比較検証（Step 4）に入る前に、以下の自動チェックを全て実行し結果を記録する。
+
+### ビルド・型チェック
+```bash
+cd /agents/web_builder/output && npm run build          # エラー0件・警告0件が合格基準
+cd /agents/web_builder/output && npx tsc --noEmit --strict  # 型エラー0件が合格基準
+```
+- ビルドエラーがある場合は Builder に即座に差し戻し（手動レビューに進まない）
+- `any` 型の使用が検出された場合は medium priority の修正指示として記録
+
+### Lighthouse CI スコア閾値
+デプロイ後URLに対し適用: **Performance > 85 / Accessibility > 90 / Best Practices > 90 / SEO > 90**
+スコアが閾値を下回った場合、該当カテゴリの詳細項目を `fix_instructions` に追加する。
 
 ## 使用するツール
 - `Read`: 全エージェントの output.json、Builder の生成コード
