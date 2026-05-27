@@ -120,102 +120,24 @@ Builder が生成した `/agents/web_builder/output/` を Vercel にデプロイ
   "reference_url": "https://example.com",
   "overall_score": 72,
   "categories": {
-    "structure": {
-      "score": 85,
-      "max_points": 20,
-      "weighted_score": 17,
-      "issues": [
-        "FAQセクションが未実装",
-        "フッターのSNSリンクカラムが欠落"
-      ]
-    },
-    "design": {
-      "score": 70,
-      "max_points": 25,
-      "weighted_score": 17.5,
-      "issues": [
-        "プライマリカラーが #3B82F6 ではなく #2563EB になっている",
-        "h1のfont-sizeが48pxではなく36pxになっている",
-        "セクション間のスペーシングが80pxで参考サイトの120pxより狭い"
-      ]
-    },
-    "motion": {
-      "score": 60,
-      "max_points": 20,
-      "weighted_score": 12,
-      "issues": [
-        "features セクションのスクロールアニメーションが未実装",
-        "カードのホバーエフェクト（浮き上がり）が未実装"
-      ]
-    },
-    "interaction": {
-      "score": 65,
-      "max_points": 20,
-      "weighted_score": 13,
-      "issues": [
-        "アコーディオンの開閉アニメーションが直線的（easingなし）",
-        "モバイルメニューのスライドインが未実装（即座に表示される）"
-      ]
-    },
-    "responsive": {
-      "score": 80,
-      "max_points": 15,
-      "weighted_score": 12,
-      "issues": [
-        "タブレット表示でカードが2列ではなく1列になっている"
-      ]
-    }
+    "structure": { "score": 85, "max_points": 20, "weighted_score": 17, "issues": ["FAQセクションが未実装", "フッターのSNSリンクカラムが欠落"] },
+    "design": { "score": 70, "max_points": 25, "weighted_score": 17.5, "issues": ["プライマリカラーが誤っている", "h1のfont-sizeが不一致", "セクション間スペーシング不足"] },
+    "motion": { "score": 60, "max_points": 20, "weighted_score": 12, "issues": ["スクロールアニメーション未実装", "ホバーエフェクト未実装"] },
+    "interaction": { "score": 65, "max_points": 20, "weighted_score": 13, "issues": ["アコーディオンのeasing未設定", "モバイルメニューのスライドイン未実装"] },
+    "responsive": { "score": 80, "max_points": 15, "weighted_score": 12, "issues": ["タブレットでカード列数が不正"] }
   },
   "fix_instructions": [
     {
-      "priority": "high",
-      "category": "structure",
-      "file": "src/app/page.tsx",
-      "section": "faq",
+      "priority": "high", "category": "structure", "file": "src/app/page.tsx", "section": "faq",
       "issue": "FAQセクションが完全に欠落している",
-      "expected": "8項目のアコーディオン形式のFAQセクション",
-      "current": "該当セクションなし",
-      "fix_suggestion": "interaction_analyzer/output.json の accordions[0] を参照し、FAQ セクションを追加。Accordion コンポーネントを作成して配置。"
+      "expected": "8項目のアコーディオン形式のFAQセクション", "current": "該当セクションなし",
+      "fix_suggestion": "interaction_analyzer/output.json の accordions[0] を参照しFAQセクションを追加"
     },
     {
-      "priority": "high",
-      "category": "design",
-      "file": "tailwind.config.ts",
-      "section": "global",
-      "issue": "プライマリカラーが間違っている",
-      "expected": "#3B82F6",
-      "current": "#2563EB",
-      "fix_suggestion": "tailwind.config.ts の colors.primary を '#3B82F6' に修正"
-    },
-    {
-      "priority": "medium",
-      "category": "motion",
-      "file": "src/app/page.tsx",
-      "section": "features",
+      "priority": "medium", "category": "motion", "file": "src/app/page.tsx", "section": "features",
       "issue": "カードのスクロールアニメーションが未実装",
-      "expected": "画面内に入った時にfade-in-upで順番に表示（stagger 0.1s）",
-      "current": "即座に全カードが表示される",
-      "fix_suggestion": "framer-motion の useInView + motion.div + staggerChildren を使用。variants: { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }"
-    },
-    {
-      "priority": "medium",
-      "category": "design",
-      "file": "src/app/page.tsx",
-      "section": "all",
-      "issue": "セクション間スペーシングが不足",
-      "expected": "120px",
-      "current": "80px (py-20)",
-      "fix_suggestion": "各セクションの py-20 を py-[120px] または独自のスペーシングクラスに変更"
-    },
-    {
-      "priority": "low",
-      "category": "responsive",
-      "file": "src/app/page.tsx",
-      "section": "features",
-      "issue": "タブレットでカードが1列表示",
-      "expected": "md:grid-cols-2",
-      "current": "grid-cols-1 lg:grid-cols-3",
-      "fix_suggestion": "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 に変更"
+      "expected": "fade-in-up + stagger 0.1s", "current": "即座に全カード表示",
+      "fix_suggestion": "framer-motion useInView + staggerChildren を使用"
     }
   ],
   "summary": "構造は概ね再現できているが、FAQセクションの欠落とデザインの細部（カラー、スペーシング）に改善が必要。モーションは基本実装があるが、スクロールアニメーションの追加が求められる。",
