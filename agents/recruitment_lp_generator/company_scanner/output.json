@@ -1,5 +1,4 @@
 {
-  "template": "pop",
   "company": {
     "name": "株式会社一二三",
     "name_en": "Hifumi Inc.",
@@ -65,5 +64,18 @@
         "資格保有の企業様を優遇"
       ]
     }
+  ],
+  "recommended_template": "classic",
+  "tone_reasoning": "創業2022年で新しいが、『信頼 × 技術力』『何十年先も残り続ける誇り』というブランドメッセージは王道採用LPと相性が良い。地場（加古川・姫路）密着 × プラント工事という重厚な事業特性も classic を推奨。ただし若手募集の側面もあるため modern / pop でも訴求可能。",
+  "source_url": "https://www.hifumi-123.com",
+  "scanned_pages": [
+    "https://www.hifumi-123.com",
+    "https://www.hifumi-123.com/business",
+    "https://www.hifumi-123.com/recruit",
+    "https://www.hifumi-123.com/company"
+  ],
+  "scanned_at": "2026-05-28T00:00:00Z",
+  "warnings": [
+    "サイトはサンドボックスから直接取得できなかったため、ユーザー提供のスクリーンショットから手動構造化"
   ]
 }

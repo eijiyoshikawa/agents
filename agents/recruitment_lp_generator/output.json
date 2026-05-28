@@ -1,0 +1,61 @@
+{
+  "request": {
+    "company_url": "https://www.hifumi-123.com",
+    "template": "all-3-variants"
+  },
+  "company": {
+    "name": "株式会社一二三",
+    "name_en": "Hifumi Inc.",
+    "slug": "hifumi-123",
+    "founded": "2022年7月",
+    "address": "〒675-0008 兵庫県加古川市新神野1丁目11-7",
+    "ceo": "早川 敦輝",
+    "source_url": "https://www.hifumi-123.com"
+  },
+  "variants": [
+    {
+      "template": "modern",
+      "project_path": "outputs/recruitment-lp/hifumi-123-modern/",
+      "previews": [
+        "outputs/recruitment-lp/hifumi-123-modern/previews/modern-desktop-hero.png",
+        "outputs/recruitment-lp/hifumi-123-modern/previews/modern-desktop-full.png",
+        "outputs/recruitment-lp/hifumi-123-modern/previews/modern-sp-hero.png",
+        "outputs/recruitment-lp/hifumi-123-modern/previews/modern-sp-full.png"
+      ],
+      "build_status": "success",
+      "vercel_url": null,
+      "deploy_note": "サンドボックスのネットワーク制限により Vercel デプロイは未実施。ローカルで npm install && npm run start で確認可能。"
+    },
+    {
+      "template": "classic",
+      "project_path": "outputs/recruitment-lp/hifumi-123-classic/",
+      "previews": [
+        "outputs/recruitment-lp/hifumi-123-classic/previews/classic-desktop-hero.png",
+        "outputs/recruitment-lp/hifumi-123-classic/previews/classic-desktop-full.png",
+        "outputs/recruitment-lp/hifumi-123-classic/previews/classic-sp-hero.png",
+        "outputs/recruitment-lp/hifumi-123-classic/previews/classic-sp-full.png"
+      ],
+      "build_status": "success",
+      "vercel_url": null
+    },
+    {
+      "template": "pop",
+      "project_path": "outputs/recruitment-lp/hifumi-123-pop/",
+      "previews": [
+        "outputs/recruitment-lp/hifumi-123-pop/previews/pop-desktop-hero.png",
+        "outputs/recruitment-lp/hifumi-123-pop/previews/pop-desktop-full.png",
+        "outputs/recruitment-lp/hifumi-123-pop/previews/pop-sp-hero.png",
+        "outputs/recruitment-lp/hifumi-123-pop/previews/pop-sp-full.png"
+      ],
+      "build_status": "success",
+      "vercel_url": null
+    }
+  ],
+  "recommended_template": "classic",
+  "tone_reasoning": "『信頼 × 技術力』『何十年先も残り続ける誇り』というブランドメッセージは王道採用LPと相性が良い。地場（加古川・姫路）密着 × プラント工事という重厚な事業特性も classic を推奨。ただし若手職人募集の側面もあるため pop / modern でも訴求可能。",
+  "generated_at": "2026-05-28T12:00:00Z",
+  "warnings": [
+    "サンドボックスから企業サイトを直接取得できなかったため、ユーザー提供のスクリーンショットから構造化",
+    "Vercel デプロイは未実施（環境制限）。実稼働環境では scripts/generate-recruitment-lp.sh で自動デプロイ可能"
+  ]
+}
