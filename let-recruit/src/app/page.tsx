@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Download, AlertCircle } from "lucide-react";
+import { Download, AlertCircle, Loader2 } from "lucide-react";
 import type { ExtractResponse, JobPosting } from "@/lib/types";
 import { LET_COMPANY } from "@/lib/company";
 import { letMarkSvg } from "@/lib/logo";
@@ -85,6 +85,12 @@ export default function Home() {
                 {pdfLoading ? "生成中…" : "PDFダウンロード"}
               </button>
             </div>
+            {pdfLoading && (
+              <p className="mb-4 flex items-center gap-2 rounded-xl border border-border-soft bg-surface px-4 py-3 text-xs leading-relaxed text-[#9ca3af]">
+                <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-brand" />
+                PDFを生成しています。混雑時は出力まで3分ほどかかる場合がありますので、このままお待ちください。
+              </p>
+            )}
             <JobPreview job={job} company={LET_COMPANY} />
           </div>
         </section>
