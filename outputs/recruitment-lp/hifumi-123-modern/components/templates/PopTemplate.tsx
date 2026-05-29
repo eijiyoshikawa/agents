@@ -1,5 +1,12 @@
 import type { CompanyData } from "@/lib/types";
 import ApplicationForm from "@/components/common/ApplicationForm";
+import { STOCK_PHOTOS, getThumbUrl } from "@/lib/stock-photos";
+
+const SERVICE_PHOTOS = [
+  STOCK_PHOTOS.service.plant,
+  STOCK_PHOTOS.service.pipes,
+  STOCK_PHOTOS.service.welding,
+];
 
 export default function PopTemplate({ data }: { data: CompanyData }) {
   const { company, services, jobs } = data;
@@ -133,21 +140,33 @@ export default function PopTemplate({ data }: { data: CompanyData }) {
               const colors = ["bg-safety-500", "bg-construction-400", "bg-white"];
               const rotations = ["sm:-rotate-1", "sm:rotate-1", "sm:-rotate-1"];
               const textColors = ["text-white", "text-stone-900", "text-stone-900"];
+              const photo = SERVICE_PHOTOS[i % SERVICE_PHOTOS.length];
               return (
                 <div
                   key={service.name}
-                  className={`${colors[i % colors.length]} ${rotations[i % rotations.length]} ${textColors[i % textColors.length]} border-4 border-stone-900 p-6 shadow-[6px_6px_0_0_rgba(251,191,36,1)] transition hover:rotate-0 sm:p-8 sm:shadow-[8px_8px_0_0_rgba(251,191,36,1)]`}
+                  className={`${colors[i % colors.length]} ${rotations[i % rotations.length]} ${textColors[i % textColors.length]} border-4 border-stone-900 shadow-[6px_6px_0_0_rgba(251,191,36,1)] transition hover:rotate-0 sm:shadow-[8px_8px_0_0_rgba(251,191,36,1)]`}
                 >
-                  <div className="mb-4 inline-block bg-stone-900 px-3 py-1 text-[10px] font-extrabold text-construction-400 sm:px-4 sm:text-xs">
-                    No.{String(i + 1).padStart(2, "0")}
+                  {/* サービス写真サムネ（ポップ枠で囲む） */}
+                  <div className="relative aspect-[16/9] overflow-hidden border-b-4 border-stone-900 bg-stone-700">
+                    <img
+                      src={getThumbUrl(photo)}
+                      alt={photo.alt}
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
                   </div>
-                  <h3 className="mb-3 text-xl font-black sm:text-2xl">{service.name}</h3>
-                  <p className="text-sm font-medium leading-relaxed sm:text-base">{service.description}</p>
-                  {service.target && (
-                    <p className="mt-4 inline-block bg-stone-900 px-3 py-1 text-xs font-bold text-white">
-                      for {service.target}
-                    </p>
-                  )}
+                  <div className="p-6 sm:p-8">
+                    <div className="mb-4 inline-block bg-stone-900 px-3 py-1 text-[10px] font-extrabold text-construction-400 sm:px-4 sm:text-xs">
+                      No.{String(i + 1).padStart(2, "0")}
+                    </div>
+                    <h3 className="mb-3 text-xl font-black sm:text-2xl">{service.name}</h3>
+                    <p className="text-sm font-medium leading-relaxed sm:text-base">{service.description}</p>
+                    {service.target && (
+                      <p className="mt-4 inline-block bg-stone-900 px-3 py-1 text-xs font-bold text-white">
+                        for {service.target}
+                      </p>
+                    )}
+                  </div>
                 </div>
               );
             })}

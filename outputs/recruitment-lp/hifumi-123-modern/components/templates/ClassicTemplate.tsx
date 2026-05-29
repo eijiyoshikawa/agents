@@ -1,5 +1,12 @@
 import type { CompanyData } from "@/lib/types";
 import ApplicationForm from "@/components/common/ApplicationForm";
+import { STOCK_PHOTOS, getHeroUrl, getThumbUrl } from "@/lib/stock-photos";
+
+const BUSINESS_PHOTOS = [
+  STOCK_PHOTOS.service.plant,
+  STOCK_PHOTOS.service.pipes,
+  STOCK_PHOTOS.service.welding,
+];
 
 export default function ClassicTemplate({ data }: { data: CompanyData }) {
   const { company, services, jobs } = data;
@@ -31,7 +38,15 @@ export default function ClassicTemplate({ data }: { data: CompanyData }) {
 
       {/* Hero */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-navy-900 via-navy-800 to-navy-950" />
+        {/* 建設現場の背景写真 */}
+        <img
+          src={getHeroUrl(STOCK_PHOTOS.hero.site)}
+          alt={STOCK_PHOTOS.hero.site.alt}
+          loading="eager"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        {/* ネイビーグラデーション オーバーレイ */}
+        <div className="absolute inset-0 bg-gradient-to-br from-navy-900/95 via-navy-800/90 to-navy-950/95" />
         {/* 建築図面風の細いライン */}
         <div
           className="absolute inset-0 opacity-[0.08]"
@@ -173,15 +188,24 @@ export default function ClassicTemplate({ data }: { data: CompanyData }) {
             <div className="mx-auto mt-4 h-px w-16 bg-brass-500" />
           </div>
           <div className="space-y-10 sm:space-y-12">
-            {services.map((service, i) => (
+            {services.map((service, i) => {
+              const photo = BUSINESS_PHOTOS[i % BUSINESS_PHOTOS.length];
+              return (
               <div
                 key={service.name}
                 className={`grid gap-6 md:grid-cols-2 md:items-center md:gap-8 ${i % 2 === 1 ? "md:[&>div:first-child]:order-2" : ""}`}
               >
-                <div className="flex aspect-[4/3] items-center justify-center rounded-sm bg-gradient-to-br from-navy-900 to-navy-800 text-white">
-                  <div className="text-center">
-                    <div className="font-serif text-5xl font-bold text-brass-400 opacity-50 sm:text-6xl">{String(i + 1).padStart(2, "0")}</div>
-                    <div className="mt-2 text-[10px] tracking-widest text-brass-400 sm:text-xs">BUSINESS</div>
+                <div className="relative flex aspect-[4/3] items-end overflow-hidden rounded-sm bg-gradient-to-br from-navy-900 to-navy-800">
+                  <img
+                    src={getThumbUrl(photo)}
+                    alt={photo.alt}
+                    loading="lazy"
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                  {/* ネイビー&真鍮 ラベル */}
+                  <div className="relative w-full bg-gradient-to-t from-navy-950/85 via-navy-900/40 to-transparent p-5 text-white">
+                    <div className="font-serif text-3xl font-bold text-brass-400 sm:text-4xl">{String(i + 1).padStart(2, "0")}</div>
+                    <div className="mt-1 text-[10px] tracking-widest text-brass-400 sm:text-xs">BUSINESS</div>
                   </div>
                 </div>
                 <div>
@@ -195,7 +219,8 @@ export default function ClassicTemplate({ data }: { data: CompanyData }) {
                   )}
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>

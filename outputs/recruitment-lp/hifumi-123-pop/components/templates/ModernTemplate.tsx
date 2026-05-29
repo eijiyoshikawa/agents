@@ -1,5 +1,12 @@
 import type { CompanyData } from "@/lib/types";
 import ApplicationForm from "@/components/common/ApplicationForm";
+import { STOCK_PHOTOS, getHeroUrl, getThumbUrl } from "@/lib/stock-photos";
+
+const SERVICE_PHOTOS = [
+  STOCK_PHOTOS.service.plant,
+  STOCK_PHOTOS.service.pipes,
+  STOCK_PHOTOS.service.welding,
+];
 
 export default function ModernTemplate({ data }: { data: CompanyData }) {
   const { company, services, jobs } = data;
@@ -32,6 +39,15 @@ export default function ModernTemplate({ data }: { data: CompanyData }) {
 
       {/* Hero */}
       <section className="relative overflow-hidden px-5 pb-20 pt-32 sm:px-6 sm:pb-24 md:pt-48">
+        {/* 背景写真（建設現場・薄め）+ 白オーバーレイ */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-slate-100 to-white">
+          <img
+            src={getHeroUrl(STOCK_PHOTOS.hero.plant)}
+            alt={STOCK_PHOTOS.hero.plant.alt}
+            loading="eager"
+            className="h-full w-full object-cover opacity-15"
+          />
+        </div>
         {/* 図面風グリッド背景 */}
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.04]"
@@ -115,26 +131,40 @@ export default function ModernTemplate({ data }: { data: CompanyData }) {
           </p>
           <h2 className="mb-10 text-2xl font-bold sm:text-3xl md:mb-16 md:text-4xl">事業内容</h2>
           <div className="grid gap-6 md:grid-cols-3">
-            {services.map((service, i) => (
-              <div
-                key={service.name}
-                className="rounded-sm border border-slate-200 bg-white p-8 transition hover:border-slate-900 hover:shadow-md"
-              >
-                <div className="mb-6 flex items-baseline gap-2">
-                  <span className="text-xs font-medium tracking-widest text-safety-500">No.</span>
-                  <span className="text-4xl font-bold text-slate-900">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
+            {services.map((service, i) => {
+              const photo = SERVICE_PHOTOS[i % SERVICE_PHOTOS.length];
+              return (
+                <div
+                  key={service.name}
+                  className="overflow-hidden rounded-sm border border-slate-200 bg-white transition hover:border-slate-900 hover:shadow-md"
+                >
+                  {/* サービス写真サムネ */}
+                  <div className="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-slate-700 to-slate-900">
+                    <img
+                      src={getThumbUrl(photo)}
+                      alt={photo.alt}
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div className="p-8">
+                    <div className="mb-4 flex items-baseline gap-2">
+                      <span className="text-xs font-medium tracking-widest text-safety-500">No.</span>
+                      <span className="text-3xl font-bold text-slate-900">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                    </div>
+                    <h3 className="mb-3 text-xl font-bold">{service.name}</h3>
+                    <p className="text-sm leading-relaxed text-slate-600">{service.description}</p>
+                    {service.target && (
+                      <p className="mt-4 border-t border-slate-100 pt-3 text-xs text-slate-500">
+                        対象: {service.target}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <h3 className="mb-3 text-xl font-bold">{service.name}</h3>
-                <p className="text-sm leading-relaxed text-slate-600">{service.description}</p>
-                {service.target && (
-                  <p className="mt-4 border-t border-slate-100 pt-3 text-xs text-slate-500">
-                    対象: {service.target}
-                  </p>
-                )}
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
