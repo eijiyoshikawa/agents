@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Download, FileText, AlertCircle } from "lucide-react";
+import { Download, AlertCircle } from "lucide-react";
 import type { ExtractResponse, JobPosting } from "@/lib/types";
 import { LET_COMPANY } from "@/lib/company";
+import { letMarkSvg } from "@/lib/logo";
 import { requestExtract, downloadPdf } from "@/lib/client";
 import { UrlInputForm } from "@/components/UrlInputForm";
 import { JobEditor } from "@/components/JobEditor";
@@ -96,9 +97,13 @@ function Header() {
   return (
     <header className="border-b border-ink pb-6">
       <div className="flex items-center gap-3">
-        <FileText className="h-6 w-6 text-brand" />
-        <span className="text-2xl font-bold tracking-[0.12em] text-brand">
-          LET
+        <span
+          className="text-brand"
+          aria-hidden
+          dangerouslySetInnerHTML={{ __html: letMarkSvg(30) }}
+        />
+        <span className="text-xl font-bold tracking-[0.06em] text-brand">
+          LET inc.
         </span>
         <span className="text-xs tracking-[0.08em] text-ink">求人票ジェネレーター</span>
       </div>
