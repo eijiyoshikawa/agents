@@ -36,9 +36,14 @@
 | `mockups/mobile-daily-report.html` | モバイル日報モック(電子サイン↔紙写真両対応・文字サイズ切替・4ステップ) |
 | `mockups/billing-wizard.html` | 請求ウィザードモック(締め→明細調整→請求書プレビュー/PDF) |
 | `mockups/payroll-wizard.html` | 給与ウィザードモック(集計→支給/控除明細→確定・振込データ) |
+| `mockups/dashboard.html` | ダッシュボード(KPI・要対応・配置進捗・お知らせ・アクティビティ) |
+| `mockups/payments-ar.html` | 入金・売掛(消込モーダル・売掛残・入金漏れ) |
+| `mockups/master-site-edit.html` | 配置先マスタ編集(基本/締め+請求単価/対応履歴・月極↔スポット) |
 | `source/` | 一次ソース(JBCAカタログ)の出典メモ・取得スクリプト |
 | `STARTER/` | 新リポジトリ初期化セット(README/構成/.env.example/Phase1チケット) |
 | `sales/` | 販売用 LP構成案・提案資料構成案・別セッション引き渡しプロンプト |
+| `sales/preview/lp.html` | LP 簡易先行プレビュー(全12セクション・レスポンシブ) |
+| `sales/preview/proposal.html` | 提案資料 簡易先行プレビュー(12スライド・矢印キー操作) |
 
 > `08`〜`09` は参考元スクショのない領域。新サービスの理想フローとして機能を想定(各所「(仮)」明記)。
 

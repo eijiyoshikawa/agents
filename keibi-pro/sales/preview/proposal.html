@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>警備Pro ご提案（スライド先行プレビュー）</title>
+<style>
+  :root{--ink:#1c2430;--ink-soft:#48515e;--cream:#f7f5f0;--brand:#1b4d8f;--brand-d:#143a6e;--brand-soft:#e8eef7;--line:#e6e2d8;--ok:#2fa36b;--amber:#f4c430;--warn:#d2495b}
+  *{box-sizing:border-box}
+  body{margin:0;background:#0d2240;font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",system-ui,sans-serif;color:var(--ink);display:flex;flex-direction:column;align-items:center;min-height:100vh}
+  .deck{width:min(960px,96vw);margin:18px auto 80px}
+  .slide{position:relative;background:#fff;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.4);aspect-ratio:16/9;padding:44px 52px;margin-bottom:18px;overflow:hidden;display:none}
+  .slide.show{display:block}
+  .deck.all .slide{display:block}
+  .pg{position:absolute;right:18px;bottom:14px;color:#b9c0cc;font-size:12px}
+  .kic{position:absolute;left:0;top:0;height:8px;width:100%;background:linear-gradient(90deg,var(--brand),var(--amber))}
+  .ey{color:var(--brand);font-weight:800;letter-spacing:.1em;font-size:13px}
+  h1{font-size:40px;margin:.1em 0}
+  h2{font-size:28px;margin:.1em 0 .5em}
+  p,li{font-size:18px;color:var(--ink-soft);line-height:1.8}
+  .cover{display:flex;flex-direction:column;justify-content:center;height:100%;background:linear-gradient(150deg,#fff,var(--brand-soft))}
+  .cover h1{color:var(--ink)} .cover .sub{font-size:20px;color:var(--brand);font-weight:700}
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:10px}
+  .box{background:var(--cream);border:1px solid var(--line);border-radius:12px;padding:16px}
+  .box h3{margin:0 0 6px;font-size:18px;color:var(--ink)}
+  .flow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
+  .flow .n{background:var(--brand-soft);color:var(--brand);font-weight:800;border-radius:10px;padding:10px 14px;font-size:16px}
+  .flow .ar{color:#b9c0cc;font-weight:800}
+  .big{font-size:64px;font-weight:800;color:var(--brand);line-height:1}
+  table{width:100%;border-collapse:collapse;margin-top:10px}
+  th,td{border-bottom:1px solid var(--line);padding:9px 10px;text-align:center;font-size:15px}
+  th:first-child,td:first-child{text-align:left}
+  th{background:#f0eee7}.me{background:var(--brand-soft);color:var(--brand);font-weight:800}
+  .yes{color:var(--ok);font-weight:800}.no{color:#c2c8d0}
+  ul{margin:.3em 0}
+  .pill{display:inline-block;font-size:12px;font-weight:800;padding:3px 10px;border-radius:999px;background:var(--brand-soft);color:var(--brand)}
+  .calc{background:#0d2240;color:#fff;border-radius:12px;padding:18px;margin-top:12px;font-size:18px}
+  .calc b{color:#ffd86b}
+  /* controls */
+  .ctl{position:fixed;bottom:0;left:0;right:0;background:#0a1a30;color:#cfe0f2;display:flex;gap:12px;align-items:center;justify-content:center;padding:10px;font-size:14px}
+  .ctl button{background:#1b4d8f;color:#fff;border:0;border-radius:8px;padding:8px 14px;font-weight:700;cursor:pointer}
+  .ctl button.alt{background:#22324a}
+  .note{position:absolute;left:52px;bottom:14px;color:#9aa1ac;font-size:12px}
+</style></head>
+<body>
+<div class="deck" id="deck">
+
+  <!-- 1 表紙 -->
+  <div class="slide show cover"><div class="kic"></div>
+    <div class="ey">ご提案</div>
+    <h1>警備業務を、ひとつに。</h1>
+    <div class="sub">統合業務管理クラウド「警備Pro」</div>
+    <p style="margin-top:18px">2026年6月 ／ ご提案先:○○警備株式会社 御中</p>
+    <div class="pg">1</div>
+  </div>
+
+  <!-- 2 現状理解 -->
+  <div class="slide"><div class="kic"></div>
+    <div class="ey">御社の現状理解</div><h2>ヒアリング内容</h2>
+    <div class="cols">
+      <div class="box"><h3>体制</h3><p>在籍◯名／拠点◯ヶ所。配置〜経理を少人数で運用。</p></div>
+      <div class="box"><h3>現在の運用</h3><p>Excel・紙＋一部システム。月末に作業が集中。</p></div>
+      <div class="box"><h3>ご要望</h3><p>業務効率化・情報の一元化・社内ルール化。</p></div>
+      <div class="box"><h3>制約</h3><p>現場はスマホ操作に不慣れな方も。紙サイン運用が残る。</p></div>
+    </div>
+    <div class="pg">2</div>
+  </div>
+
+  <!-- 3 課題 -->
+  <div class="slide"><div class="kic"></div>
+    <div class="ey">課題</div><h2>よくある警備会社の課題</h2>
+    <ul>
+      <li>月末の請求・給与作成が多忙・属人化</li>
+      <li>Excelと紙で二重入力・転記ミス</li>
+      <li>日報・タイムカードの回収と転記が重い</li>
+      <li>立入の備付書類（法定）づくりに追われる（業界の<b>83.3%</b>が課題）</li>
+    </ul>
+    <div class="pg">3</div>
+  </div>
+
+  <!-- 4 本質 -->
+  <div class="slide"><div class="kic"></div>
+    <div class="ey">課題の本質</div><h2>原因は「情報がバラバラ・手作業」</h2>
+    <p>得意先・現場・隊員・勤務・請求・給与・入金が別々の台帳に分散。<br>だから二度入力が生まれ、ミスと残業が増える。</p>
+    <p style="margin-top:18px;font-size:22px;color:var(--ink)"><b>→ 1つのデータでつなげば、入力は1回で済む。</b></p>
+    <div class="pg">4</div>
+  </div>
+
+  <!-- 5 警備Proとは -->
+  <div class="slide"><div class="kic"></div>
+    <div class="ey">警備Proとは</div><h2>警備業特化の統合業務管理クラウド</h2>
+    <p>「誰でも・簡単に・同じ」。日々の勤務を入れるだけで、請求も給与も日報も連動。</p>
+    <div class="cols" style="margin-top:8px">
+      <div class="box"><h3>クラウド</h3><p>いつでもどこでも。拠点間で情報共有。</p></div>
+      <div class="box"><h3>モバイル標準</h3><p>上下番・シフト・日報をスマホで。</p></div>
+      <div class="box"><h3>警備業特化</h3><p>資格者配置・路線検索・距離計算・仮払い。</p></div>
+      <div class="box"><h3>やさしいUI</h3><p>50歳以上にも配慮。文字サイズ切替。</p></div>
+    </div>
+    <div class="pg">5</div>
+  </div>
+
+  <!-- 6 全体像 -->
+  <div class="slide"><div class="kic"></div>
+    <div class="ey">システム全体像</div><h2>受注から入金まで、一気通貫</h2>
+    <div class="flow"><span class="n">受注</span><span class="ar">→</span><span class="n">配置</span><span class="ar">→</span><span class="n">勤務実績</span><span class="ar">→</span><span class="n">請求／給与</span><span class="ar">→</span><span class="n">入金</span></div>
+    <p style="margin-top:18px">勤務実績を中心に、請求と給与の双方へ自動集計。締めはボタンひとつ。</p>
+    <div class="pg">6</div>
+  </div>
+
+  <!-- 7 機能ダイジェスト -->
+  <div class="slide"><div class="kic"></div>
+    <div class="ey">主要機能</div><h2>警備業に必要な機能を網羅</h2>
+    <div class="cols">
+      <div class="box"><h3>① 配置ボード</h3><p>受注＋配置を1画面。未配置可視化・同配置NG・資格者配置・路線検索。</p></div>
+      <div class="box"><h3>② 勤務実績→請求/給与</h3><p>入力1回で連動。残業/深夜は自動計算。</p></div>
+      <div class="box"><h3>③ モバイル日報</h3><p>画面サイン／紙写真→Drive保存→取引先へ控え自動送信。</p></div>
+      <div class="box"><h3>④ 請求・帳票</h3><p>インボイス請求書・法定三帳簿・作業員名簿・契約書。</p></div>
+    </div>
+    <p class="pill" style="margin-top:12px">各機能の画面イメージは mockups/ を参照</p>
+    <div class="pg">7</div>
+  </div>
+
+  <!-- 8 効果 -->
+  <div class="slide"><div class="kic"></div>
+    <div class="ey">導入効果</div><h2>事務作業を大幅に削減</h2>
+    <div style="display:flex;gap:30px;align-items:center;margin-top:10px">
+      <div><div class="big">76.8%</div><p>作業時間削減<br>（月65.2時間／50名規模）</p></div>
+      <div class="calc">
+        御社試算式:<br>
+        <b>削減時間 = 月の事務時間 H × 0.768</b><br>
+        <b>金額換算 = 削減時間 × 事務時給 W</b><br>
+        例) H=85h, W=2,000円 → 約65h・約13万円/月（年156万円）
+      </div>
+    </div>
+    <div class="note">※ 効果は提供元（業界実績）に基づく参考値。前提により変動。</div>
+    <div class="pg">8</div>
+  </div>
+
+  <!-- 9 比較 -->
+  <div class="slide"><div class="kic"></div>
+    <div class="ey">比較</div><h2>他のやり方との違い</h2>
+    <table>
+      <thead><tr><th>項目</th><th>Excel/紙</th><th>旧オンプレ</th><th class="me">警備Pro</th></tr></thead>
+      <tbody>
+        <tr><td>一元管理</td><td class="no">✕</td><td>△</td><td class="me yes">◎</td></tr>
+        <tr><td>クラウド/どこでも</td><td class="no">✕</td><td>△</td><td class="me yes">◎</td></tr>
+        <tr><td>モバイル（標準）</td><td class="no">✕</td><td>別課金</td><td class="me yes">◎</td></tr>
+        <tr><td>電子サイン＋紙写真</td><td class="no">✕</td><td>一部</td><td class="me yes">◎</td></tr>
+        <tr><td>AI分析/カスタム帳票</td><td class="no">✕</td><td>別製品</td><td class="me yes">◎(予定)</td></tr>
+      </tbody>
+    </table>
+    <div class="pg">9</div>
+  </div>
+
+  <!-- 10 安心 -->
+  <div class="slide"><div class="kic"></div>
+    <div class="ey">安心して使える</div><h2>導入・移行・サポート・セキュリティ</h2>
+    <div class="cols">
+      <div class="box"><h3>導入サポート</h3><p>訪問・リモートで初期設定〜運用を支援。制度改正も自動対応。</p></div>
+      <div class="box"><h3>データ移行</h3><p>他社・ExcelからCSV（コンバート）で取込。</p></div>
+      <div class="box"><h3>権限・セキュリティ</h3><p>給与・単価のマスキング、監査ログ、クラウドバックアップ。</p></div>
+      <div class="box"><h3>やさしさ</h3><p>50歳以上にも配慮したUI・サポート導線。</p></div>
+    </div>
+    <div class="pg">10</div>
+  </div>
+
+  <!-- 11 料金/スケジュール -->
+  <div class="slide"><div class="kic"></div>
+    <div class="ey">料金・スケジュール</div><h2>分かりやすい月額・最短で稼働</h2>
+    <p>月額サブスク（人数規模・機能で段階）。<b>隊員アカウントは一定数まで無料</b>＋超過のみ少額。</p>
+    <div class="flow"><span class="n">問い合わせ</span><span class="ar">→</span><span class="n">ヒアリング</span><span class="ar">→</span><span class="n">設定</span><span class="ar">→</span><span class="n">稼働</span></div>
+    <p style="margin-top:16px">御社向けの概算プランは別紙にてご提示します。</p>
+    <div class="pg">11</div>
+  </div>
+
+  <!-- 12 CTA -->
+  <div class="slide cover"><div class="kic"></div>
+    <div class="ey">次の一歩</div>
+    <h1>まずは、無料デモから。</h1>
+    <p>御社の1日を題材に、配置〜請求〜日報の流れをその場でご体感いただけます。</p>
+    <p style="margin-top:18px;font-size:16px">担当:________　TEL:________　Mail:________</p>
+    <div class="pg">12</div>
+  </div>
+
+</div>
+
+<div class="ctl">
+  <button class="alt" onclick="prev()">◀ 前</button>
+  <span id="ind">1 / 12</span>
+  <button onclick="next()">次 ▶</button>
+  <button class="alt" onclick="toggleAll()" id="allbtn">一覧表示</button>
+  <span style="color:#6f86a6">← → キーで移動</span>
+</div>
+<script>
+  let i=0; const slides=[...document.querySelectorAll('.slide')];
+  function render(){slides.forEach((s,n)=>s.classList.toggle('show',n===i));document.getElementById('ind').textContent=(i+1)+' / '+slides.length;}
+  function next(){if(i<slides.length-1){i++;render();}}
+  function prev(){if(i>0){i--;render();}}
+  function toggleAll(){const d=document.getElementById('deck');d.classList.toggle('all');
+    document.getElementById('allbtn').textContent=d.classList.contains('all')?'1枚表示':'一覧表示';}
+  document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')next();if(e.key==='ArrowLeft')prev();});
+  render();
+</script>
+</body></html>

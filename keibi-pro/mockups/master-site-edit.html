@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>警備Pro — 配置先マスタ編集(モック)</title>
+<style>
+  :root{--ink:#1c2430;--ink-soft:#48515e;--cream:#f7f5f0;--surface:#fff;--brand:#1b4d8f;--brand-soft:#e8eef7;--line:#e3e0d8;--line-strong:#cdd3dd;--ok:#2fa36b;--radius:10px;--shadow:0 1px 2px rgba(18,28,44,.06),0 8px 24px rgba(18,28,44,.08)}
+  *{box-sizing:border-box}html,body{margin:0;height:100%}
+  body{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",system-ui,sans-serif;color:var(--ink);background:var(--cream);font-size:14px;line-height:1.6}
+  .app{display:grid;grid-template-columns:212px 1fr;grid-template-rows:56px 1fr;height:100vh}
+  .topbar{grid-column:1/3;display:flex;align-items:center;gap:16px;padding:0 18px;background:var(--surface);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+  .logo{font-weight:800;color:var(--brand)}.logo span{color:var(--ink)}
+  .search{flex:1;max-width:420px}.search input{width:100%;padding:8px 12px;border:1px solid var(--line-strong);border-radius:999px;background:var(--cream)}
+  .me{display:flex;align-items:center;gap:8px;color:var(--ink-soft)}.avatar{width:30px;height:30px;border-radius:50%;background:var(--brand-soft);display:grid;place-items:center;color:var(--brand);font-weight:700}
+  .nav{background:var(--surface);border-right:1px solid var(--line);padding:10px 8px;overflow:auto}
+  .nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;color:var(--ink-soft);text-decoration:none;font-weight:600}.nav a .ic{width:20px;text-align:center}
+  .nav a.active{background:var(--brand);color:#fff}.nav a:not(.active):hover{background:var(--brand-soft);color:var(--brand)}.nav .grp{font-size:11px;color:#9aa1ac;padding:14px 12px 4px;letter-spacing:.08em}
+  .main{overflow:auto;padding:18px 20px}
+  .crumbs{color:var(--ink-soft);font-size:13px;margin-bottom:6px}
+  .pagehead{display:flex;align-items:center;gap:12px;margin-bottom:12px}.pagehead h1{font-size:20px;margin:0}.spacer{flex:1}
+  .btn{border:1px solid var(--line-strong);background:#fff;border-radius:8px;padding:7px 12px;font-weight:600;cursor:pointer;color:var(--ink)}.btn:hover{background:var(--brand-soft);border-color:var(--brand)}.btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.sm{padding:4px 9px;font-size:13px}
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:14px}
+  .tab{padding:9px 16px;border:1px solid var(--line);border-bottom:none;border-radius:8px 8px 0 0;background:#f0eee7;font-weight:700;color:var(--ink-soft);cursor:pointer}
+  .tab.on{background:var(--surface);color:var(--brand);box-shadow:0 -2px 0 var(--brand) inset}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+  .panel h3{margin:0 0 12px;font-size:14px;color:var(--brand)}
+  .form{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 18px}
+  .fld{display:flex;flex-direction:column;gap:4px}.fld.col2{grid-column:1/3}
+  .fld label{font-size:12px;color:var(--ink-soft);font-weight:700}
+  .fld input,.fld select{padding:8px 10px;border:1px solid var(--line-strong);border-radius:8px;background:#fff;font-size:14px}
+  .inline{display:flex;gap:8px;align-items:center}
+  .seg{display:inline-flex;background:var(--line);border-radius:8px;padding:3px}
+  .seg button{border:0;background:transparent;padding:6px 14px;font-weight:700;border-radius:6px;cursor:pointer;color:var(--ink-soft)}
+  .seg button.on{background:#fff;color:var(--brand);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  .hide{display:none}
+  table{width:100%;border-collapse:collapse}thead th{background:#f0eee7;text-align:right;font-size:12px;color:var(--ink-soft);padding:8px 10px;border-bottom:1px solid var(--line)}
+  thead th:first-child{text-align:left}
+  tbody td{padding:6px 8px;border-bottom:1px solid var(--line)}tbody td:first-child{font-weight:700}
+  tbody td input{width:84px;text-align:right;padding:6px 8px;border:1px solid var(--line-strong);border-radius:6px;font-variant-numeric:tabular-nums}
+  .rate-note{font-size:12px;color:#9aa1ac;margin-top:8px}
+  .foot{position:sticky;bottom:0;background:var(--cream);padding-top:10px;display:flex;gap:10px;justify-content:flex-end}
+  .hint{font-size:12px;color:#9aa1ac}
+</style></head>
+<body>
+<div class="app">
+  <header class="topbar"><div class="logo">警備<span>Pro</span></div>
+    <select class="btn sm"><option>01 本社</option></select>
+    <div class="search"><input placeholder="🔍 配置先・得意先を検索…"></div>
+    <div class="me"><span>管理者</span><div class="avatar">管</div></div>
+  </header>
+  <nav class="nav">
+    <a href="#"><span class="ic">▣</span>ホーム</a><a href="#"><span class="ic">▤</span>配置ボード</a><a href="#"><span class="ic">▦</span>勤務実績</a>
+    <div class="grp">請求・入金</div><a href="#"><span class="ic">¥</span>請求</a><a href="#"><span class="ic">◉</span>入金・売掛</a>
+    <div class="grp">給与</div><a href="#"><span class="ic">💴</span>給与</a>
+    <div class="grp">その他</div><a href="#" class="active"><span class="ic">▥</span>マスタ</a><a href="#"><span class="ic">🖨</span>帳票</a>
+  </nav>
+  <main class="main">
+    <div class="crumbs">マスタ › 得意先:モチベーションアップ㈱ › 配置先</div>
+    <div class="pagehead"><h1>1交差点 道路工事</h1><span class="hint">配置先番号 0001</span><div class="spacer"></div>
+      <button class="btn sm">作業員名簿印刷</button><button class="btn sm">1号契約書</button><button class="btn sm">2号契約書</button>
+    </div>
+
+    <div class="tabs">
+      <div class="tab on" onclick="tab('basic',this)">基本情報</div>
+      <div class="tab" onclick="tab('billing',this)">請求情報・単価</div>
+      <div class="tab" onclick="tab('history',this)">対応履歴</div>
+    </div>
+
+    <!-- 基本情報 -->
+    <section data-tab="basic">
+      <div class="panel">
+        <h3>配置先情報</h3>
+        <div class="form">
+          <div class="fld"><label>配置先名称</label><input value="1交差点 道路工事"></div>
+          <div class="fld"><label>フリガナ</label><input value="イチコウサテン ドウロコウジ"></div>
+          <div class="fld col2"><label>現場住所</label><input value="〒550-0025 大阪府大阪市西区九条南1-1-1"></div>
+          <div class="fld col2"><label>件名</label><input value="大阪市西区九条南1-1-1交差点における車両の誘導"></div>
+          <div class="fld"><label>警備業区分</label><select><option>01 交通誘導(2号)</option><option>04 施設警備(1号)</option></select></div>
+          <div class="fld"><label>担当業務</label><input value="車両・歩行者の交通誘導"></div>
+          <div class="fld"><label>現場監督名</label><input value="現場 監督"></div>
+          <div class="fld"><label>管制日報送付先</label><input value="wada@example.co.jp"></div>
+          <div class="fld"><label>建退共加入</label><div class="seg"><button class="on">有</button><button>無</button></div></div>
+          <div class="fld"><label>警備契約書締結</label><div class="seg"><button class="on">締結済</button><button>未</button></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 請求情報・単価 -->
+    <section data-tab="billing" class="hide">
+      <div class="panel">
+        <h3>締め・サイクル / 課税(★現場単位で締め)</h3>
+        <div class="form">
+          <div class="fld"><label>請求形態</label><div class="seg" id="rateform"><button class="on" onclick="rf(this,'spot')">スポット</button><button onclick="rf(this,'month')">月極</button></div></div>
+          <div class="fld"><label>配置先単価ランク</label><select><option>15000</option><option>18000</option></select></div>
+          <div class="fld"><label>締日</label><div class="inline"><input value="20" style="width:60px"> 日</div></div>
+          <div class="fld"><label>請求日</label><div class="inline"><input value="0" style="width:50px">ヶ月後 <input value="31" style="width:50px"> 日</div></div>
+          <div class="fld"><label>入金予定日</label><div class="inline"><input value="1" style="width:50px">ヶ月後 <input value="25" style="width:50px"> 日</div></div>
+          <div class="fld"><label>無線機代</label><div class="inline"><input value="1000" style="width:70px">円/台 <input value="2500" style="width:70px">円/セット</div></div>
+          <div class="fld"><label>課税方法</label><select><option>外税</option><option>内税</option></select></div>
+          <div class="fld"><label>端数処理</label><select><option>切り捨て</option><option>四捨五入</option><option>切り上げ</option></select></div>
+          <div class="fld"><label>税率</label><input value="0.10"></div>
+          <div class="fld"><label>手当</label><div class="inline"><select><option>003 運転手当</option></select><input value="1000" style="width:80px"></div></div>
+        </div>
+        <!-- 月極時のみ表示 -->
+        <div id="monthbox" class="form hide" style="margin-top:12px;background:#f6f3fb;padding:12px;border-radius:8px">
+          <div class="fld"><label>契約人数</label><input value="3"></div>
+          <div class="fld"><label>契約時間</label><input value="09:00〜18:00"></div>
+          <div class="fld"><label>月極単価(月額)</label><input value="1,200,000"></div>
+          <div class="fld"><label>月極総称名</label><input value="1交差点 常駐警備"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>請求単価設定(勤務種別 × 項目) <span class="hint">時間外・時給は1時間あたり</span></h3>
+        <table>
+          <thead><tr><th>勤務</th><th>単価</th><th>残業</th><th>昼残</th><th>早出</th><th>遅刻</th><th>時給</th><th>深夜</th><th>深夜残業</th></tr></thead>
+          <tbody>
+            <tr><td>001 日勤</td><td><input value="18000"></td><td><input value="1875"></td><td><input value="1875"></td><td><input value="1875"></td><td><input value="0"></td><td><input value="1500"></td><td><input value="375"></td><td><input value="2345"></td></tr>
+            <tr><td>002 資日勤</td><td><input value="18000"></td><td><input value="2250"></td><td><input value="2250"></td><td><input value="2250"></td><td><input value="0"></td><td><input value="1800"></td><td><input value="450"></td><td><input value="2700"></td></tr>
+            <tr><td>101 夜勤</td><td><input value="18000"></td><td><input value="2250"></td><td><input value="2250"></td><td><input value="2250"></td><td><input value="0"></td><td><input value="1800"></td><td><input value="0"></td><td><input value="2700"></td></tr>
+            <tr><td>102 資夜勤</td><td><input value="21000"></td><td><input value="2625"></td><td><input value="2100"></td><td><input value="2100"></td><td><input value="0"></td><td><input value="2100"></td><td><input value="0"></td><td><input value="2625"></td></tr>
+          </tbody>
+        </table>
+        <div class="rate-note">右クリックで行挿入/削除。隊員側の給与単価と合わせて、勤務実績で個別上書き可(マスタ参照/上書きトグル)。</div>
+      </div>
+    </section>
+
+    <!-- 対応履歴 -->
+    <section data-tab="history" class="hide">
+      <div class="panel">
+        <h3>対応履歴</h3>
+        <table style="text-align:left">
+          <thead><tr style="text-align:left"><th style="text-align:left">日付</th><th style="text-align:left">区分</th><th style="text-align:left">内容</th><th style="text-align:left">担当</th></tr></thead>
+          <tbody>
+            <tr><td>2026/05/18</td><td>電話</td><td style="text-align:left">来月の増員(夜勤+1)依頼。配置調整済。</td><td>営業太郎</td></tr>
+            <tr><td>2026/04/30</td><td>メール</td><td style="text-align:left">請求書送付。控えをDriveへ保存。</td><td>経理</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="foot">
+      <button class="btn">コピー</button><button class="btn">削除</button><button class="btn primary">登録(保存)</button>
+    </div>
+  </main>
+</div>
+<script>
+  function tab(name,el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');
+    document.querySelectorAll('section[data-tab]').forEach(s=>s.classList.toggle('hide',s.dataset.tab!==name));}
+  function rf(el,kind){el.parentNode.querySelectorAll('button').forEach(b=>b.classList.remove('on'));el.classList.add('on');
+    document.getElementById('monthbox').classList.toggle('hide',kind!=='month');}
+</script>
+</body></html>

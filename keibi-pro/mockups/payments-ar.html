@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>警備Pro — 入金・売掛(モック)</title>
+<style>
+  :root{--ink:#1c2430;--ink-soft:#48515e;--cream:#f7f5f0;--surface:#fff;--brand:#1b4d8f;--brand-soft:#e8eef7;--line:#e3e0d8;--line-strong:#cdd3dd;--ok:#2fa36b;--ok-bg:#e3f5ec;--warn:#d2495b;--warn-bg:#fbe6e9;--radius:10px;--shadow:0 1px 2px rgba(18,28,44,.06),0 8px 24px rgba(18,28,44,.08)}
+  *{box-sizing:border-box}html,body{margin:0;height:100%}
+  body{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",system-ui,sans-serif;color:var(--ink);background:var(--cream);font-size:14px;line-height:1.6}
+  .app{display:grid;grid-template-columns:212px 1fr;grid-template-rows:56px 1fr;height:100vh}
+  .topbar{grid-column:1/3;display:flex;align-items:center;gap:16px;padding:0 18px;background:var(--surface);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+  .logo{font-weight:800;color:var(--brand)}.logo span{color:var(--ink)}
+  .search{flex:1;max-width:420px}.search input{width:100%;padding:8px 12px;border:1px solid var(--line-strong);border-radius:999px;background:var(--cream)}
+  .me{display:flex;align-items:center;gap:8px;color:var(--ink-soft)}.avatar{width:30px;height:30px;border-radius:50%;background:var(--brand-soft);display:grid;place-items:center;color:var(--brand);font-weight:700}
+  .nav{background:var(--surface);border-right:1px solid var(--line);padding:10px 8px;overflow:auto}
+  .nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;color:var(--ink-soft);text-decoration:none;font-weight:600}.nav a .ic{width:20px;text-align:center}
+  .nav a.active{background:var(--brand);color:#fff}.nav a:not(.active):hover{background:var(--brand-soft);color:var(--brand)}.nav .grp{font-size:11px;color:#9aa1ac;padding:14px 12px 4px;letter-spacing:.08em}
+  .main{overflow:auto;padding:18px 20px}
+  .pagehead{display:flex;align-items:center;gap:12px;margin-bottom:12px}.pagehead h1{font-size:20px;margin:0}.spacer{flex:1}
+  .btn{border:1px solid var(--line-strong);background:#fff;border-radius:8px;padding:7px 12px;font-weight:600;cursor:pointer;color:var(--ink)}.btn:hover{background:var(--brand-soft);border-color:var(--brand)}.btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.sm{padding:4px 9px;font-size:13px}
+  .kpis{display:flex;gap:12px;margin-bottom:14px}
+  .kpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 16px;box-shadow:var(--shadow);min-width:150px}
+  .kpi .k{font-size:12px;color:var(--ink-soft)}.kpi .v{font-size:22px;font-weight:800}
+  .kpi.warn .v{color:var(--warn)}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+  .filters{display:flex;gap:10px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .filters input,.filters select{padding:7px 10px;border:1px solid var(--line-strong);border-radius:8px}
+  table{width:100%;border-collapse:collapse}thead th{background:#f0eee7;text-align:left;font-size:12px;color:var(--ink-soft);padding:9px 12px;border-bottom:1px solid var(--line)}
+  tbody td{padding:10px 12px;border-bottom:1px solid var(--line)}tbody tr:hover{background:#faf9f5}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .matched{color:var(--brand);font-weight:700}
+  .matched td{color:var(--brand)}
+  .chip{font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px}
+  .c-done{background:var(--ok-bg);color:#1d6b46}.c-short{background:var(--warn-bg);color:var(--warn)}.c-wait{background:#fff7d6;color:#8a6d00}
+  .legend{padding:10px 14px;color:var(--ink-soft);font-size:12px}
+  /* 消込モーダル */
+  .scrim{position:fixed;inset:0;background:rgba(18,28,44,.42);display:none;place-items:center;z-index:50}.scrim.open{display:grid}
+  .modal{background:#fff;border-radius:14px;width:560px;max-width:94vw;box-shadow:var(--shadow);overflow:hidden}
+  .modal .hd{padding:14px 18px;border-bottom:1px solid var(--line);font-weight:800}
+  .modal .bd{padding:14px 18px}
+  .modal .ft{padding:14px 18px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}
+  .alloc{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
+</style></head>
+<body>
+<div class="app">
+  <header class="topbar"><div class="logo">警備<span>Pro</span></div>
+    <select class="btn sm"><option>01 本社</option></select>
+    <div class="search"><input placeholder="🔍 得意先を検索…"></div>
+    <div class="me"><span>経理</span><div class="avatar">経</div></div>
+  </header>
+  <nav class="nav">
+    <a href="#"><span class="ic">▣</span>ホーム</a><a href="#"><span class="ic">▤</span>配置ボード</a><a href="#"><span class="ic">▦</span>勤務実績</a>
+    <div class="grp">請求・入金</div><a href="#"><span class="ic">¥</span>請求</a><a href="#" class="active"><span class="ic">◉</span>入金・売掛</a>
+    <div class="grp">給与</div><a href="#"><span class="ic">💴</span>給与</a>
+    <div class="grp">その他</div><a href="#"><span class="ic">▥</span>マスタ</a><a href="#"><span class="ic">🖨</span>帳票</a>
+  </nav>
+  <main class="main">
+    <div class="pagehead"><h1>入金・売掛</h1><div class="spacer"></div>
+      <button class="btn sm">得意先元帳</button><button class="btn sm">入金一覧出力</button><button class="btn primary sm">+ 入金登録</button>
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="k">当月請求</div><div class="v">¥8.43M</div></div>
+      <div class="kpi"><div class="k">入金済</div><div class="v">¥5.30M</div></div>
+      <div class="kpi warn"><div class="k">売掛残(未消込)</div><div class="v">¥3.13M</div></div>
+      <div class="kpi"><div class="k">入金漏れ(予定超過)</div><div class="v">2件</div></div>
+    </div>
+    <div class="panel">
+      <div class="filters">
+        <span style="font-weight:700">入金予定日</span>
+        <input type="text" value="2026/05/01" style="width:120px"> 〜 <input type="text" value="2026/06/30" style="width:120px">
+        <label><input type="checkbox" checked> 未消込のみ</label>
+        <div class="spacer" style="flex:1"></div>
+        <button class="btn sm">検索</button>
+      </div>
+      <table>
+        <thead><tr><th>入金予定日</th><th>得意先</th><th class="num">請求額</th><th>入金日</th><th class="num">入金額</th><th class="num">手数料</th><th class="num">調整</th><th class="num">差引</th><th>状態</th><th></th></tr></thead>
+        <tbody>
+          <tr class="matched"><td>2026/05/31</td><td>㈱山田コーポレーション</td><td class="num">1,683,000</td><td>05/31</td><td class="num">1,683,000</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="chip c-done">✓ 消込済</span></td><td></td></tr>
+          <tr><td>2026/05/31</td><td>モチベーションアップ㈱</td><td class="num">8,427,100</td><td>—</td><td class="num">5,300,000</td><td class="num">0</td><td class="num">0</td><td class="num">3,127,100</td><td><span class="chip c-short">一部入金</span></td><td><button class="btn sm" onclick="openMatch()">消込</button></td></tr>
+          <tr><td>2026/05/31</td><td>㈱第一生命</td><td class="num">11,000</td><td>—</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">11,000</td><td><span class="chip c-wait">未入金</span></td><td><button class="btn sm" onclick="openMatch()">消込</button></td></tr>
+          <tr><td class="num" style="color:var(--warn)">2026/04/30 ⚠</td><td>㈱中野建設</td><td class="num">244,200</td><td>—</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">244,200</td><td><span class="chip c-short">入金漏れ</span></td><td><button class="btn sm" onclick="openMatch()">消込</button></td></tr>
+          <tr class="matched"><td>2026/05/30</td><td>大阪開発㈱</td><td class="num">122,925</td><td>05/30</td><td class="num">122,925</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="chip c-done">✓ 消込済</span></td><td></td></tr>
+        </tbody>
+      </table>
+      <div class="legend">青字=請求額と入金合計が一致(消込完了)。差引金額で売掛残を管理。手数料・安全会費・調整額も入力可。</div>
+    </div>
+  </main>
+</div>
+
+<!-- 消込モーダル -->
+<div class="scrim" id="scrim">
+  <div class="modal">
+    <div class="hd">入金の消込 — モチベーションアップ㈱</div>
+    <div class="bd">
+      <div style="display:flex;gap:10px;margin-bottom:10px">
+        <div style="flex:1"><div style="font-size:12px;color:var(--ink-soft)">入金日</div><input type="text" value="2026/06/01" style="width:100%;padding:7px;border:1px solid var(--line-strong);border-radius:8px"></div>
+        <div style="flex:1"><div style="font-size:12px;color:var(--ink-soft)">入金額</div><input type="text" value="3,127,100" style="width:100%;padding:7px;border:1px solid var(--line-strong);border-radius:8px"></div>
+        <div style="flex:1"><div style="font-size:12px;color:var(--ink-soft)">手数料</div><input type="text" value="0" style="width:100%;padding:7px;border:1px solid var(--line-strong);border-radius:8px"></div>
+      </div>
+      <div style="font-size:13px;color:var(--ink-soft);margin:6px 0">残請求への配賦(請求額=配賦合計で消込完了)</div>
+      <div class="alloc"><span>1交差点 道路工事(04/21〜05/20)</span><input type="text" value="2,594,900" class="num" style="width:130px;padding:6px;border:1px solid var(--line-strong);border-radius:8px"></div>
+      <div class="alloc"><span>C高速道路(04/21〜05/20)</span><input type="text" value="532,200" class="num" style="width:130px;padding:6px;border:1px solid var(--line-strong);border-radius:8px"></div>
+      <div class="alloc" style="font-weight:800"><span>配賦合計 / 入金額</span><span class="num">3,127,100 / 3,127,100 ✓</span></div>
+    </div>
+    <div class="ft"><button class="btn" onclick="closeMatch()">キャンセル</button><button class="btn primary" onclick="closeMatch()">消込を登録</button></div>
+  </div>
+</div>
+<script>
+  function openMatch(){document.getElementById('scrim').classList.add('open')}
+  function closeMatch(){document.getElementById('scrim').classList.remove('open')}
+</script>
+</body></html>
