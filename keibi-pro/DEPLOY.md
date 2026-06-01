@@ -33,6 +33,16 @@ Vercel:
 `keibi-pro/` をサブフォルダのまま push し、Vercel の
 **Settings → Build & Development → Root Directory = `keibi-pro`** に設定。
 
+## 「Deploy to Vercel」ボタン（READMEに貼る用・テンプレ）
+
+リポジトリ作成後、`<owner>/<repo>` を差し替えて README に貼ると1クリック導線になります。
+
+```md
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/<owner>/<repo>)
+```
+
+> サブフォルダ運用（B）の場合は、クローン後に Root Directory=`keibi-pro` を設定。
+
 ## C. CLI で一発
 
 ```bash
