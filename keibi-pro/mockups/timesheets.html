@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>警備Pro — 勤務実績(モック)</title>
+<style>
+  :root{--ink:#1c2430;--ink-soft:#48515e;--cream:#f7f5f0;--surface:#fff;--brand:#1b4d8f;--brand-soft:#e8eef7;--line:#e3e0d8;--line-strong:#cdd3dd;--ok:#2fa36b;--amber:#f4c430;--radius:10px;--shadow:0 1px 2px rgba(18,28,44,.06),0 8px 24px rgba(18,28,44,.08)}
+  *{box-sizing:border-box}html,body{margin:0;height:100%}
+  body{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",system-ui,sans-serif;color:var(--ink);background:var(--cream);font-size:13px;line-height:1.5}
+  .app{display:grid;grid-template-columns:212px 1fr;grid-template-rows:56px 1fr;height:100vh}
+  .topbar{grid-column:1/3;display:flex;align-items:center;gap:16px;padding:0 18px;background:var(--surface);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+  .logo{font-weight:800;color:var(--brand);font-size:14px}.logo span{color:var(--ink)}
+  .search{flex:1;max-width:380px}.search input{width:100%;padding:7px 12px;border:1px solid var(--line-strong);border-radius:999px;background:var(--cream)}
+  .me{display:flex;align-items:center;gap:8px;color:var(--ink-soft)}.avatar{width:30px;height:30px;border-radius:50%;background:var(--brand-soft);display:grid;place-items:center;color:var(--brand);font-weight:700}
+  .nav{background:var(--surface);border-right:1px solid var(--line);padding:10px 8px;overflow:auto}
+  .nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;color:var(--ink-soft);text-decoration:none;font-weight:600}.nav a .ic{width:20px;text-align:center}
+  .nav a.active{background:var(--brand);color:#fff}.nav a:not(.active):hover{background:var(--brand-soft);color:var(--brand)}.nav .grp{font-size:11px;color:#9aa1ac;padding:14px 12px 4px;letter-spacing:.08em}
+  .main{overflow:auto;padding:14px 16px}
+  .pagehead{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}.pagehead h1{font-size:18px;margin:0}.spacer{flex:1}
+  .btn{border:1px solid var(--line-strong);background:#fff;border-radius:8px;padding:6px 11px;font-weight:600;cursor:pointer;color:var(--ink);font-size:13px}.btn:hover{background:var(--brand-soft);border-color:var(--brand)}.btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .seg{display:inline-flex;background:var(--line);border-radius:8px;padding:3px}
+  .seg button{border:0;background:transparent;padding:5px 11px;font-weight:700;border-radius:6px;cursor:pointer;color:var(--ink-soft);font-size:13px}
+  .seg button.on{background:#fff;color:var(--brand);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto}
+  table{width:100%;border-collapse:collapse;white-space:nowrap}
+  thead th{position:sticky;top:0;background:#f0eee7;text-align:right;font-size:11px;color:var(--ink-soft);padding:8px 9px;border-bottom:1px solid var(--line)}
+  thead th.l{text-align:left}
+  tbody td{padding:6px 9px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+  tbody td.l{text-align:left}
+  tbody tr:hover{background:#faf9f5}
+  .site{font-weight:700}.site small{display:block;font-weight:500;color:var(--ink-soft)}
+  td input{width:64px;text-align:right;padding:4px 6px;border:1px solid transparent;border-radius:5px;background:transparent;font-variant-numeric:tabular-nums;font-size:13px}
+  td input:hover{border-color:var(--line-strong)}td input:focus{border-color:var(--brand);background:#fff;outline:none}
+  .ovr{background:#fff7d6;border-color:#f0d98a !important}
+  .photo{color:var(--brand);cursor:pointer}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--ink-soft);font-size:12px;padding:8px 2px}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:3px;vertical-align:middle;margin-right:4px}
+  .hint{font-size:12px;color:#9aa1ac}
+</style></head>
+<body>
+<div class="app">
+  <header class="topbar"><div class="logo">警備<span>Pro</span></div>
+    <select class="btn"><option>01 本社</option></select>
+    <div class="search"><input placeholder="🔍 隊員・現場を検索…"></div>
+    <div class="me"><span>配置担当</span><div class="avatar">山</div></div>
+  </header>
+  <nav class="nav">
+    <a href="#"><span class="ic">▣</span>ホーム</a><a href="#"><span class="ic">▤</span>配置ボード</a>
+    <a href="#" class="active"><span class="ic">▦</span>勤務実績</a>
+    <div class="grp">請求・入金</div><a href="#"><span class="ic">¥</span>請求</a><a href="#"><span class="ic">◉</span>入金・売掛</a>
+    <div class="grp">給与</div><a href="#"><span class="ic">💴</span>給与</a>
+    <div class="grp">その他</div><a href="#"><span class="ic">▥</span>マスタ</a><a href="#"><span class="ic">🖨</span>帳票</a>
+  </nav>
+  <main class="main">
+    <div class="pagehead">
+      <h1>勤務実績</h1>
+      <span class="hint">2026/06/01(月)</span>
+      <div class="seg"><button class="on">全体</button><button>現場別</button><button>隊員別</button><button>得意先別</button></div>
+      <select class="btn"><option>列:基本入力</option><option>列:単価確認</option><option>列:付帯費用</option></select>
+      <div class="spacer"></div>
+      <button class="btn">時間一括セット</button><button class="btn">🖨 管制日報</button><button class="btn primary">登録</button>
+    </div>
+    <div class="panel">
+      <table>
+        <thead><tr>
+          <th class="l">#</th><th class="l">得意先 / 配置先</th><th class="l">隊員</th><th class="l">勤務</th><th>報告時間</th>
+          <th>請求%</th><th>給与%</th><th>休憩</th><th>残業</th><th>深夜</th><th>単価</th><th>交通費</th><th class="l">写真</th>
+        </tr></thead>
+        <tbody>
+          <tr><td class="l">1</td><td class="l site">モチベ㈱<small>1交差点 道路工事</small></td><td class="l">福沢 諭吉</td><td class="l">001 日勤</td><td>09:00-18:00</td>
+            <td><input value="1.0"></td><td><input value="1.0"></td><td><input value="60"></td><td><input value="0"></td><td><input value="0"></td><td><input value="18,000"></td><td><input value="600"></td><td class="l"><span class="photo">📎2</span></td></tr>
+          <tr><td class="l">2</td><td class="l site">モチベ㈱<small>1交差点 道路工事</small></td><td class="l">日給 月男</td><td class="l">001 日勤</td><td>09:00-20:00</td>
+            <td><input value="1.0"></td><td><input value="1.0"></td><td><input value="60"></td><td><input value="2.0"></td><td><input value="0"></td><td><input value="18,000"></td><td><input value="600"></td><td class="l"><span class="photo">📎1</span></td></tr>
+          <tr><td class="l">3</td><td class="l site">第一生命㈱<small>本社前</small></td><td class="l">夏目 漱石</td><td class="l">001 日勤</td><td>08:00-17:00</td>
+            <td><input value="1.0"></td><td><input value="1.0"></td><td><input value="60"></td><td><input value="0"></td><td><input value="0"></td><td><input value="18,000"></td><td><input value="0"></td><td class="l hint">―</td></tr>
+          <tr><td class="l">4</td><td class="l site">モチベ㈱<small>B道路舗装工事</small></td><td class="l">深夜 太郎</td><td class="l">001 日勤</td><td>08:00-16:00</td>
+            <td><input value="1.0"></td><td><input value="1.0"></td><td><input value="45"></td><td><input value="0"></td><td><input value="0"></td><td><input value="16,500" class="ovr" title="マスタ単価18,000を上書き"></td><td><input value="0"></td><td class="l"><span class="photo">📎1</span></td></tr>
+          <tr><td class="l">5</td><td class="l site">モチベ㈱<small>C高速道路</small></td><td class="l">大谷 A子</td><td class="l">001 日勤</td><td>08:00-17:00</td>
+            <td><input value="1.0"></td><td><input value="1.0"></td><td><input value="60"></td><td><input value="0"></td><td><input value="0"></td><td><input value="18,000"></td><td><input value="0"></td><td class="l hint">―</td></tr>
+          <tr><td class="l">6</td><td class="l site">モチベ㈱<small>1交差点 道路工事</small></td><td class="l">馬場 和夫</td><td class="l">101 夜勤</td><td>22:00-05:00</td>
+            <td><input value="1.0"></td><td><input value="1.0"></td><td><input value="60"></td><td><input value="0"></td><td><input value="6.0"></td><td><input value="18,000"></td><td><input value="0"></td><td class="l hint">―</td></tr>
+        </tbody>
+      </table>
+      <div class="legend">
+        <span><span class="dot" style="background:#fff7d6;border:1px solid #f0d98a"></span>マスタ単価を上書き(差分)</span>
+        <span>📎=日報写真(Driveプレビュー)</span>
+        <span>セル編集はExcelライク / 行ダブルクリックで日報・単価詳細へ</span>
+      </div>
+    </div>
+    <p class="hint" style="margin-top:8px">この実績が請求・給与の双方へ自動集計されます(締めはボタンひとつ)。</p>
+  </main>
+</div>
+</body></html>

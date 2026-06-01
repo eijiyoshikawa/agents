@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>警備Pro — プロダクトデモ（Phase1 ここまで動きます）</title>
+<style>
+  :root{--ink:#1c2430;--ink-soft:#48515e;--cream:#f7f5f0;--surface:#fff;--brand:#1b4d8f;--brand-d:#143a6e;--brand-soft:#e8eef7;--line:#e6e2d8;--ok:#2fa36b;--amber:#f4c430;--radius:16px;--maxw:1120px}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",system-ui,sans-serif;color:var(--ink);background:var(--cream);line-height:1.8}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 20px}
+  header{background:rgba(247,245,240,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+  .hd{display:flex;align-items:center;gap:14px;height:62px}
+  .brand{font-weight:800;color:var(--brand);font-size:20px}.brand span{color:var(--ink)}
+  .demo-tag{background:var(--amber);color:#5a4a00;font-weight:800;font-size:12px;padding:3px 10px;border-radius:999px}
+  .sp{flex:1}
+  .btn{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:9px 16px;font-weight:800;text-decoration:none;cursor:pointer;border:1px solid var(--brand);font-size:14px}
+  .btn.primary{background:var(--brand);color:#fff}.btn.ghost{background:#fff;color:var(--brand)}
+  /* hero */
+  .hero{background:linear-gradient(160deg,#fff,var(--brand-soft));border-bottom:1px solid var(--line)}
+  .hero .wrap{padding:48px 20px 40px}
+  .ey{color:var(--brand);font-weight:800;letter-spacing:.08em;font-size:13px;margin-bottom:8px}
+  h1{font-size:32px;line-height:1.35;margin:0 0 12px}
+  @media(min-width:820px){h1{font-size:40px}}
+  .hero p{font-size:17px;color:var(--ink-soft);max-width:760px;margin:0 0 20px}
+  .heroctas{display:flex;gap:10px;flex-wrap:wrap}
+  .story{display:grid;grid-template-columns:1fr;gap:12px;margin-top:28px}
+  @media(min-width:760px){.story{grid-template-columns:repeat(3,1fr)}}
+  .step{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}
+  .step .n{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--brand);color:#fff;font-weight:800;font-size:13px;margin-bottom:6px}
+  .step b{display:block}
+  .step.cur{border-color:var(--brand);box-shadow:0 8px 24px rgba(27,77,143,.14)}
+  .badge{font-size:11px;font-weight:800;padding:2px 9px;border-radius:999px;background:#e3f5ec;color:#1d6b46}
+  /* sections */
+  section{padding:46px 0}
+  h2{font-size:24px;margin:0 0 6px}
+  .lead{color:var(--ink-soft);margin:0 0 22px}
+  .grid{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:640px){.grid{grid-template-columns:1fr 1fr}}
+  @media(min-width:980px){.grid{grid-template-columns:repeat(3,1fr)}}
+  .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;text-decoration:none;color:inherit;display:flex;flex-direction:column;transition:transform .12s,box-shadow .12s}
+  .card:hover{transform:translateY(-2px);box-shadow:0 14px 34px rgba(18,28,44,.12)}
+  .card .thumb{height:120px;background:var(--brand-soft);position:relative;display:grid;place-items:center;color:var(--brand);font-size:34px;border-bottom:1px solid var(--line)}
+  .card .thumb .role{position:absolute;top:10px;left:10px;font-size:11px;font-weight:800;background:#fff;border:1px solid var(--line);border-radius:999px;padding:2px 9px;color:var(--ink-soft)}
+  .card .b{padding:14px 16px}
+  .card h3{margin:0 0 4px;font-size:16px}
+  .card p{margin:0;font-size:13px;color:var(--ink-soft)}
+  .card .go{margin-top:auto;padding:10px 16px;border-top:1px solid var(--line);font-weight:800;color:var(--brand);font-size:13px}
+  .salesrow{display:grid;grid-template-columns:1fr;gap:14px;margin-top:8px}
+  @media(min-width:760px){.salesrow{grid-template-columns:1fr 1fr}}
+  .deploybox{background:#10243f;color:#cfe0f2;border-radius:var(--radius);padding:24px}
+  .deploybox h2{color:#fff}.deploybox code{background:#0a1a30;padding:2px 7px;border-radius:6px;color:#ffd86b}
+  .deploybox ol{margin:10px 0 0;padding-left:20px}.deploybox li{margin:6px 0}
+  footer{background:#10243f;color:#9fb6d4;font-size:12px;padding:24px 0;margin-top:30px}
+  .muted{color:#9aa1ac;font-size:12px}
+  .pillrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .pillrow span{background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 11px;font-size:12px;font-weight:700;color:var(--brand)}
+</style></head>
+<body>
+
+<header><div class="wrap hd">
+  <div class="brand">警備<span>Pro</span></div>
+  <span class="demo-tag">DEMO</span>
+  <div class="sp"></div>
+  <a class="btn ghost" href="sales/preview/lp.html">サービスLP</a>
+  <a class="btn primary" href="sales/preview/proposal.html">提案資料</a>
+</div></header>
+
+<div class="hero"><div class="wrap">
+  <div class="ey">プロダクトデモ ／ Phase 1</div>
+  <h1>「まずは、ここまで動きます」を<br>その場でお見せする。</h1>
+  <p>警備会社のための統合業務管理クラウド「警備Pro」。受注 → 配置 → 勤務実績 → 請求／給与 → 入金 と、現場のモバイル日報まで。下のカードから各画面を実際に触れます（クリックで操作可能なモック）。</p>
+  <div class="heroctas">
+    <a class="btn primary" href="mockups/dispatch-board.html">配置ボードを触る ▶</a>
+    <a class="btn ghost" href="mockups/mobile-daily-report.html">モバイル日報を試す</a>
+  </div>
+  <div class="pillrow"><span>クラウド</span><span>モバイル標準</span><span>インボイス対応</span><span>50歳以上にやさしいUI</span><span>警備業特化（資格者配置・路線検索）</span></div>
+
+  <div class="story">
+    <div class="step cur"><span class="n">1</span><b>1社に導入 <span class="badge">いまここ</span></b><span class="muted">この会社の運用に合わせて稼働。現場の声で磨く。</span></div>
+    <div class="step"><span class="n">2</span><b>運用で実績化</b><span class="muted">効果（削減時間・採算）を数字で蓄積。</span></div>
+    <div class="step"><span class="n">3</span><b>他社へ横展開</b><span class="muted">実績を武器に、同業へ提案・拡大。</span></div>
+  </div>
+</div></div>
+
+<section><div class="wrap">
+  <h2>内勤（管理）画面</h2>
+  <p class="lead">PCで使う中核業務。日々の入力1回で、請求も給与も連動します。</p>
+  <div class="grid">
+    <a class="card" href="mockups/dashboard.html"><div class="thumb">▣<span class="role">全ロール</span></div><div class="b"><h3>ダッシュボード</h3><p>残作業（未配置/未締め/未消込/未承認日報）を集約。お知らせ一斉送信。</p></div><div class="go">開く →</div></a>
+    <a class="card" href="mockups/dispatch-board.html"><div class="thumb">▤<span class="role">配置担当</span></div><div class="b"><h3>配置ボード ★</h3><p>受注＋配置を1画面。未配置可視化・同配置NG警告・資格者配置・路線検索。</p></div><div class="go">開く →</div></a>
+    <a class="card" href="mockups/timesheets.html"><div class="thumb">▦<span class="role">配置担当</span></div><div class="b"><h3>勤務実績グリッド</h3><p>Excelライク入力・視点切替・単価のマスタ参照/上書き・日報写真。</p></div><div class="go">開く →</div></a>
+    <a class="card" href="mockups/billing-wizard.html"><div class="thumb">¥<span class="role">経理</span></div><div class="b"><h3>請求ウィザード</h3><p>締め→明細調整（追加請求）→インボイス請求書プレビュー/PDF。</p></div><div class="go">開く →</div></a>
+    <a class="card" href="mockups/payroll-wizard.html"><div class="thumb">💴<span class="role">経理</span></div><div class="b"><h3>給与ウィザード</h3><p>集計→支給/控除明細・差引支払→確定・全銀振込データ。</p></div><div class="go">開く →</div></a>
+    <a class="card" href="mockups/payments-ar.html"><div class="thumb">◉<span class="role">経理</span></div><div class="b"><h3>入金・売掛</h3><p>消込モーダル・売掛残・入金漏れの可視化。</p></div><div class="go">開く →</div></a>
+    <a class="card" href="mockups/master-site-edit.html"><div class="thumb">▥<span class="role">管理者</span></div><div class="b"><h3>配置先マスタ編集</h3><p>締め設定＋請求単価マトリクス。月極↔スポット切替。</p></div><div class="go">開く →</div></a>
+  </div>
+</div></section>
+
+<section style="background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)"><div class="wrap">
+  <h2>現場・隊員（モバイル）</h2>
+  <p class="lead">スマホで完結。50歳以上でも迷わない設計（文字サイズ切替・大ボタン・4ステップ）。</p>
+  <div class="grid">
+    <a class="card" href="mockups/mobile-daily-report.html"><div class="thumb">📱<span class="role">隊員</span></div><div class="b"><h3>モバイル日報 ★</h3><p>電子サイン↔紙写真の両対応・文字サイズ切替・クラウド保存・取引先へ控え自動送信。</p></div><div class="go">スマホ幅で開く →</div></a>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <h2>営業・提案</h2>
+  <p class="lead">他社展開のための、すぐ使える販促物。</p>
+  <div class="salesrow">
+    <a class="card" href="sales/preview/lp.html"><div class="thumb">🌐</div><div class="b"><h3>サービスLP（先行プレビュー）</h3><p>課題→解決→機能→効果→比較→料金→FAQ→フォーム。レスポンシブ。</p></div><div class="go">開く →</div></a>
+    <a class="card" href="sales/preview/proposal.html"><div class="thumb">📑</div><div class="b"><h3>提案資料（スライド）</h3><p>12スライド。←→キーで操作。効果試算・比較表入り。</p></div><div class="go">開く →</div></a>
+  </div>
+</div></section>
+
+<section style="background:#fff;border-top:1px solid var(--line)"><div class="wrap">
+  <div class="deploybox">
+    <h2>このデモの公開方法（Vercel）</h2>
+    <p>このフォルダ（<code>keibi-pro/</code>）は<strong>ビルド不要の静的サイト</strong>です。新リポジトリに置いてVercelに繋ぐだけで即公開できます。</p>
+    <ol>
+      <li>新規リポジトリを作成し、<code>keibi-pro/</code> の中身をリポジトリ直下にコピー（または Vercel の Root Directory を <code>keibi-pro</code> に設定）。</li>
+      <li>Vercel で「New Project」→ 当リポジトリを Import。フレームワークは <code>Other</code>（静的）。</li>
+      <li>Deploy → 公開URLの <code>/</code> でこのデモ、<code>/sales/preview/lp.html</code> でLPが開きます。</li>
+    </ol>
+    <p class="muted" style="margin-top:10px">※ 詳細は <code>DEPLOY.md</code>。本番アプリ（Next.js+DB）は <code>STARTER/</code> と <code>docs/</code> を土台に構築します。</p>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <strong style="color:#fff">警備Pro</strong> — プロダクトデモ（Phase1）<br>
+  <span class="muted">本デモは構成確認用のクリック可能モックです。データはダミー。ロゴ・コピー・効果数値は確定版で差し替え。</span>
+</div></footer>
+</body></html>
