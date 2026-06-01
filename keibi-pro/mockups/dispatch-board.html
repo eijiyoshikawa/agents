@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>警備Pro — 配置ボード(高忠実度モック)</title>
+<style>
+  /* ── feer風 和文B2Bトークン(暫定) ── */
+  :root{
+    --ink:#1c2430; --ink-soft:#48515e; --cream:#f7f5f0; --surface:#ffffff;
+    --brand:#1b4d8f; --brand-soft:#e8eef7; --line:#e3e0d8; --line-strong:#cdd3dd;
+    /* ステータス色(色だけに依存しない: 必ずアイコン+文字併記) */
+    --st-open:#f4c430; --st-open-bg:#fff7d6;
+    --st-assigned:#9aa3af; --st-assigned-bg:#f1f3f5;
+    --st-notified:#3aa0d8; --st-notified-bg:#e2f1fb;
+    --st-departed:#2fa36b; --st-departed-bg:#e3f5ec;
+    --st-unconfirmed:#d2495b; --st-unconfirmed-bg:#fbe6e9;
+    --st-actual:#7b8492; --st-actual-bg:#eceef1;
+    --radius:10px; --shadow:0 1px 2px rgba(18,28,44,.06),0 8px 24px rgba(18,28,44,.08);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",system-ui,sans-serif;
+       color:var(--ink);background:var(--cream);font-size:14px;line-height:1.6}
+  /* ── レイアウト ── */
+  .app{display:grid;grid-template-columns:212px 1fr;grid-template-rows:56px 1fr;height:100vh}
+  .topbar{grid-column:1/3;display:flex;align-items:center;gap:16px;padding:0 18px;
+          background:var(--surface);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+  .logo{font-weight:800;letter-spacing:.02em;color:var(--brand)}
+  .logo span{color:var(--ink)}
+  .topbar .sel{margin-left:6px}
+  .search{flex:1;max-width:420px}
+  .search input{width:100%;padding:8px 12px;border:1px solid var(--line-strong);border-radius:999px;background:var(--cream)}
+  .me{display:flex;align-items:center;gap:8px;color:var(--ink-soft)}
+  .avatar{width:30px;height:30px;border-radius:50%;background:var(--brand-soft);display:grid;place-items:center;color:var(--brand);font-weight:700}
+  /* ── サイドナビ ── */
+  .nav{background:var(--surface);border-right:1px solid var(--line);padding:10px 8px;overflow:auto}
+  .nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;color:var(--ink-soft);text-decoration:none;font-weight:600}
+  .nav a .ic{width:20px;text-align:center}
+  .nav a.active{background:var(--brand);color:#fff}
+  .nav a:not(.active):hover{background:var(--brand-soft);color:var(--brand)}
+  .nav .grp{font-size:11px;color:#9aa1ac;padding:14px 12px 4px;letter-spacing:.08em}
+  /* ── メイン ── */
+  .main{overflow:auto;padding:18px 20px}
+  .pagehead{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  .pagehead h1{font-size:20px;margin:0}
+  .datenav{display:flex;align-items:center;gap:6px}
+  .btn{border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:7px 12px;font-weight:600;cursor:pointer;color:var(--ink)}
+  .btn:hover{background:var(--brand-soft);border-color:var(--brand)}
+  .btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .btn.sm{padding:4px 9px;font-size:13px}
+  .spacer{flex:1}
+  /* ── カウンタバー ── */
+  .counters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+  .counter{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:10px 14px;min-width:104px;box-shadow:var(--shadow)}
+  .counter .k{font-size:12px;color:var(--ink-soft)}
+  .counter .v{font-size:22px;font-weight:800}
+  .counter.warn{border-color:var(--st-unconfirmed);background:#fff}
+  .counter.warn .v{color:var(--st-unconfirmed)}
+  /* ── ボード ── */
+  .board{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+  table{width:100%;border-collapse:collapse}
+  thead th{background:#f0eee7;text-align:left;font-size:12px;color:var(--ink-soft);padding:10px 12px;border-bottom:1px solid var(--line)}
+  tbody td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:middle}
+  tbody tr:hover{background:#faf9f5}
+  .site{font-weight:700}
+  .site small{display:block;font-weight:500;color:var(--ink-soft)}
+  .num{font-variant-numeric:tabular-nums;font-weight:700;text-align:center}
+  .num .lack{color:var(--st-unconfirmed)}
+  /* ステータスピル(色+アイコン+文字) */
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap}
+  .pill .dot{width:8px;height:8px;border-radius:50%}
+  .s-open{background:var(--st-open-bg);color:#8a6d00} .s-open .dot{background:var(--st-open)}
+  .s-assigned{background:var(--st-assigned-bg);color:#4b5563} .s-assigned .dot{background:var(--st-assigned)}
+  .s-notified{background:var(--st-notified-bg);color:#155e8b} .s-notified .dot{background:var(--st-notified)}
+  .s-departed{background:var(--st-departed-bg);color:#1d6b46} .s-departed .dot{background:var(--st-departed)}
+  .s-unconfirmed{background:var(--st-unconfirmed-bg);color:#a4233a} .s-unconfirmed .dot{background:var(--st-unconfirmed)}
+  /* 隊員チップ */
+  .guards{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+  .gchip{background:var(--cream);border:1px solid var(--line-strong);border-radius:999px;padding:3px 10px;font-size:13px}
+  .gchip.lv1{border-color:#c9a227;background:#fbf4dd}
+  .addslot{border:1px dashed var(--st-open);color:#8a6d00;background:var(--st-open-bg);border-radius:999px;padding:3px 11px;font-weight:700;cursor:pointer}
+  .addslot:hover{filter:brightness(.97)}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--ink-soft);font-size:12px;padding:10px 12px}
+  .legend .pill{font-size:11px}
+  /* ── 右ドロワー(隊員ピッカー)── */
+  .drawer{position:fixed;top:0;right:0;height:100vh;width:340px;background:var(--surface);
+          border-left:1px solid var(--line);box-shadow:-8px 0 24px rgba(18,28,44,.12);
+          transform:translateX(100%);transition:transform .2s ease;display:flex;flex-direction:column;z-index:40}
+  .drawer.open{transform:none}
+  .drawer h3{margin:0;padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+  .drawer .filters{padding:12px 16px;border-bottom:1px solid var(--line);display:grid;gap:8px}
+  .drawer .filters input,.drawer .filters select{padding:7px 10px;border:1px solid var(--line-strong);border-radius:8px;width:100%}
+  .drawer .filters .row{display:flex;gap:8px}
+  .drawer .list{overflow:auto;padding:6px}
+  .grow{padding:9px 12px;border-radius:8px;display:flex;align-items:center;justify-content:space-between;border:1px solid transparent}
+  .grow:hover{background:var(--cream)}
+  .grow .nm{font-weight:700}
+  .grow .meta{font-size:12px;color:var(--ink-soft)}
+  .grow.busy .nm{color:var(--st-unconfirmed)}
+  .grow .tag{font-size:11px;padding:2px 7px;border-radius:999px;background:var(--brand-soft);color:var(--brand)}
+  .grow .tag.neg{background:#fff3d6;color:#8a6d00}
+  /* ── NG警告モーダル ── */
+  .scrim{position:fixed;inset:0;background:rgba(18,28,44,.42);display:none;place-items:center;z-index:50}
+  .scrim.open{display:grid}
+  .modal{background:#fff;border-radius:14px;width:440px;max-width:92vw;box-shadow:var(--shadow);overflow:hidden}
+  .modal .hd{padding:16px 18px;display:flex;gap:12px;align-items:flex-start;border-bottom:1px solid var(--line)}
+  .modal .warnico{width:38px;height:38px;border-radius:50%;background:#fff3d6;color:#a4233a;display:grid;place-items:center;font-size:20px;flex:none}
+  .modal .bd{padding:14px 18px;color:var(--ink-soft)}
+  .modal .bd b{color:var(--ink)}
+  .modal .ngrow{margin-top:10px;background:var(--cream);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+  .modal .ft{padding:14px 18px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--line)}
+  .hint{font-size:12px;color:#9aa1ac;margin-top:8px}
+  .tabs{display:flex;gap:4px;margin-bottom:0}
+  .tabs .tab{padding:8px 14px;border:1px solid var(--line);border-bottom:none;border-radius:8px 8px 0 0;background:#f0eee7;font-weight:700;color:var(--ink-soft);cursor:pointer}
+  .tabs .tab.active{background:var(--surface);color:var(--brand)}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- トップバー -->
+  <header class="topbar">
+    <div class="logo">警備<span>Pro</span></div>
+    <select class="btn sm sel"><option>01 本社</option><option>02 難波支店</option></select>
+    <div class="search"><input placeholder="🔍 得意先・現場・隊員を検索…" /></div>
+    <div class="me"><span>配置担当</span><div class="avatar">山</div></div>
+  </header>
+
+  <!-- サイドナビ -->
+  <nav class="nav">
+    <a href="#"><span class="ic">▣</span>ホーム</a>
+    <a href="#" class="active"><span class="ic">▤</span>配置ボード</a>
+    <a href="#"><span class="ic">▦</span>勤務実績</a>
+    <div class="grp">請求・入金</div>
+    <a href="#"><span class="ic">¥</span>請求</a>
+    <a href="#"><span class="ic">◉</span>入金・売掛</a>
+    <div class="grp">給与</div>
+    <a href="#"><span class="ic">💴</span>給与</a>
+    <div class="grp">その他</div>
+    <a href="#"><span class="ic">▥</span>マスタ</a>
+    <a href="#"><span class="ic">🖨</span>帳票</a>
+    <a href="#"><span class="ic">⚙</span>設定</a>
+  </nav>
+
+  <!-- メイン -->
+  <main class="main">
+    <div class="pagehead">
+      <h1>配置ボード</h1>
+      <div class="datenav">
+        <button class="btn sm">◀</button>
+        <button class="btn sm">2026/06/01 (月) 📅</button>
+        <button class="btn sm">▶</button>
+      </div>
+      <div class="spacer"></div>
+      <button class="btn sm">月間人数入力(受注)</button>
+      <button class="btn sm">🖨 印刷</button>
+      <button class="btn primary sm">登録</button>
+    </div>
+
+    <!-- 残作業カウンタ -->
+    <div class="counters">
+      <div class="counter"><div class="k">受注</div><div class="v">46</div></div>
+      <div class="counter"><div class="k">配置済</div><div class="v">44</div></div>
+      <div class="counter warn"><div class="k">⚠ 未配置</div><div class="v">2</div></div>
+      <div class="counter"><div class="k">出勤可能</div><div class="v">113</div></div>
+      <div class="counter"><div class="k">下番未確認</div><div class="v">1</div></div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active">日勤</div>
+      <div class="tab">夜勤</div>
+    </div>
+
+    <!-- ボード -->
+    <div class="board">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:22%">得意先 / 現場</th>
+            <th style="width:9%">勤務</th>
+            <th style="width:6%">要</th>
+            <th style="width:6%">配</th>
+            <th style="width:13%">状態</th>
+            <th>割当隊員</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="site">モチベーションアップ㈱<small>1交差点 道路工事</small></td>
+            <td>日勤<br><small>09:00–18:00</small></td>
+            <td class="num">6</td>
+            <td class="num"><span class="lack">5</span></td>
+            <td><span class="pill s-open"><span class="dot"></span>⚠ 未配置1</span></td>
+            <td><div class="guards">
+              <span class="gchip">福沢 諭吉</span><span class="gchip">日給 月男</span>
+              <span class="gchip">野口 英雄</span><span class="gchip">中村 浩一</span>
+              <span class="gchip">原田 大地</span>
+              <span class="addslot" onclick="openDrawer()">＋ 追加</span>
+            </div></td>
+          </tr>
+          <tr>
+            <td class="site">モチベーションアップ㈱<small>B道路舗装工事</small></td>
+            <td>日勤<br><small>08:00–16:00</small></td>
+            <td class="num">2</td>
+            <td class="num">2</td>
+            <td><span class="pill s-departed"><span class="dot"></span>● 出発報告済</span></td>
+            <td><div class="guards"><span class="gchip">深夜 太郎</span><span class="gchip">深夜 次郎</span></div></td>
+          </tr>
+          <tr>
+            <td class="site">㈱第一生命<small>本社前</small></td>
+            <td>日勤<br><small>08:00–17:00</small></td>
+            <td class="num">1</td>
+            <td class="num">1</td>
+            <td><span class="pill s-notified"><span class="dot"></span>✓ 配置連絡済</span></td>
+            <td><div class="guards"><span class="gchip lv1">夏目 漱石 ・1級</span></div></td>
+          </tr>
+          <tr>
+            <td class="site">㈱山田コーポレーション<small>梅田店</small></td>
+            <td>日勤<br><small>08:00–17:00</small></td>
+            <td class="num">4</td>
+            <td class="num">4</td>
+            <td><span class="pill s-assigned"><span class="dot"></span>✓ 配置済</span></td>
+            <td><div class="guards">
+              <span class="gchip">中村 浩一</span><span class="gchip">森田 幸</span>
+              <span class="gchip">新渡戸 稲蔵</span><span class="gchip">原田 大地</span>
+            </div></td>
+          </tr>
+          <tr>
+            <td class="site">㈱中野建設<small>京橋駅交差点</small></td>
+            <td>日勤<br><small>08:00–20:00</small></td>
+            <td class="num">4</td>
+            <td class="num"><span class="lack">3</span></td>
+            <td><span class="pill s-open"><span class="dot"></span>⚠ 未配置1</span></td>
+            <td><div class="guards">
+              <span class="gchip">夜野 一郎</span><span class="gchip">福本 康</span><span class="gchip">徳島 太郎</span>
+              <span class="addslot" onclick="openDrawer()">＋ 追加</span>
+            </div></td>
+          </tr>
+          <tr>
+            <td class="site">㈱平田建設<small>大阪駅桜橋口</small></td>
+            <td>日勤<br><small>08:00–17:00</small></td>
+            <td class="num">6</td>
+            <td class="num">6</td>
+            <td><span class="pill s-unconfirmed"><span class="dot"></span>⚠ 下番未確認</span></td>
+            <td><div class="guards"><span class="gchip">外注:A警備保障 ×6</span></div></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="legend">
+        <span class="pill s-open"><span class="dot"></span>未配置</span>
+        <span class="pill s-assigned"><span class="dot"></span>配置済</span>
+        <span class="pill s-notified"><span class="dot"></span>配置連絡済</span>
+        <span class="pill s-departed"><span class="dot"></span>出発報告済</span>
+        <span class="pill s-unconfirmed"><span class="dot"></span>下番未確認</span>
+        <span style="color:#9aa1ac">※ 色＋アイコン＋文字で識別(色覚特性に依存しない)</span>
+      </div>
+    </div>
+    <p class="hint">これは構造合意用の高忠実度モック(静的)。実装では D&D 割当・自動保存・キーボード操作に対応(`10`/`13`/`14`)。</p>
+  </main>
+</div>
+
+<!-- 隊員ピッカー(右ドロワー) -->
+<aside class="drawer" id="drawer">
+  <h3>隊員を選ぶ <button class="btn sm" onclick="closeDrawer()">✕</button></h3>
+  <div class="filters">
+    <input placeholder="🔍 フリガナ / 隊員番号" />
+    <div class="row">
+      <select><option>資格(指定なし)</option><option>交通誘導2級</option><option>交通誘導1級</option></select>
+      <select><option>区分</option><option>通常隊員</option><option>1級資格保持者</option></select>
+    </div>
+    <label class="meta"><input type="checkbox" checked> 空きのみ &nbsp; <input type="checkbox"> 休日交渉可(△)も表示</label>
+  </div>
+  <div class="list">
+    <div class="grow" onclick="tryAssign('福沢 諭吉',false)"><div><div class="nm">福沢 諭吉</div><div class="meta">1級 / 090-2929-2930</div></div><span class="tag">空き</span></div>
+    <div class="grow" onclick="tryAssign('樋口 一葉',true)"><div><div class="nm">樋口 一葉</div><div class="meta">1級 / 同配置NG対象あり</div></div><span class="tag neg">△ 交渉</span></div>
+    <div class="grow busy"><div><div class="nm">夏目 漱石</div><div class="meta">通常 / 本社前に配置済</div></div><span class="tag">●本社前</span></div>
+    <div class="grow" onclick="tryAssign('内勤 内子',false)"><div><div class="nm">内勤 内子</div><div class="meta">通常 / 090-5959-1030</div></div><span class="tag">空き</span></div>
+    <div class="grow" onclick="tryAssign('馬場 和夫',false)"><div><div class="nm">馬場 和夫</div><div class="meta">通常</div></div><span class="tag">空き</span></div>
+    <div class="grow"><div><div class="nm">外注さん(A警備保障)</div><div class="meta">外注法人</div></div><span class="tag">空き</span></div>
+  </div>
+</aside>
+
+<!-- 同配置NG 警告モーダル -->
+<div class="scrim" id="scrim">
+  <div class="modal">
+    <div class="hd">
+      <div class="warnico">!</div>
+      <div>
+        <strong>同配置NGの隊員がいます</strong>
+        <div class="hint" style="margin-top:2px">このまま配置してよろしいですか?</div>
+      </div>
+    </div>
+    <div class="bd">
+      <b id="ngname">樋口 一葉</b> さんは、この現場の <b>福沢 諭吉</b> さんと「同配置NG」に登録されています。
+      <div class="ngrow">理由:仲が良くない(隊員マスタ 同配置NG)</div>
+    </div>
+    <div class="ft">
+      <button class="btn" onclick="closeModal()">キャンセル</button>
+      <button class="btn" onclick="closeModal()">詳細を見る</button>
+      <button class="btn primary" onclick="closeModal()">配置する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openDrawer(){document.getElementById('drawer').classList.add('open')}
+  function closeDrawer(){document.getElementById('drawer').classList.remove('open')}
+  function tryAssign(name, isNg){
+    if(isNg){ document.getElementById('ngname').textContent=name; document.getElementById('scrim').classList.add('open'); }
+    else { closeDrawer(); }
+  }
+  function closeModal(){document.getElementById('scrim').classList.remove('open')}
+</script>
+</body>
+</html>

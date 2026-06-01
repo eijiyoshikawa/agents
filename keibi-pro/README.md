@@ -31,6 +31,7 @@
 | `13_wireframes-and-navigation.md` | 主要画面ワイヤー(ASCII)& 画面遷移図(内勤/モバイル) |
 | `14_screen-specs.md` | 画面別 項目/バリデーション/API定義(実装直前の仕様) |
 | `schema/schema.prisma` | ERDを実行可能DDLに具体化した Prisma スキーマ(移植用たたき台) |
+| `mockups/dispatch-board.html` | 配置ボードの高忠実度モック(ブラウザで開ける単一HTML) |
 
 > `08`〜`09` は参考元スクショのない領域。新サービスの理想フローとして機能を想定(各所「(仮)」明記)。
 
