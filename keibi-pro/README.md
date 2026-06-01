@@ -32,7 +32,11 @@
 | `14_screen-specs.md` | 画面別 項目/バリデーション/API定義(実装直前の仕様) |
 | `15_jbca-catalog-findings.md` | JBCA ProSERIES 公式カタログ5点の要約(一次ソース・差別化示唆) |
 | `schema/schema.prisma` | ERDを実行可能DDLに具体化した Prisma スキーマ(移植用たたき台) |
-| `mockups/dispatch-board.html` | 配置ボードの高忠実度モック(ブラウザで開ける単一HTML) |
+| `mockups/dispatch-board.html` | 配置ボードの高忠実度モック(資格者配置・路線検索・NG警告・隊員ピッカー) |
+| `mockups/mobile-daily-report.html` | モバイル日報モック(電子サイン↔紙写真両対応・文字サイズ切替・4ステップ) |
+| `source/` | 一次ソース(JBCAカタログ)の出典メモ・取得スクリプト |
+| `STARTER/` | 新リポジトリ初期化セット(README/構成/.env.example) |
+| `sales/` | 販売用 LP構成案・提案資料構成案(別セッションのデザインへ引き渡し) |
 
 > `08`〜`09` は参考元スクショのない領域。新サービスの理想フローとして機能を想定(各所「(仮)」明記)。
 

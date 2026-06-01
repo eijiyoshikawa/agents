@@ -81,6 +81,12 @@
   .gchip.lv1{border-color:#c9a227;background:#fbf4dd}
   .addslot{border:1px dashed var(--st-open);color:#8a6d00;background:var(--st-open-bg);border-radius:999px;padding:3px 11px;font-weight:700;cursor:pointer}
   .addslot:hover{filter:brightness(.97)}
+  /* 資格要件バッジ */
+  .qual{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;padding:3px 8px;border-radius:7px;background:#eef4fb;color:#155e8b;border:1px solid #cfe0f2}
+  .qual.met{background:#e3f5ec;color:#1d6b46;border-color:#bfe6cf}
+  .qual.short{background:#fbe6e9;color:#a4233a;border-color:#f0c2cb}
+  .qual small{font-weight:500;opacity:.8}
+  .qual.none{background:#f1f3f5;color:#7b8492;border-color:#e3e0d8}
   .legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--ink-soft);font-size:12px;padding:10px 12px}
   .legend .pill{font-size:11px}
   /* ── 右ドロワー(隊員ピッカー)── */
@@ -152,6 +158,7 @@
         <button class="btn sm">▶</button>
       </div>
       <div class="spacer"></div>
+      <button class="btn sm" onclick="openRoute()">🧭 資格者配置 路線検索</button>
       <button class="btn sm">月間人数入力(受注)</button>
       <button class="btn sm">🖨 印刷</button>
       <button class="btn primary sm">登録</button>
@@ -176,17 +183,19 @@
       <table>
         <thead>
           <tr>
-            <th style="width:22%">得意先 / 現場</th>
-            <th style="width:9%">勤務</th>
-            <th style="width:6%">要</th>
-            <th style="width:6%">配</th>
-            <th style="width:13%">状態</th>
+            <th style="width:20%">得意先 / 現場</th>
+            <th style="width:13%">資格要件</th>
+            <th style="width:8%">勤務</th>
+            <th style="width:5%">要</th>
+            <th style="width:5%">配</th>
+            <th style="width:12%">状態</th>
             <th>割当隊員</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td class="site">モチベーションアップ㈱<small>1交差点 道路工事</small></td>
+            <td><span class="qual short" title="路線:検定合格者の配置義務">交通誘導2級 <small>1/2</small></span></td>
             <td>日勤<br><small>09:00–18:00</small></td>
             <td class="num">6</td>
             <td class="num"><span class="lack">5</span></td>
@@ -200,6 +209,7 @@
           </tr>
           <tr>
             <td class="site">モチベーションアップ㈱<small>B道路舗装工事</small></td>
+            <td><span class="qual met" title="要件充足">交通誘導2級 <small>2/2</small></span></td>
             <td>日勤<br><small>08:00–16:00</small></td>
             <td class="num">2</td>
             <td class="num">2</td>
@@ -208,6 +218,7 @@
           </tr>
           <tr>
             <td class="site">㈱第一生命<small>本社前</small></td>
+            <td><span class="qual none">指定なし</span></td>
             <td>日勤<br><small>08:00–17:00</small></td>
             <td class="num">1</td>
             <td class="num">1</td>
@@ -216,6 +227,7 @@
           </tr>
           <tr>
             <td class="site">㈱山田コーポレーション<small>梅田店</small></td>
+            <td><span class="qual none">指定なし</span></td>
             <td>日勤<br><small>08:00–17:00</small></td>
             <td class="num">4</td>
             <td class="num">4</td>
@@ -227,6 +239,7 @@
           </tr>
           <tr>
             <td class="site">㈱中野建設<small>京橋駅交差点</small></td>
+            <td><span class="qual short" title="路線:検定合格者の配置義務">交通誘導1級 <small>0/1</small></span></td>
             <td>日勤<br><small>08:00–20:00</small></td>
             <td class="num">4</td>
             <td class="num"><span class="lack">3</span></td>
@@ -238,6 +251,7 @@
           </tr>
           <tr>
             <td class="site">㈱平田建設<small>大阪駅桜橋口</small></td>
+            <td><span class="qual met">交通誘導2級 <small>6/6</small></span></td>
             <td>日勤<br><small>08:00–17:00</small></td>
             <td class="num">6</td>
             <td class="num">6</td>
@@ -265,10 +279,11 @@
   <div class="filters">
     <input placeholder="🔍 フリガナ / 隊員番号" />
     <div class="row">
-      <select><option>資格(指定なし)</option><option>交通誘導2級</option><option>交通誘導1級</option></select>
+      <select><option>交通誘導2級(現場要件)</option><option>資格(指定なし)</option><option>交通誘導1級</option></select>
       <select><option>区分</option><option>通常隊員</option><option>1級資格保持者</option></select>
     </div>
-    <label class="meta"><input type="checkbox" checked> 空きのみ &nbsp; <input type="checkbox"> 休日交渉可(△)も表示</label>
+    <label class="meta"><input type="checkbox" checked> 有資格者のみ &nbsp; <input type="checkbox" checked> 空きのみ</label>
+    <div class="meta" style="background:#fbe6e9;color:#a4233a;border-radius:7px;padding:6px 8px">⚠ この現場は<strong>路線の配置義務</strong>あり:交通誘導2級 1/2(不足1)</div>
   </div>
   <div class="list">
     <div class="grow" onclick="tryAssign('福沢 諭吉',false)"><div><div class="nm">福沢 諭吉</div><div class="meta">1級 / 090-2929-2930</div></div><span class="tag">空き</span></div>
@@ -302,7 +317,39 @@
   </div>
 </div>
 
+<!-- 資格者配置 路線検索 モーダル -->
+<div class="scrim" id="routeScrim">
+  <div class="modal" style="width:560px">
+    <div class="hd">
+      <div class="warnico" style="background:#e2f1fb;color:#155e8b">🧭</div>
+      <div>
+        <strong>資格者配置 路線検索</strong>
+        <div class="hint" style="margin-top:2px">検定合格者の配置義務がある路線・現場で、要件を満たす隊員を横断検索します。</div>
+      </div>
+    </div>
+    <div class="bd">
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+        <select class="btn sm"><option>路線:国道2号 阿波座〜九条</option><option>路線:府道高速</option></select>
+        <select class="btn sm"><option>必要資格:交通誘導2級</option><option>交通誘導1級</option></select>
+        <button class="btn primary sm">検索</button>
+      </div>
+      <table style="font-size:13px">
+        <thead><tr><th>隊員</th><th>資格</th><th>当日</th><th>現場まで</th><th></th></tr></thead>
+        <tbody>
+          <tr><td>夏目 漱石</td><td><span class="qual met" style="font-size:11px">2級✓</span></td><td>本社前(移動可)</td><td>3.1km</td><td><button class="btn sm">この現場へ</button></td></tr>
+          <tr><td>樋口 一葉</td><td><span class="qual met" style="font-size:11px">1級✓</span></td><td>△交渉</td><td>5.4km</td><td><button class="btn sm">打診</button></td></tr>
+          <tr><td>福沢 諭吉</td><td><span class="qual met" style="font-size:11px">1級✓</span></td><td>1交差点(配置済)</td><td>0km</td><td><button class="btn sm" disabled>配置済</button></td></tr>
+        </tbody>
+      </table>
+      <div class="hint" style="margin-top:8px">距離は隊員住所→現場の概算(交通費の距離計算にも連動)。</div>
+    </div>
+    <div class="ft"><button class="btn" onclick="closeRoute()">閉じる</button></div>
+  </div>
+</div>
+
 <script>
+  function openRoute(){document.getElementById('routeScrim').classList.add('open')}
+  function closeRoute(){document.getElementById('routeScrim').classList.remove('open')}
   function openDrawer(){document.getElementById('drawer').classList.add('open')}
   function closeDrawer(){document.getElementById('drawer').classList.remove('open')}
   function tryAssign(name, isNg){

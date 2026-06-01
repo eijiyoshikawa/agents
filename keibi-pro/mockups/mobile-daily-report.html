@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>警備Pro — モバイル日報(高忠実度モック)</title>
+<style>
+  /* ── トークン ── */
+  :root{
+    --ink:#1c2430; --ink-soft:#566070; --cream:#f7f5f0; --surface:#ffffff;
+    --brand:#1b4d8f; --brand-d:#143a6e; --brand-soft:#e8eef7; --line:#e3e0d8; --line-strong:#cdd3dd;
+    --ok:#2fa36b; --warn:#d2495b;
+    /* 文字サイズ基準(JSで切替) */
+    --fs:17px;            /* 標準 */
+    --tap:54px;           /* タップターゲット最小高 */
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#0d2240;font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",system-ui,sans-serif;
+       color:var(--ink);display:grid;place-items:center;min-height:100vh;padding:18px}
+  /* スマホ筐体 */
+  .phone{width:390px;max-width:96vw;height:800px;max-height:94vh;background:var(--cream);
+         border-radius:34px;box-shadow:0 20px 60px rgba(0,0,0,.45);overflow:hidden;
+         display:flex;flex-direction:column;border:10px solid #0a0f17;position:relative}
+  .statusbar{height:30px;background:var(--brand-d);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:12px}
+  /* アプリヘッダ */
+  .appbar{background:var(--brand);color:#fff;padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+  .appbar .ttl{font-weight:800;font-size:calc(var(--fs) + 1px)}
+  .fontctl{display:flex;gap:4px;align-items:center;background:rgba(255,255,255,.15);border-radius:999px;padding:3px}
+  .fontctl button{border:0;background:transparent;color:#fff;font-weight:800;border-radius:999px;padding:4px 8px;cursor:pointer;line-height:1}
+  .fontctl button.on{background:#fff;color:var(--brand)}
+  .fontctl .a1{font-size:12px} .fontctl .a2{font-size:15px} .fontctl .a3{font-size:18px}
+  /* 本体 */
+  .body{flex:1;overflow:auto;padding:16px;font-size:var(--fs);line-height:1.7}
+  .step-indicator{display:flex;gap:6px;margin-bottom:14px}
+  .step-indicator .s{flex:1;height:6px;border-radius:999px;background:var(--line-strong)}
+  .step-indicator .s.on{background:var(--brand)}
+  h2{font-size:calc(var(--fs) + 3px);margin:.2em 0 .6em}
+  .lead{color:var(--ink-soft);margin-bottom:14px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin-bottom:14px}
+  label.fld{display:block;font-weight:700;margin:10px 0 6px}
+  select,input[type=text]{width:100%;min-height:var(--tap);font-size:var(--fs);padding:10px 12px;border:1px solid var(--line-strong);border-radius:10px;background:#fff}
+  .timegrid{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;margin-bottom:8px}
+  .nowbtn{min-height:var(--tap);border:1px solid var(--brand);background:var(--brand-soft);color:var(--brand);font-weight:800;border-radius:10px;padding:0 14px;cursor:pointer;white-space:nowrap}
+  .bignum{font-size:calc(var(--fs) + 6px);font-weight:800;text-align:center;letter-spacing:.04em}
+  /* サイン方式トグル */
+  .seg{display:flex;background:var(--line);border-radius:12px;padding:4px;margin-bottom:12px}
+  .seg button{flex:1;min-height:var(--tap);border:0;background:transparent;font-weight:800;font-size:var(--fs);border-radius:9px;cursor:pointer;color:var(--ink-soft)}
+  .seg button.on{background:#fff;color:var(--brand);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+  /* サインキャンバス */
+  .sign-wrap{border:2px dashed var(--brand);border-radius:12px;background:#fff;position:relative}
+  .sign-wrap .ph{position:absolute;inset:0;display:grid;place-items:center;color:#aab2bd;pointer-events:none;font-size:var(--fs)}
+  canvas{display:block;width:100%;height:170px;border-radius:12px;touch-action:none}
+  .signbar{display:flex;justify-content:space-between;align-items:center;margin-top:8px}
+  .link{color:var(--brand);font-weight:700;background:0;border:0;cursor:pointer;font-size:var(--fs)}
+  /* 紙写真 */
+  .photo-drop{border:2px dashed var(--line-strong);border-radius:12px;background:#fff;min-height:150px;display:grid;place-items:center;text-align:center;color:var(--ink-soft);cursor:pointer;padding:16px}
+  .thumbs{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  .thumb{width:62px;height:62px;border-radius:10px;background:var(--brand-soft);display:grid;place-items:center;color:var(--brand);font-weight:800;border:1px solid var(--line-strong);position:relative}
+  .thumb .x{position:absolute;top:-6px;right:-6px;background:var(--warn);color:#fff;border-radius:50%;width:20px;height:20px;display:grid;place-items:center;font-size:12px}
+  /* 確認 */
+  .review .row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line)}
+  .review .row .k{color:var(--ink-soft)}
+  .review .row .v{font-weight:700;text-align:right}
+  .badge{display:inline-flex;align-items:center;gap:6px;background:#e3f5ec;color:#1d6b46;border-radius:999px;padding:4px 10px;font-weight:800;font-size:calc(var(--fs) - 2px)}
+  .net-note{background:#fff7d6;border:1px solid #f0d98a;color:#8a6d00;border-radius:10px;padding:10px 12px;font-size:calc(var(--fs) - 1px);margin-top:10px}
+  /* フッタ操作 */
+  .foot{padding:12px 16px;background:var(--surface);border-top:1px solid var(--line);display:flex;gap:10px}
+  .btn{flex:1;min-height:58px;border-radius:12px;border:1px solid var(--line-strong);background:#fff;font-weight:800;font-size:var(--fs);cursor:pointer;color:var(--ink)}
+  .btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}
+  .btn.ghost{flex:0 0 96px}
+  .help{display:flex;gap:8px;margin-top:14px}
+  .help a{flex:1;text-align:center;min-height:var(--tap);display:flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line-strong);border-radius:10px;text-decoration:none;color:var(--brand);font-weight:800;background:#fff}
+  .hidden{display:none}
+  /* 送信完了 */
+  .done{position:absolute;inset:0;background:rgba(13,34,64,.6);display:none;place-items:center;padding:24px;z-index:9}
+  .done.show{display:grid}
+  .done .panel{background:#fff;border-radius:18px;padding:24px;text-align:center;width:100%}
+  .done .check{width:64px;height:64px;border-radius:50%;background:var(--ok);color:#fff;font-size:34px;display:grid;place-items:center;margin:0 auto 12px}
+  .done h3{margin:.2em 0;font-size:calc(var(--fs) + 4px)}
+  .done p{color:var(--ink-soft)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="statusbar"><span>9:41</span><span>警備Pro</span><span>📶 96%</span></div>
+
+  <!-- アプリヘッダ + 文字サイズ切替 -->
+  <div class="appbar">
+    <div class="ttl">日報の提出</div>
+    <div class="fontctl" aria-label="文字サイズ切替">
+      <span style="font-size:11px;opacity:.85;padding:0 2px">文字</span>
+      <button class="a1" onclick="setFont('s',this)">標</button>
+      <button class="a2 on" onclick="setFont('m',this)">大</button>
+      <button class="a3" onclick="setFont('l',this)">特大</button>
+    </div>
+  </div>
+
+  <div class="body" id="body">
+    <div class="step-indicator">
+      <div class="s on" data-s="1"></div><div class="s" data-s="2"></div>
+      <div class="s" data-s="3"></div><div class="s" data-s="4"></div>
+    </div>
+
+    <!-- STEP 1 現場 -->
+    <section class="step" data-step="1">
+      <h2>① 今日の現場をえらぶ</h2>
+      <p class="lead">あなたが今日はいる現場です。</p>
+      <div class="card">
+        <label class="fld">現場</label>
+        <select id="site">
+          <option>1交差点 道路工事(09:00〜18:00)</option>
+          <option>B道路舗装工事(08:00〜16:00)</option>
+          <option>梅田店(08:00〜17:00)</option>
+        </select>
+        <label class="fld">天候</label>
+        <select><option>晴れ</option><option>くもり</option><option>雨</option><option>強風</option></select>
+      </div>
+    </section>
+
+    <!-- STEP 2 時間 -->
+    <section class="step hidden" data-step="2">
+      <h2>② 時間を入れる</h2>
+      <p class="lead">「今すぐ」を押すと、いまの時刻が入ります。</p>
+      <div class="card">
+        <label class="fld">出勤(上番)</label>
+        <div class="timegrid"><input type="text" id="t-in" value="09:00" inputmode="numeric"><button class="nowbtn" onclick="setNow('t-in')">今すぐ</button></div>
+        <label class="fld">退勤(下番)</label>
+        <div class="timegrid"><input type="text" id="t-out" value="18:00" inputmode="numeric"><button class="nowbtn" onclick="setNow('t-out')">今すぐ</button></div>
+        <label class="fld">休憩(分)</label>
+        <input type="text" value="60" inputmode="numeric">
+      </div>
+    </section>
+
+    <!-- STEP 3 サイン -->
+    <section class="step hidden" data-step="3">
+      <h2>③ サインをもらう</h2>
+      <p class="lead">やり方を選べます。現場の運用に合わせてください。</p>
+      <div class="seg">
+        <button id="m-esign" class="on" onclick="setMethod('esign',this)">画面にサイン</button>
+        <button id="m-photo" onclick="setMethod('photo',this)">紙を撮影</button>
+      </div>
+
+      <!-- 電子サイン -->
+      <div id="pane-esign" class="card">
+        <label class="fld">現場担当者のサイン</label>
+        <div class="sign-wrap">
+          <div class="ph" id="sign-ph">ここに指でサイン</div>
+          <canvas id="pad"></canvas>
+        </div>
+        <div class="signbar">
+          <button class="link" onclick="clearPad()">✕ 消してやり直す</button>
+          <span class="badge" id="sign-ok" style="display:none">✓ サイン取得済</span>
+        </div>
+      </div>
+
+      <!-- 紙写真 -->
+      <div id="pane-photo" class="card hidden">
+        <label class="fld">サインをもらった紙を撮影</label>
+        <div class="photo-drop" onclick="addPhoto()">📷<br>タップして撮影 / 追加<br><small>複数枚OK</small></div>
+        <div class="thumbs" id="thumbs"></div>
+      </div>
+    </section>
+
+    <!-- STEP 4 確認 -->
+    <section class="step hidden" data-step="4">
+      <h2>④ 確認して送る</h2>
+      <div class="card review">
+        <div class="row"><span class="k">現場</span><span class="v" id="r-site">—</span></div>
+        <div class="row"><span class="k">時間</span><span class="v" id="r-time">—</span></div>
+        <div class="row"><span class="k">サイン</span><span class="v" id="r-sign">—</span></div>
+        <div class="row" style="border:0"><span class="k">特記・引継ぎ</span></div>
+        <input type="text" placeholder="あれば入力(任意)">
+      </div>
+      <div class="net-note" id="offline-note" style="display:none">📡 いまオフラインです。送信は<strong>あとで自動</strong>で行われます(二重送信されません)。</div>
+      <div class="help">
+        <a href="#">☎ 電話できく</a>
+        <a href="#">💬 LINEで送る</a>
+      </div>
+    </section>
+  </div>
+
+  <!-- フッタ -->
+  <div class="foot">
+    <button class="btn ghost" id="backBtn" onclick="prev()" style="display:none">戻る</button>
+    <button class="btn primary" id="nextBtn" onclick="next()">次へ ▶</button>
+  </div>
+
+  <!-- 送信完了 -->
+  <div class="done" id="done">
+    <div class="panel">
+      <div class="check">✓</div>
+      <h3>送信しました</h3>
+      <p>控えを取引先へ自動送信し、<br>クラウド(Google Drive)に保存しました。</p>
+      <button class="btn primary" style="margin-top:14px" onclick="reset()">ホームへ戻る</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── 文字サイズ ──
+  const FS={s:'15px',m:'17px',l:'20px'};
+  function setFont(k,el){document.documentElement.style.setProperty('--fs',FS[k]);
+    document.querySelectorAll('.fontctl button').forEach(b=>b.classList.remove('on'));el.classList.add('on');
+    setTimeout(fitCanvas,30);}
+
+  // ── ステップ制御 ──
+  let step=1, method='esign';
+  function show(){
+    document.querySelectorAll('.step').forEach(s=>s.classList.toggle('hidden', +s.dataset.step!==step));
+    document.querySelectorAll('.step-indicator .s').forEach(s=>s.classList.toggle('on', +s.dataset.s<=step));
+    document.getElementById('backBtn').style.display = step>1?'block':'none';
+    const nb=document.getElementById('nextBtn');
+    nb.textContent = step<4 ? '次へ ▶' : '送 信 する';
+    if(step===4) buildReview();
+    if(step===3) setTimeout(fitCanvas,30);
+  }
+  function next(){ if(step<4){step++;show();} else submit(); }
+  function prev(){ if(step>1){step--;show();} }
+
+  // ── 時刻 ──
+  function setNow(id){const d=new Date();document.getElementById(id).value=
+    String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+
+  // ── サイン方式 ──
+  function setMethod(m,el){method=m;
+    document.querySelectorAll('.seg button').forEach(b=>b.classList.remove('on'));el.classList.add('on');
+    document.getElementById('pane-esign').classList.toggle('hidden', m!=='esign');
+    document.getElementById('pane-photo').classList.toggle('hidden', m!=='photo');
+    if(m==='esign') setTimeout(fitCanvas,30);
+  }
+
+  // ── 署名キャンバス ──
+  let pad,ctx,drawing=false,hasSign=false;
+  function fitCanvas(){
+    pad=document.getElementById('pad'); if(!pad||pad.offsetParent===null) return;
+    const r=pad.getBoundingClientRect();
+    if(pad.width!==r.width){ pad.width=r.width; pad.height=170; }
+    ctx=pad.getContext('2d'); ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.strokeStyle='#1c2430';
+  }
+  function pos(e){const r=pad.getBoundingClientRect();const t=e.touches?e.touches[0]:e;return{x:t.clientX-r.left,y:t.clientY-r.top};}
+  function start(e){drawing=true;const p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y);e.preventDefault();}
+  function move(e){if(!drawing)return;const p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke();
+    if(!hasSign){hasSign=true;document.getElementById('sign-ph').style.display='none';document.getElementById('sign-ok').style.display='inline-flex';}e.preventDefault();}
+  function end(){drawing=false;}
+  function clearPad(){if(ctx){ctx.clearRect(0,0,pad.width,pad.height);}hasSign=false;
+    document.getElementById('sign-ph').style.display='grid';document.getElementById('sign-ok').style.display='none';}
+  document.addEventListener('DOMContentLoaded',()=>{
+    fitCanvas();
+    const c=document.getElementById('pad');
+    ['mousedown','touchstart'].forEach(ev=>c.addEventListener(ev,start));
+    ['mousemove','touchmove'].forEach(ev=>c.addEventListener(ev,move,{passive:false}));
+    ['mouseup','touchend','mouseleave'].forEach(ev=>c.addEventListener(ev,end));
+  });
+
+  // ── 紙写真 ──
+  let photos=0;
+  function addPhoto(){photos++;render();}
+  function render(){const t=document.getElementById('thumbs');t.innerHTML='';
+    for(let i=1;i<=photos;i++){const d=document.createElement('div');d.className='thumb';d.innerHTML='📄'+i+'<span class="x" onclick="rm('+i+')">✕</span>';t.appendChild(d);}}
+  function rm(i){photos=Math.max(0,photos-1);render();}
+
+  // ── 確認 ──
+  function buildReview(){
+    document.getElementById('r-site').textContent=document.getElementById('site').value.split('(')[0];
+    document.getElementById('r-time').textContent=document.getElementById('t-in').value+'〜'+document.getElementById('t-out').value;
+    document.getElementById('r-sign').textContent= method==='esign' ? (hasSign?'画面サイン ✓':'未取得') : (photos>0?('紙写真 '+photos+'枚'):'未撮影');
+    // ランダムでオフライン演出(デモ)
+    document.getElementById('offline-note').style.display = (Math.random()<0.25)?'block':'none';
+  }
+  function submit(){document.getElementById('done').classList.add('show');}
+  function reset(){document.getElementById('done').classList.remove('show');step=1;clearPad();photos=0;render();show();}
+  show();
+</script>
+</body>
+</html>
