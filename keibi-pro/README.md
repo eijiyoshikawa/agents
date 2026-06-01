@@ -22,6 +22,13 @@
 | `04_reports.md` | 帳票・出力一覧(請求書・名簿・契約書・日報等) |
 | `05_business-rules.md` | 業務ルール・計算ロジック(単価・締め・端数・制約) |
 | `06_packaging-and-roadmap.md` | プロダクト構成・価格参考・差別化/ロードマップ案 |
+| `07_consolidation.md` | 既存機能の圧縮・統合(画面数削減のリファクタ指針) |
+| `08_daily-report-and-drive.md` | (仮)日報回収フォーム & Google Drive連携 |
+| `09_permissions-and-employee-app.md` | (仮)権限管理 & 従業員(隊員)向けアプリ |
+| `10_uiux-accessibility.md` | UI/UX & アクセシビリティ方針(50歳以上配慮) |
+| `11_open-questions.md` | 懸念点・論点リスト(伴走メモ・随時更新) |
+
+> `08`〜`09` は参考元スクショのない領域。新サービスの理想フローとして機能を想定(各所「(仮)」明記)。
 
 ---
 
