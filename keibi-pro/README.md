@@ -34,9 +34,11 @@
 | `schema/schema.prisma` | ERDを実行可能DDLに具体化した Prisma スキーマ(移植用たたき台) |
 | `mockups/dispatch-board.html` | 配置ボードの高忠実度モック(資格者配置・路線検索・NG警告・隊員ピッカー) |
 | `mockups/mobile-daily-report.html` | モバイル日報モック(電子サイン↔紙写真両対応・文字サイズ切替・4ステップ) |
+| `mockups/billing-wizard.html` | 請求ウィザードモック(締め→明細調整→請求書プレビュー/PDF) |
+| `mockups/payroll-wizard.html` | 給与ウィザードモック(集計→支給/控除明細→確定・振込データ) |
 | `source/` | 一次ソース(JBCAカタログ)の出典メモ・取得スクリプト |
-| `STARTER/` | 新リポジトリ初期化セット(README/構成/.env.example) |
-| `sales/` | 販売用 LP構成案・提案資料構成案(別セッションのデザインへ引き渡し) |
+| `STARTER/` | 新リポジトリ初期化セット(README/構成/.env.example/Phase1チケット) |
+| `sales/` | 販売用 LP構成案・提案資料構成案・別セッション引き渡しプロンプト |
 
 > `08`〜`09` は参考元スクショのない領域。新サービスの理想フローとして機能を想定(各所「(仮)」明記)。
 

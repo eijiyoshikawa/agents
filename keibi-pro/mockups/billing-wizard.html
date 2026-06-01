@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>警備Pro — 請求ウィザード(高忠実度モック)</title>
+<style>
+  :root{
+    --ink:#1c2430;--ink-soft:#48515e;--cream:#f7f5f0;--surface:#fff;
+    --brand:#1b4d8f;--brand-soft:#e8eef7;--line:#e3e0d8;--line-strong:#cdd3dd;
+    --ok:#2fa36b;--ok-bg:#e3f5ec;--warn:#d2495b;--mute:#7b8492;
+    --radius:10px;--shadow:0 1px 2px rgba(18,28,44,.06),0 8px 24px rgba(18,28,44,.08);
+  }
+  *{box-sizing:border-box} html,body{margin:0;height:100%}
+  body{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",system-ui,sans-serif;color:var(--ink);background:var(--cream);font-size:14px;line-height:1.6}
+  .app{display:grid;grid-template-columns:212px 1fr;grid-template-rows:56px 1fr;height:100vh}
+  .topbar{grid-column:1/3;display:flex;align-items:center;gap:16px;padding:0 18px;background:var(--surface);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+  .logo{font-weight:800;color:var(--brand)} .logo span{color:var(--ink)}
+  .search{flex:1;max-width:420px}.search input{width:100%;padding:8px 12px;border:1px solid var(--line-strong);border-radius:999px;background:var(--cream)}
+  .me{display:flex;align-items:center;gap:8px;color:var(--ink-soft)} .avatar{width:30px;height:30px;border-radius:50%;background:var(--brand-soft);display:grid;place-items:center;color:var(--brand);font-weight:700}
+  .nav{background:var(--surface);border-right:1px solid var(--line);padding:10px 8px;overflow:auto}
+  .nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;color:var(--ink-soft);text-decoration:none;font-weight:600}
+  .nav a .ic{width:20px;text-align:center}
+  .nav a.active{background:var(--brand);color:#fff}
+  .nav a:not(.active):hover{background:var(--brand-soft);color:var(--brand)}
+  .nav .grp{font-size:11px;color:#9aa1ac;padding:14px 12px 4px;letter-spacing:.08em}
+  .main{overflow:auto;padding:18px 20px}
+  .pagehead{display:flex;align-items:center;gap:12px;margin-bottom:6px}.pagehead h1{font-size:20px;margin:0}
+  .spacer{flex:1}
+  .btn{border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:7px 12px;font-weight:600;cursor:pointer;color:var(--ink)}
+  .btn:hover{background:var(--brand-soft);border-color:var(--brand)} .btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)} .btn.sm{padding:4px 9px;font-size:13px}
+  /* ステッパー */
+  .steps{display:flex;gap:8px;margin:14px 0}
+  .steps .st{flex:1;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:10px 14px;box-shadow:var(--shadow);cursor:pointer}
+  .steps .st .no{width:26px;height:26px;border-radius:50%;background:var(--line);display:grid;place-items:center;font-weight:800;color:var(--mute)}
+  .steps .st.on{border-color:var(--brand)} .steps .st.on .no{background:var(--brand);color:#fff}
+  .steps .st.done .no{background:var(--ok);color:#fff}
+  .steps .st .t{font-weight:700} .steps .st .d{font-size:12px;color:var(--ink-soft)}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+  .panel h3{margin:0 0 12px;font-size:15px}
+  .filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .filters .f{display:flex;flex-direction:column;gap:3px} .filters label{font-size:12px;color:var(--ink-soft)}
+  .filters input,.filters select{padding:7px 10px;border:1px solid var(--line-strong);border-radius:8px}
+  table{width:100%;border-collapse:collapse} thead th{background:#f0eee7;text-align:left;font-size:12px;color:var(--ink-soft);padding:9px 12px;border-bottom:1px solid var(--line)}
+  tbody td{padding:10px 12px;border-bottom:1px solid var(--line)} tbody tr:hover{background:#faf9f5}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .tag{font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px}
+  .tag.draft{background:#fff7d6;color:#8a6d00}.tag.agg{background:var(--brand-soft);color:var(--brand)}.tag.closed{background:var(--ok-bg);color:#1d6b46}
+  .rowsel{cursor:pointer}.rowsel.active{background:var(--brand-soft)!important}
+  .hide{display:none}
+  /* 明細調整 2カラム */
+  .grid2{display:grid;grid-template-columns:1.6fr 1fr;gap:14px}
+  .sum{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed var(--line)}
+  .sum.total{border-bottom:0;border-top:2px solid var(--ink);margin-top:6px;padding-top:10px;font-size:18px;font-weight:800}
+  .addbtn{border:1px dashed var(--brand);color:var(--brand);background:var(--brand-soft);border-radius:8px;padding:6px 10px;font-weight:700;cursor:pointer;font-size:13px}
+  .pill-form{font-size:11px;padding:2px 7px;border-radius:6px;font-weight:700}
+  .pf-month{background:#efe7fb;color:#5b3aa0}.pf-spot{background:#e2f1fb;color:#155e8b}
+  .invoice{max-width:720px;margin:0 auto;background:#fff;border:1px solid var(--line);padding:28px 32px}
+  .invoice h2{text-align:center;background:#d8f0e0;display:inline-block;padding:4px 20px;border-radius:4px;margin:0 auto 16px}
+  .invoice .head{display:flex;justify-content:space-between}
+  .invoice .box{border:1px solid #2b8a5a;border-radius:4px;overflow:hidden;margin:12px 0}
+  .invoice .box table{width:100%}.invoice .box th{background:#e3f5ec;color:#1d6b46}
+  .opts{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0}
+  .opts label{display:flex;gap:6px;align-items:center;font-size:13px;background:var(--cream);padding:6px 10px;border-radius:8px;border:1px solid var(--line)}
+  .foot{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
+  .hint{font-size:12px;color:#9aa1ac}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="logo">警備<span>Pro</span></div>
+    <select class="btn sm"><option>01 本社</option></select>
+    <div class="search"><input placeholder="🔍 得意先・現場を検索…"></div>
+    <div class="me"><span>経理</span><div class="avatar">経</div></div>
+  </header>
+  <nav class="nav">
+    <a href="#"><span class="ic">▣</span>ホーム</a>
+    <a href="#"><span class="ic">▤</span>配置ボード</a>
+    <a href="#"><span class="ic">▦</span>勤務実績</a>
+    <div class="grp">請求・入金</div>
+    <a href="#" class="active"><span class="ic">¥</span>請求</a>
+    <a href="#"><span class="ic">◉</span>入金・売掛</a>
+    <div class="grp">給与</div>
+    <a href="#"><span class="ic">💴</span>給与</a>
+    <div class="grp">その他</div>
+    <a href="#"><span class="ic">▥</span>マスタ</a>
+    <a href="#"><span class="ic">🖨</span>帳票</a>
+  </nav>
+
+  <main class="main">
+    <div class="pagehead"><h1>請求</h1><span class="hint">締め → 明細調整 → 発行 を1画面で</span></div>
+
+    <!-- ステッパー -->
+    <div class="steps">
+      <div class="st on" data-s="1" onclick="go(1)"><div class="no">1</div><div><div class="t">締め対象</div><div class="d">集計する現場を選ぶ</div></div></div>
+      <div class="st" data-s="2" onclick="go(2)"><div class="no">2</div><div><div class="t">明細調整</div><div class="d">追加請求・値引き</div></div></div>
+      <div class="st" data-s="3" onclick="go(3)"><div class="no">3</div><div><div class="t">発行</div><div class="d">プレビュー・PDF</div></div></div>
+    </div>
+
+    <!-- STEP1 締め対象 -->
+    <section class="step" data-step="1">
+      <div class="panel">
+        <h3>① 締め対象を集計</h3>
+        <div class="filters">
+          <div class="f"><label>請求書月</label><input type="text" value="2026/05" style="width:90px"></div>
+          <div class="f"><label>締日</label><input type="text" value="20" style="width:50px"></div>
+          <div class="f"><label>請求期間</label><input type="text" value="2026/04/21 〜 2026/05/20" style="width:200px"></div>
+          <div class="f"><label>得意先</label><select><option>すべて</option><option>モチベーションアップ㈱</option></select></div>
+          <button class="btn">検索</button>
+          <div class="spacer"></div>
+          <button class="btn primary" onclick="go(2)">締め集計 ▶</button>
+        </div>
+        <table>
+          <thead><tr><th></th><th>得意先</th><th>配置先</th><th>形態</th><th>税率</th><th>期間</th><th>状態</th><th class="num">請求額(税込)</th></tr></thead>
+          <tbody>
+            <tr class="rowsel active"><td><input type="checkbox" checked></td><td>モチベーションアップ㈱</td><td>1交差点 道路工事</td><td><span class="pill-form pf-spot">スポット</span></td><td>10%</td><td>04/21〜05/20</td><td><span class="tag agg">集計済</span></td><td class="num">2,594,900</td></tr>
+            <tr class="rowsel"><td><input type="checkbox" checked></td><td>モチベーションアップ㈱</td><td>B道路舗装工事</td><td><span class="pill-form pf-spot">スポット</span></td><td>10%</td><td>04/21〜05/20</td><td><span class="tag agg">集計済</span></td><td class="num">937,200</td></tr>
+            <tr class="rowsel"><td><input type="checkbox" checked></td><td>モチベーションアップ㈱</td><td>Eビルディング</td><td><span class="pill-form pf-month">月極</span></td><td>10%</td><td>04/21〜05/20</td><td><span class="tag closed">確定</span></td><td class="num">715,000</td></tr>
+            <tr class="rowsel"><td><input type="checkbox"></td><td>㈱中野建設</td><td>京橋駅交差点</td><td><span class="pill-form pf-spot">スポット</span></td><td>10%</td><td>04/21〜05/20</td><td><span class="tag draft">未集計</span></td><td class="num">—</td></tr>
+            <tr class="rowsel"><td><input type="checkbox"></td><td>㈱平田建設</td><td>大阪駅桜橋口</td><td><span class="pill-form pf-spot">スポット</span></td><td>10%</td><td>04/21〜05/20</td><td><span class="tag draft">未集計</span></td><td class="num">—</td></tr>
+          </tbody>
+        </table>
+        <p class="hint">※ 月極=契約月額を固定請求 / スポット=勤務実績×単価で算出。締め集計で実績→請求データを生成(再実行は冪等)。</p>
+      </div>
+    </section>
+
+    <!-- STEP2 明細調整 -->
+    <section class="step hide" data-step="2">
+      <div class="grid2">
+        <div class="panel">
+          <h3>② 請求明細(モチベーションアップ㈱ / 1交差点 道路工事)</h3>
+          <table>
+            <thead><tr><th>月日</th><th>実施形態</th><th class="num">人数</th><th class="num">単価</th><th class="num">金額</th></tr></thead>
+            <tbody>
+              <tr><td>04/21(火)</td><td>日勤</td><td class="num">3.0</td><td class="num">18,000</td><td class="num">54,000</td></tr>
+              <tr><td>04/21(火)</td><td>夜勤</td><td class="num">2.0</td><td class="num">18,000</td><td class="num">36,000</td></tr>
+              <tr><td>04/21(火)</td><td>時給(残)</td><td class="num">8.0h</td><td class="num">1,500</td><td class="num">12,000</td></tr>
+              <tr style="background:#fff7e6"><td>04/21(火)</td><td>資機材(追加)</td><td class="num">1.0</td><td class="num">1,000</td><td class="num">1,000</td></tr>
+              <tr><td>04/22(水)</td><td>日勤</td><td class="num">4.0</td><td class="num">18,000</td><td class="num">72,000</td></tr>
+              <tr><td colspan="5" class="hint" style="text-align:center">… 明細をクリックで該当の勤務実績へジャンプ …</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <h3>請求合計</h3>
+          <div class="sum"><span>請求金額</span><span class="num">2,196,000</span></div>
+          <div class="sum"><span>▲ 値引き</span><span class="num">0</span></div>
+          <div class="sum"><span>追加請求計</span><span class="num">151,000</span></div>
+          <div class="sum"><span>小計</span><span class="num">2,359,000</span></div>
+          <div class="sum"><span>消費税(10%)</span><span class="num">235,900</span></div>
+          <div class="sum total"><span>請求合計</span><span class="num">2,594,900</span></div>
+          <h3 style="margin-top:16px">追加請求 <button class="addbtn" onclick="alert('追加請求の行を挿入(資機材・スポット応援・キャンセル料 等)')">＋ 追加</button></h3>
+          <table>
+            <thead><tr><th>名称</th><th class="num">金額</th><th>税</th></tr></thead>
+            <tbody>
+              <tr><td>資機材</td><td class="num">1,000</td><td>10%</td></tr>
+              <tr><td>スポット応援(テスト)</td><td class="num">150,000</td><td>10%</td></tr>
+            </tbody>
+          </table>
+          <p class="hint" style="margin-top:8px">⚠ 中止連絡の日時を入れると、キャンセル料規定(契約書第10項)から提案額を算出(確定は手動)。</p>
+          <div class="foot"><button class="btn" onclick="go(1)">戻る</button><button class="btn primary" onclick="go(3)">発行へ ▶</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP3 発行 -->
+    <section class="step hide" data-step="3">
+      <div class="panel">
+        <h3>③ 発行</h3>
+        <div class="filters">
+          <div class="f"><label>帳票</label><select><option>得意先別請求書(現場束ね)</option><option>得意先別配置先別請求書</option><option>配置先別請求明細書</option></select></div>
+          <div class="f"><label>テンプレート</label><select><option>いつもの設定</option><option>住所あり・単価印刷</option></select></div>
+        </div>
+        <div class="opts">
+          <label><input type="checkbox" checked>消費税欄を印字</label>
+          <label><input type="checkbox">単価を印刷</label>
+          <label><input type="checkbox">明細を合算しない</label>
+          <label><input type="checkbox" checked>登録番号(インボイス)を印字</label>
+        </div>
+        <!-- 請求書プレビュー -->
+        <div class="invoice">
+          <div style="text-align:center"><h2>御 請 求 書</h2></div>
+          <div class="head">
+            <div>モチベーションアップ㈱<br><span class="hint">気付 御中</span><div style="border-bottom:1px solid #aaa;width:220px;margin-top:24px"></div></div>
+            <div style="text-align:right;font-size:13px">㈱ビジコン・ジャパン(自社)<br>〒530-0044 大阪市北区東天満2-8-1<br>TEL 06-6734-5229<br><b>登録番号:T1234567890123</b></div>
+          </div>
+          <div class="box"><table>
+            <thead><tr><th>請求月</th><th class="num">請求金額(10%)</th><th class="num">消費税(10%)</th><th class="num">合計請求金額</th></tr></thead>
+            <tbody><tr><td>2026年05月</td><td class="num">7,661,000</td><td class="num">766,100</td><td class="num"><b>8,427,100</b></td></tr></tbody>
+          </table></div>
+          <table style="font-size:13px">
+            <thead><tr><th>No</th><th>請求期間</th><th>配置先名</th><th class="num">合計金額</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>2026/4/21〜5/20</td><td>1交差点 道路工事</td><td class="num">2,359,000</td></tr>
+              <tr><td>2</td><td>2026/4/21〜5/20</td><td>B道路舗装工事</td><td class="num">852,000</td></tr>
+              <tr><td>3</td><td>2026/4/21〜5/20</td><td>C高速道路</td><td class="num">1,080,000</td></tr>
+              <tr><td>4</td><td>2026/4/21〜5/20</td><td>D工事</td><td class="num">720,000</td></tr>
+              <tr><td>…</td><td></td><td></td><td class="num">…</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="foot">
+          <button class="btn" onclick="go(2)">戻る</button>
+          <button class="btn">🖨 印刷</button>
+          <button class="btn">PDF出力</button>
+          <button class="btn primary">請求更新(確定)</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<script>
+  let step=1;
+  function go(s){step=s;
+    document.querySelectorAll('.step').forEach(el=>el.classList.toggle('hide',+el.dataset.step!==s));
+    document.querySelectorAll('.steps .st').forEach(el=>{const n=+el.dataset.s;el.classList.toggle('on',n===s);el.classList.toggle('done',n<s);});
+  }
+  document.querySelectorAll('.rowsel').forEach(r=>r.addEventListener('click',e=>{if(e.target.tagName!=='INPUT')r.classList.toggle('active')}));
+</script>
+</body>
+</html>

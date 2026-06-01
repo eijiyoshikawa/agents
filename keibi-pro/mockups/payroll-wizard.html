@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>警備Pro — 給与ウィザード(高忠実度モック)</title>
+<style>
+  :root{
+    --ink:#1c2430;--ink-soft:#48515e;--cream:#f7f5f0;--surface:#fff;
+    --brand:#1b4d8f;--brand-soft:#e8eef7;--line:#e3e0d8;--line-strong:#cdd3dd;
+    --ok:#2fa36b;--ok-bg:#e3f5ec;--warn:#d2495b;--mute:#7b8492;
+    --pay:#1d6b46;--ded:#a4233a;
+    --radius:10px;--shadow:0 1px 2px rgba(18,28,44,.06),0 8px 24px rgba(18,28,44,.08);
+  }
+  *{box-sizing:border-box} html,body{margin:0;height:100%}
+  body{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",system-ui,sans-serif;color:var(--ink);background:var(--cream);font-size:14px;line-height:1.6}
+  .app{display:grid;grid-template-columns:212px 1fr;grid-template-rows:56px 1fr;height:100vh}
+  .topbar{grid-column:1/3;display:flex;align-items:center;gap:16px;padding:0 18px;background:var(--surface);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+  .logo{font-weight:800;color:var(--brand)} .logo span{color:var(--ink)}
+  .search{flex:1;max-width:420px}.search input{width:100%;padding:8px 12px;border:1px solid var(--line-strong);border-radius:999px;background:var(--cream)}
+  .me{display:flex;align-items:center;gap:8px;color:var(--ink-soft)} .avatar{width:30px;height:30px;border-radius:50%;background:var(--brand-soft);display:grid;place-items:center;color:var(--brand);font-weight:700}
+  .nav{background:var(--surface);border-right:1px solid var(--line);padding:10px 8px;overflow:auto}
+  .nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;color:var(--ink-soft);text-decoration:none;font-weight:600}
+  .nav a .ic{width:20px;text-align:center}.nav a.active{background:var(--brand);color:#fff}
+  .nav a:not(.active):hover{background:var(--brand-soft);color:var(--brand)}.nav .grp{font-size:11px;color:#9aa1ac;padding:14px 12px 4px;letter-spacing:.08em}
+  .main{overflow:auto;padding:18px 20px}
+  .pagehead{display:flex;align-items:center;gap:12px;margin-bottom:6px}.pagehead h1{font-size:20px;margin:0}.spacer{flex:1}
+  .btn{border:1px solid var(--line-strong);background:var(--surface);border-radius:8px;padding:7px 12px;font-weight:600;cursor:pointer;color:var(--ink)}
+  .btn:hover{background:var(--brand-soft);border-color:var(--brand)}.btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.sm{padding:4px 9px;font-size:13px}
+  .steps{display:flex;gap:8px;margin:14px 0}
+  .steps .st{flex:1;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:10px 14px;box-shadow:var(--shadow);cursor:pointer}
+  .steps .st .no{width:26px;height:26px;border-radius:50%;background:var(--line);display:grid;place-items:center;font-weight:800;color:var(--mute)}
+  .steps .st.on{border-color:var(--brand)}.steps .st.on .no{background:var(--brand);color:#fff}.steps .st.done .no{background:var(--ok);color:#fff}
+  .steps .st .t{font-weight:700}.steps .st .d{font-size:12px;color:var(--ink-soft)}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+  .panel h3{margin:0 0 12px;font-size:15px}
+  .filters{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+  .filters .f{display:flex;flex-direction:column;gap:3px}.filters label{font-size:12px;color:var(--ink-soft)}
+  .filters input,.filters select{padding:7px 10px;border:1px solid var(--line-strong);border-radius:8px}
+  .opts{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 12px}
+  .opts label{display:flex;gap:6px;align-items:center;font-size:13px;background:var(--cream);padding:6px 10px;border-radius:8px;border:1px solid var(--line)}
+  table{width:100%;border-collapse:collapse}thead th{background:#f0eee7;text-align:left;font-size:12px;color:var(--ink-soft);padding:9px 12px;border-bottom:1px solid var(--line)}
+  tbody td{padding:10px 12px;border-bottom:1px solid var(--line)}tbody tr:hover{background:#faf9f5}
+  .num{text-align:right;font-variant-numeric:tabular-nums}
+  .tag{font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px}.tag.draft{background:#fff7d6;color:#8a6d00}.tag.agg{background:var(--brand-soft);color:var(--brand)}.tag.done{background:var(--ok-bg);color:#1d6b46}
+  .mask{color:#9aa1ac;font-style:italic}
+  .hide{display:none}.hint{font-size:12px;color:#9aa1ac}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .kv{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px dashed var(--line)}
+  .kv.tot{border-bottom:0;border-top:2px solid var(--ink);margin-top:6px;padding-top:9px;font-weight:800}
+  .pay h3{color:var(--pay)}.ded h3{color:var(--ded)}
+  .net{background:#0d2240;color:#fff;border-radius:12px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+  .net .v{font-size:26px;font-weight:800}
+  .foot{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
+  .guardlist .gl{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line);cursor:pointer}
+  .guardlist .gl.active{background:var(--brand-soft)}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="logo">警備<span>Pro</span></div>
+    <select class="btn sm"><option>01 本社</option></select>
+    <div class="search"><input placeholder="🔍 隊員を検索…"></div>
+    <div class="me"><span>経理</span><div class="avatar">経</div></div>
+  </header>
+  <nav class="nav">
+    <a href="#"><span class="ic">▣</span>ホーム</a>
+    <a href="#"><span class="ic">▤</span>配置ボード</a>
+    <a href="#"><span class="ic">▦</span>勤務実績</a>
+    <div class="grp">請求・入金</div>
+    <a href="#"><span class="ic">¥</span>請求</a>
+    <a href="#"><span class="ic">◉</span>入金・売掛</a>
+    <div class="grp">給与</div>
+    <a href="#" class="active"><span class="ic">💴</span>給与</a>
+    <div class="grp">その他</div>
+    <a href="#"><span class="ic">▥</span>マスタ</a>
+    <a href="#"><span class="ic">🖨</span>帳票</a>
+  </nav>
+
+  <main class="main">
+    <div class="pagehead"><h1>給与</h1><span class="hint">集計 → 明細確認 → 確定・出力。金額は権限によりマスク</span></div>
+    <div class="steps">
+      <div class="st on" data-s="1" onclick="go(1)"><div class="no">1</div><div><div class="t">集計</div><div class="d">期間・対象を選ぶ</div></div></div>
+      <div class="st" data-s="2" onclick="go(2)"><div class="no">2</div><div><div class="t">明細確認</div><div class="d">支給・控除・差引</div></div></div>
+      <div class="st" data-s="3" onclick="go(3)"><div class="no">3</div><div><div class="t">確定・出力</div><div class="d">明細PDF・振込データ</div></div></div>
+    </div>
+
+    <!-- STEP1 集計 -->
+    <section class="step" data-step="1">
+      <div class="panel">
+        <h3>① 給与集計</h3>
+        <div class="filters">
+          <div class="f"><label>給与形態</label><select><option>日給/月給</option><option>月給</option><option>週給</option></select></div>
+          <div class="f"><label>締め期間</label><input type="text" value="2026/04/21 〜 2026/05/20" style="width:200px"></div>
+          <div class="f"><label>隊員区分</label><select><option>すべて</option><option>通常隊員</option><option>1級資格保持者</option></select></div>
+          <button class="btn">検索</button>
+        </div>
+        <div class="opts">
+          <label><input type="checkbox" checked>隊員マスタ固定支給を集計</label>
+          <label><input type="checkbox" checked>隊員マスタ固定控除を集計</label>
+          <label><input type="checkbox">全再計算</label>
+          <label><input type="checkbox">社会保険を計算</label>
+          <label><input type="checkbox">住民税を計算</label>
+          <label><input type="checkbox">年調Pro還付金を取込</label>
+        </div>
+        <table>
+          <thead><tr><th><input type="checkbox" checked></th><th>隊員</th><th>区分</th><th class="num">出勤日数</th><th>状態</th></tr></thead>
+          <tbody>
+            <tr><td><input type="checkbox" checked></td><td>福沢 諭吉 ※</td><td>1級資格保持者</td><td class="num">21.0</td><td><span class="tag draft">未</span></td></tr>
+            <tr><td><input type="checkbox" checked></td><td>夏目 漱石</td><td>通常隊員</td><td class="num">19.0</td><td><span class="tag draft">未</span></td></tr>
+            <tr><td><input type="checkbox" checked></td><td>樋口 一葉</td><td>1級資格保持者</td><td class="num">18.0</td><td><span class="tag draft">未</span></td></tr>
+            <tr><td><input type="checkbox"></td><td>外注:A警備保障</td><td>外注</td><td class="num">—</td><td><span class="tag draft">対象外</span></td></tr>
+          </tbody>
+        </table>
+        <p class="hint">※ 漏れデータを含む隊員名に「※」。内/外注は一括集計しない設定可。介護保険は40歳以上で計上。</p>
+        <div class="foot"><button class="btn primary" onclick="go(2)">給与集計 ▶</button></div>
+      </div>
+    </section>
+
+    <!-- STEP2 明細 -->
+    <section class="step hide" data-step="2">
+      <div style="display:grid;grid-template-columns:220px 1fr;gap:14px">
+        <div class="panel guardlist" style="padding:6px 0">
+          <div class="gl active"><span>福沢 諭吉</span><span class="num">210,004</span></div>
+          <div class="gl"><span>夏目 漱石</span><span class="num">168,200</span></div>
+          <div class="gl"><span>樋口 一葉</span><span class="num">182,500</span></div>
+        </div>
+        <div>
+          <div class="grid2">
+            <div class="panel pay">
+              <h3>支給</h3>
+              <div class="kv"><span>基本給(21.0日 × 8,000)</span><span class="num">168,000</span></div>
+              <div class="kv"><span>残業</span><span class="num">0</span></div>
+              <div class="kv"><span>超過手当</span><span class="num">2,240</span></div>
+              <div class="kv"><span>交通費(距離計算)</span><span class="num">22,600</span></div>
+              <div class="kv"><span>特別勤務手当</span><span class="num">5,000</span></div>
+              <div class="kv"><span>運転手当</span><span class="num">42,000</span></div>
+              <div class="kv"><span>その他</span><span class="num">10,000</span></div>
+              <div class="kv tot"><span>支給合計</span><span class="num">249,840</span></div>
+              <div class="kv" style="border:0"><span class="hint">課税対象額</span><span class="num hint">200,404</span></div>
+            </div>
+            <div class="panel ded">
+              <h3>控除</h3>
+              <div class="kv"><span>所得税</span><span class="num">0</span></div>
+              <div class="kv"><span>健康保険</span><span class="num">9,117</span></div>
+              <div class="kv"><span>厚生年金</span><span class="num">16,470</span></div>
+              <div class="kv"><span>雇用保険</span><span class="num">1,249</span></div>
+              <div class="kv"><span>介護保険(40歳以上)</span><span class="num">0</span></div>
+              <div class="kv"><span>住民税</span><span class="num">12,000</span></div>
+              <div class="kv"><span>制服代</span><span class="num">1,000</span></div>
+              <div class="kv"><span>仮払い精算</span><span class="num">0</span></div>
+              <div class="kv tot"><span>控除合計</span><span class="num">39,836</span></div>
+            </div>
+          </div>
+          <div class="net"><span>差引支払額</span><span class="v">¥210,004</span></div>
+          <div class="foot">
+            <button class="btn" onclick="go(1)">戻る</button>
+            <button class="btn">所得税・社保 再計算</button>
+            <button class="btn">給与明細 再計算</button>
+            <button class="btn primary" onclick="go(3)">確定・出力へ ▶</button>
+          </div>
+          <p class="hint">支払明細(基本給・時間外・深夜・時給…)は勤務実績由来。明細クリックで実績へジャンプ。</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP3 確定・出力 -->
+    <section class="step hide" data-step="3">
+      <div class="panel">
+        <h3>③ 確定・出力</h3>
+        <p>対象 <b>3名</b> / 支給合計 <b>¥600,704</b> / 控除合計 <b>¥112,000</b> / 差引支払 <b>¥560,704</b></p>
+        <div class="opts">
+          <label><input type="checkbox" checked>給与を確定する(確定後ロック)</label>
+          <label><input type="checkbox">勤務明細付きで出力</label>
+          <label><input type="checkbox">給与明細住所を非表示</label>
+        </div>
+        <div class="foot">
+          <button class="btn" onclick="go(2)">戻る</button>
+          <button class="btn">給与明細 PDF</button>
+          <button class="btn">振込データ作成(全銀)</button>
+          <button class="btn primary">給与確定</button>
+        </div>
+        <p class="hint">確定後はロック。修正は再集計フローへ。隊員はスマホで明細をいつでも閲覧可(`docs/09`)。</p>
+      </div>
+    </section>
+  </main>
+</div>
+<script>
+  let step=1;
+  function go(s){step=s;
+    document.querySelectorAll('.step').forEach(el=>el.classList.toggle('hide',+el.dataset.step!==s));
+    document.querySelectorAll('.steps .st').forEach(el=>{const n=+el.dataset.s;el.classList.toggle('on',n===s);el.classList.toggle('done',n<s);});
+  }
+  document.querySelectorAll('.guardlist .gl').forEach(g=>g.addEventListener('click',()=>{
+    document.querySelectorAll('.guardlist .gl').forEach(x=>x.classList.remove('active'));g.classList.add('active');
+  }));
+</script>
+</body>
+</html>
