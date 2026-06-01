@@ -1,0 +1,694 @@
+// 警備Pro — Prisma スキーマ案 (PostgreSQL)
+// 出典: keibi-pro/12_data-model-erd.md を実行可能DDLに具体化。
+// 注意: これは新リポジトリ移植用の「たたき台」。命名・粒度はレビューで調整する。
+// 共通方針:
+//  - マルチテナント: 全モデルに tenantId(=会社) を持たせ RLS で分離。
+//  - 監査: createdAt/updatedAt/createdBy/updatedBy を基本付与(一部省略)。
+//  - 締め: 配置先(Site)単位。BillingSummary は site 単位で生成し得意先で束ねる。
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ───────────────────────── Enums ─────────────────────────
+enum RateForm        { monthly spot }
+enum PayForm         { monthly daily weekly }
+enum PayMethod       { cash bank post }
+enum AccountType     { ordinary checking }
+enum TaxMethod       { exclusive inclusive }
+enum Rounding        { floor round ceil }
+enum ReassignClass   { ok caution ng client_ng }
+enum EmpInsClass     { general daily exempt }
+enum LeaveUnit       { none days month ratio80 }
+enum GuardFlag       { employee outsource non_guard }
+enum SecurityType    { facility traffic transport personal } // 1〜4号
+enum AssignStatus    { open assigned notified departed unconfirmed actual }
+enum SummaryStatus   { draft aggregated closed }
+enum ReportStatus    { draft submitted approved rejected }
+enum UserRole        { owner admin dispatcher accounting branch_manager site_leader guard }
+enum RateItem        { base overtime day_ot early late hourly night night_ot extra }
+enum FixedKind       { payment deduction }
+enum ContractType    { type1 type2 } // 1号/2号
+
+// ───────────────────────── 組織・権限 ─────────────────────────
+model Company {
+  id           String   @id @default(uuid())
+  name         String
+  invoiceRegNo String?  // インボイス登録番号 T+13桁
+  address      String?
+  tel          String?
+  fax          String?
+  bankAccounts Json?    // 振込先口座(複数)
+  invoiceHeader Json?
+  branches     Branch[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Branch {
+  id        String   @id @default(uuid())
+  tenantId  String
+  company   Company  @relation(fields: [companyId], references: [id])
+  companyId String
+  code      String   // 01 等
+  name      String
+  users     User[]
+  clients   Client[]
+  guards    Guard[]
+  @@unique([companyId, code])
+}
+
+model User {
+  id          String   @id @default(uuid())
+  tenantId    String
+  branch      Branch   @relation(fields: [branchId], references: [id])
+  branchId    String
+  guard       Guard?   @relation(fields: [guardId], references: [id])
+  guardId     String?  // 隊員アカウントの場合
+  name        String
+  email       String   @unique
+  role        UserRole
+  permissions Json?    // 画面/機能/データ範囲の上書き
+  status      String   @default("active") // active/disabled
+  createdAt   DateTime @default(now())
+}
+
+// ───────────────────────── 取引先・現場 ─────────────────────────
+model Client {
+  id             String   @id @default(uuid())
+  tenantId       String
+  branch         Branch   @relation(fields: [branchId], references: [id])
+  branchId       String
+  code           String   // 6桁
+  name           String
+  kana           String?
+  billingAddress String?
+  tel            String?
+  fax            String?
+  invoiceNote    String?
+  sites          Site[]
+  payments       Payment[]
+  billings       BillingSummary[]
+  @@unique([branchId, code])
+}
+
+/// 配置先(現場)— 締め設定の保持先(★現場単位で締め)
+model Site {
+  id             String   @id @default(uuid())
+  tenantId       String
+  client         Client   @relation(fields: [clientId], references: [id])
+  clientId       String
+  branchId       String
+  code           String   // 4桁(得意先配下)
+  name           String
+  kana           String?
+  shortName      String?
+  siteAddress    String?
+  billingAddress String?
+  subject        String?  // 件名
+  duty           String?  // 担当業務
+  securityType   SecurityType?
+  supervisorName String?
+  siteTel        String?
+  reportEmail    String?  // 管制日報送付先
+  salesRep       String?
+  // 締め・サイクル(現場単位)
+  closingDay            Int?  // 締日
+  billingOffsetMonths   Int?  // 請求 Nヶ月後
+  billingDay            Int?
+  paymentOffsetMonths   Int?  // 入金 Nヶ月後
+  paymentDay            Int?
+  taxMethod      TaxMethod @default(exclusive)
+  rounding       Rounding  @default(floor)
+  taxRate        Decimal   @default(0.10)
+  radioFeePerUnit Int?
+  radioFeePerSet  Int?
+  rateForm       RateForm  @default(spot)
+  autoHourly       Boolean @default(false)
+  payHourlyPriority Boolean @default(false)
+  rateRank       String?
+  hasKentaikyo   Boolean @default(false)
+  contractSigned Boolean @default(false)
+  monthly        Json?    // 月極(契約人数/時間/単価)
+  cancelPolicy   Json?    // キャンセル料規定(第10項)を設定値化
+  rates          SiteRate[]
+  orders         Order[]
+  contracts      Contract[]
+  attendances    Attendance[]
+  billings       BillingSummary[]
+  @@unique([clientId, code])
+}
+
+/// 請求単価(現場 × 勤務種別 × 項目)
+model SiteRate {
+  id         String   @id @default(uuid())
+  tenantId   String
+  site       Site     @relation(fields: [siteId], references: [id])
+  siteId     String
+  workType   WorkType @relation(fields: [workTypeId], references: [id])
+  workTypeId String
+  item       RateItem
+  amount     Int
+  @@unique([siteId, workTypeId, item])
+}
+
+model Contract {
+  id        String       @id @default(uuid())
+  tenantId  String
+  site      Site         @relation(fields: [siteId], references: [id])
+  siteId    String
+  type      ContractType
+  terms     Json         // 20項目(期間/時間/場所/人員/料金/キャンセル料/賠償…)
+  signedAt  DateTime?
+}
+
+// ───────────────────────── 隊員 ─────────────────────────
+model Guard {
+  id            String   @id @default(uuid())
+  tenantId      String
+  branch        Branch   @relation(fields: [branchId], references: [id])
+  branchId      String
+  code          String   // 6桁
+  name          String
+  kana          String?
+  gender        String?
+  flags         GuardFlag[]
+  category      GuardCategory? @relation(fields: [categoryId], references: [id])
+  categoryId    String?
+  address       String?
+  tel           String?
+  tel2          String?  // 教育Pro携帯欄
+  email         String?
+  fax           String?
+  emergency     Json?    // 緊急連絡先
+  joinedOn      DateTime?
+  leftOn        DateTime?
+  isLeft        Boolean  @default(false)
+  priorExpMonths Int?
+  expMonths     Int?
+  payForm       PayForm  @default(daily)
+  hasSpouse     Boolean  @default(false)
+  joinEmpIns    Boolean  @default(false)
+  joinSocialIns Boolean  @default(false)
+  incomeTaxClass String? // 月額(甲)等
+  dependents    Int      @default(0)
+  monthlySalary Int?
+  lateUnitPrice Int?
+  perfectAttendance Json? // Nカウント以上でX円
+  rateRank      String?
+  payMethod     PayMethod @default(bank)
+  useDailyPay   Boolean  @default(false)
+  hideAddressOnSlip Boolean @default(false)
+  notes         String?
+  qualText      String?
+  // relations
+  users         User[]
+  rates         GuardRate[]
+  bankAccounts  GuardBankAccount[]
+  socialInsurance GuardSocialInsurance?
+  residentTax   GuardResidentTax[]
+  fixedLines    GuardFixedLine[]
+  qualAllowances GuardQualAllowance[]
+  heldQuals     GuardHeldQual[]
+  noPairs       GuardNoPair[] @relation("guardNoPair")
+  claims        GuardClaim[]
+  paidLeave     GuardPaidLeave?
+  assignments   Assignment[]
+  attendances   Attendance[]
+  shiftRequests ShiftRequest[]
+  payrolls      Payroll[]
+  bonuses       Bonus[]
+  @@unique([branchId, code])
+}
+
+model GuardRate {
+  id         String   @id @default(uuid())
+  tenantId   String
+  guard      Guard    @relation(fields: [guardId], references: [id])
+  guardId    String
+  workType   WorkType @relation(fields: [workTypeId], references: [id])
+  workTypeId String
+  item       RateItem
+  amount     Int
+  allowance1Code   String?
+  allowance1Amount Int?
+  allowance2Code   String?
+  allowance2Amount Int?
+  @@unique([guardId, workTypeId, item])
+}
+
+model GuardBankAccount {
+  id          String      @id @default(uuid())
+  tenantId    String
+  guard       Guard       @relation(fields: [guardId], references: [id])
+  guardId     String
+  bankCode    String?
+  branchCode  String?
+  accountType AccountType @default(ordinary)
+  accountNo   String?
+  accountName String?
+  feeByGuard  Boolean     @default(true)
+  slot        String?     // 給与振込①…
+  symbolNo    String?
+}
+
+model GuardSocialInsurance {
+  id              String   @id @default(uuid())
+  tenantId        String
+  guard           Guard    @relation(fields: [guardId], references: [id])
+  guardId         String   @unique
+  stdRemuneration Int?     // 4-6月平均報酬
+  healthInsAmount Int?
+  pensionAmount   Int?
+  empInsAmount    Int?
+  careInsAmount   Int?     // 40歳以上で計上
+  healthInsNo     String?
+  healthInsName   String?  // 協会けんぽ/組合
+  pensionName     String?
+  pensionReceiver Boolean  @default(false)
+  empInsClass     EmpInsClass @default(general)
+  empInsNo        String?
+  hasKentaikyo    Boolean  @default(false)
+  voluntarySenior Boolean  @default(false)
+}
+
+model GuardResidentTax {
+  id       String @id @default(uuid())
+  tenantId String
+  guard    Guard  @relation(fields: [guardId], references: [id])
+  guardId  String
+  year     Int
+  month    Int    // 6..翌5
+  amount   Int
+  @@unique([guardId, year, month])
+}
+
+model GuardFixedLine {
+  id                 String    @id @default(uuid())
+  tenantId           String
+  guard              Guard     @relation(fields: [guardId], references: [id])
+  guardId            String
+  kind               FixedKind // payment/deduction
+  code               String
+  name               String
+  amount             Int
+  skipIfNoAttendance Boolean   @default(false)
+}
+
+model GuardQualAllowance {
+  id       String  @id @default(uuid())
+  tenantId String
+  guard    Guard   @relation(fields: [guardId], references: [id])
+  guardId  String
+  qualCode String
+  amount   Int
+  taxable  Boolean @default(true)
+}
+
+model GuardHeldQual {
+  id              String        @id @default(uuid())
+  tenantId        String
+  guard           Guard         @relation(fields: [guardId], references: [id])
+  guardId         String
+  qualification   Qualification @relation(fields: [qualificationId], references: [id])
+  qualificationId String
+  printOnLicense  Boolean       @default(false)
+}
+
+/// 同配置NG(隊員↔隊員、自己参照)
+model GuardNoPair {
+  id        String @id @default(uuid())
+  tenantId  String
+  guard     Guard  @relation("guardNoPair", fields: [guardId], references: [id])
+  guardId   String
+  ngGuardId String
+  note      String?
+  @@unique([guardId, ngGuardId])
+}
+
+model GuardClaim {
+  id            String        @id @default(uuid())
+  tenantId      String
+  guard         Guard         @relation(fields: [guardId], references: [id])
+  guardId       String
+  date          DateTime
+  clientId      String?
+  siteId        String?
+  reassignClass ReassignClass @default(ok)
+  content       String?
+}
+
+model GuardPaidLeave {
+  id            String    @id @default(uuid())
+  tenantId      String
+  guard         Guard     @relation(fields: [guardId], references: [id])
+  guardId       String    @unique
+  grantBaseDate DateTime?
+  prevGrantDate DateTime?
+  calcStartDate DateTime?
+  showOnSlip    Boolean   @default(true)
+  unit          LeaveUnit @default(month)
+}
+
+// ───────────────────────── 勤務・区分マスタ ─────────────────────────
+model WorkType {
+  id           String   @id @default(uuid())
+  tenantId     String
+  code         String   // 001 日勤 等
+  name         String
+  baseStart    String?  // "09:00"
+  baseEnd      String?  // "18:00"
+  isNight      Boolean  @default(false)
+  isHoliday    Boolean  @default(false)
+  requiresQual Boolean  @default(false)
+  siteRates    SiteRate[]
+  guardRates   GuardRate[]
+  orders       Order[]
+  assignments  Assignment[]
+  attendances  Attendance[]
+  @@unique([tenantId, code])
+}
+
+model GuardCategory { id String @id @default(uuid()) tenantId String code String name String guards Guard[] @@unique([tenantId, code]) }
+model Qualification { id String @id @default(uuid()) tenantId String code String name String held GuardHeldQual[] @@unique([tenantId, code]) }
+
+// ───────────────────────── トランザクション ─────────────────────────
+/// 受注枠(現場×勤務×月)
+model Order {
+  id         String   @id @default(uuid())
+  tenantId   String
+  branchId   String
+  site       Site     @relation(fields: [siteId], references: [id])
+  siteId     String
+  workType   WorkType @relation(fields: [workTypeId], references: [id])
+  workTypeId String
+  yearMonth  String   // "2026-06"
+  details    OrderDetail[]
+  @@unique([siteId, workTypeId, yearMonth])
+}
+
+model OrderDetail {
+  id            String   @id @default(uuid())
+  tenantId      String
+  order         Order    @relation(fields: [orderId], references: [id])
+  orderId       String
+  date          DateTime
+  requiredCount Int
+  @@unique([orderId, date])
+}
+
+/// 配置(割当)
+model Assignment {
+  id         String       @id @default(uuid())
+  tenantId   String
+  date       DateTime
+  branchId   String
+  siteId     String
+  workType   WorkType     @relation(fields: [workTypeId], references: [id])
+  workTypeId String
+  guard      Guard        @relation(fields: [guardId], references: [id])
+  guardId    String
+  status     AssignStatus @default(open)
+  slotNo     Int
+  notifiedAt DateTime?
+  departedAt DateTime?
+  finishedAt DateTime?
+  attendance Attendance?
+  @@unique([date, siteId, workTypeId, guardId])
+  @@index([date, siteId, workTypeId])
+}
+
+/// 勤務実績(★中心テーブル)
+model Attendance {
+  id              String   @id @default(uuid())
+  tenantId        String
+  date            DateTime
+  branchId        String
+  clientId        String
+  site            Site     @relation(fields: [siteId], references: [id])
+  siteId          String
+  workType        WorkType @relation(fields: [workTypeId], references: [id])
+  workTypeId      String
+  guard           Guard    @relation(fields: [guardId], references: [id])
+  guardId         String
+  assignment      Assignment? @relation(fields: [assignmentId], references: [id])
+  assignmentId    String?  @unique
+  baseStart       String?
+  baseEnd         String?
+  reportStart     String?
+  reportEnd       String?
+  billingPct      Decimal  @default(1.0)
+  payPct          Decimal  @default(1.0)
+  breakMin        Int      @default(0)
+  nightBreakMin   Int      @default(0)
+  early           Decimal  @default(0)
+  dayOt           Decimal  @default(0)
+  overtime        Decimal  @default(0)
+  late            Decimal  @default(0)
+  radioUnits      Int      @default(0)
+  radioSets       Int      @default(0)
+  transportFee    Int      @default(0)
+  taxableTransport Int     @default(0)
+  fuelFee         Int      @default(0)
+  prevDiff        Int      @default(0)
+  equipmentFee    Int      @default(0)
+  heatFee         Int      @default(0)
+  driveAllowance  Int      @default(0)
+  qualAllowance   Int      @default(0)
+  distance        Decimal?
+  restrictionCar  Boolean  @default(false)
+  actualH         Decimal  @default(0)
+  billingH        Decimal  @default(0)
+  payH            Decimal  @default(0)
+  isDailyPay      Boolean  @default(false)
+  rateOverrides   Json?    // 行単位の請求/給与単価上書き(null=マスタ参照)
+  billingSummary  BillingSummary? @relation(fields: [billingSummaryId], references: [id])
+  billingSummaryId String?
+  payroll         Payroll? @relation(fields: [payrollId], references: [id])
+  payrollId       String?
+  dailyReports    DailyReport[]
+  @@index([date, siteId, guardId, workTypeId])
+}
+
+/// 日報
+model DailyReport {
+  id           String       @id @default(uuid())
+  tenantId     String
+  date         DateTime
+  siteId       String
+  guardId      String
+  attendance   Attendance?  @relation(fields: [attendanceId], references: [id])
+  attendanceId String?
+  reportStart  String?
+  reportEnd    String?
+  breakMin     Int          @default(0)
+  weather      String?
+  notes        String?
+  incident     Boolean      @default(false)
+  status       ReportStatus @default(submitted)
+  submittedAt  DateTime?
+  approvedBy   String?
+  gpsPoint     Json?
+  photos       ReportPhoto[]
+}
+
+model ReportPhoto {
+  id            String      @id @default(uuid())
+  tenantId      String
+  report        DailyReport @relation(fields: [reportId], references: [id])
+  reportId      String
+  kind          String      // 日報/作業確認書/レシート
+  driveFileId   String      // Google Drive ファイルID
+  driveUrl      String?
+  thumbnailUrl  String?
+  ocrText       String?
+  uploadedAt    DateTime    @default(now())
+}
+
+model ShiftRequest {
+  id             String   @id @default(uuid())
+  tenantId       String
+  guard          Guard    @relation(fields: [guardId], references: [id])
+  guardId        String
+  targetPeriod   String
+  availableDates Json?
+  ngDates        Json?
+  preferredSites Json?
+  maxConsecutive Int?
+  note           String?
+  status         String   @default("submitted")
+}
+
+// ───────────────────────── 請求(現場単位で締め)─────────────────────────
+model BillingSummary {
+  id           String        @id @default(uuid())
+  tenantId     String
+  client       Client        @relation(fields: [clientId], references: [id])
+  clientId     String
+  site         Site          @relation(fields: [siteId], references: [id])
+  siteId       String
+  periodStart  DateTime
+  periodEnd    DateTime
+  closingDay   Int
+  taxRate      Decimal
+  taxMethod    TaxMethod
+  rounding     Rounding
+  subtotal     Int           @default(0)
+  discount     Int           @default(0)
+  additionalTotal Int        @default(0)
+  tax          Int           @default(0)
+  nonTaxable   Int           @default(0)
+  total        Int           @default(0)
+  status       SummaryStatus @default(draft)
+  invoiceNo    String?
+  issuedAt     DateTime?
+  lines        BillingLine[]
+  additionals  AdditionalBilling[]
+  allocations  PaymentAllocation[]
+  attendances  Attendance[]
+  @@index([clientId, periodStart, periodEnd])
+}
+
+model BillingLine {
+  id               String         @id @default(uuid())
+  tenantId         String
+  summary          BillingSummary @relation(fields: [summaryId], references: [id])
+  summaryId        String
+  date             DateTime
+  workTypeId       String?
+  billingForm      RateForm?
+  headcount        Decimal        @default(1)
+  unitPrice        Int            @default(0)
+  amount           Int            @default(0)
+  sourceAttendanceId String?      // 実績へジャンプ
+}
+
+model AdditionalBilling {
+  id        String         @id @default(uuid())
+  tenantId  String
+  summary   BillingSummary @relation(fields: [summaryId], references: [id])
+  summaryId String
+  date      DateTime
+  name      String
+  qty       Decimal        @default(1)
+  unitPrice Int
+  taxRate   Decimal
+  amount    Int
+  taxable   Boolean        @default(true)
+}
+
+// ───────────────────────── 入金(売掛・消込)─────────────────────────
+model Payment {
+  id            String   @id @default(uuid())
+  tenantId      String
+  client        Client   @relation(fields: [clientId], references: [id])
+  clientId      String
+  scheduledDate DateTime?
+  paidDate      DateTime?
+  amount        Int      @default(0)
+  fee           Int      @default(0)
+  safetyFee     Int      @default(0)
+  adjustment    Int      @default(0)
+  aggregateYm   String?
+  allocations   PaymentAllocation[]
+}
+
+model PaymentAllocation {
+  id              String         @id @default(uuid())
+  tenantId        String
+  payment         Payment        @relation(fields: [paymentId], references: [id])
+  paymentId       String
+  summary         BillingSummary @relation(fields: [summaryId], references: [id])
+  summaryId       String
+  allocatedAmount Int
+}
+
+// ───────────────────────── 給与(締め期間)─────────────────────────
+model Payroll {
+  id             String        @id @default(uuid())
+  tenantId       String
+  guard          Guard         @relation(fields: [guardId], references: [id])
+  guardId        String
+  periodStart    DateTime
+  periodEnd      DateTime
+  workDays       Decimal       @default(0)
+  actualH        Decimal       @default(0)
+  payTotal       Int           @default(0)
+  taxableAmount  Int           @default(0)
+  deductionTotal Int           @default(0)
+  netPay         Int           @default(0)
+  status         SummaryStatus @default(draft)
+  paidOn         DateTime?
+  confirmed      Boolean       @default(false)
+  lines          PayrollLine[]
+  allowances     PayrollAllowance[]
+  deductions     PayrollDeduction[]
+  attendances    Attendance[]
+  @@index([guardId, periodStart, periodEnd])
+}
+
+model PayrollLine {
+  id               String  @id @default(uuid())
+  tenantId         String
+  payroll          Payroll @relation(fields: [payrollId], references: [id])
+  payrollId        String
+  date             DateTime
+  siteId           String?
+  workTypeId       String?
+  payPct           Decimal @default(1)
+  unitPrice        Int     @default(0)
+  basePay          Int     @default(0)
+  totalPay         Int     @default(0)
+  sourceAttendanceId String?
+}
+
+model PayrollAllowance {
+  id        String  @id @default(uuid())
+  tenantId  String
+  payroll   Payroll @relation(fields: [payrollId], references: [id])
+  payrollId String
+  code      String
+  name      String
+  amount    Int
+  taxable   Boolean @default(true)
+}
+
+model PayrollDeduction {
+  id        String  @id @default(uuid())
+  tenantId  String
+  payroll   Payroll @relation(fields: [payrollId], references: [id])
+  payrollId String
+  code      String
+  name      String
+  amount    Int
+}
+
+model Bonus {
+  id         String   @id @default(uuid())
+  tenantId   String
+  guard      Guard    @relation(fields: [guardId], references: [id])
+  guardId    String
+  period     String
+  payments   Json?
+  deductions Json?
+  net        Int      @default(0)
+}
+
+// ───────────────────────── 横断 ─────────────────────────
+model AuditLog {
+  id          String   @id @default(uuid())
+  tenantId    String
+  actorUserId String
+  action      String
+  entity      String
+  entityId    String
+  before      Json?
+  after       Json?
+  at          DateTime @default(now())
+  @@index([entity, entityId])
+}
