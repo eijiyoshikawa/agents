@@ -9,7 +9,9 @@
   },
   "scripts": {
     "dry": "DRY_RUN=1 node set-kansai-a.mjs",
-    "run": "node set-kansai-a.mjs"
+    "run": "node set-kansai-a.mjs",
+    "dry:d": "DRY_RUN=1 node set-small-d.mjs",
+    "run:d": "node set-small-d.mjs"
   },
   "dependencies": {
     "@notionhq/client": "^2.2.15"
