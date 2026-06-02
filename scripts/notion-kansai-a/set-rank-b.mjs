@@ -4,10 +4,11 @@
  * DB_顧客管理（database_id: 1ac3fae434994991b465e375bef7d66c）に対し、
  * 「関西以外 × 従業員数30名以上」の企業の「見込み度合い」を "B" に設定する冪等スクリプト。
  *
- * 「関西以外」の定義は A 設定（set-kansai-a.mjs）の裏返し。
- *   A = 30名以上 AND 住所に関西4府県を含む AND 東京都を含まない
+ * 「関西以外」の定義は A 設定（set-kansai-a.mjs）の裏返し。関西＝大阪・京都・兵庫の3府県。
+ *   A = 30名以上 AND 住所に関西3府県を含む AND 東京都を含まない
  *   B = 30名以上 AND NOT(A のエリア条件)
- *     = 30名以上 AND ( 東京都を含む OR 関西4府県をいずれも含まない )
+ *     = 30名以上 AND ( 東京都を含む OR 関西3府県をいずれも含まない )
+ *   ※滋賀県は関西に含めない＝滋賀の30名以上は B。
  * これにより「東京都府中市」が "京都府" に部分一致して関西扱いされる事故を防ぎつつ、
  * 東京都府中市の企業は正しく B（関西外）に入る。
  *
@@ -34,8 +35,9 @@ const PROSPECT_PROP = "見込み度合い"; // select: A / B / C / D
 const TARGET_VALUE = "B";
 const EMPLOYEE_PROP = "従業員数"; // number
 const ADDRESS_PROP = "住所"; // rich_text
-// A 設定と完全に同じ関西4府県（滋賀県を含む）。ここを変えると A/B の境界が変わる。
-const KANSAI = ["大阪府", "京都府", "兵庫県", "滋賀県"];
+// 関西＝大阪・京都・兵庫の3府県。滋賀県はここに含めない＝滋賀の30名以上は B 扱い。
+// （A 設定は当初4府県で実行したため滋賀30名以上は一旦Aになっているが、本スクリプトでBへ移る）
+const KANSAI = ["大阪府", "京都府", "兵庫県"];
 const TOKYO = "東京都";
 const PAGE_SIZE = 100;
 const UPDATE_SLEEP_MS = 350;
@@ -63,7 +65,7 @@ const filter = {
       or: [
         // 東京都府中市など「東京都」を含む住所は関西外なので B 対象
         { property: ADDRESS_PROP, rich_text: { contains: TOKYO } },
-        // 関西4府県をいずれも含まない＝関西外
+        // 関西3府県をいずれも含まない＝関西外（滋賀はここに該当しBになる）
         {
           and: KANSAI.map((kw) => ({
             property: ADDRESS_PROP,

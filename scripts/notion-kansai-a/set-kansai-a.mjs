@@ -2,7 +2,8 @@
 // @ts-check
 /**
  * DB_顧客管理（database_id: 1ac3fae434994991b465e375bef7d66c）に対し、
- * 「関西（大阪/京都/兵庫/滋賀）かつ従業員数 >= 30」の企業の
+ * 「関西（大阪/京都/兵庫）かつ従業員数 >= 30」の企業の
+ * （滋賀県は B 扱いのため関西に含めない。初回は4府県で実行済みだが、滋賀30名以上は run:b で B に移る）
  * 「見込み度合い」を一括で "A" に設定する冪等スクリプト。
  *
  * - 既に "A" のページはスキップ（途中停止しても再実行で続きから処理可能）
@@ -27,7 +28,7 @@ const PROSPECT_PROP = "見込み度合い"; // select: A / B / C / D
 const TARGET_VALUE = "A";
 const EMPLOYEE_PROP = "従業員数"; // number
 const ADDRESS_PROP = "住所"; // rich_text
-const KANSAI = ["大阪府", "京都府", "兵庫県", "滋賀県"];
+const KANSAI = ["大阪府", "京都府", "兵庫県"]; // 滋賀県は含めない（B 扱い）
 const EXCLUDE = "東京都"; // 東京都府中市の "京都府" 部分一致を除外
 const PAGE_SIZE = 100;
 const UPDATE_SLEEP_MS = 350; // 更新間スリープ（レート制御）
