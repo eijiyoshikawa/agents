@@ -78,6 +78,22 @@ const filter = {
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+const NET_CODES = new Set([
+  "ECONNRESET", "ETIMEDOUT", "ECONNREFUSED", "EAI_AGAIN",
+  "EPIPE", "ENOTFOUND", "UND_ERR_SOCKET", "UND_ERR_CONNECT_TIMEOUT",
+]);
+
+/** ECONNRESET 等の一時的なネットワーク/接続エラーか判定する。 */
+function isNetworkError(err) {
+  if (!err) return false;
+  const code = err.code || err?.cause?.code;
+  if (code && NET_CODES.has(code)) return true;
+  if (err.name === "RequestTimeoutError") return true;
+  return /ECONNRESET|ETIMEDOUT|ECONNREFUSED|EAI_AGAIN|socket hang up|fetch failed|network/i.test(
+    String(err.message || "")
+  );
+}
+
 /**
  * Notion API 呼び出しを 429（Retry-After 準拠）/ 5xx（指数バックオフ）でリトライする。
  * @template T
@@ -102,6 +118,12 @@ async function withRetry(fn, label) {
       if (status >= 500 && status < 600 && !isLast) {
         const backoff = Math.min(2 ** attempt * 500, 16000);
         console.warn(`  [${status}] ${label}: ${backoff}ms 後に再試行`);
+        await sleep(backoff);
+        continue;
+      }
+      if (isNetworkError(err) && !isLast) {
+        const backoff = Math.min(2 ** attempt * 500, 16000);
+        console.warn(`  [NET] ${label}: ${err.code || err.message}; ${backoff}ms 後に再試行`);
         await sleep(backoff);
         continue;
       }
