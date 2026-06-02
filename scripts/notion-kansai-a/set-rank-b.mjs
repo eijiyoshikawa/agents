@@ -58,22 +58,21 @@ const notion = new Client({
   notionVersion: "2022-06-28",
 });
 
+// Notion のフィルタは2階層までしかネストできないため、
+//   E AND ( 東京都 OR (not大阪 AND not京都 AND not兵庫) )
+// を論理分配して
+//   E AND (東京都 OR not大阪) AND (東京都 OR not京都) AND (東京都 OR not兵庫)
+// と表現する（and→or→葉 の2階層に収める）。
+// 東京都府中市は「東京都」を含むため各 or が真になり、正しく B 側に入る。
 const filter = {
   and: [
     { property: EMPLOYEE_PROP, number: { greater_than_or_equal_to: 30 } },
-    {
+    ...KANSAI.map((kw) => ({
       or: [
-        // 東京都府中市など「東京都」を含む住所は関西外なので B 対象
         { property: ADDRESS_PROP, rich_text: { contains: TOKYO } },
-        // 関西3府県をいずれも含まない＝関西外（滋賀はここに該当しBになる）
-        {
-          and: KANSAI.map((kw) => ({
-            property: ADDRESS_PROP,
-            rich_text: { does_not_contain: kw },
-          })),
-        },
+        { property: ADDRESS_PROP, rich_text: { does_not_contain: kw } },
       ],
-    },
+    })),
   ],
 };
 
