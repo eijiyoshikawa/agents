@@ -1,0 +1,17 @@
+{
+  "name": "notion-kansai-a",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DB_顧客管理で関西・従業員30名以上の企業の見込み度合いを一括Aに設定する冪等スクリプト",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dry": "DRY_RUN=1 node set-kansai-a.mjs",
+    "run": "node set-kansai-a.mjs"
+  },
+  "dependencies": {
+    "@notionhq/client": "^2.2.15"
+  }
+}

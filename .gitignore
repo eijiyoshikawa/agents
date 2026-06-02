@@ -38,3 +38,7 @@ Thumbs.db
 
 # セキュリティスキャンレポート（機密情報を含む可能性）
 security-report.json
+
+# Notion一括更新スクリプトのランタイム生成物
+scripts/notion-kansai-a/updated-log.csv
+scripts/notion-kansai-a/package-lock.json
