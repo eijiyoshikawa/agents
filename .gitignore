@@ -42,4 +42,6 @@ security-report.json
 # Notion一括更新スクリプトのランタイム生成物
 scripts/notion-kansai-a/updated-log.csv
 scripts/notion-kansai-a/updated-log-small-d.csv
+scripts/notion-kansai-a/updated-log-rank-b.csv
+scripts/notion-kansai-a/updated-log-rank-c.csv
 scripts/notion-kansai-a/package-lock.json

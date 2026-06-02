@@ -11,7 +11,11 @@
     "dry": "DRY_RUN=1 node set-kansai-a.mjs",
     "run": "node set-kansai-a.mjs",
     "dry:d": "DRY_RUN=1 node set-small-d.mjs",
-    "run:d": "node set-small-d.mjs"
+    "run:d": "node set-small-d.mjs",
+    "dry:b": "DRY_RUN=1 node set-rank-b.mjs",
+    "run:b": "node set-rank-b.mjs",
+    "dry:c": "DRY_RUN=1 node set-rank-c.mjs",
+    "run:c": "node set-rank-c.mjs"
   },
   "dependencies": {
     "@notionhq/client": "^2.2.15"
