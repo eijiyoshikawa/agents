@@ -5,12 +5,16 @@ import { Download, AlertCircle, Loader2 } from "lucide-react";
 import type { ExtractResponse, JobPosting } from "@/lib/types";
 import { LET_COMPANY } from "@/lib/company";
 import { letMarkSvg } from "@/lib/logo";
-import { requestExtract, downloadPdf } from "@/lib/client";
+import { requestExtract, requestFromText, downloadPdf } from "@/lib/client";
 import { UrlInputForm } from "@/components/UrlInputForm";
+import { TextInputForm } from "@/components/TextInputForm";
 import { JobEditor } from "@/components/JobEditor";
 import { JobPreview } from "@/components/JobPreview";
 
+type Mode = "url" | "text";
+
 export default function Home() {
+  const [mode, setMode] = useState<Mode>("url");
   const [loading, setLoading] = useState(false);
   const [pdfLoading, setPdfLoading] = useState(false);
   const [error, setError] = useState("");
@@ -22,6 +26,20 @@ export default function Home() {
     setError("");
     try {
       const res = await requestExtract(urls);
+      setJob(res.job);
+      setSources(res.sources);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "エラーが発生しました。");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleText(text: string) {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await requestFromText(text);
       setJob(res.job);
       setSources(res.sources);
     } catch (e) {
@@ -47,8 +65,20 @@ export default function Home() {
   return (
     <main className="mx-auto max-w-[1280px] px-6 py-12 md:px-10">
       <Header />
-      <section className="mt-10 rounded-3xl border border-border-soft bg-surface p-6 md:p-8">
-        <UrlInputForm loading={loading} onSubmit={handleExtract} />
+      <div className="mt-10 flex gap-2">
+        <ModeTab active={mode === "url"} onClick={() => setMode("url")}>
+          他社URLから作る
+        </ModeTab>
+        <ModeTab active={mode === "text"} onClick={() => setMode("text")}>
+          テキストから整理する
+        </ModeTab>
+      </div>
+      <section className="mt-3 rounded-3xl border border-border-soft bg-surface p-6 md:p-8">
+        {mode === "url" ? (
+          <UrlInputForm loading={loading} onSubmit={handleExtract} />
+        ) : (
+          <TextInputForm loading={loading} onSubmit={handleText} />
+        )}
       </section>
 
       {error && (
@@ -96,6 +126,29 @@ export default function Home() {
         </section>
       )}
     </main>
+  );
+}
+
+function ModeTab({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-300 ${
+        active
+          ? "bg-ink text-cream"
+          : "border border-border-soft bg-white text-ink hover:border-ink"
+      }`}
+    >
+      {children}
+    </button>
   );
 }
 

@@ -33,9 +33,24 @@ export type Salary = z.infer<typeof SalarySchema>;
 export type JobPosting = z.infer<typeof JobPostingSchema>;
 
 /** 抽出API のリクエスト/レスポンス */
-export const ExtractRequestSchema = z.object({
+/** URLモード: 他社求人URLを統合 */
+export const ExtractUrlRequestSchema = z.object({
+  mode: z.literal("url"),
   urls: z.array(z.string().url()).min(1).max(8),
 });
+
+/** テキストモード: 自由記述の素案をAIが整理 */
+export const ExtractTextRequestSchema = z.object({
+  mode: z.literal("text"),
+  text: z.string().min(10).max(20000),
+});
+
+/** 後方互換: mode 未指定なら urls があれば url モード扱い */
+export const ExtractRequestSchema = z.union([
+  ExtractUrlRequestSchema,
+  ExtractTextRequestSchema,
+  z.object({ urls: z.array(z.string().url()).min(1).max(8) }),
+]);
 export type ExtractRequest = z.infer<typeof ExtractRequestSchema>;
 
 export interface ExtractResponse {
