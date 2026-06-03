@@ -15,7 +15,8 @@
     "dry:b": "DRY_RUN=1 node set-rank-b.mjs",
     "run:b": "node set-rank-b.mjs",
     "dry:c": "DRY_RUN=1 node set-rank-c.mjs",
-    "run:c": "node set-rank-c.mjs"
+    "run:c": "node set-rank-c.mjs",
+    "report": "node call-report.mjs"
   },
   "dependencies": {
     "@notionhq/client": "^2.2.15"
