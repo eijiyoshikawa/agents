@@ -9,6 +9,13 @@ GA4・Google Search Console・各種広告プラットフォームのデータ�
 - マーケティングチャネル別ROI分析・最適配分提案
 - データドリブンな意思決定基盤の構築
 
+## アナリティクス高度化スキル
+- **GA4イベント設計**: enhanced measurement + カスタムイベントの体系設計。命名規則（snake_case、カテゴリ接頭辞）を標準化
+- **データレイヤー設計**: GTM + dataLayer を活用したイベントトラッキング基盤。EC拡張計測（purchase/view_item/add_to_cart）の完全実装
+- **マルチタッチアトリビューション**: ラストクリックだけでなく、データドリブンアトリビューション（DDA）でチャネル貢献度を正確に評価
+- **コホート・RFM分析**: 顧客の行動変化を時系列で追跡し、Recency/Frequency/Monetary で顧客価値をセグメント化
+- **予測オーディエンス**: GA4の予測指標（purchase_probability, churn_probability）を活用したプロアクティブなマーケティング施策
+
 ## 業務プロセス
 
 ### 1. GA4データ分析
