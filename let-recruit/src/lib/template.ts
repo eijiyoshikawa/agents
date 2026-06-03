@@ -196,6 +196,7 @@ export function esc(input: string): string {
 
 function styles(b: CompanyProfile["brand"]): string {
   return `
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Work+Sans:wght@400;600;700&display=swap');
 :root{
   --ink:${b.ink}; --cream:${b.cream}; --accent:${b.accent};
   --accent-dark:${b.accentDark}; --surface:${b.surface};
@@ -203,7 +204,7 @@ function styles(b: CompanyProfile["brand"]): string {
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{background:var(--cream);color:var(--ink);
-  font-family:"Work Sans",-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+  font-family:"Work Sans","Noto Sans JP",-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
   -webkit-font-smoothing:antialiased;line-height:1.75;}
 .sheet{width:210mm;min-height:297mm;margin:0 auto;background:var(--cream);
   padding:18mm 16mm;position:relative;}

@@ -12,8 +12,27 @@ const CHROMIUM_PACK_URL =
   "https://github.com/Sparticuz/chromium/releases/download/v140.0.0/chromium-v140.0.0-pack.x64.tar";
 
 /**
+ * サーバーレスのChromiumには日本語フォントが無く、日本語が「豆腐」になって
+ * 消えるため、起動前に日本語フォント(Noto Sans JP)を読み込ませる。
+ * font() は実行ごとに一度だけ呼べばよい。
+ */
+const JP_FONT_URL =
+  "https://raw.githubusercontent.com/googlefonts/noto-cjk/main/Sans/OTF/Japanese/NotoSansCJKjp-Regular.otf";
+
+let fontLoaded = false;
+async function ensureJapaneseFont(): Promise<void> {
+  if (fontLoaded) return;
+  try {
+    await chromium.font(JP_FONT_URL);
+    fontLoaded = true;
+  } catch {
+    // フォント取得に失敗してもPDF生成自体は継続する
+  }
+}
+
+/**
  * 環境に応じてヘッドレスChromeを起動する。
- * - 本番(Vercel等のserverless): @sparticuz/chromium のリモートパックを使用
+ * - 本番(Vercel等のserverless): @sparticuz/chromium のリモートパック+日本語フォント
  * - ローカル: PUPPETEER_EXECUTABLE_PATH で指定したChrome/Chromiumを使用
  */
 async function launchBrowser(): Promise<Browser> {
@@ -25,6 +44,7 @@ async function launchBrowser(): Promise<Browser> {
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
   }
+  await ensureJapaneseFont();
   const executablePath = await chromium.executablePath(CHROMIUM_PACK_URL);
   return puppeteer.launch({
     args: chromium.args,
@@ -38,7 +58,10 @@ export async function htmlToPdf(html: string): Promise<Uint8Array> {
   const browser = await launchBrowser();
   try {
     const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "load" });
+    // 外部フォント(Noto Sans JP)の読み込み完了を待つため networkidle0
+    await page.setContent(html, { waitUntil: "networkidle0" });
+    // Webフォントの確実な適用を待機
+    await page.evaluateHandle("document.fonts.ready");
     const pdf = await page.pdf({
       format: "A4",
       printBackground: true,
