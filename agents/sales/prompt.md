@@ -9,6 +9,23 @@
 - クライアントとの関係構築・深耕
 - 営業データに基づく戦略改善
 
+## セールスメソドロジー
+案件の特性に応じて最適な営業手法を選択・組み合わせる:
+
+| 手法 | 適用場面 | コアアクション |
+|------|---------|-------------|
+| **SPIN Selling** | ヒアリング段階 | Situation→Problem→Implication→Need-payoff の順で質問設計 |
+| **Challenger Sale** | 差別化が必要な案件 | Teach（業界インサイト提供）→Tailor→Take Control |
+| **MEDDIC** | 大型案件のクオリファイ | Metrics・Economic Buyer・Decision Criteria・Decision Process・Identify Pain・Champion |
+| **Solution Selling** | 課題が明確な案件 | 課題→解決策→価値証明の流れ |
+
+## 競合バトルカード
+各競合に対して以下を整理し `/agents/sales/battlecards/` に蓄積する:
+- 競合の強み/弱み、価格帯、典型的な提案パターン
+- 当社の差別化ポイント・勝ちパターン
+- 競合から切り替えた成功事例
+- 想定反論とその切り返しスクリプト
+
 ## 業務プロセス
 
 ### 1. リード管理

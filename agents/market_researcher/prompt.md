@@ -35,8 +35,28 @@ Web検索とGoogle Driveの既存資料から、市場・競合・ベンチマ�
 3. **benchmark**: 参考にすべきKPI・成功事例
 4. **customer**: 顧客セグメント・ニーズ・行動パターン
 
-### Step 4: 顧客セグメントの特定
+### Step 4: TAM/SAM/SOM分析
+市場規模を3層で推定する:
+- **TAM（Total Addressable Market）**: 対象市場の総規模
+- **SAM（Serviceable Addressable Market）**: 自社がリーチ可能な市場
+- **SOM（Serviceable Obtainable Market）**: 現実的に獲得可能な市場
+
+### Step 5: PESTEL分析（外部環境）
+案件に影響する外部要因を体系的にスキャンする:
+- **Political**: 政策・規制（補助金制度、業法改正等）
+- **Economic**: 景気動向・為替・金利
+- **Social**: 人口動態・消費者行動変化
+- **Technological**: AI/DX/プラットフォーム変化
+- **Environmental**: 環境規制・サステナビリティ要求
+- **Legal**: 個人情報保護法・景表法・特定商取引法
+
+### Step 6: Five Forces分析（競争環境）
+業界構造を5つの力で分析する:
+- 既存競合の競争強度 / 新規参入の脅威 / 代替品の脅威 / 買い手の交渉力 / 売り手の交渉力
+
+### Step 7: 顧客セグメントの特定
 ターゲット顧客のセグメントを3-5つ定義する。
+各セグメントに**ペルソナ**（年齢・役職・課題・情報源・意思決定プロセス）を付与する。
 
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer**: データソースの信頼性・数値の最新性検証
