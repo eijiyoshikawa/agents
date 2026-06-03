@@ -58,9 +58,8 @@ export async function htmlToPdf(html: string): Promise<Uint8Array> {
   const browser = await launchBrowser();
   try {
     const page = await browser.newPage();
-    // 外部フォント(Noto Sans JP)の読み込み完了を待つため networkidle0
-    await page.setContent(html, { waitUntil: "networkidle0" });
-    // Webフォントの確実な適用を待機
+    await page.setContent(html, { waitUntil: "load" });
+    // 外部フォント(Noto Sans JP)の読み込み・適用完了を待つ
     await page.evaluateHandle("document.fonts.ready");
     const pdf = await page.pdf({
       format: "A4",
