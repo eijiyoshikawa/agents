@@ -1,24 +1,24 @@
 "use client";
 
-import { useState } from "react";
-import { Download, AlertCircle, Loader2 } from "lucide-react";
+import { useState, useRef } from "react";
+import { AlertCircle, Printer } from "lucide-react";
 import type { ExtractResponse, JobPosting } from "@/lib/types";
 import { LET_COMPANY } from "@/lib/company";
-import { requestExtract, requestFromText, downloadPdf } from "@/lib/client";
+import { requestExtract, requestFromText } from "@/lib/client";
 import { UrlInputForm } from "@/components/UrlInputForm";
 import { TextInputForm } from "@/components/TextInputForm";
 import { JobEditor } from "@/components/JobEditor";
-import { JobPreview } from "@/components/JobPreview";
+import { JobPreview, type JobPreviewHandle } from "@/components/JobPreview";
 
 type Mode = "url" | "text";
 
 export default function Home() {
   const [mode, setMode] = useState<Mode>("url");
   const [loading, setLoading] = useState(false);
-  const [pdfLoading, setPdfLoading] = useState(false);
   const [error, setError] = useState("");
   const [job, setJob] = useState<JobPosting | null>(null);
   const [sources, setSources] = useState<ExtractResponse["sources"]>([]);
+  const previewRef = useRef<JobPreviewHandle>(null);
 
   async function handleExtract(urls: string[]) {
     setLoading(true);
@@ -45,19 +45,6 @@ export default function Home() {
       setError(e instanceof Error ? e.message : "エラーが発生しました。");
     } finally {
       setLoading(false);
-    }
-  }
-
-  async function handleDownload() {
-    if (!job) return;
-    setPdfLoading(true);
-    setError("");
-    try {
-      await downloadPdf(job);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "PDF生成に失敗しました。");
-    } finally {
-      setPdfLoading(false);
     }
   }
 
@@ -106,21 +93,19 @@ export default function Home() {
                 [ STEP 03 ] プレビュー & 出力
               </h2>
               <button
-                onClick={handleDownload}
-                disabled={pdfLoading}
-                className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-cream transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand disabled:opacity-40"
+                onClick={() => previewRef.current?.print()}
+                className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-cream transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand"
               >
-                <Download className="h-4 w-4" />
-                {pdfLoading ? "生成中…" : "PDFダウンロード"}
+                <Printer className="h-4 w-4" />
+                PDFで保存・印刷
               </button>
             </div>
-            {pdfLoading && (
-              <p className="mb-4 flex items-center gap-2 rounded-xl border border-border-soft bg-surface px-4 py-3 text-xs leading-relaxed text-[#9ca3af]">
-                <Loader2 className="h-3.5 w-3.5 shrink-0 animate-spin text-brand" />
-                PDFを生成しています。混雑時は出力まで3分ほどかかる場合がありますので、このままお待ちください。
-              </p>
-            )}
-            <JobPreview job={job} company={LET_COMPANY} />
+            <p className="mb-4 rounded-xl border border-border-soft bg-surface px-4 py-3 text-xs leading-relaxed text-[#9ca3af]">
+              「PDFで保存・印刷」を押すと印刷画面が開きます。送信先（プリンタ）で
+              <span className="font-semibold text-ink">「PDFに保存」</span>
+              を選ぶと、求人票をPDFファイルとして保存できます。
+            </p>
+            <JobPreview ref={previewRef} job={job} company={LET_COMPANY} />
           </div>
         </section>
       )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef, useImperativeHandle, forwardRef } from "react";
 import type { CompanyProfile, JobPosting } from "@/lib/types";
 import { buildJobPostingHtml } from "@/lib/template";
 
@@ -9,21 +9,41 @@ interface Props {
   company: CompanyProfile;
 }
 
+export interface JobPreviewHandle {
+  print: () => void;
+}
+
 /**
  * PDFと同一の自己完結HTMLをiframeで表示する。
- * これによりWebプレビューとPDF出力の見た目が常に一致する。
+ * 印刷(=ブラウザの「PDFで保存」)はこのiframeをそのまま印刷するため、
+ * 閲覧環境のフォント（日本語含む）で確実にレンダリングされる。
  */
-export function JobPreview({ job, company }: Props) {
-  const html = useMemo(() => buildJobPostingHtml(job, company), [job, company]);
+export const JobPreview = forwardRef<JobPreviewHandle, Props>(
+  function JobPreview({ job, company }, ref) {
+    const html = useMemo(
+      () => buildJobPostingHtml(job, company),
+      [job, company],
+    );
+    const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  return (
-    <div className="overflow-hidden rounded-2xl border border-border-soft bg-white shadow-sm">
-      <iframe
-        title="求人票プレビュー"
-        srcDoc={html}
-        className="h-[840px] w-full"
-        sandbox=""
-      />
-    </div>
-  );
-}
+    useImperativeHandle(ref, () => ({
+      print() {
+        const win = iframeRef.current?.contentWindow;
+        if (!win) return;
+        win.focus();
+        win.print();
+      },
+    }));
+
+    return (
+      <div className="overflow-hidden rounded-2xl border border-border-soft bg-white shadow-sm">
+        <iframe
+          ref={iframeRef}
+          title="求人票プレビュー"
+          srcDoc={html}
+          className="h-[840px] w-full"
+        />
+      </div>
+    );
+  },
+);
