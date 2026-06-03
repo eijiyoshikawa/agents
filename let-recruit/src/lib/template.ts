@@ -37,10 +37,11 @@ export function buildJobPostingHtml(
 /* ---------- セクション ---------- */
 
 function header(job: JobPosting, c: CompanyProfile): string {
+  const company = job.companyName
+    ? `<span class="logo">${esc(job.companyName)}</span>`
+    : `<span class="logo">${esc(c.name)}</span>`;
   return `<header class="head">
-    <div class="brandmark">
-      <span class="logo">${esc(c.name)}</span>
-    </div>
+    <div class="brandmark">${company}</div>
     <div class="meta">
       <span>No.001 / RECRUIT</span>
       <span>${esc(job.employmentType || "正社員")}</span>
@@ -134,7 +135,7 @@ function footer(c: CompanyProfile): string {
       <span class="tagline">${esc(c.tagline)}</span>
     </div>
     <p class="foot-about">${esc(c.about)}</p>
-    <p class="foot-contact">${contacts}</p>
+    <p class="foot-contact">作成 ${esc(c.name)}　/　${contacts}</p>
   </footer>`;
 }
 

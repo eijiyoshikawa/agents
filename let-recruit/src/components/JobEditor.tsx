@@ -17,6 +17,11 @@ export function JobEditor({ job, onChange }: Props) {
 
   return (
     <div className="space-y-4">
+      <Text
+        label="募集会社名"
+        value={job.companyName}
+        onChange={(v) => set("companyName", v)}
+      />
       <Text label="募集職種" value={job.jobTitle} onChange={(v) => set("jobTitle", v)} />
       <Text
         label="キャッチコピー"

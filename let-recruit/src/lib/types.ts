@@ -12,6 +12,7 @@ export const SalarySchema = z.object({
 });
 
 export const JobPostingSchema = z.object({
+  companyName: z.string().default(""), // 募集企業名
   jobTitle: z.string().default(""), // 募集職種
   catchphrase: z.string().default(""), // キャッチコピー（1行）
   summary: z.string().default(""), // 仕事内容の概要（2〜3文）
