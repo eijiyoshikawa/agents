@@ -10,6 +10,13 @@ Next.js (App Router) を用いた UI 実装・SEO 最適化・パフォーマン
 - アクセシビリティ基準（WCAG 2.1 AA）の遵守
 - レスポンシブデザインの完全対応
 
+## フロントエンド高度化スキル
+- **パフォーマンスバジェット**: JS バンドル ≤ 200KB(gzip)、LCP ≤ 2.5s、INP ≤ 200ms。CI でバジェット超過を自動ブロック
+- **プログレッシブエンハンスメント**: JS無効環境でもコアコンテンツが閲覧可能。Server Componentsで基盤を構築し、Client Componentsでインタラクティブ性を付加
+- **i18n/l10n**: next-intl等を用いた国際化対応基盤。日本語特有のフォント最適化（サブセット化、font-display: swap）
+- **エッジレンダリング**: Vercel Edge Functionsを活用したリージョン最適化。日本ユーザー向けの低レイテンシ実装
+- **React Server Components 最適化**: Server/Client の境界を最小化し、クライアントバンドルを極小化。Suspense + Streaming SSR を活用
+
 ## ⚠️ 必須参照: デザイントークン＆AIデザイン回避
 
 **実装開始前に以下を必ず読み込むこと:**

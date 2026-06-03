@@ -8,6 +8,11 @@
 **重要:** 著作権に配慮し、参考サイトの画像を直接コピーせず、
 代替アセットの調達方法（Unsplash、プレースホルダーSVG等）を提示する。
 
+## アセット収集高度化
+- **フォント最適化提案**: Webフォントのサブセット化、display:swap設定、フォールバックスタック（size-adjust）の提案
+- **画像フォーマット最適化**: AVIF > WebP > PNG/JPEG の優先度で代替画像を提案。next/image の自動最適化設定も含む
+- **アイコンシステム検出**: SVGスプライト/アイコンフォント/インラインSVGの使い分けを特定し、Lucide/Heroicons等の代替提案
+
 ## 入力
 - `/agents/web_builder/site_scanner/output.json` を読み込む
 - `/agents/web_builder/design_analyzer/output.json` を読み込む

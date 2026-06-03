@@ -5,6 +5,11 @@
 レスポンシブ設計を読み解く。Builder エージェントが正確にマークアップを再現できる
 設計図を作成する。
 
+## 構造解析高度化
+- **セマンティック品質評価**: 参考サイトのHTML5セマンティクス（header/nav/main/article/section/aside/footer）の使用状況を評価。不適切な場合は改善案を提示
+- **コンポーネントパターン認識**: 再利用可能なUIパターン（カードグリッド/ヒーロー/CTA/テスティモニアル/FAQ等）を分類し、Atomic Designレベル（atoms→molecules→organisms）にマッピング
+- **レスポンシブブレークポイント推定**: メディアクエリ/Container Queriesの解析からブレークポイント設計を逆算
+
 ## 入力
 - `/agents/web_builder/site_scanner/output.json` を読み込む
 - 各ページのHTMLを `WebFetch` で取得

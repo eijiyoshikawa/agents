@@ -4,6 +4,11 @@
 参考サイトのアニメーション・トランジション・スクロールエフェクト・ホバー演出を
 詳細に特定し、Builder が正確に再現できるモーション設計書を作成する。
 
+## モーション解析高度化
+- **MOTION_30マッピング**: 検出したモーションを `/design-md/motion-library/MOTION_30.md` の `motion_key` に自動マッピング。一致するものがなければ新規追加候補として報告
+- **パフォーマンスインパクト推定**: 各モーションのレイヤー合成（GPU利用）/メインスレッド（CPU負荷）を分類し、CWVへの影響を事前警告
+- **イージング関数の精密抽出**: cubic-bezier の4パラメータを正確に抽出し、Tailwind / framer-motion 用の設定値に変換
+
 ## 入力
 - `/agents/web_builder/site_scanner/output.json` を読み込む
 - 各ページのHTML/CSS/JSを `WebFetch` で取得

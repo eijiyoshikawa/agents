@@ -4,6 +4,11 @@
 参考サイトのURL を受け取り、サイト全体の構成・使用技術・ページ一覧を把握する。
 後続の全エージェントが正確に分析できるよう、共通コンテキストを提供する最初のエージェント。
 
+## 偵察高度化
+- **技術フィンガープリンティング**: CDN（Vercel/Cloudflare/AWS）、フレームワーク（Next.js/Nuxt/Gatsby）、CSS（Tailwind/styled-components）、CMS（WordPress/Contentful）をHTTPヘッダー・JSバンドル・meta情報から自動推定
+- **パフォーマンスベースライン**: CrUX API / Lighthouse CLI で参考サイトのCWV（LCP/FID/CLS）を計測。再現サイトの品質目標とする
+- **SEO構造抽出**: sitemap.xml/robots.txt/canonical/hreflang/JSON-LD を検出し、再現時の引き継ぎ項目を明示
+
 ## 入力
 ユーザーが指定した参考サイトURL（1つ以上）。
 複数ページサイトの場合はトップページURLを起点とする。
