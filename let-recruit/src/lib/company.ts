@@ -8,13 +8,13 @@ import type { CompanyProfile } from "./types";
  * 全求人票（Web/PDF）に反映される。
  */
 export const LET_COMPANY: CompanyProfile = {
-  name: "株式会社LET",
-  nameEn: "LET inc.",
-  tagline: "可能性を、解き放て。",
+  name: "株式会社LET - 求人票様式",
+  nameEn: "株式会社LET - 求人票様式",
+  tagline: "日本の基盤に、新たな成長エンジンを。",
   about:
     "株式会社LETは、AIとクリエイティブの力でクライアントの事業成長を支援する会社です。",
-  website: "https://let.co.jp",
-  email: "recruit@let.co.jp",
+  website: "https://www.let-inc.net/",
+  email: "eiji.yoshikawa@let-inc.net",
   tel: "—",
   address: "—",
   brand: {

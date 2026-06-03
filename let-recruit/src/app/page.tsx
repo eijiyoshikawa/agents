@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Download, AlertCircle, Loader2 } from "lucide-react";
 import type { ExtractResponse, JobPosting } from "@/lib/types";
 import { LET_COMPANY } from "@/lib/company";
-import { letMarkSvg } from "@/lib/logo";
 import { requestExtract, requestFromText, downloadPdf } from "@/lib/client";
 import { UrlInputForm } from "@/components/UrlInputForm";
 import { TextInputForm } from "@/components/TextInputForm";
@@ -156,15 +155,9 @@ function Header() {
   return (
     <header className="border-b border-ink pb-6">
       <div className="flex items-center gap-3">
-        <span
-          className="text-brand"
-          aria-hidden
-          dangerouslySetInnerHTML={{ __html: letMarkSvg(30) }}
-        />
-        <span className="text-xl font-bold tracking-[0.06em] text-brand">
-          LET inc.
+        <span className="text-xl font-bold tracking-[0.04em] text-brand">
+          株式会社LET - 求人票様式
         </span>
-        <span className="text-xs tracking-[0.08em] text-ink">求人票ジェネレーター</span>
       </div>
       <h1 className="mt-6 text-3xl font-bold leading-tight md:text-4xl">
         他社求人URLを貼るだけ。

@@ -1,5 +1,4 @@
 import type { CompanyProfile, JobPosting, Salary } from "./types";
-import { letMarkSvg } from "./logo";
 
 /**
  * 求人票デザインの「単一ソース」。
@@ -39,9 +38,7 @@ export function buildJobPostingHtml(
 function header(job: JobPosting, c: CompanyProfile): string {
   return `<header class="head">
     <div class="brandmark">
-      <span class="mark">${letMarkSvg(34)}</span>
-      <span class="logo">${esc(c.nameEn)}</span>
-      <span class="logo-jp">${esc(c.name)}</span>
+      <span class="logo">${esc(c.name)}</span>
     </div>
     <div class="meta">
       <span>No.001 / RECRUIT</span>
@@ -132,8 +129,7 @@ function footer(c: CompanyProfile): string {
     .join("　/　");
   return `<footer class="foot">
     <div class="foot-brand">
-      <span class="mark">${letMarkSvg(28)}</span>
-      <span class="logo">${esc(c.nameEn)}</span>
+      <span class="logo">${esc(c.name)}</span>
       <span class="tagline">${esc(c.tagline)}</span>
     </div>
     <p class="foot-about">${esc(c.about)}</p>
@@ -213,9 +209,7 @@ html,body{background:var(--cream);color:var(--ink);
 .head{display:flex;justify-content:space-between;align-items:flex-start;
   border-bottom:1px solid var(--ink);padding-bottom:10px;}
 .brandmark{display:flex;align-items:center;gap:10px;}
-.mark{color:var(--accent);display:inline-flex;align-items:center;}
-.logo{font-weight:700;font-size:22px;letter-spacing:0.06em;color:var(--accent);}
-.logo-jp{font-size:12px;color:var(--ink);letter-spacing:0.08em;}
+.logo{font-weight:700;font-size:17px;letter-spacing:0.04em;color:var(--accent);}
 .meta{font-family:ui-monospace,Menlo,monospace;font-size:10px;color:var(--muted);
   display:flex;flex-direction:column;align-items:flex-end;gap:2px;letter-spacing:0.05em;}
 
