@@ -18,7 +18,7 @@
 
 import { Client, APIResponseError } from "@notionhq/client";
 
-const CALL_LOG_DB_ID = process.env.CALL_LOG_DB_ID;
+const CALL_LOG_DB_ID = process.env.CALL_LOG_DB_ID || "f2a72c6221ed4de5acb000848c9b0cbe";
 const DATE_PROP = process.env.DATE_PROP || "架電日時"; // Date プロパティ名
 const DATE_FIELD = process.env.DATE_FIELD || "property"; // "property" | "created_time"
 const ASSIGNEE_PROP = process.env.ASSIGNEE_PROP || "担当者";
@@ -30,11 +30,7 @@ if (!process.env.NOTION_TOKEN) {
   console.error('ERROR: NOTION_TOKEN 未設定。export NOTION_TOKEN="ntn_..." してください。');
   process.exit(1);
 }
-if (!CALL_LOG_DB_ID) {
-  console.error('ERROR: CALL_LOG_DB_ID 未設定。架電ログDBのIDをセットしてください。');
-  console.error('  export CALL_LOG_DB_ID="..."');
-  process.exit(1);
-}
+// 既定は作成済みの「📞 架電記録」DB。別DBを使う場合のみ CALL_LOG_DB_ID で上書き。
 
 const notion = new Client({
   auth: process.env.NOTION_TOKEN,
