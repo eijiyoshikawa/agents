@@ -20,7 +20,7 @@ export function buildJobPostingHtml(
 <style>${styles(b)}</style>
 </head>
 <body>
-<main class="sheet">
+<main class="sheet" id="sheet">
   ${header(job, company)}
   ${heroBlock(job)}
   ${summaryBlock(job)}
@@ -29,6 +29,7 @@ export function buildJobPostingHtml(
   ${processBlock(job)}
   ${footer(company)}
 </main>
+<script>${fitScript()}</script>
 </body>
 </html>`;
 }
@@ -190,6 +191,35 @@ export function esc(input: string): string {
 
 /* ---------- スタイル（feerトークン埋め込み・A4） ---------- */
 
+/**
+ * 印刷時、コンテンツがA4 1枚に必ず収まるよう .sheet を縦方向に自動スケールする。
+ * 印刷ダイアログを開く前(beforeprint)に高さを測り、A4の印字可能高を超える分だけ
+ * transform: scale() で縮小する。印刷後(afterprint)に元へ戻す。
+ */
+function fitScript(): string {
+  return `
+(function(){
+  var sheet=document.getElementById('sheet');
+  if(!sheet)return;
+  // A4印字可能高 = 297mm - 上下padding(8mm*2)。96dpi換算(1mm≒3.7795px)。
+  var MM=3.7795275591;
+  var avail=(297-16)*MM;
+  function fit(){
+    sheet.style.zoom='1';
+    var h=sheet.scrollHeight;
+    // 1ページに必ず収めるためzoomで縮小（はみ出る時のみ）。安全マージン2%。
+    var z = h>avail ? (avail/h)*0.98 : 1;
+    sheet.style.zoom=String(z);
+  }
+  // 印刷前に確実にフィット。スクリーンでも初期表示時に一度フィットさせておく。
+  window.addEventListener('beforeprint',fit);
+  if(document.fonts && document.fonts.ready){document.fonts.ready.then(fit);}
+  window.addEventListener('load',fit);
+  setTimeout(fit,300);
+})();
+`;
+}
+
 function styles(b: CompanyProfile["brand"]): string {
   return `
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&family=Work+Sans:wght@400;600;700&display=swap');
@@ -202,7 +232,7 @@ function styles(b: CompanyProfile["brand"]): string {
 html,body{background:#ffffff;color:var(--ink);
   font-family:"Work Sans","Noto Sans JP",-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
   -webkit-font-smoothing:antialiased;line-height:1.5;}
-.sheet{width:210mm;min-height:297mm;margin:0 auto;background:#ffffff;
+.sheet{width:210mm;margin:0 auto;background:#ffffff;
   padding:10mm 12mm;position:relative;}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;}
 
@@ -264,10 +294,14 @@ html,body{background:#ffffff;color:var(--ink);
 
 @page{size:A4;margin:0;}
 @media print{
-  html,body{background:#fff;}
-  .sheet{margin:0;box-shadow:none;width:100%;min-height:auto;height:auto;
-    padding:8mm 12mm;page-break-after:avoid;}
-  .block,.hero,.head,.foot,.cols,.conditions,.steps{break-inside:avoid;}
+  html,body{background:#fff;width:210mm;height:auto;margin:0;padding:0;
+    overflow:hidden;}
+  .sheet{margin:0;box-shadow:none;width:210mm;height:auto;
+    padding:8mm 12mm;overflow:hidden;}
+  /* 全要素のページ分割を物理的に禁止し、1ページに収める */
+  .sheet,.sheet *{break-inside:avoid;page-break-inside:avoid;
+    break-before:avoid;page-break-before:avoid;
+    break-after:avoid;page-break-after:avoid;}
 }
 `;
 }
