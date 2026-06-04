@@ -32,18 +32,18 @@ describe("buildJobPostingHtml", () => {
     expect(html).toContain(LET_COMPANY.brand.accent);
   });
 
-  it("職種・コピーが反映され、危険な入力はエスケープされる", () => {
+  it("コピーが反映され、危険な入力はエスケープされる", () => {
     const job = emptyJobPosting();
-    job.jobTitle = "エンジニア<img>";
+    job.companyName = "テスト社<img>";
     job.catchphrase = "成長しよう";
     const html = buildJobPostingHtml(job, LET_COMPANY);
     expect(html).toContain("成長しよう");
-    expect(html).toContain("エンジニア&lt;img&gt;");
-    expect(html).not.toContain("エンジニア<img>");
+    expect(html).toContain("テスト社&lt;img&gt;");
+    expect(html).not.toContain("テスト社<img>");
   });
 
-  it("空セクションは描画しない", () => {
+  it("空の求人票では概要セクションを描画しない", () => {
     const html = buildJobPostingHtml(emptyJobPosting(), LET_COMPANY);
-    expect(html).not.toContain("選考プロセス");
+    expect(html).not.toContain("求人概要");
   });
 });

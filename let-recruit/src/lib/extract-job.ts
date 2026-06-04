@@ -24,7 +24,7 @@ async function callClaude(
   const client = new Anthropic({ apiKey });
   const message = await client.messages.create({
     model: process.env.ANTHROPIC_MODEL || DEFAULT_MODEL,
-    max_tokens: 4096,
+    max_tokens: 8192,
     system,
     messages: [{ role: "user", content: userPrompt }],
   });
@@ -59,7 +59,7 @@ export async function extractJobPosting(
   const client = new Anthropic({ apiKey });
   const message = await client.messages.create({
     model: process.env.ANTHROPIC_MODEL || DEFAULT_MODEL,
-    max_tokens: 4096,
+    max_tokens: 8192,
     system: EXTRACTION_SYSTEM_PROMPT,
     messages: [{ role: "user", content: buildExtractionUserPrompt(pages) }],
   });

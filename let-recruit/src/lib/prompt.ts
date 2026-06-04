@@ -25,24 +25,49 @@ export const TEXT_SYSTEM_PROMPT = `あなたは採用のプロフェッショナ
 - 必ず指定されたJSONスキーマだけを出力する。前置き・説明・マークダウンは一切付けない。`;
 
 /** 共通のJSONスキーマ説明（プロンプト末尾に付与）。 */
-const JSON_SCHEMA_GUIDE = `JSONスキーマ:
+const JSON_SCHEMA_GUIDE = `JSONスキーマ（読み取れない項目は空文字""または空配列[]のままにする。創作しない）:
 {
-  "companyName": "募集している企業名（読み取れる場合のみ。不明なら空文字）",
-  "jobTitle": "募集職種（例: フロントエンドエンジニア）",
-  "catchphrase": "求職者の心を掴む1行のキャッチコピー",
+  "catchphrase": "求職者の心を掴むタイトル/キャッチコピー(1行)",
+  "companyName": "募集している企業名",
+  "industry": "業種",
+  "occupation": "職種カテゴリ",
+  "establishedYear": "設立年(例: 2017年)",
+  "employeeCount": "従業員数(例: 31〜50名)",
+  "listingStatus": "上場区分(例: 未上場)",
+  "averageAge": "平均年齢(例: 26歳)",
+  "genderRatio": "男女比率(例: 5:5)",
+  "companyWebsite": "会社HPのURL",
+  "companyAddress": "本社所在地",
+  "jobTitle": "募集職種",
+  "employmentType": "雇用形態(例: 正社員)",
+  "recruitPosition": "採用ポジション(例: 中途採用)",
+  "jobLevel": "職位(例: リーダー、メンバー)",
+  "education": "最終学歴(例: 高卒以上)",
+  "jobExperience": "職種経験の要否(例: 職種未経験NG)",
+  "industryExperience": "業種経験の要否(例: 業種未経験NG)",
   "summary": "仕事内容の概要を2〜3文で",
-  "responsibilities": ["具体的な業務内容を箇条書きで複数"],
-  "requiredSkills": ["必須要件を箇条書きで"],
-  "preferredSkills": ["歓迎要件を箇条書きで"],
-  "idealCandidate": ["求める人物像を箇条書きで"],
-  "appealPoints": ["この仕事・環境の魅力を箇条書きで"],
-  "employmentType": "雇用形態（例: 正社員）",
-  "salary": { "type": "月給 または 年収", "min": 数値またはnull, "max": 数値またはnull, "note": "補足（賞与・昇給等）" },
+  "responsibilities": ["主な業務内容を箇条書きで"],
+  "requiredSkills": ["必須条件を箇条書きで"],
+  "idealCandidate": ["内定の可能性が高い人/求める人物像を箇条書きで"],
+  "appealPoints": ["この求人の魅力を箇条書きで"],
+  "philosophy": "理念・ビジョン(ミッション/ビジョン等の文章)",
+  "businessDescription": "事業内容と今後の事業展開の文章",
+  "culture": "働く人・社風の文章",
+  "prPoints": "PRポイントの文章",
+  "recruitBackground": "募集背景",
+  "orgStructure": "現在の組織構成(例: 部署の人数: 5)",
+  "salary": { "type": "月給 または 年収", "min": 数値またはnull, "max": 数値またはnull, "note": "賞与回数・昇給等の補足" },
+  "salaryDetail": "給与・年収例の詳細文章",
   "workLocation": "勤務地",
   "workHours": "勤務時間",
-  "holidays": "休日・休暇",
-  "benefits": ["福利厚生を箇条書きで"],
-  "selectionProcess": ["選考プロセスを順番に"]
+  "overtime": "残業に関する補足",
+  "holidays": "休日休暇",
+  "benefits": ["福利厚生・諸手当を箇条書きで"],
+  "smokingPolicy": "受動喫煙対策(例: 屋内禁煙)",
+  "casualInterview": "カジュアル面談の有無",
+  "companyBriefing": "会社説明会の有無",
+  "aptitudeTest": "適性テストの有無",
+  "selectionProcess": ["選考フローを順番に"]
 }`;
 
 /** テキスト素案 → 求人票JSON のユーザープロンプトを組み立てる。 */

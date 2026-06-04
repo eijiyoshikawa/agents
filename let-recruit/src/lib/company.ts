@@ -17,6 +17,11 @@ export const LET_COMPANY: CompanyProfile = {
   email: "eiji.yoshikawa@let-inc.net",
   tel: "—",
   address: "—",
+  agency: {
+    name: "株式会社LET",
+    address: "大阪府大阪市中央区南久宝寺町4丁目4-12 IB CENTERビル 8F",
+    licenseNumber: "—",
+  },
   brand: {
     ink: "#1a1a1a",
     cream: "#FFF9EF",
