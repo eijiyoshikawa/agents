@@ -19,7 +19,7 @@ export function JobEditor({ job, onChange }: Props) {
     <div className="space-y-5">
       <Group title="基本情報（求人サイトに無い項目は手入力）">
         <Text label="タイトル/キャッチコピー" value={job.catchphrase} onChange={(v) => set("catchphrase", v)} />
-        <Text label="会社名" value={job.companyName} onChange={(v) => set("companyName", v)} />
+        <Text label="募集元の会社名（空欄なら後で記入）" value={job.companyName} onChange={(v) => set("companyName", v)} />
         <Row>
           <Text label="業種" value={job.industry} onChange={(v) => set("industry", v)} />
           <Text label="職種" value={job.occupation} onChange={(v) => set("occupation", v)} />
