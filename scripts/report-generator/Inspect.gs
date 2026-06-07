@@ -21,8 +21,10 @@ function inspectDeck() {
     out.push({ slide: i + 1, shapes: dumpShapes_(slides[i]) });
   }
   var json = JSON.stringify(out, null, 1);
-  Logger.log(json);          // 表示 > ログ からコピー
-  return json;
+  // ログは上限で切れるため Drive ファイルへ丸ごと保存する
+  var file = DriveApp.createFile('deck_structure.json', json, 'application/json');
+  Logger.log('Saved: ' + file.getUrl() + '  id=' + file.getId());
+  return file.getId();
 }
 
 /** 1スライド内の全シェイプを軽量にダンプ */
