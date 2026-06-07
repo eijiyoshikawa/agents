@@ -1,9 +1,16 @@
 {
-  "_about": "ワークサンプル。REVECAREERAGENCY/2026年06提出分 フォルダのスクショから Claude が抽出した例。account_analytics は概要_28日間.pngから実値抽出済み。空文字('')は要確認/未抽出で、推定値は入れていない。",
+  "_about": "Claude(MCP)が 2026年06提出分 フォルダのスクショから OCR×ビジョン照合で抽出。account_analytics=概要_28日間.png由来、popular_posts上位=投稿別インサイト由来(投稿14本目はビジョン精密確認済み)。空文字('')は未確定で推定値は入れていない。このファイルは実際に同フォルダへ書き込んだ report_data.json と同一。",
+  "_extraction_notes": {
+    "verified_by_vision": ["概要_28日間.png", "投稿14本目.png"],
+    "from_ocr_only": ["投稿22本目.png", "投稿12本目.png"],
+    "period": "過去28日間 (2026/5/7-6/3)",
+    "caveats": "OCRではコメント/シェアの順が紛らわしい。クライアント提出前に上位投稿は再確認推奨。"
+  },
   "_todo": [
-    "followers_start: 前月末フォロワー数(過去レポート or 概要前月分)から確定",
-    "post_analysis_monthly: 月次集計が必要。現状フォルダに月次集計スクショが無いため要提供",
-    "summary/next_actions: 数値傾向からClaudeが下書き→人がレビュー"
+    "followers_start: 運用開始時 or 前月末フォロワー数を補完(現状current=7,790のみ確定)",
+    "post_analysis_monthly: 月次平均集計スクショが未提供のため空",
+    "comments_change_pct/post_count_total/post_frequency_monthly: 元スクショに無く未取得",
+    "summary/next_actions: 数値傾向からの下書き→人レビュー後に確定"
   ],
   "meta": {
     "client_name": "REVECAREERAGENCY",
@@ -25,7 +32,7 @@
   "account_analytics": {
     "followers_start": "",
     "followers_current": "7,790",
-    "follower_change_pct": "+0.45%",
+    "follower_change_pct": "+117.35%",
     "likes": "2,828",
     "likes_change_pct": "+17.30%",
     "comments": "79",
@@ -45,32 +52,56 @@
   "popular_posts": [
     {
       "post_date": "2025/09/21",
-      "views": "253,544",
+      "views": "271,300",
       "likes": "2,500",
-      "comments": "47",
-      "shares": "56",
+      "comments": "56",
+      "shares": "47",
       "saves": "279",
       "new_followers": "",
-      "retention": "36.97s"
+      "retention": "9.6%"
     },
     {
       "post_date": "2025/11/07",
-      "views": "61,115",
+      "views": "65,400",
       "likes": "734",
-      "comments": "18",
-      "shares": "38",
+      "comments": "38",
+      "shares": "18",
       "saves": "72",
       "new_followers": "",
-      "retention": "17.42s"
+      "retention": ""
+    },
+    {
+      "post_date": "2025/09/03",
+      "views": "51,000",
+      "likes": "526",
+      "comments": "24",
+      "shares": "13",
+      "saves": "79",
+      "new_followers": "",
+      "retention": ""
     }
   ],
   "highlighted_posts": [
     {
       "post_date": "2025年9月21日",
       "theme": "社長に1日密着",
-      "eval_point": "",
+      "eval_point": "リーチ253,544・再生271.3K・プロフィール閲覧4,966。密着フォーマットが滞在と回遊を強く牽引。45-54歳層が36.9%で中心。",
       "comment_pickup": "",
       "image_file_id": "1jrSG9qWzV4MjCVk9cuvYyeXh-1zSlJAX"
+    },
+    {
+      "post_date": "2025年11月7日",
+      "theme": "お金の余裕＝心の余裕？",
+      "eval_point": "リーチ61,115・プロフィール閲覧705。価値観に踏み込む問いかけ型が保存・コメントを誘発。",
+      "comment_pickup": "",
+      "image_file_id": "1wuRUewff1Xw37veXTn1pwx3uivwlwswI"
+    },
+    {
+      "post_date": "2025年9月3日",
+      "theme": "皆さんの伝え方は大丈夫ですか？",
+      "eval_point": "リーチ47,908・プロフィール閲覧1,335とPF誘導が強い。実務Tips型は採用層との相性が良い。",
+      "comment_pickup": "",
+      "image_file_id": "1gnAv2VkhL1rOr1gpH0KAgYWhXSnp0Kja"
     }
   ],
   "next_actions": {
@@ -81,10 +112,13 @@
     "future_measure_2": ""
   },
   "dashboard_images": {
+    "overview_7d": "1W_3i7HHC0ttS1I7I8VBe61p6aOG3S9uZ",
     "overview_28d": "1_QGRZ2oKEZY1C75kOAPYuxNQkm5dOEtA",
     "overview_60d": "1hiiFYY63ak-hIdYIXKd5GcouDO0feaQD",
     "overview_365d": "1EKZDr1T0SpqZ6_O_cb6CDZbyy4yLL0dv",
+    "audience_7d": "1I545UjQHjSSH8OgzQ_83Rccp2bWETWwB",
     "audience_28d": "1nDRLq9a6ecCk6d5fVhz6sLYV4g3HFk2I",
+    "audience_60d": "1iaN_VhIjCXWH8b0RqSBdGyrw4Jyno4Iy",
     "audience_365d": "1Y6Fj3d7Q0AKyFSZYI1KD4B53snljdNyK",
     "account_overview": "18EhvKSBU_eAXGXZPl-l5rjXVJ1PltUo-"
   }
