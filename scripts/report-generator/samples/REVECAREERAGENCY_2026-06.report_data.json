@@ -1,0 +1,91 @@
+{
+  "_about": "ワークサンプル。REVECAREERAGENCY/2026年06提出分 フォルダのスクショから Claude が抽出した例。account_analytics は概要_28日間.pngから実値抽出済み。空文字('')は要確認/未抽出で、推定値は入れていない。",
+  "_todo": [
+    "followers_start: 前月末フォロワー数(過去レポート or 概要前月分)から確定",
+    "post_analysis_monthly: 月次集計が必要。現状フォルダに月次集計スクショが無いため要提供",
+    "summary/next_actions: 数値傾向からClaudeが下書き→人がレビュー"
+  ],
+  "meta": {
+    "client_name": "REVECAREERAGENCY",
+    "account_name": "黒崎子就職エージェント",
+    "account_handle": "kurosaki_shacho",
+    "platform": "TikTok",
+    "report_ym": "2026年6月",
+    "operation_period": "2025年6月〜2026年5月",
+    "operation_purpose": "採用応募の獲得 / ブランド認知 / フォロワー増加",
+    "data_fetch_date": "2026年6月3日",
+    "created_by": "株式会社LET マーケティング",
+    "created_date": "2026年6月7日",
+    "source_folder_id": "1HAOa5Epvuaqgr_YrQWgNhNlM5VZKulzH"
+  },
+  "summary": {
+    "summary_text": "",
+    "result_text": ""
+  },
+  "account_analytics": {
+    "followers_start": "",
+    "followers_current": "7,790",
+    "follower_change_pct": "+0.45%",
+    "likes": "2,828",
+    "likes_change_pct": "+17.30%",
+    "comments": "79",
+    "comments_change_pct": "",
+    "shares": "35",
+    "shares_change_pct": "-20.18%",
+    "post_count_total": "",
+    "post_frequency_monthly": "",
+    "video_views": "203,451",
+    "video_views_change_pct": "+139.21%",
+    "pf_access": "7,212",
+    "pf_access_change_pct": "+135.07%",
+    "reach": "190,693",
+    "reach_change_pct": "+146.21%"
+  },
+  "post_analysis_monthly": [],
+  "popular_posts": [
+    {
+      "post_date": "2025/09/21",
+      "views": "253,544",
+      "likes": "2,500",
+      "comments": "47",
+      "shares": "56",
+      "saves": "279",
+      "new_followers": "",
+      "retention": "36.97s"
+    },
+    {
+      "post_date": "2025/11/07",
+      "views": "61,115",
+      "likes": "734",
+      "comments": "18",
+      "shares": "38",
+      "saves": "72",
+      "new_followers": "",
+      "retention": "17.42s"
+    }
+  ],
+  "highlighted_posts": [
+    {
+      "post_date": "2025年9月21日",
+      "theme": "社長に1日密着",
+      "eval_point": "",
+      "comment_pickup": "",
+      "image_file_id": "1jrSG9qWzV4MjCVk9cuvYyeXh-1zSlJAX"
+    }
+  ],
+  "next_actions": {
+    "reflection": "",
+    "current_issue": "",
+    "action_plan": "",
+    "future_measure_1": "",
+    "future_measure_2": ""
+  },
+  "dashboard_images": {
+    "overview_28d": "1_QGRZ2oKEZY1C75kOAPYuxNQkm5dOEtA",
+    "overview_60d": "1hiiFYY63ak-hIdYIXKd5GcouDO0feaQD",
+    "overview_365d": "1EKZDr1T0SpqZ6_O_cb6CDZbyy4yLL0dv",
+    "audience_28d": "1nDRLq9a6ecCk6d5fVhz6sLYV4g3HFk2I",
+    "audience_365d": "1Y6Fj3d7Q0AKyFSZYI1KD4B53snljdNyK",
+    "account_overview": "18EhvKSBU_eAXGXZPl-l5rjXVJ1PltUo-"
+  }
+}
