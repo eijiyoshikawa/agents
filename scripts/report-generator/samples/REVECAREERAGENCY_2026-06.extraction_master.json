@@ -1,0 +1,107 @@
+{
+  "_about": "REVECAREERAGENCY(TikTok @kurosaki_shacho) 2026年6月提出分の『全数値抽出マスター』。集約系スクショ(アカウント概要/概要4期間/オーディエンス4期間)をClaude(MCP)がOCR×ビジョンで抽出。個別投稿(約50本)は extraction_master の posts[] に後続バッチで追記予定。数値は文字列。OCRが乱れた箇所は _confidence/_caveat に明記。テンプレへの流し込みは report_data.json 側で取捨選択する(本ファイルは生データの保管庫)。",
+  "_status": {
+    "aggregates_done": true,
+    "posts_done": false,
+    "posts_total_screenshots": "約50本(投稿01〜71本目, 連番は歯抜け)",
+    "data_date": "2026年6月3日時点(UTC基準)"
+  },
+  "account": {
+    "name": "黒崎社長就職エージェント",
+    "handle": "kurosaki_shacho",
+    "platform": "TikTok",
+    "followers_total": "7,790",
+    "likes_total": "40.8K",
+    "bio": "はたらくに、まっすぐ！ 企業の採用サポートも行っております",
+    "_caveat": "アカウント概要.pngはトップ画面でOCRノイズ多め。followers_total/likes_totalは信頼できる。"
+  },
+  "overview_by_period": {
+    "_columns": "video_views=動画視聴数, reach=視聴者リーチ, pf_views=プロフィール閲覧, likes/shares/comments, net_followers=純増加数, new_followers=新規フォロワー, lost_followers=フォロワー減少。括弧内は前期間比。",
+    "d7": {
+      "range": "2026/5/28-6/3",
+      "video_views": "15,876", "video_views_pct": "-77.09",
+      "reach": "13,267", "reach_pct": "-79.75",
+      "pf_views": "480", "pf_views_pct": "-0.42",
+      "likes": "196", "likes_pct": "-72.36",
+      "shares": "6", "shares_pct": "-47.37",
+      "comments": "10",
+      "net_followers": "-12", "new_followers": "11", "lost_followers": "23",
+      "engaged_audience": "324", "engaged_audience_pct": "-68.79",
+      "_confidence": "low",
+      "_caveat": "7日間は母数が小さくOCR錯綜。動画視聴/リーチの取り違えに注意。年齢/国は短期で国際ノイズ大。"
+    },
+    "d28": {
+      "range": "2026/5/7-6/3",
+      "video_views": "203,451", "video_views_pct": "+139.21",
+      "reach": "190,693", "reach_pct": "+146.21",
+      "pf_views": "7,212", "pf_views_pct": "+135.07",
+      "likes": "2,828", "likes_pct": "+17.30",
+      "shares": "35", "shares_pct": "-20.18",
+      "comments": "79",
+      "net_followers": "580", "net_followers_pct": "+180.19",
+      "new_followers": "671", "new_followers_pct": "+117.35",
+      "lost_followers": "91",
+      "engaged_audience": "4,260", "engaged_audience_pct": "+21.33",
+      "_confidence": "high",
+      "_caveat": "comments前月比はスクショに非表示。"
+    },
+    "d60": {
+      "range": "2026/4/5-6/3",
+      "video_views": "295,254", "video_views_pct": "-73.96",
+      "reach": "273,383", "reach_pct": "-75.25",
+      "pf_views": "10,610", "pf_views_pct": "-40.01",
+      "likes": "5,406", "likes_pct": "-38.20",
+      "shares": "71", "shares_pct": "-52.03",
+      "comments": "198", "comments_pct": "-60.16",
+      "net_followers": "773", "new_followers": "987", "new_followers_pct": "-46.30",
+      "lost_followers": "214",
+      "engaged_audience": "8,014", "engaged_audience_pct": "-44.31",
+      "_confidence": "high"
+    },
+    "d365": {
+      "range": "2025/6/1-2026/5/31",
+      "video_views": "3,901,753",
+      "reach": "3,398,199",
+      "pf_views": "91,262",
+      "likes": "40,744", "shares": "714", "comments": "1,864",
+      "net_followers": "7,742", "new_followers": "8,474", "lost_followers": "732",
+      "engaged_audience": "63,546",
+      "_confidence": "high",
+      "_caveat": "前期間比は『>999.99%』表示(前年データ無し)のため比率は無意味。"
+    }
+  },
+  "audience_by_period": {
+    "_note": "gender/age/country/city は%。各期間スクショより。低シェア期(7日)は国際ノイズが大きい。",
+    "d7": {
+      "gender": { "male": "71.4", "female": "28.6" },
+      "age": { "25-34": "41.7", "35-44": "25.0", "45-54": "16.7", "18-24": "8.3", "55+": "8.3" },
+      "top_countries": { "ナイジェリア": "12.2", "インドネシア": "7.3", "シンガポール": "7.3", "日本": "7.3", "キルギス": "4.9", "タイ": "4.9", "ベトナム": "4.9", "香港": "4.9", "台湾": "4.9", "カタール": "4.8", "その他": "36.6" },
+      "top_cities": { "Osaka": "10.0", "Setagaya-ku": "6.7", "Kochi": "6.7", "Kumamoto": "3.3", "Nara": "3.3", "Nishinomiya": "3.3", "Shibuya": "3.3", "Anjo": "3.3", "Nerima": "3.3", "その他": "53.4" },
+      "_confidence": "low",
+      "_caveat": "年齢/国はOCR錯綜。提出には d28/d60/d365 を推奨。"
+    },
+    "d28": {
+      "gender": { "male": "88.4", "female": "11.6" },
+      "age": { "45-54": "37.8", "35-44": "27.4", "55+": "22.8", "25-34": "10.2", "18-24": "1.8" },
+      "top_countries": { "日本": "82.7", "ナイジェリア": "1.7", "ベトナム": "1.3", "シンガポール": "1.1", "アメリカ合衆国": "0.8", "キルギス": "0.7", "タイ": "0.7", "その他": "7.2" },
+      "top_cities": { "Tokyo": "9.5", "Setagaya-ku": "6.7", "Osaka": "6.2", "Nagoya": "3.4", "Kobe": "3.3", "Maki": "3.1", "Shirokanedai": "2.8", "Neyagawa": "2.6", "Kumagaya": "2.6", "その他": "55.7" },
+      "_confidence": "high"
+    },
+    "d60": {
+      "gender": { "male": "82.4", "female": "17.6" },
+      "age": { "45-54": "34.8", "35-44": "25.6", "55+": "21.3", "25-34": "13.9", "18-24": "4.4" },
+      "top_countries": { "日本": "76.3", "ネパール": "2.2", "インドネシア": "1.6", "ミャンマー": "1.3", "シンガポール": "1.3", "その他": "9.7" },
+      "top_cities": { "Tokyo": "7.2", "Osaka": "6.5", "Setagaya-ku": "6.1", "Yokohama": "3.5", "Nagoya": "3.4", "Kobe": "2.9", "Izumiotsu": "2.9", "Fukuoka": "2.8", "その他": "60.2" },
+      "_confidence": "high"
+    },
+    "d365": {
+      "gender": { "male": "83.1", "female": "16.9" },
+      "age": { "45-54": "32.7", "35-44": "22.8", "55+": "21.8", "25-34": "18.2", "18-24": "4.5" },
+      "top_countries": { "日本": "89.6", "インドネシア": "0.9", "ネパール": "0.7", "ベトナム": "0.7", "アメリカ合衆国": "0.7", "タイ": "0.7", "ナイジェリア": "0.6", "シンガポール": "0.6", "フィリピン": "0.6", "韓国": "0.5", "その他": "4.4" },
+      "top_cities": { "Osaka": "7.8", "Tokyo": "6.6", "Setagaya-ku": "4.4", "Yokohama": "3.6", "Nagoya": "3.5", "Kobe": "2.2", "Kyoto": "1.6", "その他": "64.3" },
+      "_confidence": "high"
+    }
+  },
+  "posts": [],
+  "_posts_todo": "投稿別インサイト/ の約50本(投稿01〜71本目)を後続バッチで posts[] へ抽出予定。各投稿: 投稿日/視聴回数/いいね/コメント/シェア/保存/プロフィール閲覧/リーチ/視聴維持率/平均視聴秒数 等。"
+}
