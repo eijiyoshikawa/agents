@@ -131,10 +131,18 @@
 
 ---
 
-## 付録A: クライアント提出用 Slides 出力（任意・後付け）
-Notion主軸とは独立に、クライアント提出体裁が必要な場合のみ使用する。
-同じ `report_data.json` を入力に、`/scripts/report-generator/Code.gs`（Apps Script）が
-テンプレ『【テンプレ】分析レポート』を複製して流し込む。
-ワンタイム設定（マスターテンプレのトークン化・Apps Scriptデプロイ）は
-`/scripts/report-generator/README.md` を参照。MCPではSlides中身を編集できないため、
-この経路だけは人手の初期設定が必要。
+## 付録A: クライアント提出用 Slides 出力（Notionと併走）
+Notionの一覧生成と並行して、クライアント提出体裁のGoogleスライドも作成する。
+
+### テンプレートは新規作成不要（既存を流用）
+- 既存テンプレ『【テンプレ】分析レポート』(15枚) `1CKpQVi9juA34NV4z07VJhj4pTNK4BGm6IbXFy3IpKQM` をそのまま使う。
+- **複製はMCPで即実行可**（`copy_file`）。各月次フォルダに `{client}_{月}_分析レポート` を生成し、NotionのSlidesリンク欄に記録する。
+  - 実例: REVECAREERAGENCY 2026/06 → `1Y7srMYJt9ZNGhzaE2PZoLmnRmgevAz8Fqctxo9aB9M8`
+
+### 中身の充填は2方式
+| 方式 | 内容 | 初期設定 |
+|---|---|---|
+| **手動** | MCPで複製まで自動。中の数値・画像は人が貼る | なし（即運用可） |
+| **自動** | `report_data.json` を入力に Apps Script(`Code.gs`)が流し込む | 一度だけ：①テンプレを複製し`{{TOKEN}}`化したマスターを用意 ②Apps Scriptをデプロイ・認証 |
+
+MCPではSlides中身を編集できないため、**自動充填の経路だけ**人手の初期設定（トークン化＋Apps Scriptデプロイ）が必要。詳細は `/scripts/report-generator/README.md`。
