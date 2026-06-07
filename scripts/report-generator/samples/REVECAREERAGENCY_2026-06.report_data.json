@@ -1,125 +1,79 @@
 {
-  "_about": "Claude(MCP)が 2026年06提出分 フォルダのスクショから OCR×ビジョン照合で抽出。account_analytics=概要_28日間.png由来、popular_posts上位=投稿別インサイト由来(投稿14本目はビジョン精密確認済み)。空文字('')は未確定で推定値は入れていない。このファイルは実際に同フォルダへ書き込んだ report_data.json と同一。",
-  "_extraction_notes": {
-    "verified_by_vision": ["概要_28日間.png", "投稿14本目.png"],
-    "from_ocr_only": ["投稿22本目.png", "投稿12本目.png"],
-    "period": "過去28日間 (2026/5/7-6/3)",
-    "caveats": "OCRではコメント/シェアの順が紛らわしい。クライアント提出前に上位投稿は再確認推奨。"
-  },
+  "_about": "位置ベース確定版(Code.gs)用のデータ。数値は概要_28日間.png/投稿別インサイトからClaude(MCP)が抽出した実値。narrative(summary/next_actions)は数値傾向からの下書きで人レビュー後に確定。未取得項目はキー自体を省略=テンプレ既定の placeholder を維持する。",
   "_todo": [
-    "followers_start: 運用開始時 or 前月末フォロワー数を補完(現状current=7,790のみ確定)",
-    "post_analysis_monthly: 月次平均集計スクショが未提供のため空",
-    "comments_change_pct/post_count_total/post_frequency_monthly: 元スクショに無く未取得",
-    "summary/next_actions: 数値傾向からの下書き→人レビュー後に確定"
+    "followers_start / posts_total / post_freq / comments_pct: 元スクショに無く未取得(キー省略中)",
+    "summary・next_actions・highlighted_posts.comment: 下書き。提出前に人がレビューして確定",
+    "slide6のグラフ画像/各投稿のスクショ: テンプレに画像枠が無いため手貼り(自動配置対象外)",
+    "slide8 月次平均テーブル: 集計スクショ未提供のため省略(テンプレ表を維持)"
   ],
   "meta": {
-    "client_name": "REVECAREERAGENCY",
-    "account_name": "黒崎子就職エージェント",
-    "account_handle": "kurosaki_shacho",
-    "platform": "TikTok",
+    "deck_title": "REVECAREERAGENCY_2026年6月_分析レポート",
+    "client": "REVECAREERAGENCY",
     "report_ym": "2026年6月",
-    "operation_period": "2025年6月〜2026年5月",
-    "operation_purpose": "採用応募の獲得 / ブランド認知 / フォロワー増加",
-    "data_fetch_date": "2026年6月3日",
-    "created_by": "株式会社LET マーケティング",
-    "created_date": "2026年6月7日",
-    "source_folder_id": "1HAOa5Epvuaqgr_YrQWgNhNlM5VZKulzH"
+    "author": "株式会社LET マーケティング",
+    "created": "2026年6月7日 作成"
   },
   "summary": {
-    "summary_text": "",
-    "result_text": ""
+    "basic_info": "アカウント名　『黒崎社長就職エージェント』@kurosaki_shacho\n運用期間（2025年6月〜2026年5月）\n運用目的　採用応募の獲得 / ブランド認知 / フォロワー増加",
+    "goal": "採用応募につながるブランド認知の最大化。動画視聴とプロフィール来訪を伸ばし、フォロワー基盤を拡大する。",
+    "result": "直近28日でフォロワー7,790（前回比+117%）、動画視聴203,451（+139%）、プロフィールアクセス7,212（+135%）と認知指標が大幅伸長。社長密着フォーマットが牽引役となった。"
   },
-  "account_analytics": {
-    "followers_start": "",
-    "followers_current": "7,790",
-    "follower_change_pct": "+117.35%",
-    "likes": "2,828",
-    "likes_change_pct": "+17.30%",
-    "comments": "79",
-    "comments_change_pct": "",
-    "shares": "35",
-    "shares_change_pct": "-20.18%",
-    "post_count_total": "",
-    "post_frequency_monthly": "",
+  "account": {
+    "header": "アカウント分析　（データ取得日：2026年6月3日）",
+    "followers_now": "7,790",
+    "followers_change": "+117.35",
     "video_views": "203,451",
-    "video_views_change_pct": "+139.21%",
+    "video_views_pct": "+139.21",
     "pf_access": "7,212",
-    "pf_access_change_pct": "+135.07%",
-    "reach": "190,693",
-    "reach_change_pct": "+146.21%"
+    "pf_access_pct": "+135.07",
+    "likes": "2,828",
+    "likes_pct": "+17.30",
+    "comments": "79",
+    "shares": "35",
+    "shares_pct": "-20.18"
   },
-  "post_analysis_monthly": [],
-  "popular_posts": [
-    {
-      "post_date": "2025/09/21",
-      "views": "271,300",
-      "likes": "2,500",
-      "comments": "56",
-      "shares": "47",
-      "saves": "279",
-      "new_followers": "",
-      "retention": "9.6%"
-    },
-    {
-      "post_date": "2025/11/07",
-      "views": "65,400",
-      "likes": "734",
-      "comments": "38",
-      "shares": "18",
-      "saves": "72",
-      "new_followers": "",
-      "retention": ""
-    },
-    {
-      "post_date": "2025/09/03",
-      "views": "51,000",
-      "likes": "526",
-      "comments": "24",
-      "shares": "13",
-      "saves": "79",
-      "new_followers": "",
-      "retention": ""
-    }
-  ],
+  "posts": {
+    "_note_": "slide9は2行×8列の表が3つ。各表に上位投稿を1件ずつ。1行目=ヘッダ、2行目=実値。new_followers未取得は—。",
+    "popular_table1": [
+      ["投稿日", "視聴回数", "いいね", "コメント", "シェア", "保存", "新規フォロワー", "維持率"],
+      ["2025/09/21", "271,300", "2,500", "56", "47", "279", "—", "9.6%"]
+    ],
+    "popular_table2": [
+      ["投稿日", "視聴回数", "いいね", "コメント", "シェア", "保存", "新規フォロワー", "維持率"],
+      ["2025/11/07", "65,400", "734", "38", "18", "72", "—", "—"]
+    ],
+    "popular_table3": [
+      ["投稿日", "視聴回数", "いいね", "コメント", "シェア", "保存", "新規フォロワー", "維持率"],
+      ["2025/09/03", "51,000", "526", "24", "13", "79", "—", "—"]
+    ]
+  },
   "highlighted_posts": [
     {
-      "post_date": "2025年9月21日",
-      "theme": "社長に1日密着",
-      "eval_point": "リーチ253,544・再生271.3K・プロフィール閲覧4,966。密着フォーマットが滞在と回遊を強く牽引。45-54歳層が36.9%で中心。",
-      "comment_pickup": "",
-      "image_file_id": "1jrSG9qWzV4MjCVk9cuvYyeXh-1zSlJAX"
+      "header": "投稿日：2025年9月21日　テーマ：社長に1日密着",
+      "eval": "リーチ253,544・再生271.3K・プロフィール閲覧4,966。密着フォーマットが滞在と回遊を強く牽引。45-54歳層が36.9%で中心。",
+      "comment": "（コメントピックアップは提出前に追記）"
     },
     {
-      "post_date": "2025年11月7日",
-      "theme": "お金の余裕＝心の余裕？",
-      "eval_point": "リーチ61,115・プロフィール閲覧705。価値観に踏み込む問いかけ型が保存・コメントを誘発。",
-      "comment_pickup": "",
-      "image_file_id": "1wuRUewff1Xw37veXTn1pwx3uivwlwswI"
+      "header": "投稿日：2025年11月7日　テーマ：お金の余裕＝心の余裕？",
+      "eval": "リーチ61,115・プロフィール閲覧705。価値観に踏み込む問いかけ型が保存・コメントを誘発。",
+      "comment": "（コメントピックアップは提出前に追記）"
     },
     {
-      "post_date": "2025年9月3日",
-      "theme": "皆さんの伝え方は大丈夫ですか？",
-      "eval_point": "リーチ47,908・プロフィール閲覧1,335とPF誘導が強い。実務Tips型は採用層との相性が良い。",
-      "comment_pickup": "",
-      "image_file_id": "1gnAv2VkhL1rOr1gpH0KAgYWhXSnp0Kja"
+      "header": "投稿日：2025年9月3日　テーマ：皆さんの伝え方は大丈夫ですか？",
+      "eval": "リーチ47,908・プロフィール閲覧1,335とPF誘導が強い。実務Tips型は採用層との相性が良い。",
+      "comment": "（コメントピックアップは提出前に追記）"
     }
   ],
   "next_actions": {
-    "reflection": "",
-    "current_issue": "",
-    "action_plan": "",
-    "future_measure_1": "",
-    "future_measure_2": ""
+    "reflection": "認知系指標（視聴・PFアクセス・フォロワー）は前回比+117〜139%と大幅伸長。密着・価値観・実務Tipsの3フォーマットが有効と確認できた。",
+    "current_issue": "シェア数が前回比-20%。拡散の起点となる『共有したくなる』要素が弱く、リーチの伸びをシェアに転換できていない。",
+    "next_action": "勝ち筋の社長密着シリーズを定例化。冒頭2秒の結論提示と保存導線を全投稿に標準化する。",
+    "current_issue2": "コメント数が母数に対して少なく、双方向のエンゲージメントが弱い。",
+    "next_action2": "問いかけ型CTAを各投稿末尾に挿入し、コメント返信運用でコミュニティ感を醸成する。"
   },
-  "dashboard_images": {
-    "overview_7d": "1W_3i7HHC0ttS1I7I8VBe61p6aOG3S9uZ",
-    "overview_28d": "1_QGRZ2oKEZY1C75kOAPYuxNQkm5dOEtA",
-    "overview_60d": "1hiiFYY63ak-hIdYIXKd5GcouDO0feaQD",
-    "overview_365d": "1EKZDr1T0SpqZ6_O_cb6CDZbyy4yLL0dv",
-    "audience_7d": "1I545UjQHjSSH8OgzQ_83Rccp2bWETWwB",
-    "audience_28d": "1nDRLq9a6ecCk6d5fVhz6sLYV4g3HFk2I",
-    "audience_60d": "1iaN_VhIjCXWH8b0RqSBdGyrw4Jyno4Iy",
-    "audience_365d": "1Y6Fj3d7Q0AKyFSZYI1KD4B53snljdNyK",
-    "account_overview": "18EhvKSBU_eAXGXZPl-l5rjXVJ1PltUo-"
+  "images": {
+    "_note_": "任意。slide1表紙(360x360)/slide4総括(225x276)の画像枠のみ差替可。Drive画像IDまたは公開URL。空=テンプレ画像を維持。",
+    "cover": "",
+    "summary": ""
   }
 }

@@ -1,248 +1,289 @@
 /**
- * SNS分析レポート 自動生成レンダラ (Google Apps Script)
+ * SNS分析レポート 自動生成レンダラ (Google Apps Script) — 位置ベース確定版
  * ------------------------------------------------------------
- * 役割: 月次『提出分』フォルダ内の report_data.json を読み込み、
- *       テンプレ『【テンプレ】分析レポート』を複製して数値・表・画像を流し込む。
+ * 役割: 提出分フォルダ内の report_data.json を読み込み、マスターテンプレを複製して
+ *       数値・テキスト・表・画像を「シェイプの位置(left,top)」で特定して流し込む。
  *
- * 責務分担:
- *   - 数値抽出(画像→JSON) ... Claude(MCP)が実施し report_data.json を同フォルダへ出力
- *   - 描画(複製/差し込み)  ... 本スクリプト
- *   - 一覧管理(Notion)     ... 後段(別途連携)
- *
- * 前提(ワンタイム設定):
- *   1. テンプレを複製し『{{TOKEN}}』形式のプレースホルダを埋め込んだ
- *      「マスターテンプレ」を用意し、その ID を TEMPLATE_ID に設定する。
- *      (元テンプレは "0,000"/"テキスト" が重複し replaceAllText が誤爆するため)
- *      トークン一覧は本ファイル末尾の TOKEN_MAP コメントを参照。
- *   2. スクリプトに Drive / Slides の権限を付与(初回実行時に承認)。
+ * 設計方針:
+ *   - トークン化(穴埋め{{}})は不要。元テンプレをそのまま複製して直接当て込む。
+ *   - シェイプ特定は objectId ではなく position(left,top) で行う(複製でID再採番されても安全)。
+ *   - 位置マップは deck_structure.json(inspectDeck の出力)から確定済み。
  *
  * 使い方:
- *   - スプレッドシート/スライドにバインドした場合: メニュー「レポート生成」から実行
- *   - 単体実行: generateReportForFolder('<提出分フォルダID>') を直接実行
+ *   1) TEMPLATE_ID にマスター「【テンプレ】分析レポート-マスターデータ」のIDを設定(設定済み)
+ *   2) 提出分フォルダに report_data.json を置く(samples/ のサンプルを参照)
+ *   3) generateReportForFolder('<提出分フォルダID>') を実行
+ *      または generateReportFromDataFile('<report_data.jsonのファイルID>') を実行
  */
 
 // ===== 設定 =====
-var TEMPLATE_ID = 'PUT_TOKENIZED_MASTER_TEMPLATE_ID_HERE'; // {{TOKEN}}化したマスターのID
-var DATA_FILENAME = 'report_data.json';                    // 同フォルダ内のデータファイル名
+var TEMPLATE_ID = '1EHHEVOZTm7GkrU111lU69Nz1x-cwsgMfpu1unaWzazA'; // マスター「-マスターデータ」
+var DATA_FILENAME = 'report_data.json';
+var POS_TOLERANCE = 2; // 位置一致の許容誤差(pt)
 
 /**
- * 指定フォルダに対しレポートを1本生成する。
- * @param {string} folderId 月次『提出分』フォルダのID
- * @return {string} 生成したプレゼンテーションのURL
+ * 流し込み対象マップ。slide番号(1始まり) → [{l:left, t:top, key:データキー}]
+ * key は flatten 済みデータ(buildFields_)のプロパティ名。
+ * 合成テキスト(タイトル等)は「完成済み文字列」をデータ側で渡す前提で全文 setText する。
  */
+var TEXT_MAP = {
+  1: [
+    { l: 130, t: 238, key: 's1_author' },    // "株式会社LET マーケティング 〇〇"
+    { l: 130, t: 268, key: 's1_created' }    // "2026年6月7日 作成"
+  ],
+  4: [
+    { l: 45,  t: 111, key: 's4_basic_info' },// 基本情報ブロック(複数行)
+    { l: 45,  t: 253, key: 's4_goal' },      // 目標 本文
+    { l: 45,  t: 331, key: 's4_result' }     // 結果 本文
+  ],
+  6: [
+    { l: 43,  t: 42,  key: 's6_header' },        // "アカウント分析　（データ取得日：…）"
+    // 左: フォロワー数推移
+    { l: 134, t: 93,  key: 's6_followers_start' },
+    { l: 134, t: 152, key: 's6_followers_now' },
+    { l: 143, t: 218, key: 's6_followers_change' }, // 前回比%
+    // 左下: 投稿数(累計) / 投稿頻度(月間)
+    { l: 98,  t: 308, key: 's6_posts_total' },
+    { l: 254, t: 322, key: 's6_post_freq' },
+    // 右: エンゲージメント(値)
+    { l: 400, t: 97,  key: 's6_video_views' },
+    { l: 400, t: 151, key: 's6_pf_access' },
+    { l: 400, t: 203, key: 's6_likes' },
+    { l: 400, t: 257, key: 's6_comments' },
+    { l: 400, t: 310, key: 's6_shares' },
+    // 右: 前月比%
+    { l: 562, t: 105, key: 's6_video_views_pct' },
+    { l: 562, t: 155, key: 's6_pf_access_pct' },
+    { l: 561, t: 211, key: 's6_likes_pct' },
+    { l: 561, t: 261, key: 's6_comments_pct' },
+    { l: 561, t: 317, key: 's6_shares_pct' }
+  ],
+  10: [
+    { l: 45,  t: 121, key: 's10_post_header' }, // "投稿日：… テーマ：…"
+    { l: 45,  t: 223, key: 's10_eval' },
+    { l: 44,  t: 339, key: 's10_comment' }
+  ],
+  11: [
+    { l: 45,  t: 121, key: 's11_post_header' },
+    { l: 45,  t: 223, key: 's11_eval' },
+    { l: 44,  t: 339, key: 's11_comment' }
+  ],
+  12: [
+    { l: 45,  t: 121, key: 's12_post_header' },
+    { l: 45,  t: 223, key: 's12_eval' },
+    { l: 44,  t: 339, key: 's12_comment' }
+  ],
+  14: [
+    { l: 45,  t: 85,  key: 's14_reflection' },   // 振り返り
+    { l: 45,  t: 196, key: 's14_current_issue' },// 現状の課題
+    { l: 46,  t: 302, key: 's14_next_action' }   // 今後の施策
+  ],
+  15: [
+    { l: 45,  t: 85,  key: 's15_current_issue' },
+    { l: 46,  t: 190, key: 's15_next_action' }
+  ]
+};
+
+/**
+ * 部分置換マップ。書式(フォントサイズ等)を保ちたい合成ボックス用。
+ * slide番号 → [{l,t, find:置換対象文字列, key:データキー}]
+ */
+var REPLACE_MAP = {
+  1: [{ l: 61, t: 81, find: '202●年●月', key: 's1_title_date' }] // 表紙の日付のみ差し替え
+};
+
+/** 表の位置マップ。slide番号 → [{t:top, key:データキー(2次元配列)}] */
+var TABLE_MAP = {
+  8: [{ t: 85,  key: 's8_table' }],
+  9: [{ t: 85,  key: 's9_table1' }, { t: 184, key: 's9_table2' }, { t: 283, key: 's9_table3' }]
+};
+
+/** 画像の位置マップ。slide番号 → [{l,t, key:画像URL}] (任意。URLが無ければスキップ) */
+var IMAGE_MAP = {
+  1: [{ l: 358, t: 23,  key: 's1_image_url' }],
+  4: [{ l: 430, t: 71,  key: 's4_image_url' }]
+};
+
+// ===== エントリポイント =====
 function generateReportForFolder(folderId) {
   var folder = DriveApp.getFolderById(folderId);
-  var data = readReportData_(folder);
-  var deck = duplicateTemplate_(folder, data);
+  var it = folder.getFilesByName(DATA_FILENAME);
+  if (!it.hasNext()) throw new Error(DATA_FILENAME + ' が見つかりません: ' + folder.getName());
+  var data = JSON.parse(it.next().getBlob().getDataAsString('UTF-8'));
+  return render_(data, folder);
+}
 
-  fillTextTokens_(deck, data);
-  fillPostAnalysisTable_(deck, data);    // slide8: 投稿分析(月次)
-  fillPopularPostsTable_(deck, data);    // slide9: 伸びた投稿
-  insertDashboardImages_(deck, data);    // slide6: グラフ画像
-  insertHighlightedPostImages_(deck, data); // slide10-12: よかった投稿画像
+function generateReportFromDataFile(dataFileId) {
+  var file = DriveApp.getFileById(dataFileId);
+  var data = JSON.parse(file.getBlob().getDataAsString('UTF-8'));
+  return render_(data, file.getParents().hasNext() ? file.getParents().next() : null);
+}
 
+/** 複製→流し込み→保存 */
+function render_(data, folder) {
+  var fields = buildFields_(data);
+  var name = (fields._deck_title || '分析レポート');
+  var copyFile = DriveApp.getFileById(TEMPLATE_ID).makeCopy(name);
+  if (folder) { folder.addFile(copyFile); DriveApp.getRootFolder().removeFile(copyFile); }
+
+  var deck = SlidesApp.openById(copyFile.getId());
+  var slides = deck.getSlides();
+  fillTexts_(slides, fields);
+  fillReplaces_(slides, fields);
+  fillTables_(slides, fields);
+  fillImages_(slides, fields);
   deck.saveAndClose();
+
   var url = 'https://docs.google.com/presentation/d/' + deck.getId() + '/edit';
   Logger.log('生成完了: ' + url);
   return url;
 }
 
-/** 同フォルダ内の report_data.json を読み込んでオブジェクト化 */
-function readReportData_(folder) {
-  var it = folder.getFilesByName(DATA_FILENAME);
-  if (!it.hasNext()) {
-    throw new Error(DATA_FILENAME + ' がフォルダ内に見つかりません: ' + folder.getName());
-  }
-  return JSON.parse(it.next().getBlob().getDataAsString('UTF-8'));
-}
-
-/** マスターテンプレを複製し、命名してフォルダへ配置 */
-function duplicateTemplate_(folder, data) {
-  var m = data.meta || {};
-  var name = [m.client_name, m.report_ym, '分析レポート'].filter(String).join('_');
-  var copy = DriveApp.getFileById(TEMPLATE_ID).makeCopy(name, folder);
-  return SlidesApp.openById(copy.getId());
-}
-
-/** {{TOKEN}} を実値へ一括置換 */
-function fillTextTokens_(deck, data) {
-  var map = buildTokenMap_(data);
-  Object.keys(map).forEach(function (token) {
-    var value = map[token] == null ? '' : String(map[token]);
-    deck.replaceAllText('{{' + token + '}}', value);
+// ===== テキスト流し込み =====
+function fillTexts_(slides, fields) {
+  Object.keys(TEXT_MAP).forEach(function (sn) {
+    var slide = slides[Number(sn) - 1];
+    if (!slide) return;
+    TEXT_MAP[sn].forEach(function (m) {
+      if (!(m.key in fields)) return;             // データ未指定はテンプレ既定値を維持
+      var shape = findShapeByPos_(slide, m.l, m.t);
+      if (shape) shape.getText().setText(toStr_(fields[m.key]));
+      else Logger.log('未検出(text) slide' + sn + ' @' + m.l + ',' + m.t);
+    });
   });
 }
 
-/** report_data → トークン辞書。値が無いものは空文字に */
-function buildTokenMap_(data) {
-  var m = data.meta || {};
-  var s = data.summary || {};
-  var a = data.account_analytics || {};
-  var n = data.next_actions || {};
-  var h = data.highlighted_posts || [];
-  var map = {
-    CLIENT_NAME: m.client_name, ACCOUNT_NAME: m.account_name, ACCOUNT_HANDLE: m.account_handle,
-    REPORT_YM: m.report_ym, OPERATION_PERIOD: m.operation_period, OPERATION_PURPOSE: m.operation_purpose,
-    DATA_FETCH_DATE: m.data_fetch_date, CREATED_BY: m.created_by, CREATED_DATE: m.created_date,
-    SUMMARY_TEXT: s.summary_text, RESULT_TEXT: s.result_text,
-    FOLLOWERS_START: a.followers_start, FOLLOWERS_CURRENT: a.followers_current, FOLLOWER_CHANGE_PCT: a.follower_change_pct,
-    LIKES: a.likes, LIKES_PCT: a.likes_change_pct, COMMENTS: a.comments, COMMENTS_PCT: a.comments_change_pct,
-    SHARES: a.shares, SHARES_PCT: a.shares_change_pct, POST_COUNT: a.post_count_total, POST_FREQ: a.post_frequency_monthly,
-    VIDEO_VIEWS: a.video_views, VIDEO_VIEWS_PCT: a.video_views_change_pct, PF_ACCESS: a.pf_access, PF_ACCESS_PCT: a.pf_access_change_pct,
-    REACH: a.reach, REACH_PCT: a.reach_change_pct,
-    REFLECTION: n.reflection, CURRENT_ISSUE: n.current_issue, ACTION_PLAN: n.action_plan,
-    FUTURE_MEASURE_1: n.future_measure_1, FUTURE_MEASURE_2: n.future_measure_2
+// ===== 部分置換(書式維持) =====
+function fillReplaces_(slides, fields) {
+  Object.keys(REPLACE_MAP).forEach(function (sn) {
+    var slide = slides[Number(sn) - 1];
+    if (!slide) return;
+    REPLACE_MAP[sn].forEach(function (m) {
+      if (!(m.key in fields)) return;
+      var shape = findShapeByPos_(slide, m.l, m.t);
+      if (shape) shape.getText().replaceAllText(m.find, toStr_(fields[m.key]));
+      else Logger.log('未検出(replace) slide' + sn + ' @' + m.l + ',' + m.t);
+    });
+  });
+}
+
+// ===== 表流し込み(既存セルを上書き。行数はテンプレの範囲内で) =====
+function fillTables_(slides, fields) {
+  Object.keys(TABLE_MAP).forEach(function (sn) {
+    var slide = slides[Number(sn) - 1];
+    if (!slide) return;
+    var tables = slide.getTables();
+    TABLE_MAP[sn].forEach(function (m) {
+      if (!fields[m.key]) return;
+      var table = pickTableByTop_(tables, m.t);
+      if (!table) { Logger.log('未検出(table) slide' + sn + ' top' + m.t); return; }
+      writeTable_(table, fields[m.key]);
+    });
+  });
+}
+
+function writeTable_(table, matrix) {
+  var nR = table.getNumRows(), nC = table.getNumColumns();
+  for (var r = 0; r < matrix.length && r < nR; r++) {
+    var row = matrix[r] || [];
+    for (var c = 0; c < row.length && c < nC; c++) {
+      if (row[c] == null) continue;
+      table.getCell(r, c).getText().setText(toStr_(row[c]));
+    }
+  }
+}
+
+// ===== 画像差し替え(任意) =====
+function fillImages_(slides, fields) {
+  Object.keys(IMAGE_MAP).forEach(function (sn) {
+    var slide = slides[Number(sn) - 1];
+    if (!slide) return;
+    IMAGE_MAP[sn].forEach(function (m) {
+      var url = fields[m.key];
+      if (!url) return;
+      var img = findImageByPos_(slide, m.l, m.t);
+      if (!img) { Logger.log('未検出(image) slide' + sn + ' @' + m.l + ',' + m.t); return; }
+      try {
+        if (/^https?:\/\//.test(url)) img.replace(url);            // 公開URL
+        else img.replace(DriveApp.getFileById(url).getBlob());     // DriveファイルID
+      } catch (e) { Logger.log('画像差替失敗 ' + m.key + ': ' + e); }
+    });
+  });
+}
+
+// ===== シェイプ探索(位置ベース) =====
+function findShapeByPos_(slide, l, t) {
+  return nearest_(slide.getShapes(), l, t);
+}
+function findImageByPos_(slide, l, t) {
+  return nearest_(slide.getImages(), l, t);
+}
+function nearest_(els, l, t) {
+  for (var i = 0; i < els.length; i++) {
+    if (Math.abs(els[i].getLeft() - l) <= POS_TOLERANCE &&
+        Math.abs(els[i].getTop() - t) <= POS_TOLERANCE) return els[i];
+  }
+  return null;
+}
+function pickTableByTop_(tables, t) {
+  for (var i = 0; i < tables.length; i++) {
+    if (Math.abs(tables[i].getTop() - t) <= POS_TOLERANCE) return tables[i];
+  }
+  return null;
+}
+function toStr_(v) { return v == null ? '' : String(v); }
+
+// ===== データ整形: report_data.json → flatフィールド =====
+function buildFields_(data) {
+  var m = data.meta || {}, s = data.summary || {}, a = data.account || {},
+      p = data.posts || {}, n = data.next_actions || {}, img = data.images || {};
+  var hi = data.highlighted_posts || [];
+  var f = {
+    _deck_title: m.deck_title || [m.client, m.report_ym, '分析レポート'].filter(String).join('_'),
+    // slide1
+    s1_title_date: m.report_ym, s1_author: m.author, s1_created: m.created,
+    s1_image_url: img.cover,
+    // slide4
+    s4_basic_info: s.basic_info, s4_goal: s.goal, s4_result: s.result,
+    s4_image_url: img.summary,
+    // slide6
+    s6_header: a.header,
+    s6_followers_start: a.followers_start, s6_followers_now: a.followers_now,
+    s6_followers_change: a.followers_change,
+    s6_posts_total: a.posts_total, s6_post_freq: a.post_freq,
+    s6_video_views: a.video_views, s6_video_views_pct: a.video_views_pct,
+    s6_pf_access: a.pf_access, s6_pf_access_pct: a.pf_access_pct,
+    s6_likes: a.likes, s6_likes_pct: a.likes_pct,
+    s6_comments: a.comments, s6_comments_pct: a.comments_pct,
+    s6_shares: a.shares, s6_shares_pct: a.shares_pct,
+    // slide8/9 tables
+    s8_table: p.monthly_table, s9_table1: p.popular_table1,
+    s9_table2: p.popular_table2, s9_table3: p.popular_table3,
+    // slide14/15
+    s14_reflection: n.reflection, s14_current_issue: n.current_issue, s14_next_action: n.next_action,
+    s15_current_issue: n.current_issue2, s15_next_action: n.next_action2
   };
+  // slide10-12 よかった投稿(配列の0..2)
   for (var i = 0; i < 3; i++) {
-    var p = h[i] || {};
-    map['POST_DATE_' + (i + 1)] = p.post_date;
-    map['POST_THEME_' + (i + 1)] = p.theme;
-    map['POST_EVAL_' + (i + 1)] = p.eval_point;
-    map['POST_COMMENT_' + (i + 1)] = p.comment_pickup;
+    var h = hi[i] || {}, sn = (10 + i);
+    f['s' + sn + '_post_header'] = h.header;
+    f['s' + sn + '_eval'] = h.eval;
+    f['s' + sn + '_comment'] = h.comment;
   }
-  return map;
+  // 未指定キーは「テンプレ既定値維持」のため削除しておく
+  Object.keys(f).forEach(function (k) { if (f[k] === undefined) delete f[k]; });
+  return f;
 }
 
-/** slide8 の月次テーブルを埋める(プレースホルダ表 {{TBL_POST_ANALYSIS}} を含むスライドを起点) */
-function fillPostAnalysisTable_(deck, data) {
-  var rows = data.post_analysis_monthly || [];
-  if (!rows.length) return;
-  var header = ['', '投稿', '平均IMP', '平均リーチ', '平均いいね', '平均保存', '平均秒数', '平均再生秒', '平均維持率'];
-  var matrix = rows.map(function (r) {
-    return [r.month, r.posts, r.avg_impressions, r.avg_reach, r.avg_likes, r.avg_saves, r.avg_seconds, r.avg_play_seconds, r.avg_retention];
-  });
-  replaceTableByToken_(deck, '{{TBL_POST_ANALYSIS}}', header, matrix);
-}
-
-/** slide9 の伸びた投稿テーブルを埋める */
-function fillPopularPostsTable_(deck, data) {
-  var rows = data.popular_posts || [];
-  if (!rows.length) return;
-  var header = ['投稿日', '視聴回数', 'いいね', 'コメント', 'シェア', '保存', '新規フォロワー', '維持率'];
-  var matrix = rows.map(function (r) {
-    return [r.post_date, r.views, r.likes, r.comments, r.shares, r.saves, r.new_followers, r.retention];
-  });
-  replaceTableByToken_(deck, '{{TBL_POPULAR_POSTS}}', header, matrix);
-}
-
-/**
- * トークンを含むテキストボックスがあるスライドに、新規テーブルを生成して値を流し込む。
- * (テンプレ側の表セルを直接編集するのは構造が壊れやすいため、新規テーブルを置く方式)
- */
-function replaceTableByToken_(deck, token, header, matrix) {
-  var slide = findSlideWithText_(deck, token);
-  if (!slide) { Logger.log('表トークン未検出: ' + token); return; }
-  var all = [header].concat(matrix);
-  var table = slide.insertTable(all.length, header.length);
-  for (var r = 0; r < all.length; r++) {
-    for (var c = 0; c < header.length; c++) {
-      table.getCell(r, c).getText().setText(all[r][c] == null ? '' : String(all[r][c]));
-    }
-  }
-  removeTextToken_(slide, token);
-}
-
-/** slide6: ダッシュボードのグラフ画像を貼り込む(プレースホルダ {{IMG_*}} の位置へ) */
-function insertDashboardImages_(deck, data) {
-  var imgs = data.dashboard_images || {};
-  var pairs = [
-    ['{{IMG_OVERVIEW_28D}}', imgs.overview_28d],
-    ['{{IMG_OVERVIEW_60D}}', imgs.overview_60d],
-    ['{{IMG_AUDIENCE_28D}}', imgs.audience_28d],
-    ['{{IMG_ACCOUNT_OVERVIEW}}', imgs.account_overview]
-  ];
-  pairs.forEach(function (pr) {
-    if (pr[1]) insertImageAtToken_(deck, pr[0], pr[1]);
-  });
-}
-
-/** slide10-12: よかった投稿の画像を貼り込む */
-function insertHighlightedPostImages_(deck, data) {
-  var h = data.highlighted_posts || [];
-  for (var i = 0; i < Math.min(h.length, 3); i++) {
-    if (h[i] && h[i].image_file_id) {
-      insertImageAtToken_(deck, '{{IMG_POST_' + (i + 1) + '}}', h[i].image_file_id);
-    }
-  }
-}
-
-/** 指定トークンのテキストボックス位置にDrive画像を挿入し、トークンを消す */
-function insertImageAtToken_(deck, token, fileId) {
-  var slide = findSlideWithText_(deck, token);
-  if (!slide) { Logger.log('画像トークン未検出: ' + token); return; }
-  var shape = findShapeWithText_(slide, token);
-  var blob = DriveApp.getFileById(fileId).getBlob();
-  var img = slide.insertImage(blob);
-  if (shape) {
-    img.setLeft(shape.getLeft()).setTop(shape.getTop());
-    fitWithin_(img, shape.getWidth(), shape.getHeight());
-    shape.remove();
-  }
-}
-
-/** 画像をボックス内に収まるよう等比縮小 */
-function fitWithin_(img, maxW, maxH) {
-  var ratio = Math.min(maxW / img.getWidth(), maxH / img.getHeight(), 1);
-  img.setWidth(img.getWidth() * ratio).setHeight(img.getHeight() * ratio);
-}
-
-// ===== ユーティリティ =====
-function findSlideWithText_(deck, text) {
-  var slides = deck.getSlides();
-  for (var i = 0; i < slides.length; i++) {
-    if (slideContainsText_(slides[i], text)) return slides[i];
-  }
-  return null;
-}
-function slideContainsText_(slide, text) {
-  return !!findShapeWithText_(slide, text);
-}
-function findShapeWithText_(slide, text) {
-  var shapes = slide.getShapes();
-  for (var i = 0; i < shapes.length; i++) {
-    var t = shapes[i].getText && shapes[i].getText();
-    if (t && t.asString().indexOf(text) !== -1) return shapes[i];
-  }
-  return null;
-}
-function removeTextToken_(slide, token) {
-  var shape = findShapeWithText_(slide, token);
-  if (shape) shape.getText().replaceAllText(token, '');
-}
-
-// ===== バインド時メニュー =====
+// ===== バインド時メニュー(任意) =====
 function onOpen() {
-  var ui = (SpreadsheetApp.getUi && SpreadsheetApp.getUi()) || (SlidesApp.getUi && SlidesApp.getUi());
+  var ui = (SlidesApp.getUi && SlidesApp.getUi()) || (SpreadsheetApp.getUi && SpreadsheetApp.getUi());
   if (ui) ui.createMenu('レポート生成').addItem('フォルダIDを指定して生成', 'promptAndGenerate_').addToUi();
 }
 function promptAndGenerate_() {
-  var ui = SpreadsheetApp.getUi ? SpreadsheetApp.getUi() : SlidesApp.getUi();
+  var ui = SlidesApp.getUi ? SlidesApp.getUi() : SpreadsheetApp.getUi();
   var res = ui.prompt('提出分フォルダIDを入力してください');
   if (res.getSelectedButton() === ui.Button.OK) {
-    var url = generateReportForFolder(res.getResponseText().trim());
-    ui.alert('生成完了:\n' + url);
+    ui.alert('生成完了:\n' + generateReportForFolder(res.getResponseText().trim()));
   }
 }
-
-/* =====================================================================
- * TOKEN_MAP — マスターテンプレに埋め込むプレースホルダ一覧
- * ---------------------------------------------------------------------
- * slide1  表紙       : {{REPORT_YM}} {{CREATED_BY}} {{CREATED_DATE}}
- * slide4  総括       : {{ACCOUNT_NAME}} {{ACCOUNT_HANDLE}} {{OPERATION_PERIOD}}
- *                      {{OPERATION_PURPOSE}} {{SUMMARY_TEXT}} {{RESULT_TEXT}}
- * slide6  アカウント : {{DATA_FETCH_DATE}} {{FOLLOWERS_START}} {{FOLLOWERS_CURRENT}}
- *                      {{FOLLOWER_CHANGE_PCT}} {{LIKES}} {{LIKES_PCT}} {{COMMENTS}}
- *                      {{COMMENTS_PCT}} {{SHARES}} {{SHARES_PCT}} {{POST_COUNT}}
- *                      {{POST_FREQ}} {{VIDEO_VIEWS}} {{VIDEO_VIEWS_PCT}} {{PF_ACCESS}}
- *                      {{PF_ACCESS_PCT}} {{REACH}} {{REACH_PCT}}
- *                      画像枠: {{IMG_OVERVIEW_28D}} {{IMG_OVERVIEW_60D}}
- *                              {{IMG_AUDIENCE_28D}} {{IMG_ACCOUNT_OVERVIEW}}
- * slide8  投稿分析   : 表枠テキストボックス {{TBL_POST_ANALYSIS}}
- * slide9  伸びた投稿 : 表枠テキストボックス {{TBL_POPULAR_POSTS}}
- * slide10 よかった投稿: {{POST_DATE_1}} {{POST_THEME_1}} {{POST_EVAL_1}}
- *                       {{POST_COMMENT_1}} 画像枠 {{IMG_POST_1}}
- * slide11 よかった投稿: _2 系
- * slide12 よかった投稿: _3 系
- * slide14 次回施策   : {{REFLECTION}} {{CURRENT_ISSUE}} {{FUTURE_MEASURE_2}}
- * slide15 次回施策   : {{ACTION_PLAN}} {{FUTURE_MEASURE_1}} {{FUTURE_MEASURE_2}}
- * ===================================================================== */
