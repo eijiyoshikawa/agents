@@ -1,112 +1,189 @@
-import json, collections
+#!/usr/bin/env python3
+"""
+extraction_master.json -> report_data.json 変換（クライアント非依存・再利用可）
 
-src = json.load(open('scripts/report-generator/samples/REVECAREERAGENCY_2026-06.extraction_master.json'))
-posts = src['posts']
+抽出マスター（Claudeがスクショから生成）から、レンダラ(Code.gs)が消費する
+report_data.json を機械生成する。アカウント数値・月次表・上位投稿は自動算出、
+ナラティブ(総括/施策)は数値からのドラフトを生成し【要レビュー】を付す。
+
+使い方:
+  python3 build_report_data.py \
+      --master path/to/extraction_master.json \
+      --out    path/to/report_data.json \
+      --client REVECAREERAGENCY --ym 2026年6月 --data-date 2026年6月3日 \
+      --account-name 黒崎社長就職エージェント --handle kurosaki_shacho \
+      --period 2025年6月〜2026年5月 --months 6
+
+依存: 標準ライブラリのみ。
+"""
+import argparse, json, collections
+
 
 def num(s):
-    if s is None: return None
-    s = str(s).replace(',', '').strip()
-    if s == '': return None
+    if s is None:
+        return None
+    s = str(s).replace(',', '').replace('+', '').replace('%', '').strip()
+    if s in ('', '—', '-'):
+        return None
     try:
-        if s.endswith('M'): return int(float(s[:-1]) * 1_000_000)
-        if s.endswith('K'): return int(float(s[:-1]) * 1_000)
+        if s.endswith('M'):
+            return int(float(s[:-1]) * 1_000_000)
+        if s.endswith('K'):
+            return int(float(s[:-1]) * 1_000)
         return float(s) if '.' in s else int(s)
-    except: return None
+    except ValueError:
+        return None
 
-# monthly aggregation
-months = collections.OrderedDict()
-for p in posts:
-    ym = p['date'][:7]
-    months.setdefault(ym, []).append(p)
 
 def avg(vals):
     vals = [v for v in vals if v is not None]
-    return round(sum(vals)/len(vals)) if vals else None
+    return round(sum(vals) / len(vals)) if vals else None
 
-monthly_rows = []
-for ym, ps in months.items():
-    monthly_rows.append({
-        'ym': ym, 'count': len(ps),
-        'views': avg([num(p['views']) for p in ps]),
-        'reach': avg([num(p['reach']) for p in ps]),
-        'likes': avg([num(p['likes']) for p in ps]),
-        'saves': avg([num(p['saves']) for p in ps]),
-        'pf':    avg([num(p['pf']) for p in ps]),
-        'avg_s': avg([num(p['avg_s']) for p in ps]),
-        'cr':    avg([num(p['cr']) for p in ps]),
-    })
 
-def fmt(n): return '' if n is None else f"{n:,}"
-def label(ym):
-    y,m = ym.split('-'); return f"{y}/{int(m)}月"
+def fmt(n):
+    return '' if n is None else f"{n:,}"
 
-# slide8: recent 6 months
-recent = monthly_rows[-6:]
-header8 = ['月','投稿数','平均再生','平均リーチ','平均いいね','平均保存','平均PF閲覧','平均視聴秒','平均完了率']
-table8 = [header8] + [[label(r['ym']), str(r['count']), fmt(r['views']), fmt(r['reach']),
-                       fmt(r['likes']), fmt(r['saves']), fmt(r['pf']),
-                       ('' if r['avg_s'] is None else f"{r['avg_s']}s"),
-                       ('' if r['cr'] is None else f"{r['cr']}%")] for r in recent]
 
-# top3 by views
-top3 = sorted(posts, key=lambda p: (num(p['views']) or 0), reverse=True)[:3]
-header9 = ['投稿日','視聴回数','いいね','コメント','シェア','保存','PF閲覧','完了率']
-def trow(p): return [p['date'], p['views'], p['likes'], p['comments'] or '—',
-                     p['shares'] or '—', p['saves'], p['pf'], f"{p['cr']}%"]
+def month_label(ym):
+    y, m = ym.split('-')
+    return f"{y}/{int(m)}月"
 
-report = {
-  "meta": {
-    "deck_title": "REVECAREERAGENCY_2026年6月_分析レポート",
-    "client": "REVECAREERAGENCY", "report_ym": "2026年6月",
-    "author": "株式会社LET マーケティング", "created": "2026年6月7日 作成"
-  },
-  "summary": {
-    "basic_info": "アカウント名　『黒崎社長就職エージェント』@kurosaki_shacho\n運用期間（2025年6月〜2026年5月）\n運用目的　採用応募の獲得 / ブランド認知 / フォロワー増加",
-    "goal": "採用応募につながるブランド認知の最大化。動画視聴とプロフィール来訪を伸ばし、フォロワー基盤を拡大する。",
-    "result": "直近28日でフォロワー7,790（前回比+117%）、動画視聴203,451（+139%）、プロフィールアクセス7,212（+135%）と認知指標が大幅伸長。社長密着・ドッキリ系が牽引し、年間では再生390万・新規フォロワー8,474を獲得。"
-  },
-  "account": {
-    "header": "アカウント分析　（データ取得日：2026年6月3日）",
-    "followers_start": "7,210", "followers_now": "7,790", "followers_change": "+117.35",
-    "posts_total": "71", "post_freq": "6", "comments_pct": "—",
-    "video_views": "203,451", "video_views_pct": "+139.21",
-    "pf_access": "7,212", "pf_access_pct": "+135.07",
-    "likes": "2,828", "likes_pct": "+17.30",
-    "comments": "79", "shares": "35", "shares_pct": "-20.18"
-  },
-  "posts": {
-    "header_monthly": "投稿分析　（データ取得期間：2025年12月〜2026年5月）",
-    "header_popular": "伸びた投稿分析　（データ取得期間：2025年6月〜2026年5月）",
-    "monthly_table": table8,
-    "popular_table1": [header9, trow(top3[0])],
-    "popular_table2": [header9, trow(top3[1])],
-    "popular_table3": [header9, trow(top3[2])]
-  },
-  "highlighted_posts": [
-    {"header": f"投稿日：{top3[0]['date']}　テーマ：{top3[0]['theme']}",
-     "eval": f"再生{top3[0]['views']}・リーチ{top3[0]['reach']}・PF閲覧{top3[0]['pf']}・完了率{top3[0]['cr']}%。社長を巻き込むドッキリ企画が圧倒的な拡散とプロフィール来訪を生んだ。",
-     "comment": "（コメントピックアップは提出前に追記）"},
-    {"header": f"投稿日：{top3[1]['date']}　テーマ：{top3[1]['theme']}",
-     "eval": f"再生{top3[1]['views']}・リーチ{top3[1]['reach']}・PF閲覧{top3[1]['pf']}・平均視聴{top3[1]['avg_s']}s。クイズ形式で長尺でも最後まで視聴され、保存{top3[1]['saves']}件と高い。",
-     "comment": "（コメントピックアップは提出前に追記）"},
-    {"header": f"投稿日：{top3[2]['date']}　テーマ：{top3[2]['theme']}",
-     "eval": f"再生{top3[2]['views']}・リーチ{top3[2]['reach']}・PF閲覧{top3[2]['pf']}・平均視聴{top3[2]['avg_s']}s。社長の素顔が見える密着フォーマットが採用検討層に深く刺さった。",
-     "comment": "（コメントピックアップは提出前に追記）"}
-  ],
-  "next_actions": {
-    "reflection": "認知系指標（視聴・PFアクセス・フォロワー）は前回比+117〜139%と大幅伸長。ドッキリ／社長密着／クイズの3フォーマットが勝ち筋と確認。",
-    "current_issue": "シェアが前回比-20%。バズは一部の大型企画に依存し、共有を生む型が再現できていない。",
-    "next_action": "社長密着・ドッキリのシリーズ化で再現性を確保。冒頭2秒の結論提示と保存導線を全投稿に標準化する。",
-    "current_issue2": "母数に対しコメントが少なく双方向性が弱い。45-54歳中心で若手採用層(25-34)の比率が低い。",
-    "next_action2": "問いかけ型CTAでコメントを誘発。若手向けテーマ（選考Tips・キャリア相談）を増やし25-34層を取り込む。"
-  },
-  "images": {"cover": "", "summary": ""}
-}
 
-open('scripts/report-generator/samples/REVECAREERAGENCY_2026-06.report_data.json','w').write(
-    json.dumps(report, ensure_ascii=False, indent=2))
-print("== monthly (recent6) ==")
-for r in table8: print(r)
-print("== top3 ==")
-for p in top3: print(p['date'], p['theme'], p['views'])
-print("OK")
+def build_account(master):
+    """28日概要 + アカウント概要から slide6 ブロックを作る"""
+    a = master.get('account', {})
+    d28 = master.get('overview_by_period', {}).get('d28', {})
+    foll_now = a.get('followers_total', '')
+    net = num(d28.get('net_followers'))
+    foll_now_n = num(foll_now)
+    start = fmt(foll_now_n - net) if (foll_now_n is not None and net is not None) else ''
+    posts = master.get('posts', [])
+    return {
+        "header": "",  # 呼び出し側で data-date を埋める
+        "followers_start": start,
+        "followers_now": foll_now,
+        "followers_change": str(d28.get('new_followers_pct', '')).replace('%', ''),
+        "posts_total": str(len(posts)) if posts else '',
+        "post_freq": str(round(len(posts) / 12)) if posts else '',
+        "comments_pct": str(d28.get('comments_pct', '—')).replace('%', '') or '—',
+        "video_views": d28.get('video_views', ''),
+        "video_views_pct": str(d28.get('video_views_pct', '')).replace('%', ''),
+        "pf_access": d28.get('pf_views', ''),
+        "pf_access_pct": str(d28.get('pf_views_pct', '')).replace('%', ''),
+        "likes": d28.get('likes', ''),
+        "likes_pct": str(d28.get('likes_pct', '')).replace('%', ''),
+        "comments": d28.get('comments', ''),
+        "shares": d28.get('shares', ''),
+        "shares_pct": str(d28.get('shares_pct', '')).replace('%', ''),
+    }
+
+
+def build_monthly(posts, months):
+    by = collections.OrderedDict()
+    for p in posts:
+        by.setdefault(p['date'][:7], []).append(p)
+    rows = []
+    for ym, ps in by.items():
+        rows.append([
+            month_label(ym), str(len(ps)),
+            fmt(avg([num(p.get('views')) for p in ps])),
+            fmt(avg([num(p.get('reach')) for p in ps])),
+            fmt(avg([num(p.get('likes')) for p in ps])),
+            fmt(avg([num(p.get('saves')) for p in ps])),
+            fmt(avg([num(p.get('pf')) for p in ps])),
+            (lambda v: '' if v is None else f"{v}s")(avg([num(p.get('avg_s')) for p in ps])),
+            (lambda v: '' if v is None else f"{v}%")(avg([num(p.get('cr')) for p in ps])),
+        ])
+    header = ['月', '投稿数', '平均再生', '平均リーチ', '平均いいね', '平均保存', '平均PF閲覧', '平均視聴秒', '平均完了率']
+    return [header] + rows[-months:]
+
+
+def top_table(p):
+    header = ['投稿日', '視聴回数', 'いいね', 'コメント', 'シェア', '保存', 'PF閲覧', '完了率']
+    row = [p['date'], p.get('views', ''), p.get('likes', ''), p.get('comments') or '—',
+           p.get('shares') or '—', p.get('saves', ''), p.get('pf', ''),
+           f"{p.get('cr', '')}%" if p.get('cr') else '']
+    return [header, row]
+
+
+def draft_narrative(master):
+    d28 = master.get('overview_by_period', {}).get('d28', {})
+    aud = master.get('audience_by_period', {}).get('d28', {})
+    age = aud.get('age', {})
+    top_age = max(age, key=age.get) if age else ''
+    result = (f"直近28日で動画視聴{d28.get('video_views','')}（{d28.get('video_views_pct','')}）、"
+              f"プロフィールアクセス{d28.get('pf_views','')}（{d28.get('pf_views_pct','')}）、"
+              f"フォロワー{master.get('account',{}).get('followers_total','')}と認知指標が伸長。【要レビュー】")
+    return {
+        "goal": "採用応募につながるブランド認知の最大化。動画視聴とプロフィール来訪を伸ばす。【要レビュー】",
+        "result": result,
+        "reflection": "認知系指標が前回比で伸長。上位投稿の型を勝ち筋として横展開する。【要レビュー】",
+        "current_issue": "バズが一部の大型企画に依存し、再現性のある型が確立できていない。【要レビュー】",
+        "next_action": "勝ち筋フォーマットのシリーズ化と、冒頭2秒の結論提示・保存導線の標準化。【要レビュー】",
+        "current_issue2": f"主要視聴層は{top_age}。ターゲット層とのギャップを点検する必要がある。【要レビュー】",
+        "next_action2": "問いかけ型CTAでコメントを誘発し、ターゲット層向けテーマを増やす。【要レビュー】",
+    }
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--master', required=True)
+    ap.add_argument('--out', required=True)
+    ap.add_argument('--client', required=True)
+    ap.add_argument('--ym', required=True, help='例: 2026年6月')
+    ap.add_argument('--data-date', default='', help='例: 2026年6月3日')
+    ap.add_argument('--account-name', default='')
+    ap.add_argument('--handle', default='')
+    ap.add_argument('--period', default='', help='運用期間 例: 2025年6月〜2026年5月')
+    ap.add_argument('--months', type=int, default=6)
+    args = ap.parse_args()
+
+    master = json.load(open(args.master, encoding='utf-8'))
+    posts = master.get('posts', [])
+    top3 = sorted(posts, key=lambda p: (num(p.get('views')) or 0), reverse=True)[:3]
+
+    account = build_account(master)
+    account['header'] = f"アカウント分析　（データ取得日：{args.data_date}）"
+    nar = draft_narrative(master)
+    acct_name = args.account_name or master.get('account', {}).get('name', '')
+    handle = args.handle or master.get('account', {}).get('handle', '')
+
+    report = {
+        "meta": {
+            "deck_title": f"{args.client}_{args.ym}_分析レポート",
+            "client": args.client, "report_ym": args.ym,
+            "author": "株式会社LET マーケティング", "created": f"{args.ym}作成",
+        },
+        "summary": {
+            "basic_info": f"アカウント名　『{acct_name}』@{handle}\n運用期間（{args.period}）\n運用目的　採用応募の獲得 / ブランド認知 / フォロワー増加",
+            "goal": nar["goal"], "result": nar["result"],
+        },
+        "account": account,
+        "posts": {
+            "header_monthly": f"投稿分析　（データ取得期間：{args.period}）",
+            "header_popular": f"伸びた投稿分析　（データ取得期間：{args.period}）",
+            "monthly_table": build_monthly(posts, args.months),
+            "popular_table1": top_table(top3[0]) if len(top3) > 0 else [],
+            "popular_table2": top_table(top3[1]) if len(top3) > 1 else [],
+            "popular_table3": top_table(top3[2]) if len(top3) > 2 else [],
+        },
+        "highlighted_posts": [
+            {"header": f"投稿日：{p['date']}　テーマ：{p.get('theme','')}",
+             "eval": f"再生{p.get('views','')}・リーチ{p.get('reach','')}・PF閲覧{p.get('pf','')}・完了率{p.get('cr','')}%。【要レビュー：評価ポイントを追記】",
+             "comment": "（コメントピックアップは提出前に追記）"}
+            for p in top3
+        ],
+        "next_actions": {
+            "reflection": nar["reflection"], "current_issue": nar["current_issue"],
+            "next_action": nar["next_action"], "current_issue2": nar["current_issue2"],
+            "next_action2": nar["next_action2"],
+        },
+        "images": {"cover": "", "summary": ""},
+    }
+    with open(args.out, 'w', encoding='utf-8') as f:
+        json.dump(report, f, ensure_ascii=False, indent=2)
+    print(f"wrote {args.out}  posts={len(posts)} months={len(report['posts']['monthly_table'])-1} top3={[p['date'] for p in top3]}")
+
+
+if __name__ == '__main__':
+    main()
