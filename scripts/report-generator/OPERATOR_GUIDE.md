@@ -39,6 +39,15 @@
 > テンプレのレイアウトを変えた場合のみ、`Inspect.gs` を再実行して `deck_structure.json` を取得し、
 > `Code.gs` の `TEXT_MAP`/`TABLE_MAP`/`IMAGE_MAP`/`REPLACE_MAP` の座標を更新する（開発担当）。
 
+### オプション: 完全自動化（ウォッチャー）
+`Watcher.gs` を同じプロジェクトに同居させると、**フォルダに `report_data.json` を置くだけ**で
+デッキが自動生成される（手動実行が不要になる）。
+1. `Watcher.gs` を貼付し、`WATCH_ROOT_IDS` にクライアント群の親フォルダIDを設定
+2. `installWatcher()` を一度実行（5分毎トリガー作成）
+3. 以降、配下に `report_data.json` が現れると自動生成し、`.report_generated`（完了マーカー＋デッキURL）を残す
+- **再生成**したいときは対象フォルダの `.report_generated` を削除する
+- 運用フローが「Driveフォルダに `report_data.json` を置く（=Claudeが置く）→ 数分後にデッキ完成」になる
+
 ---
 
 ## 2. 毎月のレポート作成（メンバーの手順）
