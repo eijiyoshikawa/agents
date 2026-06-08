@@ -58,17 +58,26 @@ var TEXT_MAP = {
     { l: 561, t: 261, key: 's6_comments_pct' },
     { l: 561, t: 317, key: 's6_shares_pct' }
   ],
+  8: [
+    { l: 43,  t: 42,  key: 's8_header' }     // "投稿分析　（データ取得期間：…）"
+  ],
+  9: [
+    { l: 43,  t: 42,  key: 's9_header' }      // "伸びた投稿分析　（データ取得期間：…）"
+  ],
   10: [
+    { l: 43,  t: 42,  key: 's10_header' },
     { l: 45,  t: 121, key: 's10_post_header' }, // "投稿日：… テーマ：…"
     { l: 45,  t: 223, key: 's10_eval' },
     { l: 44,  t: 339, key: 's10_comment' }
   ],
   11: [
+    { l: 43,  t: 42,  key: 's11_header' },
     { l: 45,  t: 121, key: 's11_post_header' },
     { l: 45,  t: 223, key: 's11_eval' },
     { l: 44,  t: 339, key: 's11_comment' }
   ],
   12: [
+    { l: 43,  t: 42,  key: 's12_header' },
     { l: 45,  t: 121, key: 's12_post_header' },
     { l: 45,  t: 223, key: 's12_eval' },
     { l: 44,  t: 339, key: 's12_comment' }
@@ -257,6 +266,8 @@ function buildFields_(data) {
     s6_comments: a.comments, s6_comments_pct: a.comments_pct,
     s6_shares: a.shares, s6_shares_pct: a.shares_pct,
     // slide8/9 tables
+    s8_header: p.header_monthly, s9_header: p.header_popular,
+    s10_header: p.header_popular, s11_header: p.header_popular, s12_header: p.header_popular,
     s8_table: p.monthly_table, s9_table1: p.popular_table1,
     s9_table2: p.popular_table2, s9_table3: p.popular_table3,
     // slide14/15

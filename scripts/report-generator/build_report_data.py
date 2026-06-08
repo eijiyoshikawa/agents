@@ -67,13 +67,16 @@ report = {
   },
   "account": {
     "header": "アカウント分析　（データ取得日：2026年6月3日）",
-    "followers_now": "7,790", "followers_change": "+117.35",
+    "followers_start": "7,210", "followers_now": "7,790", "followers_change": "+117.35",
+    "posts_total": "71", "post_freq": "6", "comments_pct": "—",
     "video_views": "203,451", "video_views_pct": "+139.21",
     "pf_access": "7,212", "pf_access_pct": "+135.07",
     "likes": "2,828", "likes_pct": "+17.30",
     "comments": "79", "shares": "35", "shares_pct": "-20.18"
   },
   "posts": {
+    "header_monthly": "投稿分析　（データ取得期間：2025年12月〜2026年5月）",
+    "header_popular": "伸びた投稿分析　（データ取得期間：2025年6月〜2026年5月）",
     "monthly_table": table8,
     "popular_table1": [header9, trow(top3[0])],
     "popular_table2": [header9, trow(top3[1])],
