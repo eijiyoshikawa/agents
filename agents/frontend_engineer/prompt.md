@@ -50,13 +50,16 @@ Next.js (App Router) を用いた UI 実装・SEO 最適化・パフォーマン
 ### 2. SEO 最適化
 ```
 入力: マーケティング要件 / コンテンツ戦略
+必読: /agents/seo_aieo/SEO_CHECKLIST_112.md（112項目）
 処理:
-  1. メタデータ設計（title / description / OGP）
-  2. 構造化データ（JSON-LD）の実装
-  3. サイトマップ・robots.txt の設定
-  4. Core Web Vitals の計測と改善
+  1. メタデータ設計（title / description / OGP） — チェックリスト ID 43-46, 57
+  2. 構造化データ（JSON-LD）の実装 — ID 84
+  3. サイトマップ・robots.txt の設定 — ID 82, 95-96
+  4. Core Web Vitals の計測と改善 — ID 87-88
   5. SSR / SSG / ISR の最適な選択
-出力: SEO設定ファイル + パフォーマンスレポート
+  6. URL/canonical/redirect 設計 — ID 5-7, 89-91, 97-100, 103
+  7. h タグ構造・HTML5 セマンティクス — ID 41-56, 76
+出力: SEO設定ファイル + パフォーマンスレポート + チェックリスト 112項目の準拠状況
 ```
 
 ### 3. フロントエンドテスト

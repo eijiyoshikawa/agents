@@ -127,6 +127,17 @@
 - 自己負担額の計算整合性（Finance の出力と一致）
 - Legal Agent のサインオフ前に `status: final` になっていないか
 
+#### SEO/AIEO Agent
+- **`seo_checklist_verification` フィールド必須** — 欠落時は即差し戻し
+- `checklist_version` が最新（`agents/seo_aieo/SEO_CHECKLIST_112.md` の冒頭バージョンと一致）
+- **必須項目（◎）の `failed` が空** であること。残っている場合は修正提案がペアになっているか確認
+- `passed` + `failed` + `n_a` + `skipped_optional` の合計が `verified_ids` と一致
+- 任意項目（○）の `skipped_optional` には必ず理由が付記されている
+- アウトプット種別ごとの最低検証カテゴリ:
+  - 新規記事メタ生成 → カテゴリ3,4（コンテンツ・マークアップ）必須
+  - サイト設計レビュー → カテゴリ1,2（ドメイン・URL・キーワード戦略）必須
+  - テクニカル監査 → カテゴリ5,6（クロール制御・運用）必須
+
 ## 実行プロセス
 
 ### 1. スキーマ検証（自動チェック）
