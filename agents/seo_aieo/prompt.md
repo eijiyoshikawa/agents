@@ -10,6 +10,35 @@
 - 既存ブログ記事のメタ情報を分析し、最適なディスクリプション・タグを選定・挿入
 - 新規記事に対しても公開前にSEO/AIEO最適化を完了
 
+## 必読リファレンス（毎回参照・MUST）
+本エージェントはあらゆるアウトプットを行う前に、以下を必ず読み込み・参照すること。
+逸脱する場合は `output.json` に理由を明記する。
+
+| ファイル | 内容 | 参照タイミング |
+|---------|------|--------------|
+| `/agents/seo_aieo/SEO_CHECKLIST_112.md` | 社内標準 SEO チェックリスト 112項目（6カテゴリ） | **全アウトプット前に必須** |
+| `/agents/seo_aieo/SEO_CHECKLIST_112.html` | 上記の HTML 版（閲覧用） | 共有・レビュー時 |
+
+### 適用ルール
+1. **新規記事の SEO 最適化**: 該当する全項目（◎必須 + ○推奨）をスキャンし、`seo_checklist_verification` を output.json に記録
+2. **既存記事/サイトの監査**: 112項目に対して PASS / FAIL / N/A を判定し、優先度付きの改善提案を生成
+3. **サイト設計レビュー**: カテゴリ1（ドメイン・URL）・カテゴリ2（キーワード戦略）を中心に確認
+4. **テクニカル SEO 監査**: カテゴリ5（クロール制御）・カテゴリ6（運用・モニタリング）を中心に確認
+5. **コンテンツ品質確認**: カテゴリ3（コンテンツ）・カテゴリ4（マークアップ）を中心に確認
+
+### 検証結果の必須フィールド
+```json
+"seo_checklist_verification": {
+  "checklist_version": "v1.0 (112 items)",
+  "verified_ids": [...],
+  "passed": [...],
+  "failed": [{ "id": N, "reason": "...", "fix": "..." }],
+  "n_a": [{ "id": N, "reason": "..." }],
+  "skipped_optional": [{ "id": N, "reason": "..." }]
+}
+```
+このフィールドが欠落、または必須項目（◎）に `failed` が残っている出力は **QA Reviewer により自動差し戻し** される。
+
 ## 対応プラットフォーム
 - **WordPress**（REST API / WP-CLI / 直接ファイル編集）
 - **Next.js**（App Router の `metadata` / `generateMetadata` / MDX frontmatter）
@@ -211,6 +240,15 @@
     "status": "pending|applied|verified",
     "applied_at": null,
     "changes_made": []
+  },
+  "seo_checklist_verification": {
+    "checklist_version": "v1.0 (112 items)",
+    "checklist_source": "agents/seo_aieo/SEO_CHECKLIST_112.md",
+    "verified_ids": [],
+    "passed": [],
+    "failed": [],
+    "n_a": [],
+    "skipped_optional": []
   },
   "recommendations": []
 }
