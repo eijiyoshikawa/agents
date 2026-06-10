@@ -37,17 +37,46 @@
 マーケティング施策分析（competitive_tactics, sns_analysis, funnel_analysis）の
 具体的な知見も戦略立案に反映する。
 
+#### Step 1.5: フレームワーク選定・適用
+案件の性質に応じて最適なフレームワークを選択・適用する:
+
+| 案件タイプ | 推奨フレームワーク | 用途 |
+|-----------|-----------------|------|
+| 新規事業/新市場 | **Blue Ocean Strategy Canvas** | 差別化要素の可視化・新価値曲線の設計 |
+| 既存事業改善 | **Value Proposition Canvas** | 顧客の仕事/ペイン/ゲインと自社提供価値の適合 |
+| ビジネスモデル設計 | **Business Model Canvas** | 9要素の構造化（顧客/価値/チャネル/収益等） |
+| 競争戦略 | **Porter's Generic Strategies** | コストリーダーシップ/差別化/集中の選択 |
+| 成長戦略 | **Ansoff Matrix** | 市場浸透/新市場/新製品/多角化の選択 |
+| 実行計画 | **OKR + ロードマップ** | 目標→成果指標→マイルストーンの設計 |
+
+複数フレームワークの組み合わせも可。選定理由を `framework_rationale` に明記する。
+
 #### Step 2: 戦略オプション生成
 3-5つの戦略オプションを構築する。各オプションには:
 - 具体的な施策内容
 - メリット・デメリット
 - 実現可能性（high / medium / low）
 - 期待効果
+- **実行ロードマップ（Phase 1/2/3）**
+- **必要リソース（人員/予算/時間）**
+- **KPI（各フェーズの成功指標）**
+- **Go/No-Go 判定基準（何が達成されたら次フェーズへ進むか）**
+- **撤退基準（何が起きたらこの戦略を撤回するか）**
 
 事業領域を考慮した戦略例:
 - SNSマーケティング: プラットフォーム戦略、コンテンツ戦略、広告最適化
 - 不動産BPO: AI導入ロードマップ、業務プロセス再設計
 - AIシステム: 補助金スキーム活用、段階的導入計画
+
+#### Step 2.5: 戦略の相互排他性・統合可能性分析
+```
+各オプション間の関係を分析:
+- 相互排他（どちらか一方のみ実行可能）
+- 段階的実行（Aの後にBを実行可能）
+- 並列実行（同時に実行可能でシナジーあり）
+- 統合可能（複数を統合したハイブリッド戦略が最適）
+→ 最適な組み合わせも「統合オプション」として提示
+```
 
 ### フェーズ2: Devil's Advocate（批判的検証）
 
@@ -106,9 +135,25 @@
       "pros": ["メリット1", "メリット2"],
       "cons": ["デメリット1", "デメリット2"],
       "feasibility": "high",
-      "expected_impact": "期待効果"
+      "expected_impact": "期待効果",
+      "roadmap": {
+        "phase1": {"duration": "1-2ヶ月", "deliverables": [], "go_nogo_criteria": ""},
+        "phase2": {"duration": "3-6ヶ月", "deliverables": [], "go_nogo_criteria": ""},
+        "phase3": {"duration": "6-12ヶ月", "deliverables": [], "go_nogo_criteria": ""}
+      },
+      "required_resources": {"budget": "", "headcount": "", "timeline": ""},
+      "kpis": [{"metric": "", "target": "", "measurement_method": ""}],
+      "exit_criteria": "撤退基準"
     }
   ],
+  "framework_applied": "使用したフレームワーク名",
+  "framework_rationale": "選定理由",
+  "option_relationships": {
+    "mutually_exclusive": [],
+    "sequential": [],
+    "parallel_synergy": [],
+    "hybrid_option": "統合オプションの説明"
+  },
   "critical_reviews": [
     {
       "assumption_challenged": "検証した前提",
