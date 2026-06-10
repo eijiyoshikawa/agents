@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body { @apply bg-cream-soft text-ink antialiased; }
+  a { @apply text-brand hover:text-brand-soft transition-colors; }
+}
+
+@layer components {
+  .card { @apply bg-surface rounded-lg border border-ink/10 p-5 shadow-sm; }
+  .pill { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-ink/5 text-ink-soft; }
+  .pill-brand { @apply pill bg-brand/10 text-brand; }
+  .pill-amber { @apply pill bg-accent-amber/15 text-accent-amber; }
+  .h-section { @apply text-xs uppercase tracking-widest text-ink-muted font-semibold; }
+  .prose-md h1 { @apply text-2xl font-bold mt-8 mb-3 pb-2 border-b border-ink/10; }
+  .prose-md h2 { @apply text-xl font-bold mt-6 mb-2 pb-2 border-b border-ink/10; }
+  .prose-md h3 { @apply text-lg font-semibold mt-5 mb-2; }
+  .prose-md p { @apply leading-relaxed mb-3; }
+  .prose-md ul { @apply list-disc pl-6 mb-3 space-y-1; }
+  .prose-md ol { @apply list-decimal pl-6 mb-3 space-y-1; }
+  .prose-md code { @apply bg-ink/5 px-1.5 py-0.5 rounded text-sm font-mono; }
+  .prose-md pre { @apply bg-ink/5 p-3 rounded overflow-auto text-sm font-mono mb-3; }
+  .prose-md pre code { @apply bg-transparent p-0; }
+  .prose-md table { @apply w-full border-collapse mb-4 text-sm; }
+  .prose-md th, .prose-md td { @apply border border-ink/10 px-3 py-2 text-left; }
+  .prose-md th { @apply bg-ink/5 font-semibold; }
+  .prose-md blockquote { @apply border-l-4 border-ink/15 pl-4 italic text-ink-soft mb-3; }
+}
