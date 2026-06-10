@@ -69,18 +69,23 @@
 案件は **Notion DB を正本（master）** とし、週次で **Slack に全件サマリ**を自動通知する。
 
 ```
-[随時] ポータル/個別サイトを巡回し、新着・更新案件を Notion DB に追記
-        （案件名・主催自治体・要件・期日・予算・領域・区分・種別・ステータス・URL）
-
 [毎週 月曜 08:00 JST] GitHub Actions が起動
-  1. scripts/bid_watch_notify.py が Notion DB を全件取得
-  2. AI系 / SNS系 に分類、締切間近（14日以内）を抽出
+  1. scripts/bid_collect.py  — 官公需情報ポータルAPIから直近14日の AI/SNS 案件を収集し、
+                               URL で重複排除して Notion DB に新規案件だけを「未着手」で追記
+  2. scripts/bid_watch_notify.py — Notion DB を全件取得し AI系/SNS系に分類、締切間近を抽出
   3. 全件サマリを Slack（Incoming Webhook 先のチャンネル）へ投稿
 ```
 
 - **Notion DB**: 🏛️ 入札案件ウォッチDB（AI/SNS）— 「営業管理DB｜全体ハブ」配下
+- **収集スクリプト**: [`scripts/bid_collect.py`](../scripts/bid_collect.py)
 - **通知スクリプト**: [`scripts/bid_watch_notify.py`](../scripts/bid_watch_notify.py)
 - **ワークフロー**: [`.github/workflows/bid-watch.yml`](../.github/workflows/bid-watch.yml)（cron `0 23 * * 0` = 月 08:00 JST）
+
+### 自動収集の情報源
+- **官公需情報ポータルサイト 検索API**（中小企業庁・無料・認証不要・XML応答）
+  - エンドポイント: `https://www.kkj.go.jp/api/` ／ ガイド: https://www.kkj.go.jp/doc/ja/api_guide.pdf
+  - 国・独立行政法人・地方自治体の入札情報を**横断**。`bid_collect.py` の `AI_KEYWORDS` / `SNS_KEYWORDS` で検索。
+  - NJSS 等の有料横断サービスを足したい場合は、`bid_collect.py` に source adapter を追加すればよい設計。
 
 ### セットアップ（GitHub Secrets を3つ登録するだけ）
 リポジトリの Settings → Secrets and variables → Actions に以下を登録:
@@ -93,6 +98,19 @@
 
 > 通知先チャンネルは **Webhook 作成時に選んだチャンネル**になる。変更時は Webhook を作り直すだけ。
 > 手動テストは GitHub Actions の「Run workflow」(workflow_dispatch) から即時実行できる。
+
+#### Slack Incoming Webhook の作り方（5分）
+1. https://api.slack.com/apps → **Create New App** → **From scratch**
+2. App 名（例: `入札ウォッチ`）と対象ワークスペースを選択 → Create
+3. 左メニュー **Incoming Webhooks** → トグルを **On**
+4. **Add New Webhook to Workspace** → 通知したい**チャンネルを選択** → 許可
+5. 生成された **Webhook URL**（`https://hooks.slack.com/services/...`）をコピー
+6. GitHub の `SLACK_WEBHOOK_URL` Secret に貼り付け → 完了
+
+#### Notion トークンの作り方
+1. https://www.notion.so/my-integrations → **New integration** → 作成しトークンを取得
+2. 入札案件ウォッチDB のページで **「…」→ Connections → 作成した integration を接続**（共有）
+3. トークンを `NOTION_TOKEN`、DB id（`774ab0e09e12473392f9c3ba5db17a77`）を `NOTION_DATABASE_ID` に登録
 
 ### 新着収集の自動化（次フェーズ）
 現状スクリプトは「Notion → Slack」通知のみ自動。案件の**収集**は手動/エージェント追記。

@@ -19,6 +19,13 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Collect new cases from 官公需API into Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          COLLECT_WINDOW_DAYS: "14"
+        run: python scripts/bid_collect.py
+
       - name: Notify Slack from Notion
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
