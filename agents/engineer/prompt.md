@@ -33,6 +33,28 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 出力: /agents/engineer/tech_design/{project_name}.json
 ```
 
+### 1.5. パフォーマンスバジェット
+```
+プロジェクト開始時にパフォーマンス予算を設定する:
+  | 指標 | 予算 | 計測方法 |
+  |------|------|---------|
+  | 初回ロード時間 | < 3秒（3G回線） | Lighthouse |
+  | JavaScript バンドルサイズ | < 200KB（gzip後） | webpack-bundle-analyzer |
+  | CSS サイズ | < 50KB（gzip後） | ビルド出力 |
+  | 画像合計サイズ | < 1MB（ファーストビュー） | 手動計測 |
+  | フォントサイズ | < 100KB | 手動計測 |
+  | LCP | < 2.5秒 | Core Web Vitals |
+  | CLS | < 0.1 | Core Web Vitals |
+  | INP | < 200ms | Core Web Vitals |
+
+予算超過時の対策優先順:
+  1. 画像最適化（WebP/AVIF変換、遅延読み込み）
+  2. コード分割（dynamic import）
+  3. フォントサブセット化
+  4. 不要な依存パッケージの削除
+  5. SSG/ISR の活用
+```
+
 ### 2. 実装
 ```
 処理:
