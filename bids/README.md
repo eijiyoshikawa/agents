@@ -64,22 +64,39 @@
 
 ---
 
-## 週次 Gmail 通知フロー（提案）
+## 運用フロー（Notion 正本 + 週次 Slack 通知）
+
+案件は **Notion DB を正本（master）** とし、週次で **Slack に全件サマリ**を自動通知する。
 
 ```
-[毎週 月曜 朝]
-  1. 上記ポータル/個別サイトをキーワードで巡回
-  2. 新着・更新案件を抽出 → bids/YYYY-MM-DD.md に追記
-  3. 前回比の「新着」「締切間近（7日以内）」を要約
-  4. Gmail で eiyoshi99@gmail.com 宛にレポート送信
-       件名: 【入札ウォッチ】AI/SNS 新着 N件（YYYY-MM-DD）
-       本文: 新着案件 / 締切間近 / 全件サマリ表
+[随時] ポータル/個別サイトを巡回し、新着・更新案件を Notion DB に追記
+        （案件名・主催自治体・要件・期日・予算・領域・区分・種別・ステータス・URL）
+
+[毎週 月曜 08:00 JST] GitHub Actions が起動
+  1. scripts/bid_watch_notify.py が Notion DB を全件取得
+  2. AI系 / SNS系 に分類、締切間近（14日以内）を抽出
+  3. 全件サマリを Slack（Incoming Webhook 先のチャンネル）へ投稿
 ```
 
-### 自動化の選択肢（1回分のリストを見てから判断）
-1. **GitHub Actions（cron 週次）** — 完全自動。スクリプト + Gmail送信を CI で実行。初期構築が必要。
-2. **エージェント手動キック / `loop`** — Subsidy Scout 同型の手順書を用意し、毎週手動 or セッション内ループで実行。
-3. **現状維持（手動収集 + Markdown）** — まずはこれ。精度・件数を見て 1 or 2 へ移行。
+- **Notion DB**: 🏛️ 入札案件ウォッチDB（AI/SNS）— 「営業管理DB｜全体ハブ」配下
+- **通知スクリプト**: [`scripts/bid_watch_notify.py`](../scripts/bid_watch_notify.py)
+- **ワークフロー**: [`.github/workflows/bid-watch.yml`](../.github/workflows/bid-watch.yml)（cron `0 23 * * 0` = 月 08:00 JST）
+
+### セットアップ（GitHub Secrets を3つ登録するだけ）
+リポジトリの Settings → Secrets and variables → Actions に以下を登録:
+
+| Secret 名 | 内容 |
+|-----------|------|
+| `NOTION_TOKEN` | Notion インテグレーションのトークン（DB を共有しておく） |
+| `NOTION_DATABASE_ID` | 入札案件ウォッチDB の database id（`774ab0e09e12473392f9c3ba5db17a77`） |
+| `SLACK_WEBHOOK_URL` | 通知先チャンネルに紐づく Slack Incoming Webhook URL |
+
+> 通知先チャンネルは **Webhook 作成時に選んだチャンネル**になる。変更時は Webhook を作り直すだけ。
+> 手動テストは GitHub Actions の「Run workflow」(workflow_dispatch) から即時実行できる。
+
+### 新着収集の自動化（次フェーズ）
+現状スクリプトは「Notion → Slack」通知のみ自動。案件の**収集**は手動/エージェント追記。
+調達ポータル(GEPS)・NJSS 等の自動スクレイピングは別 step として追加可能。
 
 ---
 
