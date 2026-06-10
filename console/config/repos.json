@@ -1,0 +1,59 @@
+{
+  "$schema": "./repos.schema",
+  "version": 1,
+  "description": "Console が横断参照する GitHub リポジトリのレジストリ。GITHUB_TOKEN（PAT）が設定されていれば scripts/scan-github.mjs が自動取得する。",
+  "limits": {
+    "maxFilesPerRepo": 80,
+    "maxFileSizeKB": 200,
+    "maxIndexableTextKB": 50,
+    "excludePatterns": [
+      "node_modules/",
+      ".next/",
+      "dist/",
+      "build/",
+      "out/",
+      ".turbo/",
+      "coverage/",
+      "*.lock",
+      "*.lockb",
+      "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp", "*.ico",
+      "*.pdf", "*.zip", "*.tar", "*.gz", "*.mp4", "*.mov"
+    ]
+  },
+  "repos": [
+    {
+      "id": "agents",
+      "fullName": "eijiyoshikawa/agents",
+      "label": "AI Agent Organization",
+      "category": "core",
+      "description": "本リポジトリ。46+ エージェントとコンソール本体。",
+      "includePaths": ["agents", "console", "design-md", "learnings"],
+      "tags": ["core", "internal"]
+    },
+    {
+      "id": "REPLACE_REPO_1",
+      "fullName": "eijiyoshikawa/<REPO_NAME>",
+      "label": "プロジェクト名（編集してください）",
+      "category": "product",
+      "description": "プロジェクトの概要を 1-2行で",
+      "includePaths": ["README.md", "docs", "src"],
+      "tags": ["product"]
+    },
+    {
+      "id": "REPLACE_REPO_2",
+      "fullName": "eijiyoshikawa/<REPO_NAME>",
+      "label": "プロジェクト名（編集してください）",
+      "category": "product",
+      "description": "プロジェクトの概要を 1-2行で",
+      "includePaths": ["README.md", "docs"],
+      "tags": ["product"]
+    }
+  ],
+  "categories": {
+    "core": { "label": "コア・組織", "color": "indigo" },
+    "product": { "label": "プロダクト", "color": "brand" },
+    "client": { "label": "クライアント案件", "color": "amber" },
+    "experiment": { "label": "実験・PoC", "color": "violet" },
+    "ops": { "label": "運用・社内ツール", "color": "teal" }
+  }
+}

@@ -290,8 +290,15 @@ function loadDrive() {
   return readJSON(p) ?? { folders: [], stats: {} };
 }
 
+// ---- Load cross-repo data produced by scan-github.mjs (optional) ----
+function loadCrossRepos() {
+  const repos = readJSON(path.join(OUT_DIR, "repos.json")) ?? { items: [] };
+  const files = readJSON(path.join(OUT_DIR, "repo-files.json")) ?? { items: [] };
+  return { repos: repos.items || [], files: files.items || [] };
+}
+
 // ---- Search index (lightweight, client-loaded for cmd-k) ----
-function buildSearchIndex(agents, projects, reports, templates, designRefs, drive) {
+function buildSearchIndex(agents, projects, reports, templates, designRefs, drive, crossRepos) {
   const items = [];
   for (const a of agents) {
     items.push({ kind: "agent", id: a.id, label: a.name, sub: a.department, href: `/agents/${encodeURIComponent(a.id)}`, keywords: `${a.name} ${a.department} ${(a.headline||"").slice(0,80)}` });
@@ -311,6 +318,19 @@ function buildSearchIndex(agents, projects, reports, templates, designRefs, driv
   for (const f of drive.folders ?? []) {
     items.push({ kind: "drive", id: f.id, label: f.name, sub: "Google Drive", href: `/drive#${f.id}`, keywords: `drive ${f.name} ${(f.subfolders||[]).join(" ")}` });
   }
+  for (const r of crossRepos.repos ?? []) {
+    items.push({ kind: "repo", id: r.id, label: r.label, sub: r.fullName, href: `/repos/${r.id}`, keywords: `repo ${r.label} ${r.fullName} ${(r.tags||[]).join(" ")} ${r.description||""}` });
+  }
+  for (const f of crossRepos.files ?? []) {
+    items.push({
+      kind: "repo-file",
+      id: `${f.repo}:${f.path}`,
+      label: f.path,
+      sub: f.repoLabel,
+      href: `/repos/${f.repo}#${encodeURIComponent(f.path)}`,
+      keywords: `${f.path} ${f.repoLabel} ${(f.snippet||"").slice(0,300)}`,
+    });
+  }
   const pages = [
     { kind: "page", label: "ダッシュボード", href: "/", keywords: "dashboard top" },
     { kind: "page", label: "エージェント", href: "/agents", keywords: "agents members 一覧" },
@@ -322,6 +342,7 @@ function buildSearchIndex(agents, projects, reports, templates, designRefs, driv
     { kind: "page", label: "日次レポート", href: "/reports", keywords: "reports daily 日報" },
     { kind: "page", label: "ナレッジ", href: "/learnings", keywords: "learnings 学習 ナレッジ" },
     { kind: "page", label: "Google Drive", href: "/drive", keywords: "drive ファイル 基幹" },
+    { kind: "page", label: "リポジトリ", href: "/repos", keywords: "repos github クロスリポ 横断" },
     { kind: "page", label: "コスト", href: "/costs", keywords: "cost 運用費 料金" },
     { kind: "page", label: "管理者設定", href: "/admin", keywords: "admin 管理者 設定" },
   ];
@@ -335,8 +356,9 @@ const learnings = scanLearnings();
 const designRefs = scanDesignRefs();
 const templates = buildTemplates();
 const drive = loadDrive();
+const crossRepos = loadCrossRepos();
 const kpis = buildKPIs(agents, projects, reports);
-const searchIndex = buildSearchIndex(agents, projects, reports, templates, designRefs, drive);
+const searchIndex = buildSearchIndex(agents, projects, reports, templates, designRefs, drive, crossRepos);
 
 const write = (name, data) => fs.writeFileSync(path.join(OUT_DIR, name), JSON.stringify(data, null, 2));
 write("agents.json", agents);
@@ -349,4 +371,4 @@ write("kpis.json", kpis);
 write("drive.json", drive);
 write("search-index.json", searchIndex);
 
-console.log(`[scan] agents=${agents.length} projects=${projects.length} reports=${reports.length} learnings.instincts=${learnings.instincts.length} learnings.sessions=${learnings.sessions.length} designRefs=${designRefs.length} driveFolders=${(drive.folders||[]).length} searchIndex=${searchIndex.length}`);
+console.log(`[scan] agents=${agents.length} projects=${projects.length} reports=${reports.length} learnings.instincts=${learnings.instincts.length} learnings.sessions=${learnings.sessions.length} designRefs=${designRefs.length} driveFolders=${(drive.folders||[]).length} crossRepos=${crossRepos.repos.length} crossFiles=${crossRepos.files.length} searchIndex=${searchIndex.length}`);

@@ -13,6 +13,8 @@
 | `/org/graph` | **React Flow による相互干渉グラフ**（ノードクリックでフォーカス） | 公開 |
 | `/projects` | プロジェクト横断ビュー | 公開 |
 | `/drive` | **Google Drive フォルダ構成・連携状態**（マニフェスト方式） | 公開 |
+| `/repos` | **GitHub クロスリポ参照**（README / コミット / ファイルツリー） | 公開 |
+| `/repos/[id]` | 個別リポ詳細（メタデータ・直近コミット・ファイルツリー・README） | 公開 |
 | `/documents` | 書類テンプレート選択 | 公開 |
 | `/documents/new/[id]` | フォーム入力 → ブリーフ生成（生成自体は未実装、現状維持） | 公開 |
 | `/analytics` | 稼働率・相互干渉カバレッジ・部門配分・レポート密度 | 公開 |
@@ -72,6 +74,34 @@ npm run build      # out/ に静的サイトを書き出し
 3. カスタムドメインを使う場合は `console/public/CNAME` を作成し、DNS 設定
 
 `NEXT_PUBLIC_BASE_PATH` 環境変数で basePath を制御。リポジトリ名が `agents` の場合は自動で `/agents` が付きます。
+
+## GitHub クロスリポ参照
+
+`/repos` ページで、他リポジトリの内容を横断参照できます。
+
+### セットアップ
+1. GitHub Settings → Developer settings → **Personal access tokens (fine-grained)** で PAT を発行
+   - 権限: `Contents: Read-only`, `Metadata: Read-only`
+   - 対象リポ: 横断参照したいリポを選択
+2. 環境変数 `GITHUB_TOKEN`（または `GH_TOKEN`）として設定
+   - ローカル: `console/.env.local`
+   - Vercel: Project Settings → Environment Variables
+   - GitHub Actions: Settings → Secrets → `CROSSREPO_TOKEN`（workflow が自動でフォールバック）
+3. `console/config/repos.json` の `REPLACE_REPO_*` を実在のリポ名に書き換え
+4. `npm run scan` を実行
+
+### スキャナの挙動
+- `scripts/scan-github.mjs` が GitHub REST API でメタデータ・README・直近コミット・指定パスのファイル一覧を取得
+- 取得結果は `data/repos.json` と `data/repo-files.json` に保存
+- ⌘K コマンドパレットの検索対象にも自動追加される（リポ名 / ファイルパス / スニペット）
+- トークン未設定でもビルドは成功（`/repos` がセットアップ案内を表示）
+
+### 制限
+`config/repos.json` の `limits` で調整可能:
+- `maxFilesPerRepo`: リポごとの最大ファイル数（デフォルト 80）
+- `maxFileSizeKB`: 取得対象の最大ファイルサイズ（デフォルト 200KB）
+- `maxIndexableTextKB`: 検索インデックス対象の最大サイズ（デフォルト 50KB）
+- `excludePatterns`: node_modules / dist / 画像 / バイナリは自動除外
 
 ## Google Drive 連携
 

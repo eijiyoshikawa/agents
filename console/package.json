@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "scan": "node scripts/scan-repo.mjs",
+    "scan": "node scripts/scan-github.mjs && node scripts/scan-repo.mjs",
     "predev": "npm run scan",
     "prebuild": "npm run scan",
     "dev": "next dev -p 4000",

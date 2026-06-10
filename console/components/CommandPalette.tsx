@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Search, Users, Briefcase, FileText, CalendarDays, Sparkles, FolderOpen,
-  LayoutDashboard, Settings, Palette,
+  LayoutDashboard, Settings, Palette, Github, File as FileIcon,
 } from "lucide-react";
 import searchIndex from "@/data/search-index.json";
 
@@ -12,6 +12,7 @@ type Item = { kind: string; id?: string; label: string; sub?: string; href: stri
 const ICON: Record<string, any> = {
   agent: Users, project: Briefcase, report: CalendarDays, template: FileText,
   drive: FolderOpen, design: Palette, page: LayoutDashboard, default: Sparkles,
+  repo: Github, "repo-file": FileIcon,
 };
 
 export default function CommandPalette() {
@@ -116,7 +117,7 @@ export default function CommandPalette() {
 }
 
 function kindLabel(k: string) {
-  return { agent: "エージェント", project: "プロジェクト", report: "レポート", template: "書類", drive: "Drive", design: "デザイン", page: "ページ" }[k] ?? k;
+  return { agent: "エージェント", project: "プロジェクト", report: "レポート", template: "書類", drive: "Drive", design: "デザイン", page: "ページ", repo: "リポジトリ", "repo-file": "ファイル" }[k] ?? k;
 }
 
 function scoreMatch(item: Item, q: string) {
