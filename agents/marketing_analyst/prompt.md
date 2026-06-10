@@ -57,10 +57,41 @@ Agent 3（Market Researcher）、Agent 4（Analogy Finder）と **並列で実�
 - 季節性やイベントとの連動パターン
 - 業界のプロモーション傾向・ベストプラクティス
 
-### Step 6: 自社への示唆まとめ（actionable_insights）
+### Step 6: マーケティングテクノロジースタック分析
+競合が使用しているマーケテック（MarTech）ツールを推定分析する:
+- **CRM/MA**: HubSpot / Salesforce / Marketo 等
+- **アクセス解析**: GA4 / Adobe Analytics / Mixpanel 等
+- **広告管理**: Google Ads / Meta Business Suite / 広告代理店ツール
+- **SNS管理**: Later / Buffer / Hootsuite 等
+- **LP/Web**: WordPress / Webflow / Next.js / STUDIO 等
+- **技術検出方法**: WebサイトのHTMLソース・Wappalyzer的な分析
+
+### Step 7: コンテンツパフォーマンスマトリクス
+```
+           高エンゲージメント
+                │
+    教育型      │    バイラル型
+    (How-to)    │    (トレンド)
+                │
+低コスト ───────┼─────── 高コスト
+                │
+    定型型      │    制作型
+    (テンプレ)   │    (プロ動画)
+                │
+           低エンゲージメント
+```
+各象限で競合がどのコンテンツに注力しているかをマッピングし、最適な投資配分を提示する。
+
+### Step 8: 自社への示唆まとめ（actionable_insights）
 事業領域を考慮し、実行可能な示唆を整理する:
-- **クイックウィン**: すぐに実行できる施策（1-2ヶ月以内）
-- **中長期施策**: 3ヶ月以上かけて取り組むべき施策
+
+| 施策分類 | 時間軸 | 内容 | 期待効果 | 必要リソース | KPI |
+|---------|--------|------|---------|------------|------|
+| クイックウィン | 1-2ヶ月 | すぐに実行可能 | 短期的な改善 | 低 | 具体的KPI |
+| 中期施策 | 3-6ヶ月 | 基盤構築系 | 中期的な成長 | 中 | 具体的KPI |
+| 長期施策 | 6-12ヶ月 | 競争優位構築 | 持続的な差別化 | 高 | 具体的KPI |
+
+各施策に**優先順位スコア**を付与（impact × feasibility × urgency = 1-125点）。
 
 事業領域:
 - SNSマーケティング（Instagram, TikTok, YouTube 運用/広告/クリエイティブ）
@@ -124,16 +155,29 @@ Agent 3（Market Researcher）、Agent 4（Analogy Finder）と **並列で実�
       "source": "情報源URL"
     }
   ],
-  "actionable_insights": {
-    "quick_wins": [
-      "すぐに実行可能な施策1",
-      "すぐに実行可能な施策2"
-    ],
-    "mid_long_term": [
-      "中長期で取り組むべき施策1",
-      "中長期で取り組むべき施策2"
-    ]
-  }
+  "martech_analysis": {
+    "competitor_name": "企業名",
+    "detected_tools": {"crm": "", "analytics": "", "ads": "", "sns": "", "web": ""},
+    "detection_method": "検出方法",
+    "source": "URL"
+  },
+  "content_performance_matrix": {
+    "high_engagement_low_cost": ["教育型コンテンツ事例"],
+    "high_engagement_high_cost": ["バイラル型コンテンツ事例"],
+    "low_engagement_low_cost": ["定型コンテンツ事例"],
+    "recommended_allocation": "投資配分の推奨（例: 教育型60%, バイラル型20%, 制作型20%）"
+  },
+  "actionable_insights": [
+    {
+      "title": "施策名",
+      "category": "quick_win|mid_term|long_term",
+      "timeframe": "1-2ヶ月",
+      "expected_impact": "期待効果",
+      "required_resources": "必要リソース",
+      "kpi": "追跡すべきKPI",
+      "priority_score": 0
+    }
+  ]
 }
 ```
 
