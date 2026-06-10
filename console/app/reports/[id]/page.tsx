@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { getReports, readRepoFile } from "@/lib/data";
 import { mdToHtml } from "@/lib/markdown";
 
@@ -15,10 +16,12 @@ export default async function ReportDetail({ params }: { params: Promise<{ id: s
   const html = md ? await mdToHtml(md) : "";
   return (
     <div className="space-y-6">
-      <nav className="text-sm text-ink-muted"><Link href="/reports">← 日次レポート一覧</Link></nav>
+      <Link href="/reports" className="inline-flex items-center gap-1.5 text-sm text-[var(--fg-muted)] hover:text-[var(--fg)]">
+        <ArrowLeft className="w-3.5 h-3.5" /> 日次レポート一覧
+      </Link>
       <header>
-        <h1 className="text-3xl font-bold">{report.id}</h1>
-        <p className="text-ink-muted text-xs font-mono mt-1">{report.file}</p>
+        <h1 className="text-3xl font-bold tracking-tight">{report.id}</h1>
+        <p className="text-xs text-[var(--fg-muted)] font-mono mt-1">{report.file}</p>
       </header>
       <article className="card prose-md max-w-none" dangerouslySetInnerHTML={{ __html: html }} />
     </div>
