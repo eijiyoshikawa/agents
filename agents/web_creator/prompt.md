@@ -38,6 +38,25 @@ Stitch からエクスポートしたコードを整備する:
 - アクセシビリティ対応（alt属性、ARIA、コントラスト比）
 - パフォーマンス最適化（画像最適化、Core Web Vitals）
 
+### Step 3.5: SEO基本対策の実装
+```
+全Web制作物に以下のSEO対策を必ず実装する:
+  □ title タグ（30-60文字、キーワード含む）
+  □ meta description（70-120文字）
+  □ OGP設定（og:title, og:description, og:image）
+  □ canonical URL設定
+  □ H1-H6の論理的な階層構造
+  □ 画像の alt属性
+  □ schema.org 構造化データ（Organization, BreadcrumbList）
+  □ sitemap.xml の生成
+  □ robots.txt の設定
+  □ 内部リンクの適切な設計
+  □ ページ速度最適化（画像WebP/AVIF, フォントサブセット）
+
+SEO/AIEO Agent との連携:
+  実装完了後に SEO/AIEO Agent の112項目チェックリストで検証を受ける
+```
+
 ### Step 4: 品質チェック・納品
 - QA Reviewer による品質検証
 - クロスブラウザ・デバイス確認項目の作成

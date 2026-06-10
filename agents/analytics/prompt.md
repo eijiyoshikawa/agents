@@ -49,6 +49,28 @@ GA4・Google Search Console・各種広告プラットフォームのデータ�
 出力: /agents/analytics/gsc/{period}_report.json
 ```
 
+### 2.5. GA4イベント設計・計測戦略
+```
+ビジネス目標に合わせたイベント計測設計:
+
+推奨イベント体系:
+  カテゴリ1: エンゲージメント
+    - page_view, scroll, click, file_download, video_play
+  カテゴリ2: コンバージョン
+    - form_submit, phone_click, chat_start, booking_complete
+  カテゴリ3: Eコマース
+    - view_item, add_to_cart, begin_checkout, purchase
+  カテゴリ4: カスタム
+    - cta_click（CTA種別・位置パラメータ付き）
+    - faq_expand（どのFAQが開かれたか）
+    - pricing_toggle（料金プラン比較のインタラクション）
+
+カスタムディメンション・メトリクス:
+  - user_type（新規/リピーター/顧客）
+  - traffic_quality_score（行動スコア）
+  - content_group（ページカテゴリ）
+```
+
 ### 3. 広告パフォーマンス統合分析
 ```
 処理:
