@@ -284,13 +284,59 @@ function buildKPIs(agents, projects, reports) {
   };
 }
 
+// ---- Drive manifest ----
+function loadDrive() {
+  const p = path.resolve(__dirname, "../config/drive-manifest.json");
+  return readJSON(p) ?? { folders: [], stats: {} };
+}
+
+// ---- Search index (lightweight, client-loaded for cmd-k) ----
+function buildSearchIndex(agents, projects, reports, templates, designRefs, drive) {
+  const items = [];
+  for (const a of agents) {
+    items.push({ kind: "agent", id: a.id, label: a.name, sub: a.department, href: `/agents/${encodeURIComponent(a.id)}`, keywords: `${a.name} ${a.department} ${(a.headline||"").slice(0,80)}` });
+  }
+  for (const p of projects) {
+    items.push({ kind: "project", id: p.id, label: p.id, sub: `${p.fileCount} files`, href: `/projects/${p.slug}`, keywords: p.id });
+  }
+  for (const r of reports) {
+    items.push({ kind: "report", id: r.id, label: r.id, sub: "日次レポート", href: `/reports/${r.id}`, keywords: r.id });
+  }
+  for (const t of templates) {
+    items.push({ kind: "template", id: t.id, label: t.title, sub: `書類: ${t.output}`, href: `/documents/new/${t.id}`, keywords: `${t.title} ${t.description}` });
+  }
+  for (const d of designRefs) {
+    items.push({ kind: "design", id: d.id, label: d.id, sub: "design-md", href: `/projects`, keywords: `design ${d.id}` });
+  }
+  for (const f of drive.folders ?? []) {
+    items.push({ kind: "drive", id: f.id, label: f.name, sub: "Google Drive", href: `/drive#${f.id}`, keywords: `drive ${f.name} ${(f.subfolders||[]).join(" ")}` });
+  }
+  const pages = [
+    { kind: "page", label: "ダッシュボード", href: "/", keywords: "dashboard top" },
+    { kind: "page", label: "エージェント", href: "/agents", keywords: "agents members 一覧" },
+    { kind: "page", label: "組織マップ", href: "/org", keywords: "org map 組織 配置" },
+    { kind: "page", label: "相互干渉グラフ", href: "/org/graph", keywords: "graph network 干渉" },
+    { kind: "page", label: "プロジェクト", href: "/projects", keywords: "projects outputs 案件" },
+    { kind: "page", label: "書類作成", href: "/documents", keywords: "documents 書類 generate" },
+    { kind: "page", label: "分析", href: "/analytics", keywords: "analytics kpi 分析" },
+    { kind: "page", label: "日次レポート", href: "/reports", keywords: "reports daily 日報" },
+    { kind: "page", label: "ナレッジ", href: "/learnings", keywords: "learnings 学習 ナレッジ" },
+    { kind: "page", label: "Google Drive", href: "/drive", keywords: "drive ファイル 基幹" },
+    { kind: "page", label: "コスト", href: "/costs", keywords: "cost 運用費 料金" },
+    { kind: "page", label: "管理者設定", href: "/admin", keywords: "admin 管理者 設定" },
+  ];
+  return [...pages, ...items];
+}
+
 const agents = scanAgents();
 const projects = scanProjects();
 const reports = scanDailyReports();
 const learnings = scanLearnings();
 const designRefs = scanDesignRefs();
 const templates = buildTemplates();
+const drive = loadDrive();
 const kpis = buildKPIs(agents, projects, reports);
+const searchIndex = buildSearchIndex(agents, projects, reports, templates, designRefs, drive);
 
 const write = (name, data) => fs.writeFileSync(path.join(OUT_DIR, name), JSON.stringify(data, null, 2));
 write("agents.json", agents);
@@ -300,5 +346,7 @@ write("learnings.json", learnings);
 write("design-refs.json", designRefs);
 write("templates.json", templates);
 write("kpis.json", kpis);
+write("drive.json", drive);
+write("search-index.json", searchIndex);
 
-console.log(`[scan] agents=${agents.length} projects=${projects.length} reports=${reports.length} learnings.instincts=${learnings.instincts.length} learnings.sessions=${learnings.sessions.length} designRefs=${designRefs.length}`);
+console.log(`[scan] agents=${agents.length} projects=${projects.length} reports=${reports.length} learnings.instincts=${learnings.instincts.length} learnings.sessions=${learnings.sessions.length} designRefs=${designRefs.length} driveFolders=${(drive.folders||[]).length} searchIndex=${searchIndex.length}`);

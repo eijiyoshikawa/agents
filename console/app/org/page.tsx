@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { GitBranch, ArrowUpRight } from "lucide-react";
 import { getAgents, colorClasses } from "@/lib/data";
 
 const COLUMNS = [
@@ -18,9 +19,14 @@ export default function OrgMap() {
 
   return (
     <div className="space-y-8">
-      <header>
-        <h1 className="text-3xl font-bold tracking-tight">組織マップ</h1>
-        <p className="text-sm text-[var(--fg-muted)] mt-1">部門カラム × カラーカードで全エージェントを一望</p>
+      <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-3">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">組織マップ</h1>
+          <p className="text-sm text-[var(--fg-muted)] mt-1">部門カラム × カラーカードで全エージェントを一望</p>
+        </div>
+        <Link href="/org/graph" className="btn btn-primary self-start md:self-auto">
+          <GitBranch className="w-3.5 h-3.5" /> 相互干渉グラフで見る <ArrowUpRight className="w-3.5 h-3.5" />
+        </Link>
       </header>
 
       <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
