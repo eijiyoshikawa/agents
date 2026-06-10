@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, Network, Briefcase, FileText, BarChart3,
   CalendarDays, BookOpen, Settings, Sun, Moon, Monitor, Sparkles, ShieldCheck, LogOut,
+  FolderOpen, Wallet, GitBranch,
 } from "lucide-react";
 import { useConsole } from "./ConsoleProviders";
 import { useState } from "react";
@@ -12,11 +13,14 @@ const NAV = [
   { href: "/", label: "ダッシュボード", icon: LayoutDashboard, group: "view" },
   { href: "/agents", label: "エージェント", icon: Users, group: "view" },
   { href: "/org", label: "組織マップ", icon: Network, group: "view" },
+  { href: "/org/graph", label: "相互干渉グラフ", icon: GitBranch, group: "view" },
   { href: "/projects", label: "プロジェクト", icon: Briefcase, group: "view" },
+  { href: "/drive", label: "Google Drive", icon: FolderOpen, group: "data" },
   { href: "/documents", label: "書類作成", icon: FileText, group: "create" },
   { href: "/analytics", label: "分析", icon: BarChart3, group: "view" },
   { href: "/reports", label: "日次レポート", icon: CalendarDays, group: "view" },
   { href: "/learnings", label: "ナレッジ", icon: BookOpen, group: "view" },
+  { href: "/costs", label: "コスト", icon: Wallet, group: "ops" },
 ];
 
 export default function Sidebar() {
@@ -59,10 +63,42 @@ export default function Sidebar() {
             );
           })}
         </ul>
+        {!collapsed && <div className="h-section px-2 py-2 mt-4">データ</div>}
+        <ul className="space-y-0.5">
+          {visibleNav.filter((n) => n.group === "data").map((n) => {
+            const active = pathname.startsWith(n.href);
+            const Icon = n.icon;
+            return (
+              <li key={n.href}>
+                <Link href={n.href} className={`nav-item ${active ? "active" : ""}`} title={collapsed ? n.label : undefined}>
+                  <Icon className="w-4 h-4 shrink-0" strokeWidth={2} />
+                  {!collapsed && <span>{n.label}</span>}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+
         {!collapsed && <div className="h-section px-2 py-2 mt-4">作成</div>}
         <ul className="space-y-0.5">
           {visibleNav.filter((n) => n.group === "create").map((n) => {
             const active = pathname.startsWith(n.href);
+            const Icon = n.icon;
+            return (
+              <li key={n.href}>
+                <Link href={n.href} className={`nav-item ${active ? "active" : ""}`} title={collapsed ? n.label : undefined}>
+                  <Icon className="w-4 h-4 shrink-0" strokeWidth={2} />
+                  {!collapsed && <span>{n.label}</span>}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+
+        {!collapsed && <div className="h-section px-2 py-2 mt-4">運用</div>}
+        <ul className="space-y-0.5">
+          {visibleNav.filter((n) => n.group === "ops").map((n) => {
+            const active = pathname === n.href;
             const Icon = n.icon;
             return (
               <li key={n.href}>

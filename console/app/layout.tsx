@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { ConsoleProviders } from "@/components/ConsoleProviders";
 import Sidebar from "@/components/Sidebar";
 import TopBar from "@/components/TopBar";
+import CommandPalette from "@/components/CommandPalette";
 
 export const metadata: Metadata = {
   title: "Agents Console",
@@ -27,6 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <div className="max-w-7xl mx-auto w-full">{children}</div>
               </main>
             </div>
+            <CommandPalette />
           </div>
         </ConsoleProviders>
       </body>

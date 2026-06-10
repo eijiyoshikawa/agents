@@ -1,0 +1,122 @@
+{
+  "$schema": "./drive-manifest.schema",
+  "version": 1,
+  "description": "Google Drive 上の基幹データを Console から参照するためのマニフェスト。実運用では Drive API + Service Account でこの JSON を自動生成する想定。MVP では手で編集して全社員に共有する。",
+  "rootFolderId": "REPLACE_WITH_DRIVE_FOLDER_ID",
+  "rootFolderName": "AI Agents 共有ドライブ",
+  "lastSyncedAt": "2026-06-10T00:00:00Z",
+  "syncMode": "manual",
+  "folders": [
+    {
+      "id": "01_BIZ",
+      "name": "01_経営・戦略",
+      "owner": "ceo",
+      "description": "経営戦略・投資判断・対外コミュニケーション資料",
+      "agents": ["ceo", "coo", "strategist", "devils_advocate"],
+      "fileCount": 0,
+      "subfolders": ["事業計画", "投資家向け資料", "取締役会議事録"],
+      "tags": ["confidential", "admin-only"]
+    },
+    {
+      "id": "02_SALES",
+      "name": "02_営業・案件",
+      "owner": "sales",
+      "description": "商談議事録・見積・受発注・契約書",
+      "agents": ["sales", "marketing", "customer_success", "pr"],
+      "fileCount": 0,
+      "subfolders": ["商談議事録", "見積書", "受注台帳", "契約書"],
+      "tags": ["customer-data"]
+    },
+    {
+      "id": "03_FINANCE",
+      "name": "03_経理・財務",
+      "owner": "finance",
+      "description": "請求書・領収書・PL・キャッシュフロー",
+      "agents": ["finance", "subsidy_writer"],
+      "fileCount": 0,
+      "subfolders": ["請求書", "領収書", "月次PL", "補助金実績"],
+      "tags": ["confidential", "admin-only"]
+    },
+    {
+      "id": "04_HR",
+      "name": "04_人事・労務",
+      "owner": "hr",
+      "description": "雇用契約・評価シート・採用関連資料",
+      "agents": ["hr", "legal"],
+      "fileCount": 0,
+      "subfolders": ["雇用契約", "評価シート", "採用台帳"],
+      "tags": ["confidential", "personal-data", "admin-only"]
+    },
+    {
+      "id": "05_LEGAL",
+      "name": "05_法務・コンプラ",
+      "owner": "legal",
+      "description": "NDA・利用規約・プライバシーポリシー・リスクログ",
+      "agents": ["legal", "compliance"],
+      "fileCount": 0,
+      "subfolders": ["NDA", "規約・ポリシー", "リスクログ"],
+      "tags": ["confidential"]
+    },
+    {
+      "id": "06_CONSULT",
+      "name": "06_コンサル案件",
+      "owner": "strategist",
+      "description": "クライアント別の提案・戦略・実行資料",
+      "agents": ["retriever", "issue_structurer", "market_researcher", "analogy_finder", "marketing_analyst", "strategist", "report_builder", "document_builder"],
+      "fileCount": 0,
+      "subfolders": ["建築工房", "BSF新規事業", "草案NPO", "九州産業運輸", "sakumiru"],
+      "tags": ["customer-data"]
+    },
+    {
+      "id": "07_DEV",
+      "name": "07_開発・成果物",
+      "owner": "tech_lead",
+      "description": "実装ドキュメント・設計書・テスト計画",
+      "agents": ["tech_lead", "frontend_engineer", "backend_engineer", "infrastructure", "qa_engineer", "ui_ux_designer", "data_engineer", "designer", "engineer", "web_builder"],
+      "fileCount": 0,
+      "subfolders": ["設計書", "ADR", "テスト計画", "リリースノート"],
+      "tags": []
+    },
+    {
+      "id": "08_MARKETING",
+      "name": "08_マーケ・コンテンツ",
+      "owner": "marketing",
+      "description": "コンテンツ計画・SNS素材・広告クリエイティブ",
+      "agents": ["marketing", "content_creator", "sns_operator", "ad_operations", "copywriter", "seo_aieo", "analytics"],
+      "fileCount": 0,
+      "subfolders": ["SNS素材", "ブログ原稿", "広告クリエイティブ", "プレスリリース"],
+      "tags": []
+    },
+    {
+      "id": "09_SUBSIDY",
+      "name": "09_補助金・助成金",
+      "owner": "subsidy_strategist",
+      "description": "公募要項・申請書ドラフト・採択事例・実績報告",
+      "agents": ["subsidy_scout", "subsidy_strategist", "subsidy_writer"],
+      "fileCount": 0,
+      "subfolders": ["公募要項", "申請書", "採択事例", "実績報告"],
+      "tags": ["confidential"]
+    },
+    {
+      "id": "10_PROJECT",
+      "name": "10_プロジェクト管理",
+      "owner": "project_manager",
+      "description": "ロードマップ・進捗・タスクボード",
+      "agents": ["project_manager", "qa_reviewer", "kpi_dashboard"],
+      "fileCount": 0,
+      "subfolders": ["ロードマップ", "進捗管理", "ステークホルダー会議"],
+      "tags": []
+    }
+  ],
+  "stats": {
+    "totalFolders": 10,
+    "estimatedFiles": "未取得（API連携後に自動更新）",
+    "lastFullScan": null
+  },
+  "integration": {
+    "status": "manifest-only",
+    "nextStep": "Drive API + Service Account を設定し、scripts/scan-drive.mjs で自動同期",
+    "requiredScopes": ["https://www.googleapis.com/auth/drive.metadata.readonly"],
+    "recommendedApproach": "Service Account を共有ドライブに編集権限なしのビューワーとして招待、メタデータのみを定期取得（OAuth は不要）"
+  }
+}

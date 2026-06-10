@@ -12,6 +12,9 @@
     "/analytics": { "label": "分析", "visible": true, "adminOnly": false },
     "/reports": { "label": "日次レポート", "visible": true, "adminOnly": false },
     "/learnings": { "label": "ナレッジ", "visible": true, "adminOnly": false },
+    "/org/graph": { "label": "相互干渉グラフ", "visible": true, "adminOnly": false },
+    "/drive": { "label": "Google Drive", "visible": true, "adminOnly": false },
+    "/costs": { "label": "コスト", "visible": true, "adminOnly": true },
     "/admin": { "label": "管理者設定", "visible": true, "adminOnly": true }
   },
   "departments": {
@@ -33,6 +36,9 @@
     "dashboard.agents": { "label": "エージェントプレビュー", "visible": true },
     "dashboard.projects": { "label": "プロジェクトプレビュー", "visible": true },
     "agent.prompt": { "label": "エージェントのプロンプト全文", "visible": true },
-    "agent.output": { "label": "エージェントの output.json 全文", "visible": true, "adminOnly": true }
+    "agent.output": { "label": "エージェントの output.json 全文", "visible": true, "adminOnly": true },
+    "drive.integration": { "label": "Drive 連携ステータス", "visible": true },
+    "drive.setup": { "label": "Drive 本番連携手順", "visible": true, "adminOnly": true },
+    "drive.required-scopes": { "label": "Drive 権限スコープ", "visible": true, "adminOnly": true }
   }
 }
