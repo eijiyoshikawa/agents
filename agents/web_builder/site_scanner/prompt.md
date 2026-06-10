@@ -60,6 +60,18 @@ HTMLソースと読み込まれたリソースから技術を検出する:
 - Google Analytics / GTM
 - Facebook Pixel 等
 
+### Step 3.5: パフォーマンス・SEO基本情報の取得
+```
+以下の技術的特性も検出する:
+  - Service Worker / PWA 対応
+  - preload / prefetch リンクの使用
+  - 画像フォーマット（WebP/AVIF/JPEG/PNG の割合）
+  - フォントの読み込み方式（display: swap / preload 等）
+  - CDN使用の有無（Cloudflare/Fastly/Vercel Edge等）
+  - HTTP/2 or HTTP/3 対応
+  - キャッシュ戦略（Cache-Control ヘッダーの確認）
+```
+
 ### Step 4: サイトの特徴メモ
 サイト全体の印象・特徴を簡潔にメモする:
 - デザインの方向性（ミニマル/リッチ/コーポレート等）

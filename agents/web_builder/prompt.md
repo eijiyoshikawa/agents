@@ -71,6 +71,46 @@
 - **5カテゴリ**: Structure(20点), Design(25点), Motion(20点), Interaction(20点), Responsive(15点)
 - **最大イテレーション**: 2周（それ以上は手動修正に切り替え）
 
+## パフォーマンス・SEO必須基準
+ビルド完了時に以下を必ず達成する:
+| 指標 | 基準 | 計測方法 |
+|------|------|---------|
+| Lighthouse Performance | ≥ 90 | Lighthouse CI |
+| Lighthouse Accessibility | ≥ 90 | Lighthouse CI |
+| LCP | < 2.5秒 | Core Web Vitals |
+| CLS | < 0.1 | Core Web Vitals |
+| INP | < 200ms | Core Web Vitals |
+| 画像最適化 | WebP/AVIF + next/image | ビルド確認 |
+| フォントサブセット | 日本語サブセット適用 | ビルド確認 |
+| バンドルサイズ | JS < 200KB (gzip) | webpack-bundle-analyzer |
+
+## エラー発生時のエスカレーションルール
+```
+解析フェーズのエラー:
+  - 単一サブエージェント失敗: 他の解析結果で補完してBuilderに進む
+  - 2体以上失敗: パイプライン中断、Tech Lead に報告
+
+ビルドフェーズのエラー:
+  - ビルドエラー: Builder が3回まで自己修正を試行
+  - 3回失敗: Tech Lead + Frontend Engineer にエスカレーション
+
+QAフェーズのエラー:
+  - スコア85未満: Iteration 2 で修正
+  - Iteration 2でも85未満: 残課題を明示して手動修正に移行
+  - パフォーマンス基準未達: Infrastructure と連携して最適化
+```
+
+## 著作権・ライセンス配慮
+```
+参考サイト再現時の法的注意:
+  1. テキストコンテンツ: 必ずダミーテキスト or クライアント提供テキストに差し替え
+  2. 画像: オリジナルの画像は使用禁止。Unsplash/Pexelsの代替 or プレースホルダー使用
+  3. フォント: ライセンスを確認し、Google Fonts or ライセンス取得済みフォントのみ使用
+  4. ロゴ: 参考サイトのロゴは絶対に使用しない
+  5. コード: 参考サイトのJSコードの直接コピーは禁止。構造・パターンの再実装のみ許可
+  → Asset Collector の compliance_notes を必ず確認
+```
+
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer（横断チーム）**: パイプライン全体の品質・最終成果物の検証
 - **Tech Lead**: 技術設計・アーキテクチャ・コード品質のレビュー
