@@ -343,6 +343,7 @@ function buildSearchIndex(agents, projects, reports, templates, designRefs, driv
     { kind: "page", label: "ナレッジ", href: "/learnings", keywords: "learnings 学習 ナレッジ" },
     { kind: "page", label: "Google Drive", href: "/drive", keywords: "drive ファイル 基幹" },
     { kind: "page", label: "リポジトリ", href: "/repos", keywords: "repos github クロスリポ 横断" },
+    { kind: "page", label: "アーキテクチャ", href: "/architecture", keywords: "architecture 図 フロー データ flow diagram" },
     { kind: "page", label: "コスト", href: "/costs", keywords: "cost 運用費 料金" },
     { kind: "page", label: "管理者設定", href: "/admin", keywords: "admin 管理者 設定" },
   ];

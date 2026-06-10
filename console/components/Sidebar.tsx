@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard, Users, Network, Briefcase, FileText, BarChart3,
   CalendarDays, BookOpen, Settings, Sun, Moon, Monitor, Sparkles, ShieldCheck, LogOut,
-  FolderOpen, Wallet, GitBranch, Github,
+  FolderOpen, Wallet, GitBranch, Github, Workflow,
 } from "lucide-react";
 import { useConsole } from "./ConsoleProviders";
 import { useState } from "react";
@@ -21,6 +21,7 @@ const NAV = [
   { href: "/analytics", label: "分析", icon: BarChart3, group: "view" },
   { href: "/reports", label: "日次レポート", icon: CalendarDays, group: "view" },
   { href: "/learnings", label: "ナレッジ", icon: BookOpen, group: "view" },
+  { href: "/architecture", label: "アーキテクチャ", icon: Workflow, group: "ops" },
   { href: "/costs", label: "コスト", icon: Wallet, group: "ops" },
 ];
 
