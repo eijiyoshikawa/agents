@@ -108,26 +108,50 @@ async def _launch_browser(pw, headed: bool, use_real_chrome: bool):
     return await pw.chromium.launch(headless=not headed, args=args)
 
 
+def _replace_page_param(url: str, page_num: int) -> str:
+    """URL の page= パラメータを置き換える（既存パラメータは全て保持）。"""
+    from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
+    parsed = urlparse(url)
+    qs = [(k, v) for k, v in parse_qsl(parsed.query, keep_blank_values=True)
+          if k != "page"]
+    qs.append(("page", str(page_num)))
+    return urlunparse(parsed._replace(query=urlencode(qs)))
+
+
 async def collect_job_urls(page: Page, prefectures: list[str],
                            max_pages: int, delay: float) -> list[str]:
     """検索結果ページから求人URL（/jobs/{ID}）を収集する。
 
-    1ページ目は build_search_url で構築。2ページ目以降は
-    DOM 内の「次のページ」リンクを動的に辿る（クエリパラメータが
-    隠れたセッショントークン optx_rd を必要とするため）。
+    初回アクセスでサーバがリダイレクトで optx_rd（セッショントークン）を
+    付与する。以降のページ送りはそのURLを起点に page= だけ変更する。
     """
     job_ids: set[str] = set()
-    url: str | None = build_search_url(prefectures, 1)
+    initial_url = build_search_url(prefectures, 1)
+    try:
+        await page.goto(initial_url, wait_until="domcontentloaded")
+    except Exception as e:
+        print(f"[search] initial navigation failed: {e}", file=sys.stderr)
+        return []
+    # JS で求人カードが描画されるまで待つ
+    try:
+        await page.wait_for_selector('a[href^="/jobs/"]', timeout=15000)
+    except Exception:
+        pass
+    base_url = page.url
+    if base_url != initial_url:
+        print(f"[search] redirected: {base_url[:120]}", file=sys.stderr)
+
     for page_num in range(1, max_pages + 1):
-        if not url:
-            print(f"[search p{page_num}] no next URL; stop", file=sys.stderr)
-            break
-        try:
-            await page.goto(url, wait_until="domcontentloaded")
-        except Exception as e:
-            print(f"[search p{page_num}] navigation failed: {e}",
-                  file=sys.stderr)
-            break
+        if page_num > 1:
+            url = _replace_page_param(base_url, page_num)
+            try:
+                await page.goto(url, wait_until="domcontentloaded")
+                await page.wait_for_selector('a[href^="/jobs/"]',
+                                             timeout=10000)
+            except Exception as e:
+                print(f"[search p{page_num}] navigation/wait failed: {e}",
+                      file=sys.stderr)
+                break
         hrefs = await page.eval_on_selector_all(
             'a[href^="/jobs/"]',
             "els => els.map(e => e.getAttribute('href'))",
@@ -147,9 +171,6 @@ async def collect_job_urls(page: Page, prefectures: list[str],
               file=sys.stderr)
         if new == 0:
             break
-        # 次のページ URL を動的に取得（無ければ build_search_url にフォールバック）
-        next_url = await _next_page_url(page)
-        url = next_url if next_url else build_search_url(prefectures, page_num + 1)
         await asyncio.sleep(delay)
     return [f"{BASE_URL}/jobs/{jid}" for jid in sorted(job_ids, key=int)]
 
