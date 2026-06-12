@@ -152,10 +152,23 @@ async def collect_job_urls(page: Page, prefectures: list[str],
                 print(f"[search p{page_num}] navigation/wait failed: {e}",
                       file=sys.stderr)
                 break
-        hrefs = await page.eval_on_selector_all(
-            'a[href^="/jobs/"]',
-            "els => els.map(e => e.getAttribute('href'))",
-        )
+        # eval_on_selector_all は execution context 破棄でエラーになる
+        # ことがあるので軽くリトライする
+        hrefs: list[str] = []
+        for attempt in range(3):
+            try:
+                hrefs = await page.eval_on_selector_all(
+                    'a[href^="/jobs/"]',
+                    "els => els.map(e => e.getAttribute('href'))",
+                )
+                break
+            except Exception as e:
+                if attempt == 2:
+                    print(f"[search p{page_num}] eval failed after retries: "
+                          f"{e}", file=sys.stderr)
+                    hrefs = []
+                else:
+                    await asyncio.sleep(1)
         new = 0
         for href in hrefs:
             if not href:

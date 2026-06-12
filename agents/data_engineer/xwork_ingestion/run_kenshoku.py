@@ -31,16 +31,22 @@ INDUSTRY = "建設"
 
 def scrape_one(pref_key: str, max_pages: int, delay: float,
                limit_jobs: int | None, out_path: Path) -> int:
+    """1府県のスクレイプ。Playwright 例外は捕捉して、取得済みデータは
+    最低限保存する（途中クラッシュで全部失われないように）。"""
     label = PREFECTURE_LABELS.get(pref_key)
     if not label:
         print(f"[{pref_key}] no label found in PREFECTURE_LABELS; skip",
               file=sys.stderr)
         return 0
     print(f"\n=== [{pref_key}] scrape ({label}) ===", file=sys.stderr)
-    records = asyncio.run(crawl(
-        [label], max_pages=max_pages, delay=delay,
-        headed=True, use_real_chrome=True, limit_jobs=limit_jobs,
-    ))
+    try:
+        records = asyncio.run(crawl(
+            [label], max_pages=max_pages, delay=delay,
+            headed=True, use_real_chrome=True, limit_jobs=limit_jobs,
+        ))
+    except Exception as e:
+        print(f"[{pref_key}] crawl crashed: {e}", file=sys.stderr)
+        records = []
     out_path.write_text(json.dumps(records, ensure_ascii=False, indent=2),
                         encoding="utf-8")
     print(f"[{pref_key}] wrote {len(records)} companies → {out_path}",
