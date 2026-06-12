@@ -271,51 +271,43 @@ async def extract_company_info(page: Page, job_url: str,
 async def _extract_workplace_address(page: Page) -> str:
     """求人本体の「勤務地」「勤務地詳細」を取り出す。
 
-    建職バンクは「勤務地」表示が短いことも多いので、より詳細な
-    「勤務地詳細」「支店所在地」「アクセス」のうち住所らしいものを採用する。
+    会社概要セクションを除外したテキストから「勤務地詳細→支店所在地→勤務地」
+    の順でラベル直後の値を取得する。本社住所と求人勤務地が違うことが多いため
+    （本社=東京、求人=大阪 等）、別フィールドとして保持する。
     """
-    try:
-        candidates = await page.eval_on_selector_all(
-            "section, div, td, dd",
-            """els => {
-                const out = [];
-                for (const el of els) {
-                    const t = (el.innerText || '').trim();
-                    if (!t) continue;
-                    if (t.length > 200) continue;
-                    if (t.includes('〒') || t.match(/[都道府県].{0,15}[市区町村]/)) {
-                        out.push(t);
-                    }
-                }
-                return out.slice(0, 5);
-            }""",
-        )
-    except Exception:
+    body_text = await page.evaluate("() => document.body.innerText || ''")
+    if not body_text:
         return ""
-    for c in candidates:
-        m = ZIPCODE_RE.search(c)
-        if m:
-            return _clean_text(c)
-    if candidates:
-        return _clean_text(candidates[0])
+    # 会社概要セクションを除外（このセクション内の住所は本社住所であり、
+    # 求人勤務地ではない）
+    if "会社概要" in body_text:
+        body_text = body_text.split("会社概要", 1)[0]
+
+    for label in ("勤務地詳細", "支店所在地", "勤務地"):
+        # ラベル直後の改行→値、または「ラベル: 値」形式
+        pattern = rf"{label}\s*[::]?\s*\n?\s*([^\n]+(?:\n[^\n]+)?)"
+        m = re.search(pattern, body_text)
+        if not m:
+            continue
+        value = _clean_text(m.group(1))
+        if value in ("", "詳しく見る"):
+            continue
+        return value[:200]
     return ""
 
 
 async def _extract_occupation(page: Page) -> str:
-    """求人本体の職種を取得する（パンくず or ラベル）。"""
-    try:
-        text = await page.eval_on_selector(
-            "nav, ol, .breadcrumb",
-            "el => el ? (el.innerText || '') : ''",
-        )
-    except Exception:
+    """求人本体の職種を取得する（パンくず or 「職種」ラベル）。"""
+    body_text = await page.evaluate("() => document.body.innerText || ''")
+    if not body_text:
         return ""
-    if not text:
-        return ""
-    parts = [p.strip() for p in re.split(r"[>›/›\n]", text) if p.strip()]
-    # 最後はその求人タイトル。最後から2番目あたりが職種カテゴリ。
-    if len(parts) >= 2:
-        return parts[-2]
+    if "会社概要" in body_text:
+        body_text = body_text.split("会社概要", 1)[0]
+    m = re.search(r"職種\s*\n?\s*([^\n]+)", body_text)
+    if m:
+        value = _clean_text(m.group(1))
+        if value not in ("", "詳しく見る"):
+            return value[:80]
     return ""
 
 
