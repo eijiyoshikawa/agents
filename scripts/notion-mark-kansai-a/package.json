@@ -1,0 +1,17 @@
+{
+  "name": "notion-mark-kansai-a",
+  "version": "1.0.0",
+  "description": "DB_顧客管理 の関西・従業員30名以上の企業に見込み度合いAを一括設定",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dry-run": "DRY_RUN=1 node set-kansai-a.mjs",
+    "apply": "node set-kansai-a.mjs"
+  },
+  "dependencies": {
+    "@notionhq/client": "^2.2.15"
+  }
+}
