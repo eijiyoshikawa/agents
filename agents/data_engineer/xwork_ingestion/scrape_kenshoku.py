@@ -107,7 +107,11 @@ async def collect_job_urls(page: Page, prefectures: list[str],
 def _clean_text(text: str | None) -> str:
     if not text:
         return ""
-    return re.sub(r"\s+", " ", text).strip()
+    cleaned = re.sub(r"\s+", " ", text).strip()
+    # ラベル値の末尾によく付くUI文字列を除去
+    cleaned = re.sub(r"\s*(詳しく見る|もっと見る|もっと表示)\s*$", "",
+                     cleaned).strip()
+    return cleaned
 
 
 def _parse_company_overview(body_text: str,
