@@ -110,6 +110,62 @@ def _clean_text(text: str | None) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+def _parse_company_overview(body_text: str,
+                            links: list[dict]) -> dict[str, str]:
+    """ページテキストから「ラベル: 値」をスキャンする。
+
+    建職バンクの会社概要は、ラベルと値が改行で並ぶことが多い。
+    "会社名\\n株式会社XXX\\n会社HP\\nhttps://..." のような並び。
+    """
+    if not body_text:
+        return {}
+    # 会社概要セクション以降に絞ると精度が上がる
+    section = body_text
+    if "会社概要" in body_text:
+        section = body_text.split("会社概要", 1)[1]
+    # 後続セクションのノイズを切る
+    for stop in ("条件が近いおすすめ求人", "同じ条件の求人を見る",
+                 "建職バンクとは", "資格から探す"):
+        if stop in section:
+            section = section.split(stop, 1)[0]
+            break
+
+    lines = [l.strip() for l in section.splitlines() if l.strip()]
+    info: dict[str, str] = {}
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        # 「ラベル: 値」形式（同一行）
+        m = re.match(r"^(会社名|社名|会社HP|ホームページ|住所|本社所在地|"
+                     r"従業員数|資本金|設立|創業|詳細説明|事業内容)\s*[::]\s*(.+)$",
+                     line)
+        if m:
+            info.setdefault(m.group(1), m.group(2).strip())
+            i += 1
+            continue
+        # ラベル単独行 → 次の非空行が値
+        if line in LABEL_KEYS and i + 1 < len(lines):
+            value = lines[i + 1]
+            if value not in LABEL_KEYS:
+                info.setdefault(line, value)
+                i += 2
+                continue
+        i += 1
+
+    # 会社HP は body_text からのテキストだとリンクになっていない
+    # 可能性があるので、links の中から「about / company / corporate」
+    # に近いURLを採用する
+    if "会社HP" not in info and links:
+        for lk in links:
+            href = lk.get("href", "")
+            if any(k in href.lower() for k in
+                   ("/about", "/company", "corporate", "profile")):
+                info.setdefault("会社HP", href)
+                break
+
+    return info
+
+
 def _parse_employee_count(text: str) -> int | None:
     if not text:
         return None
@@ -122,11 +178,18 @@ def _parse_employee_count(text: str) -> int | None:
         return None
 
 
-async def extract_company_info(page: Page, job_url: str) -> dict | None:
+LABEL_KEYS = ["会社名", "社名", "会社HP", "ホームページ", "住所",
+              "本社所在地", "従業員数", "資本金", "設立", "創業",
+              "詳細説明", "事業内容"]
+
+
+async def extract_company_info(page: Page, job_url: str,
+                               debug_dir: Path | None = None) -> dict | None:
     """求人詳細ページの「会社概要」セクションから会社情報を抽出する。
 
-    建職バンクの会社概要は、ラベル列+値列の表（dt/dd または th/td）構造。
-    汎用的に拾うため、ラベル文字列をキーに探す。
+    DOM構造に依存せず、ページ全体テキストから「ラベル: 値」パターンで
+    会社情報を取り出す方式。建職バンクのHTMLは構造化されているが、
+    複数の表現パターン(dl/table/div) に汎用対応するためテキストベース。
     """
     try:
         await page.goto(job_url, wait_until="domcontentloaded")
@@ -134,39 +197,29 @@ async def extract_company_info(page: Page, job_url: str) -> dict | None:
         print(f"[detail {job_url}] navigation failed: {e}", file=sys.stderr)
         return None
 
-    # 「会社概要」セクション全体を取得。dt/dd でラベル+値が並ぶ構造を想定。
-    # 失敗しても部分抽出できるよう、複数のセレクタを試す。
-    rows = await page.eval_on_selector_all(
-        "dl dt, dl dd, table th, table td",
-        """els => {
-            const out = [];
-            for (let i = 0; i < els.length; i++) {
-                out.push({ tag: els[i].tagName.toLowerCase(),
-                           text: els[i].innerText || '',
-                           href: els[i].querySelector('a') ?
-                                 els[i].querySelector('a').href : '' });
-            }
-            return out;
-        }""",
+    # まず会社概要セクションが現れるまで少し待つ（クライアント側レンダリング対策）
+    try:
+        await page.wait_for_selector("text=会社概要", timeout=5000)
+    except Exception:
+        pass
+
+    body_text = await page.evaluate("() => document.body.innerText || ''")
+
+    # 「会社HP」直後にリンクが入る形式が多いため、a 要素のテキスト+href も収集
+    links = await page.eval_on_selector_all(
+        "a[href^='http']",
+        "els => els.map(e => ({text: (e.innerText||'').trim(), href: e.href}))",
     )
-    info: dict[str, str] = {}
-    # dl: dt → dd, table: th → td の順で隣接ペアになる前提
-    last_label: str | None = None
-    last_tag: str | None = None
-    for cell in rows:
-        text = _clean_text(cell.get("text"))
-        tag = cell.get("tag")
-        if tag in ("dt", "th"):
-            last_label = text
-            last_tag = tag
-        elif tag in ("dd", "td") and last_label:
-            if last_label not in info:
-                info[last_label] = text
-                # 会社HP の <a> の href を優先採用
-                if "HP" in last_label and cell.get("href"):
-                    info[last_label] = cell.get("href")
-            last_label = None
-            last_tag = None
+
+    if debug_dir:
+        debug_dir.mkdir(parents=True, exist_ok=True)
+        job_id = job_url.rstrip("/").split("/")[-1]
+        (debug_dir / f"job_{job_id}.txt").write_text(
+            body_text or "(empty)", encoding="utf-8")
+        (debug_dir / f"job_{job_id}_links.json").write_text(
+            json.dumps(links, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    info = _parse_company_overview(body_text, links)
 
     if not info:
         return None
@@ -178,6 +231,10 @@ async def extract_company_info(page: Page, job_url: str) -> dict | None:
     capital = (info.get("資本金") or "").strip()
     founded = (info.get("設立") or info.get("創業") or "").strip()
     description = (info.get("詳細説明") or info.get("事業内容") or "").strip()
+
+    if not company_name:
+        # body_text の最初の方に「<東京>...」の前に会社名があるパターン
+        company_name = info.get("_fallback_name", "").strip()
 
     # 勤務地（求人）は会社概要外。求人本体の方にある。
     workplace_address = await _extract_workplace_address(page)
@@ -264,7 +321,8 @@ async def _extract_occupation(page: Page) -> str:
 
 async def crawl(prefectures: list[str], max_pages: int, delay: float,
                 headed: bool, use_real_chrome: bool,
-                limit_jobs: int | None = None) -> list[dict]:
+                limit_jobs: int | None = None,
+                debug_dir: Path | None = None) -> list[dict]:
     results: list[dict] = []
     seen_companies: set[str] = set()
     async with async_playwright() as pw:
@@ -292,7 +350,7 @@ async def crawl(prefectures: list[str], max_pages: int, delay: float,
         print(f"[step2] extracting company info from {len(job_urls)} jobs",
               file=sys.stderr)
         for i, job_url in enumerate(job_urls, 1):
-            info = await extract_company_info(page, job_url)
+            info = await extract_company_info(page, job_url, debug_dir=debug_dir)
             if info is None:
                 print(f"[detail {i}/{len(job_urls)}] skip "
                       f"(no info): {job_url}", file=sys.stderr)
@@ -328,6 +386,8 @@ def main() -> int:
                     help="ブラウザを表示せずに実行する。既定は headed")
     ap.add_argument("--no-real-chrome", action="store_true",
                     help="インストール済み Chrome ではなく Chromium を使う")
+    ap.add_argument("--debug-dir", type=Path, default=None,
+                    help="各求人ページの body text を保存（構造調査用）")
     args = ap.parse_args()
 
     data = asyncio.run(crawl(
@@ -335,6 +395,7 @@ def main() -> int:
         headed=not args.headless,
         use_real_chrome=not args.no_real_chrome,
         limit_jobs=args.limit_jobs,
+        debug_dir=args.debug_dir,
     ))
     args.out.write_text(json.dumps(data, ensure_ascii=False, indent=2),
                         encoding="utf-8")
