@@ -49,12 +49,51 @@ def build_search_url(prefectures: list[str], page_num: int = 1) -> str:
     """検索結果ページのURLを構築する。
 
     建職バンクは jobs_search[prefecture_names]=県名,県名 形式。
+    `ver` パラメータが無いと page=2 以降のページネーションが効かない
+    （1ページ目と同じ結果を返す）ことを確認済み。
     """
     pref_csv = ",".join(prefectures)
-    params = [("jobs_search[prefecture_names]", pref_csv)]
+    params = [
+        ("jobs_search[prefecture_names]", pref_csv),
+        ("ver", "issue_4359"),
+    ]
     if page_num > 1:
         params.append(("page", str(page_num)))
     return f"{SEARCH_URL}?{urlencode(params, quote_via=quote)}"
+
+
+async def _next_page_url(page: Page) -> str | None:
+    """「次のページ」リンクを抽出する（フォールバック用）。"""
+    try:
+        href = await page.evaluate("""() => {
+            const sel = [
+                'a[rel="next"]',
+                'a.pagination__next',
+                '.pagination a[href*="page="]:last-of-type',
+                'a:has(span:contains("次"))',
+            ];
+            for (const s of sel) {
+                try {
+                    const el = document.querySelector(s);
+                    if (el && el.href) return el.href;
+                } catch (e) {}
+            }
+            // すべての /jobs/search?...&page=N のリンクから最大値を探す
+            const links = Array.from(document.querySelectorAll(
+                'a[href*="/jobs/search"][href*="page="]'));
+            let maxP = 0, best = null;
+            for (const l of links) {
+                const m = l.href.match(/page=(\\d+)/);
+                if (m) {
+                    const p = parseInt(m[1], 10);
+                    if (p > maxP) { maxP = p; best = l.href; }
+                }
+            }
+            return best;
+        }""")
+        return href
+    except Exception:
+        return None
 
 
 async def _launch_browser(pw, headed: bool, use_real_chrome: bool):
@@ -71,10 +110,18 @@ async def _launch_browser(pw, headed: bool, use_real_chrome: bool):
 
 async def collect_job_urls(page: Page, prefectures: list[str],
                            max_pages: int, delay: float) -> list[str]:
-    """検索結果ページから求人URL（/jobs/{ID}）を収集する。"""
+    """検索結果ページから求人URL（/jobs/{ID}）を収集する。
+
+    1ページ目は build_search_url で構築。2ページ目以降は
+    DOM 内の「次のページ」リンクを動的に辿る（クエリパラメータが
+    隠れたセッショントークン optx_rd を必要とするため）。
+    """
     job_ids: set[str] = set()
+    url: str | None = build_search_url(prefectures, 1)
     for page_num in range(1, max_pages + 1):
-        url = build_search_url(prefectures, page_num)
+        if not url:
+            print(f"[search p{page_num}] no next URL; stop", file=sys.stderr)
+            break
         try:
             await page.goto(url, wait_until="domcontentloaded")
         except Exception as e:
@@ -100,6 +147,9 @@ async def collect_job_urls(page: Page, prefectures: list[str],
               file=sys.stderr)
         if new == 0:
             break
+        # 次のページ URL を動的に取得（無ければ build_search_url にフォールバック）
+        next_url = await _next_page_url(page)
+        url = next_url if next_url else build_search_url(prefectures, page_num + 1)
         await asyncio.sleep(delay)
     return [f"{BASE_URL}/jobs/{jid}" for jid in sorted(job_ids, key=int)]
 
