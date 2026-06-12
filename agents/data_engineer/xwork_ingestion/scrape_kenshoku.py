@@ -172,7 +172,10 @@ async def collect_job_urls(page: Page, prefectures: list[str],
         if new == 0:
             break
         await asyncio.sleep(delay)
-    return [f"{BASE_URL}/jobs/{jid}" for jid in sorted(job_ids, key=int)]
+    # 新着順（求人IDの降順）で返す。古い求人は会社概要が省略されている
+    # ことが多くスキップ率が高いため。
+    return [f"{BASE_URL}/jobs/{jid}" for jid in sorted(job_ids, key=int,
+                                                       reverse=True)]
 
 
 def _clean_text(text: str | None) -> str:
