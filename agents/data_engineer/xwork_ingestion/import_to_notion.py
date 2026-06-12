@@ -88,13 +88,14 @@ def classify(item: dict, idx: ExistingIndex) -> tuple[str, dict | None]:
     return "new", None
 
 
-def append_media(client: NotionClient, page: dict, dry_run: bool) -> bool:
+def append_media(client: NotionClient, page: dict, dry_run: bool,
+                 media_tag: str = MEDIA_TAG) -> bool:
     current = media_of(page)
-    if MEDIA_TAG in current:
+    if media_tag in current:
         return False
     if dry_run:
         return True
-    client.update_media(page["id"], current + [MEDIA_TAG])
+    client.update_media(page["id"], current + [media_tag])
     return True
 
 
@@ -145,10 +146,19 @@ def _rich(content: str) -> dict:
     return {"rich_text": [{"text": {"content": content}}]}
 
 
-def build_memo(item: dict) -> str:
+def build_memo(item: dict, media_tag: str = MEDIA_TAG) -> str:
     lines: list[str] = []
     if item.get("detail_url"):
-        lines.append(f"クロスワーク求人: {item['detail_url']}")
+        lines.append(f"{media_tag}求人: {item['detail_url']}")
+    if item.get("company_hp"):
+        lines.append(f"会社HP: {item['company_hp']}")
+    if item.get("founded"):
+        lines.append(f"設立: {item['founded']}")
+    if item.get("workplace_address"):
+        lines.append(f"勤務地（求人）: {item['workplace_address']}")
+    if item.get("description"):
+        desc = item["description"][:300]
+        lines.append(f"会社説明: {desc}")
     if item.get("hello_work_company_id"):
         lines.append(f"法人番号: {item['hello_work_company_id']}")
     if item.get("representative_title"):
@@ -176,10 +186,10 @@ def build_memo(item: dict) -> str:
 
 
 def build_new_props(item: dict, needs_review: bool, db_props: set[str],
-                    industry: str) -> dict[str, Any]:
+                    industry: str, media_tag: str = MEDIA_TAG) -> dict[str, Any]:
     props: dict[str, Any] = {
         "顧客名": {"title": [{"text": {"content": item.get("company_name", "")}}]},
-        "掲載元メディア": {"multi_select": [{"name": MEDIA_TAG}]},
+        "掲載元メディア": {"multi_select": [{"name": media_tag}]},
         "業種": {"select": {"name": industry}},
         "確認状況": {"select": {"name": "未確認"}},
         "重複確認必要": {"checkbox": needs_review},
@@ -201,7 +211,10 @@ def build_new_props(item: dict, needs_review: bool, db_props: set[str],
         optional["従業員数"] = {"number": item["employee_count_total"]}
     if item.get("capital"):
         optional["資本金"] = _rich(item["capital"])
-    memo = build_memo(item)
+    if item.get("company_hp") and "会社URL" in db_props:
+        if not props.get("会社URL"):
+            optional["会社URL"] = {"url": item["company_hp"]}
+    memo = build_memo(item, media_tag=media_tag)
     if memo:
         optional["メモ"] = _rich(memo)
     for key, val in optional.items():
@@ -213,7 +226,8 @@ def build_new_props(item: dict, needs_review: bool, db_props: set[str],
 
 
 def run(input_path: Path, dry_run: bool, use_gbiz: bool,
-        industry: str = DEFAULT_INDUSTRY) -> dict:
+        industry: str = DEFAULT_INDUSTRY,
+        media_tag: str = MEDIA_TAG) -> dict:
     client = NotionClient()
     db_props = fetch_db_properties(client)
     idx = build_index(client)
@@ -241,7 +255,7 @@ def run(input_path: Path, dry_run: bool, use_gbiz: bool,
         stats[kind] += 1
         try:
             _process_item(client, item, kind, page, db_props, industry,
-                          dry_run, stats)
+                          dry_run, stats, media_tag=media_tag)
         except (requests.HTTPError, RuntimeError) as e:
             stats["errors"] += 1
             body = ""
@@ -254,9 +268,9 @@ def run(input_path: Path, dry_run: bool, use_gbiz: bool,
 
 def _process_item(client: NotionClient, item: dict, kind: str, page: dict | None,
                   db_props: set[str], industry: str, dry_run: bool,
-                  stats: dict) -> None:
+                  stats: dict, media_tag: str = MEDIA_TAG) -> None:
     if kind == "match_name" and page is not None:
-        if append_media(client, page, dry_run):
+        if append_media(client, page, dry_run, media_tag=media_tag):
             stats["media_appended"] += 1
         additions = fill_empty_on_match(item, page, db_props, industry)
         if additions:
@@ -267,7 +281,8 @@ def _process_item(client: NotionClient, item: dict, kind: str, page: dict | None
     if dry_run:
         return
     needs_review = kind in ("partial_phone", "partial_host")
-    client.create_customer(build_new_props(item, needs_review, db_props, industry))
+    client.create_customer(build_new_props(item, needs_review, db_props,
+                                           industry, media_tag=media_tag))
 
 
 def main() -> int:
@@ -276,11 +291,16 @@ def main() -> int:
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--no-gbiz", action="store_true",
                     help="gBizINFO による電話・URL 補完を無効化")
+    ap.add_argument("--media", default=MEDIA_TAG,
+                    help="掲載元メディアのタグ名（既定: クロスワーク）")
+    ap.add_argument("--industry", default=DEFAULT_INDUSTRY,
+                    help="業種ラベル（既定: 建設）")
     args = ap.parse_args()
     if "NOTION_TOKEN" not in os.environ:
         print("error: NOTION_TOKEN env var is required", file=sys.stderr)
         return 2
-    stats = run(args.input, args.dry_run, use_gbiz=not args.no_gbiz)
+    stats = run(args.input, args.dry_run, use_gbiz=not args.no_gbiz,
+                industry=args.industry, media_tag=args.media)
     print(json.dumps(stats, ensure_ascii=False, indent=2))
     return 0
 

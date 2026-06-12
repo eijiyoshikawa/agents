@@ -176,16 +176,69 @@ python enrich_places.py --apply --max-targets 2000 --industry 運輸・物流 --
 
 ---
 
-## 6. 関連スクリプト一覧
+## 6. 建職バンク（kenshoku-bank.com）の取り込み
+
+x-work.jp と並ぶ第2の建設業求人サイト。求人詳細ページに「会社概要」セクションがあり、
+**会社HP・本社住所・従業員数・資本金**まで取れる（x-work.jp より詳細）。
+
+### スクレイプ + Notion 投入
+
+```bash
+cd ~/agents/agents/data_engineer/xwork_ingestion
+source .venv/bin/activate
+export $(grep -v '^#' .env | xargs)
+
+# 関西4府県 dry-run
+python run_kenshoku.py --prefectures osaka kyoto hyogo shiga --dry-run
+
+# 関西4府県 本実行
+python run_kenshoku.py --prefectures osaka kyoto hyogo shiga
+
+# 全国一掃（all で47都道府県）
+python run_kenshoku.py --prefectures all
+```
+
+### Places API で電話補完
+
+x-work.jp と同じ流れ。「建職バンク」メディアで絞る:
+
+```bash
+python enrich_places.py --apply --max-targets 2000 --industry 建設 --media 建職バンク
+```
+
+### 仕様メモ
+
+- **URL構造**: `?jobs_search[prefecture_names]=県名&page=N`
+- **検索結果**: 1ページ20件、`&page=N` でページング
+- **求人詳細**: `/jobs/{ID}` で個別ページ、ここに「会社概要」セクションあり
+- **電話番号**: ❌ サイト上に無し → Places API で補完
+- **2段階クロール**: (1) 検索結果から求人URL収集 → (2) 各求人から会社情報抽出
+- **会社デデュプ**: 会社名で重複排除（1社が複数求人を出すケースに対応）
+
+### スケール感
+
+| 項目 | 規模 |
+|---|---|
+| 全公開求人 | 約7,200件 |
+| 会社単位ユニーク（推定） | 約3,000〜5,000社/全国 |
+| 関西4府県（推定） | 約400〜600社の新規追加 |
+| 所要時間（関西） | 2〜4時間 |
+| 所要時間（全国） | 半日〜1日 |
+
+---
+
+## 7. 関連スクリプト一覧
 
 | パス | 用途 |
 |---|---|
-| `run_batch.py` | 府県×職種一括スクレイプ&投入オーケストレータ |
+| `run_batch.py` | x-work.jp の府県×職種一括スクレイプ&投入 |
+| `run_kenshoku.py` | 建職バンクの府県別スクレイプ&投入 |
 | `scrape_xwork.py` | x-work.jp 単発スクレイプ |
-| `import_to_notion.py` | JSON → Notion 重複判定込み投入 |
+| `scrape_kenshoku.py` | 建職バンク単発スクレイプ（2段階クロール） |
+| `import_to_notion.py` | JSON → Notion 重複判定込み投入（`--media` でタグ指定可） |
 | `enrich_places.py` | Google Places API で電話・URL補完 |
 | `enrich_phones.py` | 公式サイトクロールで電話番号抽出 |
 | `enrich_urls_cse.py` | Google CSE で公式URL補完（現在GCP設定要） |
 | `find_duplicates.py` | 重複検出&フラグ立て |
-| `prefecture_cities.py` | 47都道府県市町村リスト + 業種職種定義 |
+| `prefecture_cities.py` | 47都道府県市町村リスト + 業種職種 + 都道府県名(漢字) |
 | `~/agents/scripts/notion-mark-kansai-a/set-kansai-a.mjs` | 関西30名以上をA化 |
