@@ -227,7 +227,61 @@ python enrich_places.py --apply --max-targets 2000 --industry 建設 --media 建
 
 ---
 
-## 7. 関連スクリプト一覧
+## 7. 補完パイプラインと月予算（¥5,000/月 仮置き）
+
+新規ページのデータ補完は **コスト¥0手段を優先**して、Places API は最後の手段にする。
+
+### 補完パイプラインの優先順位
+
+```
+[1] gBizINFO (run_batch.py 内 use-gbiz)         ¥0  法人番号が xwork から取れたら自動
+[2] enrich_urls_search.py（Bing 検索）            ¥0  URL推定、CSE代替
+[3] enrich_phones.py（公式サイトクロール）         ¥0  URLがあれば電話抽出
+[4] enrich_places.py（Google Places API）        $0.032/件  残りのみ、予算管理
+```
+
+### 月予算 ¥5,000 の使い方
+
+| 用途 | 想定件数 | コスト |
+|---|---|---|
+| Places API（無料手段で取れなかった分） | 約 1,000件/月 | ¥4,800 (~$32) |
+| 予備 | - | ¥200 |
+
+→ Places は `--max-targets 200` 程度で1日ごとに分割実行が安全。
+
+### 予算アラート設定（必須）
+
+GCP コンソールで月¥5,000のアラート＋自動停止を設定:
+
+```
+https://console.cloud.google.com/billing/budgets?project=saleslist-496305
+```
+
+### 推奨の実行順序
+
+```bash
+# 例: 関西の建職バンク経由企業の補完
+cd ~/agents/agents/data_engineer/xwork_ingestion
+source .venv/bin/activate
+export $(grep -v '^#' .env | xargs)
+
+# [1] gBizINFO は run_batch.py の --use-gbiz で実施済み
+
+# [2] Bing で URL補完（無料、約 200件/15分）
+python enrich_urls_search.py --apply --max-targets 200 \
+  --industry 建設 --media 建職バンク
+
+# [3] URL取得済みなら公式サイトから電話抽出（無料）
+python enrich_phones.py --apply --max-targets 300
+
+# [4] Places API でカバーできなかった残りを処理（予算厳守）
+python enrich_places.py --apply --max-targets 200 \
+  --industry 建設 --media 建職バンク
+```
+
+---
+
+## 8. 関連スクリプト一覧
 
 | パス | 用途 |
 |---|---|
@@ -237,7 +291,8 @@ python enrich_places.py --apply --max-targets 2000 --industry 建設 --media 建
 | `scrape_kenshoku.py` | 建職バンク単発スクレイプ（2段階クロール） |
 | `import_to_notion.py` | JSON → Notion 重複判定込み投入（`--media` でタグ指定可） |
 | `enrich_places.py` | Google Places API で電話・URL補完 |
-| `enrich_phones.py` | 公式サイトクロールで電話番号抽出 |
+| `enrich_phones.py` | 公式サイトクロールで電話番号抽出（無料） |
+| `enrich_urls_search.py` | **Bing 検索で公式URL補完（無料、CSEの代替）** |
 | `enrich_urls_cse.py` | Google CSE で公式URL補完（現在GCP設定要） |
 | `find_duplicates.py` | 重複検出&フラグ立て |
 | `prefecture_cities.py` | 47都道府県市町村リスト + 業種職種 + 都道府県名(漢字) |
