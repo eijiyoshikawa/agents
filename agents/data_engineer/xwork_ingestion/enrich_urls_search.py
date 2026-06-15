@@ -1,7 +1,7 @@
-"""会社名から公式URLを Bing 検索経由で推定する（無料）。
+"""会社名から公式URLを DuckDuckGo HTML 検索経由で推定する（無料）。
 
 CSE が GCP設定問題で動かない・Places API が課金されすぎる、という背景で
-無料の補完手段として実装。Bing 検索結果ページを HTMLとしてフェッチし、
+無料の補完手段として実装。DuckDuckGo の HTMLエンドポイントを利用し、
 上位結果から公式URLっぽいものを採用する。
 
 - コスト ¥0
@@ -31,7 +31,7 @@ import requests
 from normalize import normalize_company_name
 from notion_client import NotionClient, text_prop, title_of
 
-BING_SEARCH_URL = "https://www.bing.com/search"
+DDG_HTML_URL = "https://html.duckduckgo.com/html/"
 DEFAULT_DELAY_SEC = 2.0
 DEFAULT_WORKERS = 2
 DEFAULT_MAX_TARGETS = 200
@@ -59,6 +59,7 @@ EXCLUDE_DOMAINS = (
     "tabelog.com", "ekiten.jp", "navitime.co.jp", "mapion.co.jp",
     "itp.ne.jp", "google.com", "google.co.jp",
     "bing.com", "yahoo.co.jp", "yahoo.com",
+    "duckduckgo.com",
     "ameblo.jp", "hatenablog.com", "livedoor.jp", "fc2.com",
     "prtimes.jp", "businesswire.com", "newscast.jp",
     "homes.co.jp", "suumo.jp", "minkabu.jp",
@@ -67,11 +68,13 @@ EXCLUDE_DOMAINS = (
 EXCLUDE_EXT = (".pdf", ".jpg", ".jpeg", ".png", ".gif",
                ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx")
 
-BING_RESULT_RE = re.compile(
-    r'<li[^>]*class="[^"]*b_algo[^"]*"[^>]*>.*?'
-    r'<h2[^>]*>.*?<a[^>]+href="([^"]+)"',
-    re.DOTALL,
+# DDG HTML の検索結果リンク（result__a クラス）
+DDG_RESULT_RE = re.compile(
+    r'<a[^>]+class="[^"]*result__a[^"]*"[^>]+href="([^"]+)"',
+    re.IGNORECASE,
 )
+# 「実体URL」が uddg= パラメータに入っている形式
+DDG_REDIRECT_RE = re.compile(r"uddg=([^&]+)")
 
 
 def _extract_city(address: str) -> str:
@@ -95,64 +98,72 @@ def _is_excluded(url: str) -> bool:
     return False
 
 
-def _clean_url(url: str) -> str:
-    """Bingリダイレクトを剥がす（href が ?u=... 形式のことがある）。"""
-    if not url:
+def _resolve_ddg_redirect(href: str) -> str:
+    """DDG HTML は href が //duckduckgo.com/l/?uddg=<URLエンコード> 形式。
+    そのままだとリダイレクトURLなので、uddg を取り出してデコードする。"""
+    if not href:
         return ""
-    if url.startswith("/"):
-        return ""
-    if "bing.com/ck/" in url or "bing.com/aclk" in url:
-        # Bing広告経由のリダイレクト
-        m = re.search(r"[?&]u=([^&]+)", url)
+    if href.startswith("//"):
+        href = "https:" + href
+    if "duckduckgo.com/l/" in href:
+        m = DDG_REDIRECT_RE.search(href)
         if m:
             try:
                 return unquote(m.group(1))
             except Exception:
                 return ""
         return ""
-    return url
+    if href.startswith("http"):
+        return href
+    return ""
 
 
-def search_bing(company_name: str, city: str = "",
-                timeout: int = 20) -> list[str]:
-    """Bing検索で会社名から候補URLを取得（上位10件）。"""
+def search_ddg(company_name: str, city: str = "",
+               timeout: int = 20,
+               debug_path: Path | None = None) -> list[str]:
+    """DuckDuckGo HTML検索で会社名から候補URLを取得（上位10件）。"""
     query_parts = [f'"{company_name}"']
     if city:
         query_parts.append(city)
     query_parts.append("公式")
     query = " ".join(query_parts)
-    params = {"q": query, "count": 10, "mkt": "ja-JP", "setlang": "ja"}
     headers = {
         "User-Agent": REAL_UA,
         "Accept": "text/html,application/xhtml+xml",
         "Accept-Language": "ja,en;q=0.9",
-        "Referer": "https://www.bing.com/",
+        "Referer": "https://duckduckgo.com/",
     }
+    data = {"q": query, "kl": "jp-jp"}
     for attempt in range(3):
         try:
-            r = requests.get(BING_SEARCH_URL, params=params,
-                             headers=headers, timeout=timeout)
+            r = requests.post(DDG_HTML_URL, data=data,
+                              headers=headers, timeout=timeout)
         except requests.RequestException:
             time.sleep(2 ** attempt)
             continue
-        if r.status_code == 429:
-            time.sleep(5 + attempt * 5)
+        if r.status_code == 202:
+            time.sleep(2 + attempt * 2)
             continue
         if r.status_code != 200:
             return []
-        # 検索結果リンクを抽出
-        urls = []
-        for raw in BING_RESULT_RE.findall(r.text):
-            cleaned = _clean_url(raw)
-            if cleaned:
-                urls.append(cleaned)
+        if debug_path:
+            debug_path.write_text(r.text, encoding="utf-8")
+        urls: list[str] = []
+        seen: set[str] = set()
+        for href in DDG_RESULT_RE.findall(r.text):
+            resolved = _resolve_ddg_redirect(href)
+            if not resolved or resolved in seen:
+                continue
+            seen.add(resolved)
+            urls.append(resolved)
+            if len(urls) >= 10:
+                break
         return urls
     return []
 
 
 def pick_best_url(urls: list[str], company_name: str) -> str:
     """除外ドメインフィルタを掛けて、最初のURLを採用。"""
-    norm = normalize_company_name(company_name).lower()
     for url in urls:
         if _is_excluded(url):
             continue
@@ -160,7 +171,8 @@ def pick_best_url(urls: list[str], company_name: str) -> str:
     return ""
 
 
-def process_one(page: dict, delay: float) -> dict:
+def process_one(page: dict, delay: float,
+                debug_dir: Path | None = None) -> dict:
     title = title_of(page)
     address = text_prop(page, "住所")
     existing_url = text_prop(page, "会社URL")
@@ -172,7 +184,12 @@ def process_one(page: dict, delay: float) -> dict:
     city = _extract_city(address)
     # 礼儀正しいクロール: ランダム delay
     time.sleep(delay + random.uniform(0, 0.5))
-    urls = search_bing(title, city)
+    debug_path = None
+    if debug_dir:
+        debug_dir.mkdir(parents=True, exist_ok=True)
+        safe = re.sub(r"[^\w\-]", "_", title)[:50]
+        debug_path = debug_dir / f"{safe}.html"
+    urls = search_ddg(title, city, debug_path=debug_path)
     if not urls:
         return {"id": page["id"], "title": title, "status": "no_match"}
     url = pick_best_url(urls, title)
@@ -208,13 +225,15 @@ def collect_targets(client: NotionClient, max_targets: int,
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--report", type=Path,
-                    default=Path("bing_urls_report.json"))
+                    default=Path("ddg_urls_report.json"))
     ap.add_argument("--apply", action="store_true")
     ap.add_argument("--max-targets", type=int, default=DEFAULT_MAX_TARGETS)
     ap.add_argument("--workers", type=int, default=DEFAULT_WORKERS)
     ap.add_argument("--delay", type=float, default=DEFAULT_DELAY_SEC)
     ap.add_argument("--industry", default="")
     ap.add_argument("--media", default="")
+    ap.add_argument("--debug-dir", type=Path, default=None,
+                    help="各クエリのHTMLレスポンスを保存（構造確認用）")
     args = ap.parse_args()
 
     if "NOTION_TOKEN" not in os.environ:
@@ -231,7 +250,8 @@ def main() -> int:
 
     report: list[dict] = []
     with ThreadPoolExecutor(max_workers=args.workers) as ex:
-        futures = [ex.submit(process_one, p, args.delay) for p in targets]
+        futures = [ex.submit(process_one, p, args.delay, args.debug_dir)
+                   for p in targets]
         for i, fut in enumerate(as_completed(futures), 1):
             r = fut.result()
             report.append(r)
@@ -278,3 +298,4 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
