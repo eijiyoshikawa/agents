@@ -65,15 +65,28 @@ async def login(page: Page, email: str, password: str,
         print(f"[login] navigation failed: {e}", file=sys.stderr)
         return False
 
-    # SPA対応: input 要素が描画されるまで待つ
+    # SPA対応: JSバンドル読み込み完了まで待つ
     try:
-        await page.wait_for_selector("input", timeout=15000)
+        await page.wait_for_load_state("networkidle", timeout=30000)
     except Exception:
-        # それでも見えなければ networkidle まで待つ
+        pass
+
+    # input 要素が描画されるまで待つ（最大2回試行）
+    for attempt in range(2):
         try:
-            await page.wait_for_load_state("networkidle", timeout=10000)
+            await page.wait_for_selector("input", timeout=15000)
+            break
         except Exception:
-            pass
+            if attempt == 0:
+                print("[login] input not visible yet, waiting 5s more...",
+                      file=sys.stderr)
+                await asyncio.sleep(5)
+                # 念のためページを再評価
+                try:
+                    await page.wait_for_load_state("networkidle",
+                                                    timeout=10000)
+                except Exception:
+                    pass
 
     # ページ内の全 input 要素を列挙してログ出力（デバッグ強化）
     try:
