@@ -52,10 +52,12 @@ def _replace_page_param(url: str, page_num: int) -> str:
     return urlunparse(parsed._replace(query=urlencode(qs)))
 
 
-async def login(page: Page, email: str, password: str) -> bool:
+async def login(page: Page, email: str, password: str,
+                debug_dir: Path | None = None) -> bool:
     """ログインフォームに認証情報を入力してログインする。
 
     フォームのセレクタはサイト構造に応じて柔軟に試行する。
+    失敗時はデバッグディレクトリに HTML / フォーム情報をダンプ。
     """
     try:
         await page.goto(LOGIN_URL, wait_until="domcontentloaded")
@@ -63,17 +65,45 @@ async def login(page: Page, email: str, password: str) -> bool:
         print(f"[login] navigation failed: {e}", file=sys.stderr)
         return False
 
+    # ページ内の全 input 要素を列挙してログ出力（デバッグ強化）
+    try:
+        inputs = await page.eval_on_selector_all(
+            "input",
+            """els => els.map(e => ({
+                type: e.type || '',
+                name: e.name || '',
+                id: e.id || '',
+                placeholder: e.placeholder || '',
+                autocomplete: e.autocomplete || '',
+            }))""",
+        )
+        print(f"[login] found {len(inputs)} input fields:", file=sys.stderr)
+        for inp in inputs[:20]:
+            print(f"  - {inp}", file=sys.stderr)
+    except Exception:
+        inputs = []
+
     email_selectors = [
         'input[type="email"]',
         'input[name="email"]',
         'input[name="login_id"]',
+        'input[name="loginId"]',
+        'input[name="user[email]"]',
+        'input[name="agent[email]"]',
+        'input[name="account"]',
+        'input[name="username"]',
+        'input[name="id"]',
         'input[id="email"]',
+        'input[id="login"]',
+        'input[id="loginId"]',
         'input[autocomplete="email"]',
         'input[autocomplete="username"]',
     ]
     pw_selectors = [
         'input[type="password"]',
         'input[name="password"]',
+        'input[name="user[password]"]',
+        'input[name="agent[password]"]',
         'input[id="password"]',
         'input[autocomplete="current-password"]',
     ]
@@ -82,23 +112,46 @@ async def login(page: Page, email: str, password: str) -> bool:
         'input[type="submit"]',
         'button:has-text("ログイン")',
         'button:has-text("サインイン")',
+        'button:has-text("Login")',
+        'a:has-text("ログイン")',
     ]
 
-    async def _try_fill(selectors: list[str], value: str) -> bool:
+    async def _try_fill(selectors: list[str], value: str,
+                        kind: str) -> str:
         for sel in selectors:
             try:
                 el = await page.query_selector(sel)
                 if el:
                     await el.fill(value)
-                    return True
+                    print(f"[login] {kind} filled via {sel}", file=sys.stderr)
+                    return sel
             except Exception:
                 continue
+        return ""
+
+    def _dump_html(reason: str):
+        if debug_dir:
+            debug_dir.mkdir(parents=True, exist_ok=True)
+            (debug_dir / f"login_failed_{reason}.html").write_text(
+                "(dump pending)", encoding="utf-8")
+
+    email_sel = await _try_fill(email_selectors, email, "email")
+    if not email_sel:
+        print("[login] email field not found", file=sys.stderr)
+        try:
+            html = await page.content()
+            if debug_dir:
+                debug_dir.mkdir(parents=True, exist_ok=True)
+                (debug_dir / "login_page.html").write_text(html,
+                                                            encoding="utf-8")
+                print(f"[login] HTML dumped to {debug_dir}/login_page.html",
+                      file=sys.stderr)
+        except Exception:
+            pass
         return False
 
-    if not await _try_fill(email_selectors, email):
-        print("[login] email field not found", file=sys.stderr)
-        return False
-    if not await _try_fill(pw_selectors, password):
+    pw_sel = await _try_fill(pw_selectors, password, "password")
+    if not pw_sel:
         print("[login] password field not found", file=sys.stderr)
         return False
 
@@ -108,27 +161,36 @@ async def login(page: Page, email: str, password: str) -> bool:
             el = await page.query_selector(sel)
             if el:
                 await el.click()
+                print(f"[login] submit clicked via {sel}", file=sys.stderr)
                 clicked = True
                 break
         except Exception:
             continue
     if not clicked:
-        # 最終手段: Enter キー押下
         try:
             await page.keyboard.press("Enter")
+            print("[login] submitted via Enter key", file=sys.stderr)
         except Exception:
             print("[login] submit failed", file=sys.stderr)
             return False
 
     # ログイン後の遷移を待つ
     try:
-        await page.wait_for_load_state("networkidle", timeout=10000)
+        await page.wait_for_load_state("networkidle", timeout=15000)
     except Exception:
         pass
 
     current_url = page.url
     if "/login" in current_url:
         print(f"[login] still on /login: {current_url}", file=sys.stderr)
+        if debug_dir:
+            try:
+                html = await page.content()
+                debug_dir.mkdir(parents=True, exist_ok=True)
+                (debug_dir / "login_after_submit.html").write_text(
+                    html, encoding="utf-8")
+            except Exception:
+                pass
         return False
     return True
 
@@ -444,7 +506,7 @@ async def crawl(start_url: str, max_pages: int, delay: float,
 
         if email and password:
             print("[login] attempting login...", file=sys.stderr)
-            ok = await login(page, email, password)
+            ok = await login(page, email, password, debug_dir=debug_dir)
             if not ok:
                 print("[login] FAILED", file=sys.stderr)
                 await browser.close()
