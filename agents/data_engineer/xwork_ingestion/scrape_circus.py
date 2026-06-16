@@ -300,27 +300,31 @@ async def _scroll_to_bottom(page: Page, steps: int = 6) -> None:
 
 
 async def _extract_job_ids_from_dom(page: Page) -> list[str]:
-    """DOM 内の /search/{ID} リンクを優先抽出。
-    DOM に無い場合のみ __NEXT_DATA__ から `/search/{ID}` リテラルを拾う
-    （広い `"id":\\d+` は city/occupation ID を巻き込むので使わない）。
+    """求人ID を DOM の /search/{ID} アンカー + __NEXT_DATA__ から抽出。
+    CIRCUS は検索カードに <a href> を持たない場合があるので、
+    __NEXT_DATA__ の jobSearch.items / "id": NNN も走査する。
+    city/occupation ID 混入を避けるため、ID 長 >= 5 桁(>=10000)で絞る。
     """
     try:
         jids = await page.evaluate(
             r"""() => {
                 const ids = new Set();
+                const add = (v) => {
+                    if (!v) return;
+                    // 5桁以上のみ採用（city ID 1156-1332、occupation 147-172 を除外）
+                    if (String(v).length >= 5) ids.add(String(v));
+                };
                 document.querySelectorAll('a[href]').forEach(a => {
                     const h = a.getAttribute('href') || '';
                     const m = h.match(/^\/search\/(\d+)(?:[\/?#]|$)/);
-                    if (m) ids.add(m[1]);
+                    if (m) add(m[1]);
                 });
-                if (ids.size === 0) {
-                    const nd = document.getElementById('__NEXT_DATA__');
-                    if (nd && nd.textContent) {
-                        const re = /"\/search\/(\d+)"/g;
-                        let m;
-                        while ((m = re.exec(nd.textContent)) !== null) {
-                            ids.add(m[1]);
-                        }
+                const nd = document.getElementById('__NEXT_DATA__');
+                if (nd && nd.textContent) {
+                    const re = /"\/search\/(\d+)"|"jobId":\s*(\d+)|"id":\s*(\d+)/g;
+                    let m;
+                    while ((m = re.exec(nd.textContent)) !== null) {
+                        add(m[1] || m[2] || m[3]);
                     }
                 }
                 return Array.from(ids);
