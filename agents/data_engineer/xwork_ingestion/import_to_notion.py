@@ -139,6 +139,15 @@ def fill_empty_on_match(item: dict, page: dict, db_props: set[str], industry: st
             additions["従業員数"] = {"number": item["employee_count_total"]}
     if "業種" in db_props and not _page_select(page, "業種"):
         additions["業種"] = {"select": {"name": industry}}
+    if ("設立年" in db_props and item.get("founded_year")
+            and _page_number(page, "設立年") is None):
+        additions["設立年"] = {"number": item["founded_year"]}
+    if ("上場区分" in db_props and item.get("listing_class")
+            and not _page_select(page, "上場区分")):
+        additions["上場区分"] = {"select": {"name": item["listing_class"]}}
+    if ("企業フェーズ" in db_props and item.get("company_phase")
+            and not _page_select(page, "企業フェーズ")):
+        additions["企業フェーズ"] = {"select": {"name": item["company_phase"]}}
     return additions
 
 
@@ -152,6 +161,18 @@ def build_memo(item: dict, media_tag: str = MEDIA_TAG) -> str:
         lines.append(f"{media_tag}求人: {item['detail_url']}")
     if item.get("company_hp"):
         lines.append(f"会社HP: {item['company_hp']}")
+    if item.get("youtube_url"):
+        lines.append(f"YouTube: {item['youtube_url']}")
+    if item.get("classification"):
+        lines.append(f"求人区分: {item['classification']}")
+    if item.get("industry_label"):
+        lines.append(f"業界カテゴリ: {item['industry_label']}")
+    if item.get("salary_range"):
+        lines.append(f"年収レンジ: {item['salary_range']}")
+    if item.get("average_age"):
+        lines.append(f"平均年齢: {item['average_age']}")
+    if item.get("gender_ratio"):
+        lines.append(f"男女比: {item['gender_ratio']}")
     if item.get("founded"):
         lines.append(f"設立: {item['founded']}")
     if item.get("workplace_address"):
@@ -214,6 +235,12 @@ def build_new_props(item: dict, needs_review: bool, db_props: set[str],
     if item.get("company_hp") and "会社URL" in db_props:
         if not props.get("会社URL"):
             optional["会社URL"] = {"url": item["company_hp"]}
+    if item.get("founded_year") and "設立年" in db_props:
+        optional["設立年"] = {"number": item["founded_year"]}
+    if item.get("listing_class") and "上場区分" in db_props:
+        optional["上場区分"] = {"select": {"name": item["listing_class"]}}
+    if item.get("company_phase") and "企業フェーズ" in db_props:
+        optional["企業フェーズ"] = {"select": {"name": item["company_phase"]}}
     memo = build_memo(item, media_tag=media_tag)
     if memo:
         optional["メモ"] = _rich(memo)

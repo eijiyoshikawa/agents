@@ -281,14 +281,77 @@ python enrich_places.py --apply --max-targets 200 \
 
 ---
 
-## 8. 関連スクリプト一覧
+## 8. CIRCUS AGENT（circus-job.com）の取り込み
+
+会員制のエージェント向け求人サイト。求人詳細ページに「企業情報」セクションがあり、
+**設立年・上場区分・企業フェーズ・従業員数・本社住所・公式HP・YouTube** まで取得可能。
+電話番号は載っていないため、必要なら投入後に `enrich_phones.py` で補完。
+
+### 事前準備
+
+1. `.env` に CIRCUS の認証情報を追加:
+   ```
+   CIRCUS_EMAIL=your-email@example.com
+   CIRCUS_PASSWORD=your-password
+   ```
+2. ブラウザで対象エリア・職種をフィルタした検索結果ページのURLをコピー
+3. Notion DB_顧客管理 に以下プロパティが追加済みであること:
+   - `上場区分` (select)
+   - `企業フェーズ` (select)
+   - `設立年` (number)
+
+### スクレイプ + Notion 投入
+
+```bash
+cd ~/agents/agents/data_engineer/xwork_ingestion
+source .venv/bin/activate
+export $(grep -v '^#' .env | xargs)
+
+# dry-run（5件で動作確認）
+python scrape_circus.py \
+  --start-url "https://circus-job.com/search?...&page=1" \
+  --out /tmp/test_circus.json --max-pages 2 --limit-jobs 5 \
+  --debug-dir /tmp/circus_debug
+
+# 関西エリア本実行
+python run_circus.py \
+  --start-url "https://circus-job.com/search?...&page=1" \
+  --dry-run
+
+python run_circus.py \
+  --start-url "https://circus-job.com/search?...&page=1"
+```
+
+### 仕様メモ
+
+- **URL構造**: `?qJson=...&page=N&occupations=...&cities=...`
+- **検索結果**: 1ページ25件、`&page=N` でページング
+- **求人詳細**: `/search/{ID}` で個別ページ
+- **ログイン**: `https://circus-job.com/login`、メアド+PW
+- **会社デデュプ**: 会社名で重複排除
+- **新着順処理**: 求人IDの降順（直近の求人ほど情報が新しい）
+
+### スケール感（関西エリア例）
+
+| 項目 | 規模 |
+|---|---|
+| 検索結果（建築/施工管理18職種） | 約 688件 |
+| 会社単位ユニーク（推定） | 約 400〜500社 |
+| 新規追加（既存DB除く） | 約 200〜400社 |
+| 所要時間 | 1〜2時間 |
+
+---
+
+## 9. 関連スクリプト一覧
 
 | パス | 用途 |
 |---|---|
 | `run_batch.py` | x-work.jp の府県×職種一括スクレイプ&投入 |
 | `run_kenshoku.py` | 建職バンクの府県別スクレイプ&投入 |
+| `run_circus.py` | CIRCUS AGENT のスクレイプ&投入オーケストレータ |
 | `scrape_xwork.py` | x-work.jp 単発スクレイプ |
 | `scrape_kenshoku.py` | 建職バンク単発スクレイプ（2段階クロール） |
+| `scrape_circus.py` | CIRCUS AGENT 単発スクレイプ（ログイン+詳細抽出） |
 | `import_to_notion.py` | JSON → Notion 重複判定込み投入（`--media` でタグ指定可） |
 | `enrich_places.py` | Google Places API で電話・URL補完 |
 | `enrich_phones.py` | 公式サイトクロールで電話番号抽出（無料） |
