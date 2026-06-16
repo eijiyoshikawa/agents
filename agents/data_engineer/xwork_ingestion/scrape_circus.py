@@ -65,6 +65,16 @@ async def login(page: Page, email: str, password: str,
         print(f"[login] navigation failed: {e}", file=sys.stderr)
         return False
 
+    # SPA対応: input 要素が描画されるまで待つ
+    try:
+        await page.wait_for_selector("input", timeout=15000)
+    except Exception:
+        # それでも見えなければ networkidle まで待つ
+        try:
+            await page.wait_for_load_state("networkidle", timeout=10000)
+        except Exception:
+            pass
+
     # ページ内の全 input 要素を列挙してログ出力（デバッグ強化）
     try:
         inputs = await page.eval_on_selector_all(
