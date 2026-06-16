@@ -441,8 +441,34 @@ async def collect_job_urls(page: Page, start_url: str, max_pages: int,
                         pass
 
                 if not content_loaded:
-                    print(f"[search p{page_num}] content did not populate",
+                    print(f"[search p{page_num}] content wait timeout, "
+                          f"trying API capture + search button click",
                           file=sys.stderr)
+                    # 「検索する」ボタンを総当たりクリックして結果ロードをトリガー
+                    try:
+                        clicked = await page.evaluate(r"""() => {
+                            const buttons = document.querySelectorAll(
+                                'button, [role="button"]');
+                            for (const b of buttons) {
+                                const t = (b.innerText || '').trim();
+                                if (/件を?検索/.test(t) || /^検索する$/.test(t)) {
+                                    b.click();
+                                    return t;
+                                }
+                            }
+                            return '';
+                        }""")
+                        if clicked:
+                            print(f"[search p{page_num}] clicked button: "
+                                  f"{clicked!r}", file=sys.stderr)
+                            await asyncio.sleep(3)
+                            try:
+                                await page.wait_for_load_state(
+                                    "networkidle", timeout=15000)
+                            except Exception:
+                                pass
+                    except Exception:
+                        pass
                     if debug_dir:
                         try:
                             debug_dir.mkdir(parents=True, exist_ok=True)
@@ -453,13 +479,14 @@ async def collect_job_urls(page: Page, start_url: str, max_pages: int,
                                 "() => document.body.innerText || ''")
                             (debug_dir / f"search_p{page_num}.txt").write_text(
                                 body_text or "(empty)", encoding="utf-8")
-                            print(f"[search p{page_num}] dumped HTML+text → "
-                                  f"{debug_dir}", file=sys.stderr)
-                            print(f"[search p{page_num}] current URL: "
-                                  f"{page.url}", file=sys.stderr)
+                            await page.screenshot(
+                                path=str(debug_dir /
+                                         f"search_p{page_num}.png"),
+                                full_page=True)
+                            print(f"[search p{page_num}] dumped HTML/text/png "
+                                  f"→ {debug_dir}", file=sys.stderr)
                         except Exception:
                             pass
-                    break
             except Exception as e:
                 print(f"[search p{page_num}] failed: {e}", file=sys.stderr)
                 break
