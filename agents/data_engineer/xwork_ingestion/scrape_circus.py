@@ -300,7 +300,10 @@ async def _scroll_to_bottom(page: Page, steps: int = 6) -> None:
 
 
 async def _extract_job_ids_from_dom(page: Page) -> list[str]:
-    """DOM 内の /search/{ID} リンク or __NEXT_DATA__ から jid を抽出。"""
+    """DOM 内の /search/{ID} リンクを優先抽出。
+    DOM に無い場合のみ __NEXT_DATA__ から `/search/{ID}` リテラルを拾う
+    （広い `"id":\\d+` は city/occupation ID を巻き込むので使わない）。
+    """
     try:
         jids = await page.evaluate(
             r"""() => {
@@ -310,13 +313,14 @@ async def _extract_job_ids_from_dom(page: Page) -> list[str]:
                     const m = h.match(/^\/search\/(\d+)(?:[\/?#]|$)/);
                     if (m) ids.add(m[1]);
                 });
-                const nd = document.getElementById('__NEXT_DATA__');
-                if (nd && nd.textContent) {
-                    const re = /"\/search\/(\d+)"|"jobId":\s*(\d+)|"id":\s*(\d+)/g;
-                    let m;
-                    while ((m = re.exec(nd.textContent)) !== null) {
-                        const v = m[1] || m[2] || m[3];
-                        if (v && v.length >= 4) ids.add(v);
+                if (ids.size === 0) {
+                    const nd = document.getElementById('__NEXT_DATA__');
+                    if (nd && nd.textContent) {
+                        const re = /"\/search\/(\d+)"/g;
+                        let m;
+                        while ((m = re.exec(nd.textContent)) !== null) {
+                            ids.add(m[1]);
+                        }
                     }
                 }
                 return Array.from(ids);
