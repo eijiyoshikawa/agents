@@ -245,7 +245,19 @@ async def collect_job_urls(page: Page, start_url: str, max_pages: int,
         url = _replace_page_param(start_url, page_num)
         try:
             await page.goto(url, wait_until="domcontentloaded")
-            await page.wait_for_selector('a[href^="/search/"]', timeout=10000)
+            # SPA対応: networkidle まで待つ
+            try:
+                await page.wait_for_load_state("networkidle", timeout=30000)
+            except Exception:
+                pass
+            # 初回はログイン直後のポップアップを閉じる
+            if page_num == 1:
+                try:
+                    await page.keyboard.press("Escape")
+                    await asyncio.sleep(0.5)
+                except Exception:
+                    pass
+            await page.wait_for_selector('a[href^="/search/"]', timeout=30000)
         except Exception as e:
             print(f"[search p{page_num}] failed: {e}", file=sys.stderr)
             break
@@ -376,7 +388,12 @@ async def extract_company_info(page: Page, job_url: str,
     """求人詳細ページから会社情報を抽出する。"""
     try:
         await page.goto(job_url, wait_until="domcontentloaded")
-        await page.wait_for_selector("text=企業情報", timeout=10000)
+        # SPA対応: networkidle まで待つ
+        try:
+            await page.wait_for_load_state("networkidle", timeout=20000)
+        except Exception:
+            pass
+        await page.wait_for_selector("text=企業情報", timeout=15000)
     except Exception as e:
         print(f"[detail {job_url}] navigation failed: {e}", file=sys.stderr)
         return None
