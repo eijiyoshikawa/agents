@@ -335,61 +335,60 @@ async def _extract_job_ids_from_dom(page: Page) -> list[str]:
         return []
 
 
+_API_JOB_ID_RE = re.compile(r'"(?:id|jobId|job_id)"\s*:\s*(\d{5,})')
+
+
 async def collect_job_urls(page: Page, start_url: str, max_pages: int,
                            delay: float,
                            debug_dir: Path | None = None) -> list[str]:
-    """検索結果ページから求人URL（/search/{ID}）を収集する。"""
+    """検索結果ページから求人URL（/search/{ID}）を収集する。
+    DOM + __NEXT_DATA__ + API レスポンスインターセプト の3経路で求人IDを拾う。
+    """
     job_ids: set[str] = set()
-    for page_num in range(1, max_pages + 1):
-        url = _replace_page_param(start_url, page_num)
-        try:
-            await page.goto(url, wait_until="domcontentloaded")
-            try:
-                await page.wait_for_load_state("networkidle", timeout=30000)
-            except Exception:
-                pass
-            if page_num == 1:
-                closed = await _dismiss_popups(page)
-                if closed:
-                    print(f"[search p1] closed {closed} popup(s)",
-                          file=sys.stderr)
-                try:
-                    await page.wait_for_load_state("networkidle",
-                                                    timeout=10000)
-                except Exception:
-                    pass
+    api_captured: set[str] = set()
 
-            # カードの placeholder ではなく実コンテンツが描画されるのを待つ
-            content_loaded = False
+    async def on_response(response):
+        try:
+            url = response.url
+            if "circus-job.com" not in url:
+                return
+            headers = response.headers or {}
+            ct = (headers.get("content-type") or "").lower()
+            if "json" not in ct:
+                return
+            body = await response.text()
+            if not body or len(body) > 5_000_000:
+                return
+            for m in _API_JOB_ID_RE.finditer(body):
+                api_captured.add(m.group(1))
+        except Exception:
+            pass
+
+    def listener(response):
+        asyncio.create_task(on_response(response))
+
+    page.on("response", listener)
+    try:
+        for page_num in range(1, max_pages + 1):
+            url = _replace_page_param(start_url, page_num)
             try:
-                await page.wait_for_function(
-                    r"""() => {
-                        // /search/{numeric} へのリンクが1件でもあれば OK
-                        const anchors = document.querySelectorAll('a[href]');
-                        for (const a of anchors) {
-                            const h = a.getAttribute('href') || '';
-                            if (/^\/search\/\d+/.test(h)) return true;
-                        }
-                        // カードに十分なテキストが入っていればOK
-                        const cards = document.querySelectorAll(
-                            '[class*="JobSearchResultCard"]');
-                        if (cards.length > 0) {
-                            const txt = (cards[0].innerText || '').trim();
-                            if (txt.length > 50) return true;
-                        }
-                        return false;
-                    }""",
-                    timeout=30000,
-                )
-                content_loaded = True
-            except Exception:
-                # スクロールしてもう一度待つ（仮想リスト対策）
-                await _scroll_to_bottom(page)
+                await page.goto(url, wait_until="domcontentloaded")
                 try:
-                    await page.wait_for_load_state("networkidle",
-                                                    timeout=10000)
+                    await page.wait_for_load_state("networkidle", timeout=30000)
                 except Exception:
                     pass
+                if page_num == 1:
+                    closed = await _dismiss_popups(page)
+                    if closed:
+                        print(f"[search p1] closed {closed} popup(s)",
+                              file=sys.stderr)
+                    try:
+                        await page.wait_for_load_state("networkidle",
+                                                        timeout=10000)
+                    except Exception:
+                        pass
+
+                content_loaded = False
                 try:
                     await page.wait_for_function(
                         r"""() => {
@@ -398,57 +397,70 @@ async def collect_job_urls(page: Page, start_url: str, max_pages: int,
                                 const h = a.getAttribute('href') || '';
                                 if (/^\/search\/\d+/.test(h)) return true;
                             }
+                            const cards = document.querySelectorAll(
+                                '[class*="JobSearchResultCard"]');
+                            if (cards.length > 0) {
+                                const txt = (cards[0].innerText || '').trim();
+                                if (txt.length > 50) return true;
+                            }
                             return false;
                         }""",
-                        timeout=15000,
+                        timeout=30000,
                     )
                     content_loaded = True
                 except Exception:
-                    pass
-
-            if not content_loaded:
-                print(f"[search p{page_num}] content did not populate",
-                      file=sys.stderr)
-                if debug_dir:
+                    await _scroll_to_bottom(page)
                     try:
-                        debug_dir.mkdir(parents=True, exist_ok=True)
-                        html = await page.content()
-                        (debug_dir / f"search_p{page_num}.html").write_text(
-                            html, encoding="utf-8")
-                        body_text = await page.evaluate(
-                            "() => document.body.innerText || ''")
-                        (debug_dir / f"search_p{page_num}.txt").write_text(
-                            body_text or "(empty)", encoding="utf-8")
-                        print(f"[search p{page_num}] dumped HTML+text → "
-                              f"{debug_dir}", file=sys.stderr)
-                        print(f"[search p{page_num}] current URL: "
-                              f"{page.url}", file=sys.stderr)
+                        await page.wait_for_load_state("networkidle",
+                                                        timeout=10000)
                     except Exception:
                         pass
-                break
-        except Exception as e:
-            print(f"[search p{page_num}] failed: {e}", file=sys.stderr)
-            break
 
-        # 仮想リスト対策で念のためスクロール
-        await _scroll_to_bottom(page, steps=4)
-
-        jids: list[str] = []
-        for attempt in range(3):
-            jids = await _extract_job_ids_from_dom(page)
-            if jids:
+                if not content_loaded:
+                    print(f"[search p{page_num}] content did not populate",
+                          file=sys.stderr)
+                    if debug_dir:
+                        try:
+                            debug_dir.mkdir(parents=True, exist_ok=True)
+                            html = await page.content()
+                            (debug_dir / f"search_p{page_num}.html").write_text(
+                                html, encoding="utf-8")
+                            body_text = await page.evaluate(
+                                "() => document.body.innerText || ''")
+                            (debug_dir / f"search_p{page_num}.txt").write_text(
+                                body_text or "(empty)", encoding="utf-8")
+                            print(f"[search p{page_num}] dumped HTML+text → "
+                                  f"{debug_dir}", file=sys.stderr)
+                            print(f"[search p{page_num}] current URL: "
+                                  f"{page.url}", file=sys.stderr)
+                        except Exception:
+                            pass
+                    break
+            except Exception as e:
+                print(f"[search p{page_num}] failed: {e}", file=sys.stderr)
                 break
-            await asyncio.sleep(1)
-        new = 0
-        for jid in jids:
-            if jid not in job_ids:
-                job_ids.add(jid)
-                new += 1
-        print(f"[search p{page_num}] +{new} (total={len(job_ids)})",
-              file=sys.stderr)
-        if new == 0:
-            break
-        await asyncio.sleep(delay)
+
+            await _scroll_to_bottom(page, steps=4)
+            # API レスポンス処理完了を少し待つ
+            await asyncio.sleep(2)
+
+            jids_dom = await _extract_job_ids_from_dom(page)
+            all_jids = set(jids_dom) | api_captured
+
+            new_ids = all_jids - job_ids
+            new_count = len(new_ids)
+            job_ids |= new_ids
+            print(f"[search p{page_num}] +{new_count} "
+                  f"(api={len(api_captured)}, total={len(job_ids)})",
+                  file=sys.stderr)
+            if new_count == 0:
+                break
+            await asyncio.sleep(delay)
+    finally:
+        try:
+            page.remove_listener("response", listener)
+        except Exception:
+            pass
     return [f"{BASE_URL}/search/{jid}" for jid in sorted(
         job_ids, key=int, reverse=True)]
 
