@@ -48,10 +48,20 @@ def scrape(start_url: str, max_pages: int, delay: float,
             email=email,
             password=password,
             debug_dir=debug_dir,
+            out_path=out_path,
         ))
     except Exception as e:
         print(f"[circus] crawl crashed: {e}", file=sys.stderr)
         records = []
+    # crawl() が逐次保存しているので、追加で上書きはしない。
+    # 既存ファイルが残っていればそれを真値とする。
+    if out_path.exists():
+        try:
+            existing = json.loads(out_path.read_text(encoding="utf-8"))
+            if isinstance(existing, list) and len(existing) >= len(records):
+                records = existing
+        except Exception:
+            pass
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(records, ensure_ascii=False, indent=2),
                         encoding="utf-8")

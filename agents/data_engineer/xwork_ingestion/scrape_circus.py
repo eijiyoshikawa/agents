@@ -723,9 +723,40 @@ async def crawl(start_url: str, max_pages: int, delay: float,
                 headed: bool, use_real_chrome: bool,
                 limit_jobs: int | None = None,
                 debug_dir: Path | None = None,
-                email: str = "", password: str = "") -> list[dict]:
+                email: str = "", password: str = "",
+                out_path: Path | None = None,
+                save_every: int = 20) -> list[dict]:
     results: list[dict] = []
     seen_companies: set[str] = set()
+
+    # 既存JSONがあれば読み込み（再開対応）
+    if out_path and out_path.exists():
+        try:
+            existing = json.loads(out_path.read_text(encoding="utf-8"))
+            if isinstance(existing, list):
+                results = existing
+                for r in results:
+                    n = r.get("company_name", "")
+                    if n:
+                        seen_companies.add(n)
+                print(f"[resume] loaded {len(results)} existing companies "
+                      f"from {out_path}", file=sys.stderr)
+        except Exception as e:
+            print(f"[resume] failed to load {out_path}: {e}", file=sys.stderr)
+
+    def _save_partial(reason: str = ""):
+        if not out_path:
+            return
+        try:
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+            out_path.write_text(
+                json.dumps(results, ensure_ascii=False, indent=2),
+                encoding="utf-8")
+            print(f"[save] {len(results)} companies → {out_path}"
+                  + (f" ({reason})" if reason else ""), file=sys.stderr)
+        except Exception as e:
+            print(f"[save] failed: {e}", file=sys.stderr)
+
     async with async_playwright() as pw:
         browser = await _launch_browser(pw, headed, use_real_chrome)
         ctx = await browser.new_context(
@@ -738,13 +769,18 @@ async def crawl(start_url: str, max_pages: int, delay: float,
         page = await ctx.new_page()
         page.set_default_timeout(DEFAULT_TIMEOUT_MS)
 
+        async def _ensure_login() -> bool:
+            if not (email and password):
+                return False
+            return await login(page, email, password, debug_dir=debug_dir)
+
         if email and password:
             print("[login] attempting login...", file=sys.stderr)
-            ok = await login(page, email, password, debug_dir=debug_dir)
+            ok = await _ensure_login()
             if not ok:
                 print("[login] FAILED", file=sys.stderr)
                 await browser.close()
-                return []
+                return results
             print("[login] success", file=sys.stderr)
 
         print(f"[step1] collecting job URLs", file=sys.stderr)
@@ -759,31 +795,58 @@ async def crawl(start_url: str, max_pages: int, delay: float,
 
         print(f"[step2] extracting company info from {len(job_urls)} jobs",
               file=sys.stderr)
-        for i, job_url in enumerate(job_urls, 1):
-            info = await extract_company_info(
-                page, job_url,
-                debug_dir=debug_dir,
-                dump_always=(debug_dir is not None and i <= 3),
-            )
-            if info is None:
-                if i % 20 == 0 or i == len(job_urls):
-                    print(f"[detail {i}/{len(job_urls)}] skip (no info)",
+        try:
+            for i, job_url in enumerate(job_urls, 1):
+                info = await extract_company_info(
+                    page, job_url,
+                    debug_dir=debug_dir,
+                    dump_always=(debug_dir is not None and i <= 3),
+                )
+                # /login 検出時は再ログインしてリトライ
+                if info is None and "/login" in page.url:
+                    print(f"[detail {i}] session expired, re-logging in...",
                           file=sys.stderr)
+                    ok = await _ensure_login()
+                    if ok:
+                        print(f"[detail {i}] re-login ok, retrying",
+                              file=sys.stderr)
+                        info = await extract_company_info(
+                            page, job_url, debug_dir=debug_dir,
+                            dump_always=False,
+                        )
+                    else:
+                        print(f"[detail {i}] re-login failed, abort",
+                              file=sys.stderr)
+                        _save_partial("re-login failed")
+                        break
+
+                if info is None:
+                    if i % 20 == 0 or i == len(job_urls):
+                        print(f"[detail {i}/{len(job_urls)}] skip (no info)",
+                              file=sys.stderr)
+                    await asyncio.sleep(delay)
+                    continue
+                name = info["company_name"]
+                if name in seen_companies:
+                    if i % 20 == 0 or i == len(job_urls):
+                        print(f"[detail {i}/{len(job_urls)}] dup {name!r} "
+                              f"(unique={len(results)})", file=sys.stderr)
+                else:
+                    seen_companies.add(name)
+                    results.append(info)
+                    if i % 20 == 0 or i == len(job_urls):
+                        print(f"[detail {i}/{len(job_urls)}] +{name!r} "
+                              f"(unique={len(results)})", file=sys.stderr)
+                if save_every and len(results) % save_every == 0:
+                    _save_partial(f"checkpoint {i}/{len(job_urls)}")
                 await asyncio.sleep(delay)
-                continue
-            name = info["company_name"]
-            if name in seen_companies:
-                if i % 20 == 0 or i == len(job_urls):
-                    print(f"[detail {i}/{len(job_urls)}] dup {name!r} "
-                          f"(unique={len(results)})", file=sys.stderr)
-            else:
-                seen_companies.add(name)
-                results.append(info)
-                if i % 20 == 0 or i == len(job_urls):
-                    print(f"[detail {i}/{len(job_urls)}] +{name!r} "
-                          f"(unique={len(results)})", file=sys.stderr)
-            await asyncio.sleep(delay)
-        await browser.close()
+        except KeyboardInterrupt:
+            print("[crawl] interrupted by user", file=sys.stderr)
+            _save_partial("interrupted")
+            raise
+        finally:
+            _save_partial("final")
+            await browser.close()
     return results
 
 
@@ -817,6 +880,7 @@ def main() -> int:
         debug_dir=args.debug_dir,
         email=email,
         password=password,
+        out_path=args.out,
     ))
     args.out.write_text(json.dumps(data, ensure_ascii=False, indent=2),
                         encoding="utf-8")
