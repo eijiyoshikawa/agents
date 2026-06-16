@@ -34,7 +34,8 @@ INDUSTRY = "建設"
 
 def scrape(start_url: str, max_pages: int, delay: float,
            limit_jobs: int | None, out_path: Path,
-           email: str, password: str) -> int:
+           email: str, password: str,
+           debug_dir: Path | None = None) -> int:
     print(f"\n=== [circus] scrape ===", file=sys.stderr)
     try:
         records = asyncio.run(crawl(
@@ -46,6 +47,7 @@ def scrape(start_url: str, max_pages: int, delay: float,
             limit_jobs=limit_jobs,
             email=email,
             password=password,
+            debug_dir=debug_dir,
         ))
     except Exception as e:
         print(f"[circus] crawl crashed: {e}", file=sys.stderr)
@@ -73,6 +75,8 @@ def main() -> int:
                     help="Notion投入前で停止し dry-run 統計を表示")
     ap.add_argument("--skip-scrape", action="store_true",
                     help="既存JSONを使い、scrape を飛ばす")
+    ap.add_argument("--debug-dir", type=Path, default=None,
+                    help="検索/詳細ページのHTML/textをダンプ（デバッグ用）")
     args = ap.parse_args()
 
     if "NOTION_TOKEN" not in os.environ:
@@ -99,7 +103,7 @@ def main() -> int:
                   file=sys.stderr)
             return 2
         scrape(args.start_url, args.max_pages, args.delay, args.limit_jobs,
-               args.out, email, password)
+               args.out, email, password, debug_dir=args.debug_dir)
 
     if not args.out.exists():
         print(f"error: {args.out} not found", file=sys.stderr)

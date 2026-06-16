@@ -278,6 +278,55 @@ async def _dismiss_popups(page: Page) -> int:
     return closed
 
 
+async def _scroll_to_bottom(page: Page, steps: int = 6) -> None:
+    """ページを段階的にスクロールし、仮想リスト/遅延描画をトリガー。"""
+    try:
+        height = await page.evaluate("() => document.body.scrollHeight || 0")
+    except Exception:
+        height = 0
+    if not height:
+        return
+    for i in range(1, steps + 1):
+        y = int(height * i / steps)
+        try:
+            await page.evaluate(f"window.scrollTo(0, {y})")
+        except Exception:
+            pass
+        await asyncio.sleep(0.4)
+    try:
+        await page.evaluate("window.scrollTo(0, 0)")
+    except Exception:
+        pass
+
+
+async def _extract_job_ids_from_dom(page: Page) -> list[str]:
+    """DOM 内の /search/{ID} リンク or __NEXT_DATA__ から jid を抽出。"""
+    try:
+        jids = await page.evaluate(
+            r"""() => {
+                const ids = new Set();
+                document.querySelectorAll('a[href]').forEach(a => {
+                    const h = a.getAttribute('href') || '';
+                    const m = h.match(/^\/search\/(\d+)(?:[\/?#]|$)/);
+                    if (m) ids.add(m[1]);
+                });
+                const nd = document.getElementById('__NEXT_DATA__');
+                if (nd && nd.textContent) {
+                    const re = /"\/search\/(\d+)"|"jobId":\s*(\d+)|"id":\s*(\d+)/g;
+                    let m;
+                    while ((m = re.exec(nd.textContent)) !== null) {
+                        const v = m[1] || m[2] || m[3];
+                        if (v && v.length >= 4) ids.add(v);
+                    }
+                }
+                return Array.from(ids);
+            }"""
+        )
+        return [str(j) for j in (jids or [])]
+    except Exception:
+        return []
+
+
 async def collect_job_urls(page: Page, start_url: str, max_pages: int,
                            delay: float,
                            debug_dir: Path | None = None) -> list[str]:
@@ -287,29 +336,70 @@ async def collect_job_urls(page: Page, start_url: str, max_pages: int,
         url = _replace_page_param(start_url, page_num)
         try:
             await page.goto(url, wait_until="domcontentloaded")
-            # SPA対応: networkidle まで待つ
             try:
                 await page.wait_for_load_state("networkidle", timeout=30000)
             except Exception:
                 pass
-            # ポップアップを閉じる
             if page_num == 1:
                 closed = await _dismiss_popups(page)
                 if closed:
                     print(f"[search p1] closed {closed} popup(s)",
                           file=sys.stderr)
-                # 再度ロード待ち
                 try:
                     await page.wait_for_load_state("networkidle",
                                                     timeout=10000)
                 except Exception:
                     pass
+
+            # カードの placeholder ではなく実コンテンツが描画されるのを待つ
+            content_loaded = False
             try:
-                await page.wait_for_selector('a[href^="/search/"]',
-                                             timeout=30000)
-            except Exception as e:
-                # 失敗時にHTMLダンプ
-                print(f"[search p{page_num}] selector timeout: {e}",
+                await page.wait_for_function(
+                    r"""() => {
+                        // /search/{numeric} へのリンクが1件でもあれば OK
+                        const anchors = document.querySelectorAll('a[href]');
+                        for (const a of anchors) {
+                            const h = a.getAttribute('href') || '';
+                            if (/^\/search\/\d+/.test(h)) return true;
+                        }
+                        // カードに十分なテキストが入っていればOK
+                        const cards = document.querySelectorAll(
+                            '[class*="JobSearchResultCard"]');
+                        if (cards.length > 0) {
+                            const txt = (cards[0].innerText || '').trim();
+                            if (txt.length > 50) return true;
+                        }
+                        return false;
+                    }""",
+                    timeout=30000,
+                )
+                content_loaded = True
+            except Exception:
+                # スクロールしてもう一度待つ（仮想リスト対策）
+                await _scroll_to_bottom(page)
+                try:
+                    await page.wait_for_load_state("networkidle",
+                                                    timeout=10000)
+                except Exception:
+                    pass
+                try:
+                    await page.wait_for_function(
+                        r"""() => {
+                            const anchors = document.querySelectorAll('a[href]');
+                            for (const a of anchors) {
+                                const h = a.getAttribute('href') || '';
+                                if (/^\/search\/\d+/.test(h)) return true;
+                            }
+                            return false;
+                        }""",
+                        timeout=15000,
+                    )
+                    content_loaded = True
+                except Exception:
+                    pass
+
+            if not content_loaded:
+                print(f"[search p{page_num}] content did not populate",
                       file=sys.stderr)
                 if debug_dir:
                     try:
@@ -321,8 +411,8 @@ async def collect_job_urls(page: Page, start_url: str, max_pages: int,
                             "() => document.body.innerText || ''")
                         (debug_dir / f"search_p{page_num}.txt").write_text(
                             body_text or "(empty)", encoding="utf-8")
-                        print(f"[search p{page_num}] dumped HTML and text "
-                              f"to {debug_dir}", file=sys.stderr)
+                        print(f"[search p{page_num}] dumped HTML+text → "
+                              f"{debug_dir}", file=sys.stderr)
                         print(f"[search p{page_num}] current URL: "
                               f"{page.url}", file=sys.stderr)
                     except Exception:
@@ -331,27 +421,18 @@ async def collect_job_urls(page: Page, start_url: str, max_pages: int,
         except Exception as e:
             print(f"[search p{page_num}] failed: {e}", file=sys.stderr)
             break
-        hrefs: list[str] = []
+
+        # 仮想リスト対策で念のためスクロール
+        await _scroll_to_bottom(page, steps=4)
+
+        jids: list[str] = []
         for attempt in range(3):
-            try:
-                hrefs = await page.eval_on_selector_all(
-                    'a[href^="/search/"]',
-                    "els => els.map(e => e.getAttribute('href'))",
-                )
+            jids = await _extract_job_ids_from_dom(page)
+            if jids:
                 break
-            except Exception:
-                if attempt < 2:
-                    await asyncio.sleep(1)
-                else:
-                    hrefs = []
+            await asyncio.sleep(1)
         new = 0
-        for href in hrefs:
-            if not href:
-                continue
-            m = JOB_PATH_RE.match(href.split("?")[0])
-            if not m:
-                continue
-            jid = m.group(1)
+        for jid in jids:
             if jid not in job_ids:
                 job_ids.add(jid)
                 new += 1
@@ -360,7 +441,6 @@ async def collect_job_urls(page: Page, start_url: str, max_pages: int,
         if new == 0:
             break
         await asyncio.sleep(delay)
-    # 新着順（IDの降順）
     return [f"{BASE_URL}/search/{jid}" for jid in sorted(
         job_ids, key=int, reverse=True)]
 
