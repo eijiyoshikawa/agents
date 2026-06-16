@@ -360,6 +360,7 @@ async def _extract_job_ids_from_dom(page: Page) -> list[str]:
 
 
 _API_JOB_ID_RE = re.compile(r'"(?:id|jobId|job_id)"\s*:\s*(\d{5,})')
+_API_URL_JOB_RE = re.compile(r'/search/(\d{5,})(?:[?#"\\]|$)')
 
 
 async def collect_job_urls(page: Page, start_url: str, max_pages: int,
@@ -370,6 +371,7 @@ async def collect_job_urls(page: Page, start_url: str, max_pages: int,
     """
     job_ids: set[str] = set()
     api_captured: set[str] = set()
+    _api_dump_count = [0]
 
     async def on_response(response):
         try:
@@ -383,8 +385,23 @@ async def collect_job_urls(page: Page, start_url: str, max_pages: int,
             body = await response.text()
             if not body or len(body) > 5_000_000:
                 return
+            # URL に /search/{ID} を含むものを最優先で抽出
+            for m in _API_URL_JOB_RE.finditer(body):
+                api_captured.add(m.group(1))
+            # 補助: "id"/"jobId":NNNNN の数値
             for m in _API_JOB_ID_RE.finditer(body):
                 api_captured.add(m.group(1))
+            # 最初の数件のAPIレスポンスをデバッグ保存
+            if debug_dir and _api_dump_count[0] < 10:
+                try:
+                    debug_dir.mkdir(parents=True, exist_ok=True)
+                    idx = _api_dump_count[0]
+                    _api_dump_count[0] += 1
+                    safe_url = re.sub(r'[^a-zA-Z0-9]', '_', url)[-80:]
+                    (debug_dir / f"api_{idx:02d}_{safe_url}.json").write_text(
+                        body[:1_000_000], encoding="utf-8")
+                except Exception:
+                    pass
         except Exception:
             pass
 
