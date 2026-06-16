@@ -21,11 +21,14 @@ const notion = new Client({
 
 const KANSAI_RE = /(大阪府|京都府|兵庫県|滋賀県)/;
 const KANTO_RE = /(東京都|神奈川県|千葉県|埼玉県)/;
+const CONSTRUCTION_INDUSTRY = "建設";
 
-function computeRank(employees, address) {
+function computeRank(employees, address, industry) {
   if (employees == null) return null;
   if (employees >= 30) {
-    if (KANTO_RE.test(address) || KANSAI_RE.test(address)) return "A";
+    const inKantoKansai = KANTO_RE.test(address) || KANSAI_RE.test(address);
+    const isConstruction = industry === CONSTRUCTION_INDUSTRY;
+    if (inKantoKansai && isConstruction) return "A";
     return "B";
   }
   if (employees >= 10) return "C";
@@ -97,6 +100,10 @@ function getEmployeeCount(page) {
   return page.properties?.["従業員数"]?.number ?? null;
 }
 
+function getIndustry(page) {
+  return page.properties?.["業種"]?.select?.name ?? null;
+}
+
 async function main() {
   console.log(`mode:        ${DRY_RUN ? "DRY_RUN" : (FORCE ? "APPLY (FORCE overwrite)" : "APPLY (fill empty only)")}`);
   console.log(`database_id: ${DATABASE_ID}`);
@@ -125,8 +132,9 @@ async function main() {
     total++;
     const employees = getEmployeeCount(page);
     const address = getAddress(page);
+    const industry = getIndustry(page);
     const currentRank = getRank(page);
-    const expectedRank = computeRank(employees, address);
+    const expectedRank = computeRank(employees, address, industry);
 
     if (expectedRank == null) continue;
     if (employees >= 30 && !address) noAddress++;
@@ -153,7 +161,7 @@ async function main() {
     if (DRY_RUN) {
       if (toUpdate <= 10) {
         console.log(
-          `[sample] ${getTitle(page)} | ${fromKey} → ${expectedRank} | emp=${employees} | ${address.slice(0, 40)}`,
+          `[sample] ${getTitle(page)} | ${fromKey} → ${expectedRank} | emp=${employees} | 業種=${industry ?? "(empty)"} | ${address.slice(0, 40)}`,
         );
       }
       continue;
