@@ -534,32 +534,53 @@ def _extract_year(text: str) -> int | None:
 
 
 async def extract_company_info(page: Page, job_url: str,
-                               debug_dir: Path | None = None) -> dict | None:
+                               debug_dir: Path | None = None,
+                               dump_always: bool = False) -> dict | None:
     """求人詳細ページから会社情報を抽出する。"""
     try:
         await page.goto(job_url, wait_until="domcontentloaded")
-        # SPA対応: networkidle まで待つ
         try:
             await page.wait_for_load_state("networkidle", timeout=20000)
         except Exception:
             pass
-        await page.wait_for_selector("text=企業情報", timeout=15000)
     except Exception as e:
         print(f"[detail {job_url}] navigation failed: {e}", file=sys.stderr)
         return None
 
+    # セッション切れ検出
+    if "/login" in page.url:
+        print(f"[detail {job_url}] redirected to /login (session expired)",
+              file=sys.stderr)
+        return None
+
+    # 「企業情報」「会社情報」「求人企業」のいずれかの登場を待つ（緩く）
+    found_label = ""
+    for label in ("企業情報", "会社情報", "求人企業", "求人取扱企業"):
+        try:
+            await page.wait_for_selector(f"text={label}", timeout=8000)
+            found_label = label
+            break
+        except Exception:
+            continue
+
     body_text = await page.evaluate("() => document.body.innerText || ''")
+    job_id = job_url.rstrip("/").split("/")[-1]
+
+    if debug_dir and (dump_always or not found_label):
+        debug_dir.mkdir(parents=True, exist_ok=True)
+        (debug_dir / f"job_{job_id}.txt").write_text(
+            body_text or "(empty)", encoding="utf-8")
+        if not found_label:
+            print(f"[detail {job_url}] no label found, dumped body to "
+                  f"{debug_dir}/job_{job_id}.txt", file=sys.stderr)
+
+    if not found_label:
+        return None
 
     links = await page.eval_on_selector_all(
         "a[href^='http']",
         "els => els.map(e => ({text: (e.innerText||'').trim(), href: e.href}))",
     )
-
-    if debug_dir:
-        debug_dir.mkdir(parents=True, exist_ok=True)
-        job_id = job_url.rstrip("/").split("/")[-1]
-        (debug_dir / f"job_{job_id}.txt").write_text(
-            body_text or "(empty)", encoding="utf-8")
 
     # 会社名抽出
     company_name = ""
@@ -735,8 +756,11 @@ async def crawl(start_url: str, max_pages: int, delay: float,
         print(f"[step2] extracting company info from {len(job_urls)} jobs",
               file=sys.stderr)
         for i, job_url in enumerate(job_urls, 1):
-            info = await extract_company_info(page, job_url,
-                                              debug_dir=debug_dir)
+            info = await extract_company_info(
+                page, job_url,
+                debug_dir=debug_dir,
+                dump_always=(debug_dir is not None and i <= 3),
+            )
             if info is None:
                 if i % 20 == 0 or i == len(job_urls):
                     print(f"[detail {i}/{len(job_urls)}] skip (no info)",
