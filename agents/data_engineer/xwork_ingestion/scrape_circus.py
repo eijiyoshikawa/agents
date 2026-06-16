@@ -237,8 +237,50 @@ async def login(page: Page, email: str, password: str,
     return True
 
 
+async def _dismiss_popups(page: Page) -> int:
+    """ポップアップ/モーダルを総当たりで閉じる。"""
+    closed = 0
+    # Esc キーを数回
+    for _ in range(3):
+        try:
+            await page.keyboard.press("Escape")
+            await asyncio.sleep(0.3)
+        except Exception:
+            pass
+    # 閉じるボタン候補
+    close_selectors = [
+        'button[aria-label="close"]',
+        'button[aria-label="Close"]',
+        'button[aria-label="閉じる"]',
+        'div[role="dialog"] button',
+        'button:has-text("閉じる")',
+        'button:has-text("OK")',
+        'button:has-text("同意")',
+        'button:has-text("同意する")',
+        'button:has-text("次へ")',
+        'button:has-text("スキップ")',
+        'button:has-text("あとで")',
+        '[class*="modal"] [class*="close" i]',
+        '[class*="dialog"] [class*="close" i]',
+    ]
+    for sel in close_selectors:
+        try:
+            els = await page.query_selector_all(sel)
+            for el in els:
+                try:
+                    await el.click(timeout=2000)
+                    closed += 1
+                    await asyncio.sleep(0.3)
+                except Exception:
+                    pass
+        except Exception:
+            continue
+    return closed
+
+
 async def collect_job_urls(page: Page, start_url: str, max_pages: int,
-                           delay: float) -> list[str]:
+                           delay: float,
+                           debug_dir: Path | None = None) -> list[str]:
     """検索結果ページから求人URL（/search/{ID}）を収集する。"""
     job_ids: set[str] = set()
     for page_num in range(1, max_pages + 1):
@@ -250,14 +292,42 @@ async def collect_job_urls(page: Page, start_url: str, max_pages: int,
                 await page.wait_for_load_state("networkidle", timeout=30000)
             except Exception:
                 pass
-            # 初回はログイン直後のポップアップを閉じる
+            # ポップアップを閉じる
             if page_num == 1:
+                closed = await _dismiss_popups(page)
+                if closed:
+                    print(f"[search p1] closed {closed} popup(s)",
+                          file=sys.stderr)
+                # 再度ロード待ち
                 try:
-                    await page.keyboard.press("Escape")
-                    await asyncio.sleep(0.5)
+                    await page.wait_for_load_state("networkidle",
+                                                    timeout=10000)
                 except Exception:
                     pass
-            await page.wait_for_selector('a[href^="/search/"]', timeout=30000)
+            try:
+                await page.wait_for_selector('a[href^="/search/"]',
+                                             timeout=30000)
+            except Exception as e:
+                # 失敗時にHTMLダンプ
+                print(f"[search p{page_num}] selector timeout: {e}",
+                      file=sys.stderr)
+                if debug_dir:
+                    try:
+                        debug_dir.mkdir(parents=True, exist_ok=True)
+                        html = await page.content()
+                        (debug_dir / f"search_p{page_num}.html").write_text(
+                            html, encoding="utf-8")
+                        body_text = await page.evaluate(
+                            "() => document.body.innerText || ''")
+                        (debug_dir / f"search_p{page_num}.txt").write_text(
+                            body_text or "(empty)", encoding="utf-8")
+                        print(f"[search p{page_num}] dumped HTML and text "
+                              f"to {debug_dir}", file=sys.stderr)
+                        print(f"[search p{page_num}] current URL: "
+                              f"{page.url}", file=sys.stderr)
+                    except Exception:
+                        pass
+                break
         except Exception as e:
             print(f"[search p{page_num}] failed: {e}", file=sys.stderr)
             break
@@ -573,7 +643,8 @@ async def crawl(start_url: str, max_pages: int, delay: float,
             print("[login] success", file=sys.stderr)
 
         print(f"[step1] collecting job URLs", file=sys.stderr)
-        job_urls = await collect_job_urls(page, start_url, max_pages, delay)
+        job_urls = await collect_job_urls(page, start_url, max_pages, delay,
+                                          debug_dir=debug_dir)
         print(f"[step1] {len(job_urls)} job URLs collected", file=sys.stderr)
 
         if limit_jobs is not None:
