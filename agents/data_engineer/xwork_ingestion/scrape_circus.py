@@ -378,6 +378,9 @@ async def collect_job_urls(page: Page, start_url: str, max_pages: int,
             url = response.url
             if "circus-job.com" not in url:
                 return
+            # 検索結果APIのみ対象（qJson含むURL）。groups/conditions等は除外。
+            if "qJson" not in url and "job_search" not in url and "jobs" not in url:
+                return
             headers = response.headers or {}
             ct = (headers.get("content-type") or "").lower()
             if "json" not in ct:
@@ -385,13 +388,22 @@ async def collect_job_urls(page: Page, start_url: str, max_pages: int,
             body = await response.text()
             if not body or len(body) > 5_000_000:
                 return
-            # URL に /search/{ID} を含むものを最優先で抽出
+            # JSON parse して jobs[].id を厳密抽出
+            try:
+                data = json.loads(body)
+                jobs = data.get("jobs") if isinstance(data, dict) else None
+                if isinstance(jobs, list):
+                    for job in jobs:
+                        if isinstance(job, dict):
+                            jid = job.get("id")
+                            if isinstance(jid, int) and jid > 0:
+                                api_captured.add(str(jid))
+            except Exception:
+                pass
+            # 補助: URL リテラル /search/{ID} も拾う
             for m in _API_URL_JOB_RE.finditer(body):
                 api_captured.add(m.group(1))
-            # 補助: "id"/"jobId":NNNNN の数値
-            for m in _API_JOB_ID_RE.finditer(body):
-                api_captured.add(m.group(1))
-            # 最初の数件のAPIレスポンスをデバッグ保存
+            # 最初の10件のAPIレスポンスをデバッグ保存
             if debug_dir and _api_dump_count[0] < 10:
                 try:
                     debug_dir.mkdir(parents=True, exist_ok=True)
