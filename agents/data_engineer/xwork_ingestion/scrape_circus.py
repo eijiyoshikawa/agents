@@ -203,15 +203,34 @@ async def login(page: Page, email: str, password: str,
     except Exception:
         pass
 
+    # 念のため少し待つ
+    await asyncio.sleep(2)
+
     current_url = page.url
     if "/login" in current_url:
         print(f"[login] still on /login: {current_url}", file=sys.stderr)
+        # エラーメッセージを検出
+        try:
+            error_text = await page.evaluate("""() => {
+                const sel = '[class*="error" i], [class*="Error"], [role="alert"], .MuiFormHelperText-root';
+                const els = document.querySelectorAll(sel);
+                return Array.from(els).map(e => (e.innerText||'').trim())
+                    .filter(t => t).join(' | ');
+            }""")
+            if error_text:
+                print(f"[login] error message: {error_text}",
+                      file=sys.stderr)
+        except Exception:
+            pass
         if debug_dir:
             try:
                 html = await page.content()
                 debug_dir.mkdir(parents=True, exist_ok=True)
                 (debug_dir / "login_after_submit.html").write_text(
                     html, encoding="utf-8")
+                print(f"[login] post-submit HTML → "
+                      f"{debug_dir}/login_after_submit.html",
+                      file=sys.stderr)
             except Exception:
                 pass
         return False
