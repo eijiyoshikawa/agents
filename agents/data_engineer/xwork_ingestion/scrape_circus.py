@@ -203,12 +203,36 @@ async def login(page: Page, email: str, password: str,
     except Exception:
         pass
 
-    # 念のため少し待つ
-    await asyncio.sleep(2)
+    # URL が /login から離れるのを最大10秒待つ
+    for _ in range(20):
+        if "/login" not in page.url:
+            break
+        await asyncio.sleep(0.5)
 
     current_url = page.url
     if "/login" in current_url:
         print(f"[login] still on /login: {current_url}", file=sys.stderr)
+        # innerText + screenshot を保存（HTML だけだと SPA で中身が分からない）
+        try:
+            body_text = await page.evaluate(
+                "() => document.body.innerText || ''")
+            if debug_dir:
+                debug_dir.mkdir(parents=True, exist_ok=True)
+                (debug_dir / "login_after_submit.txt").write_text(
+                    body_text or "(empty)", encoding="utf-8")
+                print(f"[login] post-submit innerText → "
+                      f"{debug_dir}/login_after_submit.txt", file=sys.stderr)
+        except Exception:
+            body_text = ""
+        try:
+            if debug_dir:
+                await page.screenshot(
+                    path=str(debug_dir / "login_after_submit.png"),
+                    full_page=True)
+                print(f"[login] screenshot → "
+                      f"{debug_dir}/login_after_submit.png", file=sys.stderr)
+        except Exception:
+            pass
         # エラーメッセージを検出
         try:
             error_text = await page.evaluate("""() => {
