@@ -43,6 +43,11 @@ def main() -> int:
                     help="詳細取得をスキップ（高速だが従業員数等が空）")
     ap.add_argument("--max-details", type=int, default=None,
                     help="詳細取得の上限（テスト用）")
+    ap.add_argument("--full-scan", action="store_true",
+                    help="名前フィルタを外して全社の詳細取得+"
+                         "business_summary で建設業判定（取りこぼし回収）")
+    ap.add_argument("--concurrency", type=int, default=5,
+                    help="詳細取得の並列数 (full_scan モード時)")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--skip-scrape", action="store_true")
     args = ap.parse_args()
@@ -73,7 +78,9 @@ def main() -> int:
             total = discover(token, args.prefectures, args.min_employees,
                              args.out,
                              fetch_details=not args.no_detail,
-                             max_details=args.max_details)
+                             max_details=args.max_details,
+                             full_scan=args.full_scan,
+                             concurrency=args.concurrency)
             print(f"[gbiz] discovered {total} companies → {args.out}",
                   file=sys.stderr)
         except KeyboardInterrupt:

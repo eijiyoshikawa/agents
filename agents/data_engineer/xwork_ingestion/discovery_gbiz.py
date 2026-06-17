@@ -64,6 +64,28 @@ EXCLUDE_NAME_RE = re.compile(
     r"クリニック|病院|医院|診療所|薬局)"
 )
 
+# 事業概要から建設業を判定するためのキーワード
+# (name フィルタで取りこぼした「○○商事」「○○工業」等を business_summary で救う)
+CONSTRUCTION_SUMMARY_RE = re.compile(
+    r"(建設業|建築業|建築工事|土木工事|建築設計|土木設計|施工管理|"
+    r"電気工事|管工事|空調工事|設備工事|塗装工事|防水工事|内装工事|"
+    r"鉄筋工事|解体工事|基礎工事|外構工事|サッシ工事|ガラス工事|"
+    r"舗装工事|造園工事|タイル工事|内装仕上|防食工事|ハウスメーカー|"
+    r"住宅メーカー|ハウスビルダー|リフォーム|戸建住宅|注文住宅|"
+    r"建材|建築資材|建設機械|住宅設備|不動産開発|プラント建設|"
+    r"ゼネコン|工務店|建設コンサルタント|建築コンサルタント|"
+    r"総合建設|総合建築|住宅販売|建物管理)"
+)
+
+
+def is_construction_by_summary(summary: str) -> bool:
+    """事業概要テキストから建設業判定。"""
+    if not summary:
+        return False
+    if EXCLUDE_NAME_RE.search(summary):
+        return False
+    return bool(CONSTRUCTION_SUMMARY_RE.search(summary))
+
 
 def _build_session(token: str) -> requests.Session:
     s = requests.Session()
@@ -213,8 +235,16 @@ def _format_capital(cap: Any) -> str:
 
 def discover(token: str, prefectures: list[str], min_employees: int,
              out_path: Path, fetch_details: bool = True,
-             max_details: int | None = None) -> int:
-    """都道府県別に list + name filter + detail を実行して JSON 保存。"""
+             max_details: int | None = None,
+             full_scan: bool = False,
+             concurrency: int = 5) -> int:
+    """都道府県別に list + name filter + detail を実行して JSON 保存。
+
+    Args:
+        full_scan: True なら名前フィルタを外し、全社の詳細を取得して
+                   business_summary で建設業判定する（取りこぼし回収モード）。
+        concurrency: 詳細取得の並列数（full_scan 時のみ意味あり）。
+    """
     session = _build_session(token)
     records: list[dict] = []
     seen_corp_nums: set[str] = set()
@@ -249,7 +279,9 @@ def discover(token: str, prefectures: list[str], min_employees: int,
                 continue
 
             print(f"\n[pref] {pref_name} (code={pref_code}) "
-                  f"min_emp={min_employees}", file=sys.stderr)
+                  f"min_emp={min_employees} "
+                  f"mode={'FULL_SCAN' if full_scan else 'name_filter'}",
+                  file=sys.stderr)
 
             # Step 1: List endpoint で全社取得
             page_entries: list[dict] = []
@@ -262,11 +294,21 @@ def discover(token: str, prefectures: list[str], min_employees: int,
                     break
                 time.sleep(SLEEP_SEC)
 
-            # Step 2: 名前で建設業フィルタ
-            candidates = [e for e in page_entries
-                          if is_construction_by_name(e.get("name", ""))]
-            print(f"  [filter] {len(page_entries)} → {len(candidates)} "
-                  f"(建設名フィルタ後)", file=sys.stderr)
+            # Step 2: 候補絞り込み
+            if full_scan:
+                # 全社対象（既処理 corp_no と除外名のみ skip）
+                candidates = [
+                    e for e in page_entries
+                    if e.get("corporate_number") not in seen_corp_nums
+                    and not EXCLUDE_NAME_RE.search(e.get("name", ""))
+                ]
+                print(f"  [filter] {len(page_entries)} → {len(candidates)} "
+                      f"(全社対象, FULL_SCAN)", file=sys.stderr)
+            else:
+                candidates = [e for e in page_entries
+                              if is_construction_by_name(e.get("name", ""))]
+                print(f"  [filter] {len(page_entries)} → {len(candidates)} "
+                      f"(建設名フィルタ後)", file=sys.stderr)
 
             # Step 3: 詳細取得
             if not fetch_details:
@@ -282,28 +324,92 @@ def discover(token: str, prefectures: list[str], min_employees: int,
                 continue
 
             added = 0
-            for i, e in enumerate(candidates, 1):
-                cn = e.get("corporate_number", "")
-                if not cn or cn in seen_corp_nums:
-                    continue
-                if max_details and added >= max_details:
-                    break
-                detail = fetch_detail(session, cn)
-                seen_corp_nums.add(cn)
-                records.append(_format_record(detail or {}, e))
-                added += 1
-                if i % 20 == 0:
-                    name = (detail or e).get("name", "")[:30]
-                    print(f"  [detail {i}/{len(candidates)}] "
-                          f"+{name} (unique={len(records)})",
-                          file=sys.stderr)
-                if added % 50 == 0:
-                    _save()
-                    print(f"  [save] checkpoint {added}", file=sys.stderr)
-                time.sleep(SLEEP_SEC)
+            kept_construction = 0
+            skipped_non_construction = 0
+
+            if full_scan and concurrency > 1:
+                # 並列詳細取得 (full_scan モードのみ)
+                from concurrent.futures import ThreadPoolExecutor, as_completed
+                pending = [e for e in candidates
+                           if e.get("corporate_number")
+                           and e.get("corporate_number") not in seen_corp_nums]
+                if max_details:
+                    pending = pending[:max_details]
+                print(f"  [parallel] fetching details for {len(pending)} "
+                      f"with concurrency={concurrency}", file=sys.stderr)
+                done = 0
+                with ThreadPoolExecutor(max_workers=concurrency) as ex:
+                    fut_to_entry = {
+                        ex.submit(fetch_detail, session,
+                                  e["corporate_number"]): e
+                        for e in pending
+                    }
+                    for fut in as_completed(fut_to_entry):
+                        e = fut_to_entry[fut]
+                        cn = e["corporate_number"]
+                        done += 1
+                        try:
+                            detail = fut.result()
+                        except Exception as exc:
+                            print(f"    [detail {cn}] error: {exc}",
+                                  file=sys.stderr)
+                            seen_corp_nums.add(cn)
+                            continue
+                        seen_corp_nums.add(cn)
+                        name = (detail or {}).get("name") or e.get("name", "")
+                        summary = (detail or {}).get("business_summary") or ""
+                        # 建設業判定: name OR summary のいずれか
+                        if (is_construction_by_name(name)
+                                or is_construction_by_summary(summary)):
+                            records.append(_format_record(detail or {}, e))
+                            added += 1
+                            kept_construction += 1
+                            if added % 20 == 0:
+                                print(f"    [keep {added}] +{name[:30]} "
+                                      f"(processed {done}/{len(pending)})",
+                                      file=sys.stderr)
+                        else:
+                            skipped_non_construction += 1
+                        if added > 0 and added % 50 == 0:
+                            _save()
+                            print(f"  [save] checkpoint {added}",
+                                  file=sys.stderr)
+                        if done % 500 == 0:
+                            print(f"  [progress] {done}/{len(pending)} "
+                                  f"processed, kept={kept_construction} "
+                                  f"skipped={skipped_non_construction}",
+                                  file=sys.stderr)
+            else:
+                # 直列詳細取得（従来のname_filterモード）
+                for i, e in enumerate(candidates, 1):
+                    cn = e.get("corporate_number", "")
+                    if not cn or cn in seen_corp_nums:
+                        continue
+                    if max_details and added >= max_details:
+                        break
+                    detail = fetch_detail(session, cn)
+                    seen_corp_nums.add(cn)
+                    records.append(_format_record(detail or {}, e))
+                    added += 1
+                    if i % 20 == 0:
+                        name = (detail or e).get("name", "")[:30]
+                        print(f"  [detail {i}/{len(candidates)}] "
+                              f"+{name} (unique={len(records)})",
+                              file=sys.stderr)
+                    if added % 50 == 0:
+                        _save()
+                        print(f"  [save] checkpoint {added}",
+                              file=sys.stderr)
+                    time.sleep(SLEEP_SEC)
             _save()
-            print(f"  [save] pref {pref_name} done, +{added} new",
-                  file=sys.stderr)
+            if full_scan:
+                print(f"  [save] pref {pref_name} done, +{added} kept "
+                      f"(out of {kept_construction + skipped_non_construction} "
+                      f"scanned, {skipped_non_construction} non-construction)",
+                      file=sys.stderr)
+            else:
+                print(f"  [save] pref {pref_name} done, +{added} new",
+                      file=sys.stderr)
     except KeyboardInterrupt:
         print("[interrupt] saving partial results", file=sys.stderr)
         _save()
@@ -324,6 +430,11 @@ def main() -> int:
                     help="詳細取得をスキップ（高速だが従業員数等が空）")
     ap.add_argument("--max-details", type=int, default=None,
                     help="詳細取得の上限（テスト用）")
+    ap.add_argument("--full-scan", action="store_true",
+                    help="名前フィルタを外して全社の詳細を取得し"
+                         "business_summary で建設業判定（取りこぼし回収）")
+    ap.add_argument("--concurrency", type=int, default=5,
+                    help="詳細取得の並列数 (full_scan モード時)")
     args = ap.parse_args()
 
     token = os.environ.get("GBIZ_API_TOKEN", "")
@@ -334,7 +445,9 @@ def main() -> int:
     total = discover(token, args.prefectures, args.min_employees,
                      args.out,
                      fetch_details=not args.no_detail,
-                     max_details=args.max_details)
+                     max_details=args.max_details,
+                     full_scan=args.full_scan,
+                     concurrency=args.concurrency)
     print(f"\n[done] {total} companies written → {args.out}",
           file=sys.stderr)
     return 0
