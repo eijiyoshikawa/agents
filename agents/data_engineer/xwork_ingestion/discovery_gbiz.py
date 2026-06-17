@@ -1,8 +1,11 @@
 """gBizINFO API で建設業を都道府県別に discovery 検索する。
 
-経産省 gBizINFO API を使い、指定した都道府県の建設業（業種大分類=D）から
-従業員数 >= N の法人を全件抽出する。出力は import_to_notion.py が期待する
-companies JSON フォーマット。
+戦略 (gBizINFO API の制約に合わせて):
+  1. List 検索 (prefecture + employee_number_from) で都道府県内の社を全件取得
+     → ただし応答は最小情報 (corporate_number, name, location 等)
+  2. 会社名キーワードで建設業を絞り込み (建設/工務/土木/施工/建築/建材/設備工事 等)
+  3. 該当社のみ詳細 API (/hojin/{corp_no}) で従業員数・代表者・URL 等を取得
+  4. companies JSON フォーマットで保存
 
 CLI:
     export GBIZ_API_TOKEN=...
@@ -10,19 +13,13 @@ CLI:
       --prefectures 東京都 神奈川県 千葉県 埼玉県 \\
       --min-employees 30 \\
       --out batch/gbiz/kanto_construction.json
-
-仕様:
-    - gBizINFO API: GET https://info.gbiz.go.jp/hojin/v1/hojin
-    - ヘッダ: X-hojinInfo-api-token
-    - 業種フィルタ: business_item (JSIC 中分類: 06=総合工事業, 07=職別工事業,
-      08=設備工事業)
-    - レート制限対策: 1秒スリープ、429時にバックオフ
 """
 from __future__ import annotations
 
 import argparse
 import json
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -33,16 +30,39 @@ import requests
 BASE = "https://info.gbiz.go.jp/hojin/v1/hojin"
 HEADER_NAME = "X-hojinInfo-api-token"
 TIMEOUT = 30
-SLEEP_SEC = 1.0
-PAGE_LIMIT = 1000  # 1ページあたり最大
+SLEEP_SEC = 0.5
+PAGE_LIMIT = 5000  # 1ページあたり最大
+MAX_PAGES = 10     # gBizINFO 制限: page 1-10
 
-# 建設業 JSIC 中分類
-CONSTRUCTION_BUSINESS_ITEMS = ["06", "07", "08"]
-BUSINESS_ITEM_NAMES = {
-    "06": "総合工事業",
-    "07": "職別工事業（設備工事業を除く）",
-    "08": "設備工事業",
+# JIS X 0401 都道府県コード
+PREFECTURE_CODES = {
+    "北海道": "01", "青森県": "02", "岩手県": "03", "宮城県": "04",
+    "秋田県": "05", "山形県": "06", "福島県": "07", "茨城県": "08",
+    "栃木県": "09", "群馬県": "10", "埼玉県": "11", "千葉県": "12",
+    "東京都": "13", "神奈川県": "14", "新潟県": "15", "富山県": "16",
+    "石川県": "17", "福井県": "18", "山梨県": "19", "長野県": "20",
+    "岐阜県": "21", "静岡県": "22", "愛知県": "23", "三重県": "24",
+    "滋賀県": "25", "京都府": "26", "大阪府": "27", "兵庫県": "28",
+    "奈良県": "29", "和歌山県": "30", "鳥取県": "31", "島根県": "32",
+    "岡山県": "33", "広島県": "34", "山口県": "35", "徳島県": "36",
+    "香川県": "37", "愛媛県": "38", "高知県": "39", "福岡県": "40",
+    "佐賀県": "41", "長崎県": "42", "熊本県": "43", "大分県": "44",
+    "宮崎県": "45", "鹿児島県": "46", "沖縄県": "47",
 }
+
+# 建設業を疑う会社名キーワード
+CONSTRUCTION_NAME_RE = re.compile(
+    r"(建設|建築|工務店|工務|土木|施工|住宅|ハウス|建材|設備工事|"
+    r"電気工事|管工事|塗装|解体|ゼネコン|造園|舗装|鉄筋|基礎工事|"
+    r"リフォーム|防水|内装|外装|タイル|サッシ|住設|住建|住宅設備|"
+    r"建工|建装|建販)"
+)
+
+# 建設業から除外したいキーワード (老人ホーム/介護等)
+EXCLUDE_NAME_RE = re.compile(
+    r"(老人ホーム|介護|ケアハウス|デイサービス|福祉|"
+    r"クリニック|病院|医院|診療所|薬局)"
+)
 
 
 def _build_session(token: str) -> requests.Session:
@@ -52,96 +72,117 @@ def _build_session(token: str) -> requests.Session:
     return s
 
 
-def search_page(session: requests.Session, prefecture: str,
-                business_item: str, min_employees: int,
-                page: int) -> dict:
-    """1ページ分の検索結果を返す。"""
-    params = {
-        "prefecture": prefecture,
-        "business_item": business_item,
-        "employee_number_lower": min_employees,
-        "exist_flg": "true",
-        "page": page,
-        "limit": PAGE_LIMIT,
-    }
+def _get_with_retry(session: requests.Session, url: str,
+                    params: dict | None = None) -> requests.Response:
+    """5回までリトライ付き GET。429/5xx でバックオフ。"""
     for attempt in range(5):
         try:
-            r = session.get(BASE, params=params, timeout=TIMEOUT)
+            r = session.get(url, params=params, timeout=TIMEOUT)
         except requests.RequestException as e:
             wait = 2 ** attempt
-            print(f"[gbiz] request error: {e}, retrying in {wait}s",
-                  file=sys.stderr)
-            time.sleep(wait)
-            continue
-        if r.status_code == 429:
-            wait = 2 ** attempt
-            print(f"[gbiz] 429 rate limited, sleeping {wait}s",
-                  file=sys.stderr)
-            time.sleep(wait)
-            continue
-        if r.status_code >= 500:
-            wait = 2 ** attempt
-            print(f"[gbiz] {r.status_code} server error, sleeping {wait}s",
+            print(f"  [retry] request error: {e}, sleep {wait}s",
                   file=sys.stderr)
             time.sleep(wait)
             continue
         if r.status_code == 401:
-            print(f"[gbiz] 401 unauthorized: check GBIZ_API_TOKEN",
+            print(f"  [fatal] 401 unauthorized: GBIZ_API_TOKEN 確認",
                   file=sys.stderr)
             sys.exit(2)
-        r.raise_for_status()
-        return r.json()
-    raise RuntimeError(f"gbiz search failed after retries: pref={prefecture}, "
-                       f"item={business_item}, page={page}")
+        if r.status_code in (429, 500, 502, 503, 504):
+            wait = 2 ** attempt
+            print(f"  [retry] {r.status_code}, sleep {wait}s", file=sys.stderr)
+            time.sleep(wait)
+            continue
+        return r
+    raise RuntimeError(f"GET failed after retries: {url}")
 
 
-def _format_record(hojin: dict) -> dict[str, Any]:
-    """gBizINFO の hojin-info を companies JSON フォーマットに変換。"""
+def list_search(session: requests.Session, pref_code: str,
+                min_employees: int, page: int) -> list[dict]:
+    """都道府県+従業員数で list 検索。最小情報のみ。"""
+    params = {
+        "prefecture": pref_code,
+        "employee_number_from": min_employees,
+        "page": page,
+        "limit": PAGE_LIMIT,
+    }
+    r = _get_with_retry(session, BASE, params=params)
+    if r.status_code == 404:
+        return []
+    r.raise_for_status()
+    data = r.json()
+    return data.get("hojin-infos") or []
+
+
+def fetch_detail(session: requests.Session, corp_no: str) -> dict | None:
+    """法人番号で詳細情報取得。"""
+    r = _get_with_retry(session, f"{BASE}/{corp_no}")
+    if r.status_code == 404:
+        return None
+    r.raise_for_status()
+    data = r.json()
+    infos = data.get("hojin-infos") or []
+    return infos[0] if infos else None
+
+
+def is_construction_by_name(name: str) -> bool:
+    """会社名から建設業っぽいか判定。"""
+    if not name:
+        return False
+    if EXCLUDE_NAME_RE.search(name):
+        return False
+    return bool(CONSTRUCTION_NAME_RE.search(name))
+
+
+def _format_record(hojin: dict, list_entry: dict) -> dict[str, Any]:
+    """詳細 + list を companies JSON に変換。"""
+    name = (hojin.get("name") if hojin else None) or list_entry.get("name", "")
+    location = ((hojin.get("location") if hojin else None)
+                or list_entry.get("location", ""))
+    corp_no = (list_entry.get("corporate_number")
+               or (hojin.get("corporate_number") if hojin else "") or "")
+
+    def _get(k):
+        return hojin.get(k) if hojin else None
+
     return {
-        "company_name": hojin.get("name") or "",
-        "company_hp": hojin.get("company_url") or "",
+        "company_name": name,
+        "company_hp": _get("company_url") or "",
         "youtube_url": "",
-        "address": hojin.get("location") or "",
+        "address": location,
         "workplace_address": "",
         "phone": "",
-        "company_url": hojin.get("company_url") or "",
+        "company_url": _get("company_url") or "",
         "occupation": "",
         "industry_label": "建設業",
         "classification": "",
         "salary_range": "",
-        "founded_year": _extract_founded_year(hojin),
+        "founded_year": _extract_founded_year(hojin or {}),
         "listing_class": "",
         "company_phase": "",
-        "employee_count_total": hojin.get("employee_number"),
+        "employee_count_total": _get("employee_number"),
         "average_age": "",
         "gender_ratio": "",
-        "representative": hojin.get("representative_name") or "",
+        "representative": _get("representative_name") or "",
         "representative_title": (
-            hojin.get("representative_title")
-            or hojin.get("representative_position") or ""
+            _get("representative_title") or _get("representative_position") or ""
         ),
-        "business_content": hojin.get("business_summary") or "",
+        "business_content": _get("business_summary") or "",
         "company_feature": "",
         "employee_count_workplace": None,
         "employee_count_female": (
-            hojin.get("female_worker_number")
-            if isinstance(hojin.get("female_worker_number"), int) else None
+            _get("female_worker_number")
+            if isinstance(_get("female_worker_number"), int) else None
         ),
         "employee_count_part_time": None,
-        "capital": _format_capital(hojin.get("capital_stock")),
-        "founded": (
-            hojin.get("date_of_establishment")
-            or hojin.get("founded_year") or ""
-        ),
-        "description": hojin.get("business_summary") or "",
+        "capital": _format_capital(_get("capital_stock")),
+        "founded": (_get("date_of_establishment") or _get("founded_year") or ""),
+        "description": _get("business_summary") or "",
         "detail_url": "",
-        "hello_work_company_id": hojin.get("corporate_number") or "",
-        "source_url": (
-            f"https://info.gbiz.go.jp/hojin/ichiran/"
-            f"{hojin.get('corporate_number', '')}"
-            if hojin.get("corporate_number") else ""
-        ),
-        "business_summary_gbiz": hojin.get("business_summary") or "",
+        "hello_work_company_id": corp_no,
+        "source_url": (f"https://info.gbiz.go.jp/hojin/ichiran/{corp_no}"
+                       if corp_no else ""),
+        "business_summary_gbiz": _get("business_summary") or "",
     }
 
 
@@ -171,8 +212,9 @@ def _format_capital(cap: Any) -> str:
 
 
 def discover(token: str, prefectures: list[str], min_employees: int,
-             out_path: Path, max_pages_per_query: int = 50) -> int:
-    """全 prefectures × CONSTRUCTION_BUSINESS_ITEMS をスキャンして JSON 保存。"""
+             out_path: Path, fetch_details: bool = True,
+             max_details: int | None = None) -> int:
+    """都道府県別に list + name filter + detail を実行して JSON 保存。"""
     session = _build_session(token)
     records: list[dict] = []
     seen_corp_nums: set[str] = set()
@@ -190,7 +232,7 @@ def discover(token: str, prefectures: list[str], min_employees: int,
                 print(f"[resume] loaded {len(records)} existing companies",
                       file=sys.stderr)
         except Exception as e:
-            print(f"[resume] failed to load {out_path}: {e}", file=sys.stderr)
+            print(f"[resume] failed: {e}", file=sys.stderr)
 
     def _save():
         out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -198,50 +240,70 @@ def discover(token: str, prefectures: list[str], min_employees: int,
             json.dumps(records, ensure_ascii=False, indent=2),
             encoding="utf-8")
 
-    total_queries = len(prefectures) * len(CONSTRUCTION_BUSINESS_ITEMS)
-    q_done = 0
-
     try:
-        for pref in prefectures:
-            for item in CONSTRUCTION_BUSINESS_ITEMS:
-                q_done += 1
-                item_name = BUSINESS_ITEM_NAMES.get(item, item)
-                print(f"\n[query {q_done}/{total_queries}] pref={pref} "
-                      f"business_item={item} ({item_name}) "
-                      f"min_emp={min_employees}", file=sys.stderr)
-                page = 1
-                new_in_query = 0
-                while page <= max_pages_per_query:
-                    data = search_page(session, pref, item,
-                                       min_employees, page)
-                    infos = data.get("hojin-infos") or []
-                    if not infos:
-                        print(f"  [page {page}] no results, done",
-                              file=sys.stderr)
-                        break
-                    page_new = 0
-                    for hojin in infos:
-                        cn = hojin.get("corporate_number") or ""
-                        if not cn or cn in seen_corp_nums:
-                            continue
-                        seen_corp_nums.add(cn)
-                        records.append(_format_record(hojin))
-                        page_new += 1
-                        new_in_query += 1
-                    total = data.get("totalCount") or data.get("total_count")
-                    print(f"  [page {page}] got {len(infos)} records "
-                          f"(+{page_new} new) total_so_far="
-                          f"{len(records)} (api total={total})",
-                          file=sys.stderr)
-                    if len(infos) < PAGE_LIMIT:
-                        break
-                    page += 1
-                    time.sleep(SLEEP_SEC)
-                if new_in_query > 0:
-                    _save()
-                    print(f"  [save] +{new_in_query} → {out_path}",
-                          file=sys.stderr)
+        for pref_name in prefectures:
+            pref_code = PREFECTURE_CODES.get(pref_name)
+            if not pref_code:
+                print(f"[warn] unknown prefecture: {pref_name}",
+                      file=sys.stderr)
+                continue
+
+            print(f"\n[pref] {pref_name} (code={pref_code}) "
+                  f"min_emp={min_employees}", file=sys.stderr)
+
+            # Step 1: List endpoint で全社取得
+            page_entries: list[dict] = []
+            for page in range(1, MAX_PAGES + 1):
+                infos = list_search(session, pref_code, min_employees, page)
+                page_entries.extend(infos)
+                print(f"  [list page {page}] +{len(infos)} "
+                      f"(total in pref={len(page_entries)})", file=sys.stderr)
+                if len(infos) < PAGE_LIMIT:
+                    break
                 time.sleep(SLEEP_SEC)
+
+            # Step 2: 名前で建設業フィルタ
+            candidates = [e for e in page_entries
+                          if is_construction_by_name(e.get("name", ""))]
+            print(f"  [filter] {len(page_entries)} → {len(candidates)} "
+                  f"(建設名フィルタ後)", file=sys.stderr)
+
+            # Step 3: 詳細取得
+            if not fetch_details:
+                for e in candidates:
+                    cn = e.get("corporate_number", "")
+                    if not cn or cn in seen_corp_nums:
+                        continue
+                    seen_corp_nums.add(cn)
+                    records.append(_format_record({}, e))
+                _save()
+                print(f"  [save] +{len(candidates)} (詳細skip)",
+                      file=sys.stderr)
+                continue
+
+            added = 0
+            for i, e in enumerate(candidates, 1):
+                cn = e.get("corporate_number", "")
+                if not cn or cn in seen_corp_nums:
+                    continue
+                if max_details and added >= max_details:
+                    break
+                detail = fetch_detail(session, cn)
+                seen_corp_nums.add(cn)
+                records.append(_format_record(detail or {}, e))
+                added += 1
+                if i % 20 == 0:
+                    name = (detail or e).get("name", "")[:30]
+                    print(f"  [detail {i}/{len(candidates)}] "
+                          f"+{name} (unique={len(records)})",
+                          file=sys.stderr)
+                if added % 50 == 0:
+                    _save()
+                    print(f"  [save] checkpoint {added}", file=sys.stderr)
+                time.sleep(SLEEP_SEC)
+            _save()
+            print(f"  [save] pref {pref_name} done, +{added} new",
+                  file=sys.stderr)
     except KeyboardInterrupt:
         print("[interrupt] saving partial results", file=sys.stderr)
         _save()
@@ -258,8 +320,10 @@ def main() -> int:
     ap.add_argument("--min-employees", type=int, default=30)
     ap.add_argument("--out", type=Path,
                     default=Path("batch/gbiz/construction.json"))
-    ap.add_argument("--max-pages", type=int, default=50,
-                    help="1クエリあたりの最大ページ数（無限ループ防止）")
+    ap.add_argument("--no-detail", action="store_true",
+                    help="詳細取得をスキップ（高速だが従業員数等が空）")
+    ap.add_argument("--max-details", type=int, default=None,
+                    help="詳細取得の上限（テスト用）")
     args = ap.parse_args()
 
     token = os.environ.get("GBIZ_API_TOKEN", "")
@@ -268,7 +332,9 @@ def main() -> int:
         return 2
 
     total = discover(token, args.prefectures, args.min_employees,
-                     args.out, max_pages_per_query=args.max_pages)
+                     args.out,
+                     fetch_details=not args.no_detail,
+                     max_details=args.max_details)
     print(f"\n[done] {total} companies written → {args.out}",
           file=sys.stderr)
     return 0
