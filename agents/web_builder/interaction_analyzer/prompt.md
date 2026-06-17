@@ -84,6 +84,8 @@
 
 `/agents/web_builder/interaction_analyzer/output.json` に保存:
 
+**全コンポーネント共通付与フィールド:** `"accessibility"`（キーボード操作可否・スクリーンリーダー対応・必要ARIA属性）、`"state_complexity"`: `"low"|"medium"|"high"`（状態管理の複雑度）、`"effort"`: `"simple"|"medium"|"complex"`（実装工数見積）を各オブジェクトに必ず含める。
+
 ```json
 {
   "forms": [

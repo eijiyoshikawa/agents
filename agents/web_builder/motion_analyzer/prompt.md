@@ -11,62 +11,79 @@
 ## 実行手順
 
 ### Step 1: CSS アニメーション・トランジションの検出
-CSSファイルとインラインスタイルから以下を検出する:
-
-- `@keyframes` 定義（アニメーション名、プロパティ変化、タイミング）
-- `transition` プロパティ（対象プロパティ、duration、easing）
-- `animation` プロパティ（参照するkeyframes、繰り返し、方向）
-- `transform` の使用パターン（translate, scale, rotate）
-- `opacity` の変化パターン
+- `@keyframes` 定義（名前、プロパティ変化、タイミング）
+- `transition` / `animation` プロパティ（対象、duration、easing）
+- `transform`（translate/scale/rotate）・`opacity` 変化パターン
 
 ### Step 2: JavaScript アニメーションライブラリの検出
-`site_scanner/output.json` の `external_libraries` を参照しつつ、
-JS ソースから以下のパターンを検出する:
-
+`site_scanner/output.json` の `external_libraries` を参照しつつ検出:
 - **GSAP**: `gsap.to()`, `ScrollTrigger`, `timeline`
-- **AOS**: `data-aos="fade-up"` 等の属性
-- **Intersection Observer**: `IntersectionObserver` の使用
+- **AOS**: `data-aos` 属性
+- **Intersection Observer**: `IntersectionObserver` 使用
 - **Framer Motion**: `motion.div`, `animate`, `variants`
 - **Lottie**: `lottie-player`, `lottie-web`
 - **Scroll系**: `scroll-behavior: smooth`, parallax 実装
 
 ### Step 3: スクロールアニメーションの特定
-ページをスクロールした時に発火するアニメーションを特定する:
-
 各セクション/要素について:
-1. **トリガー条件**: 画面内に入った時 / スクロール位置 / 特定の%
-2. **アニメーション種類**:
-   - `fade-in`: フェードイン
-   - `fade-in-up`: 下から上にフェードイン
-   - `fade-in-left`/`fade-in-right`: 左右からフェードイン
-   - `scale-in`: 拡大しながら表示
-   - `slide-in`: スライドイン
-   - `stagger`: 子要素が順番に表示
-3. **タイミング**: duration, delay, easing (ease, ease-out, cubic-bezier)
-4. **子要素のスタガー**: 順番に表示される場合、その間隔
+1. **トリガー条件**: 画面内進入 / スクロール位置 / 特定%
+2. **アニメーション種類**: `fade-in`, `fade-in-up`, `fade-in-left/right`, `scale-in`, `slide-in`, `stagger`（子要素順次表示）
+3. **タイミング**: duration, delay, easing, stagger間隔
 
-### Step 4: ホバーエフェクトの特定
-マウスオーバー時の演出を記録する:
+### Step 4: スクロール駆動アニメーション検出（CSS scroll-timeline）
+CSS `scroll-timeline` / `animation-timeline: scroll()` / `view()` を検出:
+- `scroll-timeline-name`, `scroll-timeline-axis` の定義
+- `animation-timeline: scroll()` / `animation-timeline: view()` の使用
+- `animation-range` によるトリガー範囲指定
+- JS版 `ScrollTimeline` / `ViewTimeline` API の使用
 
+### Step 5: View Transitions API の検出
+ページ遷移・DOM変更時の View Transitions を検出:
+- `document.startViewTransition()` の呼び出し
+- CSS `view-transition-name` プロパティの定義
+- `::view-transition-*` 疑似要素によるカスタムスタイル
+- MPA 向け `@view-transition { navigation: auto; }` メタ指定
+- SPA フレームワーク統合（Next.js `useViewTransition` 等）
+
+### Step 6: ホバーエフェクトの特定
 - ボタン: 色変化、拡大、シャドウ変化、矢印移動
 - カード: 浮き上がり（translateY + shadow）、画像ズーム
 - リンク: 下線アニメーション、色変化
 - 画像: ズーム、オーバーレイ表示
 
-### Step 5: ページ遷移・特殊アニメーションの検出
-- ページ遷移アニメーション（fade, slide, none）
-- ローディングアニメーション
-- スクロールに連動したパララックス効果
-- 数値カウントアップ
-- テキストアニメーション（タイピング、文字ごとのフェードイン等）
-- スクロールバー連動のプログレスバー
+### Step 7: ページ遷移・特殊アニメーションの検出
+- ページ遷移（fade/slide/View Transitions API）、ローディング
+- パララックス、数値カウントアップ、テキストアニメーション
+- スクロール連動プログレスバー
 
-### Step 6: 実装推奨の決定
-検出したアニメーションの複雑さに応じて、最適な実装方法を推奨する:
+### Step 8: パフォーマンス影響評価
+検出した各アニメーションに対し以下を評価:
 
-- **CSS only**: シンプルなhover、transition、基本的なkeyframes
+| レベル | 基準 | 推奨対応 |
+|--------|------|----------|
+| **low** | `opacity`/`transform` のみ。GPU合成レイヤーで完結 | そのまま実装 |
+| **medium** | レイアウト非トリガーだが要素数多・同時発火5+ | `will-change` 付与、stagger で分散 |
+| **high** | `width`/`height`/`top` 等レイアウトトリガー or 重いフィルタ | CSS変数/transform に置換、又は削除検討 |
+
+評価項目: 対象プロパティ（compositorのみか）、同時発火数、Lottie/Canvas有無、モバイル影響
+
+### Step 9: アニメーション優先度ランキング
+時間制約がある場合の実装優先度を `priority` フィールドで付与:
+- **P1（必須）**: ブランド印象を決定するヒーロー演出、主要CTA hover
+- **P2（推奨）**: セクション進入アニメーション、カード hover
+- **P3（余裕時）**: マイクロインタラクション、装飾的パララックス、ローディング
+
+### Step 10: Reduced Motion フォールバック文書化
+各アニメーションに `prefers-reduced-motion: reduce` 時のフォールバックを記録:
+- `opacity` 系: `duration: 0` で即表示（位置移動なし）
+- `transform` 系: 移動距離をゼロにし opacity のみ残す
+- ループ/パララックス: 完全停止、静的状態を表示
+- View Transitions: `@media (prefers-reduced-motion: reduce) { ::view-transition-group(*) { animation-duration: 0s; } }`
+
+### Step 11: 実装推奨の決定
+- **CSS only**: シンプルなhover、transition、基本keyframes、scroll-timeline
 - **framer-motion**: React向けスクロールアニメーション、ページ遷移
-- **GSAP**: 複雑なタイムライン、ScrollTrigger連動、パフォーマンス重視
+- **GSAP**: 複雑なタイムライン、ScrollTrigger連動
 
 ## 出力フォーマット
 
@@ -76,85 +93,66 @@ JS ソースから以下のパターンを検出する:
 {
   "scroll_animations": [
     {
-      "section_id": "hero",
-      "target": "h1, p, buttons",
-      "type": "fade-in-up",
-      "trigger": "on-load",
-      "duration": "0.8s",
-      "delay": "0.2s",
-      "stagger": "0.15s",
-      "easing": "ease-out",
-      "implementation": "framer-motion variants + staggerChildren"
-    },
+      "section_id": "hero", "target": "h1, p, buttons",
+      "motion_key": "masking-reveal", "type": "fade-in-up",
+      "trigger": "on-load", "duration": "0.8s", "delay": "0.2s",
+      "stagger": "0.15s", "easing": "ease-out",
+      "implementation": "framer-motion variants + staggerChildren",
+      "perf_impact": "low", "priority": "P1",
+      "reduced_motion": "instant opacity, no translateY"
+    }
+  ],
+  "scroll_driven_animations": [
     {
-      "section_id": "features",
-      "target": "各カード",
-      "type": "fade-in-up",
-      "trigger": "scroll-into-view",
-      "duration": "0.6s",
-      "delay": "0",
-      "stagger": "0.1s",
-      "easing": "ease-out",
-      "implementation": "framer-motion useInView + stagger"
+      "section_id": "progress-bar", "api": "CSS scroll-timeline",
+      "timeline": "scroll(root block)", "range": "0% 100%",
+      "motion_key": "scroll-progress-bar", "implementation": "CSS animation-timeline",
+      "perf_impact": "low", "priority": "P2",
+      "reduced_motion": "static full-width bar"
+    }
+  ],
+  "view_transitions": [
+    {
+      "scope": "SPA", "trigger": "route-change",
+      "transition_names": ["hero-image", "page-content"],
+      "custom_styles": "::view-transition-old { animation: fade-out 0.2s }",
+      "implementation": "document.startViewTransition + Next.js router",
+      "perf_impact": "low", "priority": "P2",
+      "reduced_motion": "animation-duration: 0s on all groups"
     }
   ],
   "hover_effects": [
     {
       "target": "primary-button",
-      "effects": ["背景色を暗く", "translateY(-2px)", "shadow-lg追加"],
-      "duration": "0.3s",
-      "easing": "ease",
-      "implementation": "CSS transition + Tailwind hover:"
-    },
-    {
-      "target": "card",
-      "effects": ["translateY(-4px)", "shadow-xl"],
-      "duration": "0.3s",
-      "easing": "ease",
-      "implementation": "CSS transition + Tailwind hover:"
-    },
-    {
-      "target": "card内の画像",
-      "effects": ["scale(1.05)"],
-      "duration": "0.5s",
-      "easing": "ease",
-      "implementation": "CSS transform + overflow-hidden"
+      "effects": ["背景色暗化", "translateY(-2px)", "shadow-lg"],
+      "duration": "0.3s", "easing": "ease",
+      "implementation": "CSS transition + Tailwind hover:",
+      "perf_impact": "low", "priority": "P1"
     }
   ],
   "page_transitions": {
-    "type": "fade",
-    "duration": "0.3s",
-    "implementation": "framer-motion AnimatePresence"
+    "type": "view-transition", "duration": "0.3s",
+    "implementation": "View Transitions API + fallback framer-motion"
   },
   "special_animations": [
     {
-      "type": "parallax",
-      "section_id": "hero",
-      "description": "背景画像がスクロールに対して0.5倍速で移動",
-      "implementation": "CSS background-attachment: fixed or framer-motion useScroll"
-    },
-    {
-      "type": "counter",
-      "section_id": "stats",
-      "description": "数値が0からターゲット値までカウントアップ",
-      "implementation": "framer-motion useInView + useMotionValue"
-    },
-    {
-      "type": "text-reveal",
-      "section_id": "hero",
-      "description": "テキストが1文字ずつ表示",
-      "implementation": "framer-motion variants + split text"
+      "type": "parallax", "section_id": "hero", "motion_key": "custom",
+      "description": "背景画像が0.5倍速スクロール",
+      "implementation": "CSS scroll-timeline or framer-motion useScroll",
+      "perf_impact": "medium", "priority": "P3",
+      "reduced_motion": "static background, no parallax"
     }
   ],
-  "loading_animation": {
-    "has_loader": false,
-    "type": "none",
-    "description": ""
-  },
+  "loading_animation": { "has_loader": false, "type": "none" },
   "recommended_library": "framer-motion",
-  "recommended_library_reason": "React/Next.js環境で最も統合しやすく、スクロールアニメーション・ページ遷移・ホバーエフェクトを統一的に扱える",
+  "recommended_library_reason": "Next.js統合性、スクロール/遷移/ホバーを統一的に扱える",
   "complexity_level": "medium",
-  "total_animation_count": 12
+  "total_animation_count": 12,
+  "perf_summary": {
+    "high_impact_count": 0, "medium_impact_count": 2,
+    "recommendation": "will-change付与でmedium→low化可能"
+  },
+  "proposed_motion": []
 }
 ```
 
@@ -165,37 +163,16 @@ JS ソースから以下のパターンを検出する:
 
 ## モーション語彙のマッピング（必須参照）
 
-解析で検出したモーションは、**必ず `/design-md/motion-library/MOTION_30.md` の `motion_key`** にマッピングして出力する。Builder が同じ語彙でモーションを再現できるようにするため。
+検出モーションは **`/design-md/motion-library/MOTION_30.md` の `motion_key`** に必ずマッピング。
 
-**マッピング手順:**
-1. 検出したモーションの演出・発火条件・使用ライブラリを整理
-2. MOTION_30.md の 30件から最も近い `motion_key` を選択
-3. 複数候補がある場合は演出の忠実度が高い方を優先
-4. 該当する `motion_key` が無い場合は `motion_key: "custom"` としたうえで、MOTION_30.md への追加候補として `proposed_motion` フィールドに詳細を記録
-
-**output.json への追記フィールド:**
-```json
-{
-  "scroll_animations": [
-    {
-      "section_id": "hero",
-      "target": "h1",
-      "motion_key": "masking-reveal",
-      "trigger": "on-load",
-      "duration": "0.7s",
-      "easing": "cubic-bezier(0.33, 1, 0.68, 1)",
-      "stagger": "0.08s",
-      "implementation": "framer-motion + overflow-hidden wrapper"
-    }
-  ],
-  "proposed_motion": []
-}
-```
+**手順:**
+1. 検出モーションの演出・発火条件・ライブラリを整理
+2. MOTION_30.md の30件+和文B2B 3件から最も近い `motion_key` を選択
+3. 複数候補は演出忠実度が高い方を優先
+4. 該当なしは `motion_key: "custom"` + `proposed_motion` に追加候補を記録
 
 **よくあるマッピング例:**
-- 画面一面が円形に展開する → `circle-reveal`
-- 斜めパネルで画面遷移 → `slanted-slide`
-- 文字が下からマスクで現れる → `masking-reveal`
-- 数字がドラムロール → `slot-counter`
-- カードが3D傾斜 → `card-tilt`
-- 常時ノイズ背景 → `overlay-texture`
+- 画面が円形展開 → `circle-reveal` / 斜めパネル遷移 → `slanted-slide`
+- 文字が下からマスク表示 → `masking-reveal` / 数字ドラムロール → `slot-counter`
+- カード3D傾斜 → `card-tilt` / 常時ノイズ背景 → `overlay-texture`
+- スクロール進捗バー → `scroll-progress-bar` / キーワード横流れ → `marquee-keywords`

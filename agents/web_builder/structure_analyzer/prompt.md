@@ -16,9 +16,14 @@
 `WebFetch` でHTMLを取得する。
 
 各ページについて以下を把握する:
-- `<header>`, `<main>`, `<footer>` の基本構造
+- `<header>`, `<nav>`, `<main>`, `<aside>`, `<footer>` の基本構造
 - `<section>` や `<div>` によるセクション分割
 - セクションの出現順序と数
+- **セマンティックHTML品質**:
+  - ランドマーク要素（`<header>`, `<nav>`, `<main>`, `<aside>`, `<footer>`）の適切な使用
+  - ARIA ロール（`role="banner"`, `role="navigation"`, `role="complementary"` 等）の付与状況
+  - `<article>`, `<figure>`, `<figcaption>`, `<time>` 等の意味的要素の使用度
+  - セマンティック品質を A（模範的）/ B（標準的）/ C（改善余地あり）/ D（div偏重）で評価
 
 ### Step 2: セクション単位の詳細解析
 各セクションについて以下を記録する:
@@ -33,23 +38,51 @@
    - `grid-4col`: 4カラムグリッド
    - `alternating`: 左右交互レイアウト
 4. **配置方法**: Flexbox / CSS Grid / 絶対配置
-5. **子要素の構成**: 見出し + テキスト + ボタン、カード x 3、画像 + テキスト 等
-6. **推定高さ**: 100vh / auto / 特定px値
+5. **グリッドシステム検出**:
+   - グリッド種別: `12-col`（Bootstrap系）/ `custom-N-col` / `auto-fit` / `masonry` / `none`
+   - ガター幅（gap値）とカラム比率（例: `2:1`, `1:1:1`）
+   - レスポンシブ時のカラム数変化（例: PC 3col → SP 1col）
+6. **子要素の構成**: 見出し + テキスト + ボタン、カード x 3、画像 + テキスト 等
+7. **推定高さ**: 100vh / auto / 特定px値
 
-### Step 3: ナビゲーション構造の解析
+### Step 3: コンテンツ階層分析
+各ページの見出しレベルと読み順を検証する:
+
+1. **見出し階層**: `h1` → `h2` → `h3` の順序が論理的にスキップなく構成されているか
+   - `h1` の数（ページあたり1つが理想）
+   - レベルスキップ（例: h2 → h4）の有無と箇所
+2. **読み順**: DOM順序が視覚的な表示順序と一致しているか（CSS orderやflexbox reverseによるズレ）
+3. **階層深度**: コンテンツのネスト段数（浅い=明快、深い=複雑）
+4. **見出しマップ**: ページ全体の見出しツリーをインデント形式で記録
+
+### Step 4: ナビゲーション構造の解析
 - ヘッダーナビゲーションの項目とリンク先
 - ナビゲーションの種類: fixed-top / sticky / static
 - モバイルハンバーガーメニューの有無
 - ドロップダウン/メガメニューの有無
 - CTAボタンの有無（「お問い合わせ」等）
 
-### Step 4: フッター構造の解析
+### Step 5: フッター構造の解析
 - カラム数と各カラムの内容
 - ロゴ・著作権表示の位置
 - SNSリンクの有無
 - サイトマップ的なリンク一覧
 
-### Step 5: 共通レイアウトパターンの抽出
+### Step 6: 固定・スティッキー要素のインベントリ
+ナビゲーション以外も含め、`position: fixed` / `position: sticky` の全要素を棚卸しする:
+
+- **対象要素**: ヘッダー、サイドバー、TOC（目次）、CTA バー、Cookie バナー、チャットウィジェット、トップへ戻るボタン、フローティングアクション等
+- 各要素の `position` 値（`fixed` / `sticky`）と固定方向（top / bottom / left / right）
+- 表示条件: 常時表示 / スクロール後出現 / 特定ビューポートのみ
+
+### Step 7: z-index レイヤーマップ
+ページ内の重なり順を明示する z-index マップを作成する:
+
+- `z-index` が明示的に設定された全要素を抽出
+- レイヤー分類: `base`(0) / `content`(1-9) / `sticky`(10-49) / `overlay`(50-99) / `modal`(100+)
+- 同一レイヤー内の競合（同じ z-index で異なる要素）がある場合は注記
+
+### Step 8: 共通レイアウトパターンの抽出
 全ページを通じた共通パターンを抽出する:
 - コンテンツの最大幅（max-width）
 - セクション間のスペーシング
@@ -57,7 +90,7 @@
 - ヘッダー高さ
 - 共通パディング
 
-### Step 6: ページ間の共通/固有要素の整理
+### Step 9: ページ間の共通/固有要素の整理
 - 共通コンポーネント: Header, Footer, CTA Section 等
 - ページ固有のセクション構成
 
@@ -71,6 +104,9 @@
     {
       "url": "https://example.com",
       "page_role": "top",
+      "semantic_quality": "B",
+      "heading_map": ["h1: メインタイトル", "  h2: サービス", "    h3: 機能1", "  h2: 実績"],
+      "heading_issues": [],
       "sections": [
         {
           "id": "hero",
@@ -80,6 +116,7 @@
           "content_type": "hero_with_video_bg",
           "children_summary": "h1 + p + 2x button",
           "grid_or_flex": "flex-col-center",
+          "grid_system": {"type": "none"},
           "estimated_height": "100vh",
           "background_type": "video | image | color | gradient",
           "notes": "オーバーレイ付き動画背景"
@@ -92,6 +129,7 @@
           "content_type": "icon_card_grid",
           "children_summary": "section-heading + 3x card(icon + h3 + p)",
           "grid_or_flex": "grid-cols-3",
+          "grid_system": {"type": "custom-3-col", "gutter": "24px", "responsive": "3col→1col@768px"},
           "estimated_height": "auto",
           "background_type": "color",
           "notes": "各カードにアイコン付き"
@@ -116,7 +154,17 @@
         "has_copyright": true,
         "has_sns_links": true,
         "sns_platforms": ["Twitter", "Instagram", "Facebook"]
-      }
+      },
+      "fixed_sticky_elements": [
+        {"element": "header nav", "position": "fixed", "direction": "top", "condition": "常時表示"},
+        {"element": "トップへ戻るボタン", "position": "fixed", "direction": "bottom-right", "condition": "スクロール200px後に出現"}
+      ],
+      "z_index_map": [
+        {"layer": "base", "range": "0", "elements": ["main content"]},
+        {"layer": "sticky", "range": "10", "elements": ["header nav"]},
+        {"layer": "overlay", "range": "50", "elements": ["mobile menu"]},
+        {"layer": "modal", "range": "100", "elements": ["cookie banner"]}
+      ]
     }
   ],
   "common_layout": {
