@@ -120,7 +120,8 @@ def _get_with_retry(session: requests.Session, url: str,
 
 
 def list_search(session: requests.Session, pref_code: str,
-                min_employees: int, page: int) -> list[dict]:
+                min_employees: int, page: int,
+                max_employees: int | None = None) -> list[dict]:
     """都道府県+従業員数で list 検索。最小情報のみ。"""
     params = {
         "prefecture": pref_code,
@@ -128,6 +129,8 @@ def list_search(session: requests.Session, pref_code: str,
         "page": page,
         "limit": PAGE_LIMIT,
     }
+    if max_employees is not None:
+        params["employee_number_to"] = max_employees
     r = _get_with_retry(session, BASE, params=params)
     if r.status_code == 404:
         return []
@@ -237,7 +240,8 @@ def discover(token: str, prefectures: list[str], min_employees: int,
              out_path: Path, fetch_details: bool = True,
              max_details: int | None = None,
              full_scan: bool = False,
-             concurrency: int = 5) -> int:
+             concurrency: int = 5,
+             max_employees: int | None = None) -> int:
     """都道府県別に list + name filter + detail を実行して JSON 保存。
 
     Args:
@@ -278,15 +282,18 @@ def discover(token: str, prefectures: list[str], min_employees: int,
                       file=sys.stderr)
                 continue
 
+            emp_range = (f"{min_employees}-{max_employees}"
+                         if max_employees else f"{min_employees}+")
             print(f"\n[pref] {pref_name} (code={pref_code}) "
-                  f"min_emp={min_employees} "
+                  f"emp={emp_range} "
                   f"mode={'FULL_SCAN' if full_scan else 'name_filter'}",
                   file=sys.stderr)
 
             # Step 1: List endpoint で全社取得
             page_entries: list[dict] = []
             for page in range(1, MAX_PAGES + 1):
-                infos = list_search(session, pref_code, min_employees, page)
+                infos = list_search(session, pref_code, min_employees, page,
+                                    max_employees=max_employees)
                 page_entries.extend(infos)
                 print(f"  [list page {page}] +{len(infos)} "
                       f"(total in pref={len(page_entries)})", file=sys.stderr)
@@ -424,6 +431,8 @@ def main() -> int:
     ap.add_argument("--prefectures", nargs="+", required=True,
                     help="都道府県名（例: 東京都 神奈川県）")
     ap.add_argument("--min-employees", type=int, default=30)
+    ap.add_argument("--max-employees", type=int, default=None,
+                    help="従業員数の上限 (B/C候補用: 10-29名 等)")
     ap.add_argument("--out", type=Path,
                     default=Path("batch/gbiz/construction.json"))
     ap.add_argument("--no-detail", action="store_true",
@@ -447,7 +456,8 @@ def main() -> int:
                      fetch_details=not args.no_detail,
                      max_details=args.max_details,
                      full_scan=args.full_scan,
-                     concurrency=args.concurrency)
+                     concurrency=args.concurrency,
+                     max_employees=args.max_employees)
     print(f"\n[done] {total} companies written → {args.out}",
           file=sys.stderr)
     return 0

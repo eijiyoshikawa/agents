@@ -37,6 +37,8 @@ def main() -> int:
     ap.add_argument("--prefectures", nargs="+",
                     help="都道府県名（例: 東京都 神奈川県）")
     ap.add_argument("--min-employees", type=int, default=30)
+    ap.add_argument("--max-employees", type=int, default=None,
+                    help="従業員数の上限 (B/C候補用: 10-29名 等)")
     ap.add_argument("--out", type=Path,
                     default=Path("batch/gbiz/construction.json"))
     ap.add_argument("--no-detail", action="store_true",
@@ -80,7 +82,8 @@ def main() -> int:
                              fetch_details=not args.no_detail,
                              max_details=args.max_details,
                              full_scan=args.full_scan,
-                             concurrency=args.concurrency)
+                             concurrency=args.concurrency,
+                             max_employees=args.max_employees)
             print(f"[gbiz] discovered {total} companies → {args.out}",
                   file=sys.stderr)
         except KeyboardInterrupt:
