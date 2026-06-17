@@ -39,7 +39,10 @@ def main() -> int:
     ap.add_argument("--min-employees", type=int, default=30)
     ap.add_argument("--out", type=Path,
                     default=Path("batch/gbiz/construction.json"))
-    ap.add_argument("--max-pages", type=int, default=50)
+    ap.add_argument("--no-detail", action="store_true",
+                    help="詳細取得をスキップ（高速だが従業員数等が空）")
+    ap.add_argument("--max-details", type=int, default=None,
+                    help="詳細取得の上限（テスト用）")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--skip-scrape", action="store_true")
     args = ap.parse_args()
@@ -68,7 +71,9 @@ def main() -> int:
         print(f"\n=== [gbiz] discovery ===", file=sys.stderr)
         try:
             total = discover(token, args.prefectures, args.min_employees,
-                             args.out, max_pages_per_query=args.max_pages)
+                             args.out,
+                             fetch_details=not args.no_detail,
+                             max_details=args.max_details)
             print(f"[gbiz] discovered {total} companies → {args.out}",
                   file=sys.stderr)
         except KeyboardInterrupt:
