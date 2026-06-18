@@ -182,6 +182,21 @@ def main():
         stem = base.rsplit("-hero", 1)[0]                # 001-...
         query = trim_query(row[kw_col], args.max_words)
 
+        # この記事で必要なファイル名を先に確定する
+        targets = []
+        for i in range(args.per_article):
+            if args.body_only:
+                targets.append(f"{stem}-{i + 1:02d}.jpg")   # 本文用: -01, -02...
+            else:
+                targets.append(base if i == 0 else f"{stem}-{i:02d}.jpg")
+
+        # 全ファイルが既にあるなら、API検索もせずスキップ（再実行時の429回避）
+        if not args.overwrite and all(
+                os.path.exists(os.path.join(OUT_DIR, t)) for t in targets):
+            print(f"  [{idn}] スキップ(全既存): {', '.join(targets)}")
+            skip += len(targets)
+            continue
+
         try:
             if args.source == "pexels":
                 hits = search_pexels(query, key, cand)
@@ -197,11 +212,7 @@ def main():
         avail = [h for h in hits if h[0] not in used_ids]
         ai = 0
 
-        for i in range(args.per_article):
-            if args.body_only:
-                fname = f"{stem}-{i + 1:02d}.jpg"      # 本文用: -01, -02, ...
-            else:
-                fname = base if i == 0 else f"{stem}-{i:02d}.jpg"  # hero + -01...
+        for i, fname in enumerate(targets):
             dest = os.path.join(OUT_DIR, fname)
 
             if os.path.exists(dest) and not args.overwrite:
