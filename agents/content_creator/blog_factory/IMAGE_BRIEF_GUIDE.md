@@ -88,7 +88,17 @@ python3 download_images.py --source pixabay --per-article 2   # 1記事2枚（he
 python3 download_images.py --source pexels  --lang ja         # 日本語KWで検索
 python3 download_images.py --source pexels  --only 001,002    # 指定記事だけ
 python3 download_images.py --source pexels  --sleep 2.0       # レート制限がきつい時は待機を長く
+
+# アイキャッチを自作する場合：本文用画像だけ取得（-01.jpg から保存・heroは作らない）
+python3 download_images.py --source pixabay --body-only
+python3 download_images.py --source pixabay --body-only --per-article 2   # 本文に2枚
 ```
+
+### Pixabay 利用上の注意（公式規約より）
+- レート制限は **100リクエスト/60秒**。本スクリプトは既定で記事ごとに1.5秒待機するため通常は超えません。
+- **同一リクエストは24時間キャッシュ**が求められます。短時間に繰り返し再実行しないでください（本スクリプトは既存ファイルを自動スキップします）。
+- **画像URLの恒久ホットリンクは禁止**。必ずダウンロードして自社サーバー（WordPressメディア）に保存してから使います（本スクリプトはローカル保存します）。
+- API利用の条件として、Pixabayは「素材の出所を示すこと」を求めています。記事やサイトに **「画像: Pixabay」等のクレジット**を入れるか、`images/_download_log.csv` の記録を保管しておくと安心です。
 
 ### 出力
 - 画像は `images/` に、`記事番号-スラッグ-hero.jpg`（必要なら `-01.jpg`…）で保存。

@@ -102,6 +102,8 @@ def main():
                    help="APIレート制限対策の待機秒（既定1.5）")
     ap.add_argument("--only", default="",
                    help="対象記事番号をカンマ区切りで指定（例 001,002）")
+    ap.add_argument("--body-only", action="store_true",
+                   help="アイキャッチ(hero)を作らず、本文用に -01.jpg から保存する")
     ap.add_argument("--overwrite", action="store_true",
                    help="既存ファイルも上書きする")
     args = ap.parse_args()
@@ -155,7 +157,10 @@ def main():
 
         for i in range(min(args.per_article, len(hits))):
             img_url, author, ref = hits[i]
-            fname = base if i == 0 else f"{stem}-{i:02d}.jpg"
+            if args.body_only:
+                fname = f"{stem}-{i + 1:02d}.jpg"      # 本文用: -01, -02, ...
+            else:
+                fname = base if i == 0 else f"{stem}-{i:02d}.jpg"  # hero + -01...
             dest = os.path.join(OUT_DIR, fname)
             if os.path.exists(dest) and not args.overwrite:
                 print(f"  [{idn}] スキップ(既存): {fname}")
