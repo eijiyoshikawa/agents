@@ -13,6 +13,9 @@ import sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 ARTICLES_DIR = os.path.join(HERE, "articles")
 OUT_CSV = os.path.join(HERE, "articles.csv")
+# 作業メンバーがGoogleスプレッドシートへ取り込み、コピペ作業しやすいよう
+# 日本語ヘッダー＋作業列を付けた版
+OUT_SHEET_CSV = os.path.join(HERE, "articles_for_sheets.csv")
 
 # CSVの列順（WordPress入力時のマッピングは ARTICLE_TEMPLATE.md を参照）
 COLUMNS = [
@@ -23,6 +26,26 @@ COLUMNS = [
 ]
 # CSVではリストを "; " で連結する列
 LIST_FIELDS = {"sub_keywords", "tags"}
+
+# シート用CSVの列順と日本語ヘッダー（作業しやすい並び）。
+# (内部キー, 表示ヘッダー) のタプル。"__check__" は空の作業列。
+SHEET_COLUMNS = [
+    ("id", "記事番号"),
+    ("__check__", "入力済み"),
+    ("category", "カテゴリ"),
+    ("title", "記事タイトル"),
+    ("subtitle", "サブタイトル"),
+    ("body", "本文"),
+    ("target_keyword", "メインキーワード"),
+    ("sub_keywords", "サブキーワード"),
+    ("meta_description", "メタディスクリプション"),
+    ("caption", "キャプション(alt)"),
+    ("tags", "タグ"),
+    ("slug", "スラッグ"),
+    ("char_count", "文字数"),
+    ("area", "エリア"),
+    ("status", "ステータス"),
+]
 
 
 def parse_front_matter(text):
@@ -110,7 +133,19 @@ def build():
         writer.writeheader()
         writer.writerows(rows)
 
-    print(f"\n生成完了: {OUT_CSV}（{len(rows)}記事）")
+    # 作業メンバー向け：日本語ヘッダー＋「入力済み」作業列のシート用CSV
+    with open(OUT_SHEET_CSV, "w", encoding="utf-8-sig", newline="") as f:
+        writer = csv.writer(f, quoting=csv.QUOTE_ALL)
+        writer.writerow([header for _, header in SHEET_COLUMNS])
+        for row in rows:
+            writer.writerow([
+                "" if key == "__check__" else row.get(key, "")
+                for key, _ in SHEET_COLUMNS
+            ])
+
+    print(f"\n生成完了:")
+    print(f"  {OUT_CSV}（{len(rows)}記事 / 全項目・英語ヘッダー）")
+    print(f"  {OUT_SHEET_CSV}（{len(rows)}記事 / スプレッドシート用・日本語ヘッダー）")
     return 0
 
 
