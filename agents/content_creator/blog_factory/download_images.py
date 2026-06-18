@@ -25,6 +25,7 @@ import argparse
 import csv
 import json
 import os
+import re
 import sys
 import time
 import urllib.parse
@@ -34,6 +35,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 BRIEF_CSV = os.path.join(HERE, "articles_image_brief.csv")
 OUT_DIR = os.path.join(HERE, "images")
 LOG_CSV = os.path.join(OUT_DIR, "_download_log.csv")
+# 全記事で同じ写真が重複しないよう、使用済み画像ID（"source:id"）を記録する
+USED_IDS_FILE = os.path.join(OUT_DIR, "_used_ids.txt")
 
 PEXELS_ENDPOINT = "https://api.pexels.com/v1/search"
 PIXABAY_ENDPOINT = "https://pixabay.com/api/"
@@ -51,10 +54,10 @@ def http_get_json(url, headers=None):
         return json.loads(r.read().decode("utf-8"))
 
 
-def search_pexels(query, key, count):
-    """Pexels で検索し、[(画像URL, 撮影者, 参照URL), ...] を返す。"""
+def search_pexels(query, key, per_page):
+    """Pexels で検索し、[(画像ID, 画像URL, 撮影者, 参照URL), ...] を返す。"""
     params = urllib.parse.urlencode({
-        "query": query, "per_page": max(count, 3),
+        "query": query, "per_page": min(max(per_page, 3), 80),
         "orientation": "landscape",
     })
     data = http_get_json(f"{PEXELS_ENDPOINT}?{params}",
@@ -64,14 +67,15 @@ def search_pexels(query, key, count):
         src = p.get("src", {})
         img = src.get("large2x") or src.get("large") or src.get("original")
         if img:
-            out.append((img, p.get("photographer", ""), p.get("url", "")))
+            out.append((f"pexels:{p.get('id')}", img,
+                       p.get("photographer", ""), p.get("url", "")))
     return out
 
 
-def search_pixabay(query, key, count, lang):
+def search_pixabay(query, key, per_page, lang):
     params = urllib.parse.urlencode({
         "key": key, "q": query, "image_type": "photo",
-        "safesearch": "true", "per_page": max(count, 3),
+        "safesearch": "true", "per_page": min(max(per_page, 3), 100),
         "orientation": "horizontal", "lang": lang,
     })
     data = http_get_json(f"{PIXABAY_ENDPOINT}?{params}")
@@ -79,8 +83,42 @@ def search_pixabay(query, key, count, lang):
     for h in data.get("hits", []):
         img = h.get("largeImageURL") or h.get("webformatURL")
         if img:
-            out.append((img, h.get("user", ""), h.get("pageURL", "")))
+            out.append((f"pixabay:{h.get('id')}", img,
+                       h.get("user", ""), h.get("pageURL", "")))
     return out
+
+
+def load_used_ids():
+    """過去に取得済みの画像ID集合を読み込む。"""
+    s = set()
+    if os.path.exists(USED_IDS_FILE):
+        with open(USED_IDS_FILE, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    s.add(line)
+    return s
+
+
+def save_used_ids(s):
+    os.makedirs(OUT_DIR, exist_ok=True)
+    with open(USED_IDS_FILE, "w", encoding="utf-8") as f:
+        for x in sorted(s):
+            f.write(x + "\n")
+
+
+def seed_used_from_log(used):
+    """既存の _download_log.csv から、取得済み画像IDを推定して used に加える。
+    （以前のダウンロード分との重複も避けるため）"""
+    if not os.path.exists(LOG_CSV):
+        return
+    with open(LOG_CSV, encoding="utf-8-sig") as f:
+        for r in csv.DictReader(f):
+            src = (r.get("ソース") or "").strip()
+            url = (r.get("元URL") or "").strip().rstrip("/")
+            m = re.search(r"(\d+)$", url)
+            if src and m:
+                used.add(f"{src}:{m.group(1)}")
 
 
 def download(url, dest):
@@ -127,8 +165,14 @@ def main():
 
     log_rows = []
     ok = miss = skip = 0
+    used_ids = load_used_ids()
+    seed_used_from_log(used_ids)   # 既存DL分のIDも重複回避に含める
+
     with open(BRIEF_CSV, encoding="utf-8-sig") as f:
         rows = list(csv.DictReader(f))
+
+    # 重複回避のため候補は多めに取得し、使用済みを除外して選ぶ
+    cand = min(80, max(args.per_article * 8, 30))
 
     for row in rows:
         idn = row["記事番号"]
@@ -140,34 +184,43 @@ def main():
 
         try:
             if args.source == "pexels":
-                hits = search_pexels(query, key, args.per_article)
+                hits = search_pexels(query, key, cand)
             else:
-                hits = search_pixabay(query, key, args.per_article, args.lang)
+                hits = search_pixabay(query, key, cand, args.lang)
         except Exception as e:
             print(f"  [{idn}] 検索失敗: {e}", file=sys.stderr)
             miss += 1
             time.sleep(args.sleep)
             continue
 
-        if not hits:
-            print(f"  [{idn}] ヒットなし: '{query}'")
-            miss += 1
-            time.sleep(args.sleep)
-            continue
+        # まだ使っていない写真だけを候補にする（他記事・既存DLとの重複回避）
+        avail = [h for h in hits if h[0] not in used_ids]
+        ai = 0
 
-        for i in range(min(args.per_article, len(hits))):
-            img_url, author, ref = hits[i]
+        for i in range(args.per_article):
             if args.body_only:
                 fname = f"{stem}-{i + 1:02d}.jpg"      # 本文用: -01, -02, ...
             else:
                 fname = base if i == 0 else f"{stem}-{i:02d}.jpg"  # hero + -01...
             dest = os.path.join(OUT_DIR, fname)
+
             if os.path.exists(dest) and not args.overwrite:
                 print(f"  [{idn}] スキップ(既存): {fname}")
                 skip += 1
                 continue
+
+            # 重複しない次の写真を選ぶ
+            if ai >= len(avail):
+                print(f"  [{idn}] 重複しない候補が不足: {fname} は未取得"
+                      f"（KWを調整して再実行してください）")
+                miss += 1
+                continue
+            uid, img_url, author, ref = avail[ai]
+            ai += 1
+
             try:
                 download(img_url, dest)
+                used_ids.add(uid)          # 取得した写真IDを記録（以後は再利用しない）
                 print(f"  [{idn}] 保存: {fname}")
                 ok += 1
                 log_rows.append({
@@ -178,6 +231,8 @@ def main():
                 print(f"  [{idn}] DL失敗 {fname}: {e}", file=sys.stderr)
                 miss += 1
             time.sleep(args.sleep)
+
+    save_used_ids(used_ids)   # 使用済みIDを保存（次回実行でも重複を回避）
 
     # ログ追記（撮影者・元URLの記録。クレジット不要だが記録として残す）
     write_header = not os.path.exists(LOG_CSV)

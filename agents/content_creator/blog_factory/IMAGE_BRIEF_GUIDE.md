@@ -92,7 +92,16 @@ python3 download_images.py --source pexels  --sleep 2.0       # レート制限�
 # アイキャッチを自作する場合：本文用画像だけ取得（-01.jpg から保存・heroは作らない）
 python3 download_images.py --source pixabay --body-only
 python3 download_images.py --source pixabay --body-only --per-article 2   # 本文に2枚
+
+# 【推奨】日本寄りの写真を、各記事2枚ずつ、他記事と重複しないように取得
+python3 download_images.py --source pixabay --body-only --per-article 2 --lang ja
 ```
+
+### 写真の重複回避（自動）
+- 取得した写真IDは `images/_used_ids.txt` に記録され、**他の記事や次回実行でも同じ写真を再利用しません**。
+- 既存ファイル（例: 過去に取得した `-01.jpg`）は保持され、重複しない**新しい写真**で不足分（`-02.jpg` 等）を補います。
+- 候補が尽きて「重複しない候補が不足」と出た記事は、`articles_image_brief.csv` の検索KWを変える／`--max-words` を増やす／`--lang en` で再取得すると埋まります。
+- 完全に取り直したいときは `images/_used_ids.txt` を削除してから再実行してください。
 
 ### Pixabay 利用上の注意（公式規約より）
 - レート制限は **100リクエスト/60秒**。本スクリプトは既定で記事ごとに1.5秒待機するため通常は超えません。
