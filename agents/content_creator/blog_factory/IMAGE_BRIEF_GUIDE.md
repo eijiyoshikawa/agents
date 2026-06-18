@@ -62,9 +62,49 @@ cd agents/content_creator/blog_factory
 python3 generate_image_brief.py   # articles_image_brief.csv を更新
 ```
 
-## 自動化したい場合（オプション・別途キーが必要）
-本ガイドは手作業前提ですが、ご希望があれば次の自動化スクリプトも用意できます。
-- **フリー素材 一括ダウンロード**: Pexels / Pixabay の無料APIキーがあれば、各記事キーワードで画像を自動取得。
-- **WordPress 一括アップロード**: WordPressのアプリケーションパスワード＋サイトURLがあれば、ローカル画像をメディアへ一括投入し alt も自動設定。
+## ② フリー素材 一括ダウンロード（`download_images.py`）
+`articles_image_brief.csv` のキーワード・ファイル名を使い、Pexels / Pixabay から
+画像を一括ダウンロードします。**画像のはめ込み（記事への挿入）は手動**で行ってください。
 
-必要になったらお知らせください。
+### 事前準備：無料APIキーの取得（数分・無料）
+- **Pexels**: https://www.pexels.com/api/ でアカウント作成 → API Key を発行
+- **Pixabay**: https://pixabay.com/api/docs/ でアカウント作成 → API Key を確認
+- どちらも**無料**・画像は商用利用可・クレジット不要（レート制限あり）。
+
+### 実行手順
+```bash
+cd agents/content_creator/blog_factory
+
+# 1) APIキーを環境変数にセット（ハードコード禁止。この値はコミットされません）
+export PEXELS_API_KEY=あなたのキー        # Pexelsを使う場合
+#   または
+export PIXABAY_API_KEY=あなたのキー       # Pixabayを使う場合
+
+# 2) ダウンロード実行（アイキャッチ1枚/記事・英語KWで検索）
+python3 download_images.py --source pexels
+
+# よく使うオプション
+python3 download_images.py --source pixabay --per-article 2   # 1記事2枚（hero + -01）
+python3 download_images.py --source pexels  --lang ja         # 日本語KWで検索
+python3 download_images.py --source pexels  --only 001,002    # 指定記事だけ
+python3 download_images.py --source pexels  --sleep 2.0       # レート制限がきつい時は待機を長く
+```
+
+### 出力
+- 画像は `images/` に、`記事番号-スラッグ-hero.jpg`（必要なら `-01.jpg`…）で保存。
+- 再実行しても既存ファイルはスキップ（途中から再開OK。`--overwrite` で上書き）。
+- `images/_download_log.csv` に「ファイル名・検索語・ソース・撮影者・元URL」を記録。
+- `images/` フォルダと `.env` は `.gitignore` 済み（バイナリ・キーはリポジトリに残りません）。
+
+### ダウンロード後の流れ（手動）
+1. `images/` の画像を確認し、人物・ロゴが目立つ等で不適切なものは差し替え（再検索/別サイト）
+2. 必要なら横1200〜1600pxにリサイズ・圧縮
+3. WordPress「メディア > 新規追加」でアップロード → alt に `アイキャッチ_alt` を設定
+4. 記事編集で本文の見出し付近に挿入（はめ込みは手動）
+
+> ヒント：英語KWでヒットが弱い記事は `--lang ja`（Pixabayが日本語に強め）や、
+> `articles_image_brief.csv` の検索語を編集してから再実行すると精度が上がります。
+
+## ③ WordPress 一括アップロード（オプション・未着手）
+WordPressのアプリケーションパスワード＋サイトURLがあれば、`images/` をメディアへ
+一括投入し alt も自動設定するスクリプトも用意できます。必要になったらお知らせください。
