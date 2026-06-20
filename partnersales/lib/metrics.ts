@@ -1,11 +1,18 @@
-// シードデータから派生した各種集計を1か所で組み立てる
+// データソースから生データを取得し、各種集計を1か所で組み立てる。
 import { computeAllCommissions, earningsByPartner } from "./commission";
 import { computeStats, leaderboard, supportQueue, type PartnerStats } from "./leaderboard";
 import { buildTree } from "./tree";
+import { getDataSource } from "./db";
 import type { NodeMetric } from "@/components/TreeView";
-import { deals, partners, services } from "@/data/seed";
 
-export function getModel() {
+export async function getModel() {
+  const ds = getDataSource();
+  const [services, partners, deals] = await Promise.all([
+    ds.getServices(),
+    ds.getPartners(),
+    ds.getDeals(),
+  ]);
+
   const commissions = computeAllCommissions(deals, services, partners);
   const earnings = earningsByPartner(commissions);
   const stats = computeStats(partners, deals, commissions);
@@ -22,6 +29,7 @@ export function getModel() {
   }
 
   return {
+    source: ds.name,
     partners,
     services,
     deals,

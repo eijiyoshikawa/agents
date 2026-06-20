@@ -129,15 +129,28 @@ Commission:  accrued（発生）→ payable（支払可能）→ paid（支払�
 Vercel / GitHub 連携が現在途絶えているため、**git 操作はすべてターミナル経由**で行う
 （`git add` / `commit` / `push -u origin <branch>`）。自動デプロイには依存しない。
 
-## 6. 事前準備フェーズの完了定義（このブランチの成果物）
+## 6. 進捗（このブランチの成果物）
 
+### v0（事前準備）
 - [x] ドメインモデル（`lib/types.ts`）
 - [x] 報酬計算エンジン（`lib/commission.ts`）+ ユニットテスト
 - [x] ツリー構築ユーティリティ（`lib/tree.ts`）
-- [x] サンプルシードデータ（`data/seed.ts`）
+- [x] サンプルシードデータ（`data/`）
 - [x] Next.js スキャフォールド（管理ダッシュボード / パートナー個別ページ / サービス一覧）
-- [ ] Supabase スキーマ移行（v1 で実施）
-- [ ] 認証・パートナーログイン（v1 で実施）
+
+### v1（コード側で完了。外部設定は `docs/RUNBOOK.md`）
+- [x] Supabase スキーマ・RLS・登録 RPC（`supabase/migrations/`）
+- [x] seed ↔ Supabase 自動切替のデータ層（`lib/db/`）
+- [x] パートナー登録フォーム（`/register`、`?ref=` 招待コード対応）
+- [x] 招待コード・スラッグ生成（衝突回避）+ テスト
+- [x] Notion 連携の実装（実スキーマ準拠、トークンで送信）+ テスト
+
+### v1 後半 / v2（要外部設定・要相談）
+- [ ] パートナーログイン（Supabase Auth、自分のツリーのみ閲覧）
+- [ ] 成約入力・ステータス変更の管理 UI
+- [ ] 登録完了 → Notion 自動同期（Edge Function）
+- [ ] 静的 → Vercel 動的レンダリング（新規ページ即時発行）
+- [ ] Stripe 連携による報酬支払自動化
 
 ## 7. 確定した仕様（2026-06-20）
 

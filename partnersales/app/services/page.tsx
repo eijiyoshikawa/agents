@@ -7,8 +7,8 @@ function rewardLabel(r: TierReward | undefined): string {
   return r.type === "percentage" ? pct(r.rate ?? 0) : yen(r.fixedAmount ?? 0);
 }
 
-export default function ServicesPage() {
-  const m = getModel();
+export default async function ServicesPage() {
+  const m = await getModel();
 
   return (
     <div style={{ display: "grid", gap: 24 }}>

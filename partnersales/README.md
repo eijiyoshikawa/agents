@@ -6,13 +6,15 @@ MLM 型リファラル管理システム。パートナー個別ページと自�
 > 仕様の詳細は [`docs/SPEC.md`](docs/SPEC.md) を参照。
 > 現在は **事前準備フェーズ（v0）**: ドメインモデル・報酬エンジン・UI スキャフォールドまで。
 
-## できること（v0）
+## できること
 
 - **報酬エンジン**（`lib/commission.ts`）— 成約から紹介ツリーを最大3段上って報酬を分配
 - **リーダーボード / 重点サポート判定**（`lib/leaderboard.ts`）
 - **自社管理ダッシュボード**（`/`）— 全体ツリー・ランキング・サポート候補・サマリ
 - **パートナー個別ページ**（`/partners/[slug]`）— 自分のダウンラインツリーと発生報酬
 - **サービス・報酬プラン一覧**（`/services`）
+- **パートナー登録フォーム**（`/register`）— 招待コード（`?ref=`）対応・個別ページ発行
+- **Supabase 連携**（環境変数で自動切替）・**Notion 連携**（DB_協業先管理 へ同期）
 
 ## セットアップ
 
@@ -20,30 +22,44 @@ MLM 型リファラル管理システム。パートナー個別ページと自�
 cd partnersales
 npm install --legacy-peer-deps
 npm run dev      # http://localhost:4100
-npm test         # 報酬エンジンのユニットテスト
+npm test         # ユニットテスト（21件）
 npm run build    # out/ に静的サイトを書き出し
 ```
+
+環境変数を設定しなければ **seed データ** で動作する。
+Supabase / Notion / デプロイの設定手順は **[`docs/RUNBOOK.md`](docs/RUNBOOK.md)** を参照。
+DB スキーマは [`supabase/`](supabase/) を参照。
 
 ## 構成
 
 ```
 partnersales/
-├─ docs/SPEC.md            # 仕様書（報酬ルール・画面・ロードマップ）
+├─ docs/
+│  ├─ SPEC.md              # 仕様書（報酬ルール・画面・ロードマップ）
+│  └─ RUNBOOK.md           # 立ち上げ手順（手作業の項目）
+├─ supabase/               # DB スキーマ・RLS・登録 RPC・seed
+│  ├─ migrations/*.sql
+│  ├─ seed.sql
+│  └─ README.md
 ├─ lib/
 │  ├─ types.ts             # ドメインモデル
 │  ├─ tree.ts              # 紹介ツリーの構築・アップライン探索
-│  ├─ commission.ts        # 報酬計算エンジン（純粋関数）
-│  ├─ commission.test.ts   # ユニットテスト（vitest, 13件）
+│  ├─ commission.ts        # 報酬計算エンジン（純粋関数）+ test
 │  ├─ leaderboard.ts       # 成績集計・重点サポート判定
-│  ├─ metrics.ts           # シードから派生集計を組み立てるセレクタ
-│  └─ integrations/notion.ts # Notion DB 連携スタブ（v1 実装）
+│  ├─ referral-code.ts     # 招待コード・スラッグ生成 + test
+│  ├─ metrics.ts           # データソースから派生集計を組み立てる
+│  ├─ db/                  # データ層（seed ↔ Supabase 自動切替）
+│  │  ├─ index.ts          # getDataSource()
+│  │  ├─ seed-source.ts / supabase-source.ts / supabase.ts
+│  │  └─ register.ts       # 登録 RPC 呼び出し（ブラウザ）
+│  └─ integrations/notion.ts # Notion DB_協業先管理 連携 + test
 ├─ data/
 │  ├─ services.ts          # ★ サービス定義と報酬率（ここに追加・変更）
 │  ├─ partners.ts          # パートナーと紹介ツリー
 │  ├─ deals.ts             # クライアント契約（成約）
 │  └─ seed.ts              # 上記の集約エクスポート
 ├─ components/TreeView.tsx
-└─ app/                    # Next.js App Router（ダッシュボード / パートナー / サービス）
+└─ app/                    # ダッシュボード / partners / services / register
 ```
 
 ## 報酬ルール（要約）

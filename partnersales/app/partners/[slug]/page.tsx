@@ -5,14 +5,14 @@ import { yen } from "@/lib/format";
 import { buildTree } from "@/lib/tree";
 import TreeView from "@/components/TreeView";
 
-export function generateStaticParams() {
-  const m = getModel();
+export async function generateStaticParams() {
+  const m = await getModel();
   return m.partners.map((p) => ({ slug: p.slug }));
 }
 
 export default async function PartnerPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const m = getModel();
+  const m = await getModel();
   const partner = m.partners.find((p) => p.slug === slug);
   if (!partner) notFound();
 

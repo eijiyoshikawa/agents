@@ -4,8 +4,8 @@ import { getModel } from "@/lib/metrics";
 import { yen } from "@/lib/format";
 import TreeView from "@/components/TreeView";
 
-export default function Dashboard() {
-  const m = getModel();
+export default async function Dashboard() {
+  const m = await getModel();
 
   const totalConfirmed = [...m.earnings.values()].reduce((a, e) => a + e.confirmed, 0);
   const totalPending = [...m.earnings.values()].reduce((a, e) => a + e.pending, 0);

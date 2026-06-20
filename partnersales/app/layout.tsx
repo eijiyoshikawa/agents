@@ -10,6 +10,7 @@ export const metadata: Metadata = {
 const nav = [
   { href: "/", label: "ダッシュボード" },
   { href: "/services", label: "サービス・報酬" },
+  { href: "/register", label: "パートナー登録" },
 ];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
