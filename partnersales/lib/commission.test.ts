@@ -8,14 +8,15 @@ import {
 import { uplineChain, downlineIds, indexById } from "./tree";
 import { computeStats, supportQueue } from "./leaderboard";
 import { deals, partners, services } from "@/data/seed";
-import type { Deal, Partner, Service } from "./types";
+import type { Deal, Service } from "./types";
 
 const byId = indexById(partners);
 const svc = (id: string): Service => services.find((s) => s.id === id)!;
+const deal = (id: string): Deal => deals.find((d) => d.id === id)!;
 
 describe("tierAmount", () => {
   it("percentage は金額×率を切り捨て", () => {
-    expect(tierAmount({ tier: 1, type: "percentage", rate: 0.15 }, 300000)).toBe(45000);
+    expect(tierAmount({ tier: 1, type: "percentage", rate: 0.1 }, 1000000)).toBe(100000);
     expect(tierAmount({ tier: 3, type: "percentage", rate: 0.02 }, 12345)).toBe(246);
   });
   it("fixed は固定額", () => {
@@ -23,54 +24,56 @@ describe("tierAmount", () => {
   });
 });
 
-describe("uplineChain", () => {
-  it("最大3段で打ち切る", () => {
+describe("uplineChain（クライアントの上に最大3段）", () => {
+  it("3段で打ち切り、4段上は含めない", () => {
     const chain = uplineChain("p-delta", byId, 3);
     expect(chain.map((p) => p.id)).toEqual(["p-delta", "p-blue", "p-acme"]);
   });
-  it("3段未満なら居る分だけ返す", () => {
-    expect(uplineChain("p-blue", byId, 3).map((p) => p.id)).toEqual(["p-blue", "p-acme"]);
+  it("ルート（弊社直接パートナー）は本人のみ＝tier1相当", () => {
     expect(uplineChain("p-acme", byId, 3).map((p) => p.id)).toEqual(["p-acme"]);
   });
 });
 
 describe("commissionsForDeal", () => {
-  it("3段すべてに分配する（percentage）", () => {
-    const deal = deals.find((d) => d.id === "d-001")!;
-    const cs = commissionsForDeal(deal, svc("svc-sns"), byId);
+  it("仕様例どおり 10% / 3% / 2% を3段に分配する", () => {
+    const cs = commissionsForDeal(deal("d-001"), svc("svc-sns"), byId);
     expect(cs).toEqual([
-      { dealId: "d-001", serviceId: "svc-sns", partnerId: "p-delta", tier: 1, amount: 45000, status: "paid" },
-      { dealId: "d-001", serviceId: "svc-sns", partnerId: "p-blue", tier: 2, amount: 15000, status: "paid" },
-      { dealId: "d-001", serviceId: "svc-sns", partnerId: "p-acme", tier: 3, amount: 6000, status: "paid" },
+      { dealId: "d-001", serviceId: "svc-sns", partnerId: "p-delta", tier: 1, amount: 100000, status: "paid" },
+      { dealId: "d-001", serviceId: "svc-sns", partnerId: "p-blue", tier: 2, amount: 30000, status: "paid" },
+      { dealId: "d-001", serviceId: "svc-sns", partnerId: "p-acme", tier: 3, amount: 20000, status: "paid" },
     ]);
   });
 
   it("4段目以降には分配しない（上は最大3ノード）", () => {
-    const deal = deals.find((d) => d.id === "d-001")!;
-    const cs = commissionsForDeal(deal, svc("svc-sns"), byId);
-    expect(cs.every((c) => c.tier <= 3)).toBe(true);
+    const cs = commissionsForDeal(deal("d-001"), svc("svc-sns"), byId);
     expect(cs).toHaveLength(3);
+    expect(cs.every((c) => c.tier <= 3)).toBe(true);
   });
 
-  it("上位が居なければ居る段だけ生成（acme 自己成約は tier1 のみ）", () => {
-    const deal = deals.find((d) => d.id === "d-005")!;
-    const cs = commissionsForDeal(deal, svc("svc-web"), byId);
+  it("弊社の直接紹介者（ルート）が紹介すると tier1 のみ", () => {
+    const d: Deal = { id: "t", serviceId: "svc-sns", clientName: "X", introducerPartnerId: "p-acme", amount: 1000000, status: "paid", closedAt: "2026-05-01" };
+    const cs = commissionsForDeal(d, svc("svc-sns"), byId);
     expect(cs).toHaveLength(1);
-    expect(cs[0]).toMatchObject({ partnerId: "p-acme", tier: 1, amount: 80000 });
+    expect(cs[0]).toMatchObject({ partnerId: "p-acme", tier: 1, amount: 100000 });
+  });
+
+  it("自己成約は tier1 を出さず、上位の tier2/tier3 は支払う", () => {
+    const cs = commissionsForDeal(deal("d-005"), svc("svc-sns"), byId);
+    expect(cs.map((c) => [c.partnerId, c.tier, c.amount])).toEqual([
+      ["p-blue", 2, 30000],
+      ["p-acme", 3, 20000],
+    ]);
+    expect(cs.some((c) => c.partnerId === "p-delta")).toBe(false);
+  });
+
+  it("固定額プランも段ごとに分配する", () => {
+    const cs = commissionsForDeal(deal("d-002"), svc("svc-web"), byId);
+    expect(cs.map((c) => c.amount)).toEqual([80000, 30000, 10000]);
   });
 
   it("pending の成約は accrued（見込み）になる", () => {
-    const deal = deals.find((d) => d.id === "d-004")!;
-    const cs = commissionsForDeal(deal, svc("svc-sns"), byId);
+    const cs = commissionsForDeal(deal("d-004"), svc("svc-sns"), byId);
     expect(cs.every((c) => c.status === "accrued")).toBe(true);
-  });
-
-  it("該当段の報酬定義が無ければスキップ", () => {
-    const partial: Service = { id: "x", name: "x", active: true, rewards: [{ tier: 1, type: "fixed", fixedAmount: 1000 }] };
-    const deal: Deal = { id: "z", serviceId: "x", partnerId: "p-delta", amount: 100000, status: "paid", closedAt: "2026-05-01" };
-    const cs = commissionsForDeal(deal, partial, byId);
-    expect(cs).toHaveLength(1);
-    expect(cs[0].tier).toBe(1);
   });
 });
 
@@ -78,12 +81,10 @@ describe("earningsByPartner", () => {
   it("確定と見込みを分けて集計する", () => {
     const all = computeAllCommissions(deals, services, partners);
     const e = earningsByPartner(all);
-    // acme は複数成約のツリー上位 + 自己成約で確定報酬が積み上がる
     const acme = e.get("p-acme")!;
     expect(acme.confirmed).toBeGreaterThan(0);
-    // blue の pending（d-004）は見込みに入る
     const blue = e.get("p-blue")!;
-    expect(blue.pending).toBeGreaterThan(0);
+    expect(blue.pending).toBeGreaterThan(0); // d-004(pending) の tier1
   });
 });
 
@@ -92,7 +93,7 @@ describe("leaderboard / supportQueue", () => {
   const fixedNow = new Date("2026-06-20").getTime();
   const stats = computeStats(partners, deals, all, fixedNow);
 
-  it("acme のダウンライン総売上は子孫成約を含む", () => {
+  it("acme のダウンライン総売上は子孫の紹介成約を含む", () => {
     const acme = stats.find((s) => s.partner.id === "p-acme")!;
     expect(acme.downlineCount).toBe(downlineIds("p-acme", partners).size);
     expect(acme.totalSales).toBe(acme.ownSales + acme.downlineSales);

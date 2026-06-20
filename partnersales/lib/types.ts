@@ -48,17 +48,27 @@ export interface Partner {
 
 export type DealStatus = "pending" | "confirmed" | "paid";
 
-/** あるパートナー経由で発生した売上 */
+/** クライアント契約（成約）。報酬はこの契約額を起点に計算する */
 export interface Deal {
   id: string;
   serviceId: string;
-  /** 成約を発生させたパートナー（ツリーの最下点 = tier1 受領者） */
-  partnerId: string;
-  /** 成約金額（円） */
+  /** 契約したクライアント名（弊社=LET と契約した外部の顧客） */
+  clientName: string;
+  /**
+   * このクライアントを紹介したパートナー（= tier1 の受領者）。
+   * ここからツリーを最大3段上って tier2 / tier3 へ分配する。
+   */
+  introducerPartnerId: string;
+  /** 契約金額（円）。報酬率はこの額に対して掛ける */
   amount: number;
   status: DealStatus;
   closedAt: string; // ISO date
-  /** 顧客名など任意のメモ */
+  /**
+   * 自己成約フラグ。パートナー自身が弊社と契約（自分が顧客）した場合 true。
+   * true のとき tier1 は支払わない（上位の tier2 / tier3 は通常どおり支払う）。
+   */
+  isSelfDeal?: boolean;
+  /** 任意のメモ */
   note?: string;
 }
 

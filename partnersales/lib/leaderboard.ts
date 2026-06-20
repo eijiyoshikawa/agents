@@ -43,8 +43,8 @@ export function computeStats(
 ): PartnerStats[] {
   const dealsByPartner = new Map<string, Deal[]>();
   for (const d of deals) {
-    if (!dealsByPartner.has(d.partnerId)) dealsByPartner.set(d.partnerId, []);
-    dealsByPartner.get(d.partnerId)!.push(d);
+    if (!dealsByPartner.has(d.introducerPartnerId)) dealsByPartner.set(d.introducerPartnerId, []);
+    dealsByPartner.get(d.introducerPartnerId)!.push(d);
   }
 
   const earnedByPartner = new Map<string, number>();

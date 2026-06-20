@@ -19,7 +19,7 @@ export default async function PartnerPage({ params }: { params: Promise<{ slug: 
   const stat = statsFor(m.stats, partner.id);
   const earn = m.earnings.get(partner.id);
   const subtree = buildTree(m.partners, partner.id);
-  const myDeals = m.deals.filter((d) => d.partnerId === partner.id);
+  const myDeals = m.deals.filter((d) => d.introducerPartnerId === partner.id);
   const serviceName = (id: string) => m.services.find((s) => s.id === id)?.name ?? id;
 
   return (
@@ -52,17 +52,21 @@ export default async function PartnerPage({ params }: { params: Promise<{ slug: 
           <div className="h-section" style={{ marginBottom: 8 }}>段別 確定報酬内訳</div>
           {([1, 2, 3] as const).map((t) => (
             <div key={t} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid var(--card-border)" }}>
-              <span>tier{t}（{t === 1 ? "直接成約" : `${t - 1}段下の紹介`}）</span>
+              <span>tier{t}（{t === 1 ? "クライアント直接紹介" : `${t - 1}段下からの成約`}）</span>
               <span className="stat-num">{yen(earn?.byTier[t] ?? 0)}</span>
             </div>
           ))}
         </div>
         <div className="card">
-          <div className="h-section" style={{ marginBottom: 8 }}>自身の成約</div>
+          <div className="h-section" style={{ marginBottom: 8 }}>あなたが紹介した成約</div>
           {myDeals.length === 0 && <div style={{ color: "var(--fg-muted)", fontSize: 13 }}>成約なし</div>}
           {myDeals.map((d) => (
             <div key={d.id} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid var(--card-border)" }}>
-              <span>{serviceName(d.serviceId)} <span className="pill">{d.status}</span></span>
+              <span>
+                {d.clientName} <span className="pill">{d.status}</span>
+                {d.isSelfDeal && <span className="pill pill-amber" style={{ marginLeft: 4 }}>自己成約</span>}
+                <span className="h-section" style={{ display: "block", textTransform: "none", letterSpacing: 0 }}>{serviceName(d.serviceId)}</span>
+              </span>
               <span className="stat-num">{yen(d.amount)}</span>
             </div>
           ))}

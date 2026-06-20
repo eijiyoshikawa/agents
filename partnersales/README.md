@@ -28,31 +28,48 @@ npm run build    # out/ に静的サイトを書き出し
 
 ```
 partnersales/
-├─ docs/SPEC.md          # 仕様書（報酬ルール・画面・ロードマップ）
+├─ docs/SPEC.md            # 仕様書（報酬ルール・画面・ロードマップ）
 ├─ lib/
-│  ├─ types.ts           # ドメインモデル
-│  ├─ tree.ts            # 紹介ツリーの構築・アップライン探索
-│  ├─ commission.ts      # 報酬計算エンジン（純粋関数）
-│  ├─ commission.test.ts # ユニットテスト（vitest）
-│  ├─ leaderboard.ts     # 成績集計・重点サポート判定
-│  └─ metrics.ts         # シードから派生集計を組み立てるセレクタ
-├─ data/seed.ts          # サンプルデータ（本番では Supabase に置換）
+│  ├─ types.ts             # ドメインモデル
+│  ├─ tree.ts              # 紹介ツリーの構築・アップライン探索
+│  ├─ commission.ts        # 報酬計算エンジン（純粋関数）
+│  ├─ commission.test.ts   # ユニットテスト（vitest, 13件）
+│  ├─ leaderboard.ts       # 成績集計・重点サポート判定
+│  ├─ metrics.ts           # シードから派生集計を組み立てるセレクタ
+│  └─ integrations/notion.ts # Notion DB 連携スタブ（v1 実装）
+├─ data/
+│  ├─ services.ts          # ★ サービス定義と報酬率（ここに追加・変更）
+│  ├─ partners.ts          # パートナーと紹介ツリー
+│  ├─ deals.ts             # クライアント契約（成約）
+│  └─ seed.ts              # 上記の集約エクスポート
 ├─ components/TreeView.tsx
-└─ app/                  # Next.js App Router（ダッシュボード / パートナー / サービス）
+└─ app/                    # Next.js App Router（ダッシュボード / パートナー / サービス）
 ```
 
 ## 報酬ルール（要約）
 
-| 段 | 受領者 | 例（SNS運用 30万成約） |
-|----|--------|----------------------|
-| tier1 | 成約したパートナー本人 | 15% = 45,000円 |
-| tier2 | 1段上の紹介者 | 5% = 15,000円 |
-| tier3 | 2段上の紹介者 | 2% = 6,000円 |
+報酬は **クライアント契約額** を起点に計算。クライアントを紹介したパートナーから
+上方向へ最大3段に分配する（4段目以降は分配なし）。
 
-`percentage`（割合）/ `fixed`（固定額）をサービス × 段ごとに設定可。端数は円未満切り捨て。
+| 段 | 受領者 | 例（SNS運用 100万契約） |
+|----|--------|------------------------|
+| tier1 | クライアントを直接紹介したパートナー | 10% = 100,000円 |
+| tier2 | その1段上の紹介者 | 3% = 30,000円 |
+| tier3 | さらに1段上の紹介者 | 2% = 20,000円 |
+
+- `percentage`（割合）/ `fixed`（固定額）をサービス × 段ごとに設定可。端数は円未満切り捨て。
+- **弊社の直接パートナー（ルート）が紹介した場合は tier1 のみ**。
+- **自己成約**（パートナー自身が顧客）は tier1 を出さず、上位 tier2/tier3 には支払う。
+- 報酬確定（`pending → confirmed → paid`）は **手動設定**。
+
+### 報酬率を追加・変更する
+
+`data/services.ts` の `services` 配列にサービスを足す／`rewards` を書き換えるだけ。
+ロジック（`lib/commission.ts`）は変更不要。v1 で Supabase + 管理画面に置き換える。
 
 ## 次フェーズ（v1）
 
 - Supabase スキーマ移行（パートナー登録・成約入力・認証）
 - パートナーログインと個別ページの安全な発行（招待コード）
+- 紹介者登録時の **Notion DB 自動連携**（`lib/integrations/notion.ts`）
 - Stripe / Webhook による成約の自動取り込み・報酬支払

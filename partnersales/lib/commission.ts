@@ -34,8 +34,10 @@ function commissionStatusOf(deal: Deal): CommissionStatus {
 }
 
 /**
- * 1件の成約から、ツリーを最大3段上ってコミッションを生成する。
- * chain[0] = 成約者(tier1), chain[1] = tier2, chain[2] = tier3。
+ * 1件の成約から、クライアントの上位パートナーを最大3段たどってコミッションを生成する。
+ * クライアントを底とし、紹介したパートナーから上へ chain[0]=tier1, [1]=tier2, [2]=tier3。
+ * 4段目以降（4段上のパートナー）には分配しない。
+ * 自己成約（isSelfDeal）の場合は tier1 を支払わない（上位 tier2 / tier3 は支払う）。
  * 該当段の報酬定義が無い／該当パートナーが居ない段はスキップ。
  */
 export function commissionsForDeal(
@@ -43,7 +45,7 @@ export function commissionsForDeal(
   service: Service,
   partnersById: Map<string, Partner>
 ): Commission[] {
-  const chain = uplineChain(deal.partnerId, partnersById, MAX_TIERS);
+  const chain = uplineChain(deal.introducerPartnerId, partnersById, MAX_TIERS);
   const status = commissionStatusOf(deal);
   const rewardByTier = new Map<Tier, TierReward>(
     service.rewards.map((r) => [r.tier, r])
@@ -52,6 +54,8 @@ export function commissionsForDeal(
   const result: Commission[] = [];
   chain.forEach((partner, idx) => {
     const tier = (idx + 1) as Tier;
+    // 自己成約は tier1（本人＝顧客）への紹介報酬を出さない
+    if (tier === 1 && deal.isSelfDeal) return;
     const reward = rewardByTier.get(tier);
     if (!reward) return;
     const amount = tierAmount(reward, deal.amount);
