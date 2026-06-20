@@ -1,6 +1,6 @@
 // シードデータを返すデータソース（既定）。
 import type { DataSource } from "./source";
-import { deals, partners, services } from "@/data/seed";
+import { deals, partners, payouts, services } from "@/data/seed";
 
 export const seedSource: DataSource = {
   name: "seed",
@@ -12,5 +12,8 @@ export const seedSource: DataSource = {
   },
   async getDeals() {
     return deals;
+  },
+  async getPayouts() {
+    return payouts;
   },
 };

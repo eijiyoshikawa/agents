@@ -26,6 +26,7 @@ export default async function Dashboard() {
           { label: "確定報酬", value: yen(totalConfirmed) },
           { label: "見込み報酬", value: yen(totalPending) },
           { label: "パートナー数", value: String(m.partners.length) },
+          { label: "支払い対象（要請求書）", value: `${m.payoutQueue.length}件` },
         ].map((s) => (
           <div key={s.label} className="card">
             <div className="h-section">{s.label}</div>

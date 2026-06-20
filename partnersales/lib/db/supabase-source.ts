@@ -2,7 +2,7 @@
 // DB 行（snake_case）→ ドメイン型（camelCase）へマッピングする。
 import type { DataSource } from "./source";
 import { getServerClient } from "./supabase";
-import type { Deal, Partner, Service, Tier, TierReward } from "@/lib/types";
+import type { Deal, Partner, Payout, Service, Tier, TierReward } from "@/lib/types";
 
 interface ServiceRow {
   id: string;
@@ -38,6 +38,16 @@ interface DealRow {
   status: Deal["status"];
   closed_at: string;
   is_self_deal: boolean;
+  note: string | null;
+}
+interface PayoutRow {
+  id: string;
+  partner_id: string;
+  amount: number;
+  status: Payout["status"];
+  invoice_no: string | null;
+  invoiced_at: string | null;
+  paid_at: string | null;
   note: string | null;
 }
 
@@ -106,6 +116,22 @@ export const supabaseSource: DataSource = {
       closedAt: d.closed_at,
       isSelfDeal: d.is_self_deal,
       note: d.note ?? undefined,
+    }));
+  },
+
+  async getPayouts() {
+    const sb = getServerClient();
+    const { data, error } = await sb.from("payouts").select("*");
+    if (error) throw error;
+    return ((data ?? []) as PayoutRow[]).map<Payout>((p) => ({
+      id: p.id,
+      partnerId: p.partner_id,
+      amount: p.amount,
+      status: p.status,
+      invoiceNo: p.invoice_no ?? undefined,
+      invoicedAt: p.invoiced_at ?? undefined,
+      paidAt: p.paid_at ?? undefined,
+      note: p.note ?? undefined,
     }));
   },
 };

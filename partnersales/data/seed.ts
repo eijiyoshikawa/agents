@@ -7,3 +7,4 @@
 export { services, percentagePlan, fixedPlan, DEFAULT_TIER_RATES } from "./services";
 export { partners } from "./partners";
 export { deals } from "./deals";
+export { payouts } from "./payouts";

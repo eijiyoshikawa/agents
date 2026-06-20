@@ -84,3 +84,36 @@ export interface Commission {
   amount: number;
   status: CommissionStatus;
 }
+
+export type PayoutStatus = "invoiced" | "paid";
+
+/**
+ * パートナーへの支払い精算レコード。
+ * 支払いは弊社からの銀行振込のみ。紹介者が都度請求書を発行し、
+ * 請求書受領（invoiced）→ 振込完了（paid）の順に進む。
+ */
+export interface Payout {
+  id: string;
+  partnerId: string;
+  /** 支払金額（円） */
+  amount: number;
+  status: PayoutStatus;
+  /** 請求書番号（紹介者発行） */
+  invoiceNo?: string;
+  invoicedAt?: string; // ISO date
+  paidAt?: string; // ISO date
+  note?: string;
+}
+
+/**
+ * パートナーのログイン認証情報（弊社が事前発行 → スタッフが登録時に割り当て）。
+ * パスワードはハッシュで保持し、平文は発行時の一覧（Notion 等）にのみ残す。
+ */
+export interface PartnerCredential {
+  loginId: string;
+  /** 紐付くパートナー。未割り当ての発行済みは null */
+  partnerId: string | null;
+  status: "unassigned" | "active" | "disabled";
+  issuedAt: string;
+  assignedAt?: string;
+}

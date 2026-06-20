@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getModel, statsFor } from "@/lib/metrics";
 import { yen } from "@/lib/format";
 import { buildTree } from "@/lib/tree";
+import { PAYOUT_METHOD, PAYOUT_THRESHOLD } from "@/lib/payout";
 import TreeView from "@/components/TreeView";
 
 export async function generateStaticParams() {
@@ -18,6 +19,7 @@ export default async function PartnerPage({ params }: { params: Promise<{ slug: 
 
   const stat = statsFor(m.stats, partner.id);
   const earn = m.earnings.get(partner.id);
+  const payout = m.payoutStates.get(partner.id);
   const subtree = buildTree(m.partners, partner.id);
   const myDeals = m.deals.filter((d) => d.introducerPartnerId === partner.id);
   const serviceName = (id: string) => m.services.find((s) => s.id === id)?.name ?? id;
@@ -45,6 +47,26 @@ export default async function PartnerPage({ params }: { params: Promise<{ slug: 
             <div className="stat-num" style={{ fontSize: 22, marginTop: 6 }}>{s.value}</div>
           </div>
         ))}
+      </section>
+
+      <section className="card" style={{ display: "grid", gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div className="h-section">支払い状況</div>
+          {payout && (
+            <span className={payout.phase === "eligible" ? "pill pill-brand" : payout.phase === "invoiced" ? "pill pill-amber" : "pill"}>
+              {payout.phase === "eligible" ? "請求書発行をご依頼します" : payout.phase === "invoiced" ? "入金待ち" : "支払い下限未満（繰越）"}
+            </span>
+          )}
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 12 }}>
+          <div><div className="h-section">未精算（支払い対象）</div><div className="stat-num" style={{ fontSize: 18 }}>{yen(payout?.unsettled ?? 0)}</div></div>
+          <div><div className="h-section">振込済み累計</div><div className="stat-num" style={{ fontSize: 18 }}>{yen(payout?.paidOut ?? 0)}</div></div>
+          <div><div className="h-section">支払い下限</div><div className="stat-num" style={{ fontSize: 18 }}>{yen(PAYOUT_THRESHOLD)}</div></div>
+        </div>
+        <p style={{ color: "var(--fg-muted)", fontSize: 12, margin: 0 }}>
+          累計確定報酬が {yen(PAYOUT_THRESHOLD)} に達するまでは支払われません（繰越）。
+          支払いは{PAYOUT_METHOD}。
+        </p>
       </section>
 
       <section style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
