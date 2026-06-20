@@ -1,37 +1,37 @@
 # PartnerSales — 紹介報酬（3段階リファラル）管理
 
 弊社の各サービスごとに報酬形態を設定し、**最大3段目** の紹介者まで報酬を分配する
-MLM 型リファラル管理システム。パートナー個別ページと自社管理ダッシュボードを提供する。
+MLM 型リファラル管理システム。認証付きのパートナー専用ページと自社管理画面を提供する。
 
-> 仕様の詳細は [`docs/SPEC.md`](docs/SPEC.md) を参照。
-> 現在は **事前準備フェーズ（v0）**: ドメインモデル・報酬エンジン・UI スキャフォールドまで。
+> 仕様の詳細は [`docs/SPEC.md`](docs/SPEC.md)、立ち上げ手順は [`docs/RUNBOOK.md`](docs/RUNBOOK.md) を参照。
 
 ## できること
 
 - **報酬エンジン**（`lib/commission.ts`）— 成約から紹介ツリーを最大3段上って報酬を分配
 - **リーダーボード / 重点サポート判定**（`lib/leaderboard.ts`）
-- **自社管理ダッシュボード**（`/`）— 全体ツリー・ランキング・サポート候補・サマリ
-- **パートナー個別ページ**（`/partners/[slug]`）— 自分のダウンラインツリーと発生報酬
-- **サービス・報酬プラン一覧**（`/services`）
-- **スタッフ管理画面**（`/admin`）— 成約入力・ステータス変更 / 支払い精算 / パートナー登録（合言葉ガード）
-- **パートナーログイン**（`/login`）— 弊社が事前発行する ID/PASS
 - **支払い精算**（`lib/payout.ts`）— 累計 ¥50,000 下限・銀行振込・請求書フロー
+- **報酬明細・月次締め**（`lib/statement.ts`）
+- **認証ゲート**（middleware + HMAC セッション）でロール分離
+  - パートナー: `/login` → `/me`（自分のツリー・報酬・明細のみ閲覧）
+  - スタッフ: `/staff/login` → `/`（ダッシュボード）/ `/services` / `/partners/[slug]` / `/admin`
+- **スタッフ管理画面**（`/admin`）— 成約入力・ステータス変更 / 支払い精算 / パートナー登録
+  （書き込みはサーバアクション + service_role）
 - **認証情報の一括発行**（`scripts/generate-credentials.mjs`）— Notion 保管用 CSV + 登録 SQL
-- **Supabase 連携**（環境変数で自動切替）・**Notion 連携**（DB_協業先管理 へ同期）
+- **Supabase 連携**（環境変数で自動切替）・**Notion 自動同期**（登録時に DB_協業先管理 へ）
 
 ## セットアップ
 
 ```bash
 cd partnersales
 npm install --legacy-peer-deps
-npm run dev      # http://localhost:4100
-npm test         # ユニットテスト（21件）
-npm run build    # out/ に静的サイトを書き出し
+npm run dev      # http://localhost:4100（スタッフは /staff/login、既定の合言葉 staff-demo）
+npm test         # ユニットテスト
+npm run build && npm run start   # 本番相当（動的レンダリング）
 ```
 
-環境変数を設定しなければ **seed データ** で動作する。
-Supabase / Notion / デプロイの設定手順は **[`docs/RUNBOOK.md`](docs/RUNBOOK.md)** を参照。
-DB スキーマは [`supabase/`](supabase/) を参照。
+環境変数未設定でも **seed データ** で動作（スタッフログインのみ可能）。
+パートナーログインや永続化には Supabase 設定が必要 → **[`docs/RUNBOOK.md`](docs/RUNBOOK.md)**。
+認証ゲートのため **静的エクスポートではなく動的レンダリング**（Vercel / Node）で配信する。
 
 ## 構成
 
@@ -49,20 +49,21 @@ partnersales/
 │  ├─ tree.ts              # 紹介ツリーの構築・アップライン探索
 │  ├─ commission.ts        # 報酬計算エンジン（純粋関数）+ test
 │  ├─ leaderboard.ts       # 成績集計・重点サポート判定
+│  ├─ payout.ts            # 支払い精算（¥50,000 下限・請求書フロー）+ test
+│  ├─ statement.ts         # 報酬明細・月次締め + test
 │  ├─ referral-code.ts     # 招待コード・スラッグ生成 + test
+│  ├─ credentials.ts       # ログイン認証情報の生成 + test
 │  ├─ metrics.ts           # データソースから派生集計を組み立てる
+│  ├─ auth/                # セッション（HMAC）・ロール要求ヘルパー
 │  ├─ db/                  # データ層（seed ↔ Supabase 自動切替）
-│  │  ├─ index.ts          # getDataSource()
-│  │  ├─ seed-source.ts / supabase-source.ts / supabase.ts
-│  │  └─ register.ts       # 登録 RPC 呼び出し（ブラウザ）
 │  └─ integrations/notion.ts # Notion DB_協業先管理 連携 + test
-├─ data/
-│  ├─ services.ts          # ★ サービス定義と報酬率（ここに追加・変更）
-│  ├─ partners.ts          # パートナーと紹介ツリー
-│  ├─ deals.ts             # クライアント契約（成約）
-│  └─ seed.ts              # 上記の集約エクスポート
-├─ components/TreeView.tsx
-└─ app/                    # ダッシュボード / partners / services / register
+├─ data/                   # services（★報酬率）/ partners / deals / payouts / seed
+├─ components/             # TreeView / PartnerView
+├─ middleware.ts           # ルートごとのロール別アクセス制御
+└─ app/
+   ├─ (staff) /, /services, /admin, /partners/[slug], /staff/login
+   ├─ (partner) /me, /login
+   └─ api/auth/*           # partner-login / staff-login / logout
 ```
 
 ## 報酬ルール（要約）

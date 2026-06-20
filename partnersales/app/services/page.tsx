@@ -1,4 +1,5 @@
 import { getModel } from "@/lib/metrics";
+import { requireStaff } from "@/lib/auth/server";
 import { yen, pct } from "@/lib/format";
 import type { TierReward } from "@/lib/types";
 
@@ -8,6 +9,7 @@ function rewardLabel(r: TierReward | undefined): string {
 }
 
 export default async function ServicesPage() {
+  await requireStaff();
   const m = await getModel();
 
   return (

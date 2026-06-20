@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { TrendingUp, LifeBuoy, Network } from "lucide-react";
 import { getModel } from "@/lib/metrics";
+import { requireStaff } from "@/lib/auth/server";
 import { yen } from "@/lib/format";
 import TreeView from "@/components/TreeView";
 
 export default async function Dashboard() {
+  await requireStaff();
   const m = await getModel();
 
   const totalConfirmed = [...m.earnings.values()].reduce((a, e) => a + e.confirmed, 0);

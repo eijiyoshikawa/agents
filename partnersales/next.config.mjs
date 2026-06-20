@@ -1,13 +1,7 @@
 /** @type {import('next').NextConfig} */
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
-
+// 動的レンダリング（Vercel / Node）。認証ゲートで個別ページを非公開化するため、
+// 静的エクスポート（output: "export"）からは移行済み。
 const nextConfig = {
-  output: "export",
-  trailingSlash: true,
-  images: { unoptimized: true },
   reactStrictMode: true,
-  basePath,
-  assetPrefix: basePath || undefined,
-  env: { NEXT_PUBLIC_BASE_PATH: basePath },
 };
 export default nextConfig;
