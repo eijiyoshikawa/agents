@@ -75,7 +75,7 @@ export default function AdminClient({ data }: { data: AdminData }) {
 
       {tab === "成約" && <DealsTab data={data} run={run} />}
       {tab === "支払い" && <PayoutTab data={data} run={run} />}
-      {tab === "パートナー登録" && <RegisterTab run={run} disabled={!data.configured} />}
+      {tab === "パートナー登録" && <RegisterTab data={data} run={run} disabled={!data.configured} />}
     </div>
   );
 }
@@ -194,7 +194,7 @@ function PayoutTab({ data, run }: { data: AdminData; run: RunFn }) {
   );
 }
 
-function RegisterTab({ run, disabled }: { run: RunFn; disabled: boolean }) {
+function RegisterTab({ data, run, disabled }: { data: AdminData; run: RunFn; disabled: boolean }) {
   const [name, setName] = useState("");
   const [person, setPerson] = useState("");
   const [email, setEmail] = useState("");
@@ -208,22 +208,30 @@ function RegisterTab({ run, disabled }: { run: RunFn; disabled: boolean }) {
         onSubmit={async (e) => {
           e.preventDefault();
           const r = await run(() => registerPartner({ name, person, email, referrerCode, loginId }));
-          if (r.ok && r.detail) setDetail(r.detail);
+          if (r.ok && r.detail) {
+            setDetail(r.detail);
+            setName(""); setPerson(""); setEmail(""); setReferrerCode(""); setLoginId("");
+          }
         }}>
         <p className="h-section" style={{ textTransform: "none", letterSpacing: 0 }}>
-          アポ後にスタッフが登録します。事前発行済みのログインID（未割り当て）を割り当ててください。
+          アポ後にスタッフが登録します。ログインID・パスワードは自動発行され、メールアドレス宛に送信されます。
         </p>
         <label style={{ display: "grid", gap: 4 }}><span className="h-section">会社名 *</span>
           <input style={input} value={name} onChange={(e) => setName(e.target.value)} required /></label>
         <label style={{ display: "grid", gap: 4 }}><span className="h-section">担当者名</span>
           <input style={input} value={person} onChange={(e) => setPerson(e.target.value)} /></label>
-        <label style={{ display: "grid", gap: 4 }}><span className="h-section">メールアドレス</span>
-          <input style={input} type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></label>
-        <label style={{ display: "grid", gap: 4 }}><span className="h-section">紹介元の招待コード（任意）</span>
-          <input style={input} value={referrerCode} onChange={(e) => setReferrerCode(e.target.value)} placeholder="ACME-7K3Q" /></label>
-        <label style={{ display: "grid", gap: 4 }}><span className="h-section">割り当てるログインID *</span>
-          <input style={input} value={loginId} onChange={(e) => setLoginId(e.target.value)} placeholder="LET-P-0001" required /></label>
-        <button className="btn btn-primary" disabled={disabled} style={{ justifyContent: "center" }}>登録して認証情報を割り当て</button>
+        <label style={{ display: "grid", gap: 4 }}><span className="h-section">メールアドレス（ログイン情報の送信先）</span>
+          <input style={input} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="partner@example.com" /></label>
+        <label style={{ display: "grid", gap: 4 }}><span className="h-section">紹介元（任意）</span>
+          <select style={input} value={referrerCode} onChange={(e) => setReferrerCode(e.target.value)}>
+            <option value="">（なし / ルート登録）</option>
+            {data.partners.map((p) => (
+              <option key={p.id} value={p.referralCode}>{p.name}（{p.referralCode}）</option>
+            ))}
+          </select></label>
+        <label style={{ display: "grid", gap: 4 }}><span className="h-section">ログインID（空欄で自動発行）</span>
+          <input style={input} value={loginId} onChange={(e) => setLoginId(e.target.value)} placeholder="自動発行（例 LET-P-XXXXX）" /></label>
+        <button className="btn btn-primary" disabled={disabled} style={{ justifyContent: "center" }}>登録してログイン情報を発行</button>
       </form>
       {detail && (
         <div className="card" style={{ display: "grid", gap: 6 }}>
@@ -231,6 +239,9 @@ function RegisterTab({ run, disabled }: { run: RunFn; disabled: boolean }) {
           {Object.entries(detail).map(([k, v]) => (
             <div key={k} style={{ fontSize: 13 }}><span className="h-section">{k}: </span><code>{v}</code></div>
           ))}
+          {detail["パスワード"] && (
+            <p className="pill pill-amber" style={{ alignSelf: "start" }}>メール未送信のため、上記パスワードを担当者へ手動でお伝えください</p>
+          )}
         </div>
       )}
     </div>

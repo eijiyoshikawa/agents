@@ -16,6 +16,7 @@
    - `supabase/migrations/0002_rls.sql`
    - `supabase/migrations/0003_register_rpc.sql`
    - `supabase/migrations/0004_credentials_payouts.sql`
+   - `supabase/migrations/0005_set_credential.sql`
    - （任意）`supabase/seed.sql` … サンプルデータを入れる場合
 3. **Project Settings → API** から以下を控える
    - Project URL / `anon` public key / `service_role` key（秘匿）
@@ -73,24 +74,35 @@ Vercel（推奨）か Node サーバで動かす。
 
 ---
 
-## 5. パートナーのログイン認証情報を事前発行（Notion 保管）
+## 5. パートナー登録とログイン情報の発行（自動発行＋メール送信）
 
-弊社が ID/PASS をパターン発行し、アポ後にスタッフが登録時へ割り当てる運用。
+登録時に **ログインID・パスワードを自動発行**し、入力したメールアドレスへ送信します
+（事前発行スクリプトは不要になりました）。
 
-1. 認証情報を一括発行（例: 20件）
-   ```bash
-   cd partnersales
-   node scripts/generate-credentials.mjs 20 1
-   ```
-   - **標準出力の CSV**（login_id, password）を **Notion 等に保管**（平文はここだけ）
-   - 生成された **`credentials.sql`** を Supabase の SQL Editor で実行
-     （`partner_credentials` に未割り当てとしてハッシュ登録。`credentials.sql` は `.gitignore` 済み）
-2. アポ後、`/staff/login` でログイン → `/admin` →「パートナー登録」タブで会社情報を入力し、
-   未割り当ての **ログインID を割り当て**て登録（招待コード・個別ページが発行され、Notion へも同期）
+1. `/staff/login` でログイン → `/admin` →「パートナー登録」タブ
+2. 会社名・メール・紹介元（プルダウン）を入力して登録
+   - ログインID は空欄で自動採番（指定も可）
+   - パスワードは自動生成 → メール送信（メール未設定時は完了画面に表示）
 3. パートナーは `/login` で ID/PASS を入力 → **自分専用のマイページ `/me`** へ
 
 > ✅ 個別データは認証ゲート済み。パートナーは `/me` で**自分のツリー・報酬・明細のみ**閲覧可能。
 > スタッフは `/partners/[slug]` で任意のパートナーを閲覧可能（middleware でロール分離）。
+
+### 5-1. メール送信（Resend）の設定
+
+ログイン情報をメール送信するには Resend を設定します（未設定なら画面表示にフォールバック）。
+
+1. https://resend.com でアカウント作成 → **API Key** を発行
+2. 送信元ドメインを **Verify**（DNSレコード登録）。テストだけなら Resend の `onboarding@resend.dev` も可
+3. 環境変数を設定（`.env.local` と Vercel の両方）:
+   ```
+   RESEND_API_KEY=re_xxxx
+   EMAIL_FROM=PartnerSales <no-reply@your-domain.jp>
+   APP_URL=https://（本番URL）
+   ```
+
+> `scripts/generate-credentials.mjs`（事前発行スクリプト）は旧方式用で、現在は使わなくても登録できます。
+> 予約番号としてIDを先に確保したい場合のみ利用可。
 
 ## 6. 支払い運用（管理は `/admin` →「支払い」タブ）
 

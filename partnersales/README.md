@@ -3,7 +3,7 @@
 弊社の各サービスごとに報酬形態を設定し、**最大3段目** の紹介者まで報酬を分配する
 MLM 型リファラル管理システム。認証付きのパートナー専用ページと自社管理画面を提供する。
 
-> 仕様の詳細は [`docs/SPEC.md`](docs/SPEC.md)、立ち上げ手順は [`docs/RUNBOOK.md`](docs/RUNBOOK.md) を参照。
+> 仕様: [`docs/SPEC.md`](docs/SPEC.md) ／ 立ち上げ手順: [`docs/RUNBOOK.md`](docs/RUNBOOK.md) ／ スタッフ運用: [`docs/STAFF_MANUAL.md`](docs/STAFF_MANUAL.md)
 
 ## できること
 
