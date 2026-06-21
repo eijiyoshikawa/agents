@@ -265,3 +265,49 @@ export async function registerPartner(input: {
     },
   };
 }
+
+/** 既存パートナーのパスワードを再発行する（忘失・漏洩時） */
+export async function reissuePassword(partnerId: string): Promise<ActionResult> {
+  await requireStaff();
+  if (!hasServerSupabase()) return { ok: false, message: "Supabase 未設定です" };
+  if (!partnerId) return { ok: false, message: "パートナーを選択してください" };
+  const sb = getServerClient();
+
+  const { data: cred } = await sb
+    .from("partner_credentials")
+    .select("login_id")
+    .eq("partner_id", partnerId)
+    .maybeSingle();
+  if (!cred) return { ok: false, message: "このパートナーにはログインIDが割り当てられていません" };
+
+  const { data: partner } = await sb
+    .from("partners")
+    .select("name, contact_email")
+    .eq("id", partnerId)
+    .maybeSingle();
+
+  const password = generatePassword();
+  const { error } = await sb.rpc("set_credential", {
+    p_login_id: cred.login_id,
+    p_password: password,
+    p_partner_id: partnerId,
+  });
+  if (error) return { ok: false, message: `再発行に失敗: ${error.message}` };
+
+  const mail = await sendCredentialsEmail({
+    to: partner?.contact_email ?? "",
+    companyName: partner?.name ?? "",
+    loginId: cred.login_id,
+    password,
+  });
+
+  return {
+    ok: true,
+    message: `パスワードを再発行しました（${mail.sent ? "メール送信済み" : "メール未送信"}）`,
+    detail: {
+      ログインID: cred.login_id,
+      ...(mail.sent ? {} : { 新しいパスワード: password }),
+      メール: mail.sent ? `送信済み（${partner?.contact_email}）` : "未送信（上記を手動連絡）",
+    },
+  };
+}

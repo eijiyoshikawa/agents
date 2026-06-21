@@ -14,7 +14,12 @@ export async function POST(req: Request) {
   const sb = getServerClient();
   const { data, error } = await sb.rpc("partner_login", { p_login_id: loginId, p_password: password });
   if (error) {
-    return NextResponse.json({ error: "ログインに失敗しました" }, { status: 401 });
+    // ロック中はその旨を伝える（それ以外は汎用メッセージで詳細を伏せる）
+    const locked = error.message?.includes("ロック");
+    return NextResponse.json(
+      { error: locked ? error.message : "ログインに失敗しました" },
+      { status: locked ? 429 : 401 }
+    );
   }
   const row = Array.isArray(data) ? data[0] : data;
   if (!row?.slug) {

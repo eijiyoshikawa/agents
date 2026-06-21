@@ -64,7 +64,8 @@ export default function ServicesClient({ services, configured }: { services: Ser
       {err && <div className="pill pill-red" style={{ alignSelf: "start" }}>{err}</div>}
 
       {services.map((s) => (
-        <ServiceEditor key={s.id} initial={s} disabled={!configured} run={run} isNew={false} />
+        // サーバ状態が変わったら再マウントしてフォームを最新に同期
+        <ServiceEditor key={JSON.stringify(s)} initial={s} disabled={!configured} run={run} isNew={false} />
       ))}
 
       <ServiceEditor initial={emptyService()} disabled={!configured} run={run} isNew />

@@ -7,6 +7,8 @@ const STAFF_PASSPHRASE = process.env.STAFF_PASSPHRASE || "staff-demo";
 export async function POST(req: Request) {
   const { passphrase } = await req.json().catch(() => ({}));
   if (!passphrase || passphrase !== STAFF_PASSPHRASE) {
+    // 総当たりを遅延させる簡易対策
+    await new Promise((r) => setTimeout(r, 600));
     return NextResponse.json({ error: "合言葉が違います" }, { status: 401 });
   }
   await setSessionCookie({ role: "staff" });

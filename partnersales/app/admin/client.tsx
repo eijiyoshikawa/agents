@@ -9,6 +9,7 @@ import {
   markPayoutPaid,
   recordPayout,
   registerPartner,
+  reissuePassword,
   setDealStatus,
   type ActionResult,
 } from "./actions";
@@ -250,7 +251,42 @@ function RegisterTab({ data, run, disabled }: { data: AdminData; run: RunFn; dis
           )}
         </div>
       )}
+
+      <ReissueCard data={data} run={run} disabled={disabled} />
     </div>
+  );
+}
+
+function ReissueCard({ data, run, disabled }: { data: AdminData; run: RunFn; disabled: boolean }) {
+  const [partnerId, setPartnerId] = useState(data.partners[0]?.id ?? "");
+  const [detail, setDetail] = useState<Record<string, string> | null>(null);
+
+  return (
+    <form className="card" style={{ display: "grid", gap: 10 }}
+      onSubmit={async (e) => {
+        e.preventDefault();
+        if (!confirm("選択したパートナーのパスワードを再発行します。現在のパスワードは使えなくなります。よろしいですか？")) return;
+        const r = await run(() => reissuePassword(partnerId));
+        if (r.ok && r.detail) setDetail(r.detail); else setDetail(null);
+      }}>
+      <div className="h-section">パスワードの再発行（忘失・漏洩時）</div>
+      <p style={{ color: "var(--fg-muted)", fontSize: 12, margin: 0 }}>
+        新しいパスワードを発行し、登録メールへ送信します（メール未設定時は下に表示）。
+      </p>
+      <div style={{ display: "flex", gap: 8 }}>
+        <select style={{ ...input, flex: 1 }} value={partnerId} onChange={(e) => setPartnerId(e.target.value)}>
+          {data.partners.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+        </select>
+        <button className="btn btn-ghost" disabled={disabled || !partnerId}>再発行</button>
+      </div>
+      {detail && (
+        <div style={{ display: "grid", gap: 4, borderTop: "1px solid var(--card-border)", paddingTop: 8 }}>
+          {Object.entries(detail).map(([k, v]) => (
+            <div key={k} style={{ fontSize: 13 }}><span className="h-section">{k}: </span><code>{v}</code></div>
+          ))}
+        </div>
+      )}
+    </form>
   );
 }
 

@@ -18,6 +18,7 @@
    - `supabase/migrations/0004_credentials_payouts.sql`
    - `supabase/migrations/0005_set_credential.sql`
    - `supabase/migrations/0006_rate_snapshot_plans.sql`
+   - `supabase/migrations/0007_login_security.sql`
    - （任意）`supabase/seed.sql` … サンプルデータを入れる場合
 3. **Project Settings → API** から以下を控える
    - Project URL / `anon` public key / `service_role` key（秘匿）
