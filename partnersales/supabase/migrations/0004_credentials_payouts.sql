@@ -136,8 +136,8 @@ returns table (partner_id text, slug text, name text)
 language plpgsql security definer set search_path = public, extensions as $$
 declare v_hash text; v_status text; v_pid text;
 begin
-  select password_hash, status, partner_id into v_hash, v_status, v_pid
-    from partner_credentials where login_id = p_login_id;
+  select pc.password_hash, pc.status, pc.partner_id into v_hash, v_status, v_pid
+    from partner_credentials pc where pc.login_id = p_login_id;
   if v_hash is null or crypt(coalesce(p_password, ''), v_hash) <> v_hash then
     raise exception 'ログインに失敗しました';
   end if;
