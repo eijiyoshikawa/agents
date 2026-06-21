@@ -48,7 +48,7 @@ alter table public.app_secrets         enable row level security;
 
 -- スタッフ合言葉を設定／更新する（service_role で実行）
 create or replace function public.set_staff_secret(p_secret text)
-returns void language sql security definer set search_path = public as $$
+returns void language sql security definer set search_path = public, extensions as $$
   insert into app_secrets (key, value_hash)
   values ('staff', crypt(p_secret, gen_salt('bf')))
   on conflict (key) do update set value_hash = excluded.value_hash;
@@ -56,7 +56,7 @@ $$;
 
 -- 合言葉を検証。不一致なら例外
 create or replace function public.assert_staff(p_secret text)
-returns void language plpgsql security definer set search_path = public as $$
+returns void language plpgsql security definer set search_path = public, extensions as $$
 declare v_hash text;
 begin
   select value_hash into v_hash from app_secrets where key = 'staff';
@@ -80,7 +80,7 @@ create or replace function public.staff_register_partner(
   p_login_id      text
 )
 returns table (id text, slug text, referral_code text)
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = public, extensions as $$
 declare
   v_parent_id text;
   v_slug text;
@@ -133,7 +133,7 @@ $$;
 -- ─────────────────────────────────────────────
 create or replace function public.partner_login(p_login_id text, p_password text)
 returns table (partner_id text, slug text, name text)
-language plpgsql security definer set search_path = public as $$
+language plpgsql security definer set search_path = public, extensions as $$
 declare v_hash text; v_status text; v_pid text;
 begin
   select password_hash, status, partner_id into v_hash, v_status, v_pid
@@ -156,7 +156,7 @@ create or replace function public.staff_create_deal(
   p_introducer_partner_id text, p_amount bigint, p_status text,
   p_closed_at date, p_is_self_deal boolean, p_note text
 )
-returns text language plpgsql security definer set search_path = public as $$
+returns text language plpgsql security definer set search_path = public, extensions as $$
 declare v_id text := gen_random_uuid()::text;
 begin
   perform assert_staff(p_secret);
@@ -169,7 +169,7 @@ end;
 $$;
 
 create or replace function public.staff_set_deal_status(p_secret text, p_deal_id text, p_status text)
-returns void language plpgsql security definer set search_path = public as $$
+returns void language plpgsql security definer set search_path = public, extensions as $$
 begin
   perform assert_staff(p_secret);
   if p_status not in ('pending', 'confirmed', 'paid') then raise exception '不正なステータス: %', p_status; end if;
@@ -184,7 +184,7 @@ create or replace function public.staff_record_payout(
   p_secret text, p_partner_id text, p_amount bigint,
   p_status text, p_invoice_no text, p_note text
 )
-returns text language plpgsql security definer set search_path = public as $$
+returns text language plpgsql security definer set search_path = public, extensions as $$
 declare v_id text := gen_random_uuid()::text;
 begin
   perform assert_staff(p_secret);
@@ -196,7 +196,7 @@ end;
 $$;
 
 create or replace function public.staff_mark_payout_paid(p_secret text, p_payout_id text)
-returns void language plpgsql security definer set search_path = public as $$
+returns void language plpgsql security definer set search_path = public, extensions as $$
 begin
   perform assert_staff(p_secret);
   update payouts set status = 'paid', paid_at = current_date where id = p_payout_id;
