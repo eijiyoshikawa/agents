@@ -1,0 +1,25 @@
+{
+  "meeting_date": "YYYY-MM-DD",
+  "meeting_title": "",
+  "decisions": [
+    { "title": "", "detail": "", "decided_by": "" }
+  ],
+  "action_items": [
+    {
+      "id": "T-1",
+      "title": "",
+      "description": "",
+      "owner_agent": "",
+      "owner_agent_confidence": "high",
+      "priority": "high | medium | low",
+      "due": null,
+      "due_estimated": false,
+      "work_required": false,
+      "work_type": "implementation | research | document | communication | decision | none",
+      "dependencies": [],
+      "status": "todo"
+    }
+  ],
+  "open_questions": [],
+  "parked": []
+}
