@@ -261,7 +261,8 @@ function RatePlansTab({ data, run, disabled }: { data: AdminData; run: RunFn; di
         紹介者ごとに適用する料率を設定できます。成約時に、その紹介者のパターン（無ければサービス既定）が料率として記録されます。
       </p>
       {data.ratePlans.map((p) => (
-        <RatePlanEditor key={p.id} data={data} plan={p} run={run} disabled={disabled} isNew={false} />
+        // サーバ状態が変わったら再マウントして編集フォームを最新に同期（割り当ての取り違え防止）
+        <RatePlanEditor key={JSON.stringify(p)} data={data} plan={p} run={run} disabled={disabled} isNew={false} />
       ))}
       <RatePlanEditor data={data} plan={null} run={run} disabled={disabled} isNew />
     </div>
