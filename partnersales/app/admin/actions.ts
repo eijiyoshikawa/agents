@@ -7,7 +7,39 @@ import { generateReferralCode, randomCode, slugify } from "@/lib/referral-code";
 import { generatePassword } from "@/lib/credentials";
 import { syncPartnerToNotion } from "@/lib/integrations/notion";
 import { sendCredentialsEmail } from "@/lib/integrations/email";
-import type { DealStatus, Partner } from "@/lib/types";
+import { mergeRewards } from "@/lib/rates";
+import type { DealStatus, Partner, Tier, TierReward } from "@/lib/types";
+
+interface RewardRow {
+  service_id?: string;
+  tier: number;
+  type: "percentage" | "fixed";
+  rate: number | null;
+  fixed_amount: number | null;
+}
+function rowToReward(r: RewardRow): TierReward {
+  return { tier: r.tier as Tier, type: r.type, rate: r.rate ?? undefined, fixedAmount: r.fixed_amount ?? undefined };
+}
+
+/** 成約時点の料率スナップショットを解決（サービス既定 ← 紹介者の料率パターンで上書き） */
+async function resolveRewardSnapshot(
+  sb: ReturnType<typeof getServerClient>,
+  serviceId: string,
+  introducerPartnerId: string
+): Promise<TierReward[]> {
+  const { data: base } = await sb.from("service_rewards").select("*").eq("service_id", serviceId);
+  const baseRewards = ((base ?? []) as RewardRow[]).map(rowToReward);
+
+  const { data: partner } = await sb
+    .from("partners").select("rate_plan_id").eq("id", introducerPartnerId).maybeSingle();
+  const planId = (partner as { rate_plan_id: string | null } | null)?.rate_plan_id;
+  if (!planId) return baseRewards;
+
+  const { data: override } = await sb
+    .from("rate_plan_rewards").select("*").eq("plan_id", planId).eq("service_id", serviceId);
+  const overrideRewards = ((override ?? []) as RewardRow[]).map(rowToReward);
+  return mergeRewards(baseRewards, overrideRewards);
+}
 
 export interface ActionResult {
   ok: boolean;
@@ -49,6 +81,7 @@ export async function createDeal(input: {
   await requireStaff();
   if (!hasServerSupabase()) return { ok: false, message: "Supabase 未設定です" };
   const sb = getServerClient();
+  const snapshot = await resolveRewardSnapshot(sb, input.serviceId, input.introducerPartnerId);
   const { error } = await sb.from("deals").insert({
     service_id: input.serviceId,
     client_name: input.clientName,
@@ -58,9 +91,10 @@ export async function createDeal(input: {
     closed_at: input.closedAt,
     is_self_deal: input.isSelfDeal,
     note: input.note || null,
+    reward_snapshot: snapshot,
   });
   if (error) return { ok: false, message: error.message };
-  return { ok: true, message: "成約を登録しました" };
+  return { ok: true, message: "成約を登録しました（料率を記録）" };
 }
 
 export async function setDealStatus(dealId: string, status: DealStatus): Promise<ActionResult> {

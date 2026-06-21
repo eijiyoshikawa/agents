@@ -16,4 +16,7 @@ export const seedSource: DataSource = {
   async getPayouts() {
     return payouts;
   },
+  async getRatePlans() {
+    return [];
+  },
 };

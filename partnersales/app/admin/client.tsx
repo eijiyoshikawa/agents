@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Trash2 } from "lucide-react";
 import { yen } from "@/lib/format";
 import { PAYOUT_THRESHOLD } from "@/lib/payout";
 import {
@@ -12,12 +12,16 @@ import {
   setDealStatus,
   type ActionResult,
 } from "./actions";
+import { saveRatePlan, deleteRatePlan } from "./rate-actions";
 import type { DealStatus } from "@/lib/types";
+
+type TierRow = { tier: number; type: "percentage" | "fixed"; value: number };
 
 export interface AdminData {
   source: string;
   configured: boolean;
-  services: { id: string; name: string }[];
+  services: { id: string; name: string; rewards: TierRow[] }[];
+  ratePlans: { id: string; name: string; partnerIds: string[]; rewards: { serviceId: string; tier: number; type: "percentage" | "fixed"; value: number }[] }[];
   partners: { id: string; name: string; slug: string; referralCode: string; status: string }[];
   deals: { id: string; clientName: string; serviceName: string; introducer: string; amount: number; status: DealStatus; closedAt: string; isSelfDeal: boolean }[];
   payoutRows: { partnerId: string; name: string; confirmedTotal: number; paidOut: number; invoicedAmount: number; unsettled: number; phase: string }[];
@@ -30,7 +34,8 @@ const input: React.CSSProperties = {
 };
 const phaseLabel: Record<string, string> = { below_threshold: "下限未満（繰越）", eligible: "請求書発行依頼", invoiced: "入金待ち" };
 const phasePill: Record<string, string> = { below_threshold: "pill", eligible: "pill pill-brand", invoiced: "pill pill-amber" };
-const tabs = ["成約", "支払い", "パートナー登録"] as const;
+const tierLabel = ["tier1（直接）", "tier2（1段上）", "tier3（2段上）"];
+const tabs = ["成約", "支払い", "パートナー登録", "料率パターン"] as const;
 type Tab = (typeof tabs)[number];
 
 export default function AdminClient({ data }: { data: AdminData }) {
@@ -76,6 +81,7 @@ export default function AdminClient({ data }: { data: AdminData }) {
       {tab === "成約" && <DealsTab data={data} run={run} />}
       {tab === "支払い" && <PayoutTab data={data} run={run} />}
       {tab === "パートナー登録" && <RegisterTab data={data} run={run} disabled={!data.configured} />}
+      {tab === "料率パターン" && <RatePlansTab data={data} run={run} disabled={!data.configured} />}
     </div>
   );
 }
@@ -245,5 +251,105 @@ function RegisterTab({ data, run, disabled }: { data: AdminData; run: RunFn; dis
         </div>
       )}
     </div>
+  );
+}
+
+function RatePlansTab({ data, run, disabled }: { data: AdminData; run: RunFn; disabled: boolean }) {
+  return (
+    <div style={{ display: "grid", gap: 16 }}>
+      <p className="h-section" style={{ textTransform: "none", letterSpacing: 0 }}>
+        紹介者ごとに適用する料率を設定できます。成約時に、その紹介者のパターン（無ければサービス既定）が料率として記録されます。
+      </p>
+      {data.ratePlans.map((p) => (
+        <RatePlanEditor key={p.id} data={data} plan={p} run={run} disabled={disabled} isNew={false} />
+      ))}
+      <RatePlanEditor data={data} plan={null} run={run} disabled={disabled} isNew />
+    </div>
+  );
+}
+
+function RatePlanEditor({
+  data, plan, run, disabled, isNew,
+}: {
+  data: AdminData;
+  plan: AdminData["ratePlans"][number] | null;
+  run: RunFn; disabled: boolean; isNew: boolean;
+}) {
+  const buildRewards = (): Record<string, TierRow[]> => {
+    const map: Record<string, TierRow[]> = {};
+    for (const s of data.services) {
+      map[s.id] = [1, 2, 3].map((t) => {
+        const fromPlan = plan?.rewards.find((r) => r.serviceId === s.id && r.tier === t);
+        const def = s.rewards.find((r) => r.tier === t);
+        const src = fromPlan ?? def;
+        return { tier: t, type: src?.type ?? "percentage", value: src?.value ?? 0 };
+      });
+    }
+    return map;
+  };
+  const [name, setName] = useState(plan?.name ?? "");
+  const [rewards, setRewards] = useState<Record<string, TierRow[]>>(buildRewards);
+  const [partnerIds, setPartnerIds] = useState<string[]>(plan?.partnerIds ?? []);
+
+  const setR = (serviceId: string, tier: number, patch: Partial<TierRow>) =>
+    setRewards((m) => ({ ...m, [serviceId]: m[serviceId].map((r) => (r.tier === tier ? { ...r, ...patch } : r)) }));
+  const togglePartner = (id: string) =>
+    setPartnerIds((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]));
+
+  return (
+    <form className="card" style={{ display: "grid", gap: 12, borderStyle: isNew ? "dashed" : "solid" }}
+      onSubmit={(e) => {
+        e.preventDefault();
+        const flat = Object.entries(rewards).flatMap(([serviceId, rows]) =>
+          rows.map((r) => ({ serviceId, tier: r.tier, type: r.type, value: r.value })));
+        run(() => saveRatePlan({ id: isNew ? undefined : plan!.id, name, rewards: flat, partnerIds }));
+        if (isNew) { setName(""); setPartnerIds([]); setRewards(buildRewards()); }
+      }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <strong style={{ fontSize: 15 }}>{isNew ? "＋ 新規料率パターン" : plan!.name}</strong>
+        {!isNew && <span className="pill">{partnerIds.length}名に適用</span>}
+      </div>
+      <label style={{ display: "grid", gap: 4 }}><span className="h-section">パターン名 *</span>
+        <input style={input} value={name} onChange={(e) => setName(e.target.value)} required /></label>
+
+      {data.services.map((s) => (
+        <div key={s.id} style={{ border: "1px solid var(--card-border)", borderRadius: 8, padding: 10 }}>
+          <div className="h-section" style={{ marginBottom: 6 }}>{s.name}</div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
+            {rewards[s.id]?.map((r, i) => (
+              <div key={r.tier} style={{ display: "grid", gap: 4 }}>
+                <span className="h-section">{tierLabel[i]}</span>
+                <select style={input} value={r.type} onChange={(e) => setR(s.id, r.tier, { type: e.target.value as TierRow["type"] })}>
+                  <option value="percentage">％</option><option value="fixed">円</option>
+                </select>
+                <input style={input} type="number" min={0} value={r.value} onChange={(e) => setR(s.id, r.tier, { value: Number(e.target.value) })} />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
+      <div>
+        <div className="h-section" style={{ marginBottom: 6 }}>適用する紹介者</div>
+        {data.partners.length === 0 && <div style={{ color: "var(--fg-muted)", fontSize: 13 }}>パートナーがいません</div>}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, maxHeight: 180, overflow: "auto" }}>
+          {data.partners.map((p) => (
+            <label key={p.id} style={{ display: "flex", gap: 4, alignItems: "center", fontSize: 13, border: "1px solid var(--card-border)", borderRadius: 6, padding: "4px 8px" }}>
+              <input type="checkbox" checked={partnerIds.includes(p.id)} onChange={() => togglePartner(p.id)} /> {p.name}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ display: "flex", gap: 8 }}>
+        <button className="btn btn-primary" disabled={disabled} style={{ marginLeft: "auto" }}>{isNew ? "作成" : "保存"}</button>
+        {!isNew && (
+          <button type="button" className="btn btn-ghost" disabled={disabled}
+            onClick={() => { if (confirm(`「${plan!.name}」を削除しますか？`)) run(() => deleteRatePlan(plan!.id)); }}>
+            <Trash2 size={14} /> 削除
+          </button>
+        )}
+      </div>
+    </form>
   );
 }

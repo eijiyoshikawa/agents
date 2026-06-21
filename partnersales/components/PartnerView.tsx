@@ -6,6 +6,7 @@ import { statsFor } from "@/lib/metrics";
 import { PAYOUT_METHOD, PAYOUT_THRESHOLD } from "@/lib/payout";
 import { monthlyTotals, statementForPartner } from "@/lib/statement";
 import TreeView from "@/components/TreeView";
+import Counter from "@/components/Counter";
 import type { getModel } from "@/lib/metrics";
 import type { Partner } from "@/lib/types";
 
@@ -45,14 +46,16 @@ export default function PartnerView({
 
       <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 14 }}>
         {[
-          { label: "自身＋配下 総売上", value: yen(stat?.totalSales ?? 0) },
-          { label: "確定報酬", value: yen(earn?.confirmed ?? 0) },
-          { label: "見込み報酬", value: yen(earn?.pending ?? 0) },
-          { label: "ダウンライン", value: `${stat?.downlineCount ?? 0}名` },
+          { label: "自身＋配下 総売上", value: stat?.totalSales ?? 0, prefix: "¥", suffix: "" },
+          { label: "確定報酬", value: earn?.confirmed ?? 0, prefix: "¥", suffix: "" },
+          { label: "見込み報酬", value: earn?.pending ?? 0, prefix: "¥", suffix: "" },
+          { label: "ダウンライン", value: stat?.downlineCount ?? 0, prefix: "", suffix: "名" },
         ].map((s) => (
           <div key={s.label} className="card">
             <div className="h-section">{s.label}</div>
-            <div className="stat-num" style={{ fontSize: 22, marginTop: 6 }}>{s.value}</div>
+            <div style={{ fontSize: 22, marginTop: 6 }}>
+              <Counter value={s.value} prefix={s.prefix} suffix={s.suffix} />
+            </div>
           </div>
         ))}
       </section>
@@ -67,8 +70,8 @@ export default function PartnerView({
           )}
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 12 }}>
-          <div><div className="h-section">未精算（支払い対象）</div><div className="stat-num" style={{ fontSize: 18 }}>{yen(payout?.unsettled ?? 0)}</div></div>
-          <div><div className="h-section">振込済み累計</div><div className="stat-num" style={{ fontSize: 18 }}>{yen(payout?.paidOut ?? 0)}</div></div>
+          <div><div className="h-section">未精算（支払い対象）</div><div style={{ fontSize: 18 }}><Counter value={payout?.unsettled ?? 0} prefix="¥" /></div></div>
+          <div><div className="h-section">振込済み累計</div><div style={{ fontSize: 18 }}><Counter value={payout?.paidOut ?? 0} prefix="¥" /></div></div>
           <div><div className="h-section">支払い下限</div><div className="stat-num" style={{ fontSize: 18 }}>{yen(PAYOUT_THRESHOLD)}</div></div>
         </div>
         <p style={{ color: "var(--fg-muted)", fontSize: 12, margin: 0 }}>

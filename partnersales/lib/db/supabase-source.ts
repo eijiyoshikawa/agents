@@ -2,7 +2,7 @@
 // DB 行（snake_case）→ ドメイン型（camelCase）へマッピングする。
 import type { DataSource } from "./source";
 import { getServerClient } from "./supabase";
-import type { Deal, Partner, Payout, Service, Tier, TierReward } from "@/lib/types";
+import type { Deal, Partner, Payout, RatePlan, Service, Tier, TierReward } from "@/lib/types";
 
 interface ServiceRow {
   id: string;
@@ -28,6 +28,7 @@ interface PartnerRow {
   contact_email: string | null;
   joined_at: string;
   status: Partner["status"];
+  rate_plan_id: string | null;
 }
 interface DealRow {
   id: string;
@@ -39,6 +40,7 @@ interface DealRow {
   closed_at: string;
   is_self_deal: boolean;
   note: string | null;
+  reward_snapshot: TierReward[] | null;
 }
 interface PayoutRow {
   id: string;
@@ -99,6 +101,7 @@ export const supabaseSource: DataSource = {
       contact: { person: p.contact_person ?? undefined, email: p.contact_email ?? undefined },
       joinedAt: p.joined_at,
       status: p.status,
+      ratePlanId: p.rate_plan_id,
     }));
   },
 
@@ -115,6 +118,7 @@ export const supabaseSource: DataSource = {
       status: d.status,
       closedAt: d.closed_at,
       isSelfDeal: d.is_self_deal,
+      rewards: d.reward_snapshot ?? undefined,
       note: d.note ?? undefined,
     }));
   },
@@ -132,6 +136,38 @@ export const supabaseSource: DataSource = {
       invoicedAt: p.invoiced_at ?? undefined,
       paidAt: p.paid_at ?? undefined,
       note: p.note ?? undefined,
+    }));
+  },
+
+  async getRatePlans() {
+    const sb = getServerClient();
+    const [{ data: plans, error: e1 }, { data: rewards, error: e2 }, { data: parts, error: e3 }] =
+      await Promise.all([
+        sb.from("rate_plans").select("*"),
+        sb.from("rate_plan_rewards").select("*"),
+        sb.from("partners").select("id, rate_plan_id"),
+      ]);
+    if (e1) throw e1;
+    if (e2) throw e2;
+    if (e3) throw e3;
+
+    type PlanRewardRow = RewardRow & { plan_id: string };
+    const rewardsByPlan = new Map<string, RatePlan["rewards"]>();
+    for (const row of (rewards ?? []) as PlanRewardRow[]) {
+      if (!rewardsByPlan.has(row.plan_id)) rewardsByPlan.set(row.plan_id, []);
+      rewardsByPlan.get(row.plan_id)!.push({ serviceId: row.service_id, reward: toReward(row) });
+    }
+    const partnersByPlan = new Map<string, string[]>();
+    for (const p of (parts ?? []) as { id: string; rate_plan_id: string | null }[]) {
+      if (!p.rate_plan_id) continue;
+      if (!partnersByPlan.has(p.rate_plan_id)) partnersByPlan.set(p.rate_plan_id, []);
+      partnersByPlan.get(p.rate_plan_id)!.push(p.id);
+    }
+    return ((plans ?? []) as { id: string; name: string }[]).map<RatePlan>((p) => ({
+      id: p.id,
+      name: p.name,
+      rewards: rewardsByPlan.get(p.id) ?? [],
+      partnerIds: partnersByPlan.get(p.id) ?? [],
     }));
   },
 };

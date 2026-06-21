@@ -44,6 +44,18 @@ export interface Partner {
   contact?: { person?: string; email?: string };
   joinedAt: string; // ISO date
   status: "active" | "dormant" | "suspended";
+  /** 適用する料率パターン。null ならサービス既定 */
+  ratePlanId?: string | null;
+}
+
+/** 名前付きの料率パターン（サービス × 段の報酬を上書き） */
+export interface RatePlan {
+  id: string;
+  name: string;
+  /** サービスごとの上書き報酬 */
+  rewards: { serviceId: string; reward: TierReward }[];
+  /** このパターンを適用する紹介者（パートナー）ID */
+  partnerIds: string[];
 }
 
 export type DealStatus = "pending" | "confirmed" | "paid";
@@ -68,6 +80,12 @@ export interface Deal {
    * true のとき tier1 は支払わない（上位の tier2 / tier3 は通常どおり支払う）。
    */
   isSelfDeal?: boolean;
+  /**
+   * 成約時点の料率スナップショット。存在すればこれを使って報酬を計算する
+   * （サービス既定の料率を後から変えても、この成約の報酬は変わらない）。
+   * 未設定（旧データ）はサービス既定にフォールバック。
+   */
+  rewards?: TierReward[];
   /** 任意のメモ */
   note?: string;
 }

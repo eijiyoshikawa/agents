@@ -47,9 +47,9 @@ export function commissionsForDeal(
 ): Commission[] {
   const chain = uplineChain(deal.introducerPartnerId, partnersById, MAX_TIERS);
   const status = commissionStatusOf(deal);
-  const rewardByTier = new Map<Tier, TierReward>(
-    service.rewards.map((r) => [r.tier, r])
-  );
+  // 成約時点のスナップショットがあればそれを使う（サービス既定の後からの変更に影響されない）
+  const plan = deal.rewards && deal.rewards.length > 0 ? deal.rewards : service.rewards;
+  const rewardByTier = new Map<Tier, TierReward>(plan.map((r) => [r.tier, r]));
 
   const result: Commission[] = [];
   chain.forEach((partner, idx) => {

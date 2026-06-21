@@ -4,6 +4,7 @@ import { getModel } from "@/lib/metrics";
 import { requireStaff } from "@/lib/auth/server";
 import { yen } from "@/lib/format";
 import TreeView from "@/components/TreeView";
+import Counter from "@/components/Counter";
 
 export default async function Dashboard() {
   await requireStaff();
@@ -24,15 +25,17 @@ export default async function Dashboard() {
 
       <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14 }}>
         {[
-          { label: "総売上", value: yen(totalSales) },
-          { label: "確定報酬", value: yen(totalConfirmed) },
-          { label: "見込み報酬", value: yen(totalPending) },
-          { label: "パートナー数", value: String(m.partners.length) },
-          { label: "支払い対象（要請求書）", value: `${m.payoutQueue.length}件` },
+          { label: "総売上", value: totalSales, prefix: "¥", suffix: "" },
+          { label: "確定報酬", value: totalConfirmed, prefix: "¥", suffix: "" },
+          { label: "見込み報酬", value: totalPending, prefix: "¥", suffix: "" },
+          { label: "パートナー数", value: m.partners.length, prefix: "", suffix: "" },
+          { label: "支払い対象（要請求書）", value: m.payoutQueue.length, prefix: "", suffix: "件" },
         ].map((s) => (
           <div key={s.label} className="card">
             <div className="h-section">{s.label}</div>
-            <div className="stat-num" style={{ fontSize: 24, marginTop: 6 }}>{s.value}</div>
+            <div style={{ fontSize: 24, marginTop: 6 }}>
+              <Counter value={s.value} prefix={s.prefix} suffix={s.suffix} />
+            </div>
           </div>
         ))}
       </section>
