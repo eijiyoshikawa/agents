@@ -203,3 +203,46 @@
 @media (prefers-reduced-motion: reduce) {
   .ps-spinner { animation-duration: 1.6s; }
 }
+
+/* ───────── 組織図（紹介ツリー）: 上→下のツリー、枝線つき ───────── */
+.org-tree { overflow-x: auto; padding: 8px 4px 20px; }
+.org-tree .org-inner { display: inline-block; min-width: 100%; }
+.org-tree ul {
+  display: flex; justify-content: center; align-items: flex-start;
+  padding-top: 24px; position: relative; margin: 0; list-style: none;
+}
+.org-tree li {
+  list-style: none; position: relative; padding: 24px 12px 0;
+  display: flex; flex-direction: column; align-items: center;
+}
+/* 子へ伸びる枝線 */
+.org-tree li::before, .org-tree li::after {
+  content: ""; position: absolute; top: 0; right: 50%;
+  border-top: 2px solid var(--card-border); width: 50%; height: 24px;
+}
+.org-tree li::after {
+  right: auto; left: 50%; border-left: 2px solid var(--card-border);
+}
+.org-tree li:only-child::before, .org-tree li:only-child::after { display: none; }
+.org-tree li:only-child { padding-top: 0; }
+.org-tree li:first-child::before, .org-tree li:last-child::after { border: 0 none; }
+.org-tree li:last-child::before { border-right: 2px solid var(--card-border); border-radius: 0 6px 0 0; }
+.org-tree li:first-child::after { border-radius: 6px 0 0 0; }
+.org-tree ul ul::before {
+  content: ""; position: absolute; top: 0; left: 50%;
+  border-left: 2px solid var(--card-border); width: 0; height: 24px;
+}
+.org-node {
+  width: 210px; background: var(--card); border: 1px solid var(--card-border);
+  border-radius: 12px; padding: 10px 12px; text-align: left;
+  box-shadow: 0 1px 2px rgba(15,15,18,.04); transition: box-shadow .2s, transform .2s, border-color .2s;
+}
+.org-node:hover { box-shadow: 0 8px 24px -10px rgba(15,15,18,.28); transform: translateY(-1px); }
+.dark .org-node:hover { box-shadow: 0 8px 24px -10px rgba(0,0,0,.6); }
+.org-node-root { border-color: var(--accent); box-shadow: 0 0 0 1px rgba(34,197,138,.25); }
+.org-toggle {
+  margin-top: 8px; width: 100%; display: flex; align-items: center; justify-content: center; gap: 4px;
+  font-size: 11px; color: var(--fg-muted); background: var(--hover);
+  border: none; border-radius: 6px; padding: 3px 0; cursor: pointer;
+}
+.org-toggle:hover { color: var(--fg); }

@@ -85,7 +85,7 @@ export default async function Dashboard() {
         <h2 style={{ fontSize: 16, fontWeight: 700, marginBottom: 10, display: "flex", alignItems: "center", gap: 8 }}>
           <Network size={16} /> 全体紹介ツリー
         </h2>
-        <TreeView roots={m.forest} metrics={m.metrics} />
+        <TreeView roots={m.forest} metrics={m.metrics} rootLabel="自社（LET）" />
       </section>
     </div>
   );

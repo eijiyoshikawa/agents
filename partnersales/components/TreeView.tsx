@@ -28,47 +28,42 @@ function Node({
   const hasChildren = node.children.length > 0;
 
   return (
-    <li style={{ marginLeft: node.depth === 0 ? 0 : 18, borderLeft: node.depth === 0 ? "none" : "1px solid var(--card-border)", paddingLeft: node.depth === 0 ? 0 : 14 }}>
-      <div className="card card-hover" style={{ padding: "10px 14px", marginBottom: 8, display: "flex", alignItems: "center", gap: 12 }}>
-        <button
-          onClick={() => setOpen((v) => !v)}
-          className="btn-ghost"
-          style={{ padding: 4, borderRadius: 6, visibility: hasChildren ? "visible" : "hidden" }}
-          aria-label={open ? "折りたたむ" : "展開"}
-        >
-          {open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-        </button>
-        <span className={`pill ${tierTint[Math.min(node.depth, 3)]}`}>L{node.depth}</span>
-        <div style={{ minWidth: 0, flex: 1 }}>
-          <div style={{ fontWeight: 600, fontSize: 14 }}>
+    <li>
+      <div className={`org-node ${node.depth === 0 ? "org-node-root" : ""}`}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+          <span className={`pill ${tierTint[Math.min(node.depth, 3)]}`}>L{node.depth}</span>
+          <div style={{ fontWeight: 600, fontSize: 13, lineHeight: 1.25, minWidth: 0, flex: 1 }}>
             {linkPartners ? (
               <Link href={`/partners/${node.partner.slug}`}>{node.partner.name}</Link>
             ) : (
               node.partner.name
             )}
-            {node.partner.status === "dormant" && <span className="pill pill-amber" style={{ marginLeft: 8 }}>休眠</span>}
           </div>
-          <div className="h-section" style={{ marginTop: 2 }}>
-            <code>{node.partner.referralCode}</code>
-            {hasChildren && (
-              <span style={{ marginLeft: 10 }}>
-                <Users size={11} style={{ display: "inline", verticalAlign: "-1px" }} /> {node.children.length} 直紹介
-              </span>
-            )}
-          </div>
+          {node.partner.status === "dormant" && <span className="pill pill-amber">休眠</span>}
+        </div>
+        <div className="h-section" style={{ textTransform: "none", letterSpacing: 0 }}>
+          <code>{node.partner.referralCode}</code>
+          {hasChildren && (
+            <span style={{ marginLeft: 8 }}>
+              <Users size={11} style={{ display: "inline", verticalAlign: "-1px" }} /> {node.children.length}
+            </span>
+          )}
         </div>
         {m && (
-          <div style={{ textAlign: "right", fontSize: 12 }}>
-            <div className="stat-num" style={{ fontSize: 14 }}>{yen(m.totalSales)}</div>
-            <div className="h-section">
-              報酬確定 {yen(m.confirmed)}
-              {m.pending > 0 && <span style={{ color: "var(--fg-muted)" }}> / 見込 {yen(m.pending)}</span>}
-            </div>
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 12 }}>
+            <span className="stat-num">{yen(m.totalSales)}</span>
+            <span className="h-section" style={{ textTransform: "none", letterSpacing: 0 }}>報酬 {yen(m.confirmed)}</span>
           </div>
+        )}
+        {hasChildren && (
+          <button className="org-toggle" onClick={() => setOpen((v) => !v)} aria-label={open ? "折りたたむ" : "展開"}>
+            {open ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+            {open ? "閉じる" : `配下 ${node.children.length} を開く`}
+          </button>
         )}
       </div>
       {hasChildren && open && (
-        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+        <ul>
           {node.children.map((c) => (
             <Node key={c.partner.id} node={c} metrics={metrics} linkPartners={linkPartners} />
           ))}
@@ -82,16 +77,41 @@ export default function TreeView({
   roots,
   metrics,
   linkPartners = true,
+  rootLabel,
 }: {
   roots: TreeNode[];
   metrics: Map<string, NodeMetric>;
   linkPartners?: boolean;
+  /** 複数ルートを束ねる仮想ルートのラベル（例: 自社）。単一ルート時は不要 */
+  rootLabel?: string;
 }) {
+  if (roots.length === 0) {
+    return <div style={{ color: "var(--fg-muted)", fontSize: 13 }}>表示できるパートナーがいません。</div>;
+  }
+
+  const useSynthetic = Boolean(rootLabel) || roots.length > 1;
+
   return (
-    <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-      {roots.map((r) => (
-        <Node key={r.partner.id} node={r} metrics={metrics} linkPartners={linkPartners} />
-      ))}
-    </ul>
+    <div className="org-tree scrollbar-thin">
+      <div className="org-inner">
+        <ul>
+          {useSynthetic ? (
+            <li>
+              <div className="org-node org-node-root" style={{ textAlign: "center" }}>
+                <div style={{ fontWeight: 700, fontSize: 13 }}>{rootLabel ?? "ルート"}</div>
+                <div className="h-section" style={{ marginTop: 2 }}>{roots.length} 系列</div>
+              </div>
+              <ul>
+                {roots.map((r) => (
+                  <Node key={r.partner.id} node={r} metrics={metrics} linkPartners={linkPartners} />
+                ))}
+              </ul>
+            </li>
+          ) : (
+            <Node node={roots[0]} metrics={metrics} linkPartners={linkPartners} />
+          )}
+        </ul>
+      </div>
+    </div>
   );
 }
