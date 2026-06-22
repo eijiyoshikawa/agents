@@ -6,6 +6,7 @@ import { yen } from "@/lib/format";
 import { PAYOUT_THRESHOLD } from "@/lib/payout";
 import {
   createDeal,
+  deleteDeal,
   markPayoutPaid,
   recordPayout,
   registerPartner,
@@ -144,6 +145,11 @@ function DealsTab({ data, run }: { data: AdminData; run: RunFn }) {
               <option value="confirmed">confirmed</option>
               <option value="paid">paid</option>
             </select>
+            <button type="button" className="btn btn-ghost" disabled={disabled} style={{ padding: "6px 8px" }}
+              title="この成約を削除"
+              onClick={() => { if (confirm(`成約「${d.clientName}（${yen(d.amount)}）」を削除しますか？報酬も再計算されます。`)) run(() => deleteDeal(d.id)); }}>
+              <Trash2 size={14} />
+            </button>
           </div>
         ))}
       </div>

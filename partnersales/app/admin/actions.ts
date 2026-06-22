@@ -106,6 +106,15 @@ export async function setDealStatus(dealId: string, status: DealStatus): Promise
   return { ok: true, message: "ステータスを更新しました" };
 }
 
+export async function deleteDeal(dealId: string): Promise<ActionResult> {
+  await requireStaff();
+  if (!hasServerSupabase()) return { ok: false, message: "Supabase 未設定です" };
+  const sb = getServerClient();
+  const { error } = await sb.from("deals").delete().eq("id", dealId);
+  if (error) return { ok: false, message: error.message };
+  return { ok: true, message: "成約を削除しました" };
+}
+
 export async function recordPayout(input: {
   partnerId: string;
   amount: number;
