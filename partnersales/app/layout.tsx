@@ -12,8 +12,12 @@ const staffNav = [
   { href: "/", label: "ダッシュボード" },
   { href: "/services", label: "サービス・報酬" },
   { href: "/admin", label: "スタッフ管理" },
+  { href: "/guide", label: "ガイド" },
 ];
-const partnerNav = [{ href: "/me", label: "マイページ" }];
+const partnerNav = [
+  { href: "/me", label: "マイページ" },
+  { href: "/guide", label: "ガイド・シミュレーション" },
+];
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();

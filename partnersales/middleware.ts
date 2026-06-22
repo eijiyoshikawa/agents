@@ -30,6 +30,12 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
+  // ガイド（ログインしていれば誰でも閲覧可：パートナー本来の利用＋スタッフのプレビュー）
+  if (pathname === "/guide") {
+    if (session) return NextResponse.next();
+    return NextResponse.redirect(new URL("/login", req.url));
+  }
+
   // それ以外（ダッシュボード・管理・サービス・個別ページ）はスタッフ専用
   if (session?.role === "staff") return NextResponse.next();
   return NextResponse.redirect(new URL("/staff/login", req.url));
