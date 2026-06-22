@@ -134,11 +134,12 @@
       "priority": "high",
       "due": null,
       "due_estimated": false,
-      "work_required": false,
+      "work_required": true,
       "work_type": "document",
       "dependencies": [],
-      "status": "handoff",
-      "note": "本組織で構成方針（ADR/アーキテクチャ設計書）のドラフト作成が可能（要GO）。実アカウント統合作業は管理者対応。"
+      "status": "done",
+      "deliverable": "agents/tech_lead/adr/ADR-0001-claude-github-notion-integration.md",
+      "note": "構成方針のADRドラフトを作成済み（Proposed）。CEO/COO承認・Finance見積・Legalレビューが次アクション。実アカウント統合作業は管理者対応。"
     }
   ],
   "open_questions": [

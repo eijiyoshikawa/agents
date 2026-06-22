@@ -2,9 +2,9 @@
 
 ## サマリー
 - 抽出タスク: 9 件（決定事項 4 / 論点 4 / 保留 2）
-- このセッションで完了したコード作業: 0 件
-- 要フォロー（人手・外部対応が必要）: 9 件すべて
-- 作業ブランチ: なし（本リポジトリ内で完結する実装タスクが無かったため未作成）
+- このセッションで完了した成果物: 1 件（T-9 ADRドラフト）
+- 要フォロー（人手・外部対応が必要）: 8 件
+- 作業ブランチ: `board/2026-06-15-board-meeting`（T-9 のADR作成のため作成）
 
 > 今回のアクションは「Notion×マネフォ連携」「厚労省許可」「営業リスト購入」「人間同士の打ち合わせ」など外部・運用系が中心で、本リポジトリ内で即着手できるコード作業はありませんでした。設計ドキュメント化やスクリプト実装で当組織が引き取れる候補は下表「在庫化候補」を参照。
 
@@ -25,7 +25,7 @@
 | T-6 | アナリティクスプロ申請問題の解決 | infrastructure | medium | 不要（外部） | handoff |
 | T-7 | 営業Aランクリスト追加（約2000円・150社） | sales | high | 不要（購入）※ | handoff |
 | T-8 | Pワーク（厚労省許可）依頼先を確定 | legal | high | 不要（人手） | handoff |
-| T-9 | Claude+GitHub+Notion 統合プラットフォーム構成 | tech_lead | high | 不要（外部）※ | handoff |
+| T-9 | Claude+GitHub+Notion 統合プラットフォーム構成 | tech_lead | high | **完了（ADR）** | **done** |
 
 ※ = 本組織で設計ドキュメント／スクリプト化が可能な「在庫化候補」。
 
@@ -35,7 +35,7 @@
 | T-2 | 契約DB×売掛×買掛×入金 の**データモデル設計書**（マネフォ連携前提） | data_engineer / finance |
 | T-3 | Notion **IA（情報設計）再構築案** | coo / data_engineer |
 | T-7 | **Google Maps API 営業リスト自動収集スクリプト**（要 APIキー） | data_engineer |
-| T-9 | **Claude+GitHub+Notion 統合アーキテクチャ設計書（ADR）** | tech_lead / infrastructure |
+| T-9 | ✅ **作成済み** → `agents/tech_lead/adr/ADR-0001-claude-github-notion-integration.md` | tech_lead / infrastructure |
 
 ## 要フォロー（人手・外部対応）
 - T-1 / T-8: 人間の打ち合わせ・許可申請（担当者の対応が必要）。
