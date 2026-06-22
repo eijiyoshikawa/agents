@@ -67,37 +67,45 @@ export interface NotionSyncResult {
 }
 
 /**
- * Notion DB に1行追加する。NOTION_TOKEN 未設定ならスタブとしてペイロードのみ返す。
- * サーバ／Edge Function 上で実行する想定（ブラウザからトークンを使わない）。
+ * Notion DB に1行追加（または既存ページを更新）する。
+ * existingPageId があれば PATCH で更新、無ければ POST で新規作成。
+ * NOTION_TOKEN 未設定ならスタブとしてペイロードのみ返す。
  */
 export async function syncPartnerToNotion(
   partner: Partner,
-  referrerName?: string
+  referrerName?: string,
+  existingPageId?: string | null
 ): Promise<NotionSyncResult> {
-  const payload = {
-    parent: { database_id: NOTION_DATABASE_ID },
-    properties: buildNotionProperties(partner, referrerName),
-  };
+  const properties = buildNotionProperties(partner, referrerName);
+  const payload = { parent: { database_id: NOTION_DATABASE_ID }, properties };
 
   const token = process.env.NOTION_TOKEN;
   if (!token) {
     return { ok: false, payload, note: "NOTION_TOKEN 未設定: 送信せずペイロードのみ返却（スタブ）" };
   }
 
-  const res = await fetch("https://api.notion.com/v1/pages", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Notion-Version": NOTION_VERSION,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    "Notion-Version": NOTION_VERSION,
+    "Content-Type": "application/json",
+  };
+
+  const res = existingPageId
+    ? await fetch(`https://api.notion.com/v1/pages/${existingPageId}`, {
+        method: "PATCH",
+        headers,
+        body: JSON.stringify({ properties }),
+      })
+    : await fetch("https://api.notion.com/v1/pages", {
+        method: "POST",
+        headers,
+        body: JSON.stringify(payload),
+      });
 
   if (!res.ok) {
     const text = await res.text();
     return { ok: false, payload, note: `Notion API エラー: ${res.status} ${text}` };
   }
   const json = (await res.json()) as { id: string };
-  return { ok: true, notionPageId: json.id, payload };
+  return { ok: true, notionPageId: json.id ?? existingPageId ?? undefined, payload };
 }

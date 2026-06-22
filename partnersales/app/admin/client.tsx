@@ -11,6 +11,8 @@ import {
   registerPartner,
   reissuePassword,
   setDealStatus,
+  syncAllPartnersNotion,
+  syncPartnerNotion,
   type ActionResult,
 } from "./actions";
 import { saveRatePlan, deleteRatePlan } from "./rate-actions";
@@ -253,6 +255,31 @@ function RegisterTab({ data, run, disabled }: { data: AdminData; run: RunFn; dis
       )}
 
       <ReissueCard data={data} run={run} disabled={disabled} />
+      <NotionSyncCard data={data} run={run} disabled={disabled} />
+    </div>
+  );
+}
+
+function NotionSyncCard({ data, run, disabled }: { data: AdminData; run: RunFn; disabled: boolean }) {
+  const [partnerId, setPartnerId] = useState(data.partners[0]?.id ?? "");
+  return (
+    <div className="card" style={{ display: "grid", gap: 10 }}>
+      <div className="h-section">Notion 同期（DB_協業先管理）</div>
+      <p style={{ color: "var(--fg-muted)", fontSize: 12, margin: 0 }}>
+        新規登録は自動同期されます。既存パートナーはここで同期/再同期できます（要 NOTION_TOKEN）。
+      </p>
+      <div style={{ display: "flex", gap: 8 }}>
+        <select style={{ ...input, flex: 1 }} value={partnerId} onChange={(e) => setPartnerId(e.target.value)}>
+          {data.partners.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+        </select>
+        <button className="btn btn-ghost" disabled={disabled || !partnerId} onClick={() => run(() => syncPartnerNotion(partnerId))}>
+          このパートナーを同期
+        </button>
+      </div>
+      <button className="btn btn-ghost" disabled={disabled} style={{ justifySelf: "start" }}
+        onClick={() => { if (confirm("全パートナーを Notion へ同期します。よろしいですか？")) run(() => syncAllPartnersNotion()); }}>
+        全パートナーを一括同期
+      </button>
     </div>
   );
 }

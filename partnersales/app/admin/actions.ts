@@ -266,6 +266,68 @@ export async function registerPartner(input: {
   };
 }
 
+/** 1パートナーを Notion へ同期（既存ページがあれば更新、無ければ作成） */
+async function syncOnePartner(
+  sb: ReturnType<typeof getServerClient>,
+  partnerId: string
+): Promise<{ ok: boolean; note?: string }> {
+  const { data: p } = await sb
+    .from("partners")
+    .select("id, name, slug, parent_id, referral_code, contact_person, contact_email, joined_at, status, notion_page_id")
+    .eq("id", partnerId)
+    .maybeSingle();
+  if (!p) return { ok: false, note: "パートナーが見つかりません" };
+
+  let referrerName: string | undefined;
+  if (p.parent_id) {
+    const { data: parent } = await sb.from("partners").select("name").eq("id", p.parent_id).maybeSingle();
+    referrerName = parent?.name ?? undefined;
+  }
+
+  const partner: Partner = {
+    id: p.id,
+    name: p.name,
+    slug: p.slug,
+    parentId: p.parent_id,
+    referralCode: p.referral_code,
+    contact: { person: p.contact_person ?? undefined, email: p.contact_email ?? undefined },
+    joinedAt: p.joined_at,
+    status: p.status,
+  };
+  const sync = await syncPartnerToNotion(partner, referrerName, p.notion_page_id);
+  if (sync.ok && sync.notionPageId && sync.notionPageId !== p.notion_page_id) {
+    await sb.from("partners").update({ notion_page_id: sync.notionPageId }).eq("id", p.id);
+  }
+  return { ok: sync.ok, note: sync.note };
+}
+
+/** 指定パートナーを Notion へ同期/再同期 */
+export async function syncPartnerNotion(partnerId: string): Promise<ActionResult> {
+  await requireStaff();
+  if (!hasServerSupabase()) return { ok: false, message: "Supabase 未設定です" };
+  if (!process.env.NOTION_TOKEN) return { ok: false, message: "NOTION_TOKEN が未設定です（docs/RUNBOOK.md 参照）" };
+  const sb = getServerClient();
+  const r = await syncOnePartner(sb, partnerId);
+  return r.ok ? { ok: true, message: "Notion へ同期しました" } : { ok: false, message: `同期失敗: ${r.note ?? ""}` };
+}
+
+/** 全パートナーを Notion へ一括同期（未同期含む） */
+export async function syncAllPartnersNotion(): Promise<ActionResult> {
+  await requireStaff();
+  if (!hasServerSupabase()) return { ok: false, message: "Supabase 未設定です" };
+  if (!process.env.NOTION_TOKEN) return { ok: false, message: "NOTION_TOKEN が未設定です（docs/RUNBOOK.md 参照）" };
+  const sb = getServerClient();
+  const { data: partners } = await sb.from("partners").select("id");
+  let ok = 0;
+  let fail = 0;
+  for (const p of (partners ?? []) as { id: string }[]) {
+    const r = await syncOnePartner(sb, p.id);
+    if (r.ok) ok++;
+    else fail++;
+  }
+  return { ok: fail === 0, message: `Notion 同期: 成功 ${ok} 件 / 失敗 ${fail} 件` };
+}
+
 /** 既存パートナーのパスワードを再発行する（忘失・漏洩時） */
 export async function reissuePassword(partnerId: string): Promise<ActionResult> {
   await requireStaff();
