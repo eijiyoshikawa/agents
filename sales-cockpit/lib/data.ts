@@ -6,6 +6,7 @@ import {
   fetchCalls,
   fetchIsKpiCalls,
   fetchContracts,
+  fetchCustomerFieldOptions,
   notionConfigured,
   getStoredTargets,
 } from "./notion";
@@ -29,6 +30,17 @@ const cachedCalls = unstable_cache(fetchCalls, ["sc-calls-v2"], { revalidate: TT
 const cachedContracts = unstable_cache(fetchContracts, ["sc-contracts-v2"], { revalidate: TTL, tags: ["contracts"] });
 const cachedTargets = unstable_cache(getStoredTargets, ["sc-targets-v2"], { revalidate: TTL, tags: ["targets"] });
 const cachedFollowups = unstable_cache(fetchFollowups, ["sc-followups-v1"], { revalidate: TTL, tags: ["customers"] });
+const cachedFieldOptions = unstable_cache(fetchCustomerFieldOptions, ["sc-fieldopts-v1"], { revalidate: 3600, tags: ["schema"] });
+
+/** 顧客の編集用フィールド選択肢（Notionスキーマ由来） */
+export async function getFieldOptions(): Promise<Record<string, string[]>> {
+  if (!notionConfigured()) return {};
+  try {
+    return await cachedFieldOptions();
+  } catch {
+    return {};
+  }
+}
 
 /** フォロー対象（再コール・次回フォロー日あり） */
 export async function getFollowups(): Promise<{ customers: Customer[]; errors: string[] }> {

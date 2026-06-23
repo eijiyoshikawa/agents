@@ -7,6 +7,7 @@ import type { Customer } from "@/lib/types";
 import { buildHooks } from "@/lib/hooks";
 import { agencyReason } from "@/lib/leadflags";
 import CallButton from "./CallButton";
+import CustomerEditForm from "./CustomerEditForm";
 
 export const RANK_COLOR: Record<string, string> = {
   A: "bg-accent-red/15 text-accent-red",
@@ -30,11 +31,13 @@ export function CustomerDetailBody({
   c,
   partners = [],
   agency,
+  options = {},
   onNext,
 }: {
   c: Customer;
   partners?: string[];
   agency?: string | null;
+  options?: Record<string, string[]>;
   onNext?: () => void;
 }) {
   const agencyFlag = agency === undefined ? agencyReason(c) : agency;
@@ -63,19 +66,9 @@ export function CustomerDetailBody({
 
       <HookBox c={c} />
 
-      <div className="grid md:grid-cols-3 gap-x-6 gap-y-2 text-sm">
-        <Field label="電話番号" value={c.phone} mono />
-        <Field label="ステータス" value={c.status} />
-        <Field label="IS担当" value={c.isRep} />
-        <Field label="代表者名" value={c.rep3} />
-        <Field label="業種 / フェーズ" value={[c.industry, c.phase].filter(Boolean).join(" / ") || null} />
-        <Field label="S担当 / CS担当" value={[c.sRep, c.csRep].filter(Boolean).join(" / ") || null} />
-        <Field label="住所" value={c.address} />
-        <Field label="メール" value={c.email} mono />
-        <Field label="営業手法" value={c.method} />
-        <Field label="架電回数 / 最終架電" value={`${c.callCount ?? 0} 回 / ${c.lastCallDate?.slice(0, 10) ?? "—"}`} />
-        <Field label="アポ取得日" value={c.appointmentDate?.slice(0, 10) ?? null} />
-        <Field label="会社URL" value={c.companyUrl} link />
+      <CustomerEditForm c={c} options={options} />
+      <div className="mt-1 text-[11px] text-ink-muted">
+        架電回数 {c.callCount ?? 0} 回 ・ 最終架電 {c.lastCallDate?.slice(0, 10) ?? "—"}
       </div>
 
       <div className="flex flex-wrap items-center gap-2 mt-4">
@@ -127,21 +120,6 @@ export function GoogleSearchButton({ c, prominent }: { c: Customer; prominent?: 
     >
       <Search size={13} /> 検索
     </a>
-  );
-}
-
-function Field({ label, value, mono, link }: { label: string; value: string | null; mono?: boolean; link?: boolean }) {
-  return (
-    <div className="min-w-0">
-      <div className="text-[11px] text-slate-500">{label}</div>
-      {link && value ? (
-        <a href={value} target="_blank" rel="noreferrer" className="text-brand-glow hover:underline truncate block">
-          {value}
-        </a>
-      ) : (
-        <div className={clsx("text-slate-200 truncate", mono && "font-mono")}>{value || "—"}</div>
-      )}
-    </div>
   );
 }
 

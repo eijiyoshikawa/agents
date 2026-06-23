@@ -188,6 +188,64 @@ export async function updateCustomerConfirm(pageId: string, value: string): Prom
   await client().pages.update({ page_id: pageId, properties: { 確認状況: { select: { name: value } } } });
 }
 
+// ── 顧客項目の編集（Notionへ反映） ───────────────────────────────
+const CUSTOMER_EDIT_TYPES: Record<string, "status" | "select" | "text" | "phone" | "email" | "url" | "date"> = {
+  ステータス: "status",
+  見込み度合い: "select",
+  業種: "select",
+  企業フェーズ: "select",
+  営業手法: "select",
+  IS担当: "select",
+  S担当: "select",
+  CS担当: "select",
+  上場区分: "select",
+  電話番号: "phone",
+  代表者名: "text",
+  住所: "text",
+  メールアドレス: "email",
+  会社URL: "url",
+  採用ページ: "url",
+  アポイント取得日: "date",
+  次回フォロー日: "date",
+};
+
+/** 編集可能な選択肢系フィールドの選択肢をNotionスキーマから取得 */
+export async function fetchCustomerFieldOptions(): Promise<Record<string, string[]>> {
+  const out: Record<string, string[]> = {};
+  try {
+    const db: any = await client().databases.retrieve({ database_id: DB.customers });
+    for (const [name, type] of Object.entries(CUSTOMER_EDIT_TYPES)) {
+      if (type !== "select" && type !== "status") continue;
+      const p = db.properties?.[name];
+      const opts = p?.status?.options ?? p?.select?.options ?? [];
+      out[name] = opts.map((o: any) => o.name).filter(Boolean);
+    }
+  } catch {
+    /* スキーマ取得失敗時は空 */
+  }
+  return out;
+}
+
+/** 顧客の各項目を更新（型に応じてNotionへ書き込み。空文字はクリア） */
+export async function updateCustomer(pageId: string, fields: Record<string, string>): Promise<void> {
+  const props: any = {};
+  for (const [name, raw] of Object.entries(fields)) {
+    const t = CUSTOMER_EDIT_TYPES[name];
+    if (!t) continue;
+    const v = (raw ?? "").toString().trim();
+    if (t === "status") props[name] = { status: v ? { name: v } : null };
+    else if (t === "select") props[name] = { select: v ? { name: v } : null };
+    else if (t === "text") props[name] = { rich_text: v ? [{ type: "text", text: { content: v } }] : [] };
+    else if (t === "phone") props[name] = { phone_number: v || null };
+    else if (t === "email") props[name] = { email: v || null };
+    else if (t === "url") props[name] = { url: v || null };
+    else if (t === "date") props[name] = { date: v ? { start: v } : null };
+  }
+  if (Object.keys(props).length > 0) {
+    await client().pages.update({ page_id: pageId, properties: props });
+  }
+}
+
 /** 全顧客（取得上限まで）。架電リスト用。 */
 export async function fetchCustomers(): Promise<Customer[]> {
   const pages = await queryAll(DB.customers);

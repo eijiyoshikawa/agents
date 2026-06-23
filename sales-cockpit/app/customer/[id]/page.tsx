@@ -1,13 +1,14 @@
 import Link from "next/link";
 import clsx from "clsx";
 import { fetchCustomerById } from "@/lib/notion";
+import { getFieldOptions } from "@/lib/data";
 import { CustomerDetailBody, RANK_COLOR } from "@/components/CustomerDetailParts";
 
 export const dynamic = "force-dynamic";
 
 export default async function CustomerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const c = await fetchCustomerById(id);
+  const [c, options] = await Promise.all([fetchCustomerById(id), getFieldOptions()]);
 
   if (!c) {
     return (
@@ -25,7 +26,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
         {c.status && <span className="chip bg-white/10 text-ink-soft">{c.status}</span>}
       </div>
       <div className="card p-5">
-        <CustomerDetailBody c={c} />
+        <CustomerDetailBody c={c} options={options} />
       </div>
     </div>
   );

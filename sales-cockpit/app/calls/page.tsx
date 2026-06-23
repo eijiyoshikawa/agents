@@ -1,4 +1,4 @@
-import { getCustomers } from "@/lib/data";
+import { getCustomers, getFieldOptions } from "@/lib/data";
 import CustomerTable, { type InitialFilters } from "@/components/CustomerTable";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +21,7 @@ export default async function CallsPage({
     rank: str(sp.rank),
     industry: str(sp.industry),
   };
-  const { customers, errors } = await getCustomers();
+  const [{ customers, errors }, options] = await Promise.all([getCustomers(), getFieldOptions()]);
 
   return (
     <div className="space-y-5">
@@ -36,7 +36,7 @@ export default async function CallsPage({
         <div className="card p-4 ring-accent-amber/30 bg-accent-amber/5 text-xs text-ink-soft">{errors.join(" / ")}</div>
       )}
 
-      <CustomerTable customers={customers} initial={initial} />
+      <CustomerTable customers={customers} initial={initial} options={options} />
     </div>
   );
 }
