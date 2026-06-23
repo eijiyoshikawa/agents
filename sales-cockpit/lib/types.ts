@@ -46,6 +46,27 @@ export type Customer = {
   confirm: string | null; // 確認状況（重複チェック）
 };
 
+/** 一覧/分析用の軽量顧客（必要項目のみ・転送量削減）。詳細はIDで都度取得する。 */
+export type ListCustomer = {
+  id: string;
+  url: string;
+  name: string;
+  phone: string | null;
+  status: string | null;
+  rank: string | null;
+  industry: string | null;
+  phase: string | null;
+  method: string | null;
+  pref: string | null;
+  isRep: string | null;
+  sRep: string | null;
+  callCount: number | null;
+  lastCallDate: string | null;
+  appointmentDate: string | null;
+  address: string | null;
+  confirm: string | null;
+};
+
 /** 汎用カテゴリ内訳（項目別グラフ用の土台） */
 export type Breakdown = { label: string; count: number };
 

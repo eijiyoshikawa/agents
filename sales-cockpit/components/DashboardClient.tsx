@@ -5,7 +5,7 @@ import clsx from "clsx";
 import { X, ExternalLink } from "lucide-react";
 import type { DashboardData, Goal, DrillCustomer } from "@/lib/types";
 import { KpiCard } from "./KpiCard";
-import { MrrChart, FunnelChart, CategoryBar } from "./charts";
+import { MrrChart, FunnelChart, CategoryBar } from "./chartsDynamic";
 import CallButton from "./CallButton";
 import { yen, pct, num } from "@/lib/format";
 

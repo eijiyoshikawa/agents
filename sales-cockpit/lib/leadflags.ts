@@ -1,6 +1,7 @@
-import type { Customer } from "./types";
-
 // 無課金・ルールベースの「被りチェック」と「人材紹介会社フラグ」。
+// Customer / ListCustomer どちらでも使えるよう、必要な最小フィールドだけを要求する。
+type DupLike = { id: string; name: string; phone: string | null };
+type AgencyLike = { name: string; industry: string | null };
 
 // ── 正規化 ───────────────────────────────────────────────────────
 const ENTITY = /(株式会社|有限会社|合同会社|合名会社|合資会社|一般社団法人|一般財団法人|公益社団法人|公益財団法人|医療法人|学校法人|社会福祉法人|宗教法人|特定非営利活動法人|npo法人)/g;
@@ -24,9 +25,9 @@ export type DuplicateInfo = {
   partners: Map<string, string[]>; // id -> 重複相手の表示文字列
 };
 
-export function computeDuplicates(customers: Customer[]): DuplicateInfo {
-  const byName = new Map<string, Customer[]>();
-  const byPhone = new Map<string, Customer[]>();
+export function computeDuplicates<T extends DupLike>(customers: T[]): DuplicateInfo {
+  const byName = new Map<string, T[]>();
+  const byPhone = new Map<string, T[]>();
   for (const c of customers) {
     const n = normalizeCompanyName(c.name);
     if (n) (byName.get(n) ?? byName.set(n, []).get(n)!).push(c);
@@ -36,7 +37,7 @@ export function computeDuplicates(customers: Customer[]): DuplicateInfo {
 
   const dupIds = new Set<string>();
   const partners = new Map<string, Set<string>>();
-  const addGroup = (group: Customer[], how: string) => {
+  const addGroup = (group: T[], how: string) => {
     if (group.length < 2) return;
     for (const c of group) {
       dupIds.add(c.id);
@@ -56,9 +57,9 @@ export function computeDuplicates(customers: Customer[]): DuplicateInfo {
 }
 
 /** 重複グループ（同名 or 同電話で2件以上）。レビュー用。 */
-export function duplicateGroups(customers: Customer[]): { reason: string; key: string; members: Customer[] }[] {
-  const byName = new Map<string, Customer[]>();
-  const byPhone = new Map<string, Customer[]>();
+export function duplicateGroups<T extends DupLike>(customers: T[]): { reason: string; key: string; members: T[] }[] {
+  const byName = new Map<string, T[]>();
+  const byPhone = new Map<string, T[]>();
   for (const c of customers) {
     const n = normalizeCompanyName(c.name);
     if (n) (byName.get(n) ?? byName.set(n, []).get(n)!).push(c);
@@ -66,7 +67,7 @@ export function duplicateGroups(customers: Customer[]): { reason: string; key: s
     if (p.length >= 9) (byPhone.get(p) ?? byPhone.set(p, []).get(p)!).push(c);
   }
   const seen = new Set<string>();
-  const groups: { reason: string; key: string; members: Customer[] }[] = [];
+  const groups: { reason: string; key: string; members: T[] }[] = [];
   for (const [k, members] of byName) {
     if (members.length < 2) continue;
     groups.push({ reason: "同名", key: `name:${k}`, members });
@@ -90,7 +91,7 @@ const AGENCY_KEYWORDS = [
 ];
 
 /** 人材紹介会社らしさの根拠（無ければ null）。建設業種でも社名で判定するのが狙い。 */
-export function agencyReason(c: Customer): string | null {
+export function agencyReason(c: AgencyLike): string | null {
   if (c.industry === "人材") return "業種=人材";
   const s = (c.name ?? "").normalize("NFKC").toLowerCase();
   for (const k of AGENCY_KEYWORDS) {

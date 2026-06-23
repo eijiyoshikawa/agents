@@ -1,7 +1,7 @@
 "use client";
 
 import type { Breakdowns, Breakdown } from "@/lib/types";
-import { CategoryBar } from "./charts";
+import { CategoryBar } from "./chartsDynamic";
 
 // 表示する項目別内訳の定義。ここに1行足すだけで新しい分析軸を追加できる（拡張の土台）。
 const FIELDS: { key: keyof Breakdowns; title: string }[] = [

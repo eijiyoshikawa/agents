@@ -1,6 +1,7 @@
 import type {
   CallEvent,
   Customer,
+  ListCustomer,
   Contract,
   SeriesPoint,
   RepStat,
@@ -204,7 +205,7 @@ export function groupCount<T>(items: T[], keyOf: (x: T) => string | null | undef
   return limit > 0 ? arr.slice(0, limit) : arr;
 }
 
-export function buildBreakdowns(customers: Customer[]): Breakdowns {
+export function buildBreakdowns(customers: ListCustomer[]): Breakdowns {
   return {
     rank: groupCount(customers, (c) => c.rank),
     industry: groupCount(customers, (c) => c.industry, 15),

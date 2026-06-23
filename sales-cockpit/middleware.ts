@@ -7,8 +7,9 @@ const PUBLIC_PATHS = ["/login", "/signup"];
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // 認証API・ログイン/登録ページは素通り
-  if (pathname.startsWith("/api/auth") || PUBLIC_PATHS.includes(pathname)) {
+  // 認証API・ログイン/登録ページ・Cronウォームアップは素通り
+  // （/api/warm は CRON_SECRET でルート側が認証する）
+  if (pathname.startsWith("/api/auth") || pathname === "/api/warm" || PUBLIC_PATHS.includes(pathname)) {
     return NextResponse.next();
   }
 

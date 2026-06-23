@@ -16,7 +16,7 @@ export const RANK_COLOR: Record<string, string> = {
   D: "bg-white/10 text-slate-300",
 };
 
-export function googleSearchUrl(c: Customer): string {
+export function googleSearchUrl(c: { name: string; address: string | null }): string {
   const q = [c.name, c.address].filter(Boolean).join(" ");
   return `https://www.google.com/search?q=${encodeURIComponent(q)}`;
 }
@@ -105,7 +105,7 @@ export function HookBox({ c }: { c: Customer }) {
   );
 }
 
-export function GoogleSearchButton({ c, prominent }: { c: Customer; prominent?: boolean }) {
+export function GoogleSearchButton({ c, prominent }: { c: { name: string; address: string | null }; prominent?: boolean }) {
   return (
     <a
       href={googleSearchUrl(c)}

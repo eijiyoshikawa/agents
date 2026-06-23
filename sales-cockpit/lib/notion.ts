@@ -1,5 +1,5 @@
 import { Client } from "@notionhq/client";
-import type { Customer, Contract, CallEvent } from "./types";
+import type { Customer, Contract, CallEvent, ListCustomer } from "./types";
 
 // ── Notion クライアント & 設定 ───────────────────────────────────
 export const NOTION_REVALIDATE = Number(process.env.NOTION_REVALIDATE_SECONDS ?? 300);
@@ -40,8 +40,11 @@ function client(): Client {
   return _client;
 }
 
-/** データベース全ページをページネーションして取得（任意でNotionフィルタ指定） */
-async function queryAll(databaseId: string, filter?: any): Promise<any[]> {
+/**
+ * データベース全ページをページネーションして取得（任意でNotionフィルタ指定）。
+ * filterProperties を渡すと、そのプロパティIDのみ返却されるため転送量・処理が大幅に軽くなる。
+ */
+async function queryAll(databaseId: string, filter?: any, filterProperties?: string[]): Promise<any[]> {
   if (!databaseId) return [];
   const out: any[] = [];
   let cursor: string | undefined;
@@ -53,6 +56,7 @@ async function queryAll(databaseId: string, filter?: any): Promise<any[]> {
       start_cursor: cursor,
       page_size: 100,
       ...(filter ? { filter } : {}),
+      ...(filterProperties && filterProperties.length ? { filter_properties: filterProperties } : {}),
     });
     out.push(...res.results);
     if (!res.has_more) break;
@@ -250,6 +254,61 @@ export async function updateCustomer(pageId: string, fields: Record<string, stri
 export async function fetchCustomers(): Promise<Customer[]> {
   const pages = await queryAll(DB.customers);
   return pages.map(mapCustomer);
+}
+
+// ── 軽量リスト取得（必要プロパティのみ・全件高速化） ───────────────
+/** 一覧/分析で使う最小限のプロパティ名（filter_properties 用にIDへ変換する） */
+const LIST_FIELD_NAMES = [
+  "顧客名", "電話番号", "ステータス", "見込み度合い", "業種", "企業フェーズ",
+  "営業手法", "IS担当", "S担当", "都道府県", "架電回数", "最終架電日",
+  "アポイント取得日", "住所", "確認状況",
+];
+
+let _listPropIds: string[] | null = null;
+/** リスト用プロパティのNotion内部IDを取得（filter_properties用・1プロセス内キャッシュ） */
+export async function fetchListPropertyIds(): Promise<string[]> {
+  if (_listPropIds) return _listPropIds;
+  try {
+    const db: any = await client().databases.retrieve({ database_id: DB.customers });
+    const ids: string[] = [];
+    for (const name of LIST_FIELD_NAMES) {
+      const p = db.properties?.[name];
+      if (p?.id) ids.push(p.id);
+    }
+    _listPropIds = ids;
+    return ids;
+  } catch {
+    return [];
+  }
+}
+
+function mapListCustomer(pg: any): ListCustomer {
+  return {
+    id: pg.id,
+    url: pg.url,
+    name: txt(pg, "顧客名") ?? "(無名)",
+    phone: phone(pg, "電話番号"),
+    status: sel(pg, "ステータス"),
+    rank: sel(pg, "見込み度合い"),
+    industry: sel(pg, "業種"),
+    phase: sel(pg, "企業フェーズ"),
+    method: sel(pg, "営業手法"),
+    pref: formulaStr(pg, "都道府県"),
+    isRep: sel(pg, "IS担当"),
+    sRep: sel(pg, "S担当"),
+    callCount: number(pg, "架電回数"),
+    lastCallDate: dateStart(pg, "最終架電日"),
+    appointmentDate: dateStart(pg, "アポイント取得日"),
+    address: txt(pg, "住所"),
+    confirm: sel(pg, "確認状況"),
+  };
+}
+
+/** 全顧客（軽量版・必要項目のみ）。一覧/分析/重複/品質用。詳細はIDで都度取得。 */
+export async function fetchCustomersSlim(): Promise<ListCustomer[]> {
+  const ids = await fetchListPropertyIds();
+  const pages = await queryAll(DB.customers, undefined, ids.length ? ids : undefined);
+  return pages.map(mapListCustomer);
 }
 
 /** 着手済み顧客（ステータスあり・アプローチ前以外）。ダッシュボード集計用（正確・高速）。 */

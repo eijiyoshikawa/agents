@@ -1,5 +1,5 @@
 import { getCustomers } from "@/lib/data";
-import type { Customer } from "@/lib/types";
+import type { ListCustomer } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -13,7 +13,7 @@ const STAGES: { key: string; color: string }[] = [
 
 export default async function PipelinePage() {
   const { customers, errors } = await getCustomers();
-  const byStage: Record<string, Customer[]> = {};
+  const byStage: Record<string, ListCustomer[]> = {};
   for (const s of STAGES) byStage[s.key] = [];
   for (const c of customers) if (c.status && byStage[c.status]) byStage[c.status].push(c);
 

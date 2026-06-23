@@ -2,8 +2,8 @@
 
 import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import clsx from "clsx";
-import { Search, ChevronDown, ArrowLeft, ArrowRight, X, Bookmark } from "lucide-react";
-import type { Customer } from "@/lib/types";
+import { Search, ChevronDown, ArrowLeft, ArrowRight, X, Bookmark, Loader2 } from "lucide-react";
+import type { Customer, ListCustomer } from "@/lib/types";
 import { computeDuplicates, agencyReason } from "@/lib/leadflags";
 import CallButton from "./CallButton";
 import { CustomerDetailBody, RANK_COLOR, GoogleSearchButton } from "./CustomerDetailParts";
@@ -12,7 +12,7 @@ export type InitialFilters = { q?: string; rep?: string; status?: string; rank?:
 
 const COLSPAN = 8;
 
-const SORT_VAL: Record<string, (c: Customer) => string | number> = {
+const SORT_VAL: Record<string, (c: ListCustomer) => string | number> = {
   name: (c) => c.name,
   status: (c) => c.status ?? "",
   rank: (c) => c.rank ?? "",
@@ -27,7 +27,7 @@ export default function CustomerTable({
   initial,
   options = {},
 }: {
-  customers: Customer[];
+  customers: ListCustomer[];
   initial?: InitialFilters;
   options?: Record<string, string[]>;
 }) {
@@ -231,7 +231,7 @@ function DetailPanel({
   onNext,
   onClose,
 }: {
-  c: Customer;
+  c: ListCustomer;
   index: number;
   total: number;
   partners: string[];
@@ -242,8 +242,29 @@ function DetailPanel({
   onClose: () => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  const [full, setFull] = useState<Customer | null>(null);
+  const [err, setErr] = useState("");
+
   useEffect(() => {
     ref.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [c.id]);
+
+  // 行を開いたら詳細（全項目）を遅延ロード。一覧は軽量データのみのため。
+  useEffect(() => {
+    let alive = true;
+    setFull(null);
+    setErr("");
+    fetch(`/api/customer?id=${encodeURIComponent(c.id)}`)
+      .then((r) => r.json())
+      .then((j) => {
+        if (!alive) return;
+        if (j.ok) setFull(j.customer as Customer);
+        else setErr(j.error || "読み込みに失敗しました");
+      })
+      .catch((e) => alive && setErr(e?.message ?? "読み込みに失敗しました"));
+    return () => {
+      alive = false;
+    };
   }, [c.id]);
 
   return (
@@ -265,7 +286,15 @@ function DetailPanel({
         </div>
       </div>
 
-      <CustomerDetailBody c={c} partners={partners} agency={agency} options={options} onNext={onNext} />
+      {err ? (
+        <p className="py-8 text-center text-sm text-accent-red">⚠ {err}</p>
+      ) : !full ? (
+        <div className="flex items-center justify-center gap-2 py-10 text-sm text-slate-400">
+          <Loader2 size={16} className="animate-spin" /> 詳細を読み込み中…
+        </div>
+      ) : (
+        <CustomerDetailBody c={full} partners={partners} agency={agency} options={options} onNext={onNext} />
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
 import {
-  fetchCustomers,
+  fetchCustomersSlim,
   fetchWorkedCustomers,
   fetchFollowups,
   fetchCalls,
@@ -11,7 +11,7 @@ import {
   getStoredTargets,
 } from "./notion";
 import { buildDashboard, buildTargets, buildBreakdowns, type TargetsConfig } from "./aggregate";
-import type { DashboardData, Customer, CallEvent, Contract, Breakdowns } from "./types";
+import type { DashboardData, Customer, ListCustomer, CallEvent, Contract, Breakdowns } from "./types";
 import targetsRaw from "@/config/targets.json";
 
 const targetsConfig = targetsRaw as TargetsConfig;
@@ -21,9 +21,10 @@ const targetsConfig = targetsRaw as TargetsConfig;
 // タグ: "customers"(顧客・メモ), "calls", "contracts", "targets"
 // 既定30分キャッシュ（体感最速・Notion負荷減）。保存時は revalidateTag で即時反映するため
 // 長めでも メモ/目標/リスト の更新は遅延しない。常に最新にしたい場合は短く設定する。
-const TTL = Number(process.env.NOTION_REVALIDATE_SECONDS ?? 1800);
+const TTL = Number(process.env.NOTION_REVALIDATE_SECONDS ?? 3600);
 // キー末尾のバージョンは、取得項目（スキーマ）を変えたら上げて旧キャッシュを破棄する。
-const cachedCustomers = unstable_cache(fetchCustomers, ["sc-customers-v2"], { revalidate: TTL, tags: ["customers"] });
+// 一覧/分析は軽量版（必要プロパティのみ）でキャッシュ。詳細はIDで都度取得する。
+const cachedCustomersSlim = unstable_cache(fetchCustomersSlim, ["sc-customers-slim-v1"], { revalidate: TTL, tags: ["customers"] });
 // ダッシュボードは着手済み顧客のみ（全件28k+は非現実的なため正確・高速に集計）
 const cachedWorked = unstable_cache(fetchWorkedCustomers, ["sc-worked-v1"], { revalidate: TTL, tags: ["customers"] });
 const cachedCalls = unstable_cache(fetchCalls, ["sc-calls-v2"], { revalidate: TTL, tags: ["calls"] });
@@ -111,7 +112,7 @@ export async function getDashboard(): Promise<DashboardData> {
 export async function getAnalytics(): Promise<{ breakdowns: Breakdowns; total: number; errors: string[] }> {
   const errors: string[] = [];
   if (!notionConfigured()) return { breakdowns: buildBreakdowns([]), total: 0, errors: ["NOTION_TOKEN が未設定です。"] };
-  const customers = await safe("顧客管理", cachedCustomers, [] as Customer[], errors);
+  const customers = await safe("顧客管理", cachedCustomersSlim, [] as ListCustomer[], errors);
   return { breakdowns: buildBreakdowns(customers), total: customers.length, errors };
 }
 
@@ -131,10 +132,10 @@ export async function getContracts(): Promise<{ contracts: Contract[]; errors: s
   return { contracts, errors };
 }
 
-/** 架電一覧（クリック発信）用の顧客リスト */
-export async function getCustomers(): Promise<{ customers: Customer[]; errors: string[] }> {
+/** 架電一覧（クリック発信）用の顧客リスト（軽量版・詳細はIDで都度取得） */
+export async function getCustomers(): Promise<{ customers: ListCustomer[]; errors: string[] }> {
   const errors: string[] = [];
   if (!notionConfigured()) return { customers: [], errors: ["NOTION_TOKEN が未設定です。"] };
-  const customers = await safe("顧客管理", cachedCustomers, [] as Customer[], errors);
+  const customers = await safe("顧客管理", cachedCustomersSlim, [] as ListCustomer[], errors);
   return { customers, errors };
 }
