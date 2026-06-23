@@ -1,0 +1,83 @@
+name: Deploy sales-cockpit to Vercel
+
+# GitHub ランナー上で Vercel CLI を実行してデプロイする。
+# ビルド/デプロイはランナー（GitHub のインフラ）で走るため、開発環境側の
+# ネットワークegress制限の影響を受けない。
+#
+# 必要な GitHub Secrets（リポジトリ Settings → Secrets and variables → Actions）:
+#   - VERCEL_TOKEN : Vercel のアクセストークン（必須）
+#   - NOTION_TOKEN : Notion 内部インテグレーションの Secret（ntn_...）。
+#                    アプリがランタイムで Notion を読むために Vercel の環境変数へ自動登録する。
+#
+# ORG_ID / PROJECT_ID は不要（このワークフローがプロジェクトを自動作成・リンクする）。
+
+on:
+  push:
+    branches: [claude/jolly-dirac-j1jm1i, main]
+    paths:
+      - "sales-cockpit/**"
+      - ".github/workflows/deploy-sales-cockpit.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-sales-cockpit
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sales-cockpit
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Vercel CLI
+        run: npm i -g vercel@54
+
+      - name: Guard - VERCEL_TOKEN must be set
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ]; then
+            echo "::error::VERCEL_TOKEN secret が未設定です。リポジトリの Settings → Secrets で登録してください。"
+            exit 1
+          fi
+
+      - name: Create / link Vercel project
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        # 初回 deploy でプロジェクトを自動作成＆リンク（.vercel/project.json を生成）。
+        # プレビュー1回ぶんは捨てデプロイ。失敗してもリンク確立が目的なので継続。
+        run: vercel deploy --yes --token="$VERCEL_TOKEN" || true
+
+      - name: Set runtime env (NOTION_TOKEN)
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+        # ランタイムで使う環境変数を冪等にセット（既存は一旦削除してから追加）。
+        run: |
+          if [ -z "$NOTION_TOKEN" ]; then
+            echo "::warning::NOTION_TOKEN 未設定のままデプロイします。アプリはデータ未取得（未設定表示）になります。"
+            exit 0
+          fi
+          for ENVNAME in production preview development; do
+            vercel env rm NOTION_TOKEN "$ENVNAME" -y --token="$VERCEL_TOKEN" 2>/dev/null || true
+            printf '%s' "$NOTION_TOKEN" | vercel env add NOTION_TOKEN "$ENVNAME" --token="$VERCEL_TOKEN"
+          done
+
+      - name: Deploy to production
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          URL=$(vercel deploy --prod --yes --token="$VERCEL_TOKEN")
+          echo "Deployed: $URL"
+          echo "### ✅ 本番デプロイ完了" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "URL: $URL" >> "$GITHUB_STEP_SUMMARY"
