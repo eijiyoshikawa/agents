@@ -57,8 +57,8 @@ export default function CustomerTable({
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return customers
-      .filter((c) => (rep ? c.isRep === rep : true))
-      .filter((c) => (status ? c.status === status : true))
+      .filter((c) => (rep ? (rep === "__none__" ? !c.isRep : c.isRep === rep) : true))
+      .filter((c) => (status ? (status === "__none__" ? !c.status : c.status === status) : true))
       .filter((c) => (rank ? c.rank === rank : true))
       .filter((c) => (industry ? c.industry === industry : true))
       .filter((c) =>
@@ -95,8 +95,8 @@ export default function CustomerTable({
             className="w-full pl-9 pr-3 py-2 rounded-lg bg-surface ring-1 ring-white/10 text-sm focus:outline-none focus:ring-brand-glow/50"
           />
         </div>
-        <Select value={rep} onChange={setRep} options={reps} placeholder="IS担当（全員）" />
-        <Select value={status} onChange={setStatus} options={statuses} placeholder="ステータス（全て）" />
+        <Select value={rep} onChange={setRep} options={reps} placeholder="IS担当（全員）" includeNone />
+        <Select value={status} onChange={setStatus} options={statuses} placeholder="ステータス（全て）" includeNone />
         <Select value={rank} onChange={setRank} options={ranks} placeholder="見込み度合い（全て）" />
         <Select value={industry} onChange={setIndustry} options={industries} placeholder="業種（全て）" />
         <button
@@ -612,11 +612,13 @@ function Select({
   onChange,
   options,
   placeholder,
+  includeNone,
 }: {
   value: string;
   onChange: (v: string) => void;
   options: string[];
   placeholder: string;
+  includeNone?: boolean;
 }) {
   return (
     <select
@@ -625,6 +627,7 @@ function Select({
       className="px-3 py-2 rounded-lg bg-surface ring-1 ring-white/10 text-sm focus:outline-none focus:ring-brand-glow/50"
     >
       <option value="">{placeholder}</option>
+      {includeNone && <option value="__none__">該当なし（未設定）</option>}
       {options.map((o) => (
         <option key={o} value={o}>
           {o}
