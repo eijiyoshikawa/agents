@@ -60,11 +60,16 @@ async function queryAll(databaseId: string, filter?: any): Promise<any[]> {
   return out;
 }
 
-// 「着手済み」= ステータスあり かつ アプローチ前以外（ダッシュボード集計を正確・高速にするため）
+// 実績集計の起点日（この日以降に更新されたもののみ実績へ反映）。env で変更可。
+export const METRICS_SINCE = process.env.METRICS_SINCE || "2026-05-07";
+
+// 「着手済み」= ステータスあり かつ アプローチ前以外、かつ METRICS_SINCE 以降に更新。
+// ダッシュボードの実績を「指定日以降」に限定しつつ、正確・高速に集計するため。
 const WORKED_FILTER = {
   and: [
     { property: "ステータス", status: { is_not_empty: true } },
     { property: "ステータス", status: { does_not_equal: "アプローチ前" } },
+    { timestamp: "last_edited_time", last_edited_time: { on_or_after: METRICS_SINCE } },
   ],
 };
 

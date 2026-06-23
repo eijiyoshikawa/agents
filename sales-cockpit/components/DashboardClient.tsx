@@ -16,7 +16,8 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
         <div>
           <h1 className="text-xl font-bold text-ink">営業ダッシュボード</h1>
           <p className="text-xs text-ink-muted mt-0.5">
-            顧客ステータス基準 · 最終更新 {new Date(data.generatedAt).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}
+            実績は {data.metricsSince} 以降（顧客ステータス基準） · 最終更新{" "}
+            {new Date(data.generatedAt).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}
           </p>
         </div>
       </div>

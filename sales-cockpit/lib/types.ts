@@ -130,6 +130,7 @@ export type FunnelStage = { stage: string; count: number; color: string };
 /** ダッシュボード全体データ */
 export type DashboardData = {
   generatedAt: string;
+  metricsSince: string; // 実績集計の起点日（YYYY-MM-DD）
   ok: boolean;
   errors: string[];
   kpi: {

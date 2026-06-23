@@ -380,6 +380,7 @@ export function buildDashboard(input: {
 
   return {
     generatedAt: new Date().toISOString(),
+    metricsSince: process.env.METRICS_SINCE || "2026-05-07",
     ok: errors.length === 0,
     errors,
     kpi: {
