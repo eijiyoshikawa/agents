@@ -12,6 +12,16 @@ export type InitialFilters = { q?: string; rep?: string; status?: string; rank?:
 
 const COLSPAN = 8;
 
+const SORT_VAL: Record<string, (c: Customer) => string | number> = {
+  name: (c) => c.name,
+  status: (c) => c.status ?? "",
+  rank: (c) => c.rank ?? "",
+  industry: (c) => c.industry ?? "",
+  isRep: (c) => c.isRep ?? "",
+  callCount: (c) => c.callCount ?? 0,
+  lastCallDate: (c) => c.lastCallDate ?? "",
+};
+
 export default function CustomerTable({
   customers,
   initial,
@@ -29,6 +39,15 @@ export default function CustomerTable({
   const [dupOnly, setDupOnly] = useState(false);
   const [agencyMode, setAgencyMode] = useState<"all" | "exclude" | "only">("all");
   const [openId, setOpenId] = useState<string | null>(null);
+  const [sortKey, setSortKey] = useState<string>("lastCallDate");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const toggleSort = (key: string) => {
+    if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  };
 
   const reps = useMemo(() => uniq(customers.map((c) => c.isRep)), [customers]);
   const statuses = useMemo(() => uniq(customers.map((c) => c.status)), [customers]);
@@ -60,8 +79,14 @@ export default function CustomerTable({
         if (agencyMode === "only") return agencyMap.has(c.id);
         return true;
       })
-      .sort((a, b) => (b.lastCallDate ?? "").localeCompare(a.lastCallDate ?? ""));
-  }, [customers, q, rep, status, rank, industry, dupOnly, agencyMode, dup, agencyMap]);
+      .sort((a, b) => {
+        const f = SORT_VAL[sortKey] ?? SORT_VAL.lastCallDate;
+        const av = f(a);
+        const bv = f(b);
+        const cmp = typeof av === "number" && typeof bv === "number" ? av - bv : String(av).localeCompare(String(bv), "ja");
+        return sortDir === "asc" ? cmp : -cmp;
+      });
+  }, [customers, q, rep, status, rank, industry, dupOnly, agencyMode, dup, agencyMap, sortKey, sortDir]);
 
   // 描画は上限まで（高速化）。絞り込みで対象を減らして使う想定。
   const DISPLAY_CAP = 500;
@@ -123,13 +148,13 @@ export default function CustomerTable({
         <table className="w-full text-sm">
           <thead>
             <tr className="text-xs text-slate-400 border-b border-white/10">
-              <th className="text-left font-medium px-4 py-2.5">顧客名</th>
-              <th className="text-left font-medium px-3 py-2.5">ステータス</th>
-              <th className="text-center font-medium px-3 py-2.5">見込</th>
-              <th className="text-left font-medium px-3 py-2.5">業種</th>
-              <th className="text-left font-medium px-3 py-2.5">IS担当</th>
-              <th className="text-right font-medium px-3 py-2.5">架電回数</th>
-              <th className="text-left font-medium px-3 py-2.5">最終架電</th>
+              <SortHead label="顧客名" col="name" sortKey={sortKey} sortDir={sortDir} onClick={toggleSort} className="text-left px-4 py-2.5" />
+              <SortHead label="ステータス" col="status" sortKey={sortKey} sortDir={sortDir} onClick={toggleSort} className="text-left px-3 py-2.5" />
+              <SortHead label="見込" col="rank" sortKey={sortKey} sortDir={sortDir} onClick={toggleSort} className="text-center px-3 py-2.5" />
+              <SortHead label="業種" col="industry" sortKey={sortKey} sortDir={sortDir} onClick={toggleSort} className="text-left px-3 py-2.5" />
+              <SortHead label="IS担当" col="isRep" sortKey={sortKey} sortDir={sortDir} onClick={toggleSort} className="text-left px-3 py-2.5" />
+              <SortHead label="架電回数" col="callCount" sortKey={sortKey} sortDir={sortDir} onClick={toggleSort} className="text-right px-3 py-2.5" />
+              <SortHead label="最終架電" col="lastCallDate" sortKey={sortKey} sortDir={sortDir} onClick={toggleSort} className="text-left px-3 py-2.5" />
               <th className="text-right font-medium px-4 py-2.5">発信</th>
             </tr>
           </thead>
@@ -305,6 +330,32 @@ function SaveListBar({ filters, count }: { filters: InitialFilters; count: numbe
       {state === "saved" && <span className="text-xs text-brand-glow">✓ 保存</span>}
       {state === "error" && <span className="text-xs text-accent-red">⚠ {err}</span>}
     </div>
+  );
+}
+
+function SortHead({
+  label,
+  col,
+  sortKey,
+  sortDir,
+  onClick,
+  className,
+}: {
+  label: string;
+  col: string;
+  sortKey: string;
+  sortDir: "asc" | "desc";
+  onClick: (k: string) => void;
+  className?: string;
+}) {
+  return (
+    <th
+      onClick={() => onClick(col)}
+      className={clsx("font-medium whitespace-nowrap cursor-pointer hover:text-ink select-none", className)}
+    >
+      {label}
+      {sortKey === col ? (sortDir === "asc" ? " ▲" : " ▼") : ""}
+    </th>
   );
 }
 

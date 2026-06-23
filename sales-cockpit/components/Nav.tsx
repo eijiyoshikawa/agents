@@ -51,7 +51,7 @@ export default function Nav({ userName }: { userName: string | null }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-8 h-14 flex items-center gap-6">
         <Link href="/" className="font-bold tracking-tight text-ink flex items-center gap-2 shrink-0">
           <span className="inline-block w-2.5 h-2.5 rounded-full bg-brand animate-pulseDot" />
-          LET 営業コックピット
+          LET Sales System
         </Link>
 
         {userName && !onAuthPage && (

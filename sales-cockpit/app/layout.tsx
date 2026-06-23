@@ -5,7 +5,7 @@ import Nav from "@/components/Nav";
 import { verifySession, SESSION_COOKIE } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "LET 営業コックピット",
+  title: "LET Sales System",
   description: "Notion を単一ソースにした リード→契約→継続 一体型ダッシュボード",
 };
 

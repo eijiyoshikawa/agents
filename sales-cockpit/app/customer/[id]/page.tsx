@@ -3,6 +3,7 @@ import clsx from "clsx";
 import { fetchCustomerById } from "@/lib/notion";
 import { getFieldOptions } from "@/lib/data";
 import { CustomerDetailBody, RANK_COLOR } from "@/components/CustomerDetailParts";
+import BackButton from "@/components/BackButton";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,7 @@ export default async function CustomerPage({ params }: { params: Promise<{ id: s
 
   return (
     <div className="max-w-3xl space-y-4">
+      <BackButton />
       <div className="flex items-center gap-2">
         <h1 className="text-xl font-bold text-ink">{c.name}</h1>
         {c.rank && <span className={clsx("chip", RANK_COLOR[c.rank] ?? "bg-white/10 text-slate-300")}>{c.rank}</span>}
