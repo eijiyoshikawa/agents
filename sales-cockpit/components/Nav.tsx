@@ -105,7 +105,8 @@ export default function Nav({ userName }: { userName: string | null }) {
   };
 
   return (
-    <header className="sticky top-0 z-20 bg-night-0/70 backdrop-blur border-b border-white/10">
+    <>
+      <header className="sticky top-0 z-20 bg-night-0/70 backdrop-blur border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-8 h-14 flex items-center gap-4">
         <Link href="/" className="font-bold tracking-tight text-ink flex items-center gap-2 shrink-0">
           <span className="inline-block w-2.5 h-2.5 rounded-full bg-brand animate-pulseDot" />
@@ -208,12 +209,13 @@ export default function Nav({ userName }: { userName: string | null }) {
           </button>
         )}
       </div>
+      </header>
 
-      {/* モバイル: 全画面メニュー */}
+      {/* モバイル: 全画面メニュー（backdrop-filterを持つheaderの外に出すことでfixedをビューポート基準にする） */}
       {userName && !onAuthPage && mobileOpen && (
         <MobileMenu userName={userName} isActive={isActive} onClose={() => setMobileOpen(false)} onLogout={logout} />
       )}
-    </header>
+    </>
   );
 }
 
