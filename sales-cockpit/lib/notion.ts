@@ -118,6 +118,10 @@ function person(page: any, name: string): string | null {
   if (p?.type === "people") return p.people?.[0]?.name ?? null;
   return null;
 }
+function relationIds(page: any, name: string): string[] {
+  const p = P(page, name);
+  return p?.type === "relation" ? p.relation.map((r: any) => r.id) : [];
+}
 function formulaStr(page: any, name: string): string | null {
   const p = P(page, name);
   if (p?.type === "formula" && p.formula?.type === "string") return p.formula.string ?? null;
@@ -531,5 +535,46 @@ export async function fetchContracts(): Promise<Contract[]> {
     sRep: sel(pg, "S担当"),
     csRep: sel(pg, "社内担当"),
     health: sel(pg, "健全性スコア"),
+    customerId: relationIds(pg, "顧客")[0] ?? null,
   }));
+}
+
+/** 顧客を1件取得（単体詳細ページ用・高速） */
+export async function fetchCustomerById(id: string): Promise<Customer | null> {
+  try {
+    const pg: any = await client().pages.retrieve({ page_id: id });
+    return mapCustomer(pg);
+  } catch {
+    return null;
+  }
+}
+
+/** 複数IDの顧客をまとめて取得（契約→顧客の紐付け用） */
+export async function fetchCustomersByIds(ids: string[]): Promise<Map<string, Customer>> {
+  const uniq = [...new Set(ids.filter(Boolean))];
+  const out = new Map<string, Customer>();
+  await Promise.all(
+    uniq.map(async (id) => {
+      const c = await fetchCustomerById(id);
+      if (c) out.set(id, c);
+    }),
+  );
+  return out;
+}
+
+/** 顧客名（部分一致）で1件検索（契約名→顧客リンクの補完用） */
+export async function fetchCustomerByName(name: string): Promise<Customer | null> {
+  const q = name.trim();
+  if (!q) return null;
+  try {
+    const res: any = await client().databases.query({
+      database_id: DB.customers,
+      filter: { property: "顧客名", title: { contains: q } },
+      page_size: 1,
+    });
+    const pg = res.results?.[0];
+    return pg ? mapCustomer(pg) : null;
+  } catch {
+    return null;
+  }
 }

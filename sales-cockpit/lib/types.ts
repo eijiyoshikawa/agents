@@ -91,6 +91,7 @@ export type Contract = {
   sRep: string | null; // S担当（成約営業）
   csRep: string | null; // 社内担当（CS）
   health: string | null; // 健全性スコア
+  customerId: string | null; // 紐づく顧客ページID（IS担当の集計用）
 };
 
 /** IS別の月次目標（🎯目標設定） */

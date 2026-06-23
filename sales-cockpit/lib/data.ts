@@ -9,8 +9,8 @@ import {
   notionConfigured,
   getStoredTargets,
 } from "./notion";
-import { buildDashboard, buildTargets, type TargetsConfig } from "./aggregate";
-import type { DashboardData, Customer, CallEvent, Contract } from "./types";
+import { buildDashboard, buildTargets, buildBreakdowns, type TargetsConfig } from "./aggregate";
+import type { DashboardData, Customer, CallEvent, Contract, Breakdowns } from "./types";
 import targetsRaw from "@/config/targets.json";
 
 const targetsConfig = targetsRaw as TargetsConfig;
@@ -93,6 +93,14 @@ export async function getDashboard(): Promise<DashboardData> {
   const targets = buildTargets(calls, effectiveConfig);
 
   return buildDashboard({ calls, customers, contracts, targets, targetsConfig: effectiveConfig, errors });
+}
+
+/** 分析（全顧客の項目別内訳。母集団＝全件） */
+export async function getAnalytics(): Promise<{ breakdowns: Breakdowns; total: number; errors: string[] }> {
+  const errors: string[] = [];
+  if (!notionConfigured()) return { breakdowns: buildBreakdowns([]), total: 0, errors: ["NOTION_TOKEN が未設定です。"] };
+  const customers = await safe("顧客管理", cachedCustomers, [] as Customer[], errors);
+  return { breakdowns: buildBreakdowns(customers), total: customers.length, errors };
 }
 
 /** 架電記録（日付つき実績。目標vs実績の突合用） */

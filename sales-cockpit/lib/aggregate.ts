@@ -204,7 +204,7 @@ export function groupCount<T>(items: T[], keyOf: (x: T) => string | null | undef
   return limit > 0 ? arr.slice(0, limit) : arr;
 }
 
-function buildBreakdowns(customers: Customer[]): Breakdowns {
+export function buildBreakdowns(customers: Customer[]): Breakdowns {
   return {
     rank: groupCount(customers, (c) => c.rank),
     industry: groupCount(customers, (c) => c.industry, 15),

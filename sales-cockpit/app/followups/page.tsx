@@ -57,7 +57,7 @@ export default async function FollowupsPage() {
                     <td className="px-4 py-2.5 text-right">
                       <div className="inline-flex items-center gap-2">
                         {c.phone && <CallButton phone={c.phone} />}
-                        <Link href={`/calls?q=${encodeURIComponent(c.name)}`} className="text-xs text-brand-glow hover:underline">
+                        <Link href={`/customer/${c.id}`} className="text-xs text-brand-glow hover:underline">
                           開く
                         </Link>
                       </div>
