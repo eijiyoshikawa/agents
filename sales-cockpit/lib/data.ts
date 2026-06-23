@@ -2,6 +2,7 @@ import { unstable_cache } from "next/cache";
 import {
   fetchCustomers,
   fetchWorkedCustomers,
+  fetchFollowups,
   fetchCalls,
   fetchIsKpiCalls,
   fetchContracts,
@@ -27,6 +28,15 @@ const cachedWorked = unstable_cache(fetchWorkedCustomers, ["sc-worked-v1"], { re
 const cachedCalls = unstable_cache(fetchCalls, ["sc-calls-v2"], { revalidate: TTL, tags: ["calls"] });
 const cachedContracts = unstable_cache(fetchContracts, ["sc-contracts-v2"], { revalidate: TTL, tags: ["contracts"] });
 const cachedTargets = unstable_cache(getStoredTargets, ["sc-targets-v2"], { revalidate: TTL, tags: ["targets"] });
+const cachedFollowups = unstable_cache(fetchFollowups, ["sc-followups-v1"], { revalidate: TTL, tags: ["customers"] });
+
+/** フォロー対象（再コール・次回フォロー日あり） */
+export async function getFollowups(): Promise<{ customers: Customer[]; errors: string[] }> {
+  const errors: string[] = [];
+  if (!notionConfigured()) return { customers: [], errors: ["NOTION_TOKEN が未設定です。"] };
+  const customers = await safe("フォロー対象", cachedFollowups, [] as Customer[], errors);
+  return { customers, errors };
+}
 
 /** Promise を実行し、失敗したら fallback を返してエラーメッセージを収集する */
 async function safe<T>(label: string, fn: () => Promise<T>, fallback: T, errors: string[]): Promise<T> {
@@ -83,6 +93,14 @@ export async function getDashboard(): Promise<DashboardData> {
   const targets = buildTargets(calls, effectiveConfig);
 
   return buildDashboard({ calls, customers, contracts, targets, targetsConfig: effectiveConfig, errors });
+}
+
+/** 架電記録（日付つき実績。目標vs実績の突合用） */
+export async function getCalls(): Promise<{ calls: CallEvent[]; errors: string[] }> {
+  const errors: string[] = [];
+  if (!notionConfigured()) return { calls: [], errors: ["NOTION_TOKEN が未設定です。"] };
+  const calls = await safe("架電記録", cachedCalls, [] as CallEvent[], errors);
+  return { calls, errors };
 }
 
 /** 契約一覧（MRR担当者別など） */

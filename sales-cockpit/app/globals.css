@@ -36,6 +36,27 @@ select option {
   color: #eaf1fb;
 }
 
+/* 印刷／PDF出力（レポート） */
+@media print {
+  header,
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #111111 !important;
+  }
+  .card {
+    background: #ffffff !important;
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+  }
+  .print-light,
+  .print-light * {
+    color: #111111 !important;
+  }
+}
+
 /* アクセシビリティ: モーション低減設定を尊重 */
 @media (prefers-reduced-motion: reduce) {
   *,

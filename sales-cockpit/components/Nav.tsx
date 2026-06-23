@@ -2,15 +2,38 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, PhoneCall, BarChart3, Target, Bookmark, Wallet, LogOut, UserCircle2 } from "lucide-react";
+import {
+  LayoutDashboard,
+  PhoneCall,
+  BarChart3,
+  Target,
+  Bookmark,
+  Wallet,
+  FileText,
+  CalendarClock,
+  GitBranch,
+  RefreshCw,
+  Copy,
+  TrendingUp,
+  ShieldCheck,
+  LogOut,
+  UserCircle2,
+} from "lucide-react";
 import clsx from "clsx";
 
 const LINKS = [
   { href: "/", label: "ダッシュボード", icon: LayoutDashboard },
   { href: "/analytics", label: "分析", icon: BarChart3 },
-  { href: "/mrr", label: "MRR", icon: Wallet },
-  { href: "/calls", label: "架電リスト・発信", icon: PhoneCall },
+  { href: "/report", label: "レポート", icon: FileText },
+  { href: "/calls", label: "架電リスト", icon: PhoneCall },
+  { href: "/followups", label: "フォロー", icon: CalendarClock },
   { href: "/lists", label: "保存リスト", icon: Bookmark },
+  { href: "/pipeline", label: "商談", icon: GitBranch },
+  { href: "/mrr", label: "MRR", icon: Wallet },
+  { href: "/renewals", label: "更新/解約", icon: RefreshCw },
+  { href: "/performance", label: "実績", icon: TrendingUp },
+  { href: "/duplicates", label: "重複", icon: Copy },
+  { href: "/quality", label: "品質", icon: ShieldCheck },
   { href: "/settings/targets", label: "目標設定", icon: Target },
 ];
 

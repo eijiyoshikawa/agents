@@ -42,6 +42,8 @@ export type Customer = {
   recruitPage: string | null; // 採用ページURL
   media: string[]; // 掲載元メディア
   lastEdited: string | null; // 最終更新日時
+  nextFollow: string | null; // 次回フォロー日
+  confirm: string | null; // 確認状況（重複チェック）
 };
 
 /** 汎用カテゴリ内訳（項目別グラフ用の土台） */
@@ -88,6 +90,7 @@ export type Contract = {
   nextRenewal: string | null; // 次回更新日
   sRep: string | null; // S担当（成約営業）
   csRep: string | null; // 社内担当（CS）
+  health: string | null; // 健全性スコア
 };
 
 /** IS別の月次目標（🎯目標設定） */

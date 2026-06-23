@@ -163,7 +163,25 @@ function mapCustomer(pg: any): Customer {
     recruitPage: url(pg, "採用ページ"),
     media: multi(pg, "掲載元メディア"),
     lastEdited: pg.last_edited_time ?? null,
+    nextFollow: dateStart(pg, "次回フォロー日"),
+    confirm: sel(pg, "確認状況"),
   };
+}
+
+/** フォロー対象（再コール or 次回フォロー日あり）を取得 */
+export async function fetchFollowups(): Promise<Customer[]> {
+  const pages = await queryAll(DB.customers, {
+    or: [
+      { property: "ステータス", status: { equals: "再コール" } },
+      { property: "次回フォロー日", date: { is_not_empty: true } },
+    ],
+  });
+  return pages.map(mapCustomer);
+}
+
+/** 確認状況を更新（重複マーク用） */
+export async function updateCustomerConfirm(pageId: string, value: string): Promise<void> {
+  await client().pages.update({ page_id: pageId, properties: { 確認状況: { select: { name: value } } } });
 }
 
 /** 全顧客（取得上限まで）。架電リスト用。 */
@@ -512,5 +530,6 @@ export async function fetchContracts(): Promise<Contract[]> {
     nextRenewal: dateStart(pg, "次回更新日"),
     sRep: sel(pg, "S担当"),
     csRep: sel(pg, "社内担当"),
+    health: sel(pg, "健全性スコア"),
   }));
 }

@@ -2,12 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import clsx from "clsx";
+import { monthColumns } from "@/lib/period";
 
 type Detail = Record<string, number>;
 type Data = Record<string, Detail>;
 type StrData = Record<string, Record<string, string>>;
-
-const pad = (n: number) => String(n).padStart(2, "0");
 
 function toStr(data: Data): StrData {
   const out: StrData = {};
@@ -16,30 +15,6 @@ function toStr(data: Data): StrData {
     for (const [k, v] of Object.entries(d)) out[rep][k] = String(v);
   }
   return out;
-}
-
-/** 対象月の列（日次=各日 / 週次=各週の月曜） */
-function columnsFor(type: "日次" | "週次", month: string): { key: string; label: string }[] {
-  const [y, m] = month.split("-").map(Number);
-  if (!y || !m) return [];
-  const last = new Date(y, m, 0).getDate();
-  if (type === "日次") {
-    return Array.from({ length: last }, (_, i) => {
-      const d = i + 1;
-      return { key: `${month}-${pad(d)}`, label: String(d) };
-    });
-  }
-  // 週次: 月内の各週（月曜起点）
-  const cols: { key: string; label: string }[] = [];
-  const first = new Date(y, m - 1, 1);
-  const day = first.getDay();
-  const offsetToMonday = day === 0 ? 6 : day - 1;
-  const monday = new Date(y, m - 1, 1 - offsetToMonday);
-  while (monday <= new Date(y, m - 1, last)) {
-    cols.push({ key: `${monday.getFullYear()}-${pad(monday.getMonth() + 1)}-${pad(monday.getDate())}`, label: `${monday.getMonth() + 1}/${monday.getDate()}週` });
-    monday.setDate(monday.getDate() + 7);
-  }
-  return cols;
 }
 
 export default function CallTargetGrid({
@@ -61,7 +36,7 @@ export default function CallTargetGrid({
   const [state, setState] = useState<"idle" | "loading" | "saving" | "saved" | "error">("idle");
   const [err, setErr] = useState("");
 
-  const cols = useMemo(() => columnsFor(type, month), [type, month]);
+  const cols = useMemo(() => monthColumns(type, month), [type, month]);
   const shownReps = viewRep === "all" ? reps : reps.filter((r) => r === viewRep);
 
   // 種別・対象月の変更で再取得
