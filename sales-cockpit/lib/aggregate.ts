@@ -244,9 +244,13 @@ const CONTACTED_STATUS = new Set([
   "不通", "受付拒否", "担当者不在", "担当者拒否", "再コール", "クレーム", "見込み客", "資料請求",
   "アポイント獲得", "提案中", "商談中", "契約中", "契約終了", "失注", "パートナー",
 ]);
-const APPOINTED_STATUS = new Set(["アポイント獲得", "提案中", "商談中", "契約中", "契約終了", "パートナー"]);
 
-export function buildStatusActivity(customers: Customer[]): StatusActivity {
+/** since(YYYY-MM-DD)以降にアポ取得日があるか */
+function apptOnOrAfter(c: Customer, since: string): boolean {
+  return !!c.appointmentDate && c.appointmentDate.slice(0, 10) >= since;
+}
+
+export function buildStatusActivity(customers: Customer[], since: string): StatusActivity {
   let contacted = 0;
   let appointments = 0;
   let leads = 0;
@@ -262,7 +266,8 @@ export function buildStatusActivity(customers: Customer[]): StatusActivity {
     if (!CONTACTED_STATUS.has(s)) continue;
     contacted++;
     byResultMap.set(s, (byResultMap.get(s) ?? 0) + 1);
-    const appt = APPOINTED_STATUS.has(s);
+    // アポはアポ取得日(since以降)で統一カウント
+    const appt = apptOnOrAfter(c, since);
     if (appt) appointments++;
     const rep = c.isRep ?? "未割当";
     const r = repMap.get(rep) ?? { contacted: 0, appointments: 0 };
@@ -284,8 +289,8 @@ export function buildStatusActivity(customers: Customer[]): StatusActivity {
   const keys = recentMonthKeys(6);
   const m = new Map<string, number>();
   for (const c of customers) {
-    if (!c.appointmentDate) continue;
-    const k = monthKey(c.appointmentDate);
+    if (!apptOnOrAfter(c, since)) continue;
+    const k = monthKey(c.appointmentDate!);
     if (k) m.set(k, (m.get(k) ?? 0) + 1);
   }
   const apptMonthly = keys.map((k) => ({ key: k, label: monthLabel(k), appointments: m.get(k) ?? 0 }));
@@ -374,13 +379,14 @@ export function buildDashboard(input: {
   const ck = contractKpis(contracts);
   const reps = buildRepStats(calls, targets);
   const ts = targetSummary(reps);
-  const statusActivity = buildStatusActivity(customers);
+  const since = process.env.METRICS_SINCE || "2026-05-07";
+  const statusActivity = buildStatusActivity(customers, since);
   // アポ実績はアポイント取得日ベース（架電ログが無いため）
   const goals = buildGoals(calls, ts, apptsThisMonth(customers), ck.newContractsThisMonth, targets, targetsConfig);
 
   return {
     generatedAt: new Date().toISOString(),
-    metricsSince: process.env.METRICS_SINCE || "2026-05-07",
+    metricsSince: since,
     ok: errors.length === 0,
     errors,
     kpi: {

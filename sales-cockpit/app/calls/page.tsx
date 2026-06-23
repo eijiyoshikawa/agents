@@ -2,7 +2,7 @@ import { getCustomers } from "@/lib/data";
 import CustomerTable, { type InitialFilters } from "@/components/CustomerTable";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 60; // 大量レコード取得に備えタイムアウトを延長
+export const maxDuration = 300; // 大量レコード取得に備えタイムアウトを延長
 
 function str(v: string | string[] | undefined): string {
   return Array.isArray(v) ? (v[0] ?? "") : (v ?? "");

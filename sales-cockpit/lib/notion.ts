@@ -44,8 +44,8 @@ async function queryAll(databaseId: string, filter?: any): Promise<any[]> {
   if (!databaseId) return [];
   const out: any[] = [];
   let cursor: string | undefined;
-  // 取得上限ページ数（1ページ=100件）。既定120ページ=12,000件。env で変更可。
-  const maxPages = Number(process.env.NOTION_MAX_PAGES ?? 120);
+  // 取得上限ページ数（1ページ=100件）。既定320ページ=32,000件（全件カバー）。env で変更可。
+  const maxPages = Number(process.env.NOTION_MAX_PAGES ?? 320);
   for (let i = 0; i < maxPages; i++) {
     const res: any = await client().databases.query({
       database_id: databaseId,
