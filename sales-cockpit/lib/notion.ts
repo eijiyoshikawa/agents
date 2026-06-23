@@ -1,16 +1,24 @@
 import { Client } from "@notionhq/client";
-import type { Customer, Contract, CallEvent, CallTarget } from "./types";
+import type { Customer, Contract, CallEvent } from "./types";
 
 // ── Notion クライアント & 設定 ───────────────────────────────────
 export const NOTION_REVALIDATE = Number(process.env.NOTION_REVALIDATE_SECONDS ?? 300);
 
 const TOKEN = process.env.NOTION_TOKEN ?? "";
 
+// 既定の DB ID（株式会社LET公式Notionの実DB）。環境変数があればそちらを優先。
+const DEFAULTS = {
+  customers: "1ac3fae4-3499-4991-b465-e375bef7d66c", // 📊 DB_顧客管理
+  calls: "f2a72c62-21ed-4de5-acb0-00848c9b0cbe", // 📞 架電記録
+  contracts: "b079ca72-2a13-4562-96d6-cd83b4787bbd", // 🤝 契約管理DB
+  isKpi: "f9fa0d32-3eb1-4625-9f4a-e06cc0cedb6b", // 📞 IS架電KPI（架電ログ）
+};
+
 export const DB = {
-  customers: process.env.NOTION_DB_CUSTOMERS ?? "",
-  calls: process.env.NOTION_DB_CALLS ?? "",
-  contracts: process.env.NOTION_DB_CONTRACTS ?? "",
-  isKpi: process.env.NOTION_DB_ISKPI ?? "",
+  customers: process.env.NOTION_DB_CUSTOMERS || DEFAULTS.customers,
+  calls: process.env.NOTION_DB_CALLS || DEFAULTS.calls,
+  contracts: process.env.NOTION_DB_CONTRACTS || DEFAULTS.contracts,
+  isKpi: process.env.NOTION_DB_ISKPI || DEFAULTS.isKpi,
 };
 
 export function notionConfigured(): boolean {
@@ -67,6 +75,7 @@ function number(page: any, name: string): number | null {
   const p = P(page, name);
   if (p?.type === "number") return p.number;
   if (p?.type === "rollup" && p.rollup?.type === "number") return p.rollup.number ?? null;
+  if (p?.type === "formula" && p.formula?.type === "number") return p.formula.number ?? null;
   return null;
 }
 function phone(page: any, name: string): string | null {
@@ -85,6 +94,11 @@ function person(page: any, name: string): string | null {
   if (p?.type === "people") return p.people?.[0]?.name ?? null;
   return null;
 }
+function formulaStr(page: any, name: string): string | null {
+  const p = P(page, name);
+  if (p?.type === "formula" && p.formula?.type === "string") return p.formula.string ?? null;
+  return null;
+}
 
 // ── 各DBの取得（正規化して返す） ─────────────────────────────────
 export async function fetchCustomers(): Promise<Customer[]> {
@@ -97,8 +111,11 @@ export async function fetchCustomers(): Promise<Customer[]> {
     status: sel(pg, "ステータス"),
     rank: sel(pg, "見込み度合い"),
     industry: sel(pg, "業種"),
+    phase: sel(pg, "企業フェーズ"),
+    pref: formulaStr(pg, "都道府県"),
     isRep: sel(pg, "IS担当"),
     sRep: sel(pg, "S担当"),
+    csRep: sel(pg, "CS担当"),
     method: sel(pg, "営業手法"),
     callCount: number(pg, "架電回数"),
     lastCallDate: dateStart(pg, "最終架電日"),
@@ -121,11 +138,12 @@ export async function fetchCalls(): Promise<CallEvent[]> {
       isAppointment: !!result && APPT_RESULTS.has(result),
       isConnected: !!result && CONNECTED_RESULTS.has(result),
       source: "架電記録" as const,
+      monthlyTarget: null,
     };
   });
 }
 
-/** IS架電KPI（架電ログ）。マルチソースDBのため失敗時は空配列で穏当に縮退。 */
+/** IS架電KPI（架電ログ）。各行に「月次目標架電数」を持つため目標値もここで拾う。 */
 export async function fetchIsKpiCalls(): Promise<CallEvent[]> {
   if (!DB.isKpi) return [];
   const pages = await queryAll(DB.isKpi);
@@ -139,15 +157,9 @@ export async function fetchIsKpiCalls(): Promise<CallEvent[]> {
       isAppointment: !!status && APPT_RESULTS.has(status),
       isConnected: !!status && CONNECTED_RESULTS.has(status),
       source: "IS架電KPI" as const,
+      monthlyTarget: number(pg, "月次目標架電数"),
     };
   });
-}
-
-/** IS架電KPI 内の「🎯目標設定」。マルチソースのため取得不可なら空。 */
-export async function fetchTargets(): Promise<CallTarget[]> {
-  // 目標設定は IS架電KPI と同一データベース内の別データソース。
-  // 公開REST API では別ソースを直接引けない場合があるため、失敗は呼び出し側で握り潰す。
-  return [];
 }
 
 export async function fetchContracts(): Promise<Contract[]> {

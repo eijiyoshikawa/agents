@@ -9,6 +9,7 @@ export type CallEvent = {
   isAppointment: boolean; // アポ獲得か
   isConnected: boolean; // 通話/接続できたか
   source: "架電記録" | "IS架電KPI";
+  monthlyTarget: number | null; // IS架電KPIの月次目標架電数（その月/担当）
 };
 
 /** 顧客（📊DB_顧客管理） */
@@ -20,13 +21,19 @@ export type Customer = {
   status: string | null;
   rank: string | null; // 見込み度合い A/B/C/D
   industry: string | null;
+  phase: string | null; // 企業フェーズ
+  pref: string | null; // 都道府県
   isRep: string | null; // IS担当
   sRep: string | null; // S担当
+  csRep: string | null; // CS担当
   method: string | null; // 営業手法
   callCount: number | null; // 架電回数(rollup)
   lastCallDate: string | null; // 最終架電日(rollup)
   appointmentDate: string | null; // アポイント取得日
 };
+
+/** 汎用カテゴリ内訳（項目別グラフ用の土台） */
+export type Breakdown = { label: string; count: number };
 
 /** 契約（🤝契約管理DB） */
 export type Contract = {
@@ -59,8 +66,25 @@ export type RepStat = {
   calls: number;
   appointments: number;
   apptRate: number; // %
-  target?: number; // 当月目標架電数
-  achievement?: number; // 目標達成率 %
+  target: number; // 当月目標架電数（0=未設定）
+  achievement: number | null; // 目標達成率 %（targetなしはnull）
+};
+
+/** 全社の目標達成サマリ */
+export type TargetSummary = {
+  totalTarget: number;
+  totalCalls: number;
+  achievement: number | null; // %
+};
+
+/** 項目別内訳の集合（分析の土台。フィールドを足すだけで拡張可能） */
+export type Breakdowns = {
+  rank: Breakdown[]; // 見込み度合い
+  industry: Breakdown[]; // 業種
+  method: Breakdown[]; // 営業手法
+  phase: Breakdown[]; // 企業フェーズ
+  pref: Breakdown[]; // 都道府県
+  isRep: Breakdown[]; // IS担当
 };
 
 /** ファネル段 */
@@ -85,7 +109,9 @@ export type DashboardData = {
   weekly: SeriesPoint[];
   monthly: SeriesPoint[];
   reps: RepStat[];
+  targetSummary: TargetSummary;
   funnel: FunnelStage[];
   statusBreakdown: { status: string; count: number }[];
+  breakdowns: Breakdowns;
   mrrTrend: { key: string; label: string; mrr: number; active: number }[];
 };

@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, PhoneCall } from "lucide-react";
+import { LayoutDashboard, PhoneCall, BarChart3 } from "lucide-react";
 import clsx from "clsx";
 
 const LINKS = [
   { href: "/", label: "ダッシュボード", icon: LayoutDashboard },
+  { href: "/analytics", label: "分析", icon: BarChart3 },
   { href: "/calls", label: "架電リスト・発信", icon: PhoneCall },
 ];
 

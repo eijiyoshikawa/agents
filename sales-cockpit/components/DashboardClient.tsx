@@ -4,7 +4,7 @@ import { useState } from "react";
 import clsx from "clsx";
 import type { DashboardData } from "@/lib/types";
 import { KpiCard } from "./KpiCard";
-import { CallsChart, MrrChart, FunnelChart } from "./charts";
+import { CallsChart, MrrChart, FunnelChart, TargetChart } from "./charts";
 import { yen, pct, num } from "@/lib/format";
 
 type Period = "week" | "month";
@@ -60,7 +60,12 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
         <KpiCard label="MRR（月次経常収益）" value={yen(k.mrr)} accent="teal" />
         <KpiCard label="稼働中の契約数" value={num(k.activeContracts)} accent="teal" />
         <KpiCard label="今月の新規契約" value={num(k.newContractsThisMonth)} accent="pink" />
-        <KpiCard label="今月の総アポ数" value={num(k.monthAppts)} accent="pink" />
+        <KpiCard
+          label="今月の目標達成率"
+          value={data.targetSummary.achievement != null ? pct(data.targetSummary.achievement) : "—"}
+          sub={data.targetSummary.totalTarget > 0 ? `${num(data.targetSummary.totalCalls)} / ${num(data.targetSummary.totalTarget)} 件` : "目標未設定"}
+          accent="amber"
+        />
       </div>
 
       {/* 架電推移 */}
@@ -82,6 +87,12 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
           <FunnelChart data={data.funnel} />
         </section>
       </div>
+
+      {/* 目標達成（担当者別） */}
+      <section className="card p-5">
+        <h2 className="text-sm font-semibold text-ink mb-3">目標 vs 実績・達成率（今月 / 担当者別）</h2>
+        <TargetChart reps={data.reps} />
+      </section>
 
       {/* MRR推移 */}
       <section className="card p-5">
@@ -105,6 +116,8 @@ function RepTable({ data }: { data: DashboardData }) {
             <th className="text-right font-medium py-2">架電</th>
             <th className="text-right font-medium py-2">アポ</th>
             <th className="text-right font-medium py-2">アポ率</th>
+            <th className="text-right font-medium py-2">目標</th>
+            <th className="text-right font-medium py-2">達成率</th>
           </tr>
         </thead>
         <tbody>
@@ -114,6 +127,16 @@ function RepTable({ data }: { data: DashboardData }) {
               <td className="py-2 text-right tabular-nums">{num(r.calls)}</td>
               <td className="py-2 text-right tabular-nums">{num(r.appointments)}</td>
               <td className="py-2 text-right tabular-nums text-accent-indigo">{pct(r.apptRate)}</td>
+              <td className="py-2 text-right tabular-nums text-ink-muted">{r.target > 0 ? num(r.target) : "—"}</td>
+              <td className="py-2 text-right tabular-nums font-medium">
+                {r.achievement != null ? (
+                  <span className={r.achievement >= 100 ? "text-brand" : r.achievement >= 70 ? "text-accent-amber" : "text-accent-red"}>
+                    {r.achievement}%
+                  </span>
+                ) : (
+                  "—"
+                )}
+              </td>
             </tr>
           ))}
         </tbody>

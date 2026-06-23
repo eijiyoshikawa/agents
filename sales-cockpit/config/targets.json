@@ -1,0 +1,5 @@
+{
+  "_comment": "IS担当ごとの月次目標架電数。優先順は ①Notion(IS架電KPIの月次目標架電数) → ②ここの monthlyTargetByRep → ③defaultMonthly。Notion側で運用していればこのファイルは空のままでOK。",
+  "defaultMonthly": 0,
+  "monthlyTargetByRep": {}
+}

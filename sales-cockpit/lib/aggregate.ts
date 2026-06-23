@@ -6,6 +6,9 @@ import type {
   RepStat,
   FunnelStage,
   DashboardData,
+  Breakdown,
+  Breakdowns,
+  TargetSummary,
 } from "./types";
 import {
   weekKey,
@@ -65,6 +68,7 @@ export function buildMonthly(calls: CallEvent[], n = 6): SeriesPoint[] {
 export function buildRepStats(calls: CallEvent[], targets: Map<string, number>): RepStat[] {
   const cur = currentMonthKey();
   const map = new Map<string, Bucket>();
+  // 架電のある担当を集計
   for (const c of calls) {
     if (!c.date || monthKey(c.date) !== cur) continue;
     const rep = c.rep ?? "未割当";
@@ -73,18 +77,79 @@ export function buildRepStats(calls: CallEvent[], targets: Map<string, number>):
     if (c.isAppointment) b.appointments += 1;
     map.set(rep, b);
   }
+  // 目標だけある担当（当月架電0）も行として出す
+  for (const rep of targets.keys()) {
+    if (!map.has(rep)) map.set(rep, emptyBucket());
+  }
   const stats: RepStat[] = [...map.entries()].map(([rep, b]) => {
-    const target = targets.get(rep);
+    const target = targets.get(rep) ?? 0;
     return {
       rep,
       calls: b.calls,
       appointments: b.appointments,
       apptRate: Number(rate(b.appointments, b.calls).toFixed(1)),
       target,
-      achievement: target ? Number(rate(b.calls, target).toFixed(0)) : undefined,
+      achievement: target > 0 ? Number(rate(b.calls, target).toFixed(0)) : null,
     };
   });
   return stats.sort((a, b) => b.calls - a.calls);
+}
+
+/**
+ * 当月の目標架電数マップを構築。
+ * 優先順: ① IS架電KPI の「月次目標架電数」(当月) → ② config の担当別 → ③ config の既定値。
+ */
+export function buildTargets(
+  calls: CallEvent[],
+  config: { defaultMonthly?: number; monthlyTargetByRep?: Record<string, number> },
+): Map<string, number> {
+  const cur = currentMonthKey();
+  const fromNotion = new Map<string, number>();
+  for (const c of calls) {
+    if (c.source !== "IS架電KPI" || !c.date || monthKey(c.date) !== cur) continue;
+    if (c.rep && c.monthlyTarget && c.monthlyTarget > 0) fromNotion.set(c.rep, c.monthlyTarget);
+  }
+  const out = new Map<string, number>();
+  const cfgByRep = config.monthlyTargetByRep ?? {};
+  const reps = new Set<string>([...fromNotion.keys(), ...Object.keys(cfgByRep)]);
+  for (const rep of reps) {
+    const v = fromNotion.get(rep) ?? cfgByRep[rep] ?? config.defaultMonthly ?? 0;
+    if (v > 0) out.set(rep, v);
+  }
+  return out;
+}
+
+function targetSummary(reps: RepStat[]): TargetSummary {
+  const totalTarget = reps.reduce((s, r) => s + r.target, 0);
+  const totalCalls = reps.reduce((s, r) => s + r.calls, 0);
+  return {
+    totalTarget,
+    totalCalls,
+    achievement: totalTarget > 0 ? Number(rate(totalCalls, totalTarget).toFixed(0)) : null,
+  };
+}
+
+// ── 汎用 項目別内訳（分析の土台） ───────────────────────────────
+/** 任意フィールドで件数を集計し、多い順に返す。null/空は「(未設定)」へ。 */
+export function groupCount<T>(items: T[], keyOf: (x: T) => string | null | undefined, limit = 0): Breakdown[] {
+  const counts = new Map<string, number>();
+  for (const it of items) {
+    const k = keyOf(it) || "(未設定)";
+    counts.set(k, (counts.get(k) ?? 0) + 1);
+  }
+  const arr = [...counts.entries()].map(([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count);
+  return limit > 0 ? arr.slice(0, limit) : arr;
+}
+
+function buildBreakdowns(customers: Customer[]): Breakdowns {
+  return {
+    rank: groupCount(customers, (c) => c.rank),
+    industry: groupCount(customers, (c) => c.industry, 15),
+    method: groupCount(customers, (c) => c.method),
+    phase: groupCount(customers, (c) => c.phase),
+    pref: groupCount(customers, (c) => c.pref, 15),
+    isRep: groupCount(customers, (c) => c.isRep),
+  };
 }
 
 // 顧客ステータス → ファネル段マッピング
@@ -172,6 +237,7 @@ export function buildDashboard(input: {
   const week = weekly.find((p) => p.key === cw) ?? { calls: 0, appointments: 0, apptRate: 0 };
   const month = monthly.find((p) => p.key === cm) ?? { calls: 0, appointments: 0, apptRate: 0 };
   const ck = contractKpis(contracts);
+  const reps = buildRepStats(calls, targets);
 
   return {
     generatedAt: new Date().toISOString(),
@@ -188,9 +254,11 @@ export function buildDashboard(input: {
     },
     weekly,
     monthly,
-    reps: buildRepStats(calls, targets),
+    reps,
+    targetSummary: targetSummary(reps),
     funnel: buildFunnel(customers),
     statusBreakdown: buildStatusBreakdown(customers),
+    breakdowns: buildBreakdowns(customers),
     mrrTrend: buildMrrTrend(contracts),
   };
 }
