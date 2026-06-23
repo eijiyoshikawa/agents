@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import {
   fetchCustomers,
   fetchCalls,
@@ -11,6 +12,15 @@ import type { DashboardData, Customer, CallEvent } from "./types";
 import targetsRaw from "@/config/targets.json";
 
 const targetsConfig = targetsRaw as TargetsConfig;
+
+// ── キャッシュ（高速化） ─────────────────────────────────────────
+// Notion全件取得は重いため結果をキャッシュ。保存時に revalidateTag で無効化する。
+// タグ: "customers"(顧客・メモ), "calls", "contracts", "targets"
+const TTL = Number(process.env.NOTION_REVALIDATE_SECONDS ?? 300);
+const cachedCustomers = unstable_cache(fetchCustomers, ["sc-customers"], { revalidate: TTL, tags: ["customers"] });
+const cachedCalls = unstable_cache(fetchCalls, ["sc-calls"], { revalidate: TTL, tags: ["calls"] });
+const cachedContracts = unstable_cache(fetchContracts, ["sc-contracts"], { revalidate: TTL, tags: ["contracts"] });
+const cachedTargets = unstable_cache(getStoredTargets, ["sc-targets"], { revalidate: TTL, tags: ["targets"] });
 
 /** Promise を実行し、失敗したら fallback を返してエラーメッセージを収集する */
 async function safe<T>(label: string, fn: () => Promise<T>, fallback: T, errors: string[]): Promise<T> {
@@ -34,9 +44,9 @@ export async function getDashboard(): Promise<DashboardData> {
   }
 
   const [customers, recCalls, contracts] = await Promise.all([
-    safe("顧客管理", fetchCustomers, [] as Customer[], errors),
-    safe("架電記録", fetchCalls, [] as CallEvent[], errors),
-    safe("契約管理", fetchContracts, [], errors),
+    safe("顧客管理", cachedCustomers, [] as Customer[], errors),
+    safe("架電記録", cachedCalls, [] as CallEvent[], errors),
+    safe("契約管理", cachedContracts, [], errors),
   ]);
   // IS架電KPI はマルチソースDBで現APIバージョン非対応のことがあるため、失敗しても警告は出さず無視する。
   let kpiCalls: CallEvent[] = [];
@@ -51,7 +61,7 @@ export async function getDashboard(): Promise<DashboardData> {
   // 目標: サイト内設定（Notion 目標設定DB）を最優先。無ければ config/targets.json。
   let effectiveConfig: TargetsConfig = targetsConfig;
   try {
-    const stored = await getStoredTargets();
+    const stored = await cachedTargets();
     if (stored) {
       effectiveConfig = {
         workingDaysPerMonth: stored.workingDaysPerMonth,
@@ -73,6 +83,6 @@ export async function getDashboard(): Promise<DashboardData> {
 export async function getCustomers(): Promise<{ customers: Customer[]; errors: string[] }> {
   const errors: string[] = [];
   if (!notionConfigured()) return { customers: [], errors: ["NOTION_TOKEN が未設定です。"] };
-  const customers = await safe("顧客管理", fetchCustomers, [] as Customer[], errors);
+  const customers = await safe("顧客管理", cachedCustomers, [] as Customer[], errors);
   return { customers, errors };
 }

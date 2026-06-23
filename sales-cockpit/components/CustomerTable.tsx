@@ -55,9 +55,14 @@ export default function CustomerTable({
       .sort((a, b) => (b.lastCallDate ?? "").localeCompare(a.lastCallDate ?? ""));
   }, [customers, q, rep, status, rank, industry]);
 
-  const openIndex = useMemo(() => filtered.findIndex((c) => c.id === openId), [filtered, openId]);
+  // 描画は上限まで（高速化）。絞り込みで対象を減らして使う想定。
+  const DISPLAY_CAP = 500;
+  const visible = useMemo(() => filtered.slice(0, DISPLAY_CAP), [filtered]);
+  const truncated = filtered.length - visible.length;
+
+  const openIndex = useMemo(() => visible.findIndex((c) => c.id === openId), [visible, openId]);
   const openAt = (i: number) => {
-    if (i >= 0 && i < filtered.length) setOpenId(filtered[i].id);
+    if (i >= 0 && i < visible.length) setOpenId(visible[i].id);
   };
 
   return (
@@ -79,7 +84,11 @@ export default function CustomerTable({
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs text-slate-400">{filtered.length.toLocaleString()} 件 ・ 行をクリックで詳細・メモ</p>
+        <p className="text-xs text-slate-400">
+          {filtered.length.toLocaleString()} 件
+          {truncated > 0 && <span className="text-slate-500"> （表示は先頭{DISPLAY_CAP}件・絞り込みで全件対象）</span>}
+          ・ 行をクリックで詳細・メモ
+        </p>
         <SaveListBar filters={{ q, rep, status, rank, industry }} count={filtered.length} />
       </div>
 
@@ -98,7 +107,7 @@ export default function CustomerTable({
             </tr>
           </thead>
           <tbody>
-            {filtered.map((c, i) => (
+            {visible.map((c, i) => (
               <Fragment key={c.id}>
                 <tr
                   onClick={() => setOpenId(openId === c.id ? null : c.id)}
@@ -137,7 +146,7 @@ export default function CustomerTable({
                       <DetailPanel
                         c={c}
                         index={i}
-                        total={filtered.length}
+                        total={visible.length}
                         onPrev={() => openAt(openIndex - 1)}
                         onNext={() => openAt(openIndex + 1)}
                         onClose={() => setOpenId(null)}

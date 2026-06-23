@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { revalidateTag } from "next/cache";
 import { saveStoredTargets, type StoredTargets } from "@/lib/notion";
 import { verifySession, SESSION_COOKIE } from "@/lib/session";
 
@@ -27,6 +28,7 @@ export async function POST(req: Request) {
       updatedBy: session.name,
     };
     await saveStoredTargets(t);
+    revalidateTag("targets");
     return NextResponse.json({ ok: true });
   } catch (e: any) {
     return NextResponse.json({ ok: false, error: e?.message ?? "保存に失敗しました" }, { status: 500 });
