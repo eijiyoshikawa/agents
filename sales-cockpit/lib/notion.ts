@@ -19,7 +19,14 @@ export const DB = {
   calls: process.env.NOTION_DB_CALLS || DEFAULTS.calls,
   contracts: process.env.NOTION_DB_CONTRACTS || DEFAULTS.contracts,
   isKpi: process.env.NOTION_DB_ISKPI || DEFAULTS.isKpi,
+  // アプリ管理用（MCPで自動生成）
+  users: process.env.NOTION_DB_USERS || "791601fb-82eb-4130-aa0f-727bde6b9444",
+  targets: process.env.NOTION_DB_TARGETS || "2b8a2f71-e915-434a-ae5b-a3d2eb84aa47",
 };
+
+// Notion プロパティ組み立てヘルパー（書き込み用）
+const rt = (s: string) => ({ rich_text: [{ type: "text" as const, text: { content: s ?? "" } }] });
+const tt = (s: string) => ({ title: [{ type: "text" as const, text: { content: s ?? "" } }] });
 
 export function notionConfigured(): boolean {
   return Boolean(TOKEN && DB.customers);
@@ -143,6 +150,107 @@ export async function updateCustomerMemo(pageId: string, memo: string): Promise<
     page_id: pageId,
     properties: { メモ: { rich_text: [{ type: "text", text: { content: memo } }] } },
   });
+}
+
+// ── アプリユーザー（ログイン） ───────────────────────────────────
+export type AppUser = { pageId: string; name: string; userId: string; passwordHash: string };
+
+export async function findUserByLoginId(userId: string): Promise<AppUser | null> {
+  const pages = await queryAll(DB.users);
+  const norm = userId.trim().toLowerCase();
+  for (const pg of pages) {
+    const uid = (txt(pg, "ユーザーID") ?? "").trim().toLowerCase();
+    if (uid && uid === norm) {
+      return {
+        pageId: pg.id,
+        name: txt(pg, "名前") ?? userId,
+        userId: txt(pg, "ユーザーID") ?? userId,
+        passwordHash: txt(pg, "パスワードハッシュ") ?? "",
+      };
+    }
+  }
+  return null;
+}
+
+export async function createUser(input: {
+  name: string;
+  userId: string;
+  passwordHash: string;
+  creator?: string;
+}): Promise<void> {
+  await client().pages.create({
+    parent: { database_id: DB.users },
+    properties: {
+      名前: tt(input.name),
+      ユーザーID: rt(input.userId),
+      パスワードハッシュ: rt(input.passwordHash),
+      作成者: rt(input.creator ?? ""),
+    },
+  });
+}
+
+export async function touchUserLogin(pageId: string): Promise<void> {
+  try {
+    await client().pages.update({
+      page_id: pageId,
+      properties: { 最終ログイン: { date: { start: new Date().toISOString() } } },
+    });
+  } catch {
+    /* 失敗しても致命的ではない */
+  }
+}
+
+// ── 目標設定（サイト内編集） ─────────────────────────────────────
+export type StoredTargets = {
+  workingDaysPerMonth: number;
+  monthlyAppointments: number;
+  monthlyContracts: number;
+  dailyCallsDefault: number;
+  dailyCallsByRep: Record<string, number>;
+  updatedBy?: string;
+};
+
+const TARGET_KEY = "default"; // 全社の既定行を1つだけ使う
+
+/** 保存済み目標（default行）を取得。無ければ null。 */
+export async function getStoredTargets(): Promise<StoredTargets | null> {
+  const pages = await queryAll(DB.targets);
+  const row = pages.find((pg) => (txt(pg, "対象月") ?? "") === TARGET_KEY) ?? pages[0];
+  if (!row) return null;
+  let byRep: Record<string, number> = {};
+  try {
+    byRep = JSON.parse(txt(row, "担当別日次目標JSON") ?? "{}");
+  } catch {
+    byRep = {};
+  }
+  return {
+    workingDaysPerMonth: number(row, "営業日数") ?? 20,
+    monthlyAppointments: number(row, "月次アポ目標") ?? 0,
+    monthlyContracts: number(row, "月次契約目標") ?? 0,
+    dailyCallsDefault: number(row, "日次架電目標") ?? 0,
+    dailyCallsByRep: byRep,
+  };
+}
+
+/** 目標（default行）を作成 or 更新。 */
+export async function saveStoredTargets(t: StoredTargets): Promise<void> {
+  const props: any = {
+    名称: tt("全社目標"),
+    対象月: rt(TARGET_KEY),
+    月次アポ目標: { number: t.monthlyAppointments || 0 },
+    月次契約目標: { number: t.monthlyContracts || 0 },
+    日次架電目標: { number: t.dailyCallsDefault || 0 },
+    営業日数: { number: t.workingDaysPerMonth || 20 },
+    担当別日次目標JSON: rt(JSON.stringify(t.dailyCallsByRep ?? {})),
+    更新者: rt(t.updatedBy ?? ""),
+  };
+  const pages = await queryAll(DB.targets);
+  const existing = pages.find((pg) => (txt(pg, "対象月") ?? "") === TARGET_KEY) ?? pages[0];
+  if (existing) {
+    await client().pages.update({ page_id: existing.id, properties: props });
+  } else {
+    await client().pages.create({ parent: { database_id: DB.targets }, properties: props });
+  }
 }
 
 const APPT_RESULTS = new Set(["アポイント獲得", "アポ獲得"]);

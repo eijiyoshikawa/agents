@@ -4,6 +4,7 @@ import {
   fetchIsKpiCalls,
   fetchContracts,
   notionConfigured,
+  getStoredTargets,
 } from "./notion";
 import { buildDashboard, buildTargets, type TargetsConfig } from "./aggregate";
 import type { DashboardData, Customer, CallEvent } from "./types";
@@ -47,10 +48,25 @@ export async function getDashboard(): Promise<DashboardData> {
 
   // 「両方使っている／統合したい」方針: 架電記録 を主ソースとし IS架電KPI を統合。
   const calls: CallEvent[] = [...recCalls, ...kpiCalls];
-  // 目標: config/targets.json（日別/月次/全社）を主とし、IS架電KPIの月次目標で補完。
-  const targets = buildTargets(calls, targetsConfig);
+  // 目標: サイト内設定（Notion 目標設定DB）を最優先。無ければ config/targets.json。
+  let effectiveConfig: TargetsConfig = targetsConfig;
+  try {
+    const stored = await getStoredTargets();
+    if (stored) {
+      effectiveConfig = {
+        workingDaysPerMonth: stored.workingDaysPerMonth,
+        company: { monthlyAppointments: stored.monthlyAppointments, monthlyContracts: stored.monthlyContracts },
+        dailyCallsDefault: stored.dailyCallsDefault,
+        dailyCallsByRep: stored.dailyCallsByRep,
+        monthlyCallsByRep: {},
+      };
+    }
+  } catch {
+    /* 目標設定DB未接続などは静かに無視し、ファイル設定にフォールバック */
+  }
+  const targets = buildTargets(calls, effectiveConfig);
 
-  return buildDashboard({ calls, customers, contracts, targets, targetsConfig, errors });
+  return buildDashboard({ calls, customers, contracts, targets, targetsConfig: effectiveConfig, errors });
 }
 
 /** 架電一覧（クリック発信）用の顧客リスト */
