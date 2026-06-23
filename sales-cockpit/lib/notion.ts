@@ -23,6 +23,7 @@ export const DB = {
   users: process.env.NOTION_DB_USERS || "791601fb-82eb-4130-aa0f-727bde6b9444",
   targets: process.env.NOTION_DB_TARGETS || "2b8a2f71-e915-434a-ae5b-a3d2eb84aa47",
   lists: process.env.NOTION_DB_LISTS || "2a4d040c-8485-41e4-8403-994df6702757",
+  callTargets: process.env.NOTION_DB_CALL_TARGETS || "0b19647d-b3d8-4b00-b90d-45dc1754be21",
 };
 
 // Notion プロパティ組み立てヘルパー（書き込み用）
@@ -161,6 +162,7 @@ function mapCustomer(pg: any): Customer {
     listing: sel(pg, "上場区分"),
     recruitPage: url(pg, "採用ページ"),
     media: multi(pg, "掲載元メディア"),
+    lastEdited: pg.last_edited_time ?? null,
   };
 }
 
@@ -317,6 +319,76 @@ export async function deleteSavedList(pageId: string): Promise<void> {
   await client().pages.update({ page_id: pageId, archived: true });
 }
 
+// ── 担当者一覧（Notion依存） ─────────────────────────────────────
+/** DB_顧客管理の「IS担当」選択肢を担当者マスタとして取得 */
+export async function fetchRepOptions(): Promise<string[]> {
+  try {
+    const db: any = await client().databases.retrieve({ database_id: DB.customers });
+    const prop = db.properties?.["IS担当"];
+    const opts = prop?.select?.options ?? prop?.multi_select?.options ?? [];
+    return opts.map((o: any) => o.name).filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
+// ── 架電目標（日次・週次／担当別） ───────────────────────────────
+export type CallTargetData = Record<string, Record<string, number>>; // 担当 -> { 日付キー: 件数 }
+
+export async function getCallTargets(type: "日次" | "週次", month: string): Promise<CallTargetData> {
+  const pages = await queryAll(DB.callTargets, {
+    and: [
+      { property: "種別", select: { equals: type } },
+      { property: "対象月", rich_text: { equals: month } },
+    ],
+  });
+  const out: CallTargetData = {};
+  for (const pg of pages) {
+    const rep = txt(pg, "担当") ?? "";
+    if (!rep) continue;
+    let detail: Record<string, number> = {};
+    try {
+      detail = JSON.parse(txt(pg, "明細JSON") ?? "{}");
+    } catch {
+      detail = {};
+    }
+    out[rep] = detail;
+  }
+  return out;
+}
+
+export async function saveCallTargets(input: {
+  type: "日次" | "週次";
+  month: string;
+  byRep: CallTargetData;
+  updatedBy?: string;
+}): Promise<void> {
+  const existing = await queryAll(DB.callTargets, {
+    and: [
+      { property: "種別", select: { equals: input.type } },
+      { property: "対象月", rich_text: { equals: input.month } },
+    ],
+  });
+  const pageByRep = new Map<string, string>();
+  for (const pg of existing) {
+    const r = txt(pg, "担当");
+    if (r) pageByRep.set(r, pg.id);
+  }
+  for (const [rep, detail] of Object.entries(input.byRep)) {
+    const props: any = {
+      名称: tt(`${rep}｜${input.type}｜${input.month}`),
+      担当: rt(rep),
+      種別: { select: { name: input.type } },
+      対象月: rt(input.month),
+      明細JSON: rt(JSON.stringify(detail ?? {})),
+      更新者: rt(input.updatedBy ?? ""),
+    };
+    const pid = pageByRep.get(rep);
+    if (pid) await client().pages.update({ page_id: pid, properties: props });
+    else await client().pages.create({ parent: { database_id: DB.callTargets }, properties: props });
+  }
+}
+
 /** 目標（default行）を作成 or 更新。 */
 export async function saveStoredTargets(t: StoredTargets): Promise<void> {
   const props: any = {
@@ -389,5 +461,7 @@ export async function fetchContracts(): Promise<Contract[]> {
     kinds: multi(pg, "契約種別"),
     churnRisk: sel(pg, "解約リスク"),
     nextRenewal: dateStart(pg, "次回更新日"),
+    sRep: sel(pg, "S担当"),
+    csRep: sel(pg, "社内担当"),
   }));
 }

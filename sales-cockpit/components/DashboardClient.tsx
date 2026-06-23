@@ -23,10 +23,11 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
     [worked, since],
   );
   const apptThisMonthRows = useMemo(() => {
-    const m = new Date().toLocaleDateString("ja-JP", { timeZone: "Asia/Tokyo", year: "numeric", month: "2-digit" });
-    const key = m.replace(/\//g, "-").slice(0, 7); // YYYY-MM
-    return apptRows.filter((c) => (c.appointmentDate ?? "").slice(0, 7) === key);
-  }, [apptRows]);
+    const key = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }).slice(0, 7); // YYYY-MM
+    const APPOINTED = new Set(["アポイント獲得", "提案中", "商談中", "契約中", "契約終了", "パートナー"]);
+    // アポ獲得以降のステータス かつ 今月中に更新（最終更新日時が今月）
+    return worked.filter((c) => c.status && APPOINTED.has(c.status) && (c.lastEdited ?? "").slice(0, 7) === key);
+  }, [worked]);
 
   const open = (title: string, rows: DrillCustomer[]) => setDrill({ title, rows });
 

@@ -41,6 +41,7 @@ export type Customer = {
   listing: string | null; // 上場区分
   recruitPage: string | null; // 採用ページURL
   media: string[]; // 掲載元メディア
+  lastEdited: string | null; // 最終更新日時
 };
 
 /** 汎用カテゴリ内訳（項目別グラフ用の土台） */
@@ -59,6 +60,7 @@ export type DrillCustomer = {
   phone: string | null;
   appointmentDate: string | null;
   industry: string | null;
+  lastEdited: string | null;
 };
 
 /** 顧客ステータス基準の活動実績（架電ログが無い運用向け） */
@@ -84,6 +86,8 @@ export type Contract = {
   kinds: string[]; // 契約種別
   churnRisk: string | null; // 解約リスク
   nextRenewal: string | null; // 次回更新日
+  sRep: string | null; // S担当（成約営業）
+  csRep: string | null; // 社内担当（CS）
 };
 
 /** IS別の月次目標（🎯目標設定） */

@@ -245,6 +245,9 @@ const CONTACTED_STATUS = new Set([
   "アポイント獲得", "提案中", "商談中", "契約中", "契約終了", "失注", "パートナー",
 ]);
 
+// アポ獲得以降のステータス
+const APPOINTED_STATUS = new Set(["アポイント獲得", "提案中", "商談中", "契約中", "契約終了", "パートナー"]);
+
 /** since(YYYY-MM-DD)以降にアポ取得日があるか */
 function apptOnOrAfter(c: Customer, since: string): boolean {
   return !!c.appointmentDate && c.appointmentDate.slice(0, 10) >= since;
@@ -307,11 +310,13 @@ export function buildStatusActivity(customers: Customer[], since: string): Statu
   };
 }
 
-/** 当月のアポ獲得数（アポイント取得日ベース） */
+/** 当月のアポ獲得数：アポ獲得以降のステータス かつ 今月中に更新（最終更新日時が今月） */
 function apptsThisMonth(customers: Customer[]): number {
   const cur = currentMonthKey();
   let n = 0;
-  for (const c of customers) if (c.appointmentDate && monthKey(c.appointmentDate) === cur) n++;
+  for (const c of customers) {
+    if (c.status && APPOINTED_STATUS.has(c.status) && c.lastEdited && monthKey(c.lastEdited) === cur) n++;
+  }
   return n;
 }
 
@@ -416,6 +421,7 @@ export function buildDashboard(input: {
       phone: c.phone,
       appointmentDate: c.appointmentDate,
       industry: c.industry,
+      lastEdited: c.lastEdited,
     })),
     mrrTrend: buildMrrTrend(contracts),
   };

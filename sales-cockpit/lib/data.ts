@@ -9,7 +9,7 @@ import {
   getStoredTargets,
 } from "./notion";
 import { buildDashboard, buildTargets, type TargetsConfig } from "./aggregate";
-import type { DashboardData, Customer, CallEvent } from "./types";
+import type { DashboardData, Customer, CallEvent, Contract } from "./types";
 import targetsRaw from "@/config/targets.json";
 
 const targetsConfig = targetsRaw as TargetsConfig;
@@ -83,6 +83,14 @@ export async function getDashboard(): Promise<DashboardData> {
   const targets = buildTargets(calls, effectiveConfig);
 
   return buildDashboard({ calls, customers, contracts, targets, targetsConfig: effectiveConfig, errors });
+}
+
+/** 契約一覧（MRR担当者別など） */
+export async function getContracts(): Promise<{ contracts: Contract[]; errors: string[] }> {
+  const errors: string[] = [];
+  if (!notionConfigured()) return { contracts: [], errors: ["NOTION_TOKEN が未設定です。"] };
+  const contracts = await safe("契約管理", cachedContracts, [] as Contract[], errors);
+  return { contracts, errors };
 }
 
 /** 架電一覧（クリック発信）用の顧客リスト */
