@@ -35,6 +35,12 @@ export type Customer = {
   companyUrl: string | null; // 会社URL
   rep3: string | null; // 代表者名
   memo: string | null; // メモ
+  sns: string[]; // SNS（運用チャネル）
+  founded: number | null; // 設立年
+  employees: number | null; // 従業員数
+  listing: string | null; // 上場区分
+  recruitPage: string | null; // 採用ページURL
+  media: string[]; // 掲載元メディア
 };
 
 /** 汎用カテゴリ内訳（項目別グラフ用の土台） */

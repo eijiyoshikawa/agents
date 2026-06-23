@@ -4,6 +4,7 @@ import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from "
 import clsx from "clsx";
 import { Search, ChevronDown, ExternalLink, ArrowLeft, ArrowRight, X } from "lucide-react";
 import type { Customer } from "@/lib/types";
+import { buildHooks } from "@/lib/hooks";
 import CallButton from "./CallButton";
 
 const RANK_COLOR: Record<string, string> = {
@@ -181,6 +182,8 @@ function DetailPanel({
         </div>
       </div>
 
+      <HookBox c={c} />
+
       <div className="grid md:grid-cols-3 gap-x-6 gap-y-2 text-sm">
         <Field label="電話番号" value={c.phone} mono />
         <Field label="ステータス" value={c.status} />
@@ -279,6 +282,28 @@ function MemoEditor({ customerId, initial }: { customerId: string; initial: stri
           メモを保存
         </button>
       </div>
+    </div>
+  );
+}
+
+function HookBox({ c }: { c: Customer }) {
+  const hooks = buildHooks(c);
+  const dot: Record<string, string> = {
+    good: "bg-brand-glow",
+    chance: "bg-accent-amber",
+    info: "bg-ink-muted",
+  };
+  return (
+    <div className="mb-4 rounded-xl bg-brand/10 ring-1 ring-brand/20 p-3.5">
+      <div className="text-xs font-semibold text-brand-glow mb-1.5">📌 架電フック（採用×SNS）</div>
+      <ul className="space-y-1">
+        {hooks.map((h, i) => (
+          <li key={i} className="flex items-start gap-2 text-sm text-ink">
+            <span className={clsx("mt-1.5 h-1.5 w-1.5 rounded-full shrink-0", dot[h.tone])} />
+            <span>{h.text}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

@@ -141,6 +141,12 @@ export async function fetchCustomers(): Promise<Customer[]> {
     companyUrl: url(pg, "会社URL"),
     rep3: txt(pg, "代表者名"),
     memo: txt(pg, "メモ"),
+    sns: multi(pg, "SNS"),
+    founded: number(pg, "設立年"),
+    employees: number(pg, "従業員数"),
+    listing: sel(pg, "上場区分"),
+    recruitPage: url(pg, "採用ページ"),
+    media: multi(pg, "掲載元メディア"),
   }));
 }
 
