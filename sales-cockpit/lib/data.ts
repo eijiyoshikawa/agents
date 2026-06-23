@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import {
   fetchCustomers,
+  fetchWorkedCustomers,
   fetchCalls,
   fetchIsKpiCalls,
   fetchContracts,
@@ -21,6 +22,8 @@ const targetsConfig = targetsRaw as TargetsConfig;
 const TTL = Number(process.env.NOTION_REVALIDATE_SECONDS ?? 1800);
 // キー末尾のバージョンは、取得項目（スキーマ）を変えたら上げて旧キャッシュを破棄する。
 const cachedCustomers = unstable_cache(fetchCustomers, ["sc-customers-v2"], { revalidate: TTL, tags: ["customers"] });
+// ダッシュボードは着手済み顧客のみ（全件28k+は非現実的なため正確・高速に集計）
+const cachedWorked = unstable_cache(fetchWorkedCustomers, ["sc-worked-v1"], { revalidate: TTL, tags: ["customers"] });
 const cachedCalls = unstable_cache(fetchCalls, ["sc-calls-v2"], { revalidate: TTL, tags: ["calls"] });
 const cachedContracts = unstable_cache(fetchContracts, ["sc-contracts-v2"], { revalidate: TTL, tags: ["contracts"] });
 const cachedTargets = unstable_cache(getStoredTargets, ["sc-targets-v2"], { revalidate: TTL, tags: ["targets"] });
@@ -47,7 +50,7 @@ export async function getDashboard(): Promise<DashboardData> {
   }
 
   const [customers, recCalls, contracts] = await Promise.all([
-    safe("顧客管理", cachedCustomers, [] as Customer[], errors),
+    safe("顧客管理", cachedWorked, [] as Customer[], errors),
     safe("架電記録", cachedCalls, [] as CallEvent[], errors),
     safe("契約管理", cachedContracts, [], errors),
   ]);

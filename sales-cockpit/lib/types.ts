@@ -46,6 +46,21 @@ export type Customer = {
 /** 汎用カテゴリ内訳（項目別グラフ用の土台） */
 export type Breakdown = { label: string; count: number };
 
+/** 担当者別 ステータス実績 */
+export type StatusRep = { rep: string; contacted: number; appointments: number; apptRate: number };
+
+/** 顧客ステータス基準の活動実績（架電ログが無い運用向け） */
+export type StatusActivity = {
+  total: number;
+  leads: number; // 未着手（アプローチ前/未設定）
+  contacted: number; // コンタクト済み（架電実績）
+  appointments: number; // アポ獲得以降
+  apptRate: number; // %
+  byResult: Breakdown[]; // 架電結果の内訳
+  byRep: StatusRep[]; // 担当者別
+  apptMonthly: { key: string; label: string; appointments: number }[]; // アポ取得日の月次
+};
+
 /** 契約（🤝契約管理DB） */
 export type Contract = {
   id: string;
@@ -131,6 +146,7 @@ export type DashboardData = {
   weekly: SeriesPoint[];
   monthly: SeriesPoint[];
   reps: RepStat[];
+  statusActivity: StatusActivity;
   targetSummary: TargetSummary;
   goals: Goals;
   funnel: FunnelStage[];

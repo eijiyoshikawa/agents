@@ -39,8 +39,8 @@ function client(): Client {
   return _client;
 }
 
-/** データベース全ページをページネーションして取得 */
-async function queryAll(databaseId: string): Promise<any[]> {
+/** データベース全ページをページネーションして取得（任意でNotionフィルタ指定） */
+async function queryAll(databaseId: string, filter?: any): Promise<any[]> {
   if (!databaseId) return [];
   const out: any[] = [];
   let cursor: string | undefined;
@@ -51,6 +51,7 @@ async function queryAll(databaseId: string): Promise<any[]> {
       database_id: databaseId,
       start_cursor: cursor,
       page_size: 100,
+      ...(filter ? { filter } : {}),
     });
     out.push(...res.results);
     if (!res.has_more) break;
@@ -58,6 +59,14 @@ async function queryAll(databaseId: string): Promise<any[]> {
   }
   return out;
 }
+
+// 「着手済み」= ステータスあり かつ アプローチ前以外（ダッシュボード集計を正確・高速にするため）
+const WORKED_FILTER = {
+  and: [
+    { property: "ステータス", status: { is_not_empty: true } },
+    { property: "ステータス", status: { does_not_equal: "アプローチ前" } },
+  ],
+};
 
 // ── プロパティ抽出ヘルパー ───────────────────────────────────────
 const P = (page: any, name: string) => page?.properties?.[name];
@@ -118,9 +127,8 @@ function url(page: any, name: string): string | null {
 }
 
 // ── 各DBの取得（正規化して返す） ─────────────────────────────────
-export async function fetchCustomers(): Promise<Customer[]> {
-  const pages = await queryAll(DB.customers);
-  return pages.map((pg) => ({
+function mapCustomer(pg: any): Customer {
+  return {
     id: pg.id,
     url: pg.url,
     name: txt(pg, "顧客名") ?? "(無名)",
@@ -148,7 +156,19 @@ export async function fetchCustomers(): Promise<Customer[]> {
     listing: sel(pg, "上場区分"),
     recruitPage: url(pg, "採用ページ"),
     media: multi(pg, "掲載元メディア"),
-  }));
+  };
+}
+
+/** 全顧客（取得上限まで）。架電リスト用。 */
+export async function fetchCustomers(): Promise<Customer[]> {
+  const pages = await queryAll(DB.customers);
+  return pages.map(mapCustomer);
+}
+
+/** 着手済み顧客（ステータスあり・アプローチ前以外）。ダッシュボード集計用（正確・高速）。 */
+export async function fetchWorkedCustomers(): Promise<Customer[]> {
+  const pages = await queryAll(DB.customers, WORKED_FILTER);
+  return pages.map(mapCustomer);
 }
 
 /** 顧客ページの「メモ」を更新（Notion書き込み）。インテグレーションに更新権限が必要。 */

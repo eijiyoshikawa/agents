@@ -10,6 +10,7 @@ import type {
   Breakdowns,
   TargetSummary,
   Goals,
+  StatusActivity,
 } from "./types";
 import {
   weekKey,
@@ -238,6 +239,77 @@ export function buildFunnel(customers: Customer[]): FunnelStage[] {
   }));
 }
 
+// ステータス基準の活動実績（架電ログDBが空の運用向け）
+const CONTACTED_STATUS = new Set([
+  "不通", "受付拒否", "担当者不在", "担当者拒否", "再コール", "クレーム", "見込み客", "資料請求",
+  "アポイント獲得", "提案中", "商談中", "契約中", "契約終了", "失注", "パートナー",
+]);
+const APPOINTED_STATUS = new Set(["アポイント獲得", "提案中", "商談中", "契約中", "契約終了", "パートナー"]);
+
+export function buildStatusActivity(customers: Customer[]): StatusActivity {
+  let contacted = 0;
+  let appointments = 0;
+  let leads = 0;
+  const byResultMap = new Map<string, number>();
+  const repMap = new Map<string, { contacted: number; appointments: number }>();
+
+  for (const c of customers) {
+    const s = c.status;
+    if (!s || s === "アプローチ前") {
+      leads++;
+      continue;
+    }
+    if (!CONTACTED_STATUS.has(s)) continue;
+    contacted++;
+    byResultMap.set(s, (byResultMap.get(s) ?? 0) + 1);
+    const appt = APPOINTED_STATUS.has(s);
+    if (appt) appointments++;
+    const rep = c.isRep ?? "未割当";
+    const r = repMap.get(rep) ?? { contacted: 0, appointments: 0 };
+    r.contacted += 1;
+    if (appt) r.appointments += 1;
+    repMap.set(rep, r);
+  }
+
+  const byResult = [...byResultMap.entries()].map(([label, count]) => ({ label, count })).sort((a, b) => b.count - a.count);
+  const byRep = [...repMap.entries()]
+    .map(([rep, v]) => ({
+      rep,
+      contacted: v.contacted,
+      appointments: v.appointments,
+      apptRate: Number(rate(v.appointments, v.contacted).toFixed(1)),
+    }))
+    .sort((a, b) => b.contacted - a.contacted);
+
+  const keys = recentMonthKeys(6);
+  const m = new Map<string, number>();
+  for (const c of customers) {
+    if (!c.appointmentDate) continue;
+    const k = monthKey(c.appointmentDate);
+    if (k) m.set(k, (m.get(k) ?? 0) + 1);
+  }
+  const apptMonthly = keys.map((k) => ({ key: k, label: monthLabel(k), appointments: m.get(k) ?? 0 }));
+
+  return {
+    total: customers.length,
+    leads,
+    contacted,
+    appointments,
+    apptRate: Number(rate(appointments, contacted).toFixed(1)),
+    byResult,
+    byRep,
+    apptMonthly,
+  };
+}
+
+/** 当月のアポ獲得数（アポイント取得日ベース） */
+function apptsThisMonth(customers: Customer[]): number {
+  const cur = currentMonthKey();
+  let n = 0;
+  for (const c of customers) if (c.appointmentDate && monthKey(c.appointmentDate) === cur) n++;
+  return n;
+}
+
 export function buildStatusBreakdown(customers: Customer[]): { status: string; count: number }[] {
   const counts = new Map<string, number>();
   for (const c of customers) {
@@ -302,7 +374,9 @@ export function buildDashboard(input: {
   const ck = contractKpis(contracts);
   const reps = buildRepStats(calls, targets);
   const ts = targetSummary(reps);
-  const goals = buildGoals(calls, ts, month.appointments, ck.newContractsThisMonth, targets, targetsConfig);
+  const statusActivity = buildStatusActivity(customers);
+  // アポ実績はアポイント取得日ベース（架電ログが無いため）
+  const goals = buildGoals(calls, ts, apptsThisMonth(customers), ck.newContractsThisMonth, targets, targetsConfig);
 
   return {
     generatedAt: new Date().toISOString(),
@@ -320,6 +394,7 @@ export function buildDashboard(input: {
     weekly,
     monthly,
     reps,
+    statusActivity,
     targetSummary: ts,
     goals,
     funnel: buildFunnel(customers),
