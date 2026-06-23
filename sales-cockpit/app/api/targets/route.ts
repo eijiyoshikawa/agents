@@ -19,10 +19,15 @@ export async function POST(req: Request) {
       const n = Number(v);
       if (k && Number.isFinite(n) && n > 0) byRep[k] = n;
     }
+    const sns = Number(body.monthlyContractsSns) || 0;
+    const agency = Number(body.monthlyContractsAgency) || 0;
     const t: StoredTargets = {
       workingDaysPerMonth: Number(body.workingDaysPerMonth) || 20,
       monthlyAppointments: Number(body.monthlyAppointments) || 0,
-      monthlyContracts: Number(body.monthlyContracts) || 0,
+      // 総数は split合計を優先、無ければ従来値
+      monthlyContracts: sns + agency > 0 ? sns + agency : Number(body.monthlyContracts) || 0,
+      monthlyContractsSns: sns,
+      monthlyContractsAgency: agency,
       dailyCallsDefault: Number(body.dailyCallsDefault) || 0,
       dailyCallsByRep: byRep,
       updatedBy: session.name,

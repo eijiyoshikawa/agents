@@ -9,7 +9,8 @@ type RepRow = { rep: string; daily: string };
 export default function TargetsForm({ initial }: { initial: StoredTargets | null }) {
   const [workingDays, setWorkingDays] = useState(String(initial?.workingDaysPerMonth ?? 20));
   const [appts, setAppts] = useState(String(initial?.monthlyAppointments ?? 0));
-  const [contracts, setContracts] = useState(String(initial?.monthlyContracts ?? 0));
+  const [contractsSns, setContractsSns] = useState(String(initial?.monthlyContractsSns ?? 0));
+  const [contractsAgency, setContractsAgency] = useState(String(initial?.monthlyContractsAgency ?? 0));
   const [dailyDefault, setDailyDefault] = useState(String(initial?.dailyCallsDefault ?? 0));
   const [rows, setRows] = useState<RepRow[]>(
     Object.entries(initial?.dailyCallsByRep ?? {}).map(([rep, daily]) => ({ rep, daily: String(daily) })),
@@ -37,7 +38,8 @@ export default function TargetsForm({ initial }: { initial: StoredTargets | null
         body: JSON.stringify({
           workingDaysPerMonth: Number(workingDays),
           monthlyAppointments: Number(appts),
-          monthlyContracts: Number(contracts),
+          monthlyContractsSns: Number(contractsSns),
+          monthlyContractsAgency: Number(contractsAgency),
           dailyCallsDefault: Number(dailyDefault),
           dailyCallsByRep,
         }),
@@ -55,10 +57,12 @@ export default function TargetsForm({ initial }: { initial: StoredTargets | null
     <div className="space-y-6">
       <section className="card p-5 space-y-4">
         <h2 className="text-sm font-semibold text-ink">全社・月次の目標</h2>
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div className="grid sm:grid-cols-3 gap-4">
           <NumField label="月次 アポ獲得目標（件）" value={appts} onChange={setAppts} />
-          <NumField label="月次 契約数目標（件）" value={contracts} onChange={setContracts} />
+          <NumField label="月次 契約数目標：採用SNS（件）" value={contractsSns} onChange={setContractsSns} />
+          <NumField label="月次 契約数目標：人材紹介（件）" value={contractsAgency} onChange={setContractsAgency} />
         </div>
+        <p className="text-xs text-ink-muted">契約数は「契約種別」で採用SNS / 人材紹介に分けて集計します（合計が全体目標）。</p>
       </section>
 
       <section className="card p-5 space-y-4">

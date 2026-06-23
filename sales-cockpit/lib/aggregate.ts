@@ -31,11 +31,24 @@ import { isExcludedRep } from "./reps";
 // 目標設定ファイル(config/targets.json)の型
 export type TargetsConfig = {
   workingDaysPerMonth?: number;
-  company?: { monthlyAppointments?: number; monthlyContracts?: number };
+  company?: {
+    monthlyAppointments?: number;
+    monthlyContracts?: number;
+    monthlyContractsSns?: number;
+    monthlyContractsAgency?: number;
+  };
   dailyCallsDefault?: number;
   dailyCallsByRep?: Record<string, unknown>;
   monthlyCallsByRep?: Record<string, unknown>;
 };
+
+/** 契約種別（multi_select）を「採用SNS / 人材紹介 / その他」に分類（人材紹介を優先） */
+export type ContractCategory = "採用SNS" | "人材紹介" | "その他";
+export function contractCategory(kinds: string[]): ContractCategory {
+  if (kinds.some((k) => k.includes("人材紹介"))) return "人材紹介";
+  if (kinds.some((k) => k.includes("採用SNS"))) return "採用SNS";
+  return "その他";
+}
 
 /** "_" 始まりのコメントキーや非数値を除いた数値マップを返す */
 function numericMap(obj: Record<string, unknown> | undefined): Map<string, number> {
@@ -183,16 +196,22 @@ function buildGoals(
   calls: CallEvent[],
   ts: TargetSummary,
   monthAppts: number,
-  newContracts: number,
+  newContracts: { total: number; sns: number; agency: number },
   targets: Map<string, number>,
   config: TargetsConfig,
 ): Goals {
   const today = jstDateKey(new Date());
   const todayCalls = calls.filter((c) => c.date && jstDateKey(c.date) === today).length;
+  const snsTarget = config.company?.monthlyContractsSns ?? 0;
+  const agencyTarget = config.company?.monthlyContractsAgency ?? 0;
+  // 全体目標は「split合計 > 0 ならその合計」、無ければ従来の monthlyContracts を使う
+  const totalContractTarget = snsTarget + agencyTarget > 0 ? snsTarget + agencyTarget : config.company?.monthlyContracts ?? 0;
   return {
     monthlyCalls: goal(ts.totalTarget, ts.totalCalls),
     monthlyAppointments: goal(config.company?.monthlyAppointments ?? 0, monthAppts),
-    monthlyContracts: goal(config.company?.monthlyContracts ?? 0, newContracts),
+    monthlyContracts: goal(totalContractTarget, newContracts.total),
+    monthlyContractsSns: goal(snsTarget, newContracts.sns),
+    monthlyContractsAgency: goal(agencyTarget, newContracts.agency),
     dailyCalls: goal(dailyCallTargetTotal(calls, targets, config), todayCalls),
   };
 }
@@ -433,8 +452,16 @@ function contractKpis(contracts: Contract[]) {
   const cur = currentMonthKey();
   const activeContracts = contracts.filter((c) => c.status && ACTIVE_CONTRACT.has(c.status));
   const mrr = activeContracts.reduce((s, c) => s + c.monthly, 0);
-  const newContractsThisMonth = contracts.filter((c) => c.start && monthKey(c.start) === cur).length;
-  return { activeContracts: activeContracts.length, mrr, newContractsThisMonth };
+  const newThisMonth = contracts.filter((c) => c.start && monthKey(c.start) === cur);
+  const newContractsSnsThisMonth = newThisMonth.filter((c) => contractCategory(c.kinds) === "採用SNS").length;
+  const newContractsAgencyThisMonth = newThisMonth.filter((c) => contractCategory(c.kinds) === "人材紹介").length;
+  return {
+    activeContracts: activeContracts.length,
+    mrr,
+    newContractsThisMonth: newThisMonth.length,
+    newContractsSnsThisMonth,
+    newContractsAgencyThisMonth,
+  };
 }
 
 // ── 全体ビルド ──────────────────────────────────────────────────
@@ -459,7 +486,14 @@ export function buildDashboard(input: {
   const since = process.env.METRICS_SINCE || "2026-05-07";
   const statusActivity = buildStatusActivity(customers, since);
   // アポ実績はアポイント取得日ベース（架電ログが無いため）
-  const goals = buildGoals(calls, ts, apptsThisMonth(customers), ck.newContractsThisMonth, targets, targetsConfig);
+  const goals = buildGoals(
+    calls,
+    ts,
+    apptsThisMonth(customers),
+    { total: ck.newContractsThisMonth, sns: ck.newContractsSnsThisMonth, agency: ck.newContractsAgencyThisMonth },
+    targets,
+    targetsConfig,
+  );
 
   return {
     generatedAt: new Date().toISOString(),

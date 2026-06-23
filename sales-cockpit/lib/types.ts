@@ -152,7 +152,9 @@ export type Goal = { target: number; actual: number; achievement: number | null 
 export type Goals = {
   monthlyCalls: Goal; // 月次 架電（全社）
   monthlyAppointments: Goal; // 月次 アポ獲得（全社）
-  monthlyContracts: Goal; // 月次 契約数（全社）
+  monthlyContracts: Goal; // 月次 契約数（全社・採用SNS+人材紹介+その他）
+  monthlyContractsSns: Goal; // 月次 契約数（採用SNS）
+  monthlyContractsAgency: Goal; // 月次 契約数（人材紹介）
   dailyCalls: Goal; // 本日の架電（全社） vs 日次目標合計
 };
 
@@ -185,6 +187,8 @@ export type DashboardData = {
     activeContracts: number;
     mrr: number;
     newContractsThisMonth: number;
+    newContractsSnsThisMonth: number; // 今月の新規契約（採用SNS）
+    newContractsAgencyThisMonth: number; // 今月の新規契約（人材紹介）
   };
   weekly: SeriesPoint[];
   monthly: SeriesPoint[];

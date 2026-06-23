@@ -94,7 +94,12 @@ export async function getDashboard(): Promise<DashboardData> {
     if (stored) {
       effectiveConfig = {
         workingDaysPerMonth: stored.workingDaysPerMonth,
-        company: { monthlyAppointments: stored.monthlyAppointments, monthlyContracts: stored.monthlyContracts },
+        company: {
+          monthlyAppointments: stored.monthlyAppointments,
+          monthlyContracts: stored.monthlyContracts,
+          monthlyContractsSns: stored.monthlyContractsSns,
+          monthlyContractsAgency: stored.monthlyContractsAgency,
+        },
         dailyCallsDefault: stored.dailyCallsDefault,
         dailyCallsByRep: stored.dailyCallsByRep,
         monthlyCallsByRep: {},

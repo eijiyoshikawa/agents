@@ -65,15 +65,17 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
         <KpiCard label="今月のアポ獲得" value={num(data.goals.monthlyAppointments.actual)} accent="pink" onClick={() => open("今月のアポ獲得", apptThisMonthRows)} />
         <KpiCard label="MRR（月次経常収益）" value={yen(k.mrr)} accent="teal" />
         <KpiCard label="稼働中の契約数" value={num(k.activeContracts)} accent="teal" />
-        <KpiCard label="今月の新規契約" value={num(k.newContractsThisMonth)} accent="amber" />
+        <KpiCard label="今月の新規契約：採用SNS" value={num(k.newContractsSnsThisMonth)} accent="amber" />
+        <KpiCard label="今月の新規契約：人材紹介" value={num(k.newContractsAgencyThisMonth)} accent="amber" />
       </div>
 
       {/* 目標達成状況 */}
       <section>
         <h2 className="text-sm font-semibold text-ink mb-2">目標達成状況（今月）</h2>
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <GoalCard label="今月のアポ獲得" g={data.goals.monthlyAppointments} />
-          <GoalCard label="今月の契約数" g={data.goals.monthlyContracts} />
+          <GoalCard label="今月の契約数：採用SNS" g={data.goals.monthlyContractsSns} />
+          <GoalCard label="今月の契約数：人材紹介" g={data.goals.monthlyContractsAgency} />
           <div className="card p-4">
             <div className="text-xs font-medium text-ink-muted">コンタクト済み（{sinceLabel}）</div>
             <div className="mt-1 text-2xl font-bold tabular-nums text-brand">{num(a.contacted)}</div>

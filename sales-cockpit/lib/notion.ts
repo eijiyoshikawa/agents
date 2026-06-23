@@ -428,7 +428,9 @@ export async function touchUserLogin(pageId: string): Promise<void> {
 export type StoredTargets = {
   workingDaysPerMonth: number;
   monthlyAppointments: number;
-  monthlyContracts: number;
+  monthlyContracts: number; // 後方互換（総数）
+  monthlyContractsSns: number; // 採用SNS
+  monthlyContractsAgency: number; // 人材紹介
   dailyCallsDefault: number;
   dailyCallsByRep: Record<string, number>;
   updatedBy?: string;
@@ -451,6 +453,8 @@ export async function getStoredTargets(): Promise<StoredTargets | null> {
     workingDaysPerMonth: number(row, "営業日数") ?? 20,
     monthlyAppointments: number(row, "月次アポ目標") ?? 0,
     monthlyContracts: number(row, "月次契約目標") ?? 0,
+    monthlyContractsSns: number(row, "月次契約目標_採用SNS") ?? 0,
+    monthlyContractsAgency: number(row, "月次契約目標_人材紹介") ?? 0,
     dailyCallsDefault: number(row, "日次架電目標") ?? 0,
     dailyCallsByRep: byRep,
   };
@@ -586,6 +590,8 @@ export async function saveStoredTargets(t: StoredTargets): Promise<void> {
     対象月: rt(TARGET_KEY),
     月次アポ目標: { number: t.monthlyAppointments || 0 },
     月次契約目標: { number: t.monthlyContracts || 0 },
+    "月次契約目標_採用SNS": { number: t.monthlyContractsSns || 0 },
+    "月次契約目標_人材紹介": { number: t.monthlyContractsAgency || 0 },
     日次架電目標: { number: t.dailyCallsDefault || 0 },
     営業日数: { number: t.workingDaysPerMonth || 20 },
     担当別日次目標JSON: rt(JSON.stringify(t.dailyCallsByRep ?? {})),
