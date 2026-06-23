@@ -305,7 +305,92 @@ function DetailPanel({
         </a>
       </div>
 
+      <CallRecorder c={c} onNext={onNext} />
       <MemoEditor customerId={c.id} initial={c.memo ?? ""} />
+    </div>
+  );
+}
+
+const RECORD_STATUSES = [
+  "アポイント獲得", "見込み客", "資料請求", "再コール", "担当者不在", "担当者拒否", "受付拒否", "不通", "クレーム",
+  "提案中", "商談中", "契約中", "契約終了", "失注", "パートナー",
+];
+
+function CallRecorder({ c, onNext }: { c: Customer; onNext: () => void }) {
+  const [result, setResult] = useState("");
+  const [memo, setMemo] = useState("");
+  const [state, setState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [err, setErr] = useState("");
+
+  useEffect(() => {
+    setResult("");
+    setMemo("");
+    setState("idle");
+  }, [c.id]);
+
+  const save = async (advance: boolean) => {
+    if (!result) {
+      setErr("結果を選択してください");
+      setState("error");
+      return;
+    }
+    setState("saving");
+    setErr("");
+    try {
+      const res = await fetch("/api/call-log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customerId: c.id, customerName: c.name, result, memo }),
+      });
+      const j = await res.json();
+      if (!j.ok) throw new Error(j.error || "記録失敗");
+      setState("saved");
+      if (advance) setTimeout(onNext, 300);
+    } catch (e: any) {
+      setState("error");
+      setErr(e?.message ?? "記録失敗");
+    }
+  };
+
+  return (
+    <div className="mt-4 rounded-xl bg-white/[0.04] ring-1 ring-white/10 p-3.5">
+      <div className="text-xs font-semibold text-ink mb-2">📞 架電結果を記録（日付つきで記録＋ステータス更新）</div>
+      <div className="flex flex-wrap items-center gap-2">
+        <select
+          value={result}
+          onChange={(e) => setResult(e.target.value)}
+          className="px-3 py-2 rounded-lg bg-night-1 ring-1 ring-white/10 text-sm focus:outline-none focus:ring-brand-glow/50"
+        >
+          <option value="">結果を選択</option>
+          {RECORD_STATUSES.map((s) => (
+            <option key={s} value={s}>
+              {s}
+            </option>
+          ))}
+        </select>
+        <input
+          value={memo}
+          onChange={(e) => setMemo(e.target.value)}
+          placeholder="ひとことメモ（任意）"
+          className="flex-1 min-w-40 px-3 py-2 rounded-lg bg-night-1 ring-1 ring-white/10 text-sm focus:outline-none focus:ring-brand-glow/50"
+        />
+        <button
+          onClick={() => save(false)}
+          disabled={state === "saving"}
+          className="px-3 py-2 rounded-lg bg-brand text-white text-xs font-medium hover:bg-brand-soft disabled:opacity-50"
+        >
+          記録
+        </button>
+        <button
+          onClick={() => save(true)}
+          disabled={state === "saving"}
+          className="px-3 py-2 rounded-lg bg-white/10 text-ink text-xs font-medium hover:bg-white/20 disabled:opacity-50"
+        >
+          記録して次へ
+        </button>
+        {state === "saved" && <span className="text-xs text-brand-glow">✓ 記録しました</span>}
+        {state === "error" && <span className="text-xs text-accent-red">⚠ {err}</span>}
+      </div>
     </div>
   );
 }

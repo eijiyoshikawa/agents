@@ -186,6 +186,55 @@ export async function updateCustomerMemo(pageId: string, memo: string): Promise<
   });
 }
 
+// ── 架電結果の記録（日付ログ＋ステータス更新） ───────────────────
+const CALL_RESULT_OPTIONS = new Set([
+  "通話", "不在", "不通", "受付拒否", "担当者不在", "担当者拒否", "再コール", "クレーム", "見込み客", "資料請求", "アポイント獲得",
+]);
+const CUSTOMER_STATUS_OPTIONS = new Set([
+  "アプローチ前", "受付拒否", "不通", "担当者不在", "担当者拒否", "再コール", "クレーム", "見込み客", "資料請求",
+  "アポイント獲得", "提案中", "商談中", "契約中", "契約終了", "失注", "パートナー",
+]);
+const CALL_REP_OPTIONS = new Set(["江原", "佐久間in", "海野in", "三輪in", "境田in", "吉田", "吉川", "長野", "ロビンソンin"]);
+
+/**
+ * 架電結果を記録: ①📞架電記録に日付つきで1行作成 ②該当すれば顧客ステータスを更新。
+ * status はフォームで選んだ「結果/ステータス」。アポ獲得時はアポ取得日も更新。
+ */
+export async function recordCall(input: {
+  customerId: string;
+  customerName: string;
+  result: string; // 結果＝顧客ステータスの選択肢
+  memo?: string;
+  repName?: string;
+  setAppointmentDate?: boolean;
+}): Promise<void> {
+  const now = new Date().toISOString();
+  // ① 架電記録（日付ログ）。結果が架電記録の選択肢にあれば設定、無ければ「通話」。
+  const logProps: any = {
+    件名: tt(input.customerName || "架電"),
+    結果: { select: { name: CALL_RESULT_OPTIONS.has(input.result) ? input.result : "通話" } },
+    メモ: rt(input.memo ?? ""),
+    顧客: { relation: [{ id: input.customerId }] },
+    架電日時: { date: { start: now } },
+  };
+  if (input.repName && CALL_REP_OPTIONS.has(input.repName)) {
+    logProps["担当者"] = { select: { name: input.repName } };
+  }
+  await client().pages.create({ parent: { database_id: DB.calls }, properties: logProps });
+
+  // ② 顧客ステータス更新（結果が顧客ステータスの選択肢のときのみ）
+  const custProps: any = {};
+  if (CUSTOMER_STATUS_OPTIONS.has(input.result)) {
+    custProps["ステータス"] = { status: { name: input.result } };
+  }
+  if (input.setAppointmentDate || input.result === "アポイント獲得") {
+    custProps["アポイント取得日"] = { date: { start: now.slice(0, 10) } };
+  }
+  if (Object.keys(custProps).length > 0) {
+    await client().pages.update({ page_id: input.customerId, properties: custProps });
+  }
+}
+
 // ── アプリユーザー（ログイン） ───────────────────────────────────
 export type AppUser = { pageId: string; name: string; userId: string; passwordHash: string };
 
