@@ -16,6 +16,8 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
   const k = data.kpi;
   const a = data.statusActivity;
   const since = data.metricsSince;
+  // "2026-05-07" → "5/7以降"（コンタクト済みは累計ではなく当起点以降の集計）
+  const sinceLabel = `${Number(since.slice(5, 7))}/${Number(since.slice(8, 10))}以降`;
   const worked = data.workedCustomers;
   const [drill, setDrill] = useState<Drill>(null);
 
@@ -56,7 +58,7 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
 
       {/* KPI（クリックで内訳） */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <KpiCard label="コンタクト済み（架電実績）" value={num(a.contacted)} accent="brand" onClick={() => open("コンタクト済み", worked)} />
+        <KpiCard label={`コンタクト済み（${sinceLabel}）`} value={num(a.contacted)} accent="brand" onClick={() => open("コンタクト済み", worked)} />
         <KpiCard label="アポ獲得（アポ取得日基準）" value={num(a.appointments)} accent="pink" onClick={() => open("アポ獲得", apptRows)} />
         <KpiCard label="アポ率（アポ÷コンタクト）" value={pct(a.apptRate)} accent="indigo" />
         <KpiCard label="今月のアポ獲得" value={num(data.goals.monthlyAppointments.actual)} accent="pink" onClick={() => open("今月のアポ獲得", apptThisMonthRows)} />
@@ -72,9 +74,9 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
           <GoalCard label="今月のアポ獲得" g={data.goals.monthlyAppointments} />
           <GoalCard label="今月の契約数" g={data.goals.monthlyContracts} />
           <div className="card p-4">
-            <div className="text-xs font-medium text-ink-muted">コンタクト済み（累計）</div>
+            <div className="text-xs font-medium text-ink-muted">コンタクト済み（{sinceLabel}）</div>
             <div className="mt-1 text-2xl font-bold tabular-nums text-brand">{num(a.contacted)}</div>
-            <div className="mt-0.5 text-xs text-ink-muted">アポ率 {pct(a.apptRate)}</div>
+            <div className="mt-0.5 text-xs text-ink-muted">アポ率 {pct(a.apptRate)} ・ 全期間累計は分析ページ参照</div>
           </div>
         </div>
         <p className="text-xs text-ink-muted mt-2">
