@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -21,6 +22,8 @@ import {
   LogOut,
   UserCircle2,
   ChevronDown,
+  Menu,
+  X,
   type LucideIcon,
 } from "lucide-react";
 import clsx from "clsx";
@@ -79,8 +82,22 @@ const GROUPS: Group[] = [
 export default function Nav({ userName }: { userName: string | null }) {
   const pathname = usePathname();
   const onAuthPage = pathname === "/login" || pathname === "/signup";
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
+
+  // ページ遷移したらモバイルメニューを閉じる
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  // メニュー展開中は背面スクロールを抑止
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
 
   const logout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -96,7 +113,7 @@ export default function Nav({ userName }: { userName: string | null }) {
         </Link>
 
         {userName && !onAuthPage && (
-          <nav className="flex items-center gap-1">
+          <nav className="hidden md:flex items-center gap-1">
             <Link
               href={HOME.href}
               className={clsx(
@@ -162,9 +179,10 @@ export default function Nav({ userName }: { userName: string | null }) {
           </nav>
         )}
 
+        {/* デスクトップ: ユーザー名＋ログアウト */}
         {userName && (
-          <div className="ml-auto flex items-center gap-3 shrink-0">
-            <span className="hidden sm:flex items-center gap-1.5 text-sm text-ink-muted">
+          <div className="ml-auto hidden md:flex items-center gap-3 shrink-0">
+            <span className="flex items-center gap-1.5 text-sm text-ink-muted">
               <UserCircle2 size={16} />
               {userName}
             </span>
@@ -174,11 +192,119 @@ export default function Nav({ userName }: { userName: string | null }) {
               title="ログアウト"
             >
               <LogOut size={15} />
-              <span className="hidden sm:inline">ログアウト</span>
+              <span>ログアウト</span>
             </button>
           </div>
         )}
+
+        {/* モバイル: ハンバーガー */}
+        {userName && !onAuthPage && (
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="ml-auto md:hidden inline-flex items-center justify-center p-2 rounded-lg text-ink hover:bg-white/[0.06] transition-colors"
+            aria-label="メニューを開く"
+          >
+            <Menu size={22} />
+          </button>
+        )}
       </div>
+
+      {/* モバイル: 全画面メニュー */}
+      {userName && !onAuthPage && mobileOpen && (
+        <MobileMenu userName={userName} isActive={isActive} onClose={() => setMobileOpen(false)} onLogout={logout} />
+      )}
     </header>
+  );
+}
+
+function MobileMenu({
+  userName,
+  isActive,
+  onClose,
+  onLogout,
+}: {
+  userName: string;
+  isActive: (href: string) => boolean;
+  onClose: () => void;
+  onLogout: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 md:hidden bg-night-0 flex flex-col animate-fadeIn">
+      {/* ヘッダー */}
+      <div className="h-14 px-4 flex items-center justify-between border-b border-white/10 shrink-0">
+        <span className="font-bold tracking-tight text-ink flex items-center gap-2">
+          <span className="inline-block w-2.5 h-2.5 rounded-full bg-brand animate-pulseDot" />
+          LET Sales System
+        </span>
+        <button
+          onClick={onClose}
+          className="p-2 rounded-lg text-ink hover:bg-white/[0.06] transition-colors"
+          aria-label="メニューを閉じる"
+        >
+          <X size={22} />
+        </button>
+      </div>
+
+      {/* メニュー本体（スクロール可） */}
+      <nav className="flex-1 overflow-y-auto px-4 py-4 space-y-5">
+        <MobileLink item={HOME} active={isActive(HOME.href)} onClose={onClose} large />
+        {GROUPS.map((g) => (
+          <div key={g.label}>
+            <div className="flex items-center gap-1.5 px-1 mb-1.5 text-xs font-semibold text-ink-muted uppercase tracking-wide">
+              <g.icon size={14} />
+              {g.label}
+            </div>
+            <div className="space-y-0.5">
+              {g.items.map((it) => (
+                <MobileLink key={it.href} item={it} active={isActive(it.href)} onClose={onClose} />
+              ))}
+            </div>
+          </div>
+        ))}
+      </nav>
+
+      {/* フッター: ユーザー＋ログアウト */}
+      <div className="px-4 py-3 border-t border-white/10 flex items-center justify-between shrink-0">
+        <span className="flex items-center gap-1.5 text-sm text-ink-muted">
+          <UserCircle2 size={18} />
+          {userName}
+        </span>
+        <button
+          onClick={onLogout}
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium text-ink-muted hover:text-ink hover:bg-white/[0.06] transition-colors"
+        >
+          <LogOut size={16} />
+          ログアウト
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function MobileLink({
+  item,
+  active,
+  onClose,
+  large,
+}: {
+  item: Item;
+  active: boolean;
+  onClose: () => void;
+  large?: boolean;
+}) {
+  const Icon = item.icon;
+  return (
+    <Link
+      href={item.href}
+      onClick={onClose}
+      className={clsx(
+        "flex items-center gap-3 rounded-xl px-3 transition-colors",
+        large ? "py-3 text-base font-semibold" : "py-2.5 text-sm",
+        active ? "bg-brand/15 text-brand-glow" : "text-ink-soft hover:text-ink hover:bg-white/[0.06]",
+      )}
+    >
+      <Icon size={large ? 20 : 18} className="shrink-0" />
+      {item.label}
+    </Link>
   );
 }
