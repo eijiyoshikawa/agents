@@ -1,6 +1,6 @@
 import { getCalls } from "@/lib/data";
 import { getCallTargets } from "@/lib/notion";
-import { monthColumns, periodKeyOf } from "@/lib/period";
+import { monthColumns, periodKeyOf, currentMonthKey } from "@/lib/period";
 import { num, pct, rate } from "@/lib/format";
 import PerfControls from "@/components/PerfControls";
 
@@ -18,9 +18,7 @@ export default async function PerformancePage({
 }) {
   const sp = await searchParams;
   const type: "日次" | "週次" = str(sp.type) === "週次" ? "週次" : "日次";
-  const month = /^\d{4}-\d{2}$/.test(str(sp.month))
-    ? str(sp.month)
-    : new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }).slice(0, 7);
+  const month = /^\d{4}-\d{2}$/.test(str(sp.month)) ? str(sp.month) : currentMonthKey();
 
   const cols = monthColumns(type, month);
   const colKeys = new Set(cols.map((c) => c.key));

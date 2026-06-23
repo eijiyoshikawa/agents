@@ -21,10 +21,24 @@ export function jstDateKey(input: string | Date): string | null {
   return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
 }
 
-/** JST の月キー YYYY-MM */
+// 月の締め日: 毎月16日〜翌月15日を1ヶ月（"M月分"）として数える。
+// 例: 5/16〜6/15 = 5月分, 6/16〜7/15 = 6月分。
+export const MONTH_CUTOVER_DAY = 16;
+
+/** JST・締め日基準の月キー YYYY-MM（16日以降=当月分 / 15日以前=前月分） */
 export function monthKey(input: string | Date): string | null {
   const k = jstDateKey(input);
-  return k ? k.slice(0, 7) : null;
+  if (!k) return null;
+  let [y, m] = k.split("-").map(Number);
+  const d = Number(k.slice(8, 10));
+  if (d < MONTH_CUTOVER_DAY) {
+    m -= 1;
+    if (m < 1) {
+      m = 12;
+      y -= 1;
+    }
+  }
+  return `${y}-${pad(m)}`;
 }
 
 /** その日が属する週(月曜始まり)の月曜の YYYY-MM-DD（JST） */
@@ -70,10 +84,28 @@ export function weekLabel(key: string): string {
   return `${m}/${d}週`;
 }
 
-/** 月キー → "YY年M月" ラベル */
+/** 月キー → "YY年M月" ラベル（締め日基準。M月分=M/16〜翌15） */
 export function monthLabel(key: string): string {
   const [y, m] = key.split("-").map(Number);
   return `${String(y).slice(2)}年${m}月`;
+}
+
+/** 締め日基準の月キー(YYYY-MM)が表す実期間 [開始日, 終了日]（YYYY-MM-DD, JST） */
+export function monthRange(key: string): { start: string; end: string } {
+  const [y, m] = key.split("-").map(Number);
+  const ny = m === 12 ? y + 1 : y;
+  const nm = m === 12 ? 1 : m + 1;
+  return {
+    start: `${y}-${pad(m)}-${pad(MONTH_CUTOVER_DAY)}`,
+    end: `${ny}-${pad(nm)}-${pad(MONTH_CUTOVER_DAY - 1)}`,
+  };
+}
+
+/** 締め日基準の月キー → "5/16〜6/15" の範囲ラベル */
+export function monthRangeLabel(key: string): string {
+  const [, m] = key.split("-").map(Number);
+  const nm = m === 12 ? 1 : m + 1;
+  return `${m}/${MONTH_CUTOVER_DAY}〜${nm}/${MONTH_CUTOVER_DAY - 1}`;
 }
 
 export function currentWeekKey(now = new Date()): string {
@@ -96,18 +128,24 @@ export function mondayOf(input: Date): Date {
   x.setHours(0, 0, 0, 0);
   return x;
 }
-/** 対象月(YYYY-MM)の列。日次=各日 / 週次=各週の月曜 */
+/** 対象月(YYYY-MM・締め日基準16〜翌15)の列。日次=各日 / 週次=各週の月曜 */
 export function monthColumns(type: "日次" | "週次", month: string): { key: string; label: string }[] {
-  const [y, m] = month.split("-").map(Number);
-  if (!y || !m) return [];
-  const last = new Date(y, m, 0).getDate();
+  if (!/^\d{4}-\d{2}$/.test(month)) return [];
+  const { start, end } = monthRange(month);
+  const [sy, sm, sd] = start.split("-").map(Number);
+  const [ey, em, ed] = end.split("-").map(Number);
+  const startD = new Date(sy, sm - 1, sd);
+  const endD = new Date(ey, em - 1, ed);
   if (type === "日次") {
-    return Array.from({ length: last }, (_, i) => ({ key: `${month}-${pad(i + 1)}`, label: String(i + 1) }));
+    const cols: { key: string; label: string }[] = [];
+    for (let d = new Date(startD); d <= endD; d = new Date(d.getTime() + 86400000)) {
+      cols.push({ key: ymd(d), label: `${d.getMonth() + 1}/${d.getDate()}` });
+    }
+    return cols;
   }
   const cols: { key: string; label: string }[] = [];
-  let mon = mondayOf(new Date(y, m - 1, 1));
-  const end = new Date(y, m - 1, last);
-  while (mon <= end) {
+  let mon = mondayOf(startD);
+  while (mon <= endD) {
     cols.push({ key: ymd(mon), label: `${mon.getMonth() + 1}/${mon.getDate()}週` });
     mon = new Date(mon.getTime() + 7 * 86400000);
   }

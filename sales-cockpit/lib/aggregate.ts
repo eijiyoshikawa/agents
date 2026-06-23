@@ -20,6 +20,7 @@ import {
   recentMonthKeys,
   weekLabel,
   monthLabel,
+  monthRangeLabel,
   currentWeekKey,
   currentMonthKey,
   jstDateKey,
@@ -356,6 +357,71 @@ export function buildMrrTrend(contracts: Contract[], n = 6): { key: string; labe
     }
     return { key: mk, label: monthLabel(mk), mrr, active };
   });
+}
+
+// ── 月次実績の履歴（過去の実績一覧） ───────────────────────────
+export type MonthlyHistoryRow = {
+  key: string; // YYYY-MM（締め日基準）
+  label: string; // "26年6月"
+  range: string; // "6/16〜7/15"
+  appointments: number; // アポ獲得（アポ取得日基準）
+  newContracts: number; // 新規契約（契約開始日基準）
+  mrr: number; // 当月末時点の月次経常収益
+  activeContracts: number; // 稼働契約数
+  calls: number; // 架電数（架電記録の日付基準。ログが無い月は0）
+};
+
+/**
+ * 過去 n ヶ月（締め日基準）の月次実績を新しい順で返す。
+ * アポ=アポ取得日 / 新規契約=契約開始日 / MRR・稼働=その月に有効な契約 / 架電=架電記録の日付。
+ */
+export function buildMonthlyHistory(
+  customers: ListCustomer[],
+  contracts: Contract[],
+  calls: CallEvent[],
+  n = 12,
+): MonthlyHistoryRow[] {
+  const keys = recentMonthKeys(n);
+  const apptBy = new Map<string, number>();
+  for (const c of customers) {
+    if (!c.appointmentDate) continue;
+    const k = monthKey(c.appointmentDate);
+    if (k) apptBy.set(k, (apptBy.get(k) ?? 0) + 1);
+  }
+  const newBy = new Map<string, number>();
+  for (const ct of contracts) {
+    if (!ct.start) continue;
+    const k = monthKey(ct.start);
+    if (k) newBy.set(k, (newBy.get(k) ?? 0) + 1);
+  }
+  const callsBy = new Map<string, number>();
+  for (const cl of calls) {
+    if (!cl.date) continue;
+    const k = monthKey(cl.date);
+    if (k) callsBy.set(k, (callsBy.get(k) ?? 0) + 1);
+  }
+  return keys
+    .map((k) => {
+      let mrr = 0;
+      let active = 0;
+      for (const ct of contracts) {
+        if (isActiveInMonth(ct, k)) {
+          mrr += ct.monthly;
+          active += 1;
+        }
+      }
+      return {
+        key: k,
+        label: monthLabel(k),
+        range: monthRangeLabel(k),
+        appointments: apptBy.get(k) ?? 0,
+        newContracts: newBy.get(k) ?? 0,
+        mrr,
+        activeContracts: active,
+        calls: callsBy.get(k) ?? 0,
+      };
+    })
+    .reverse(); // 新しい月を先頭に
 }
 
 function contractKpis(contracts: Contract[]) {
