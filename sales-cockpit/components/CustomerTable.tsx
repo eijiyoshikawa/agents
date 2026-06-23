@@ -5,6 +5,7 @@ import clsx from "clsx";
 import { Search, ChevronDown, ExternalLink, ArrowLeft, ArrowRight, X, Bookmark } from "lucide-react";
 import type { Customer } from "@/lib/types";
 import { buildHooks } from "@/lib/hooks";
+import { computeDuplicates, agencyReason } from "@/lib/leadflags";
 import CallButton from "./CallButton";
 
 export type InitialFilters = { q?: string; rep?: string; status?: string; rank?: string; industry?: string };
@@ -35,12 +36,23 @@ export default function CustomerTable({
   const [status, setStatus] = useState(initial?.status ?? "");
   const [rank, setRank] = useState(initial?.rank ?? "");
   const [industry, setIndustry] = useState(initial?.industry ?? "");
+  const [dupOnly, setDupOnly] = useState(false);
+  const [agencyMode, setAgencyMode] = useState<"all" | "exclude" | "only">("all");
   const [openId, setOpenId] = useState<string | null>(null);
 
   const reps = useMemo(() => uniq(customers.map((c) => c.isRep)), [customers]);
   const statuses = useMemo(() => uniq(customers.map((c) => c.status)), [customers]);
   const ranks = useMemo(() => uniq(customers.map((c) => c.rank)), [customers]);
   const industries = useMemo(() => uniq(customers.map((c) => c.industry)), [customers]);
+  const dup = useMemo(() => computeDuplicates(customers), [customers]);
+  const agencyMap = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const c of customers) {
+      const r = agencyReason(c);
+      if (r) m.set(c.id, r);
+    }
+    return m;
+  }, [customers]);
 
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -52,8 +64,14 @@ export default function CustomerTable({
       .filter((c) =>
         needle ? c.name.toLowerCase().includes(needle) || (c.phone ?? "").includes(needle) : true,
       )
+      .filter((c) => (dupOnly ? dup.dupIds.has(c.id) : true))
+      .filter((c) => {
+        if (agencyMode === "exclude") return !agencyMap.has(c.id);
+        if (agencyMode === "only") return agencyMap.has(c.id);
+        return true;
+      })
       .sort((a, b) => (b.lastCallDate ?? "").localeCompare(a.lastCallDate ?? ""));
-  }, [customers, q, rep, status, rank, industry]);
+  }, [customers, q, rep, status, rank, industry, dupOnly, agencyMode, dup, agencyMap]);
 
   // 描画は上限まで（高速化）。絞り込みで対象を減らして使う想定。
   const DISPLAY_CAP = 500;
@@ -81,13 +99,32 @@ export default function CustomerTable({
         <Select value={status} onChange={setStatus} options={statuses} placeholder="ステータス（全て）" />
         <Select value={rank} onChange={setRank} options={ranks} placeholder="見込み度合い（全て）" />
         <Select value={industry} onChange={setIndustry} options={industries} placeholder="業種（全て）" />
+        <button
+          onClick={() => setDupOnly((v) => !v)}
+          className={clsx(
+            "px-3 py-2 rounded-lg text-sm font-medium ring-1 transition-colors",
+            dupOnly ? "bg-accent-amber/20 text-accent-amber ring-accent-amber/30" : "bg-surface text-ink-muted ring-white/10 hover:text-ink",
+          )}
+        >
+          重複候補のみ
+        </button>
+        <select
+          value={agencyMode}
+          onChange={(e) => setAgencyMode(e.target.value as any)}
+          className="px-3 py-2 rounded-lg bg-surface ring-1 ring-white/10 text-sm focus:outline-none focus:ring-brand-glow/50"
+        >
+          <option value="all">人材紹介: 含む</option>
+          <option value="exclude">人材紹介: 除外</option>
+          <option value="only">人材紹介: のみ</option>
+        </select>
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-slate-400">
           {filtered.length.toLocaleString()} 件
+          <span className="text-accent-amber"> ・重複候補 {filtered.filter((c) => dup.dupIds.has(c.id)).length}</span>
+          <span className="text-accent-violet"> ・人材紹介の疑い {filtered.filter((c) => agencyMap.has(c.id)).length}</span>
           {truncated > 0 && <span className="text-slate-500"> （表示は先頭{DISPLAY_CAP}件・絞り込みで全件対象）</span>}
-          ・ 行をクリックで詳細・メモ
         </p>
         <SaveListBar filters={{ q, rep, status, rank, industry }} count={filtered.length} />
       </div>
@@ -116,13 +153,15 @@ export default function CustomerTable({
                     openId === c.id ? "bg-brand/10" : "hover:bg-white/[0.04]",
                   )}
                 >
-                  <td className="px-4 py-2.5 font-medium max-w-56 truncate">
+                  <td className="px-4 py-2.5 font-medium max-w-64">
                     <span className="inline-flex items-center gap-1.5">
                       <ChevronDown
                         size={14}
-                        className={clsx("text-slate-400 transition-transform", openId === c.id && "rotate-180")}
+                        className={clsx("text-slate-400 transition-transform shrink-0", openId === c.id && "rotate-180")}
                       />
-                      {c.name}
+                      <span className="truncate">{c.name}</span>
+                      {dup.dupIds.has(c.id) && <span className="chip bg-accent-amber/20 text-accent-amber shrink-0">重複?</span>}
+                      {agencyMap.has(c.id) && <span className="chip bg-accent-violet/20 text-accent-violet shrink-0">人材紹介?</span>}
                     </span>
                     {c.phone && <div className="text-xs text-slate-400 font-mono ml-5">{c.phone}</div>}
                   </td>
@@ -147,6 +186,8 @@ export default function CustomerTable({
                         c={c}
                         index={i}
                         total={visible.length}
+                        partners={dup.partners.get(c.id) ?? []}
+                        agency={agencyMap.get(c.id) ?? null}
                         onPrev={() => openAt(openIndex - 1)}
                         onNext={() => openAt(openIndex + 1)}
                         onClose={() => setOpenId(null)}
@@ -167,6 +208,8 @@ function DetailPanel({
   c,
   index,
   total,
+  partners,
+  agency,
   onPrev,
   onNext,
   onClose,
@@ -174,6 +217,8 @@ function DetailPanel({
   c: Customer;
   index: number;
   total: number;
+  partners: string[];
+  agency: string | null;
   onPrev: () => void;
   onNext: () => void;
   onClose: () => void;
@@ -201,6 +246,27 @@ function DetailPanel({
           </button>
         </div>
       </div>
+
+      {(agency || partners.length > 0) && (
+        <div className="mb-4 space-y-2">
+          {agency && (
+            <div className="rounded-xl bg-accent-violet/10 ring-1 ring-accent-violet/30 p-3 text-sm">
+              <span className="font-semibold text-accent-violet">⚑ 人材紹介会社の疑い</span>
+              <span className="text-ink-soft">（{agency}）— 自社サービスの競合/対象外の可能性。架電要否を確認。</span>
+            </div>
+          )}
+          {partners.length > 0 && (
+            <div className="rounded-xl bg-accent-amber/10 ring-1 ring-accent-amber/30 p-3 text-sm">
+              <div className="font-semibold text-accent-amber mb-1">⚑ 重複の可能性（{partners.length}件）</div>
+              <ul className="space-y-0.5 text-ink-soft">
+                {partners.slice(0, 6).map((p, i) => (
+                  <li key={i}>・{p}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
 
       <HookBox c={c} />
 
