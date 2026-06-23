@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { X } from "lucide-react";
 import { yen, num } from "@/lib/format";
+import { isExcludedRep } from "@/lib/reps";
 import SortableTable, { type Column } from "./SortableTable";
 
 export type MrrRow = {
@@ -27,6 +28,7 @@ export default function MrrClient({ rows }: { rows: MrrRow[] }) {
     const m = new Map<string, { mrr: number; count: number }>();
     for (const r of rows) {
       const k = keyOf(r) || "未割当";
+      if (isExcludedRep(k)) continue; // 非稼働メンバーは担当別カードから除外
       const v = m.get(k) ?? { mrr: 0, count: 0 };
       v.mrr += r.monthly;
       v.count += 1;

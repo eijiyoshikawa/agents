@@ -16,6 +16,7 @@ import {
   Copy,
   TrendingUp,
   History,
+  CalendarCheck,
   ShieldCheck,
   LogOut,
   UserCircle2,
@@ -35,6 +36,7 @@ const GROUPS: Group[] = [
     label: "営業活動",
     icon: PhoneCall,
     items: [
+      { href: "/today", label: "本日の架電", icon: CalendarCheck },
       { href: "/calls", label: "架電リスト", icon: PhoneCall },
       { href: "/followups", label: "フォロー / 再コール", icon: CalendarClock },
       { href: "/lists", label: "保存リスト", icon: Bookmark },

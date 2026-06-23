@@ -63,6 +63,7 @@ export type ListCustomer = {
   callCount: number | null;
   lastCallDate: string | null;
   appointmentDate: string | null;
+  lastEdited: string | null; // 最終更新日時（活動日の代理指標）
   address: string | null;
   confirm: string | null;
 };

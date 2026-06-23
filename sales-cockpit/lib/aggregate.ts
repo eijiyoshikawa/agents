@@ -26,6 +26,7 @@ import {
   jstDateKey,
 } from "./period";
 import { rate } from "./format";
+import { isExcludedRep } from "./reps";
 
 // 目標設定ファイル(config/targets.json)の型
 export type TargetsConfig = {
@@ -99,6 +100,7 @@ export function buildRepStats(calls: CallEvent[], targets: Map<string, number>):
   // 架電のある担当を集計
   for (const c of calls) {
     if (!c.date || monthKey(c.date) !== cur) continue;
+    if (isExcludedRep(c.rep)) continue;
     const rep = c.rep ?? "未割当";
     const b = map.get(rep) ?? emptyBucket();
     b.calls += 1;
@@ -146,6 +148,7 @@ export function buildTargets(calls: CallEvent[], config: TargetsConfig): Map<str
 
   const out = new Map<string, number>();
   for (const rep of reps) {
+    if (isExcludedRep(rep)) continue;
     const daily = dailyByRep.get(rep) ?? dailyDefault;
     const fromDaily = daily > 0 ? daily * workingDays : 0;
     const v = monthlyByRep.get(rep) || fromDaily || fromNotion.get(rep) || 0;
@@ -213,7 +216,7 @@ export function buildBreakdowns(customers: ListCustomer[]): Breakdowns {
     method: groupCount(customers, (c) => c.method),
     phase: groupCount(customers, (c) => c.phase),
     pref: groupCount(customers, (c) => c.pref, 15),
-    isRep: groupCount(customers, (c) => c.isRep),
+    isRep: groupCount(customers.filter((c) => !isExcludedRep(c.isRep)), (c) => c.isRep),
   };
 }
 
@@ -274,6 +277,8 @@ export function buildStatusActivity(customers: Customer[], since: string): Statu
     // アポはアポ取得日(since以降)で統一カウント
     const appt = apptOnOrAfter(c, since);
     if (appt) appointments++;
+    // 担当者別（byRep）は非稼働メンバーを除外（総数 contacted/appointments には影響させない）
+    if (isExcludedRep(c.isRep)) continue;
     const rep = c.isRep ?? "未割当";
     const r = repMap.get(rep) ?? { contacted: 0, appointments: 0 };
     r.contacted += 1;

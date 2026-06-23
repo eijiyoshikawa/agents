@@ -1,5 +1,6 @@
 import { Client } from "@notionhq/client";
 import type { Customer, Contract, CallEvent, ListCustomer } from "./types";
+import { isExcludedRep } from "./reps";
 
 // ── Notion クライアント & 設定 ───────────────────────────────────
 export const NOTION_REVALIDATE = Number(process.env.NOTION_REVALIDATE_SECONDS ?? 300);
@@ -299,6 +300,7 @@ function mapListCustomer(pg: any): ListCustomer {
     callCount: number(pg, "架電回数"),
     lastCallDate: dateStart(pg, "最終架電日"),
     appointmentDate: dateStart(pg, "アポイント取得日"),
+    lastEdited: pg.last_edited_time ?? null,
     address: txt(pg, "住所"),
     confirm: sel(pg, "確認状況"),
   };
@@ -514,7 +516,7 @@ export async function fetchRepOptions(): Promise<string[]> {
     const db: any = await client().databases.retrieve({ database_id: DB.customers });
     const prop = db.properties?.["IS担当"];
     const opts = prop?.select?.options ?? prop?.multi_select?.options ?? [];
-    return opts.map((o: any) => o.name).filter(Boolean);
+    return opts.map((o: any) => o.name).filter(Boolean).filter((n: string) => !isExcludedRep(n));
   } catch {
     return [];
   }

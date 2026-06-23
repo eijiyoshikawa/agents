@@ -7,6 +7,7 @@ import type { DashboardData, Goal, DrillCustomer } from "@/lib/types";
 import { KpiCard } from "./KpiCard";
 import { MrrChart, FunnelChart, CategoryBar } from "./chartsDynamic";
 import CallButton from "./CallButton";
+import RefreshButton from "./RefreshButton";
 import { yen, pct, num } from "@/lib/format";
 import { monthKey, currentMonthKey, monthRangeLabel } from "@/lib/period";
 
