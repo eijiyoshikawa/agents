@@ -310,12 +310,12 @@ export function buildStatusActivity(customers: Customer[], since: string): Statu
   };
 }
 
-/** 当月のアポ獲得数：アポ獲得以降のステータス かつ 今月中に更新（最終更新日時が今月） */
+/** 当月のアポ獲得数：アポ取得日が今月のもの（アポ獲得以降のステータスもアポ取得日を保持するため含まれる） */
 function apptsThisMonth(customers: Customer[]): number {
   const cur = currentMonthKey();
   let n = 0;
   for (const c of customers) {
-    if (c.status && APPOINTED_STATUS.has(c.status) && c.lastEdited && monthKey(c.lastEdited) === cur) n++;
+    if (c.appointmentDate && monthKey(c.appointmentDate) === cur) n++;
   }
   return n;
 }

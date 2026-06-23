@@ -24,9 +24,8 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
   );
   const apptThisMonthRows = useMemo(() => {
     const key = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }).slice(0, 7); // YYYY-MM
-    const APPOINTED = new Set(["アポイント獲得", "提案中", "商談中", "契約中", "契約終了", "パートナー"]);
-    // アポ獲得以降のステータス かつ 今月中に更新（最終更新日時が今月）
-    return worked.filter((c) => c.status && APPOINTED.has(c.status) && (c.lastEdited ?? "").slice(0, 7) === key);
+    // アポ取得日が今月のもの（アポ獲得以降のステータスもアポ取得日を保持するため含まれる）
+    return worked.filter((c) => (c.appointmentDate ?? "").slice(0, 7) === key);
   }, [worked]);
 
   const open = (title: string, rows: DrillCustomer[]) => setDrill({ title, rows });
