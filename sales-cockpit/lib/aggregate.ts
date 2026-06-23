@@ -407,6 +407,16 @@ export function buildDashboard(input: {
     funnel: buildFunnel(customers),
     statusBreakdown: buildStatusBreakdown(customers),
     breakdowns: buildBreakdowns(customers),
+    workedCustomers: customers.map((c) => ({
+      id: c.id,
+      name: c.name,
+      url: c.url,
+      status: c.status,
+      isRep: c.isRep,
+      phone: c.phone,
+      appointmentDate: c.appointmentDate,
+      industry: c.industry,
+    })),
     mrrTrend: buildMrrTrend(contracts),
   };
 }

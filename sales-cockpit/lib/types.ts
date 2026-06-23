@@ -49,6 +49,18 @@ export type Breakdown = { label: string; count: number };
 /** 担当者別 ステータス実績 */
 export type StatusRep = { rep: string; contacted: number; appointments: number; apptRate: number };
 
+/** ダッシュボードの内訳（ドリルダウン）表示用の軽量顧客 */
+export type DrillCustomer = {
+  id: string;
+  name: string;
+  url: string;
+  status: string | null;
+  isRep: string | null;
+  phone: string | null;
+  appointmentDate: string | null;
+  industry: string | null;
+};
+
 /** 顧客ステータス基準の活動実績（架電ログが無い運用向け） */
 export type StatusActivity = {
   total: number;
@@ -153,5 +165,6 @@ export type DashboardData = {
   funnel: FunnelStage[];
   statusBreakdown: { status: string; count: number }[];
   breakdowns: Breakdowns;
+  workedCustomers: DrillCustomer[]; // 実績の内訳ドリルダウン用（着手済み・since以降）
   mrrTrend: { key: string; label: string; mrr: number; active: number }[];
 };
