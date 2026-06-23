@@ -9,6 +9,7 @@ import type {
   Breakdown,
   Breakdowns,
   TargetSummary,
+  Goals,
 } from "./types";
 import {
   weekKey,
@@ -19,8 +20,32 @@ import {
   monthLabel,
   currentWeekKey,
   currentMonthKey,
+  jstDateKey,
 } from "./period";
 import { rate } from "./format";
+
+// 目標設定ファイル(config/targets.json)の型
+export type TargetsConfig = {
+  workingDaysPerMonth?: number;
+  company?: { monthlyAppointments?: number; monthlyContracts?: number };
+  dailyCallsDefault?: number;
+  dailyCallsByRep?: Record<string, unknown>;
+  monthlyCallsByRep?: Record<string, unknown>;
+};
+
+/** "_" 始まりのコメントキーや非数値を除いた数値マップを返す */
+function numericMap(obj: Record<string, unknown> | undefined): Map<string, number> {
+  const m = new Map<string, number>();
+  for (const [k, v] of Object.entries(obj ?? {})) {
+    if (k.startsWith("_")) continue;
+    if (typeof v === "number" && v > 0) m.set(k, v);
+  }
+  return m;
+}
+
+function goal(target: number, actual: number): { target: number; actual: number; achievement: number | null } {
+  return { target, actual, achievement: target > 0 ? Number(rate(actual, target).toFixed(0)) : null };
+}
 
 type Bucket = { calls: number; appointments: number };
 
@@ -96,27 +121,45 @@ export function buildRepStats(calls: CallEvent[], targets: Map<string, number>):
 }
 
 /**
- * 当月の目標架電数マップを構築。
- * 優先順: ① IS架電KPI の「月次目標架電数」(当月) → ② config の担当別 → ③ config の既定値。
+ * 当月の担当者別「月次 架電目標」を構築。
+ * 優先順: ① config.monthlyCallsByRep(直接) → ② config の日別目標×営業日数 →
+ *         ③ IS架電KPI「月次目標架電数」(当月)。
  */
-export function buildTargets(
-  calls: CallEvent[],
-  config: { defaultMonthly?: number; monthlyTargetByRep?: Record<string, number> },
-): Map<string, number> {
+export function buildTargets(calls: CallEvent[], config: TargetsConfig): Map<string, number> {
   const cur = currentMonthKey();
+  const workingDays = config.workingDaysPerMonth && config.workingDaysPerMonth > 0 ? config.workingDaysPerMonth : 20;
+  const dailyDefault = typeof config.dailyCallsDefault === "number" ? config.dailyCallsDefault : 0;
+  const dailyByRep = numericMap(config.dailyCallsByRep);
+  const monthlyByRep = numericMap(config.monthlyCallsByRep);
+
   const fromNotion = new Map<string, number>();
   for (const c of calls) {
     if (c.source !== "IS架電KPI" || !c.date || monthKey(c.date) !== cur) continue;
     if (c.rep && c.monthlyTarget && c.monthlyTarget > 0) fromNotion.set(c.rep, c.monthlyTarget);
   }
+
+  const reps = new Set<string>([...fromNotion.keys(), ...dailyByRep.keys(), ...monthlyByRep.keys()]);
+  if (dailyDefault > 0) for (const c of calls) if (c.rep) reps.add(c.rep);
+
   const out = new Map<string, number>();
-  const cfgByRep = config.monthlyTargetByRep ?? {};
-  const reps = new Set<string>([...fromNotion.keys(), ...Object.keys(cfgByRep)]);
   for (const rep of reps) {
-    const v = fromNotion.get(rep) ?? cfgByRep[rep] ?? config.defaultMonthly ?? 0;
+    const daily = dailyByRep.get(rep) ?? dailyDefault;
+    const fromDaily = daily > 0 ? daily * workingDays : 0;
+    const v = monthlyByRep.get(rep) || fromDaily || fromNotion.get(rep) || 0;
     if (v > 0) out.set(rep, v);
   }
   return out;
+}
+
+/** 日次の架電目標合計（全社）。日別目標を持つ担当の合計。 */
+function dailyCallTargetTotal(calls: CallEvent[], targets: Map<string, number>, config: TargetsConfig): number {
+  const dailyDefault = typeof config.dailyCallsDefault === "number" ? config.dailyCallsDefault : 0;
+  const dailyByRep = numericMap(config.dailyCallsByRep);
+  const reps = new Set<string>([...dailyByRep.keys(), ...targets.keys()]);
+  if (dailyDefault > 0) for (const c of calls) if (c.rep) reps.add(c.rep);
+  let total = 0;
+  for (const rep of reps) total += dailyByRep.get(rep) ?? dailyDefault;
+  return total;
 }
 
 function targetSummary(reps: RepStat[]): TargetSummary {
@@ -126,6 +169,25 @@ function targetSummary(reps: RepStat[]): TargetSummary {
     totalTarget,
     totalCalls,
     achievement: totalTarget > 0 ? Number(rate(totalCalls, totalTarget).toFixed(0)) : null,
+  };
+}
+
+/** 各種目標の達成状況（月次アポ/契約、本日架電）。 */
+function buildGoals(
+  calls: CallEvent[],
+  ts: TargetSummary,
+  monthAppts: number,
+  newContracts: number,
+  targets: Map<string, number>,
+  config: TargetsConfig,
+): Goals {
+  const today = jstDateKey(new Date());
+  const todayCalls = calls.filter((c) => c.date && jstDateKey(c.date) === today).length;
+  return {
+    monthlyCalls: goal(ts.totalTarget, ts.totalCalls),
+    monthlyAppointments: goal(config.company?.monthlyAppointments ?? 0, monthAppts),
+    monthlyContracts: goal(config.company?.monthlyContracts ?? 0, newContracts),
+    dailyCalls: goal(dailyCallTargetTotal(calls, targets, config), todayCalls),
   };
 }
 
@@ -227,9 +289,10 @@ export function buildDashboard(input: {
   customers: Customer[];
   contracts: Contract[];
   targets: Map<string, number>;
+  targetsConfig: TargetsConfig;
   errors: string[];
 }): DashboardData {
-  const { calls, customers, contracts, targets, errors } = input;
+  const { calls, customers, contracts, targets, targetsConfig, errors } = input;
   const weekly = buildWeekly(calls);
   const monthly = buildMonthly(calls);
   const cw = currentWeekKey();
@@ -238,6 +301,8 @@ export function buildDashboard(input: {
   const month = monthly.find((p) => p.key === cm) ?? { calls: 0, appointments: 0, apptRate: 0 };
   const ck = contractKpis(contracts);
   const reps = buildRepStats(calls, targets);
+  const ts = targetSummary(reps);
+  const goals = buildGoals(calls, ts, month.appointments, ck.newContractsThisMonth, targets, targetsConfig);
 
   return {
     generatedAt: new Date().toISOString(),
@@ -255,7 +320,8 @@ export function buildDashboard(input: {
     weekly,
     monthly,
     reps,
-    targetSummary: targetSummary(reps),
+    targetSummary: ts,
+    goals,
     funnel: buildFunnel(customers),
     statusBreakdown: buildStatusBreakdown(customers),
     breakdowns: buildBreakdowns(customers),

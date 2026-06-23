@@ -1,5 +1,23 @@
 {
-  "_comment": "IS担当ごとの月次目標架電数。優先順は ①Notion(IS架電KPIの月次目標架電数) → ②ここの monthlyTargetByRep → ③defaultMonthly。Notion側で運用していればこのファイルは空のままでOK。",
-  "defaultMonthly": 0,
-  "monthlyTargetByRep": {}
+  "_comment": "■ 目標値の一括設定ファイル ■ ここを編集して保存 → git push → vercel --prod で反映されます。",
+  "_使い方": "営業日数・全社の月次目標(アポ/契約)・担当者ごとの日別/月次の架電目標 をまとめてここで管理します。",
+
+  "workingDaysPerMonth": 20,
+
+  "company": {
+    "_comment": "全社の月次目標。",
+    "monthlyAppointments": 0,
+    "monthlyContracts": 0
+  },
+
+  "dailyCallsDefault": 0,
+  "dailyCallsByRep": {
+    "_comment": "担当者ごとの『日別 架電目標数』。ここに無い担当は dailyCallsDefault を使用。月次換算は ×workingDaysPerMonth。",
+    "吉田": 0,
+    "吉川": 0
+  },
+
+  "monthlyCallsByRep": {
+    "_comment": "担当者ごとに『月次 架電目標』を直接入れたい場合のみ記入（日別より優先）。通常は空でOK。"
+  }
 }

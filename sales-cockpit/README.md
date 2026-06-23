@@ -65,6 +65,21 @@ npm run dev      # http://localhost:4100
 - `components/*` — 表示は正規化済みドメイン型のみ参照
 - デザインは CLAUDE.md の和文B2Bデフォルト（feer ベース）に準拠
 
+## 目標値の一括設定
+
+`config/targets.json` をまとめて編集 → コミット → 再デプロイ（`vercel --prod`）で反映されます。
+
+| 項目 | キー | 説明 |
+|------|------|------|
+| 営業日数 | `workingDaysPerMonth` | 日別目標→月次換算に使用 |
+| 月のアポ獲得目標 | `company.monthlyAppointments` | 全社・当月 |
+| 月の契約数目標 | `company.monthlyContracts` | 全社・当月 |
+| 日別の架電目標（共通） | `dailyCallsDefault` | 全担当の既定値 |
+| 日別の架電目標（担当別） | `dailyCallsByRep` | 担当ごとに上書き |
+| 月次の架電目標（担当別/任意） | `monthlyCallsByRep` | 直接指定したい場合のみ。日別より優先 |
+
+担当者別の月次架電目標の優先順位は **`monthlyCallsByRep` → 日別×営業日数 → Notion(IS架電KPIの月次目標架電数)** です。ダッシュボード上部の「目標達成状況」に、本日の架電・月次架電・アポ・契約の達成率が表示されます。
+
 ## 今後の拡張候補（第2弾以降）
 
 - 🎯 目標設定 DB を取り込み、担当者別の**目標達成率**を表示

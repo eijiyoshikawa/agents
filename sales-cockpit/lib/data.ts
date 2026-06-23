@@ -5,9 +5,11 @@ import {
   fetchContracts,
   notionConfigured,
 } from "./notion";
-import { buildDashboard, buildTargets } from "./aggregate";
+import { buildDashboard, buildTargets, type TargetsConfig } from "./aggregate";
 import type { DashboardData, Customer, CallEvent } from "./types";
-import targetsConfig from "@/config/targets.json";
+import targetsRaw from "@/config/targets.json";
+
+const targetsConfig = targetsRaw as TargetsConfig;
 
 /** Promise を実行し、失敗したら fallback を返してエラーメッセージを収集する */
 async function safe<T>(label: string, fn: () => Promise<T>, fallback: T, errors: string[]): Promise<T> {
@@ -20,7 +22,7 @@ async function safe<T>(label: string, fn: () => Promise<T>, fallback: T, errors:
 }
 
 function emptyDashboard(message: string): DashboardData {
-  return buildDashboard({ calls: [], customers: [], contracts: [], targets: new Map(), errors: [message] });
+  return buildDashboard({ calls: [], customers: [], contracts: [], targets: new Map(), targetsConfig, errors: [message] });
 }
 
 /** ダッシュボード用に全データを取得・集計 */
@@ -39,10 +41,10 @@ export async function getDashboard(): Promise<DashboardData> {
 
   // 「両方使っている／統合したい」方針: 架電記録 を主ソースとし IS架電KPI を統合。
   const calls: CallEvent[] = [...recCalls, ...kpiCalls];
-  // 目標: IS架電KPIの月次目標架電数を最優先、無ければ config/targets.json。
-  const targets = buildTargets(calls, targetsConfig as any);
+  // 目標: config/targets.json（日別/月次/全社）を主とし、IS架電KPIの月次目標で補完。
+  const targets = buildTargets(calls, targetsConfig);
 
-  return buildDashboard({ calls, customers, contracts, targets, errors });
+  return buildDashboard({ calls, customers, contracts, targets, targetsConfig, errors });
 }
 
 /** 架電一覧（クリック発信）用の顧客リスト */

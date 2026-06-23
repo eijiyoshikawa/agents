@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import clsx from "clsx";
-import type { DashboardData } from "@/lib/types";
+import type { DashboardData, Goal } from "@/lib/types";
 import { KpiCard } from "./KpiCard";
 import { CallsChart, MrrChart, FunnelChart, TargetChart } from "./charts";
 import { yen, pct, num } from "@/lib/format";
@@ -60,13 +60,19 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
         <KpiCard label="MRR（月次経常収益）" value={yen(k.mrr)} accent="teal" />
         <KpiCard label="稼働中の契約数" value={num(k.activeContracts)} accent="teal" />
         <KpiCard label="今月の新規契約" value={num(k.newContractsThisMonth)} accent="pink" />
-        <KpiCard
-          label="今月の目標達成率"
-          value={data.targetSummary.achievement != null ? pct(data.targetSummary.achievement) : "—"}
-          sub={data.targetSummary.totalTarget > 0 ? `${num(data.targetSummary.totalCalls)} / ${num(data.targetSummary.totalTarget)} 件` : "目標未設定"}
-          accent="amber"
-        />
+        <KpiCard label="今月の総アポ数" value={num(k.monthAppts)} accent="pink" />
       </div>
+
+      {/* 目標達成状況 */}
+      <section>
+        <h2 className="text-sm font-semibold text-ink mb-2">目標達成状況</h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <GoalCard label="本日の架電（日次目標）" g={data.goals.dailyCalls} />
+          <GoalCard label="今月の架電（月次目標）" g={data.goals.monthlyCalls} />
+          <GoalCard label="今月のアポ獲得" g={data.goals.monthlyAppointments} />
+          <GoalCard label="今月の契約数" g={data.goals.monthlyContracts} />
+        </div>
+      </section>
 
       {/* 架電推移 */}
       <section className="card p-5">
@@ -99,6 +105,28 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
         <h2 className="text-sm font-semibold text-ink mb-3">MRR・稼働契約数の推移（直近6ヶ月）</h2>
         <MrrChart data={data.mrrTrend} />
       </section>
+    </div>
+  );
+}
+
+function GoalCard({ label, g }: { label: string; g: Goal }) {
+  const color =
+    g.achievement == null
+      ? "text-ink-muted"
+      : g.achievement >= 100
+        ? "text-brand"
+        : g.achievement >= 70
+          ? "text-accent-amber"
+          : "text-accent-red";
+  return (
+    <div className="card p-4 animate-growFromBottom">
+      <div className="text-xs font-medium text-ink-muted">{label}</div>
+      <div className={clsx("mt-1 text-2xl font-bold tabular-nums", color)}>
+        {g.achievement != null ? pct(g.achievement) : "—"}
+      </div>
+      <div className="mt-0.5 text-xs text-ink-muted">
+        {g.target > 0 ? `${num(g.actual)} / ${num(g.target)} 件` : `実績 ${num(g.actual)} 件・目標未設定`}
+      </div>
     </div>
   );
 }

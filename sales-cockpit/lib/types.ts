@@ -77,6 +77,17 @@ export type TargetSummary = {
   achievement: number | null; // %
 };
 
+/** 目標と実績の組（達成率つき） */
+export type Goal = { target: number; actual: number; achievement: number | null };
+
+/** 各種目標の達成状況 */
+export type Goals = {
+  monthlyCalls: Goal; // 月次 架電（全社）
+  monthlyAppointments: Goal; // 月次 アポ獲得（全社）
+  monthlyContracts: Goal; // 月次 契約数（全社）
+  dailyCalls: Goal; // 本日の架電（全社） vs 日次目標合計
+};
+
 /** 項目別内訳の集合（分析の土台。フィールドを足すだけで拡張可能） */
 export type Breakdowns = {
   rank: Breakdown[]; // 見込み度合い
@@ -110,6 +121,7 @@ export type DashboardData = {
   monthly: SeriesPoint[];
   reps: RepStat[];
   targetSummary: TargetSummary;
+  goals: Goals;
   funnel: FunnelStage[];
   statusBreakdown: { status: string; count: number }[];
   breakdowns: Breakdowns;
