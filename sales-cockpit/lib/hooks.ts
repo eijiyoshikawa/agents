@@ -10,7 +10,8 @@ const REAL_SNS = (sns: string[]) => sns.filter((s) => s && s !== "なし");
 export function buildHooks(c: Customer, now = new Date()): Hook[] {
   const out: Hook[] = [];
   const year = now.getFullYear();
-  const realSns = REAL_SNS(c.sns);
+  const realSns = REAL_SNS(c.sns ?? []);
+  const media = c.media ?? [];
 
   // 1) SNS活用状況（このサービスの本丸）
   if (realSns.length > 0) {
@@ -20,8 +21,8 @@ export function buildHooks(c: Customer, now = new Date()): Hook[] {
   }
 
   // 2) 採用に投資しているサイン（媒体掲載・採用ページ）
-  if (c.media.length > 0) {
-    out.push({ text: `求人媒体に掲載中（${c.media.join("・")}）＝採用予算あり。媒体依存からのSNS切替/併用を訴求`, tone: "chance" });
+  if (media.length > 0) {
+    out.push({ text: `求人媒体に掲載中（${media.join("・")}）＝採用予算あり。媒体依存からのSNS切替/併用を訴求`, tone: "chance" });
   } else if (c.recruitPage) {
     out.push({ text: `自社採用ページあり＝採用に積極的。SNS連携で母集団拡大を提案`, tone: "chance" });
   }

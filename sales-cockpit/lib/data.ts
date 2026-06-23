@@ -16,11 +16,14 @@ const targetsConfig = targetsRaw as TargetsConfig;
 // ── キャッシュ（高速化） ─────────────────────────────────────────
 // Notion全件取得は重いため結果をキャッシュ。保存時に revalidateTag で無効化する。
 // タグ: "customers"(顧客・メモ), "calls", "contracts", "targets"
-const TTL = Number(process.env.NOTION_REVALIDATE_SECONDS ?? 300);
-const cachedCustomers = unstable_cache(fetchCustomers, ["sc-customers"], { revalidate: TTL, tags: ["customers"] });
-const cachedCalls = unstable_cache(fetchCalls, ["sc-calls"], { revalidate: TTL, tags: ["calls"] });
-const cachedContracts = unstable_cache(fetchContracts, ["sc-contracts"], { revalidate: TTL, tags: ["contracts"] });
-const cachedTargets = unstable_cache(getStoredTargets, ["sc-targets"], { revalidate: TTL, tags: ["targets"] });
+// 既定30分キャッシュ（体感最速・Notion負荷減）。保存時は revalidateTag で即時反映するため
+// 長めでも メモ/目標/リスト の更新は遅延しない。常に最新にしたい場合は短く設定する。
+const TTL = Number(process.env.NOTION_REVALIDATE_SECONDS ?? 1800);
+// キー末尾のバージョンは、取得項目（スキーマ）を変えたら上げて旧キャッシュを破棄する。
+const cachedCustomers = unstable_cache(fetchCustomers, ["sc-customers-v2"], { revalidate: TTL, tags: ["customers"] });
+const cachedCalls = unstable_cache(fetchCalls, ["sc-calls-v2"], { revalidate: TTL, tags: ["calls"] });
+const cachedContracts = unstable_cache(fetchContracts, ["sc-contracts-v2"], { revalidate: TTL, tags: ["contracts"] });
+const cachedTargets = unstable_cache(getStoredTargets, ["sc-targets-v2"], { revalidate: TTL, tags: ["targets"] });
 
 /** Promise を実行し、失敗したら fallback を返してエラーメッセージを収集する */
 async function safe<T>(label: string, fn: () => Promise<T>, fallback: T, errors: string[]): Promise<T> {
