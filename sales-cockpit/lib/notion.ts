@@ -22,6 +22,7 @@ export const DB = {
   // アプリ管理用（MCPで自動生成）
   users: process.env.NOTION_DB_USERS || "791601fb-82eb-4130-aa0f-727bde6b9444",
   targets: process.env.NOTION_DB_TARGETS || "2b8a2f71-e915-434a-ae5b-a3d2eb84aa47",
+  lists: process.env.NOTION_DB_LISTS || "2a4d040c-8485-41e4-8403-994df6702757",
 };
 
 // Notion プロパティ組み立てヘルパー（書き込み用）
@@ -236,6 +237,59 @@ export async function getStoredTargets(): Promise<StoredTargets | null> {
     dailyCallsDefault: number(row, "日次架電目標") ?? 0,
     dailyCallsByRep: byRep,
   };
+}
+
+// ── 保存架電リスト ───────────────────────────────────────────────
+export type ListFilters = { q?: string; rep?: string; status?: string; rank?: string; industry?: string };
+export type SavedList = {
+  pageId: string;
+  name: string;
+  creator: string;
+  createdTime: string;
+  count: number;
+  filters: ListFilters;
+};
+
+export async function listSavedLists(): Promise<SavedList[]> {
+  const pages = await queryAll(DB.lists);
+  const out: SavedList[] = pages.map((pg) => {
+    let filters: ListFilters = {};
+    try {
+      filters = JSON.parse(txt(pg, "抽出条件") ?? "{}");
+    } catch {
+      filters = {};
+    }
+    return {
+      pageId: pg.id,
+      name: txt(pg, "リスト名") ?? "(無名)",
+      creator: txt(pg, "作成者") ?? "",
+      createdTime: pg.created_time ?? "",
+      count: number(pg, "件数") ?? 0,
+      filters,
+    };
+  });
+  return out.sort((a, b) => (b.createdTime ?? "").localeCompare(a.createdTime ?? ""));
+}
+
+export async function createSavedList(input: {
+  name: string;
+  creator: string;
+  filters: ListFilters;
+  count: number;
+}): Promise<void> {
+  await client().pages.create({
+    parent: { database_id: DB.lists },
+    properties: {
+      リスト名: tt(input.name),
+      作成者: rt(input.creator),
+      抽出条件: rt(JSON.stringify(input.filters ?? {})),
+      件数: { number: input.count || 0 },
+    },
+  });
+}
+
+export async function deleteSavedList(pageId: string): Promise<void> {
+  await client().pages.update({ page_id: pageId, archived: true });
 }
 
 /** 目標（default行）を作成 or 更新。 */

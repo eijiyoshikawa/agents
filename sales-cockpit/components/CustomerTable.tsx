@@ -2,10 +2,12 @@
 
 import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import clsx from "clsx";
-import { Search, ChevronDown, ExternalLink, ArrowLeft, ArrowRight, X } from "lucide-react";
+import { Search, ChevronDown, ExternalLink, ArrowLeft, ArrowRight, X, Bookmark } from "lucide-react";
 import type { Customer } from "@/lib/types";
 import { buildHooks } from "@/lib/hooks";
 import CallButton from "./CallButton";
+
+export type InitialFilters = { q?: string; rep?: string; status?: string; rank?: string; industry?: string };
 
 const RANK_COLOR: Record<string, string> = {
   A: "bg-accent-red/15 text-accent-red",
@@ -21,12 +23,18 @@ function googleSearchUrl(c: Customer): string {
   return `https://www.google.com/search?q=${encodeURIComponent(q)}`;
 }
 
-export default function CustomerTable({ customers }: { customers: Customer[] }) {
-  const [q, setQ] = useState("");
-  const [rep, setRep] = useState("");
-  const [status, setStatus] = useState("");
-  const [rank, setRank] = useState("");
-  const [industry, setIndustry] = useState("");
+export default function CustomerTable({
+  customers,
+  initial,
+}: {
+  customers: Customer[];
+  initial?: InitialFilters;
+}) {
+  const [q, setQ] = useState(initial?.q ?? "");
+  const [rep, setRep] = useState(initial?.rep ?? "");
+  const [status, setStatus] = useState(initial?.status ?? "");
+  const [rank, setRank] = useState(initial?.rank ?? "");
+  const [industry, setIndustry] = useState(initial?.industry ?? "");
   const [openId, setOpenId] = useState<string | null>(null);
 
   const reps = useMemo(() => uniq(customers.map((c) => c.isRep)), [customers]);
@@ -70,7 +78,10 @@ export default function CustomerTable({ customers }: { customers: Customer[] }) 
         <Select value={industry} onChange={setIndustry} options={industries} placeholder="業種（全て）" />
       </div>
 
-      <p className="text-xs text-slate-400">{filtered.length.toLocaleString()} 件 ・ 行をクリックで詳細・メモ</p>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-xs text-slate-400">{filtered.length.toLocaleString()} 件 ・ 行をクリックで詳細・メモ</p>
+        <SaveListBar filters={{ q, rep, status, rank, industry }} count={filtered.length} />
+      </div>
 
       <div className="card overflow-x-auto">
         <table className="w-full text-sm">
@@ -282,6 +293,69 @@ function MemoEditor({ customerId, initial }: { customerId: string; initial: stri
           メモを保存
         </button>
       </div>
+    </div>
+  );
+}
+
+function SaveListBar({ filters, count }: { filters: InitialFilters; count: number }) {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [state, setState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const [err, setErr] = useState("");
+
+  const save = async () => {
+    if (!name.trim()) return;
+    setState("saving");
+    setErr("");
+    try {
+      const res = await fetch("/api/lists", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: name.trim(), filters, count }),
+      });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || "保存失敗");
+      setState("saved");
+      setName("");
+      setTimeout(() => setOpen(false), 900);
+    } catch (e: any) {
+      setState("error");
+      setErr(e?.message ?? "保存失敗");
+    }
+  };
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white/10 text-slate-200 text-xs font-medium hover:bg-white/20 transition-colors"
+      >
+        <Bookmark size={13} /> 現在の条件をリスト保存
+      </button>
+    );
+  }
+  return (
+    <div className="flex items-center gap-2">
+      <input
+        value={name}
+        autoFocus
+        onChange={(e) => setName(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && save()}
+        placeholder="リスト名（例: 建設・A・未架電）"
+        className="px-3 py-1.5 rounded-lg bg-night-1 ring-1 ring-white/10 text-sm focus:outline-none focus:ring-brand-glow/50"
+      />
+      <button
+        onClick={save}
+        disabled={state === "saving"}
+        className="px-3 py-1.5 rounded-lg bg-brand text-white text-xs font-medium hover:bg-brand-soft transition-colors disabled:opacity-50"
+      >
+        {state === "saving" ? "保存中…" : "保存"}
+      </button>
+      <button onClick={() => setOpen(false)} className="p-1.5 rounded-lg text-slate-400 hover:bg-white/10">
+        <X size={14} />
+      </button>
+      {state === "saved" && <span className="text-xs text-brand-glow">✓ 保存</span>}
+      {state === "error" && <span className="text-xs text-accent-red">⚠ {err}</span>}
     </div>
   );
 }

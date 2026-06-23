@@ -1,10 +1,26 @@
 import { getCustomers } from "@/lib/data";
-import CustomerTable from "@/components/CustomerTable";
+import CustomerTable, { type InitialFilters } from "@/components/CustomerTable";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60; // 大量レコード取得に備えタイムアウトを延長
 
-export default async function CallsPage() {
+function str(v: string | string[] | undefined): string {
+  return Array.isArray(v) ? (v[0] ?? "") : (v ?? "");
+}
+
+export default async function CallsPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const sp = await searchParams;
+  const initial: InitialFilters = {
+    q: str(sp.q),
+    rep: str(sp.rep),
+    status: str(sp.status),
+    rank: str(sp.rank),
+    industry: str(sp.industry),
+  };
   const { customers, errors } = await getCustomers();
 
   return (
@@ -12,17 +28,15 @@ export default async function CallsPage() {
       <div>
         <h1 className="text-xl font-bold text-ink">架電リスト・発信</h1>
         <p className="text-xs text-ink-muted mt-0.5">
-          電話番号の「発信」をクリックすると、OS既定の電話アプリ（Zoom Phone を既定にすれば Zoom）で発信します。
+          行をクリックで詳細・架電フック・メモ。電話番号の「発信」で OS既定の電話アプリ（Zoom Phone等）で発信します。
         </p>
       </div>
 
       {errors.length > 0 && (
-        <div className="card p-4 ring-accent-amber/30 bg-accent-amber/5 text-xs text-ink-soft">
-          {errors.join(" / ")}
-        </div>
+        <div className="card p-4 ring-accent-amber/30 bg-accent-amber/5 text-xs text-ink-soft">{errors.join(" / ")}</div>
       )}
 
-      <CustomerTable customers={customers} />
+      <CustomerTable customers={customers} initial={initial} />
     </div>
   );
 }
