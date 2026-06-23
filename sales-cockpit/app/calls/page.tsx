@@ -2,6 +2,7 @@ import { getCustomers } from "@/lib/data";
 import CustomerTable from "@/components/CustomerTable";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60; // 大量レコード取得に備えタイムアウトを延長
 
 export default async function CallsPage() {
   const { customers, errors } = await getCustomers();

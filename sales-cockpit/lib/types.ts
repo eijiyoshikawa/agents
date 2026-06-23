@@ -30,6 +30,11 @@ export type Customer = {
   callCount: number | null; // 架電回数(rollup)
   lastCallDate: string | null; // 最終架電日(rollup)
   appointmentDate: string | null; // アポイント取得日
+  address: string | null; // 住所
+  email: string | null; // メールアドレス
+  companyUrl: string | null; // 会社URL
+  rep3: string | null; // 代表者名
+  memo: string | null; // メモ
 };
 
 /** 汎用カテゴリ内訳（項目別グラフ用の土台） */

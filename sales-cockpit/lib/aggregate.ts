@@ -216,13 +216,13 @@ function buildBreakdowns(customers: Customer[]): Breakdowns {
 
 // 顧客ステータス → ファネル段マッピング
 const FUNNEL_ORDER: { stage: string; statuses: string[]; color: string }[] = [
-  { stage: "リード", statuses: ["アプローチ前"], color: "#7A7A85" },
-  { stage: "接触", statuses: ["受付拒否", "不通", "担当者不在", "担当者拒否", "再コール", "クレーム"], color: "#5566FF" },
-  { stage: "見込み", statuses: ["見込み客", "資料請求"], color: "#E8A93D" },
-  { stage: "アポ獲得", statuses: ["アポイント獲得"], color: "#EC4899" },
-  { stage: "提案中", statuses: ["提案中"], color: "#7C3AED" },
-  { stage: "商談中", statuses: ["商談中"], color: "#147A4A" },
-  { stage: "契約中", statuses: ["契約中", "パートナー"], color: "#0F5132" },
+  { stage: "リード", statuses: ["アプローチ前"], color: "#94A3B8" },
+  { stage: "接触", statuses: ["受付拒否", "不通", "担当者不在", "担当者拒否", "再コール", "クレーム"], color: "#818CF8" },
+  { stage: "見込み", statuses: ["見込み客", "資料請求"], color: "#FBBF24" },
+  { stage: "アポ獲得", statuses: ["アポイント獲得"], color: "#F472B6" },
+  { stage: "提案中", statuses: ["提案中"], color: "#A78BFA" },
+  { stage: "商談中", statuses: ["商談中"], color: "#38BDF8" },
+  { stage: "契約中", statuses: ["契約中", "パートナー"], color: "#2DD4BF" },
 ];
 
 export function buildFunnel(customers: Customer[]): FunnelStage[] {

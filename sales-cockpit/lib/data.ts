@@ -32,12 +32,18 @@ export async function getDashboard(): Promise<DashboardData> {
     return emptyDashboard("NOTION_TOKEN が未設定です。Vercel の環境変数に NOTION_TOKEN を設定してください。");
   }
 
-  const [customers, recCalls, kpiCalls, contracts] = await Promise.all([
+  const [customers, recCalls, contracts] = await Promise.all([
     safe("顧客管理", fetchCustomers, [] as Customer[], errors),
     safe("架電記録", fetchCalls, [] as CallEvent[], errors),
-    safe("IS架電KPI", fetchIsKpiCalls, [] as CallEvent[], errors),
     safe("契約管理", fetchContracts, [], errors),
   ]);
+  // IS架電KPI はマルチソースDBで現APIバージョン非対応のことがあるため、失敗しても警告は出さず無視する。
+  let kpiCalls: CallEvent[] = [];
+  try {
+    kpiCalls = await fetchIsKpiCalls();
+  } catch {
+    kpiCalls = [];
+  }
 
   // 「両方使っている／統合したい」方針: 架電記録 を主ソースとし IS架電KPI を統合。
   const calls: CallEvent[] = [...recCalls, ...kpiCalls];

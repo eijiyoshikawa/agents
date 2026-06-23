@@ -36,8 +36,9 @@ async function queryAll(databaseId: string): Promise<any[]> {
   if (!databaseId) return [];
   const out: any[] = [];
   let cursor: string | undefined;
-  // 無限ループ防止に上限を設ける（最大 50ページ = 5000件）
-  for (let i = 0; i < 50; i++) {
+  // 取得上限ページ数（1ページ=100件）。既定120ページ=12,000件。env で変更可。
+  const maxPages = Number(process.env.NOTION_MAX_PAGES ?? 120);
+  for (let i = 0; i < maxPages; i++) {
     const res: any = await client().databases.query({
       database_id: databaseId,
       start_cursor: cursor,
@@ -99,6 +100,14 @@ function formulaStr(page: any, name: string): string | null {
   if (p?.type === "formula" && p.formula?.type === "string") return p.formula.string ?? null;
   return null;
 }
+function email(page: any, name: string): string | null {
+  const p = P(page, name);
+  return p?.type === "email" ? p.email : null;
+}
+function url(page: any, name: string): string | null {
+  const p = P(page, name);
+  return p?.type === "url" ? p.url : null;
+}
 
 // ── 各DBの取得（正規化して返す） ─────────────────────────────────
 export async function fetchCustomers(): Promise<Customer[]> {
@@ -120,7 +129,20 @@ export async function fetchCustomers(): Promise<Customer[]> {
     callCount: number(pg, "架電回数"),
     lastCallDate: dateStart(pg, "最終架電日"),
     appointmentDate: dateStart(pg, "アポイント取得日"),
+    address: txt(pg, "住所"),
+    email: email(pg, "メールアドレス"),
+    companyUrl: url(pg, "会社URL"),
+    rep3: txt(pg, "代表者名"),
+    memo: txt(pg, "メモ"),
   }));
+}
+
+/** 顧客ページの「メモ」を更新（Notion書き込み）。インテグレーションに更新権限が必要。 */
+export async function updateCustomerMemo(pageId: string, memo: string): Promise<void> {
+  await client().pages.update({
+    page_id: pageId,
+    properties: { メモ: { rich_text: [{ type: "text", text: { content: memo } }] } },
+  });
 }
 
 const APPT_RESULTS = new Set(["アポイント獲得", "アポ獲得"]);
