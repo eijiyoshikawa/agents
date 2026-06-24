@@ -5,20 +5,35 @@ import { fetchCustomersSlim, fetchContracts } from "./notion";
 import { normalizeCompanyName, normalizePhone } from "./leadflags";
 import type { ListCustomer, Contract } from "./types";
 
-const CONN =
-  process.env.DATABASE_URL ||
-  process.env.POSTGRES_URL ||
-  process.env.DATABASE_URL_UNPOOLED ||
-  process.env.POSTGRES_URL_NON_POOLING ||
-  "";
+// 接続文字列を解決：標準名 → 無ければ postgres:// 形式の環境変数を自動検出（Custom Prefix対策）。
+function resolveConn(): string {
+  const direct =
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_URL ||
+    process.env.DATABASE_URL_UNPOOLED ||
+    process.env.POSTGRES_URL_NON_POOLING;
+  if (direct) return direct;
+  const candidates: string[] = [];
+  for (const [k, v] of Object.entries(process.env)) {
+    if (typeof v === "string" && /^postgres(ql)?:\/\//.test(v) && /url/i.test(k)) candidates.push(v);
+  }
+  // プール接続(-pooler)を優先（無ければ最初の候補）
+  return candidates.find((u) => u.includes("-pooler")) ?? candidates[0] ?? "";
+}
+
+let _conn: string | null = null;
+function conn(): string {
+  if (_conn === null) _conn = resolveConn();
+  return _conn;
+}
 
 export function dbConfigured(): boolean {
-  return Boolean(CONN);
+  return Boolean(conn());
 }
 
 let _sql: ReturnType<typeof neon> | null = null;
 function db() {
-  if (!_sql) _sql = neon(CONN);
+  if (!_sql) _sql = neon(conn());
   return _sql;
 }
 
