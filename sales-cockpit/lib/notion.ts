@@ -45,13 +45,14 @@ function client(): Client {
  * データベース全ページをページネーションして取得（任意でNotionフィルタ指定）。
  * filterProperties を渡すと、そのプロパティIDのみ返却されるため転送量・処理が大幅に軽くなる。
  */
+// 取得上限ページ数（1ページ=100件）。既定400ページ=40,000件（全件カバー）。env で変更可。
+export const NOTION_MAX_PAGES = Number(process.env.NOTION_MAX_PAGES ?? 400);
+
 async function queryAll(databaseId: string, filter?: any, filterProperties?: string[]): Promise<any[]> {
   if (!databaseId) return [];
   const out: any[] = [];
   let cursor: string | undefined;
-  // 取得上限ページ数（1ページ=100件）。既定320ページ=32,000件（全件カバー）。env で変更可。
-  const maxPages = Number(process.env.NOTION_MAX_PAGES ?? 320);
-  for (let i = 0; i < maxPages; i++) {
+  for (let i = 0; i < NOTION_MAX_PAGES; i++) {
     const res: any = await client().databases.query({
       database_id: databaseId,
       start_cursor: cursor,

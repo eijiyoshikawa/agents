@@ -1,7 +1,7 @@
 // Postgres(Neon)バックエンド。接続文字列が設定されている時だけ有効。
 // 未設定なら dbConfigured()=false となり、アプリは従来のNotionキャッシュ経路で動作する（フォールバック）。
 import { neon } from "@neondatabase/serverless";
-import { fetchCustomersSlim, fetchContracts } from "./notion";
+import { fetchCustomersSlim, fetchContracts, NOTION_MAX_PAGES } from "./notion";
 import { normalizeCompanyName, normalizePhone } from "./leadflags";
 import type { ListCustomer, Contract } from "./types";
 
@@ -107,7 +107,7 @@ async function upsertContracts(rows: Contract[], stamp: string): Promise<void> {
 }
 
 /** NotionからDBへ全件同期（cronで実行。重いNotion取得はここだけ）。 */
-export async function syncAll(): Promise<{ customers: number; contracts: number; ms: number }> {
+export async function syncAll(): Promise<{ customers: number; contracts: number; ms: number; truncated: boolean }> {
   const t0 = Date.now();
   await ensureSchema();
   const stamp = new Date().toISOString();
@@ -115,10 +115,14 @@ export async function syncAll(): Promise<{ customers: number; contracts: number;
   await upsertCustomers(customers, stamp);
   await upsertContracts(contracts, stamp);
   const sql = db();
-  await sql.query(`DELETE FROM sc_customers WHERE synced_at < $1`, [stamp]);
+  // 取得上限に達している＝Notionを取り切れていない可能性。その場合は削除を行わない（誤削除防止）。
+  const truncated = customers.length >= NOTION_MAX_PAGES * 100;
+  if (!truncated) {
+    await sql.query(`DELETE FROM sc_customers WHERE synced_at < $1`, [stamp]);
+  }
   await sql.query(`DELETE FROM sc_contracts WHERE synced_at < $1`, [stamp]);
   await sql.query(`INSERT INTO sc_sync_meta (key,value) VALUES ('last_sync',$1) ON CONFLICT (key) DO UPDATE SET value=EXCLUDED.value`, [stamp]);
-  return { customers: customers.length, contracts: contracts.length, ms: Date.now() - t0 };
+  return { customers: customers.length, contracts: contracts.length, ms: Date.now() - t0, truncated };
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
