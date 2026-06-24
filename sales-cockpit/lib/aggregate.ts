@@ -12,6 +12,7 @@ import type {
   TargetSummary,
   Goals,
   StatusActivity,
+  TodayActivity,
 } from "./types";
 import {
   weekKey,
@@ -199,9 +200,8 @@ function buildGoals(
   newContracts: { total: number; sns: number; agency: number },
   targets: Map<string, number>,
   config: TargetsConfig,
+  todayCalls: number, // 本日の架電数（ステータス更新＋ログ統合）
 ): Goals {
-  const today = jstDateKey(new Date());
-  const todayCalls = calls.filter((c) => c.date && jstDateKey(c.date) === today).length;
   const snsTarget = config.company?.monthlyContractsSns ?? 0;
   const agencyTarget = config.company?.monthlyContractsAgency ?? 0;
   // 全体目標は「split合計 > 0 ならその合計」、無ければ従来の monthlyContracts を使う
@@ -333,6 +333,69 @@ export function buildStatusActivity(customers: Customer[], since: string): Statu
     byResult,
     byRep,
     apptMonthly,
+  };
+}
+
+/**
+ * 本日の架電・活動を統合集計する。
+ * Notion手動架電は「📞架電記録」にログを作らず顧客の「ステータス」を接触系へ更新する運用のため、
+ * 「本日ステータスが接触系に更新された顧客数（最終更新日=本日）」を架電数として数える。
+ * システム架電（recordCall）も結果でステータスを更新するため、両者は概ね包含関係にある。
+ * よって二重計上を避けるため calls = max(ステータス更新ベース, 当日ログベース) とする。
+ * 過去日は最終更新日時が上書きされ再現できないため、本数値は「本日分」専用。
+ */
+export function buildTodayActivity(customers: Customer[], calls: CallEvent[]): TodayActivity {
+  const today = jstDateKey(new Date());
+
+  // ① ステータス更新ベース（Notion手動架電を含む）: 本日更新 × 接触系ステータス
+  const statusByRep = new Map<string, number>();
+  let statusTotal = 0;
+  for (const c of customers) {
+    if (!c.status || !CONTACTED_STATUS.has(c.status)) continue;
+    if (!c.lastEdited || jstDateKey(c.lastEdited) !== today) continue;
+    statusTotal += 1;
+    if (isExcludedRep(c.isRep)) continue;
+    const rep = c.isRep ?? "未割当";
+    statusByRep.set(rep, (statusByRep.get(rep) ?? 0) + 1);
+  }
+
+  // ② システム架電ログベース（📞架電記録の当日分）
+  const logByRep = new Map<string, number>();
+  let logTotal = 0;
+  for (const c of calls) {
+    if (!c.date || jstDateKey(c.date) !== today) continue;
+    logTotal += 1;
+    if (isExcludedRep(c.rep)) continue;
+    const rep = c.rep ?? "未割当";
+    logByRep.set(rep, (logByRep.get(rep) ?? 0) + 1);
+  }
+
+  // ③ 本日のアポ獲得（アポ取得日が本日）
+  const apptByRep = new Map<string, number>();
+  let apptTotal = 0;
+  for (const c of customers) {
+    if (!c.appointmentDate || c.appointmentDate.slice(0, 10) !== today) continue;
+    apptTotal += 1;
+    if (isExcludedRep(c.isRep)) continue;
+    const rep = c.isRep ?? "未割当";
+    apptByRep.set(rep, (apptByRep.get(rep) ?? 0) + 1);
+  }
+
+  const reps = new Set<string>([...statusByRep.keys(), ...logByRep.keys(), ...apptByRep.keys()]);
+  const byRep = [...reps]
+    .map((rep) => ({
+      rep,
+      calls: Math.max(statusByRep.get(rep) ?? 0, logByRep.get(rep) ?? 0),
+      appointments: apptByRep.get(rep) ?? 0,
+    }))
+    .sort((a, b) => b.calls - a.calls);
+
+  return {
+    calls: Math.max(statusTotal, logTotal),
+    appointments: apptTotal,
+    statusCalls: statusTotal,
+    systemCalls: logTotal,
+    byRep,
   };
 }
 
@@ -485,6 +548,7 @@ export function buildDashboard(input: {
   const ts = targetSummary(reps);
   const since = process.env.METRICS_SINCE || "2026-05-07";
   const statusActivity = buildStatusActivity(customers, since);
+  const today = buildTodayActivity(customers, calls);
   // アポ実績はアポイント取得日ベース（架電ログが無いため）
   const goals = buildGoals(
     calls,
@@ -493,6 +557,7 @@ export function buildDashboard(input: {
     { total: ck.newContractsThisMonth, sns: ck.newContractsSnsThisMonth, agency: ck.newContractsAgencyThisMonth },
     targets,
     targetsConfig,
+    today.calls,
   );
 
   return {
@@ -513,6 +578,7 @@ export function buildDashboard(input: {
     monthly,
     reps,
     statusActivity,
+    today,
     targetSummary: ts,
     goals,
     funnel: buildFunnel(customers),

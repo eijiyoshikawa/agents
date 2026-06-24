@@ -199,6 +199,19 @@ export type Breakdowns = {
 /** ファネル段 */
 export type FunnelStage = { stage: string; count: number; color: string };
 
+/**
+ * 本日の活動（架電数）。Notion手動架電（顧客ステータスを接触系へ更新）と
+ * システム架電（📞架電記録の当日ログ）を統合した値。
+ * calls は二重計上を避けるため max(ステータス更新ベース, ログベース) を採用する。
+ */
+export type TodayActivity = {
+  calls: number; // 本日の架電数（統合・全社）
+  appointments: number; // 本日のアポ獲得（アポ取得日が本日）
+  statusCalls: number; // 参考: ステータス更新ベース（Notion架電）
+  systemCalls: number; // 参考: 📞架電記録の当日ログ（システム架電）
+  byRep: { rep: string; calls: number; appointments: number }[]; // 担当者別（非稼働メンバー除外）
+};
+
 /** ダッシュボード全体データ */
 export type DashboardData = {
   generatedAt: string;
@@ -222,6 +235,7 @@ export type DashboardData = {
   monthly: SeriesPoint[];
   reps: RepStat[];
   statusActivity: StatusActivity;
+  today: TodayActivity; // 本日の架電・活動（Notion手動＋システム統合）
   targetSummary: TargetSummary;
   goals: Goals;
   funnel: FunnelStage[];

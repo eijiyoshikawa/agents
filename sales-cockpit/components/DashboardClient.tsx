@@ -9,7 +9,7 @@ import { MrrChart, FunnelChart, CategoryBar } from "./chartsDynamic";
 import CallButton from "./CallButton";
 import RefreshButton from "./RefreshButton";
 import { yen, pct, num } from "@/lib/format";
-import { monthKey, currentMonthKey, monthRangeLabel } from "@/lib/period";
+import { monthKey, currentMonthKey, monthRangeLabel, jstDateKey } from "@/lib/period";
 
 type Drill = { title: string; rows: DrillCustomer[] } | null;
 
@@ -31,6 +31,13 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
     // 今月＝締め日基準（16日〜翌月15日）。アポ取得日がその期間内のもの。
     return worked.filter((c) => !!c.appointmentDate && monthKey(c.appointmentDate) === curMonth);
   }, [worked, curMonth]);
+
+  // 本日の架電（ステータス更新ベース）の内訳ドリル用: 本日更新 × 接触済み（アプローチ前以外）
+  const todayKey = jstDateKey(new Date());
+  const todayContactedRows = useMemo(
+    () => worked.filter((c) => c.lastEdited && jstDateKey(c.lastEdited) === todayKey && c.status && c.status !== "アプローチ前"),
+    [worked, todayKey],
+  );
 
   const open = (title: string, rows: DrillCustomer[]) => setDrill({ title, rows });
 
@@ -56,6 +63,34 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
           </ul>
         </div>
       )}
+
+      {/* 本日の架電（Notion手動＋システム統合） */}
+      <section>
+        <div className="flex items-baseline justify-between mb-2">
+          <h2 className="text-sm font-semibold text-ink">本日の架電（{todayKey}・JST）</h2>
+          <span className="text-xs text-ink-muted">
+            内訳: ステータス更新 {num(data.today.statusCalls)} / システム架電記録 {num(data.today.systemCalls)}（重複は統合・最大値を採用）
+          </span>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <KpiCard
+            label="本日の架電数（統合）"
+            value={num(data.today.calls)}
+            accent="brand"
+            onClick={() => open(`本日の架電（ステータス更新ベース ${num(data.today.statusCalls)}件）`, todayContactedRows)}
+          />
+          <KpiCard label="本日のアポ獲得（取得日基準）" value={num(data.today.appointments)} accent="pink" />
+        </div>
+        {data.today.byRep.length > 0 && (
+          <p className="text-xs text-ink-muted mt-2">
+            担当者別:{" "}
+            {data.today.byRep.map((r) => `${r.rep} ${r.calls}件${r.appointments ? `(アポ${r.appointments})` : ""}`).join(" ・ ")}
+          </p>
+        )}
+        <p className="text-xs text-ink-muted mt-1">
+          ※ Notionで顧客ステータスを更新した架電も計上（架電後にステータスを更新する運用前提）。過去日は最終更新日時が上書きされるため、本数値は本日分のみ。
+        </p>
+      </section>
 
       {/* KPI（クリックで内訳） */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
