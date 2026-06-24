@@ -18,6 +18,7 @@ import {
   TrendingUp,
   History,
   CalendarCheck,
+  CalendarRange,
   ShieldCheck,
   LogOut,
   UserCircle2,
@@ -50,6 +51,7 @@ const GROUPS: Group[] = [
     label: "実績・分析",
     icon: TrendingUp,
     items: [
+      { href: "/weekly", label: "週次サマリ", icon: CalendarRange },
       { href: "/history", label: "月次実績の推移", icon: History },
       { href: "/performance", label: "目標 vs 実績", icon: TrendingUp },
       { href: "/analytics", label: "分析", icon: BarChart3 },

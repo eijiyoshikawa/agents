@@ -3,13 +3,14 @@ import type { NextRequest } from "next/server";
 import { verifySession, SESSION_COOKIE } from "@/lib/session";
 
 const PUBLIC_PATHS = ["/login", "/signup"];
+// Vercel Cron が叩くエンドポイント（CRON_SECRET でルート側が認証）
+const CRON_PATHS = ["/api/warm", "/api/weekly-summary", "/api/daily-summary"];
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // 認証API・ログイン/登録ページ・Cronウォームアップは素通り
-  // （/api/warm は CRON_SECRET でルート側が認証する）
-  if (pathname.startsWith("/api/auth") || pathname === "/api/warm" || PUBLIC_PATHS.includes(pathname)) {
+  // 認証API・ログイン/登録ページ・Cronは素通り
+  if (pathname.startsWith("/api/auth") || CRON_PATHS.includes(pathname) || PUBLIC_PATHS.includes(pathname)) {
     return NextResponse.next();
   }
 
