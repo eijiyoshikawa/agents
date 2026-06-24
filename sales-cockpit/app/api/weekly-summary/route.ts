@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getDashboard, getSummaryCustomers, getContracts } from "@/lib/data";
+import { getDashboard, getSummaryCustomers, getContracts, getCalls } from "@/lib/data";
 import { notifySlack } from "@/lib/notify";
 import { statsForRange, ranges, weeklySlackText } from "@/lib/summary";
 import { verifySession, SESSION_COOKIE } from "@/lib/session";
@@ -27,13 +27,14 @@ export async function GET(req: Request) {
   }
 
   const r = ranges();
-  const [dash, { customers }, { contracts }] = await Promise.all([
+  const [dash, { customers }, { contracts }, { calls }] = await Promise.all([
     getDashboard(),
     getSummaryCustomers(r.lastMon),
     getContracts(),
+    getCalls(),
   ]);
-  const lastWeek = statsForRange(customers, contracts, r.lastMon, r.lastSun);
-  const thisWeek = statsForRange(customers, contracts, r.thisMon, r.today);
+  const lastWeek = statsForRange(customers, contracts, calls, r.lastMon, r.lastSun);
+  const thisWeek = statsForRange(customers, contracts, calls, r.thisMon, r.today);
   const text = weeklySlackText(lastWeek, thisWeek, dash, r);
   const slack = await notifySlack(text);
   return NextResponse.json({ ok: true, sentToSlack: slack.ok, slack, text });
