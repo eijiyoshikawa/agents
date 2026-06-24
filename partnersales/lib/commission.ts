@@ -11,7 +11,7 @@ import type {
 } from "./types";
 import { indexById, uplineChain } from "./tree";
 
-const MAX_TIERS = 3;
+const MAX_TIERS = 2;
 
 /** 1段分の報酬額を計算（円未満切り捨て） */
 export function tierAmount(reward: TierReward, dealAmount: number): number {
@@ -28,10 +28,10 @@ function commissionStatusOf(deal: Deal): CommissionStatus {
 }
 
 /**
- * 1件の成約から、クライアントの上位パートナーを最大3段たどってコミッションを生成する。
- * クライアントを底とし、紹介したパートナーから上へ chain[0]=tier1, [1]=tier2, [2]=tier3。
- * 4段目以降（4段上のパートナー）には分配しない。
- * 自己成約（isSelfDeal）の場合は tier1 を支払わない（上位 tier2 / tier3 は支払う）。
+ * 1件の成約から、クライアントの上位パートナーを最大2段たどってコミッションを生成する。
+ * クライアントを底とし、紹介したパートナーから上へ chain[0]=tier1, [1]=tier2。
+ * 3段目以降（2段より上のパートナー）には分配しない（ツリー表示には残る）。
+ * 自己成約（isSelfDeal）の場合は tier1 を支払わない（上位 tier2 は支払う）。
  * 該当段の報酬定義が無い／該当パートナーが居ない段はスキップ。
  */
 export function commissionsForDeal(
@@ -103,7 +103,7 @@ export function earningsByPartner(
         partnerId: id,
         confirmed: 0,
         pending: 0,
-        byTier: { 1: 0, 2: 0, 3: 0 },
+        byTier: { 1: 0, 2: 0 },
       };
       map.set(id, e);
     }

@@ -22,7 +22,7 @@ export default async function AdminPage() {
     services: m.services.map((s) => ({
       id: s.id,
       name: s.name,
-      rewards: ([1, 2, 3] as const).map((t) => {
+      rewards: ([1, 2] as const).map((t) => {
         const r = s.rewards.find((x) => x.tier === t);
         return { tier: t, type: r?.type ?? "percentage", value: rewardValue(r) };
       }),

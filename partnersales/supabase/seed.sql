@@ -15,13 +15,10 @@ delete from public.service_rewards where service_id in ('svc-sns', 'svc-bpo', 's
 insert into public.service_rewards (service_id, tier, type, rate, fixed_amount) values
   ('svc-sns', 1, 'percentage', 0.10, null),
   ('svc-sns', 2, 'percentage', 0.03, null),
-  ('svc-sns', 3, 'percentage', 0.02, null),
   ('svc-bpo', 1, 'percentage', 0.10, null),
   ('svc-bpo', 2, 'percentage', 0.04, null),
-  ('svc-bpo', 3, 'percentage', 0.02, null),
   ('svc-web', 1, 'fixed', null, 80000),
-  ('svc-web', 2, 'fixed', null, 30000),
-  ('svc-web', 3, 'fixed', null, 10000);
+  ('svc-web', 2, 'fixed', null, 30000);
 
 -- partners（親より先に挿入する順序）---------------------------------
 insert into public.partners (id, name, slug, parent_id, referral_code, contact_person, contact_email, joined_at, status) values

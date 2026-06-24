@@ -1,8 +1,8 @@
 // PartnerSales ドメインモデル
 // 仕様: docs/SPEC.md
 
-/** 報酬の段。tier1 = 直接成約者、tier2 = 1段上の紹介者、tier3 = 2段上の紹介者 */
-export type Tier = 1 | 2 | 3;
+/** 報酬の段。tier1 = クライアント直接紹介者、tier2 = その1段上の紹介者（最大2段） */
+export type Tier = 1 | 2;
 
 /** 報酬の与え方 */
 export type RewardType = "percentage" | "fixed";

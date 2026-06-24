@@ -15,7 +15,7 @@ export default async function ServicesPage() {
     description: s.description ?? "",
     unitPrice: s.unitPrice ?? 0,
     active: s.active,
-    rewards: ([1, 2, 3] as const).map((t) => {
+    rewards: ([1, 2] as const).map((t) => {
       const r = s.rewards.find((x) => x.tier === t);
       const type = r?.type ?? "percentage";
       const value =

@@ -18,7 +18,7 @@ export default async function GuidePage() {
       id: s.id,
       name: s.name,
       unitPrice: s.unitPrice ?? 1000000,
-      rewards: ([1, 2, 3] as const).map((t) => {
+      rewards: ([1, 2] as const).map((t) => {
         const r = s.rewards.find((x) => x.tier === t);
         return { tier: t, type: r?.type ?? "percentage", rate: r?.rate ?? 0, fixedAmount: r?.fixedAmount ?? 0 };
       }),
@@ -53,13 +53,12 @@ export default async function GuidePage() {
         <ul>
           <li><strong>tier1</strong>：あなたが直接クライアントを紹介して成約したとき</li>
           <li><strong>tier2</strong>：あなたが紹介したパートナー（1段下）が成約したとき</li>
-          <li><strong>tier3</strong>：さらにその下（2段下）が成約したとき</li>
         </ul>
 
         <h3>2. あなたの招待コード</h3>
         <p>
           新しいパートナー（紹介会社）をお連れいただく際は、あなたの<strong>招待コード</strong>をお伝えください。
-          そのコードを使って登録された会社は、あなたの紹介ツリーの配下に入り、その成約があなたの tier2 / tier3 報酬につながります。
+          そのコードを使って登録された会社は、あなたの紹介ツリーの配下に入り、その成約があなたの tier2 報酬につながります。
           招待コードはマイページ上部に表示されています。
         </p>
 

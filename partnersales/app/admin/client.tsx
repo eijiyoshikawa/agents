@@ -38,7 +38,7 @@ const input: React.CSSProperties = {
 };
 const phaseLabel: Record<string, string> = { below_threshold: "下限未満（繰越）", eligible: "請求書発行依頼", invoiced: "入金待ち" };
 const phasePill: Record<string, string> = { below_threshold: "pill", eligible: "pill pill-brand", invoiced: "pill pill-amber" };
-const tierLabel = ["tier1（直接）", "tier2（1段上）", "tier3（2段上）"];
+const tierLabel = ["tier1（直接）", "tier2（1段上）"];
 const tabs = ["成約", "支払い", "パートナー登録", "料率パターン"] as const;
 type Tab = (typeof tabs)[number];
 
@@ -348,7 +348,7 @@ function RatePlanEditor({
   const buildRewards = (): Record<string, TierRow[]> => {
     const map: Record<string, TierRow[]> = {};
     for (const s of data.services) {
-      map[s.id] = [1, 2, 3].map((t) => {
+      map[s.id] = [1, 2].map((t) => {
         const fromPlan = plan?.rewards.find((r) => r.serviceId === s.id && r.tier === t);
         const def = s.rewards.find((r) => r.tier === t);
         const src = fromPlan ?? def;
@@ -385,7 +385,7 @@ function RatePlanEditor({
       {data.services.map((s) => (
         <div key={s.id} style={{ border: "1px solid var(--card-border)", borderRadius: 8, padding: 10 }}>
           <div className="h-section" style={{ marginBottom: 6 }}>{s.name}</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8 }}>
             {rewards[s.id]?.map((r, i) => (
               <div key={r.tier} style={{ display: "grid", gap: 4 }}>
                 <span className="h-section">{tierLabel[i]}</span>

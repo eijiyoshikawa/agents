@@ -19,7 +19,6 @@ export interface SimService {
 const tierLabel: Record<number, string> = {
   1: "あなたが直接クライアントを紹介",
   2: "あなたの紹介先（1段下）が成約",
-  3: "さらにその下（2段下）が成約",
 };
 
 function rewardAmount(r: SimReward | undefined, amount: number): number {
@@ -41,7 +40,7 @@ export default function Simulator({ services }: { services: SimService[] }) {
   const svc = services.find((s) => s.id === sid);
   const [amount, setAmount] = useState(String(svc?.unitPrice || 1000000));
   const amt = Number(amount) || 0;
-  const tiers = useMemo(() => [1, 2, 3].map((t) => svc?.rewards.find((r) => r.tier === t)), [svc]);
+  const tiers = useMemo(() => [1, 2].map((t) => svc?.rewards.find((r) => r.tier === t)), [svc]);
 
   return (
     <div style={{ display: "grid", gap: 20 }}>
@@ -57,8 +56,8 @@ export default function Simulator({ services }: { services: SimService[] }) {
           </label>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
-          {[1, 2, 3].map((t, i) => (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 12 }}>
+          {[1, 2].map((t, i) => (
             <div key={t} style={{ background: "var(--hover)", borderRadius: 10, padding: "14px 16px" }}>
               <div className="h-section">tier{t}・{rateLabel(tiers[i])}</div>
               <div style={{ fontSize: 24, marginTop: 6 }}>
@@ -76,13 +75,13 @@ export default function Simulator({ services }: { services: SimService[] }) {
       <div>
         <div className="h-section" style={{ marginBottom: 8 }}>サービス別 報酬早見表（標準単価のとき）</div>
         <div className="card" style={{ padding: 0, overflow: "hidden" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr 1fr 1fr", gap: 8, padding: "10px 14px" }} className="h-section">
-            <span>サービス（標準単価）</span><span>tier1</span><span>tier2</span><span>tier3</span>
+          <div style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr 1fr", gap: 8, padding: "10px 14px" }} className="h-section">
+            <span>サービス（標準単価）</span><span>tier1</span><span>tier2</span>
           </div>
           {services.map((s) => (
-            <div key={s.id} style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr 1fr 1fr", gap: 8, padding: "10px 14px", borderTop: "1px solid var(--card-border)", fontSize: 13 }}>
+            <div key={s.id} style={{ display: "grid", gridTemplateColumns: "1.6fr 1fr 1fr", gap: 8, padding: "10px 14px", borderTop: "1px solid var(--card-border)", fontSize: 13 }}>
               <span><strong>{s.name}</strong><br /><span className="h-section">{yen(s.unitPrice)}</span></span>
-              {[1, 2, 3].map((t) => {
+              {[1, 2].map((t) => {
                 const r = s.rewards.find((x) => x.tier === t);
                 return <span key={t} className="stat-num">{yen(rewardAmount(r, s.unitPrice))}</span>;
               })}

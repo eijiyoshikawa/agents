@@ -82,9 +82,9 @@ export default function PartnerView({
       <section style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
         <div className="card">
           <div className="h-section" style={{ marginBottom: 8 }}>段別 確定報酬内訳</div>
-          {([1, 2, 3] as const).map((t) => (
+          {([1, 2] as const).map((t) => (
             <div key={t} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid var(--card-border)" }}>
-              <span>tier{t}（{t === 1 ? "クライアント直接紹介" : `${t - 1}段下からの成約`}）</span>
+              <span>tier{t}（{t === 1 ? "クライアント直接紹介" : "1段下からの成約"}）</span>
               <span className="stat-num">{yen(earn?.byTier[t] ?? 0)}</span>
             </div>
           ))}

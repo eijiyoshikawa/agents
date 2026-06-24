@@ -10,12 +10,11 @@ import type { Service, Tier, TierReward } from "@/lib/types";
 /**
  * 標準の段別報酬テンプレート。
  * 報酬はクライアント契約額に対する割合。tier1=クライアントの直接紹介者、
- * tier2=その紹介者、tier3=さらに上の紹介者。4段目以降は分配しない。
+ * tier2=その1段上の紹介者。最大2段（3段目以降は分配しない）。
  */
 export const DEFAULT_TIER_RATES: { tier: Tier; rate: number }[] = [
   { tier: 1, rate: 0.1 }, // 10%
   { tier: 2, rate: 0.03 }, // 3%
-  { tier: 3, rate: 0.02 }, // 2%
 ];
 
 /** 割合ベースの報酬プランを生成（省略時は DEFAULT_TIER_RATES） */
@@ -44,7 +43,7 @@ export const services: Service[] = [
     unitPrice: 1000000,
     active: true,
     // 報酬率を変えたい場合はここを percentagePlan([{tier:1,rate:0.12}, ...]) のように上書き
-    rewards: percentagePlan(), // 10% / 3% / 2%
+    rewards: percentagePlan(), // 10% / 3%
   },
   {
     id: "svc-bpo",
@@ -55,7 +54,6 @@ export const services: Service[] = [
     rewards: percentagePlan([
       { tier: 1, rate: 0.1 },
       { tier: 2, rate: 0.04 },
-      { tier: 3, rate: 0.02 },
     ]),
   },
   {
@@ -68,7 +66,6 @@ export const services: Service[] = [
     rewards: fixedPlan([
       { tier: 1, fixedAmount: 80000 },
       { tier: 2, fixedAmount: 30000 },
-      { tier: 3, fixedAmount: 10000 },
     ]),
   },
 ];

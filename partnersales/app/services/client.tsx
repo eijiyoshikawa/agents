@@ -23,11 +23,11 @@ const input: React.CSSProperties = {
   padding: "8px 10px", borderRadius: 8, border: "1px solid var(--card-border)",
   background: "var(--card)", color: "var(--fg)", fontSize: 13, width: "100%",
 };
-const tierLabel = ["tier1（直接）", "tier2（1段上）", "tier3（2段上）"];
+const tierLabel = ["tier1（直接）", "tier2（1段上）"];
 
 const emptyService = (): ServiceRow => ({
   id: "", name: "", description: "", unitPrice: 0, active: true,
-  rewards: [1, 2, 3].map((tier) => ({ tier, type: "percentage", value: 0 })),
+  rewards: [1, 2].map((tier) => ({ tier, type: "percentage", value: 0 })),
 });
 
 export default function ServicesClient({ services, configured }: { services: ServiceRow[]; configured: boolean }) {
@@ -51,7 +51,7 @@ export default function ServicesClient({ services, configured }: { services: Ser
       <div>
         <h1 style={{ fontSize: 26, fontWeight: 700 }}>サービス・報酬プラン</h1>
         <p style={{ color: "var(--fg-muted)", fontSize: 14 }}>
-          サービスごとに tier1〜tier3 の紹介報酬を設定します（最大3段目まで分配）。編集して「保存」を押すと反映されます。
+          サービスごとに tier1〜tier2 の紹介報酬を設定します（最大2段目まで分配）。編集して「保存」を押すと反映されます。
         </p>
       </div>
 
@@ -117,7 +117,7 @@ function ServiceEditor({
       <label style={{ display: "grid", gap: 4 }}><span className="h-section">説明</span>
         <input style={input} value={description} onChange={(e) => setDescription(e.target.value)} /></label>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}>
         {rewards.map((r, i) => (
           <div key={r.tier} style={{ background: "var(--hover)", borderRadius: 8, padding: "10px 12px", display: "grid", gap: 6 }}>
             <div className="h-section">{tierLabel[i]}</div>
