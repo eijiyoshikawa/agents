@@ -21,13 +21,18 @@ function rowToReward(r: RewardRow): TierReward {
   return { tier: r.tier as Tier, type: r.type, rate: r.rate ?? undefined, fixedAmount: r.fixed_amount ?? undefined };
 }
 
-/** 成約時点の料率スナップショットを解決（サービス既定 ← 紹介者の料率パターンで上書き） */
+/** 成約時点の料率スナップショットを解決（サービス既定の指定区分 ← 紹介者の料率パターンで上書き） */
 async function resolveRewardSnapshot(
   sb: ReturnType<typeof getServerClient>,
   serviceId: string,
-  introducerPartnerId: string
+  introducerPartnerId: string,
+  rewardType: "agency" | "tossup"
 ): Promise<TierReward[]> {
-  const { data: base } = await sb.from("service_rewards").select("*").eq("service_id", serviceId);
+  const { data: base } = await sb
+    .from("service_rewards")
+    .select("*")
+    .eq("service_id", serviceId)
+    .eq("plan_type", rewardType);
   const baseRewards = ((base ?? []) as RewardRow[]).map(rowToReward);
 
   const { data: partner } = await sb
@@ -73,6 +78,7 @@ export async function createDeal(input: {
   clientName: string;
   introducerPartnerId: string;
   amount: number;
+  rewardType: "agency" | "tossup";
   status: DealStatus;
   closedAt: string;
   isSelfDeal: boolean;
@@ -81,12 +87,14 @@ export async function createDeal(input: {
   await requireStaff();
   if (!hasServerSupabase()) return { ok: false, message: "Supabase 未設定です" };
   const sb = getServerClient();
-  const snapshot = await resolveRewardSnapshot(sb, input.serviceId, input.introducerPartnerId);
+  const rewardType = input.rewardType === "tossup" ? "tossup" : "agency";
+  const snapshot = await resolveRewardSnapshot(sb, input.serviceId, input.introducerPartnerId, rewardType);
   const { error } = await sb.from("deals").insert({
     service_id: input.serviceId,
     client_name: input.clientName,
     introducer_partner_id: input.introducerPartnerId,
     amount: input.amount,
+    reward_type: rewardType,
     status: input.status,
     closed_at: input.closedAt,
     is_self_deal: input.isSelfDeal,

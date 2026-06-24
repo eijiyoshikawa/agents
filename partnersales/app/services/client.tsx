@@ -16,7 +16,8 @@ export interface ServiceRow {
   description: string;
   unitPrice: number;
   active: boolean;
-  rewards: RewardRow[];
+  agency: RewardRow[];
+  tossup: RewardRow[];
 }
 
 const input: React.CSSProperties = {
@@ -25,9 +26,10 @@ const input: React.CSSProperties = {
 };
 const tierLabel = ["tier1（直接）", "tier2（1段上）"];
 
+const emptyTiers = (): RewardRow[] => [1, 2].map((tier) => ({ tier, type: "percentage", value: 0 }));
 const emptyService = (): ServiceRow => ({
   id: "", name: "", description: "", unitPrice: 0, active: true,
-  rewards: [1, 2].map((tier) => ({ tier, type: "percentage", value: 0 })),
+  agency: emptyTiers(), tossup: emptyTiers(),
 });
 
 export default function ServicesClient({ services, configured }: { services: ServiceRow[]; configured: boolean }) {
@@ -83,11 +85,36 @@ function ServiceEditor({
   const [description, setDescription] = useState(initial.description);
   const [unitPrice, setUnitPrice] = useState(String(initial.unitPrice || ""));
   const [active, setActive] = useState(initial.active);
-  const [rewards, setRewards] = useState<RewardRow[]>(initial.rewards);
+  const [agency, setAgency] = useState<RewardRow[]>(initial.agency);
+  const [tossup, setTossup] = useState<RewardRow[]>(initial.tossup);
 
-  function setReward(tier: number, patch: Partial<RewardRow>) {
-    setRewards((rs) => rs.map((r) => (r.tier === tier ? { ...r, ...patch } : r)));
-  }
+  const setReward = (
+    setter: React.Dispatch<React.SetStateAction<RewardRow[]>>,
+    tier: number,
+    patch: Partial<RewardRow>
+  ) => setter((rs) => rs.map((r) => (r.tier === tier ? { ...r, ...patch } : r)));
+
+  const tierGrid = (rows: RewardRow[], setter: React.Dispatch<React.SetStateAction<RewardRow[]>>) => (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}>
+      {rows.map((r, i) => (
+        <div key={r.tier} style={{ background: "var(--hover)", borderRadius: 8, padding: "10px 12px", display: "grid", gap: 6 }}>
+          <div className="h-section">{tierLabel[i]}</div>
+          <select style={input} value={r.type} onChange={(e) => setReward(setter, r.tier, { type: e.target.value as RewardRow["type"] })}>
+            <option value="percentage">％（割合）</option>
+            <option value="fixed">円（固定）</option>
+          </select>
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <input style={input} type="number" min={0} step={r.type === "percentage" ? 0.1 : 1000}
+              value={r.value} onChange={(e) => setReward(setter, r.tier, { value: Number(e.target.value) })} />
+            <span style={{ fontSize: 13, color: "var(--fg-muted)" }}>{r.type === "percentage" ? "%" : "円"}</span>
+          </div>
+          {r.type === "percentage" && initial.unitPrice > 0 && (
+            <span className="h-section">標準単価で {yen(Math.floor(initial.unitPrice * (r.value / 100)))}</span>
+          )}
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <form
@@ -97,9 +124,9 @@ function ServiceEditor({
         e.preventDefault();
         run(() => saveService({
           id: isNew ? undefined : initial.id,
-          name, description, unitPrice: Number(unitPrice) || 0, active, rewards,
+          name, description, unitPrice: Number(unitPrice) || 0, active, agency, tossup,
         }));
-        if (isNew) { setName(""); setDescription(""); setUnitPrice(""); setActive(true); setRewards(emptyService().rewards); }
+        if (isNew) { setName(""); setDescription(""); setUnitPrice(""); setActive(true); setAgency(emptyTiers()); setTossup(emptyTiers()); }
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -117,24 +144,13 @@ function ServiceEditor({
       <label style={{ display: "grid", gap: 4 }}><span className="h-section">説明</span>
         <input style={input} value={description} onChange={(e) => setDescription(e.target.value)} /></label>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}>
-        {rewards.map((r, i) => (
-          <div key={r.tier} style={{ background: "var(--hover)", borderRadius: 8, padding: "10px 12px", display: "grid", gap: 6 }}>
-            <div className="h-section">{tierLabel[i]}</div>
-            <select style={input} value={r.type} onChange={(e) => setReward(r.tier, { type: e.target.value as RewardRow["type"] })}>
-              <option value="percentage">％（割合）</option>
-              <option value="fixed">円（固定）</option>
-            </select>
-            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <input style={input} type="number" min={0} step={r.type === "percentage" ? 0.1 : 1000}
-                value={r.value} onChange={(e) => setReward(r.tier, { value: Number(e.target.value) })} />
-              <span style={{ fontSize: 13, color: "var(--fg-muted)" }}>{r.type === "percentage" ? "%" : "円"}</span>
-            </div>
-            {r.type === "percentage" && initial.unitPrice > 0 && (
-              <span className="h-section">標準単価で {yen(Math.floor(initial.unitPrice * (r.value / 100)))}</span>
-            )}
-          </div>
-        ))}
+      <div style={{ display: "grid", gap: 6 }}>
+        <div className="pill pill-brand" style={{ alignSelf: "start" }}>代理店パターン</div>
+        {tierGrid(agency, setAgency)}
+      </div>
+      <div style={{ display: "grid", gap: 6 }}>
+        <div className="pill pill-indigo" style={{ alignSelf: "start" }}>トスアップパターン</div>
+        {tierGrid(tossup, setTossup)}
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>

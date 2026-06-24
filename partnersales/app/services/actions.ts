@@ -23,7 +23,10 @@ export interface ServiceInput {
   description?: string;
   unitPrice?: number;
   active: boolean;
-  rewards: ServiceRewardInput[];
+  /** 代理店区分の tier1/tier2 */
+  agency: ServiceRewardInput[];
+  /** トスアップ区分の tier1/tier2 */
+  tossup: ServiceRewardInput[];
 }
 
 export async function saveService(input: ServiceInput): Promise<ServiceActionResult> {
@@ -43,17 +46,20 @@ export async function saveService(input: ServiceInput): Promise<ServiceActionRes
   });
   if (e1) return { ok: false, message: e1.message };
 
-  // 報酬プランを入れ替え（tier1〜3）
+  // 報酬プランを入れ替え（代理店 / トスアップ × tier1/tier2）
   await sb.from("service_rewards").delete().eq("service_id", id);
-  const rows = input.rewards
-    .filter((r) => r.tier >= 1 && r.tier <= 3)
-    .map((r) => ({
-      service_id: id,
-      tier: r.tier,
-      type: r.type,
-      rate: r.type === "percentage" ? Math.max(0, Math.min(1, r.value / 100)) : null,
-      fixed_amount: r.type === "fixed" ? Math.max(0, Math.round(r.value)) : null,
-    }));
+  const toRows = (rewards: ServiceRewardInput[], planType: "agency" | "tossup") =>
+    rewards
+      .filter((r) => r.tier >= 1 && r.tier <= 2)
+      .map((r) => ({
+        service_id: id,
+        plan_type: planType,
+        tier: r.tier,
+        type: r.type,
+        rate: r.type === "percentage" ? Math.max(0, Math.min(1, r.value / 100)) : null,
+        fixed_amount: r.type === "fixed" ? Math.max(0, Math.round(r.value)) : null,
+      }));
+  const rows = [...toRows(input.agency, "agency"), ...toRows(input.tossup, "tossup")];
   const { error: e2 } = await sb.from("service_rewards").insert(rows);
   if (e2) return { ok: false, message: e2.message };
 

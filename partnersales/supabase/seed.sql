@@ -12,13 +12,19 @@ on conflict (id) do update set
 
 -- service_rewards ------------------------------------------------------
 delete from public.service_rewards where service_id in ('svc-sns', 'svc-bpo', 'svc-web');
-insert into public.service_rewards (service_id, tier, type, rate, fixed_amount) values
-  ('svc-sns', 1, 'percentage', 0.10, null),
-  ('svc-sns', 2, 'percentage', 0.03, null),
-  ('svc-bpo', 1, 'percentage', 0.10, null),
-  ('svc-bpo', 2, 'percentage', 0.04, null),
-  ('svc-web', 1, 'fixed', null, 80000),
-  ('svc-web', 2, 'fixed', null, 30000);
+insert into public.service_rewards (service_id, plan_type, tier, type, rate, fixed_amount) values
+  ('svc-sns', 'agency', 1, 'percentage', 0.10, null),
+  ('svc-sns', 'agency', 2, 'percentage', 0.03, null),
+  ('svc-sns', 'tossup', 1, 'percentage', 0.05, null),
+  ('svc-sns', 'tossup', 2, 'percentage', 0.02, null),
+  ('svc-bpo', 'agency', 1, 'percentage', 0.10, null),
+  ('svc-bpo', 'agency', 2, 'percentage', 0.04, null),
+  ('svc-bpo', 'tossup', 1, 'percentage', 0.05, null),
+  ('svc-bpo', 'tossup', 2, 'percentage', 0.02, null),
+  ('svc-web', 'agency', 1, 'fixed', null, 80000),
+  ('svc-web', 'agency', 2, 'fixed', null, 30000),
+  ('svc-web', 'tossup', 1, 'fixed', null, 40000),
+  ('svc-web', 'tossup', 2, 'fixed', null, 15000);
 
 -- partners（親より先に挿入する順序）---------------------------------
 insert into public.partners (id, name, slug, parent_id, referral_code, contact_person, contact_email, joined_at, status) values

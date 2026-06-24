@@ -27,7 +27,7 @@ export interface AdminData {
   services: { id: string; name: string; rewards: TierRow[] }[];
   ratePlans: { id: string; name: string; partnerIds: string[]; rewards: { serviceId: string; tier: number; type: "percentage" | "fixed"; value: number }[] }[];
   partners: { id: string; name: string; slug: string; referralCode: string; status: string }[];
-  deals: { id: string; clientName: string; serviceName: string; introducer: string; amount: number; status: DealStatus; closedAt: string; isSelfDeal: boolean }[];
+  deals: { id: string; clientName: string; serviceName: string; introducer: string; amount: number; status: DealStatus; closedAt: string; isSelfDeal: boolean; rewardType: "agency" | "tossup" }[];
   payoutRows: { partnerId: string; name: string; confirmedTotal: number; paidOut: number; invoicedAmount: number; unsettled: number; phase: string }[];
   payouts: { id: string; name: string; amount: number; status: string; invoiceNo?: string; paidAt?: string }[];
 }
@@ -101,11 +101,12 @@ function DealsTab({ data, run }: { data: AdminData; run: RunFn }) {
   const [status, setStatus] = useState<DealStatus>("pending");
   const [closedAt, setClosedAt] = useState(new Date().toISOString().slice(0, 10));
   const [isSelfDeal, setIsSelfDeal] = useState(false);
+  const [rewardType, setRewardType] = useState<"agency" | "tossup">("agency");
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
       <form className="card" style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10 }}
-        onSubmit={(e) => { e.preventDefault(); run(() => createDeal({ serviceId, clientName, introducerPartnerId: partnerId, amount: Number(amount), status, closedAt, isSelfDeal })); }}>
+        onSubmit={(e) => { e.preventDefault(); run(() => createDeal({ serviceId, clientName, introducerPartnerId: partnerId, amount: Number(amount), rewardType, status, closedAt, isSelfDeal })); }}>
         <label style={{ display: "grid", gap: 4 }}><span className="h-section">サービス</span>
           <select style={input} value={serviceId} onChange={(e) => setServiceId(e.target.value)}>
             {data.services.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
@@ -113,6 +114,11 @@ function DealsTab({ data, run }: { data: AdminData; run: RunFn }) {
         <label style={{ display: "grid", gap: 4 }}><span className="h-section">紹介パートナー（tier1）</span>
           <select style={input} value={partnerId} onChange={(e) => setPartnerId(e.target.value)}>
             {data.partners.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+          </select></label>
+        <label style={{ display: "grid", gap: 4 }}><span className="h-section">報酬区分</span>
+          <select style={input} value={rewardType} onChange={(e) => setRewardType(e.target.value as "agency" | "tossup")}>
+            <option value="agency">代理店</option>
+            <option value="tossup">トスアップ</option>
           </select></label>
         <label style={{ display: "grid", gap: 4 }}><span className="h-section">クライアント名</span>
           <input style={input} value={clientName} onChange={(e) => setClientName(e.target.value)} required /></label>
@@ -135,7 +141,11 @@ function DealsTab({ data, run }: { data: AdminData; run: RunFn }) {
         {data.deals.map((d, i) => (
           <div key={d.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", borderTop: i ? "1px solid var(--card-border)" : "none" }}>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 13, fontWeight: 600 }}>{d.clientName} {d.isSelfDeal && <span className="pill pill-amber">自己</span>}</div>
+              <div style={{ fontSize: 13, fontWeight: 600 }}>
+                {d.clientName}{" "}
+                <span className={d.rewardType === "tossup" ? "pill pill-indigo" : "pill pill-brand"}>{d.rewardType === "tossup" ? "トスアップ" : "代理店"}</span>
+                {d.isSelfDeal && <span className="pill pill-amber">自己</span>}
+              </div>
               <div className="h-section">{d.serviceName} / 紹介: {d.introducer} / {d.closedAt}</div>
             </div>
             <div className="stat-num" style={{ fontSize: 13 }}>{yen(d.amount)}</div>

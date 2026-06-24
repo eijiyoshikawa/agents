@@ -70,6 +70,13 @@ describe("commissionsForDeal", () => {
     expect(cs.map((c) => c.amount)).toEqual([80000, 30000]);
   });
 
+  it("報酬区分（トスアップ）でサービス既定の料率を切り替える", () => {
+    const d: Deal = { id: "t2", serviceId: "svc-sns", clientName: "X", introducerPartnerId: "p-delta", amount: 1000000, rewardType: "tossup", status: "confirmed", closedAt: "2026-05-01" };
+    const cs = commissionsForDeal(d, svc("svc-sns"), byId);
+    // トスアップ: tier1 5% = 50000 / tier2 2% = 20000
+    expect(cs.map((c) => [c.tier, c.amount])).toEqual([[1, 50000], [2, 20000]]);
+  });
+
   it("pending の成約は accrued（見込み）になる", () => {
     const cs = commissionsForDeal(deal("d-004"), svc("svc-sns"), byId);
     expect(cs.every((c) => c.status === "accrued")).toBe(true);

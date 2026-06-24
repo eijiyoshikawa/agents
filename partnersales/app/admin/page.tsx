@@ -22,8 +22,9 @@ export default async function AdminPage() {
     services: m.services.map((s) => ({
       id: s.id,
       name: s.name,
+      // 料率パターンのプレフィルは代理店区分の既定を使う
       rewards: ([1, 2] as const).map((t) => {
-        const r = s.rewards.find((x) => x.tier === t);
+        const r = s.rewards.find((x) => x.tier === t && (x.planType ?? "agency") === "agency");
         return { tier: t, type: r?.type ?? "percentage", value: rewardValue(r) };
       }),
     })),
@@ -54,6 +55,7 @@ export default async function AdminPage() {
       status: d.status,
       closedAt: d.closedAt,
       isSelfDeal: Boolean(d.isSelfDeal),
+      rewardType: d.rewardType === "tossup" ? "tossup" : "agency",
     })),
     payoutRows: [...m.payoutStates.values()].map((s) => ({
       partnerId: s.partnerId,

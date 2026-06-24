@@ -17,6 +17,7 @@ interface RewardRow {
   type: "percentage" | "fixed";
   rate: number | null;
   fixed_amount: number | null;
+  plan_type?: "agency" | "tossup" | null;
 }
 interface PartnerRow {
   id: string;
@@ -39,6 +40,7 @@ interface DealRow {
   status: Deal["status"];
   closed_at: string;
   is_self_deal: boolean;
+  reward_type: "agency" | "tossup" | null;
   note: string | null;
   reward_snapshot: TierReward[] | null;
 }
@@ -59,6 +61,7 @@ function toReward(r: RewardRow): TierReward {
     type: r.type,
     rate: r.rate ?? undefined,
     fixedAmount: r.fixed_amount ?? undefined,
+    planType: r.plan_type ?? undefined,
   };
 }
 
@@ -115,6 +118,7 @@ export const supabaseSource: DataSource = {
       clientName: d.client_name,
       introducerPartnerId: d.introducer_partner_id,
       amount: d.amount,
+      rewardType: d.reward_type ?? undefined,
       status: d.status,
       closedAt: d.closed_at,
       isSelfDeal: d.is_self_deal,

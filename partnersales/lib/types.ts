@@ -7,7 +7,10 @@ export type Tier = 1 | 2;
 /** 報酬の与え方 */
 export type RewardType = "percentage" | "fixed";
 
-/** サービス × 段ごとの報酬定義 */
+/** 報酬区分。代理店（agency）/ トスアップ（tossup）でサービス既定料率を切り替える */
+export type RewardPlanType = "agency" | "tossup";
+
+/** サービス × 区分 × 段ごとの報酬定義 */
 export interface TierReward {
   tier: Tier;
   type: RewardType;
@@ -15,9 +18,11 @@ export interface TierReward {
   rate?: number;
   /** type === "fixed" のとき 1成約あたりの固定額（円） */
   fixedAmount?: number;
+  /** 報酬区分。省略時は "agency"（代理店） */
+  planType?: RewardPlanType;
 }
 
-/** 弊社が販売する商材。サービスごとに3段分の報酬プランを持つ */
+/** 弊社が販売する商材。区分（代理店/トスアップ）× tier1〜2 の報酬を持つ */
 export interface Service {
   id: string;
   name: string;
@@ -25,7 +30,7 @@ export interface Service {
   description?: string;
   /** 標準的な単価（円）。見込み計算の参考値 */
   unitPrice?: number;
-  /** tier1〜tier3 の報酬定義（最大3要素） */
+  /** 区分 × 段の報酬定義（最大 2区分 × 2段 = 4要素） */
   rewards: TierReward[];
   active: boolean;
 }
@@ -68,11 +73,13 @@ export interface Deal {
   clientName: string;
   /**
    * このクライアントを紹介したパートナー（= tier1 の受領者）。
-   * ここからツリーを最大3段上って tier2 / tier3 へ分配する。
+   * ここからツリーを最大2段上って tier2 へ分配する。
    */
   introducerPartnerId: string;
   /** 契約金額（円）。報酬率はこの額に対して掛ける */
   amount: number;
+  /** 報酬区分（代理店 / トスアップ）。この成約に適用する料率パターン。省略時は agency */
+  rewardType?: RewardPlanType;
   status: DealStatus;
   closedAt: string; // ISO date
   /**

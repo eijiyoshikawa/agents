@@ -12,16 +12,19 @@ export default async function GuidePage() {
   if (!session) redirect("/login");
 
   const services = await getDataSource().getServices();
+  const tierRows = (s: (typeof services)[number], planType: "agency" | "tossup") =>
+    ([1, 2] as const).map((t) => {
+      const r = s.rewards.find((x) => x.tier === t && (x.planType ?? "agency") === planType);
+      return { tier: t, type: r?.type ?? "percentage", rate: r?.rate ?? 0, fixedAmount: r?.fixedAmount ?? 0 };
+    });
   const simServices: SimService[] = services
     .filter((s) => s.active)
     .map((s) => ({
       id: s.id,
       name: s.name,
       unitPrice: s.unitPrice ?? 1000000,
-      rewards: ([1, 2] as const).map((t) => {
-        const r = s.rewards.find((x) => x.tier === t);
-        return { tier: t, type: r?.type ?? "percentage", rate: r?.rate ?? 0, fixedAmount: r?.fixedAmount ?? 0 };
-      }),
+      agency: tierRows(s, "agency"),
+      tossup: tierRows(s, "tossup"),
     }));
 
   return (

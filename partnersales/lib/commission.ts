@@ -41,8 +41,13 @@ export function commissionsForDeal(
 ): Commission[] {
   const chain = uplineChain(deal.introducerPartnerId, partnersById, MAX_TIERS);
   const status = commissionStatusOf(deal);
-  // 成約時点のスナップショットがあればそれを使う（サービス既定の後からの変更に影響されない）
-  const plan = deal.rewards && deal.rewards.length > 0 ? deal.rewards : service.rewards;
+  // 成約時点のスナップショットがあればそれを使う（サービス既定の後からの変更に影響されない）。
+  // 無い場合はサービス既定を、成約の報酬区分（代理店/トスアップ）で絞り込む。
+  const rewardType = deal.rewardType ?? "agency";
+  const plan =
+    deal.rewards && deal.rewards.length > 0
+      ? deal.rewards
+      : service.rewards.filter((r) => (r.planType ?? "agency") === rewardType);
   const rewardByTier = new Map<Tier, TierReward>(plan.map((r) => [r.tier, r]));
 
   const result: Commission[] = [];
