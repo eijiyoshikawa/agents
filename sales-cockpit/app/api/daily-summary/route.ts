@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { getDashboard, getSummaryCustomers, getContracts } from "@/lib/data";
+import { getDashboard, getSummaryCustomers, getContracts, getCalls } from "@/lib/data";
 import { notifySlack } from "@/lib/notify";
 import { statsForRange, ranges, dailySlackText, addDays } from "@/lib/summary";
 import { verifySession, SESSION_COOKIE } from "@/lib/session";
@@ -33,12 +33,13 @@ export async function GET(req: Request) {
 
   const r = ranges();
   const target = dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam) ? dateParam : addDays(r.today, offset);
-  const [dash, { customers }, { contracts }] = await Promise.all([
+  const [dash, { customers }, { contracts }, { calls }] = await Promise.all([
     getDashboard(),
     getSummaryCustomers(target),
     getContracts(),
+    getCalls(),
   ]);
-  const stats = statsForRange(customers, contracts, target, target);
+  const stats = statsForRange(customers, contracts, calls, target, target);
   const text = dailySlackText(stats, dash, target);
   const slack = await notifySlack(text);
   return NextResponse.json({ ok: true, date: target, sentToSlack: slack.ok, slack, text });

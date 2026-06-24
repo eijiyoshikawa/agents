@@ -1,4 +1,4 @@
-import { getDashboard, getSummaryCustomers, getContracts } from "@/lib/data";
+import { getDashboard, getSummaryCustomers, getContracts, getCalls } from "@/lib/data";
 import { statsForRange, ranges, ymdLabel, type PeriodStats } from "@/lib/summary";
 import { monthLabel, monthRangeLabel, currentMonthKey } from "@/lib/period";
 import { num, pct, yen } from "@/lib/format";
@@ -10,14 +10,15 @@ export const maxDuration = 300;
 
 export default async function WeeklyPage() {
   const r = ranges();
-  const [dash, { customers, errors: e1 }, { contracts, errors: e2 }] = await Promise.all([
+  const [dash, { customers, errors: e1 }, { contracts, errors: e2 }, { calls, errors: e3 }] = await Promise.all([
     getDashboard(),
     getSummaryCustomers(r.lastMon),
     getContracts(),
+    getCalls(),
   ]);
-  const errors = [...e1, ...e2];
-  const lastWeek = statsForRange(customers, contracts, r.lastMon, r.lastSun);
-  const thisWeek = statsForRange(customers, contracts, r.thisMon, r.today);
+  const errors = [...e1, ...e2, ...e3];
+  const lastWeek = statsForRange(customers, contracts, calls, r.lastMon, r.lastSun);
+  const thisWeek = statsForRange(customers, contracts, calls, r.thisMon, r.today);
   const mk = currentMonthKey();
   const g = dash.goals;
   const now = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" });
@@ -28,7 +29,7 @@ export default async function WeeklyPage() {
         <div>
           <h1 className="text-xl font-bold text-ink">週次サマリ</h1>
           <p className="text-xs text-ink-muted mt-0.5">
-            月曜朝の定例用。活動＝IS担当の最終更新日 / アポ＝アポ取得日 / 契約＝契約開始日（採用SNS・人材紹介）。
+            月曜朝の定例用。架電＝ステータス更新(最終更新日)とシステム架電記録の統合 / アポ＝アポ取得日 / 契約＝契約開始日（採用SNS・人材紹介）。
             毎週月曜8:00にSlackへ自動投稿・平日18:15に日次をSlack投稿。最終取得 {now}
           </p>
         </div>
@@ -54,15 +55,15 @@ export default async function WeeklyPage() {
       </section>
 
       <section className="card p-5">
-        <h2 className="text-sm font-semibold text-ink mb-3">担当者別 先週の活動（最終更新日ベース）</h2>
+        <h2 className="text-sm font-semibold text-ink mb-3">担当者別 先週の架電（ステータス更新＋システム統合）</h2>
         {lastWeek.byRep.length === 0 ? (
-          <p className="text-sm text-ink-muted py-6 text-center">先週の活動データがありません。</p>
+          <p className="text-sm text-ink-muted py-6 text-center">先週の架電データがありません。</p>
         ) : (
           <table className="w-full text-sm">
             <thead>
               <tr className="text-xs text-ink-muted border-b border-white/10">
                 <th className="text-left font-medium py-2">担当</th>
-                <th className="text-right font-medium py-2">活動件数</th>
+                <th className="text-right font-medium py-2">架電件数</th>
               </tr>
             </thead>
             <tbody>
@@ -85,7 +86,7 @@ function WeekSection({ title, s, highlight }: { title: string; s: PeriodStats; h
     <section>
       <h2 className="text-sm font-semibold text-ink mb-2">{title}</h2>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <KpiCard label="活動（最終更新日）" value={num(s.activity)} accent={highlight ? "brand" : "indigo"} />
+        <KpiCard label="架電数（統合）" value={num(s.calls)} accent={highlight ? "brand" : "indigo"} />
         <KpiCard label="アポ獲得" value={num(s.appts)} accent="pink" />
         <KpiCard label="新規契約：採用SNS" value={num(s.newSns)} accent="amber" />
         <KpiCard label="新規契約：人材紹介" value={num(s.newAgency)} accent="amber" />
