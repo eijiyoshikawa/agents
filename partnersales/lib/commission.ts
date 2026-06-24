@@ -21,16 +21,10 @@ export function tierAmount(reward: TierReward, dealAmount: number): number {
   return Math.floor(reward.fixedAmount ?? 0);
 }
 
-/** Deal ステータス → Commission ステータスへのマッピング */
+/** Deal ステータス → Commission ステータスへのマッピング（確定 / 見込みの2値） */
 function commissionStatusOf(deal: Deal): CommissionStatus {
-  switch (deal.status) {
-    case "paid":
-      return "paid";
-    case "confirmed":
-      return "payable";
-    default:
-      return "accrued"; // pending = 見込み
-  }
+  // confirmed / paid（=クライアント入金済み）はどちらも「報酬確定」扱い
+  return deal.status === "pending" ? "accrued" : "confirmed";
 }
 
 /**
@@ -89,12 +83,10 @@ export function computeAllCommissions(
 
 export interface PartnerEarnings {
   partnerId: string;
-  /** 確定済み（payable + paid）の報酬合計 */
+  /** 確定報酬の合計（成約が confirmed / paid のもの） */
   confirmed: number;
-  /** 見込み（accrued）の報酬合計 */
+  /** 見込み報酬の合計（成約が pending のもの） */
   pending: number;
-  /** 支払済みの報酬合計 */
-  paid: number;
   /** 段別の確定報酬内訳 */
   byTier: Record<Tier, number>;
 }
@@ -111,7 +103,6 @@ export function earningsByPartner(
         partnerId: id,
         confirmed: 0,
         pending: 0,
-        paid: 0,
         byTier: { 1: 0, 2: 0, 3: 0 },
       };
       map.set(id, e);
@@ -126,7 +117,6 @@ export function earningsByPartner(
     } else {
       e.confirmed += c.amount;
       e.byTier[c.tier] += c.amount;
-      if (c.status === "paid") e.paid += c.amount;
     }
   }
   return map;

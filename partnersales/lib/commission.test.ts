@@ -38,9 +38,9 @@ describe("commissionsForDeal", () => {
   it("仕様例どおり 10% / 3% / 2% を3段に分配する", () => {
     const cs = commissionsForDeal(deal("d-001"), svc("svc-sns"), byId);
     expect(cs).toEqual([
-      { dealId: "d-001", serviceId: "svc-sns", partnerId: "p-delta", tier: 1, amount: 100000, status: "paid" },
-      { dealId: "d-001", serviceId: "svc-sns", partnerId: "p-blue", tier: 2, amount: 30000, status: "paid" },
-      { dealId: "d-001", serviceId: "svc-sns", partnerId: "p-acme", tier: 3, amount: 20000, status: "paid" },
+      { dealId: "d-001", serviceId: "svc-sns", partnerId: "p-delta", tier: 1, amount: 100000, status: "confirmed" },
+      { dealId: "d-001", serviceId: "svc-sns", partnerId: "p-blue", tier: 2, amount: 30000, status: "confirmed" },
+      { dealId: "d-001", serviceId: "svc-sns", partnerId: "p-acme", tier: 3, amount: 20000, status: "confirmed" },
     ]);
   });
 

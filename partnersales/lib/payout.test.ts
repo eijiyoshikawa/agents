@@ -12,7 +12,6 @@ const earn = (confirmed: number): PartnerEarnings => ({
   partnerId: "p",
   confirmed,
   pending: 0,
-  paid: 0,
   byTier: { 1: 0, 2: 0, 3: 0 },
 });
 

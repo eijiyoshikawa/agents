@@ -19,7 +19,7 @@ export type PayoutPhase =
 
 export interface PayoutState {
   partnerId: string;
-  /** 確定報酬の累計（payable + paid 相当の確定分） */
+  /** 確定報酬の累計（成約が confirmed / paid のもの） */
   confirmedTotal: number;
   /** 振込完了済みの累計 */
   paidOut: number;

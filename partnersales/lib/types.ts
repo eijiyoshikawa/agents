@@ -90,7 +90,13 @@ export interface Deal {
   note?: string;
 }
 
-export type CommissionStatus = "accrued" | "payable" | "paid";
+/**
+ * コミッション（報酬）の状態。成約の確定状況だけを表す内部値。
+ * - accrued   … 見込み（成約が pending）
+ * - confirmed … 確定（成約が confirmed / paid）。支払い対象の集計に含まれる
+ * ※ 実際にパートナーへ支払ったかどうかは別概念で、Payout（invoiced/paid）で管理する。
+ */
+export type CommissionStatus = "accrued" | "confirmed";
 
 /** 1成約から派生した、特定パートナーへの報酬 */
 export interface Commission {
