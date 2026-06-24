@@ -16,10 +16,19 @@ export default async function TodayPage() {
   // システム架電記録（参考）: 架電記録DBに本日登録された件数
   const totalCalls = calls.filter((c) => c.date && jstDateKey(c.date) === today).length;
 
-  // 本日の活動（最終更新日ベース）: IS担当が設定された顧客で、最終更新日が本日のもの
+  // 本日の架電（ステータス更新ベース）: 最終更新日が本日 × 接触系ステータス（アプローチ前以外）。
+  // Notionで顧客ステータスを更新した架電（=ログ行を作らない手動架電）を計上する。
   const editedToday = customers.filter(
-    (c) => c.isRep && !isExcludedRep(c.isRep) && c.lastEdited && jstDateKey(c.lastEdited) === today,
+    (c) =>
+      c.isRep &&
+      !isExcludedRep(c.isRep) &&
+      c.lastEdited &&
+      jstDateKey(c.lastEdited) === today &&
+      c.status &&
+      c.status !== "アプローチ前",
   );
+  // 本日の架電数（統合）: ステータス更新ベースとシステムログの最大値（二重計上を回避）
+  const integratedCalls = Math.max(editedToday.length, totalCalls);
   // 本日のアポ獲得（取得日が本日）
   const apptsTodayByDate = customers.filter(
     (c) => (c.appointmentDate ?? "").slice(0, 10) === today && !isExcludedRep(c.isRep),
@@ -51,7 +60,7 @@ export default async function TodayPage() {
         <div>
           <h1 className="text-xl font-bold text-ink">本日の架電・活動</h1>
           <p className="text-xs text-ink-muted mt-0.5">
-            {today}（JST）の活動。「活動」はIS担当が設定された顧客の<strong>最終更新日が本日</strong>のもの（架電後にNotionを更新する運用が前提）。
+            {today}（JST）。「本日の架電数（統合）」はNotionで顧客ステータスを接触系に更新した架電（<strong>最終更新日が本日</strong>）とシステム架電記録を統合（二重計上を避け最大値を採用）。
             アポは「アポイント取得日」基準。最終取得 {now}
           </p>
         </div>
@@ -63,10 +72,10 @@ export default async function TodayPage() {
       )}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <KpiCard label="本日の活動（最終更新日）" value={num(editedToday.length)} accent="brand" />
+        <KpiCard label="本日の架電数（統合）" value={num(integratedCalls)} accent="brand" />
         <KpiCard label="本日のアポ獲得（取得日基準）" value={num(apptsTodayByDate.length)} accent="pink" />
-        <KpiCard label="システム架電記録（本日）" value={num(totalCalls)} accent="indigo" />
-        <KpiCard label="稼働IS担当数" value={num(byRep.length)} accent="amber" />
+        <KpiCard label="うちステータス更新（Notion架電）" value={num(editedToday.length)} accent="teal" />
+        <KpiCard label="うちシステム架電記録" value={num(totalCalls)} accent="indigo" />
       </div>
 
       <section className="card p-5">
