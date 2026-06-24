@@ -194,3 +194,42 @@ Next.js App Router での UI 実装にモーションを含める場合は **必
 **アクセシビリティテスト:**
 - axe-core でモーション起因のフォーカス喪失・読み上げ不備を検証
 - Playwright で `prefers-reduced-motion` エミュレーションテストを追加
+
+## 高度フロントエンドスキル（Advanced Frontend Engineering）
+
+### パフォーマンスバジェット
+| リソース | バジェット | 計測ツール |
+|---------|----------|----------|
+| JS バンドル（gzip後） | 200KB以下 | webpack-bundle-analyzer |
+| 初回ペイント（FCP） | 1.8秒以下 | Lighthouse |
+| 最大コンテンツ描画（LCP） | 2.5秒以下 | Web Vitals |
+| 累積レイアウトシフト（CLS） | 0.1以下 | Web Vitals |
+| Interaction to Next Paint（INP） | 200ms以下 | Web Vitals |
+
+### レンダリング戦略の選択基準
+| 戦略 | 適用条件 | メリット | デメリット |
+|------|---------|---------|----------|
+| SSG | コンテンツ更新頻度が低い | 最速表示・CDN最適 | ビルド時間増加 |
+| ISR | 定期的な更新が必要 | SSG + 動的更新 | キャッシュ制御が複雑 |
+| SSR | リクエスト毎に異なる内容 | 常に最新・SEO最適 | サーバー負荷 |
+| CSR | 認証後のダッシュボード等 | インタラクティブ性 | 初回表示遅い・SEO不利 |
+| PPR | 静的+動的の混在ページ | 最適なハイブリッド | Next.js最新機能 |
+
+### バンドル最適化
+- **コード分割**: dynamic import で各ページのバンドルを分離
+- **Tree Shaking**: 未使用コードの自動除去を確認
+- **画像最適化**: next/image で WebP/AVIF 自動変換、sizes属性の適切な設定
+- **フォント最適化**: next/font でセルフホスト、font-display: swap
+- **Third-party最適化**: Google Analytics等の外部スクリプトは next/script で遅延読み込み
+
+### アクセシビリティ（WCAG 2.1 AA準拠）
+- **キーボードナビゲーション**: 全インタラクティブ要素にTab移動・Enter/Space操作
+- **スクリーンリーダー**: aria-label / aria-describedby / role の適切な設定
+- **コントラスト比**: テキスト 4.5:1以上、大文字 3:1以上
+- **フォーカスインジケーター**: カスタムフォーカスリングの視認性確保
+- **動的コンテンツ**: aria-live でスクリーンリーダーに変更を通知
+
+### Server Components / Client Components の使い分け
+- **Server Components（デフォルト）**: データフェッチ、静的コンテンツ、SEO重要ページ
+- **Client Components（"use client"）**: useState/useEffect、イベントハンドラ、ブラウザAPI
+- **原則**: Client Componentsを葉に近い位置に配置し、Server Componentsの範囲を最大化

@@ -157,3 +157,40 @@
 - Vercel MCP（デプロイ・プロジェクト管理・ログ確認）
 - ファイル読み書き（CI/CD 設定・環境変数管理）
 - GitHub MCP（Actions ワークフロー管理）
+
+## 高度インフラスキル（Advanced Infrastructure Engineering）
+
+### SRE原則（Site Reliability Engineering）
+- **SLI（Service Level Indicator）**: 可用性・レイテンシ・エラー率の計測指標
+- **SLO（Service Level Objective）**: SLIの目標値（可用性99.9% = 月間ダウンタイム43分以内）
+- **エラーバジェット**: SLOとの差分を「改善投資に使える予算」として活用
+- **トイル（Toil）削減**: 手作業の自動化率を四半期で+10%向上
+
+### 障害対応の高度化
+- **RPO（Recovery Point Objective）**: データ損失許容量（バックアップ頻度で決定）
+- **RTO（Recovery Time Objective）**: 復旧までの許容時間（SLOから逆算）
+- **ポストモーテム**: 障害後に blame-free な振り返りを実施し再発防止策を文書化
+- **ランブック**: 一般的な障害パターンの対応手順を事前文書化
+
+### コスト最適化（FinOps）
+- **コスト可視化**: Vercel / Supabase の月次コストを部門別・プロジェクト別に分解
+- **右サイジング**: 過剰プロビジョニングの検出と是正
+- **Reserved/Committed**: 安定利用分は割引プランを活用
+- **アイドルリソース**: 未使用のプレビューデプロイ・テスト環境の定期クリーンアップ
+- **コスト異常アラート**: 前月比+30%で自動アラート
+
+### セキュリティ高度化
+- **ゼロトラスト**: ネットワーク境界でなくリクエスト単位で認証・認可
+- **シークレットローテーション**: 90日サイクルで全シークレットを更新
+- **脆弱性管理**: Critical/High は72時間以内、Medium は2週間以内に対応
+- **依存関係監査**: npm audit + Dependabot による自動脆弱性検知
+- **ペネトレーションテスト**: 年1回の外部セキュリティ診断
+
+### CI/CDパイプライン品質
+| ゲート | 基準 | ブロック条件 |
+|--------|------|------------|
+| Lint | ESLint + Prettier | エラー0件 |
+| Type Check | tsc --noEmit | エラー0件 |
+| Unit Test | Jest/Vitest | カバレッジ80%以上 |
+| Build | next build | ビルドエラー0件 |
+| Lighthouse | CI Lighthouse | Performance 90+, A11y 90+ |
