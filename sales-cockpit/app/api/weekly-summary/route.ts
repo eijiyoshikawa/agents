@@ -1,19 +1,31 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { getDashboard, getCustomers, getContracts } from "@/lib/data";
 import { notifySlack } from "@/lib/notify";
 import { statsForRange, ranges, weeklySlackText } from "@/lib/summary";
+import { verifySession, SESSION_COOKIE } from "@/lib/session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
-/** 週次サマリ。Vercel Cron（毎週月曜 08:00 JST）から呼ばれ、Slackへ投稿する。 */
+/**
+ * 週次サマリ。Vercel Cron（毎週月曜 08:00 JST）から呼ばれ、Slackへ投稿する。
+ * 認証: CRON_SECRET のBearer、またはログイン中のセッションのどちらかでOK（ブラウザ手動テスト可）。
+ */
 export async function GET(req: Request) {
   const secret = process.env.CRON_SECRET;
   if (secret) {
     const auth = req.headers.get("authorization");
-    if (auth !== `Bearer ${secret}`) return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
+    const isCron = auth === `Bearer ${secret}`;
+    if (!isCron) {
+      const token = (await cookies()).get(SESSION_COOKIE)?.value;
+      if (!(await verifySession(token))) {
+        return NextResponse.json({ ok: false, error: "認証が必要です（ログインするか、cronから実行）" }, { status: 401 });
+      }
+    }
   }
+
   const [dash, { customers }, { contracts }] = await Promise.all([getDashboard(), getCustomers(), getContracts()]);
   const r = ranges();
   const lastWeek = statsForRange(customers, contracts, r.lastMon, r.lastSun);
