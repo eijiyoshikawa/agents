@@ -13,8 +13,10 @@ import {
   notionConfigured,
   getStoredTargets,
 } from "./notion";
+import { dbConfigured, dbGetAllSlim, dbGetContracts } from "./db";
 import { buildDashboard, buildTargets, buildBreakdowns, type TargetsConfig } from "./aggregate";
-import type { DashboardData, Customer, ListCustomer, CallEvent, Contract, Breakdowns } from "./types";
+import { searchInMemory } from "./search";
+import type { DashboardData, Customer, ListCustomer, CallEvent, Contract, Breakdowns, SearchParams, SearchResult } from "./types";
 import targetsRaw from "@/config/targets.json";
 
 const targetsConfig = targetsRaw as TargetsConfig;
@@ -42,6 +44,16 @@ const cachedContracts = unstable_cache(fetchContracts, ["sc-contracts-v2"], { re
 const cachedTargets = unstable_cache(getStoredTargets, ["sc-targets-v2"], { revalidate: TTL, tags: ["targets"] });
 const cachedFollowups = unstable_cache(fetchFollowups, ["sc-followups-v1"], { revalidate: TTL, tags: ["customers"] });
 const cachedFieldOptions = unstable_cache(fetchCustomerFieldOptions, ["sc-fieldopts-v1"], { revalidate: 3600, tags: ["schema"] });
+
+// Postgres(Neon)が設定されていればDBから読む（最速）。未設定ならNotionキャッシュにフォールバック。
+const cachedDbAll = unstable_cache(dbGetAllSlim, ["sc-db-all-v1"], { revalidate: TTL_FULL, tags: ["customers-full"] });
+const cachedDbContracts = unstable_cache(dbGetContracts, ["sc-db-contracts-v1"], { revalidate: TTL, tags: ["contracts"] });
+function loadAllSlim(): Promise<ListCustomer[]> {
+  return dbConfigured() ? cachedDbAll() : cachedCustomersSlim();
+}
+function loadContracts(): Promise<Contract[]> {
+  return dbConfigured() ? cachedDbContracts() : cachedContracts();
+}
 
 /** 顧客の編集用フィールド選択肢（Notionスキーマ由来） */
 export async function getFieldOptions(): Promise<Record<string, string[]>> {
@@ -85,7 +97,7 @@ export async function getDashboard(): Promise<DashboardData> {
   const [customers, recCalls, contracts] = await Promise.all([
     safe("顧客管理", cachedWorked, [] as Customer[], errors),
     safe("架電記録", cachedCalls, [] as CallEvent[], errors),
-    safe("契約管理", cachedContracts, [], errors),
+    safe("契約管理", loadContracts, [] as Contract[], errors),
   ]);
   // IS架電KPI はマルチソースDBで現APIバージョン非対応のことがあるため、失敗しても警告は出さず無視する。
   let kpiCalls: CallEvent[] = [];
@@ -127,7 +139,7 @@ export async function getDashboard(): Promise<DashboardData> {
 export async function getAnalytics(): Promise<{ breakdowns: Breakdowns; total: number; errors: string[] }> {
   const errors: string[] = [];
   if (!notionConfigured()) return { breakdowns: buildBreakdowns([]), total: 0, errors: ["NOTION_TOKEN が未設定です。"] };
-  const customers = await safe("顧客管理", cachedCustomersSlim, [] as ListCustomer[], errors);
+  const customers = await safe("顧客管理", loadAllSlim, [] as ListCustomer[], errors);
   return { breakdowns: buildBreakdowns(customers), total: customers.length, errors };
 }
 
@@ -143,7 +155,7 @@ export async function getCalls(): Promise<{ calls: CallEvent[]; errors: string[]
 export async function getContracts(): Promise<{ contracts: Contract[]; errors: string[] }> {
   const errors: string[] = [];
   if (!notionConfigured()) return { contracts: [], errors: ["NOTION_TOKEN が未設定です。"] };
-  const contracts = await safe("契約管理", cachedContracts, [] as Contract[], errors);
+  const contracts = await safe("契約管理", loadContracts, [] as Contract[], errors);
   return { contracts, errors };
 }
 
@@ -151,8 +163,17 @@ export async function getContracts(): Promise<{ contracts: Contract[]; errors: s
 export async function getCustomers(): Promise<{ customers: ListCustomer[]; errors: string[] }> {
   const errors: string[] = [];
   if (!notionConfigured()) return { customers: [], errors: ["NOTION_TOKEN が未設定です。"] };
-  const customers = await safe("顧客管理", cachedCustomersSlim, [] as ListCustomer[], errors);
+  const customers = await safe("顧客管理", loadAllSlim, [] as ListCustomer[], errors);
   return { customers, errors };
+}
+
+/** 架電リスト用：サーバー側で絞り込み・並べ替え・ページングし1ページだけ返す（全件をクライアントへ送らない）。 */
+export async function searchCustomers(params: SearchParams): Promise<{ result: SearchResult; errors: string[] }> {
+  const errors: string[] = [];
+  const empty: SearchResult = { rows: [], total: 0, totalDup: 0, totalAgency: 0, page: params.page ?? 1, pageSize: params.pageSize ?? 50 };
+  if (!notionConfigured() && !dbConfigured()) return { result: empty, errors: ["NOTION_TOKEN が未設定です。"] };
+  const all = await safe("顧客管理", loadAllSlim, [] as ListCustomer[], errors);
+  return { result: searchInMemory(all, params), errors };
 }
 
 function minus1(ymd: string): string {
@@ -172,6 +193,11 @@ function dedupeById(list: ListCustomer[]): ListCustomer[] {
 export async function getSummaryCustomers(sinceYmd: string): Promise<{ customers: ListCustomer[]; errors: string[] }> {
   const errors: string[] = [];
   if (!notionConfigured()) return { customers: [], errors: ["NOTION_TOKEN が未設定です。"] };
+  // DBがあれば全件（高速・キャッシュ済）を使い集計側で絞る。無ければNotionから必要範囲のみ取得。
+  if (dbConfigured()) {
+    const customers = await safe("顧客管理", loadAllSlim, [] as ListCustomer[], errors);
+    return { customers, errors };
+  }
   const since = minus1(sinceYmd); // UTC/JSTの差を吸収するため1日多めに取得（集計側でJST日付に絞る）
   const [recent, appointed] = await Promise.all([
     safe("最近更新", () => cachedRecentEdited(since), [] as ListCustomer[], errors),
@@ -184,6 +210,10 @@ export async function getSummaryCustomers(sinceYmd: string): Promise<{ customers
 export async function getPipelineCustomers(): Promise<{ customers: ListCustomer[]; errors: string[] }> {
   const errors: string[] = [];
   if (!notionConfigured()) return { customers: [], errors: ["NOTION_TOKEN が未設定です。"] };
+  if (dbConfigured()) {
+    const customers = await safe("顧客管理", loadAllSlim, [] as ListCustomer[], errors);
+    return { customers, errors };
+  }
   const customers = await safe("商談", cachedPipeline, [] as ListCustomer[], errors);
   return { customers, errors };
 }
@@ -192,6 +222,10 @@ export async function getPipelineCustomers(): Promise<{ customers: ListCustomer[
 export async function getAppointedCustomers(): Promise<{ customers: ListCustomer[]; errors: string[] }> {
   const errors: string[] = [];
   if (!notionConfigured()) return { customers: [], errors: ["NOTION_TOKEN が未設定です。"] };
+  if (dbConfigured()) {
+    const customers = await safe("顧客管理", loadAllSlim, [] as ListCustomer[], errors);
+    return { customers, errors };
+  }
   const customers = await safe("アポ有り", cachedAppointed, [] as ListCustomer[], errors);
   return { customers, errors };
 }

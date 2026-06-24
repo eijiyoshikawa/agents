@@ -68,6 +68,34 @@ export type ListCustomer = {
   confirm: string | null;
 };
 
+/** サーバー側検索の1行（重複/人材紹介フラグ付き） */
+export type SearchRow = ListCustomer & { dup: boolean; agency: string | null };
+
+/** サーバー側検索パラメータ */
+export type SearchParams = {
+  q?: string;
+  rep?: string;
+  status?: string;
+  rank?: string;
+  industry?: string;
+  agencyMode?: "all" | "exclude" | "only";
+  dupOnly?: boolean;
+  sort?: string;
+  dir?: "asc" | "desc";
+  page?: number;
+  pageSize?: number;
+};
+
+/** サーバー側検索の結果（1ページ分） */
+export type SearchResult = {
+  rows: SearchRow[];
+  total: number;
+  totalDup: number;
+  totalAgency: number;
+  page: number;
+  pageSize: number;
+};
+
 /** 汎用カテゴリ内訳（項目別グラフ用の土台） */
 export type Breakdown = { label: string; count: number };
 

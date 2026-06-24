@@ -4,7 +4,7 @@ import { verifySession, SESSION_COOKIE } from "@/lib/session";
 
 const PUBLIC_PATHS = ["/login", "/signup"];
 // Vercel Cron が叩くエンドポイント（CRON_SECRET でルート側が認証）
-const CRON_PATHS = ["/api/warm", "/api/weekly-summary", "/api/daily-summary"];
+const CRON_PATHS = ["/api/warm", "/api/weekly-summary", "/api/daily-summary", "/api/sync"];
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
