@@ -19,21 +19,21 @@ export default async function AdminPage() {
   const data: AdminData = {
     source: m.source,
     configured: hasServerSupabase(),
-    services: m.services.map((s) => ({
-      id: s.id,
-      name: s.name,
-      // 料率パターンのプレフィルは代理店区分の既定を使う
-      rewards: ([1, 2] as const).map((t) => {
-        const r = s.rewards.find((x) => x.tier === t && (x.planType ?? "agency") === "agency");
-        return { tier: t, type: r?.type ?? "percentage", value: rewardValue(r) };
-      }),
-    })),
+    services: m.services.map((s) => {
+      const tierRows = (planType: "agency" | "tossup") =>
+        ([1, 2] as const).map((t) => {
+          const r = s.rewards.find((x) => x.tier === t && (x.planType ?? "agency") === planType);
+          return { tier: t, type: r?.type ?? "percentage", value: rewardValue(r) };
+        });
+      return { id: s.id, name: s.name, agency: tierRows("agency"), tossup: tierRows("tossup") };
+    }),
     ratePlans: ratePlans.map((p) => ({
       id: p.id,
       name: p.name,
       partnerIds: p.partnerIds,
       rewards: p.rewards.map((r) => ({
         serviceId: r.serviceId,
+        planType: (r.reward.planType ?? "agency") as "agency" | "tossup",
         tier: r.reward.tier,
         type: r.reward.type,
         value: rewardValue(r.reward),

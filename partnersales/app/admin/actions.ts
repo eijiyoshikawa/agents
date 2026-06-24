@@ -41,7 +41,11 @@ async function resolveRewardSnapshot(
   if (!planId) return baseRewards;
 
   const { data: override } = await sb
-    .from("rate_plan_rewards").select("*").eq("plan_id", planId).eq("service_id", serviceId);
+    .from("rate_plan_rewards")
+    .select("*")
+    .eq("plan_id", planId)
+    .eq("service_id", serviceId)
+    .eq("plan_type", rewardType);
   const overrideRewards = ((override ?? []) as RewardRow[]).map(rowToReward);
   return mergeRewards(baseRewards, overrideRewards);
 }

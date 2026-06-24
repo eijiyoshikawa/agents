@@ -24,8 +24,8 @@ type TierRow = { tier: number; type: "percentage" | "fixed"; value: number };
 export interface AdminData {
   source: string;
   configured: boolean;
-  services: { id: string; name: string; rewards: TierRow[] }[];
-  ratePlans: { id: string; name: string; partnerIds: string[]; rewards: { serviceId: string; tier: number; type: "percentage" | "fixed"; value: number }[] }[];
+  services: { id: string; name: string; agency: TierRow[]; tossup: TierRow[] }[];
+  ratePlans: { id: string; name: string; partnerIds: string[]; rewards: { serviceId: string; planType: "agency" | "tossup"; tier: number; type: "percentage" | "fixed"; value: number }[] }[];
   partners: { id: string; name: string; slug: string; referralCode: string; status: string }[];
   deals: { id: string; clientName: string; serviceName: string; introducer: string; amount: number; status: DealStatus; closedAt: string; isSelfDeal: boolean; rewardType: "agency" | "tossup" }[];
   payoutRows: { partnerId: string; name: string; confirmedTotal: number; paidOut: number; invoicedAmount: number; unsettled: number; phase: string }[];
@@ -355,33 +355,59 @@ function RatePlanEditor({
   plan: AdminData["ratePlans"][number] | null;
   run: RunFn; disabled: boolean; isNew: boolean;
 }) {
-  const buildRewards = (): Record<string, TierRow[]> => {
-    const map: Record<string, TierRow[]> = {};
+  type ByType = { agency: TierRow[]; tossup: TierRow[] };
+  const buildRewards = (): Record<string, ByType> => {
+    const map: Record<string, ByType> = {};
     for (const s of data.services) {
-      map[s.id] = [1, 2].map((t) => {
-        const fromPlan = plan?.rewards.find((r) => r.serviceId === s.id && r.tier === t);
-        const def = s.rewards.find((r) => r.tier === t);
-        const src = fromPlan ?? def;
-        return { tier: t, type: src?.type ?? "percentage", value: src?.value ?? 0 };
-      });
+      const forType = (planType: "agency" | "tossup"): TierRow[] =>
+        [1, 2].map((t) => {
+          const fromPlan = plan?.rewards.find((r) => r.serviceId === s.id && r.planType === planType && r.tier === t);
+          const def = (planType === "tossup" ? s.tossup : s.agency).find((r) => r.tier === t);
+          const src = fromPlan ?? def;
+          return { tier: t, type: src?.type ?? "percentage", value: src?.value ?? 0 };
+        });
+      map[s.id] = { agency: forType("agency"), tossup: forType("tossup") };
     }
     return map;
   };
   const [name, setName] = useState(plan?.name ?? "");
-  const [rewards, setRewards] = useState<Record<string, TierRow[]>>(buildRewards);
+  const [rewards, setRewards] = useState<Record<string, ByType>>(buildRewards);
   const [partnerIds, setPartnerIds] = useState<string[]>(plan?.partnerIds ?? []);
 
-  const setR = (serviceId: string, tier: number, patch: Partial<TierRow>) =>
-    setRewards((m) => ({ ...m, [serviceId]: m[serviceId].map((r) => (r.tier === tier ? { ...r, ...patch } : r)) }));
+  const setR = (serviceId: string, planType: "agency" | "tossup", tier: number, patch: Partial<TierRow>) =>
+    setRewards((m) => ({
+      ...m,
+      [serviceId]: { ...m[serviceId], [planType]: m[serviceId][planType].map((r) => (r.tier === tier ? { ...r, ...patch } : r)) },
+    }));
   const togglePartner = (id: string) =>
     setPartnerIds((ids) => (ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id]));
+
+  const typeBlock = (s: AdminData["services"][number], planType: "agency" | "tossup") => (
+    <div style={{ display: "grid", gap: 4 }}>
+      <span className={planType === "tossup" ? "pill pill-indigo" : "pill pill-brand"} style={{ alignSelf: "start" }}>
+        {planType === "tossup" ? "トスアップ" : "代理店"}
+      </span>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8 }}>
+        {rewards[s.id]?.[planType].map((r, i) => (
+          <div key={r.tier} style={{ display: "grid", gap: 4 }}>
+            <span className="h-section">{tierLabel[i]}</span>
+            <select style={input} value={r.type} onChange={(e) => setR(s.id, planType, r.tier, { type: e.target.value as TierRow["type"] })}>
+              <option value="percentage">％</option><option value="fixed">円</option>
+            </select>
+            <input style={input} type="number" min={0} value={r.value} onChange={(e) => setR(s.id, planType, r.tier, { value: Number(e.target.value) })} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
     <form className="card" style={{ display: "grid", gap: 12, borderStyle: isNew ? "dashed" : "solid" }}
       onSubmit={(e) => {
         e.preventDefault();
-        const flat = Object.entries(rewards).flatMap(([serviceId, rows]) =>
-          rows.map((r) => ({ serviceId, tier: r.tier, type: r.type, value: r.value })));
+        const flat = Object.entries(rewards).flatMap(([serviceId, byType]) =>
+          (["agency", "tossup"] as const).flatMap((pt) =>
+            byType[pt].map((r) => ({ serviceId, planType: pt, tier: r.tier, type: r.type, value: r.value }))));
         run(() => saveRatePlan({ id: isNew ? undefined : plan!.id, name, rewards: flat, partnerIds }));
         if (isNew) { setName(""); setPartnerIds([]); setRewards(buildRewards()); }
       }}>
@@ -393,19 +419,10 @@ function RatePlanEditor({
         <input style={input} value={name} onChange={(e) => setName(e.target.value)} required /></label>
 
       {data.services.map((s) => (
-        <div key={s.id} style={{ border: "1px solid var(--card-border)", borderRadius: 8, padding: 10 }}>
-          <div className="h-section" style={{ marginBottom: 6 }}>{s.name}</div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 8 }}>
-            {rewards[s.id]?.map((r, i) => (
-              <div key={r.tier} style={{ display: "grid", gap: 4 }}>
-                <span className="h-section">{tierLabel[i]}</span>
-                <select style={input} value={r.type} onChange={(e) => setR(s.id, r.tier, { type: e.target.value as TierRow["type"] })}>
-                  <option value="percentage">％</option><option value="fixed">円</option>
-                </select>
-                <input style={input} type="number" min={0} value={r.value} onChange={(e) => setR(s.id, r.tier, { value: Number(e.target.value) })} />
-              </div>
-            ))}
-          </div>
+        <div key={s.id} style={{ border: "1px solid var(--card-border)", borderRadius: 8, padding: 10, display: "grid", gap: 10 }}>
+          <div className="h-section">{s.name}</div>
+          {typeBlock(s, "agency")}
+          {typeBlock(s, "tossup")}
         </div>
       ))}
 

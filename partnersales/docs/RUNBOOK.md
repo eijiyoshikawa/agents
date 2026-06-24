@@ -21,6 +21,7 @@
    - `supabase/migrations/0007_login_security.sql`
    - `supabase/migrations/0008_two_tier.sql`
    - `supabase/migrations/0009_reward_plan_type.sql`
+   - `supabase/migrations/0010_rate_plan_type.sql`
    - （任意）`supabase/seed.sql` … サンプルデータを入れる場合
 3. **Project Settings → API** から以下を控える
    - Project URL / `anon` public key / `service_role` key（秘匿）

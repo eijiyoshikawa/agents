@@ -11,7 +11,7 @@ export interface RateActionResult {
 export interface RatePlanInput {
   id?: string;
   name: string;
-  rewards: { serviceId: string; tier: number; type: "percentage" | "fixed"; value: number }[];
+  rewards: { serviceId: string; planType: "agency" | "tossup"; tier: number; type: "percentage" | "fixed"; value: number }[];
   /** このパターンを適用する紹介者ID */
   partnerIds: string[];
 }
@@ -36,10 +36,11 @@ export async function saveRatePlan(input: RatePlanInput): Promise<RateActionResu
   // 報酬の入れ替え
   await sb.from("rate_plan_rewards").delete().eq("plan_id", planId);
   const rows = input.rewards
-    .filter((r) => r.tier >= 1 && r.tier <= 3)
+    .filter((r) => r.tier >= 1 && r.tier <= 2)
     .map((r) => ({
       plan_id: planId,
       service_id: r.serviceId,
+      plan_type: r.planType,
       tier: r.tier,
       type: r.type,
       rate: r.type === "percentage" ? Math.max(0, Math.min(1, r.value / 100)) : null,
