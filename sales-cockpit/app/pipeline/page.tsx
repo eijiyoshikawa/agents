@@ -1,4 +1,4 @@
-import { getCustomers } from "@/lib/data";
+import { getPipelineCustomers } from "@/lib/data";
 import type { ListCustomer } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +12,7 @@ const STAGES: { key: string; color: string }[] = [
 ];
 
 export default async function PipelinePage() {
-  const { customers, errors } = await getCustomers();
+  const { customers, errors } = await getPipelineCustomers();
   const byStage: Record<string, ListCustomer[]> = {};
   for (const s of STAGES) byStage[s.key] = [];
   for (const c of customers) if (c.status && byStage[c.status]) byStage[c.status].push(c);

@@ -1,4 +1,4 @@
-import { getCustomers, getContracts, getCalls } from "@/lib/data";
+import { getAppointedCustomers, getContracts, getCalls } from "@/lib/data";
 import { buildMonthlyHistory } from "@/lib/aggregate";
 import MonthlyHistoryClient from "@/components/MonthlyHistoryClient";
 
@@ -7,7 +7,7 @@ export const maxDuration = 300;
 
 export default async function HistoryPage() {
   const [{ customers, errors: e1 }, { contracts, errors: e2 }, { calls, errors: e3 }] = await Promise.all([
-    getCustomers(),
+    getAppointedCustomers(),
     getContracts(),
     getCalls(),
   ]);

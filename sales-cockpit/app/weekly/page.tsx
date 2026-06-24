@@ -1,4 +1,4 @@
-import { getDashboard, getCustomers, getContracts } from "@/lib/data";
+import { getDashboard, getSummaryCustomers, getContracts } from "@/lib/data";
 import { statsForRange, ranges, ymdLabel, type PeriodStats } from "@/lib/summary";
 import { monthLabel, monthRangeLabel, currentMonthKey } from "@/lib/period";
 import { num, pct, yen } from "@/lib/format";
@@ -9,13 +9,13 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 300;
 
 export default async function WeeklyPage() {
+  const r = ranges();
   const [dash, { customers, errors: e1 }, { contracts, errors: e2 }] = await Promise.all([
     getDashboard(),
-    getCustomers(),
+    getSummaryCustomers(r.lastMon),
     getContracts(),
   ]);
   const errors = [...e1, ...e2];
-  const r = ranges();
   const lastWeek = statsForRange(customers, contracts, r.lastMon, r.lastSun);
   const thisWeek = statsForRange(customers, contracts, r.thisMon, r.today);
   const mk = currentMonthKey();

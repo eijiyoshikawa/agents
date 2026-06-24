@@ -1,4 +1,4 @@
-import { getCalls, getCustomers } from "@/lib/data";
+import { getCalls, getSummaryCustomers } from "@/lib/data";
 import { jstDateKey } from "@/lib/period";
 import { isExcludedRep } from "@/lib/reps";
 import { num, pct, rate } from "@/lib/format";
@@ -10,7 +10,7 @@ export const maxDuration = 300;
 
 export default async function TodayPage() {
   const today = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Tokyo" }); // YYYY-MM-DD
-  const [{ calls, errors: e1 }, { customers, errors: e2 }] = await Promise.all([getCalls(), getCustomers()]);
+  const [{ calls, errors: e1 }, { customers, errors: e2 }] = await Promise.all([getCalls(), getSummaryCustomers(today)]);
   const errors = [...e1, ...e2];
 
   // システム架電記録（参考）: 架電記録DBに本日登録された件数

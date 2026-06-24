@@ -313,6 +313,40 @@ export async function fetchCustomersSlim(): Promise<ListCustomer[]> {
   return pages.map(mapListCustomer);
 }
 
+/** 最近更新された顧客のみ（軽量）。今日/週次/サマリの活動集計用。since=YYYY-MM-DD（UTC基準で多めに取得しJST側で絞る） */
+export async function fetchRecentlyEditedSlim(since: string): Promise<ListCustomer[]> {
+  const ids = await fetchListPropertyIds();
+  const pages = await queryAll(
+    DB.customers,
+    { timestamp: "last_edited_time", last_edited_time: { on_or_after: since } },
+    ids.length ? ids : undefined,
+  );
+  return pages.map(mapListCustomer);
+}
+
+/** アポイント取得日が入っている顧客のみ（軽量）。アポ月次/週次サマリ用。 */
+export async function fetchAppointedSlim(): Promise<ListCustomer[]> {
+  const ids = await fetchListPropertyIds();
+  const pages = await queryAll(
+    DB.customers,
+    { property: "アポイント取得日", date: { is_not_empty: true } },
+    ids.length ? ids : undefined,
+  );
+  return pages.map(mapListCustomer);
+}
+
+const PIPELINE_STATUSES = ["アポイント獲得", "提案中", "商談中", "契約中", "パートナー"];
+/** 商談中ステータスの顧客のみ（軽量）。パイプライン用。 */
+export async function fetchPipelineSlim(): Promise<ListCustomer[]> {
+  const ids = await fetchListPropertyIds();
+  const pages = await queryAll(
+    DB.customers,
+    { or: PIPELINE_STATUSES.map((s) => ({ property: "ステータス", status: { equals: s } })) },
+    ids.length ? ids : undefined,
+  );
+  return pages.map(mapListCustomer);
+}
+
 /** 着手済み顧客（ステータスあり・アプローチ前以外）。ダッシュボード集計用（正確・高速）。 */
 export async function fetchWorkedCustomers(): Promise<Customer[]> {
   const pages = await queryAll(DB.customers, WORKED_FILTER);

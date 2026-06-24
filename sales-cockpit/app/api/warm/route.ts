@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { getDashboard, getContracts, getCustomers, getCalls, getFollowups, getFieldOptions, getAnalytics } from "@/lib/data";
 
 export const runtime = "nodejs";
@@ -20,6 +21,8 @@ export async function GET(req: Request) {
     }
   }
   const started = Date.now();
+  // 重い全件キャッシュは編集では無効化されないため、cronがここで明示的に作り直す（ユーザー表示は常に温かい状態）。
+  revalidateTag("customers-full");
   const tasks: Record<string, () => Promise<unknown>> = {
     dashboard: getDashboard,
     customers: getCustomers,

@@ -12,7 +12,7 @@ export async function POST() {
   if (!(await verifySession(token))) {
     return NextResponse.json({ ok: false, error: "認証が必要です" }, { status: 401 });
   }
-  for (const tag of ["customers", "calls", "contracts", "targets", "schema"]) {
+  for (const tag of ["customers", "customers-full", "calls", "contracts", "targets", "schema"]) {
     revalidateTag(tag);
   }
   return NextResponse.json({ ok: true, refreshedAt: new Date().toISOString() });

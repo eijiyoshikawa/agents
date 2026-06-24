@@ -1,6 +1,9 @@
 import { unstable_cache } from "next/cache";
 import {
   fetchCustomersSlim,
+  fetchRecentlyEditedSlim,
+  fetchAppointedSlim,
+  fetchPipelineSlim,
   fetchWorkedCustomers,
   fetchFollowups,
   fetchCalls,
@@ -21,12 +24,19 @@ const targetsConfig = targetsRaw as TargetsConfig;
 // タグ: "customers"(顧客・メモ), "calls", "contracts", "targets"
 // 既定30分キャッシュ（体感最速・Notion負荷減）。保存時は revalidateTag で即時反映するため
 // 長めでも メモ/目標/リスト の更新は遅延しない。常に最新にしたい場合は短く設定する。
-const TTL = Number(process.env.NOTION_REVALIDATE_SECONDS ?? 3600);
+const TTL = Number(process.env.NOTION_REVALIDATE_SECONDS ?? 1800);
+// 重い「全2.8万件」取得は編集では無効化せず、cron(/api/warm)が裏で更新する（ユーザーは常に温まったキャッシュを引く）。
+// そのため専用タグ "customers-full" ＋ 長めのTTL。編集系は "customers"（軽量側）だけを無効化する。
+const TTL_FULL = Number(process.env.NOTION_FULL_REVALIDATE_SECONDS ?? 86400);
 // キー末尾のバージョンは、取得項目（スキーマ）を変えたら上げて旧キャッシュを破棄する。
 // 一覧/分析は軽量版（必要プロパティのみ）でキャッシュ。詳細はIDで都度取得する。
-const cachedCustomersSlim = unstable_cache(fetchCustomersSlim, ["sc-customers-slim-v1"], { revalidate: TTL, tags: ["customers"] });
+const cachedCustomersSlim = unstable_cache(fetchCustomersSlim, ["sc-customers-slim-v1"], { revalidate: TTL_FULL, tags: ["customers-full"] });
 // ダッシュボードは着手済み顧客のみ（全件28k+は非現実的なため正確・高速に集計）
 const cachedWorked = unstable_cache(fetchWorkedCustomers, ["sc-worked-v1"], { revalidate: TTL, tags: ["customers"] });
+// 今日/週次/サマリ用の軽量取得（最近更新・アポ有り・商談ステータス）。編集で即更新したいので "customers" タグ。
+const cachedRecentEdited = unstable_cache(fetchRecentlyEditedSlim, ["sc-recent-v1"], { revalidate: TTL, tags: ["customers"] });
+const cachedAppointed = unstable_cache(fetchAppointedSlim, ["sc-appointed-v1"], { revalidate: TTL, tags: ["customers"] });
+const cachedPipeline = unstable_cache(fetchPipelineSlim, ["sc-pipeline-v1"], { revalidate: TTL, tags: ["customers"] });
 const cachedCalls = unstable_cache(fetchCalls, ["sc-calls-v2"], { revalidate: TTL, tags: ["calls"] });
 const cachedContracts = unstable_cache(fetchContracts, ["sc-contracts-v2"], { revalidate: TTL, tags: ["contracts"] });
 const cachedTargets = unstable_cache(getStoredTargets, ["sc-targets-v2"], { revalidate: TTL, tags: ["targets"] });
@@ -142,5 +152,46 @@ export async function getCustomers(): Promise<{ customers: ListCustomer[]; error
   const errors: string[] = [];
   if (!notionConfigured()) return { customers: [], errors: ["NOTION_TOKEN が未設定です。"] };
   const customers = await safe("顧客管理", cachedCustomersSlim, [] as ListCustomer[], errors);
+  return { customers, errors };
+}
+
+function minus1(ymd: string): string {
+  const [y, m, d] = ymd.split("-").map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d - 1));
+  const p = (n: number) => String(n).padStart(2, "0");
+  return `${dt.getUTCFullYear()}-${p(dt.getUTCMonth() + 1)}-${p(dt.getUTCDate())}`;
+}
+
+function dedupeById(list: ListCustomer[]): ListCustomer[] {
+  const m = new Map<string, ListCustomer>();
+  for (const c of list) m.set(c.id, c);
+  return [...m.values()];
+}
+
+/** 今日/週次サマリ用の顧客集合（最近更新 ∪ アポ有り）。全2.8万件取得を避ける軽量版。 */
+export async function getSummaryCustomers(sinceYmd: string): Promise<{ customers: ListCustomer[]; errors: string[] }> {
+  const errors: string[] = [];
+  if (!notionConfigured()) return { customers: [], errors: ["NOTION_TOKEN が未設定です。"] };
+  const since = minus1(sinceYmd); // UTC/JSTの差を吸収するため1日多めに取得（集計側でJST日付に絞る）
+  const [recent, appointed] = await Promise.all([
+    safe("最近更新", () => cachedRecentEdited(since), [] as ListCustomer[], errors),
+    safe("アポ有り", cachedAppointed, [] as ListCustomer[], errors),
+  ]);
+  return { customers: dedupeById([...recent, ...appointed]), errors };
+}
+
+/** パイプライン用（商談ステータスのみ・軽量） */
+export async function getPipelineCustomers(): Promise<{ customers: ListCustomer[]; errors: string[] }> {
+  const errors: string[] = [];
+  if (!notionConfigured()) return { customers: [], errors: ["NOTION_TOKEN が未設定です。"] };
+  const customers = await safe("商談", cachedPipeline, [] as ListCustomer[], errors);
+  return { customers, errors };
+}
+
+/** アポ有り顧客のみ（履歴のアポ月次など・軽量） */
+export async function getAppointedCustomers(): Promise<{ customers: ListCustomer[]; errors: string[] }> {
+  const errors: string[] = [];
+  if (!notionConfigured()) return { customers: [], errors: ["NOTION_TOKEN が未設定です。"] };
+  const customers = await safe("アポ有り", cachedAppointed, [] as ListCustomer[], errors);
   return { customers, errors };
 }
