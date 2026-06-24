@@ -31,6 +31,6 @@ export async function GET(req: Request) {
   const lastWeek = statsForRange(customers, contracts, r.lastMon, r.lastSun);
   const thisWeek = statsForRange(customers, contracts, r.thisMon, r.today);
   const text = weeklySlackText(lastWeek, thisWeek, dash, r);
-  await notifySlack(text);
-  return NextResponse.json({ ok: true, sentToSlack: Boolean(process.env.SLACK_WEBHOOK_URL), text });
+  const slack = await notifySlack(text);
+  return NextResponse.json({ ok: true, sentToSlack: slack.ok, slack, text });
 }
