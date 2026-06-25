@@ -455,7 +455,7 @@ export type MonthlyHistoryRow = {
   newContracts: number; // 新規契約（契約開始日基準）
   mrr: number; // 当月末時点の月次経常収益
   activeContracts: number; // 稼働契約数
-  calls: number; // 架電数（架電記録の日付基準。ログが無い月は0）
+  calls: number | null; // 架電数（架電記録の日付基準）。ログ運用開始前の月は null（=データなし、—表示）
 };
 
 /**
@@ -487,6 +487,9 @@ export function buildMonthlyHistory(
     const k = monthKey(cl.date);
     if (k) callsBy.set(k, (callsBy.get(k) ?? 0) + 1);
   }
+  // 架電記録ログの運用開始月（最古のログがある月）。それより前の月は日付つきログが無く
+  // 件数を再現できないため「データなし(null=—)」として扱い、0件と区別する。
+  const firstLogMonth = callsBy.size > 0 ? [...callsBy.keys()].sort()[0] : null;
   return keys
     .map((k) => {
       let mrr = 0;
@@ -505,7 +508,7 @@ export function buildMonthlyHistory(
         newContracts: newBy.get(k) ?? 0,
         mrr,
         activeContracts: active,
-        calls: callsBy.get(k) ?? 0,
+        calls: firstLogMonth && k >= firstLogMonth ? callsBy.get(k) ?? 0 : null,
       };
     })
     .reverse(); // 新しい月を先頭に
