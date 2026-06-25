@@ -20,7 +20,7 @@ export default async function HistoryPage() {
         <h1 className="text-xl font-bold text-ink">月次実績の推移（履歴）</h1>
         <p className="text-xs text-ink-muted mt-0.5">
           毎月16日〜翌月15日を1ヶ月として集計（例: 5/16〜6/15＝5月分）。アポ＝アポ取得日 / 新規契約＝契約開始日 /
-          MRR・稼働＝その月に有効な契約 / 架電＝架電記録の日付。列ヘッダーで並び替え可。
+          MRR・稼働＝その月に有効な契約 / 架電＝架電記録の日付（ログ運用開始前の月は「—」＝データなし。Notion手動架電は日付つきログが無く再現不可）。列ヘッダーで並び替え可。
         </p>
       </div>
 

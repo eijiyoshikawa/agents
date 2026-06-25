@@ -26,7 +26,14 @@ export default function MonthlyHistoryClient({ rows }: { rows: MonthlyHistoryRow
       align: "right",
       render: (r: MonthlyHistoryRow) => <span className="text-brand tabular-nums">{yen(r.mrr)}</span>,
     },
-    { key: "calls", header: "架電", align: "right", render: (r: MonthlyHistoryRow) => num(r.calls) },
+    {
+      key: "calls",
+      header: "架電",
+      align: "right",
+      sortValue: (r: MonthlyHistoryRow) => (r.calls ?? -1),
+      render: (r: MonthlyHistoryRow) =>
+        r.calls == null ? <span className="text-ink-muted" title="架電記録ログ運用開始前のためデータなし">—</span> : num(r.calls),
+    },
   ];
   return (
     <SortableTable
