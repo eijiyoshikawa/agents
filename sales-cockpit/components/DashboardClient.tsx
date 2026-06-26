@@ -28,7 +28,7 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
   );
   const curMonth = currentMonthKey();
   const apptThisMonthRows = useMemo(() => {
-    // 今月＝締め日基準（16日〜翌月15日）。アポ取得日がその期間内のもの。
+    // 今月＝暦月（1日〜末日）。アポ取得日がその期間内のもの。
     return worked.filter((c) => !!c.appointmentDate && monthKey(c.appointmentDate) === curMonth);
   }, [worked, curMonth]);
 
@@ -47,7 +47,7 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
         <div>
           <h1 className="text-xl font-bold text-ink">営業ダッシュボード</h1>
           <p className="text-xs text-ink-muted mt-0.5">
-            実績は {since} 以降（顧客ステータス基準・数字クリックで内訳表示） · 月次は締め日基準（毎月16日〜翌月15日）。今月＝{curMonth.split("-")[1]}月分（{monthRangeLabel(curMonth)}） · 最終更新{" "}
+            実績は {since} 以降（顧客ステータス基準・数字クリックで内訳表示） · 月次は暦月（毎月1日〜末日）。今月＝{curMonth.split("-")[1]}月（{monthRangeLabel(curMonth)}） · 最終更新{" "}
             {new Date(data.generatedAt).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}
           </p>
         </div>

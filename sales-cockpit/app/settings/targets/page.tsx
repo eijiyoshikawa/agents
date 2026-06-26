@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 120;
 
 export default async function TargetsSettingsPage() {
-  const month = currentMonthKey(); // 締め日基準の当月（16日〜翌15日）
+  const month = currentMonthKey(); // 当月（暦月・1日〜末日）
 
   const [initial, reps, gridData] = await Promise.all([
     getStoredTargets().catch(() => null),

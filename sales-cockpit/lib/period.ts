@@ -21,11 +21,11 @@ export function jstDateKey(input: string | Date): string | null {
   return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
 }
 
-// 月の締め日: 毎月16日〜翌月15日を1ヶ月（"M月分"）として数える。
-// 例: 5/16〜6/15 = 5月分, 6/16〜7/15 = 6月分。
-export const MONTH_CUTOVER_DAY = 16;
+// 月の区切り: 暦月（毎月1日〜末日）を1ヶ月として数える。
+// 例: 5/1〜5/31 = 5月。締め日運用に戻す場合は 16 にすると 16日〜翌月15日 になる。
+export const MONTH_CUTOVER_DAY = 1;
 
-/** JST・締め日基準の月キー YYYY-MM（16日以降=当月分 / 15日以前=前月分） */
+/** JST・月キー YYYY-MM（MONTH_CUTOVER_DAY 以降=当月 / それ未満=前月。既定=暦月） */
 export function monthKey(input: string | Date): string | null {
   const k = jstDateKey(input);
   if (!k) return null;
@@ -84,28 +84,28 @@ export function weekLabel(key: string): string {
   return `${m}/${d}週`;
 }
 
-/** 月キー → "YY年M月" ラベル（締め日基準。M月分=M/16〜翌15） */
+/** 月キー → "YY年M月" ラベル（暦月。M月=M/1〜末日） */
 export function monthLabel(key: string): string {
   const [y, m] = key.split("-").map(Number);
   return `${String(y).slice(2)}年${m}月`;
 }
 
-/** 締め日基準の月キー(YYYY-MM)が表す実期間 [開始日, 終了日]（YYYY-MM-DD, JST） */
+/** 月キー(YYYY-MM)が表す実期間 [開始日, 終了日]（YYYY-MM-DD, JST）。MONTH_CUTOVER_DAY を尊重。 */
 export function monthRange(key: string): { start: string; end: string } {
   const [y, m] = key.split("-").map(Number);
-  const ny = m === 12 ? y + 1 : y;
-  const nm = m === 12 ? 1 : m + 1;
-  return {
-    start: `${y}-${pad(m)}-${pad(MONTH_CUTOVER_DAY)}`,
-    end: `${ny}-${pad(nm)}-${pad(MONTH_CUTOVER_DAY - 1)}`,
-  };
+  // 開始＝当月の締め日 / 終了＝翌月の締め日の前日（暦月なら 1日〜末日）。Date演算で常に有効日付にする。
+  const start = new Date(Date.UTC(y, m - 1, MONTH_CUTOVER_DAY));
+  const end = new Date(Date.UTC(y, m, MONTH_CUTOVER_DAY) - 24 * 60 * 60 * 1000);
+  const fmt = (d: Date) => `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
+  return { start: fmt(start), end: fmt(end) };
 }
 
-/** 締め日基準の月キー → "5/16〜6/15" の範囲ラベル */
+/** 月キー → 範囲ラベル（暦月なら "5/1〜5/31"、締め日運用なら "5/16〜6/15"） */
 export function monthRangeLabel(key: string): string {
-  const [, m] = key.split("-").map(Number);
-  const nm = m === 12 ? 1 : m + 1;
-  return `${m}/${MONTH_CUTOVER_DAY}〜${nm}/${MONTH_CUTOVER_DAY - 1}`;
+  const { start, end } = monthRange(key);
+  const [, sm, sd] = start.split("-").map(Number);
+  const [, em, ed] = end.split("-").map(Number);
+  return `${sm}/${sd}〜${em}/${ed}`;
 }
 
 export function currentWeekKey(now = new Date()): string {
@@ -128,7 +128,7 @@ export function mondayOf(input: Date): Date {
   x.setHours(0, 0, 0, 0);
   return x;
 }
-/** 対象月(YYYY-MM・締め日基準16〜翌15)の列。日次=各日 / 週次=各週の月曜 */
+/** 対象月(YYYY-MM・暦月)の列。日次=各日 / 週次=各週の月曜 */
 export function monthColumns(type: "日次" | "週次", month: string): { key: string; label: string }[] {
   if (!/^\d{4}-\d{2}$/.test(month)) return [];
   const { start, end } = monthRange(month);
