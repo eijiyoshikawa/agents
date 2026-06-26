@@ -448,7 +448,7 @@ export function buildMrrTrend(contracts: Contract[], n = 6): { key: string; labe
 
 // ── 月次実績の履歴（過去の実績一覧） ───────────────────────────
 export type MonthlyHistoryRow = {
-  key: string; // YYYY-MM（締め日基準）
+  key: string; // YYYY-MM（暦月）
   label: string; // "26年6月"
   range: string; // "6/16〜7/15"
   appointments: number; // アポ獲得（アポ取得日基準）
@@ -459,7 +459,7 @@ export type MonthlyHistoryRow = {
 };
 
 /**
- * 過去 n ヶ月（締め日基準）の月次実績を新しい順で返す。
+ * 過去 n ヶ月（暦月）の月次実績を新しい順で返す。
  * アポ=アポ取得日 / 新規契約=契約開始日 / MRR・稼働=その月に有効な契約 / 架電=架電記録の日付。
  */
 export function buildMonthlyHistory(
