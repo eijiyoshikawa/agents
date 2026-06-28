@@ -1,7 +1,7 @@
 import { getModel } from "@/lib/metrics";
 import { getDataSource } from "@/lib/db";
 import { requireStaff } from "@/lib/auth/server";
-import { hasServerSupabase } from "@/lib/db/supabase";
+import { getServerClient, hasServerSupabase } from "@/lib/db/supabase";
 import AdminClient, { type AdminData } from "./client";
 
 export const metadata = { title: "スタッフ管理 — PartnerSales" };
@@ -13,6 +13,18 @@ export default async function AdminPage() {
   await requireStaff();
   const m = await getModel();
   const ratePlans = await getDataSource().getRatePlans();
+
+  // パートナーのログインID（パスワードは扱わない）
+  const loginIdByPartner = new Map<string, string>();
+  if (hasServerSupabase()) {
+    const { data: creds } = await getServerClient()
+      .from("partner_credentials")
+      .select("login_id, partner_id");
+    for (const c of (creds ?? []) as { login_id: string; partner_id: string | null }[]) {
+      if (c.partner_id) loginIdByPartner.set(c.partner_id, c.login_id);
+    }
+  }
+
   const partnerName = (id: string) => m.partners.find((p) => p.id === id)?.name ?? id;
   const serviceName = (id: string) => m.services.find((s) => s.id === id)?.name ?? id;
 
@@ -45,6 +57,7 @@ export default async function AdminPage() {
       slug: p.slug,
       referralCode: p.referralCode,
       status: p.status,
+      loginId: loginIdByPartner.get(p.id) ?? "",
     })),
     deals: m.deals.map((d) => ({
       id: d.id,

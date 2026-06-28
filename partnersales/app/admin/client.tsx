@@ -26,7 +26,7 @@ export interface AdminData {
   configured: boolean;
   services: { id: string; name: string; agency: TierRow[]; tossup: TierRow[] }[];
   ratePlans: { id: string; name: string; partnerIds: string[]; rewards: { serviceId: string; planType: "agency" | "tossup"; tier: number; type: "percentage" | "fixed"; value: number }[] }[];
-  partners: { id: string; name: string; slug: string; referralCode: string; status: string }[];
+  partners: { id: string; name: string; slug: string; referralCode: string; status: string; loginId: string }[];
   deals: { id: string; clientName: string; serviceName: string; introducer: string; amount: number; status: DealStatus; closedAt: string; isSelfDeal: boolean; rewardType: "agency" | "tossup" }[];
   payoutRows: { partnerId: string; name: string; confirmedTotal: number; paidOut: number; invoicedAmount: number; unsettled: number; phase: string }[];
   payouts: { id: string; name: string; amount: number; status: string; invoiceNo?: string; paidAt?: string }[];
@@ -270,8 +270,28 @@ function RegisterTab({ data, run, disabled }: { data: AdminData; run: RunFn; dis
         </div>
       )}
 
+      <LoginIdListCard data={data} />
       <ReissueCard data={data} run={run} disabled={disabled} />
       <NotionSyncCard data={data} run={run} disabled={disabled} />
+    </div>
+  );
+}
+
+function LoginIdListCard({ data }: { data: AdminData }) {
+  const rows = data.partners.filter((p) => p.loginId);
+  return (
+    <div className="card" style={{ display: "grid", gap: 8 }}>
+      <div className="h-section">ログインID一覧（{rows.length}件）</div>
+      <p style={{ color: "var(--fg-muted)", fontSize: 12, margin: 0 }}>
+        パスワードはセキュリティ上表示できません（忘失時は再発行）。
+      </p>
+      {rows.length === 0 && <div style={{ color: "var(--fg-muted)", fontSize: 13 }}>登録済みのログインIDがありません</div>}
+      {rows.map((p) => (
+        <div key={p.id} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderTop: "1px solid var(--card-border)", fontSize: 13 }}>
+          <span>{p.name}</span>
+          <code>{p.loginId}</code>
+        </div>
+      ))}
     </div>
   );
 }

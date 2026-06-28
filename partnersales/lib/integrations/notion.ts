@@ -36,14 +36,15 @@ function relationshipStatus(status: Partner["status"]): string {
  */
 export function buildNotionProperties(
   partner: Partner,
-  referrerName?: string
+  referrerName?: string,
+  loginId?: string
 ): Record<string, unknown> {
   const props: Record<string, unknown> = {
     顧問先名: { title: [{ text: { content: partner.name } }] },
     カテゴリ: { select: { name: "パートナー" } },
     関係性ステータス: { select: { name: relationshipStatus(partner.status) } },
     報酬体系: {
-      rich_text: [{ text: { content: `紹介報酬 3段階（招待コード: ${partner.referralCode}）` } }],
+      rich_text: [{ text: { content: `紹介報酬 2段階（招待コード: ${partner.referralCode}）` } }],
     },
     契約開始日: { date: { start: partner.joinedAt } },
   };
@@ -55,6 +56,10 @@ export function buildNotionProperties(
   }
   if (referrerName) {
     props["紹介元"] = { rich_text: [{ text: { content: referrerName } }] };
+  }
+  if (loginId) {
+    // ※ Notion 側に「ログインID」テキスト列が必要（パスワードは同期しない）
+    props["ログインID"] = { rich_text: [{ text: { content: loginId } }] };
   }
   return props;
 }
@@ -74,9 +79,10 @@ export interface NotionSyncResult {
 export async function syncPartnerToNotion(
   partner: Partner,
   referrerName?: string,
-  existingPageId?: string | null
+  existingPageId?: string | null,
+  loginId?: string
 ): Promise<NotionSyncResult> {
-  const properties = buildNotionProperties(partner, referrerName);
+  const properties = buildNotionProperties(partner, referrerName, loginId);
   const payload = { parent: { database_id: NOTION_DATABASE_ID }, properties };
 
   const token = process.env.NOTION_TOKEN;

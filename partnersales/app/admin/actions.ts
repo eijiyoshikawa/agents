@@ -257,7 +257,7 @@ export async function registerPartner(input: {
     status: "active",
   };
   try {
-    const sync = await syncPartnerToNotion(partner, referrerName);
+    const sync = await syncPartnerToNotion(partner, referrerName, undefined, loginId);
     if (sync.ok && sync.notionPageId) {
       await sb.from("partners").update({ notion_page_id: sync.notionPageId }).eq("id", inserted.id);
       notionNote = " / Notion 同期済み";
@@ -305,6 +305,12 @@ async function syncOnePartner(
     referrerName = parent?.name ?? undefined;
   }
 
+  const { data: cred } = await sb
+    .from("partner_credentials")
+    .select("login_id")
+    .eq("partner_id", partnerId)
+    .maybeSingle();
+
   const partner: Partner = {
     id: p.id,
     name: p.name,
@@ -315,7 +321,7 @@ async function syncOnePartner(
     joinedAt: p.joined_at,
     status: p.status,
   };
-  const sync = await syncPartnerToNotion(partner, referrerName, p.notion_page_id);
+  const sync = await syncPartnerToNotion(partner, referrerName, p.notion_page_id, cred?.login_id ?? undefined);
   if (sync.ok && sync.notionPageId && sync.notionPageId !== p.notion_page_id) {
     await sb.from("partners").update({ notion_page_id: sync.notionPageId }).eq("id", p.id);
   }

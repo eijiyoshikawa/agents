@@ -25,6 +25,13 @@ describe("buildNotionProperties", () => {
     expect(props["契約開始日"].date.start).toBe("2026-06-20");
   });
 
+  it("ログインIDを渡すとログインID列に設定する（未指定なら付けない）", () => {
+    const withId = buildNotionProperties(partner, undefined, "LET-P-0001") as Record<string, any>;
+    expect(withId["ログインID"].rich_text[0].text.content).toBe("LET-P-0001");
+    const without = buildNotionProperties(partner) as Record<string, any>;
+    expect(without["ログインID"]).toBeUndefined();
+  });
+
   it("status を関係性ステータスへ変換する", () => {
     expect((buildNotionProperties({ ...partner, status: "dormant" }) as any)["関係性ステータス"].select.name).toBe("休止中");
     expect((buildNotionProperties({ ...partner, status: "suspended" }) as any)["関係性ステータス"].select.name).toBe("契約終了");
