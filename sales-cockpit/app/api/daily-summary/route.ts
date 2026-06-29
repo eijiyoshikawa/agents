@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getDashboard, getSummaryCustomers, getContracts, getCalls } from "@/lib/data";
-import { notifySlack } from "@/lib/notify";
+import { notifySlack, SLACK_REP } from "@/lib/notify";
 import { statsForRange, ranges, dailySlackText, addDays } from "@/lib/summary";
 import { verifySession, SESSION_COOKIE } from "@/lib/session";
 
@@ -39,8 +39,11 @@ export async function GET(req: Request) {
     getContracts(),
     getCalls(),
   ]);
-  const stats = statsForRange(customers, contracts, calls, target, target);
-  const text = dailySlackText(stats, dash, target);
+  // Slack通知は対象担当（既定: 江原）の分のみ集計する。
+  const monthStart = `${target.slice(0, 7)}-01`; // 暦月の月初
+  const stats = statsForRange(customers, contracts, calls, target, target, SLACK_REP);
+  const monthMtd = statsForRange(customers, contracts, calls, monthStart, target, SLACK_REP);
+  const text = dailySlackText(stats, monthMtd, dash, target, SLACK_REP);
   const slack = await notifySlack(text);
   return NextResponse.json({ ok: true, date: target, sentToSlack: slack.ok, slack, text });
 }

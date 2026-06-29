@@ -52,6 +52,7 @@ function isContacted(status: string | null): boolean {
  * [start, end]（両端含む・YYYY-MM-DD, JST基準）で集計。
  * 架電数は「ステータス更新ベース（Notion手動架電）」と「システム架電記録ログ」を統合し、
  * 二重計上を避けるため max を採用する（ダッシュボードの本日架電数と同じ定義）。
+ * onlyRep を指定すると、その担当の分のみ集計する（Slack通知の「江原のみ」用）。
  */
 export function statsForRange(
   customers: ListCustomer[],
@@ -59,22 +60,28 @@ export function statsForRange(
   calls: CallEvent[],
   start: string,
   end: string,
+  onlyRep?: string,
 ): PeriodStats {
+  // 集計対象の担当か: 非稼働メンバー除外 ＋ onlyRep 指定時はその担当のみ。
+  const inScope = (rep: string | null | undefined): boolean =>
+    !isExcludedRep(rep) && (!onlyRep || rep === onlyRep);
+
   let statusTotal = 0;
   let appts = 0;
   let newSns = 0;
   let newAgency = 0;
   const statusByRep = new Map<string, number>();
   for (const c of customers) {
+    if (!inScope(c.isRep)) continue;
     // ステータス更新ベースの架電: 最終更新日が期間内 × 接触系ステータス
     if (c.lastEdited && isContacted(c.status)) {
       const k = jstDateKey(c.lastEdited);
       if (k && k >= start && k <= end) {
         statusTotal++;
-        if (c.isRep && !isExcludedRep(c.isRep)) statusByRep.set(c.isRep, (statusByRep.get(c.isRep) ?? 0) + 1);
+        if (c.isRep) statusByRep.set(c.isRep, (statusByRep.get(c.isRep) ?? 0) + 1);
       }
     }
-    if (!isExcludedRep(c.isRep) && c.appointmentDate) {
+    if (c.appointmentDate) {
       const k = c.appointmentDate.slice(0, 10);
       if (k >= start && k <= end) appts++;
     }
@@ -83,13 +90,14 @@ export function statsForRange(
   let logTotal = 0;
   const logByRep = new Map<string, number>();
   for (const cl of calls) {
-    if (!cl.date) continue;
+    if (!cl.date || !inScope(cl.rep)) continue;
     const k = jstDateKey(cl.date);
     if (k && k >= start && k <= end) {
       logTotal++;
-      if (cl.rep && !isExcludedRep(cl.rep)) logByRep.set(cl.rep, (logByRep.get(cl.rep) ?? 0) + 1);
+      if (cl.rep) logByRep.set(cl.rep, (logByRep.get(cl.rep) ?? 0) + 1);
     }
   }
+  // 契約は担当(IS)に紐づかない会社指標のため onlyRep ではフィルタしない（全社）。
   for (const ct of contracts) {
     if (!ct.start) continue;
     const k = ct.start.slice(0, 10);
@@ -122,11 +130,6 @@ export function ranges(now = new Date()) {
   return { today, thisMon, lastMon, lastSun };
 }
 
-function repLine(byRep: RepCount[], n = 8): string {
-  if (byRep.length === 0) return "（架電なし）";
-  return byRep.slice(0, n).map((r) => `${r.rep} ${r.count}`).join(" / ");
-}
-
 /** 架電数の内訳（ステータス更新 / システム）。同値や0は省略しシンプルに。 */
 function callsBreakdown(s: PeriodStats): string {
   return `（内訳 ステータス更新 ${num(s.statusCalls)} / システム ${num(s.systemCalls)}）`;
@@ -143,42 +146,43 @@ function monthHeader(): { label: string; range: string } {
   return { label: monthLabel(k), range: monthRangeLabel(k) };
 }
 
-/** 月次進捗の共通行（アポ・契約・MRR） */
-function monthProgressLines(dash: DashboardData): string[] {
+/**
+ * 月次の行。架電・アポは対象担当(rep)の今月実績、契約・MRRは全社（担当に紐づかない会社指標）。
+ */
+function monthLines(monthMtd: PeriodStats, dash: DashboardData, rep: string): string[] {
   const g = dash.goals;
   const mh = monthHeader();
   return [
-    `― 今月（${mh.label} ${mh.range}）進捗 ―`,
-    `アポ ${goalStr(g.monthlyAppointments.actual, g.monthlyAppointments.target, g.monthlyAppointments.achievement)}`,
-    `契約 採用SNS ${goalStr(g.monthlyContractsSns.actual, g.monthlyContractsSns.target, g.monthlyContractsSns.achievement)} ・ 人材紹介 ${goalStr(g.monthlyContractsAgency.actual, g.monthlyContractsAgency.target, g.monthlyContractsAgency.achievement)}`,
-    `MRR ${yen(dash.kpi.mrr)} ・ 稼働契約 ${num(dash.kpi.activeContracts)}件`,
+    `― 今月（${mh.label} ${mh.range}）―`,
+    `${rep}: 架電 ${num(monthMtd.calls)} ・ アポ ${num(monthMtd.appts)}`,
+    `（全社）契約 採用SNS ${goalStr(g.monthlyContractsSns.actual, g.monthlyContractsSns.target, g.monthlyContractsSns.achievement)} ・ 人材紹介 ${goalStr(g.monthlyContractsAgency.actual, g.monthlyContractsAgency.target, g.monthlyContractsAgency.achievement)} ・ MRR ${yen(dash.kpi.mrr)} ・ 稼働 ${num(dash.kpi.activeContracts)}件`,
   ];
 }
 
-/** 日次（平日夕方）Slack本文 */
-export function dailySlackText(today: PeriodStats, dash: DashboardData, todayYmd: string): string {
+/** 日次（平日夕方）Slack本文。rep の分のみを集計（既定: 江原）。 */
+export function dailySlackText(today: PeriodStats, monthMtd: PeriodStats, dash: DashboardData, todayYmd: string, rep: string): string {
   return [
-    `📊 *LET 日次レポート* ${ymdLabel(todayYmd)}`,
-    `架電 *${num(today.calls)}件* ${callsBreakdown(today)} ・ アポ獲得 *${num(today.appts)}件* ・ 新規契約 採用SNS ${num(today.newSns)} / 人材紹介 ${num(today.newAgency)}`,
-    `担当別 架電: ${repLine(today.byRep)}`,
-    ...monthProgressLines(dash),
+    `📊 *LET 日次レポート* ${ymdLabel(todayYmd)}（${rep}）`,
+    `架電 *${num(today.calls)}件* ${callsBreakdown(today)} ・ アポ獲得 *${num(today.appts)}件*`,
+    ...monthLines(monthMtd, dash, rep),
   ].join("\n");
 }
 
-/** 週次（月曜朝）Slack本文 */
+/** 週次（月曜朝）Slack本文。rep の分のみを集計（既定: 江原）。 */
 export function weeklySlackText(
   lastWeek: PeriodStats,
   thisWeek: PeriodStats,
+  monthMtd: PeriodStats,
   dash: DashboardData,
   r: { lastMon: string; lastSun: string; thisMon: string; today: string },
+  rep: string,
 ): string {
   return [
-    `🗓 *LET 週次レポート*（月曜朝）`,
+    `🗓 *LET 週次レポート*（月曜朝・${rep}）`,
     `■ 先週 ${ymdLabel(r.lastMon)}〜${ymdLabel(r.lastSun)}`,
-    `　架電 *${num(lastWeek.calls)}* ${callsBreakdown(lastWeek)} ・ アポ *${num(lastWeek.appts)}* ・ 新規契約 採用SNS ${num(lastWeek.newSns)} / 人材紹介 ${num(lastWeek.newAgency)}`,
-    `　担当別 架電: ${repLine(lastWeek.byRep)}`,
+    `　架電 *${num(lastWeek.calls)}* ${callsBreakdown(lastWeek)} ・ アポ *${num(lastWeek.appts)}*`,
     `■ 今週 ${ymdLabel(r.thisMon)}〜${ymdLabel(r.today)}（途中）`,
-    `　架電 ${num(thisWeek.calls)} ${callsBreakdown(thisWeek)} ・ アポ ${num(thisWeek.appts)} ・ 新規契約 採用SNS ${num(thisWeek.newSns)} / 人材紹介 ${num(thisWeek.newAgency)}`,
-    ...monthProgressLines(dash),
+    `　架電 ${num(thisWeek.calls)} ${callsBreakdown(thisWeek)} ・ アポ ${num(thisWeek.appts)}`,
+    ...monthLines(monthMtd, dash, rep),
   ].join("\n");
 }

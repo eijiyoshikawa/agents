@@ -10,6 +10,7 @@ import CallButton from "./CallButton";
 import RefreshButton from "./RefreshButton";
 import { yen, pct, num } from "@/lib/format";
 import { monthKey, currentMonthKey, monthRangeLabel, jstDateKey } from "@/lib/period";
+import { isExcludedRep } from "@/lib/reps";
 
 type Drill = { title: string; rows: DrillCustomer[] } | null;
 
@@ -19,7 +20,8 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
   const since = data.metricsSince;
   // "2026-05-07" → "5/7以降"（コンタクト済みは累計ではなく当起点以降の集計）
   const sinceLabel = `${Number(since.slice(5, 7))}/${Number(since.slice(8, 10))}以降`;
-  const worked = data.workedCustomers;
+  // 非稼働メンバーは集計（KPI合計・担当者別）から除外しているため、内訳ドリルも同じ母集団に揃える。
+  const worked = data.workedCustomers.filter((c) => !isExcludedRep(c.isRep));
   const [drill, setDrill] = useState<Drill>(null);
 
   const apptRows = useMemo(

@@ -278,6 +278,7 @@ function apptOnOrAfter(c: Customer, since: string): boolean {
 }
 
 export function buildStatusActivity(customers: Customer[], since: string): StatusActivity {
+  let total = 0;
   let contacted = 0;
   let appointments = 0;
   let leads = 0;
@@ -285,6 +286,9 @@ export function buildStatusActivity(customers: Customer[], since: string): Statu
   const repMap = new Map<string, { contacted: number; appointments: number }>();
 
   for (const c of customers) {
+    // 非稼働メンバーは全集計から除外（合計＝担当者別の和を一致させる）。
+    if (isExcludedRep(c.isRep)) continue;
+    total++;
     const s = c.status;
     if (!s || s === "アプローチ前") {
       leads++;
@@ -296,8 +300,6 @@ export function buildStatusActivity(customers: Customer[], since: string): Statu
     // アポはアポ取得日(since以降)で統一カウント
     const appt = apptOnOrAfter(c, since);
     if (appt) appointments++;
-    // 担当者別（byRep）は非稼働メンバーを除外（総数 contacted/appointments には影響させない）
-    if (isExcludedRep(c.isRep)) continue;
     const rep = c.isRep ?? "未割当";
     const r = repMap.get(rep) ?? { contacted: 0, appointments: 0 };
     r.contacted += 1;
@@ -318,6 +320,7 @@ export function buildStatusActivity(customers: Customer[], since: string): Statu
   const keys = recentMonthKeys(6);
   const m = new Map<string, number>();
   for (const c of customers) {
+    if (isExcludedRep(c.isRep)) continue;
     if (!apptOnOrAfter(c, since)) continue;
     const k = monthKey(c.appointmentDate!);
     if (k) m.set(k, (m.get(k) ?? 0) + 1);
@@ -325,7 +328,7 @@ export function buildStatusActivity(customers: Customer[], since: string): Statu
   const apptMonthly = keys.map((k) => ({ key: k, label: monthLabel(k), appointments: m.get(k) ?? 0 }));
 
   return {
-    total: customers.length,
+    total,
     leads,
     contacted,
     appointments,
@@ -347,14 +350,15 @@ export function buildStatusActivity(customers: Customer[], since: string): Statu
 export function buildTodayActivity(customers: Customer[], calls: CallEvent[]): TodayActivity {
   const today = jstDateKey(new Date());
 
+  // 非稼働メンバーは全集計から除外（合計＝担当者別の和を一致させる）。未割当(null)は含める。
   // ① ステータス更新ベース（Notion手動架電を含む）: 本日更新 × 接触系ステータス
   const statusByRep = new Map<string, number>();
   let statusTotal = 0;
   for (const c of customers) {
+    if (isExcludedRep(c.isRep)) continue;
     if (!c.status || !CONTACTED_STATUS.has(c.status)) continue;
     if (!c.lastEdited || jstDateKey(c.lastEdited) !== today) continue;
     statusTotal += 1;
-    if (isExcludedRep(c.isRep)) continue;
     const rep = c.isRep ?? "未割当";
     statusByRep.set(rep, (statusByRep.get(rep) ?? 0) + 1);
   }
@@ -363,20 +367,18 @@ export function buildTodayActivity(customers: Customer[], calls: CallEvent[]): T
   const logByRep = new Map<string, number>();
   let logTotal = 0;
   for (const c of calls) {
+    if (isExcludedRep(c.rep)) continue;
     if (!c.date || jstDateKey(c.date) !== today) continue;
     logTotal += 1;
-    if (isExcludedRep(c.rep)) continue;
     const rep = c.rep ?? "未割当";
     logByRep.set(rep, (logByRep.get(rep) ?? 0) + 1);
   }
 
   // ③ 本日のアポ獲得（アポ取得日が本日）
   const apptByRep = new Map<string, number>();
-  let apptTotal = 0;
   for (const c of customers) {
-    if (!c.appointmentDate || c.appointmentDate.slice(0, 10) !== today) continue;
-    apptTotal += 1;
     if (isExcludedRep(c.isRep)) continue;
+    if (!c.appointmentDate || c.appointmentDate.slice(0, 10) !== today) continue;
     const rep = c.isRep ?? "未割当";
     apptByRep.set(rep, (apptByRep.get(rep) ?? 0) + 1);
   }
@@ -390,20 +392,22 @@ export function buildTodayActivity(customers: Customer[], calls: CallEvent[]): T
     }))
     .sort((a, b) => b.calls - a.calls);
 
+  // 合計＝担当者別の和（二重計上を避けつつ内訳と一致）。内訳ノート用に source 別合計も返す。
   return {
-    calls: Math.max(statusTotal, logTotal),
-    appointments: apptTotal,
+    calls: byRep.reduce((s, r) => s + r.calls, 0),
+    appointments: byRep.reduce((s, r) => s + r.appointments, 0),
     statusCalls: statusTotal,
     systemCalls: logTotal,
     byRep,
   };
 }
 
-/** 当月のアポ獲得数：アポ取得日が今月のもの（アポ獲得以降のステータスもアポ取得日を保持するため含まれる） */
+/** 当月のアポ獲得数：アポ取得日が今月のもの（非稼働メンバーは除外し担当者別と一致させる） */
 function apptsThisMonth(customers: Customer[]): number {
   const cur = currentMonthKey();
   let n = 0;
   for (const c of customers) {
+    if (isExcludedRep(c.isRep)) continue;
     if (c.appointmentDate && monthKey(c.appointmentDate) === cur) n++;
   }
   return n;
