@@ -19,7 +19,12 @@ export async function notifySlack(text: string): Promise<SlackResult> {
   }
 }
 
+// Slack通知の対象担当（既定: 江原のみ）。SLACK_REP 環境変数で変更可。空文字なら全担当を通知。
+export const SLACK_REP = process.env.SLACK_REP ?? "江原";
+
 export async function notifyAppointment(input: { customerName: string; rep: string; memo?: string }): Promise<void> {
+  // 「江原の分のみ通知」: 対象担当以外のアポはSlack通知しない。
+  if (SLACK_REP && input.rep !== SLACK_REP) return;
   const memo = input.memo ? `\n${input.memo}` : "";
   await notifySlack(`🎉 アポ獲得！ *${input.customerName}*（担当: ${input.rep}）${memo}`);
 }

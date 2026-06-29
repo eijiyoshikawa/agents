@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { getDashboard, getSummaryCustomers, getContracts, getCalls } from "@/lib/data";
 import { notifySlack } from "@/lib/notify";
 import { statsForRange, ranges, weeklySlackText } from "@/lib/summary";
+import { SLACK_REP } from "@/lib/notify";
 import { verifySession, SESSION_COOKIE } from "@/lib/session";
 
 export const runtime = "nodejs";
@@ -33,9 +34,12 @@ export async function GET(req: Request) {
     getContracts(),
     getCalls(),
   ]);
-  const lastWeek = statsForRange(customers, contracts, calls, r.lastMon, r.lastSun);
-  const thisWeek = statsForRange(customers, contracts, calls, r.thisMon, r.today);
-  const text = weeklySlackText(lastWeek, thisWeek, dash, r);
+  // Slack通知は対象担当（既定: 江原）の分のみ集計する。
+  const monthStart = `${r.today.slice(0, 7)}-01`; // 暦月の月初
+  const lastWeek = statsForRange(customers, contracts, calls, r.lastMon, r.lastSun, SLACK_REP);
+  const thisWeek = statsForRange(customers, contracts, calls, r.thisMon, r.today, SLACK_REP);
+  const monthMtd = statsForRange(customers, contracts, calls, monthStart, r.today, SLACK_REP);
+  const text = weeklySlackText(lastWeek, thisWeek, monthMtd, dash, r, SLACK_REP);
   const slack = await notifySlack(text);
   return NextResponse.json({ ok: true, sentToSlack: slack.ok, slack, text });
 }
