@@ -128,14 +128,25 @@ function generateReportFromDataFile(dataFileId) {
   return render_(data, file.getParents().hasNext() ? file.getParents().next() : null);
 }
 
-/** 複製→流し込み→保存 */
+/**
+ * 流し込み→保存。
+ * フォルダ内に既存のスライド(出力デッキ)があれば、それを直接埋める(名前は保持)。
+ * 無ければテンプレを複製して埋める。
+ */
 function render_(data, folder) {
   var fields = buildFields_(data);
-  var name = (fields._deck_title || '分析レポート');
-  var copyFile = DriveApp.getFileById(TEMPLATE_ID).makeCopy(name);
-  if (folder) { folder.addFile(copyFile); DriveApp.getRootFolder().removeFile(copyFile); }
+  var deck = null;
+  if (folder) {
+    var existing = folder.getFilesByType(MimeType.GOOGLE_SLIDES);
+    if (existing.hasNext()) deck = SlidesApp.openById(existing.next().getId()); // 既存デッキを上書き
+  }
+  if (!deck) {
+    var name = (fields._deck_title || '分析レポート');
+    var copyFile = DriveApp.getFileById(TEMPLATE_ID).makeCopy(name);
+    if (folder) { folder.addFile(copyFile); DriveApp.getRootFolder().removeFile(copyFile); }
+    deck = SlidesApp.openById(copyFile.getId());
+  }
 
-  var deck = SlidesApp.openById(copyFile.getId());
   var slides = deck.getSlides();
   fillTexts_(slides, fields);
   fillReplaces_(slides, fields);
