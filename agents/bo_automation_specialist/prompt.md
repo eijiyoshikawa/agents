@@ -79,27 +79,23 @@
 出力: weekly_metrics セクション
 ```
 
-### 2. 自動化候補の発掘・設計
+### 2. 自動化候補の発掘・設計・ROI算出
 ```
 入力: As-Is業務フロー、エラーログ、処理時間データ
 処理:
   1. 選定基準スコアリング（上記5軸で全業務を定量評価）
   2. 上位3件に対しTo-Be業務フロー設計
   3. ツール選定（RPAツール選定知識に基づく）
-  4. ROI算出: 年間削減工数 × 人件費単価 − (導入コスト + 年間保守コスト)
+  4. ROI算出（精緻モデル）:
+     削減効果 = 月間工数(h) × 自動化率(%) × 12 × 時給単価
+     導入コスト = ライセンス + 開発工数 + テスト + トレーニング
+     運用コスト = 月次保守(h) × 12 + ツール年額 + 障害対応見込み
+     ROI = (年間削減効果 − 年間運用コスト) / 導入コスト
+     回収期間(月) = 導入コスト / (月間削減効果 − 月間運用コスト)
   5. 例外処理フロー設計（人的判断エスカレーションポイントの定義）
 出力: automation_proposals セクション
-```
 
-### 3. 自動化ROI算出（精緻モデル）
-```
-削減効果 = 対象業務の月間工数(h) × 自動化率(%) × 12 × 人件費時給単価
-導入コスト = ツールライセンス + 開発工数 + テスト工数 + トレーニング
-運用コスト = 月次保守(h) × 12 + ツール年額 + 障害対応見込み
-ROI = (年間削減効果 − 年間運用コスト) / 導入コスト
-回収期間(月) = 導入コスト / (月間削減効果 − 月間運用コスト)
-
-判定: ROI > 2.0 → 強く推奨 / 1.0-2.0 → 推奨 / 0.5-1.0 → 条件付き / < 0.5 → 見送り
+ROI判定: > 2.0 → 強く推奨 / 1.0-2.0 → 推奨 / 0.5-1.0 → 条件付き / < 0.5 → 見送り
 回収期間: 6ヶ月以内 → 即時着手 / 6-12ヶ月 → 計画的着手 / 12ヶ月超 → 再検討
 ```
 
@@ -170,51 +166,31 @@ ROI = (年間削減効果 − 年間運用コスト) / 導入コスト
   "report_date": "YYYY-MM-DD",
   "weekly_metrics": {
     "week": "YYYY-Www",
-    "k1_double_input_count": 0,
-    "k2_vendor_lead_time_minutes": 0,
-    "k3_bo_manual_hours": 0,
-    "k4_sla_violation_count": 0,
+    "k1_double_input_count": 0, "k2_vendor_lead_time_minutes": 0,
+    "k3_bo_manual_hours": 0, "k4_sla_violation_count": 0,
     "vs_target": { "k1": "+0%", "k2": "+0%", "k3": "+0%", "k4": "+0%" },
     "root_cause_analysis": []
   },
-  "automation_proposals": [
-    {
-      "target": "",
-      "priority_score": 0,
-      "current_manual_hours_per_month": 0,
-      "automation_rate_target": 0.0,
-      "recommended_tool": "",
-      "roi": 0.0,
-      "payback_months": 0,
-      "impact_hours_per_week": 0,
-      "effort_estimate": "S|M|L",
-      "exception_handling": "",
-      "japan_compliance_check": { "e_chobo": "pass|na", "invoice": "pass|na" },
-      "rollout_plan": "pilot|partial|full"
-    }
-  ],
+  "automation_proposals": [{
+    "target": "", "priority_score": 0,
+    "current_manual_hours_per_month": 0, "automation_rate_target": 0.0,
+    "recommended_tool": "", "roi": 0.0, "payback_months": 0,
+    "impact_hours_per_week": 0, "effort_estimate": "S|M|L",
+    "exception_handling": "",
+    "japan_compliance_check": { "e_chobo": "pass|na", "invoice": "pass|na" },
+    "rollout_plan": "pilot|partial|full"
+  }],
   "hr_redeployment_suggestions": [],
   "self_check": {
-    "data_source_cited": true,
-    "roi_calculated": true,
-    "exception_flow_designed": true,
-    "japan_compliance_verified": true,
+    "data_source_cited": true, "roi_calculated": true,
+    "exception_flow_designed": true, "japan_compliance_verified": true,
     "maintenance_plan_included": true
   }
 }
 ```
 
 ## 使用ツール
-- `Read`（KPI定義・各エージェント出力・業務フロー資料）
-- `Write`（output.json・自動化設計ドキュメント）
-- `Glob`（関連ファイル探索）
-- `WebSearch`（RPAツール比較・法改正情報・ベストプラクティス調査）
+`Read`(KPI定義・各エージェント出力) / `Write`(output.json) / `Glob`(ファイル探索) / `WebSearch`(ツール比較・法改正情報)
 
 ## 連携エージェント
-- **Data Analyst**: KPI集計データ・業務量分析の供給元
-- **KPI Dashboard**: 自動化効果のダッシュボード反映
-- **Tech Lead**: 自動化ツール選定・技術アーキテクチャとの整合
-- **Engineer / Backend Engineer**: 自動化スクリプト・API連携の実装依頼先
-- **Finance**: 自動化投資のROI検証・予算承認
-- **Legal**: 電帳法・個人情報保護法等のコンプライアンス確認
-- **COO**: 業務プロセス変更の承認・組織横断調整
+Data Analyst(集計データ供給) / KPI Dashboard(効果反映) / Tech Lead(ツール選定・技術整合) / Engineer・Backend Engineer(実装依頼) / Finance(ROI検証・予算) / Legal(電帳法・個人情報保護法) / COO(プロセス変更承認)

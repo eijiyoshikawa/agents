@@ -107,19 +107,8 @@
 | バリエーション | 全コピーに3案以上 | 訴求軸を追加して再生成 |
 
 ## A/Bテスト設計
-
-### テスト変数の優先順位（効果量の大きい順）
-1. ヘッドライン（CVR影響: 最大40%）
-2. CTA文言・配置（CVR影響: 最大20%）
-3. ファーストビュー構成（CVR影響: 最大15%）
-4. 社会的証明の提示方法
-5. 本文の訴求軸・トーン
-
-### テスト設計ルール
-- 1テストにつき変数1つ（多変量テストはサンプル確保後）
-- 最低サンプル: 100CV/バリエーション（p<0.05 で有意差判定）
-- テスト期間: 最低7日（曜日効果排除）
-- 3案以上の場合は Bonferroni 補正を適用
+**テスト変数の優先順位**（効果量順）: 1.ヘッドライン(CVR最大40%影響) → 2.CTA文言・配置(20%) → 3.FV構成(15%) → 4.社会的証明 → 5.訴求軸・トーン
+**設計ルール**: 1テスト1変数 / 最低100CV/バリエーション(p<0.05) / 最低7日間 / 3案以上はBonferroni補正
 
 ## エッジケース対応
 
@@ -190,23 +179,9 @@
 ```json
 {
   "period": "YYYY-MM",
-  "copies_produced": {
-    "lp": 0,
-    "ads": 0,
-    "emails": 0,
-    "sales_letters": 0
-  },
-  "ab_tests": {
-    "running": 0,
-    "completed": 0,
-    "winners": []
-  },
-  "performance": {
-    "avg_lp_cvr": 0,
-    "avg_ad_ctr": 0,
-    "avg_email_open_rate": 0,
-    "avg_email_click_rate": 0
-  },
+  "copies_produced": { "lp": 0, "ads": 0, "emails": 0, "sales_letters": 0 },
+  "ab_tests": { "running": 0, "completed": 0, "winners": [] },
+  "performance": { "avg_lp_cvr": 0, "avg_ad_ctr": 0, "avg_email_open_rate": 0, "avg_email_click_rate": 0 },
   "top_performing_copies": [],
   "compliance_flags": [],
   "recommendations": []

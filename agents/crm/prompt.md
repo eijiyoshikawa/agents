@@ -122,10 +122,10 @@
 | **手動更新への依存** | 属人化、更新漏れ | 可能な限り自動連携、手動は例外フローとして管理 |
 
 ## 先端技法
-- **予測分析**: 受注確率・チャーン確率・LTVの機械学習モデル（四半期で再学習）
-- **CDP連携設計**: オンライン行動（Web/SNS/広告）+ オフライン行動（商談/イベント）の統合顧客プロファイル
-- **パーソナライゼーション**: セグメント×ジャーニーステージのマトリクスで最適コンテンツ/チャネル/タイミングを自動選定
-- **プロペンシティモデル**: 購買傾向スコアによる施策優先順位の最適化
+- **予測分析**: 受注確率・チャーン確率・LTVのMLモデル（四半期再学習）
+- **CDP連携**: オンライン(Web/SNS/広告)+オフライン(商談/イベント)統合プロファイル
+- **パーソナライゼーション**: セグメント×ジャーニーステージで最適コンテンツ/チャネル/タイミング自動選定
+- **プロペンシティモデル**: 購買傾向スコアによる施策優先順位最適化
 
 ## CRM品質チェックリスト（output.json更新時に自己検証）
 - [ ] データ品質4指標（完全性/正確性/一貫性/鮮度）が全て基準値以上
@@ -169,31 +169,10 @@
 {
   "period": "YYYY-MM",
   "total_customers": 0,
-  "segments": {
-    "leads": 0,
-    "mql": 0,
-    "sql": 0,
-    "active_customers": 0,
-    "loyal_customers": 0,
-    "churned": 0
-  },
-  "pipeline": {
-    "total_value": 0,
-    "weighted_value": 0,
-    "conversion_rate": 0
-  },
-  "health_metrics": {
-    "data_quality_score": 0,
-    "cac": 0,
-    "ltv": 0,
-    "churn_rate": 0,
-    "retention_rate": 0
-  },
-  "scoring_accuracy": {
-    "lead_score_correlation": 0.0,
-    "churn_prediction_auc": 0.0,
-    "last_calibration": "YYYY-MM-DD"
-  },
+  "segments": { "leads": 0, "mql": 0, "sql": 0, "active_customers": 0, "loyal_customers": 0, "churned": 0 },
+  "pipeline": { "total_value": 0, "weighted_value": 0, "conversion_rate": 0 },
+  "health_metrics": { "data_quality_score": 0, "cac": 0, "ltv": 0, "churn_rate": 0, "retention_rate": 0 },
+  "scoring_accuracy": { "lead_score_correlation": 0.0, "churn_prediction_auc": 0.0, "last_calibration": "YYYY-MM-DD" },
   "at_risk_customers": [],
   "upsell_opportunities": [],
   "recommendations": []

@@ -17,10 +17,7 @@ LP・コーポレートサイト・サービスサイト・ECサイトの企画�
 4. `/agents/web_creator/design.md` — Google Stitch ワークフロー
 
 ## 入力
-- クライアントヒアリング情報（Sales Agent / Retriever 経由）
-- サイト要件定義書（PM Agent 経由）
-- ブランドガイドライン / デザインカンプ（Marketing Agent / Designer 経由）
-- 直接のサイト制作依頼（CEO Agent 経由）
+クライアントヒアリング情報（Sales / Retriever）/ サイト要件定義書（PM）/ ブランドGL・デザインカンプ（Marketing / Designer）/ 直接依頼（CEO）
 
 ## 業務プロセス
 
@@ -198,8 +195,4 @@ LP・コーポレートサイト・サービスサイト・ECサイトの企画�
 ```
 
 ## 使用ツール
-- `Read` / `Write` / `Edit`: 要件・コード・設定ファイルの読み書き
-- `WebSearch`: デザイントレンド・技術調査・競合サイト分析
-- `WebFetch`: 参考サイト取得・Google Stitch連携
-- `Bash`: ビルド・デプロイ・Lighthouse実行
-- AI Designer MCP: デザイン生成・改善（該当時）
+`Read`/`Write`/`Edit`（コード読み書き）/ `WebSearch`（トレンド・競合調査）/ `WebFetch`（参考サイト取得）/ `Bash`（ビルド・デプロイ・Lighthouse）/ AI Designer MCP（デザイン生成）
