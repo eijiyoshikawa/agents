@@ -26,6 +26,9 @@
 **Server Component をデフォルト。以下のみ `"use client"`:**
 - useState / useEffect / イベントハンドラ / framer-motion / ブラウザAPI依存
 - Client Component は葉ノードに押し下げ、`children` パターンで Server 内に島配置
+- Hydration Mismatch 防止: `typeof window` 分岐は `useEffect` 内限定。`Date.now()` / `Math.random()` を Server レンダリングで使用しない
+
+**レンダリング戦略:** Web Builder の成果物は基本 SSG（静的サイト再現）。動的コンテンツがある場合のみ ISR（`revalidate`）を検討。`"use client"` ページ全体付与は禁止。
 
 **標準ファイル構成:**
 `src/app/`（layout.tsx / page.tsx / globals.css / {subpage}/page.tsx）+ `src/components/`（Header / Footer / Container / SectionHeading / Button / Card）+ `src/lib/motion.ts`（共通Variants）
@@ -40,11 +43,13 @@ motion_key に応じて: framer-motion / gsap / @tsparticles / three 等をイ�
 design_analyzer + design-tokens.json **両方**参照。抽出値優先、不足分はトークン補完。
 - **tailwind.config.ts:** §5テンプレートベース。CSS変数カラー / フォント（Inter時cv01,ss03有効化）/ fontSize+letter-spacing込み / borderRadius 3段階 / 多層boxShadow / カスタムイージング
 - **globals.css:** §6テンプレート。`font-feature-settings: "palt" 1` / antialiased / optimizeLegibility / reduced-motion ルール / ダークモード変数
-- **layout.tsx:** `next/font/google` + サブセット最適化 / メタデータ / Header+main+Footer
+- **layout.tsx:** `next/font/google`（Noto Sans JP: weight 400/500/700 + subsets latin + display swap）+ メタデータ / Header+main+Footer
+- **日本語タイポ:** 見出し letter-spacing -0.02〜-0.04em / line-height 1.05〜1.15 / weight 500-600。本文 letter-spacing 0 / line-height 1.7〜1.8 / weight 400
 
 ### Step 4-5: コンポーネント・ページ実装
 **共通:** Header（ナビ・モバイルメニュー・スクロール変化）/ Footer / Button / Card / Container / SectionHeading — デザイントークン厳密準拠
 **ページ実装順:** ヒーロー → トップ各セクション（上→下）→ サブページ。各セクション実装時に5解析出力を並行参照。レスポンシブは各セクション同時対応。
+**セクション間余白リズム:** 均一padding禁止。大-中-大のリズムで変化をつける（design_analyzer の spacing.section_gap 参照）。背景色交互は最大2色。
 
 ### Step 6: モーション実装（MOTION_30.md 準拠）
 **厳守制約:** スクロールアニメーションはヒーロー+主要2-3箇所のみ / translateY 12-16px（20-30px禁止）/ hover: translateY(-2px)基本、scale(1.05)禁止 / バウンス・自動再生カルーセル禁止 / 1ページ同時発火2件以内 / motion_key 無断変更禁止
@@ -54,10 +59,11 @@ design_analyzer + design-tokens.json **両方**参照。抽出値優先、不足
 **globals.css 必須:** `@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:0.01ms!important; transition-duration:0.01ms!important; scroll-behavior:auto!important; } }`
 
 **和文B2B補完:** §6 `marquee-keywords` / `thinking-caret` / `scroll-progress-bar` + feer tokens（duration 300 / easing standard / grow-from-bottom）。
+**custom motion_key:** `motion_key: "custom"` 指定時は `proposed_motion` 内容で実装し、MOTION_30.md への追加提案を output.json に含める。
 
 ### Step 7-9: インタラクション・アセット・レスポンシブ
 - interaction_analyzer 準拠。各要素は最小限 Client Component に閉じ込め
-- `next/image` 必須（`<img>` 禁止）。width/height明示。ヒーローのみ `priority` 付与（LCP最適化）
+- `next/image` 必須（`<img>` 禁止）。width/height明示。`fill` 使用時は親に `aspect-ratio` 設定。ヒーローのみ `priority` 付与（LCP最適化）
 - モバイルファースト。sm: / md: / lg: / xl: 活用（〜640 / 641〜1024 / 1025〜）
 
 ### Step 10: ビルド確認
@@ -70,7 +76,7 @@ design_analyzer + design-tokens.json **両方**参照。抽出値優先、不足
 | INP | ≤ 200ms | ハンドラ軽量化 / `startTransition` / Client最小化 |
 | CLS | ≤ 0.1 | next/image寸法指定 / フォントフォールバック寸法合わせ / 動的挿入に `min-height` |
 
-framer-motion は `LazyMotion` + `domAnimation` で tree-shake。
+framer-motion は `LazyMotion` + `domAnimation` で tree-shake。Webフォントは `size-adjust` でフォールバック寸法をCLS最小化。動的コンテンツ挿入箇所は `min-height` で空間確保。サードパーティスクリプトは `next/script` strategy="afterInteractive" で遅延。
 
 ## アンチパターン（絶対禁止）
 | NG | 正解 |
@@ -93,8 +99,26 @@ framer-motion は `LazyMotion` + `domAnimation` で tree-shake。
 | マソンリー | CSS `columns` or Grid masonry（JSフォールバック） |
 | スティッキーサイドバー | `sticky top-{n}` + `overflow-y-auto` + `max-h-screen` |
 
+## アクセシビリティ（必須対応）
+- セマンティックHTML: `<main>` / `<nav>` / `<section>` / `<article>` + 適切な見出し階層（h1→h2→h3、スキップ禁止）
+- 画像: `alt` 属性必須（装飾画像は `alt=""`）。`next/image` の `alt` 未設定でビルドしない
+- インタラクティブ要素: `aria-label` / `aria-expanded` / `role` を適切に付与。キーボード操作可能（Tab/Enter/Escape）
+- 色コントラスト: テキストと背景のコントラスト比 4.5:1 以上（WCAG 2.2 AA）
+- フォーカス: `focus-visible` でフォーカスリングを表示。`outline: none` のみは禁止
+
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: 全出力の5カテゴリ（構造/デザイン/モーション/インタラクション/レスポンシブ）検証。85点未満で差し戻し
+- **Tech Lead**: コード品質・アーキテクチャ準拠・パフォーマンス
+- **UI/UX Designer**: デザイン再現精度・トークン準拠
+
 ## Iteration 2+ 修正手順
 fix_instructions を priority 順（high→medium→low）にソート → 対象ファイル修正（全体一貫性考慮）→ `npm run build` 確認
+
+## 先端技法（積極活用）
+- **Streaming SSR:** 重いセクション（カード一覧等）は `<Suspense>` 境界で遅延配信。Critical UI（ヒーロー・ナビ）を先行表示
+- **Image 最適化:** `next/image` の `sizes` 属性でレスポンシブ画像サイズヒント提供。ヒーロー以外は `loading="lazy"`（デフォルト）
+- **CSS Container Queries:** カード等の再利用コンポーネントはビューポートでなくコンテナ幅で応答（`@container` / Tailwind `@` modifier）
+- **Metadata API:** `generateMetadata` で動的メタ・OGP。`robots.ts` / `sitemap.ts` を自動生成
 
 ## 出力品質チェックリスト（各Iteration完了時に自己検証）
 **トークン準拠:** tailwind.config.ts準拠 / CSS変数+palt+antialiased / 非Tailwindブルー / オフホワイト背景 / ソフトブラック文字 / 見出しletter-spacing負・weight 500-600 / borderRadius 3段階 / 多層シャドウ

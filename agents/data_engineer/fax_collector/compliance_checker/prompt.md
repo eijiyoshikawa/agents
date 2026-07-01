@@ -147,14 +147,7 @@ fax_master.json の `compliance` セクションを多層検証する:
         "notes": ""
       }
     ],
-    "sender_display_obligations": [
-      "送信者の名称",
-      "送信者の住所",
-      "送信者の電話番号",
-      "送信者のメールアドレス",
-      "FAX送信停止の申し出先",
-      "FAX送信停止の方法"
-    ],
+    "sender_display_obligations": ["送信者名称", "住所", "電話番号", "メールアドレス", "停止申出先", "停止方法"],
     "opt_out_requirements": {
       "mechanism_required": true,
       "response_deadline": "48時間以内（遅滞なく）",
@@ -173,41 +166,12 @@ fax_master.json の `compliance` セクションを多層検証する:
     "recommendations": []
   },
   "pre_send_checklist": [
-    {
-      "item": "弁護士による法的レビュー完了",
-      "status": "pending",
-      "required": true
-    },
-    {
-      "item": "送信者情報の表示テンプレート作成",
-      "status": "pending",
-      "required": true
-    },
-    {
-      "item": "送信停止受付体制の整備",
-      "status": "pending",
-      "required": true
-    },
-    {
-      "item": "停止要求者データベースの構築",
-      "status": "pending",
-      "required": true
-    },
-    {
-      "item": "送信時間帯の設定（平日9:00-18:00）",
-      "status": "pending",
-      "required": true
-    },
-    {
-      "item": "送信ログ保存体制の構築（3年間）",
-      "status": "pending",
-      "required": true
-    },
-    {
-      "item": "テスト送信の実施と表示確認",
-      "status": "pending",
-      "required": true
-    }
+    { "item": "弁護士による法的レビュー完了", "status": "pending", "required": true },
+    { "item": "送信者情報の表示テンプレート作成", "status": "pending", "required": true },
+    { "item": "送信停止受付体制の整備", "status": "pending", "required": true },
+    { "item": "停止要求者DB構築+送信ログ保存体制（3年）", "status": "pending", "required": true },
+    { "item": "送信時間帯の設定（平日9:00-18:00）", "status": "pending", "required": true },
+    { "item": "テスト送信の実施と表示確認", "status": "pending", "required": true }
   ]
 }
 ```

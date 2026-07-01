@@ -178,59 +178,12 @@ Web Collector が収集した生データの重複排除・形式統一・信頼
 ```
 
 ### output/fax_master.json
-
-```json
-{
-  "project_name": "建設業FAX番号収集",
-  "updated_at": "YYYY-MM-DD",
-  "collection_summary": {
-    "total_companies": 0,
-    "companies_with_fax": 0,
-    "fax_coverage_rate": "0%",
-    "prefectures_completed": 0,
-    "prefectures_total": 47,
-    "sources_used": [],
-    "confidence_distribution": { "high": 0, "medium": 0, "low": 0 }
-  },
-  "companies": [],
-  "data_quality": {
-    "completeness": "FAX番号保有率",
-    "freshness": "データ収集日",
-    "dedup_count": "重複排除数",
-    "invalid_count": "無効FAX番号数"
-  },
-  "compliance": {
-    "robots_txt_checked": true,
-    "rate_limiting_applied": true,
-    "legal_review_status": "pending",
-    "notes": ""
-  }
-}
-```
+normalized/{prefecture}.json の全県統合版。`collection_summary`（件数・カバレッジ率・信頼度分布）、`companies`（全レコード）、`data_quality`（保有率・鮮度・重複排除数・無効数）、`compliance`（robots/レート制限/法的レビュー状況）を含む。スキーマは既存の fax_master.json 定義に準拠する。
 
 ## Notion 連携
-
-正規化完了後、Compliance Checker の後に Notion データベースへ登録する。
-Notion MCP の `notion-create-pages` を使用し、以下の設定で登録:
-
-- **parent:** `data_source_id: f82746bf-de5d-40fa-9077-66d27bff2639`
-- **バッチサイズ:** 100件ずつ
-- **プロパティマッピング:**
-
-| fax_master.json | Notion プロパティ | 型 |
-|----------------|-----------------|-----|
-| company_name | 会社名 | Title |
-| fax | FAX番号 | Phone |
-| phone | 電話番号 | Phone |
-| prefecture | 都道府県 | Select |
-| city | 市区町村 | Text |
-| address | 住所 | Text |
-| business_category | 業種区分 | Select |
-| permit_number | 許可番号 | Text |
-| confidence | 信頼度 | Select |
-| source | データソース | Text |
-| collected_at | 収集日 | Date |
-| — | 送信状況 | Select（デフォルト: 未送信） |
+正規化完了後、Compliance Checker の後に Notion データベースへ登録する。`notion-create-pages` を使用。
+- **parent:** `data_source_id: f82746bf-de5d-40fa-9077-66d27bff2639` / **バッチ:** 100件ずつ
+- **マッピング:** company_name→会社名(Title), fax→FAX番号(Phone), phone→電話番号(Phone), prefecture→都道府県(Select), city→市区町村(Text), address→住所(Text), business_category→業種区分(Select), permit_number→許可番号(Text), confidence→信頼度(Select), source→データソース(Text), collected_at→収集日(Date), 送信状況→Select(デフォルト:未送信)
 
 ## 使用ツール
 - `Read`: raw/*.json の読み込み
