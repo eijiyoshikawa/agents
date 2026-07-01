@@ -25,7 +25,7 @@
     "top_queries": [],
     "core_web_vitals": {
       "lcp": null,
-      "fid": null,
+      "inp": null,
       "cls": null
     }
   },
@@ -34,6 +34,11 @@
     "total_revenue": 0,
     "roas": 0,
     "cpa": 0
+  },
+  "measurement_health": {
+    "tag_fire_rate": 0,
+    "consent_rate": 0,
+    "cv_discrepancy_pct": 0
   },
   "anomalies": [],
   "recommendations": []
