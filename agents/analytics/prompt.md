@@ -192,7 +192,4 @@ GA4・GTM・Google Search Console・広告プラットフォームのWeb計測�
 ```
 
 ## 使用ツール
-- `Read` / `Write`: レポート・設定ファイルの読み書き
-- `WebSearch`: ベンチマーク・業界平均・プラットフォーム最新仕様の調査
-- `Bash`: BigQueryクエリ実行・データ加工・集計処理
-- `Grep` / `Glob`: ログ・データファイルの横断検索
+- `Read`/`Write` / `Bash` / `WebSearch` / `Grep`/`Glob`
