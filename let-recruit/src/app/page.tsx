@@ -1,7 +1,17 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { AlertCircle, Printer, Save, FilePlus } from "lucide-react";
+import Link from "next/link";
+import {
+  AlertCircle,
+  Printer,
+  Save,
+  FilePlus,
+  ChevronDown,
+  ChevronRight,
+  Clock,
+  ListFilter,
+} from "lucide-react";
 import type { ExtractResponse, JobPosting } from "@/lib/types";
 import { emptyJobPosting } from "@/lib/types";
 import { LET_COMPANY } from "@/lib/company";
@@ -33,12 +43,23 @@ export default function Home() {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [savedNote, setSavedNote] = useState("");
+  const [historyOpen, setHistoryOpen] = useState(false);
   const previewRef = useRef<JobPreviewHandle>(null);
 
-  // 初回に履歴を読み込む（localStorageはクライアントのみ）
+  // 初回に履歴を読み込み、一覧ページから指定された求人票があれば開く
   useEffect(() => {
+    const list = loadHistory();
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setHistory(loadHistory());
+    setHistory(list);
+    const pendingId = window.sessionStorage.getItem("let-recruit-open-id");
+    if (pendingId) {
+      window.sessionStorage.removeItem("let-recruit-open-id");
+      const entry = list.find((e) => e.id === pendingId);
+      if (entry) {
+        setJob(entry.job);
+        setActiveId(entry.id);
+      }
+    }
   }, []);
 
   async function handleExtract(urls: string[]) {
@@ -169,15 +190,42 @@ export default function Home() {
 
       {sources.length > 0 && <SourceList sources={sources} />}
 
-      <HistoryPanel
-        entries={history}
-        activeId={activeId}
-        onOpen={handleOpen}
-        onDelete={handleDelete}
-        onBulkPrint={handleBulkPrint}
-        onBulkUpdate={handleBulkUpdate}
-        onBulkDelete={handleBulkDelete}
-      />
+      {history.length > 0 && (
+        <div className="mt-8">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setHistoryOpen((v) => !v)}
+              className="inline-flex items-center gap-2 rounded-full border border-border-soft bg-white px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-ink"
+            >
+              {historyOpen ? (
+                <ChevronDown className="h-4 w-4" />
+              ) : (
+                <ChevronRight className="h-4 w-4" />
+              )}
+              <Clock className="h-4 w-4" />
+              保存した求人票（{history.length}件）
+            </button>
+            <Link
+              href="/history"
+              className="inline-flex items-center gap-2 rounded-full border border-border-soft bg-white px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-ink"
+            >
+              <ListFilter className="h-4 w-4" />
+              一覧ページで開く
+            </Link>
+          </div>
+          {historyOpen && (
+            <HistoryPanel
+              entries={history}
+              activeId={activeId}
+              onOpen={handleOpen}
+              onDelete={handleDelete}
+              onBulkPrint={handleBulkPrint}
+              onBulkUpdate={handleBulkUpdate}
+              onBulkDelete={handleBulkDelete}
+            />
+          )}
+        </div>
+      )}
 
       {job && (
         <section className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[420px_1fr]">
