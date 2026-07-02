@@ -1,14 +1,22 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { AlertCircle, Printer } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { AlertCircle, Printer, Save, FilePlus } from "lucide-react";
 import type { ExtractResponse, JobPosting } from "@/lib/types";
+import { emptyJobPosting } from "@/lib/types";
 import { LET_COMPANY } from "@/lib/company";
 import { requestExtract, requestFromText } from "@/lib/client";
+import {
+  loadHistory,
+  saveEntry,
+  deleteEntry,
+  type HistoryEntry,
+} from "@/lib/history";
 import { UrlInputForm } from "@/components/UrlInputForm";
 import { TextInputForm } from "@/components/TextInputForm";
 import { JobEditor } from "@/components/JobEditor";
 import { JobPreview, type JobPreviewHandle } from "@/components/JobPreview";
+import { HistoryPanel } from "@/components/HistoryPanel";
 
 type Mode = "url" | "text";
 
@@ -18,7 +26,16 @@ export default function Home() {
   const [error, setError] = useState("");
   const [job, setJob] = useState<JobPosting | null>(null);
   const [sources, setSources] = useState<ExtractResponse["sources"]>([]);
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [savedNote, setSavedNote] = useState("");
   const previewRef = useRef<JobPreviewHandle>(null);
+
+  // 初回に履歴を読み込む（localStorageはクライアントのみ）
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setHistory(loadHistory());
+  }, []);
 
   async function handleExtract(urls: string[]) {
     setLoading(true);
@@ -27,6 +44,7 @@ export default function Home() {
       const res = await requestExtract(urls);
       setJob(res.job);
       setSources(res.sources);
+      setActiveId(null); // 新規生成なので未保存扱い
     } catch (e) {
       setError(e instanceof Error ? e.message : "エラーが発生しました。");
     } finally {
@@ -41,6 +59,7 @@ export default function Home() {
       const res = await requestFromText(text);
       setJob(res.job);
       setSources(res.sources);
+      setActiveId(null);
     } catch (e) {
       setError(e instanceof Error ? e.message : "エラーが発生しました。");
     } finally {
@@ -48,16 +67,53 @@ export default function Home() {
     }
   }
 
+  function handleSave() {
+    if (!job) return;
+    const { id, history: next } = saveEntry(job, activeId, Date.now());
+    setActiveId(id);
+    setHistory(next);
+    setSavedNote(activeId ? "更新しました" : "履歴に保存しました");
+    window.setTimeout(() => setSavedNote(""), 2500);
+  }
+
+  function handleOpen(entry: HistoryEntry) {
+    setJob(entry.job);
+    setActiveId(entry.id);
+    setSources([]);
+    setError("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function handleDelete(id: string) {
+    const next = deleteEntry(id);
+    setHistory(next);
+    if (id === activeId) setActiveId(null);
+  }
+
+  function handleNewBlank() {
+    setJob(emptyJobPosting());
+    setActiveId(null);
+    setSources([]);
+    setError("");
+  }
+
   return (
     <main className="mx-auto max-w-[1280px] px-6 py-12 md:px-10">
       <Header />
-      <div className="mt-10 flex gap-2">
+      <div className="mt-10 flex flex-wrap items-center gap-2">
         <ModeTab active={mode === "url"} onClick={() => setMode("url")}>
           他社URLから作る
         </ModeTab>
         <ModeTab active={mode === "text"} onClick={() => setMode("text")}>
           テキストから整理する
         </ModeTab>
+        <button
+          onClick={handleNewBlank}
+          className="ml-auto inline-flex items-center gap-2 rounded-full border border-border-soft bg-white px-4 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-ink"
+        >
+          <FilePlus className="h-4 w-4" />
+          空から作る
+        </button>
       </div>
       <section className="mt-3 rounded-3xl border border-border-soft bg-surface p-6 md:p-8">
         {mode === "url" ? (
@@ -76,6 +132,13 @@ export default function Home() {
 
       {sources.length > 0 && <SourceList sources={sources} />}
 
+      <HistoryPanel
+        entries={history}
+        activeId={activeId}
+        onOpen={handleOpen}
+        onDelete={handleDelete}
+      />
+
       {job && (
         <section className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[420px_1fr]">
           <div className="grow-in">
@@ -83,6 +146,20 @@ export default function Home() {
               <h2 className="text-sm font-semibold tracking-[0.06em] text-brand-dark">
                 [ STEP 02 ] 内容を確認・編集
               </h2>
+              <div className="flex items-center gap-2">
+                {savedNote && (
+                  <span className="text-xs font-medium text-[#0fa388]">
+                    {savedNote}
+                  </span>
+                )}
+                <button
+                  onClick={handleSave}
+                  className="inline-flex items-center gap-2 rounded-full border border-ink bg-white px-4 py-2 text-sm font-semibold text-ink transition-colors hover:bg-ink hover:text-cream"
+                >
+                  <Save className="h-4 w-4" />
+                  {activeId ? "上書き保存" : "履歴に保存"}
+                </button>
+              </div>
             </div>
             <JobEditor job={job} onChange={setJob} />
           </div>
@@ -150,8 +227,8 @@ function Header() {
         <span className="text-brand">LETデザイン</span>の求人票へ。
       </h1>
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-ink">
-        参考にしたい求人ページのURLを貼り付けると、AIが内容を読み取り1枚の求人票に統合。
-        Web上で確認でき、そのままPDFとしても出力できます。
+        参考にしたい求人ページのURLを貼り付けると、AIが内容を読み取り求人票に整理。
+        作成した求人票は履歴に保存でき、後から再編集・PDF出力できます。
       </p>
     </header>
   );
