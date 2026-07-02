@@ -3,6 +3,9 @@ import {
   loadHistory,
   saveEntry,
   deleteEntry,
+  deleteEntries,
+  bulkUpdateField,
+  filterHistory,
   makeTitle,
   formatSavedAt,
 } from "@/lib/history";
@@ -62,6 +65,69 @@ describe("deleteEntry", () => {
     const rest = deleteEntry(id);
     expect(rest).toHaveLength(1);
     expect(rest.find((e) => e.id === id)).toBeUndefined();
+  });
+});
+
+describe("deleteEntries", () => {
+  it("複数IDをまとめて削除する", () => {
+    const a = saveEntry(emptyJobPosting(), null, 1000).id;
+    const b = saveEntry(emptyJobPosting(), null, 2000).id;
+    saveEntry(emptyJobPosting(), null, 3000);
+    const rest = deleteEntries([a, b]);
+    expect(rest).toHaveLength(1);
+  });
+});
+
+describe("bulkUpdateField", () => {
+  function seed() {
+    const j1 = emptyJobPosting();
+    j1.companyName = "A社";
+    const j2 = emptyJobPosting();
+    j2.companyName = "B社";
+    j2.companyWebsite = "https://existing.example";
+    const a = saveEntry(j1, null, 1000).id;
+    const b = saveEntry(j2, null, 2000).id;
+    return { a, b };
+  }
+
+  it("overwriteは常に上書きする", () => {
+    const { a, b } = seed();
+    bulkUpdateField([a, b], "companyWebsite", "https://let-inc.net/", "overwrite", 5000);
+    const list = loadHistory();
+    expect(list.every((e) => e.job.companyWebsite === "https://let-inc.net/")).toBe(true);
+  });
+
+  it("fillEmptyは空欄のみ設定する", () => {
+    const { a, b } = seed();
+    bulkUpdateField([a, b], "companyWebsite", "https://let-inc.net/", "fillEmpty", 5000);
+    const list = loadHistory();
+    const A = list.find((e) => e.id === a)!;
+    const B = list.find((e) => e.id === b)!;
+    expect(A.job.companyWebsite).toBe("https://let-inc.net/"); // 空欄→設定
+    expect(B.job.companyWebsite).toBe("https://existing.example"); // 既存→維持
+  });
+
+  it("選択外は変更しない", () => {
+    const { a, b } = seed();
+    bulkUpdateField([a], "industry", "IT", "overwrite", 5000);
+    const list = loadHistory();
+    expect(list.find((e) => e.id === a)!.job.industry).toBe("IT");
+    expect(list.find((e) => e.id === b)!.job.industry).toBe("");
+  });
+});
+
+describe("filterHistory", () => {
+  it("会社名で絞り込む（大文字小文字無視）", () => {
+    const j1 = emptyJobPosting();
+    j1.companyName = "株式会社LET";
+    const j2 = emptyJobPosting();
+    j2.companyName = "テスト商事";
+    saveEntry(j1, null, 1000);
+    saveEntry(j2, null, 2000);
+    const list = loadHistory();
+    expect(filterHistory(list, "let")).toHaveLength(1);
+    expect(filterHistory(list, "テスト")).toHaveLength(1);
+    expect(filterHistory(list, "")).toHaveLength(2);
   });
 });
 

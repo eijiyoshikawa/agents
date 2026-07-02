@@ -19,7 +19,14 @@ export function buildJobPostingHtml(
 <style>${styles(b)}</style>
 </head>
 <body>
-<main class="sheet" id="sheet">
+${sheetBody(job, company)}
+</body>
+</html>`;
+}
+
+/** 1件分の求人票本文（.sheet）を返す。一括印刷で複数連結するために分離。 */
+function sheetBody(job: JobPosting, company: CompanyProfile): string {
+  return `<main class="sheet" id="sheet">
   ${titleBlock(job)}
   ${basicInfoTable(job)}
   ${wantedSection(job)}
@@ -28,7 +35,36 @@ export function buildJobPostingHtml(
   ${companyInfoSection(job, company)}
   ${agencySection(company)}
   ${noticeBlock()}
-</main>
+</main>`;
+}
+
+/**
+ * 複数の求人票を1つの印刷ドキュメントに連結する（各求人票を改ページで区切る）。
+ * 一括PDF保存で使用。
+ */
+export function buildCombinedHtml(
+  jobs: JobPosting[],
+  company: CompanyProfile,
+): string {
+  const b = company.brand;
+  const sheets = jobs
+    .map(
+      (job, i) =>
+        `<div class="print-page"${i > 0 ? ' style="break-before:page;"' : ""}>${sheetBody(job, company)}</div>`,
+    )
+    .join("\n");
+  return `<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<title>${esc(company.name)} 求人票（${jobs.length}件）</title>
+<style>${styles(b)}
+.print-page{break-inside:auto;}
+@media screen{.print-page{margin-bottom:24px;}}
+</style>
+</head>
+<body>
+${sheets}
 </body>
 </html>`;
 }

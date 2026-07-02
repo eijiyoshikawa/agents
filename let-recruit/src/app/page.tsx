@@ -5,12 +5,16 @@ import { AlertCircle, Printer, Save, FilePlus } from "lucide-react";
 import type { ExtractResponse, JobPosting } from "@/lib/types";
 import { emptyJobPosting } from "@/lib/types";
 import { LET_COMPANY } from "@/lib/company";
-import { requestExtract, requestFromText } from "@/lib/client";
+import { requestExtract, requestFromText, printCombined } from "@/lib/client";
+import { buildCombinedHtml } from "@/lib/template";
 import {
   loadHistory,
   saveEntry,
   deleteEntry,
+  deleteEntries,
+  bulkUpdateField,
   type HistoryEntry,
+  type BulkFieldKey,
 } from "@/lib/history";
 import { UrlInputForm } from "@/components/UrlInputForm";
 import { TextInputForm } from "@/components/TextInputForm";
@@ -90,6 +94,39 @@ export default function Home() {
     if (id === activeId) setActiveId(null);
   }
 
+  function handleBulkDelete(ids: string[]) {
+    const next = deleteEntries(ids);
+    setHistory(next);
+    if (activeId && ids.includes(activeId)) setActiveId(null);
+  }
+
+  function handleBulkPrint(ids: string[]) {
+    const jobs = history
+      .filter((e) => ids.includes(e.id))
+      .map((e) => e.job);
+    if (jobs.length === 0) return;
+    try {
+      printCombined(buildCombinedHtml(jobs, LET_COMPANY));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "印刷に失敗しました。");
+    }
+  }
+
+  function handleBulkUpdate(
+    ids: string[],
+    field: BulkFieldKey,
+    value: string,
+    mode: "overwrite" | "fillEmpty",
+  ) {
+    const next = bulkUpdateField(ids, field, value, mode, Date.now());
+    setHistory(next);
+    // 編集中の求人票が対象なら、画面側も反映
+    if (activeId && ids.includes(activeId)) {
+      const updated = next.find((e) => e.id === activeId);
+      if (updated) setJob(updated.job);
+    }
+  }
+
   function handleNewBlank() {
     setJob(emptyJobPosting());
     setActiveId(null);
@@ -137,6 +174,9 @@ export default function Home() {
         activeId={activeId}
         onOpen={handleOpen}
         onDelete={handleDelete}
+        onBulkPrint={handleBulkPrint}
+        onBulkUpdate={handleBulkUpdate}
+        onBulkDelete={handleBulkDelete}
       />
 
       {job && (

@@ -75,6 +75,80 @@ export function deleteEntry(id: string): HistoryEntry[] {
   return list;
 }
 
+/** 複数IDをまとめて削除し、残りを返す。 */
+export function deleteEntries(ids: string[]): HistoryEntry[] {
+  const set = new Set(ids);
+  const list = loadHistory().filter((e) => !set.has(e.id));
+  persist(list);
+  return list;
+}
+
+/** 一括編集でまとめて設定できるテキスト系フィールド。 */
+export const BULK_FIELDS = [
+  { key: "companyWebsite", label: "会社HP" },
+  { key: "companyAddress", label: "本社所在地" },
+  { key: "industry", label: "業種" },
+  { key: "establishedYear", label: "設立年" },
+  { key: "employeeCount", label: "従業員数" },
+  { key: "listingStatus", label: "上場区分" },
+  { key: "averageAge", label: "平均年齢" },
+  { key: "genderRatio", label: "男女比率" },
+  { key: "employmentType", label: "雇用形態" },
+  { key: "workLocation", label: "勤務地" },
+  { key: "workHours", label: "勤務時間" },
+  { key: "holidays", label: "休日休暇" },
+  { key: "smokingPolicy", label: "受動喫煙対策" },
+] as const;
+
+export type BulkFieldKey = (typeof BULK_FIELDS)[number]["key"];
+
+/**
+ * 選択したIDの求人票の、指定フィールドを一括で値に設定する。
+ * mode="overwrite": 常に上書き / mode="fillEmpty": 空欄のみ設定。
+ * 保存後の全履歴を返す。
+ */
+export function bulkUpdateField(
+  ids: string[],
+  field: BulkFieldKey,
+  value: string,
+  mode: "overwrite" | "fillEmpty",
+  timestamp: number,
+): HistoryEntry[] {
+  const set = new Set(ids);
+  const list = loadHistory().map((e) => {
+    if (!set.has(e.id)) return e;
+    const current = e.job[field];
+    if (mode === "fillEmpty" && current) return e; // 既に値あり→スキップ
+    const job = { ...e.job, [field]: value };
+    return { ...e, job, title: makeTitle(job), savedAt: timestamp };
+  });
+  persist(list);
+  return loadHistory();
+}
+
+/** 会社名・職種・キャッチ等で履歴を絞り込む（大文字小文字無視）。 */
+export function filterHistory(
+  entries: HistoryEntry[],
+  query: string,
+): HistoryEntry[] {
+  const q = query.trim().toLowerCase();
+  if (!q) return entries;
+  return entries.filter((e) => {
+    const j = e.job;
+    const haystack = [
+      j.companyName,
+      j.jobTitle,
+      j.catchphrase,
+      j.industry,
+      j.workLocation,
+      e.title,
+    ]
+      .join(" ")
+      .toLowerCase();
+    return haystack.includes(q);
+  });
+}
+
 /** 保存時刻を「YYYY/MM/DD HH:mm」で整形する。 */
 export function formatSavedAt(ms: number): string {
   const d = new Date(ms);
