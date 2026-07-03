@@ -44,22 +44,30 @@ export default function Home() {
   const [activeId, setActiveId] = useState<string | null>(null);
   const [savedNote, setSavedNote] = useState("");
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [storageMode, setStorageMode] = useState<"server" | "local">("local");
   const previewRef = useRef<JobPreviewHandle>(null);
 
   // 初回に履歴を読み込み、一覧ページから指定された求人票があれば開く
   useEffect(() => {
-    const list = loadHistory();
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setHistory(list);
-    const pendingId = window.sessionStorage.getItem("let-recruit-open-id");
-    if (pendingId) {
-      window.sessionStorage.removeItem("let-recruit-open-id");
-      const entry = list.find((e) => e.id === pendingId);
-      if (entry) {
-        setJob(entry.job);
-        setActiveId(entry.id);
+    let cancelled = false;
+    (async () => {
+      const { entries, mode } = await loadHistory();
+      if (cancelled) return;
+      setHistory(entries);
+      setStorageMode(mode);
+      const pendingId = window.sessionStorage.getItem("let-recruit-open-id");
+      if (pendingId) {
+        window.sessionStorage.removeItem("let-recruit-open-id");
+        const entry = entries.find((e) => e.id === pendingId);
+        if (entry) {
+          setJob(entry.job);
+          setActiveId(entry.id);
+        }
       }
-    }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   async function handleExtract(urls: string[]) {
@@ -92,12 +100,14 @@ export default function Home() {
     }
   }
 
-  function handleSave() {
+  async function handleSave() {
     if (!job) return;
-    const { id, history: next } = saveEntry(job, activeId, Date.now());
+    const wasUpdate = Boolean(activeId);
+    const { id, result } = await saveEntry(job, activeId, Date.now());
     setActiveId(id);
-    setHistory(next);
-    setSavedNote(activeId ? "更新しました" : "履歴に保存しました");
+    setHistory(result.entries);
+    setStorageMode(result.mode);
+    setSavedNote(wasUpdate ? "更新しました" : "履歴に保存しました");
     window.setTimeout(() => setSavedNote(""), 2500);
   }
 
@@ -109,15 +119,17 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  function handleDelete(id: string) {
-    const next = deleteEntry(id);
-    setHistory(next);
+  async function handleDelete(id: string) {
+    const { entries, mode } = await deleteEntry(id);
+    setHistory(entries);
+    setStorageMode(mode);
     if (id === activeId) setActiveId(null);
   }
 
-  function handleBulkDelete(ids: string[]) {
-    const next = deleteEntries(ids);
-    setHistory(next);
+  async function handleBulkDelete(ids: string[]) {
+    const { entries, mode } = await deleteEntries(ids);
+    setHistory(entries);
+    setStorageMode(mode);
     if (activeId && ids.includes(activeId)) setActiveId(null);
   }
 
@@ -133,17 +145,23 @@ export default function Home() {
     }
   }
 
-  function handleBulkUpdate(
+  async function handleBulkUpdate(
     ids: string[],
     field: BulkFieldKey,
     value: string,
     mode: "overwrite" | "fillEmpty",
   ) {
-    const next = bulkUpdateField(ids, field, value, mode, Date.now());
-    setHistory(next);
-    // 編集中の求人票が対象なら、画面側も反映
+    const { entries, mode: sm } = await bulkUpdateField(
+      ids,
+      field,
+      value,
+      mode,
+      Date.now(),
+    );
+    setHistory(entries);
+    setStorageMode(sm);
     if (activeId && ids.includes(activeId)) {
-      const updated = next.find((e) => e.id === activeId);
+      const updated = entries.find((e) => e.id === activeId);
       if (updated) setJob(updated.job);
     }
   }
@@ -212,6 +230,17 @@ export default function Home() {
               <ListFilter className="h-4 w-4" />
               一覧ページで開く
             </Link>
+            <span
+              className={`ml-auto rounded-full px-3 py-1 text-xs font-semibold ${
+                storageMode === "server"
+                  ? "bg-[#e6f4f0] text-[#0fa388]"
+                  : "bg-surface text-[#9ca3af]"
+              }`}
+            >
+              {storageMode === "server"
+                ? "チーム共有中"
+                : "このブラウザのみ"}
+            </span>
           </div>
           {historyOpen && (
             <HistoryPanel

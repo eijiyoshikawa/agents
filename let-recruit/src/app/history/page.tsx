@@ -23,8 +23,14 @@ export default function HistoryPage() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setHistory(loadHistory());
+    let cancelled = false;
+    (async () => {
+      const { entries } = await loadHistory();
+      if (!cancelled) setHistory(entries);
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   function handleOpen(entry: HistoryEntry) {
@@ -33,12 +39,14 @@ export default function HistoryPage() {
     router.push("/");
   }
 
-  function handleDelete(id: string) {
-    setHistory(deleteEntry(id));
+  async function handleDelete(id: string) {
+    const { entries } = await deleteEntry(id);
+    setHistory(entries);
   }
 
-  function handleBulkDelete(ids: string[]) {
-    setHistory(deleteEntries(ids));
+  async function handleBulkDelete(ids: string[]) {
+    const { entries } = await deleteEntries(ids);
+    setHistory(entries);
   }
 
   function handleBulkPrint(ids: string[]) {
@@ -51,13 +59,14 @@ export default function HistoryPage() {
     }
   }
 
-  function handleBulkUpdate(
+  async function handleBulkUpdate(
     ids: string[],
     field: BulkFieldKey,
     value: string,
     mode: "overwrite" | "fillEmpty",
   ) {
-    setHistory(bulkUpdateField(ids, field, value, mode, Date.now()));
+    const { entries } = await bulkUpdateField(ids, field, value, mode, Date.now());
+    setHistory(entries);
   }
 
   return (

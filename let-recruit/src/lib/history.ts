@@ -1,25 +1,28 @@
 import type { JobPosting } from "./types";
+import {
+  makeTitle,
+  applyBulkField,
+  type HistoryEntry,
+  type BulkFieldKey,
+} from "./history-util";
 
-/** localStorageに保存する求人票の履歴エントリ。 */
-export interface HistoryEntry {
-  id: string;
-  savedAt: number; // 保存時刻（epoch ms）
-  title: string; // 一覧表示用（会社名・職種から自動生成）
-  job: JobPosting;
-}
+export type { HistoryEntry, BulkFieldKey } from "./history-util";
+export {
+  makeTitle,
+  filterHistory,
+  formatSavedAt,
+  BULK_FIELDS,
+} from "./history-util";
 
 const STORAGE_KEY = "let-recruit-history";
-const MAX_ENTRIES = 100;
+const MAX_ENTRIES = 500;
 
-/** 一覧表示用のタイトルを組み立てる。 */
-export function makeTitle(job: JobPosting): string {
-  const company = job.companyName || "（会社名未入力）";
-  const role = job.jobTitle || job.catchphrase || "求人票";
-  return `${company}｜${role}`;
-}
+/** 保存モード。server=DB共有 / local=このブラウザのみ。 */
+export type StorageMode = "server" | "local";
 
-/** 履歴を全件読み込む（新しい順）。 */
-export function loadHistory(): HistoryEntry[] {
+/* ---------------- localStorage 実装 ---------------- */
+
+function localLoad(): HistoryEntry[] {
   if (typeof window === "undefined") return [];
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
@@ -32,126 +35,167 @@ export function loadHistory(): HistoryEntry[] {
   }
 }
 
-/** 履歴を保存する（内部用）。 */
-function persist(list: HistoryEntry[]): void {
+function localPersist(list: HistoryEntry[]): void {
   if (typeof window === "undefined") return;
-  const trimmed = list.slice(0, MAX_ENTRIES);
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
+  window.localStorage.setItem(
+    STORAGE_KEY,
+    JSON.stringify(list.slice(0, MAX_ENTRIES)),
+  );
+}
+
+/* ---------------- サーバー(API)実装 ---------------- */
+
+/** サーバーAPIが使えるか（503なら未設定=localへフォールバック）。 */
+async function serverList(): Promise<HistoryEntry[] | null> {
+  try {
+    const res = await fetch("/api/history", { cache: "no-store" });
+    if (res.status === 503) return null; // DB未設定
+    if (!res.ok) throw new Error("server error");
+    const data = await res.json();
+    return (data.entries as HistoryEntry[]) ?? [];
+  } catch {
+    return null;
+  }
+}
+
+async function serverSave(entry: HistoryEntry): Promise<HistoryEntry[] | null> {
+  return serverPost({ action: "save", entry });
+}
+
+async function serverDelete(ids: string[]): Promise<HistoryEntry[] | null> {
+  return serverPost({ action: "delete", ids });
+}
+
+async function serverImport(
+  entries: HistoryEntry[],
+): Promise<HistoryEntry[] | null> {
+  if (entries.length === 0) return serverList();
+  return serverPost({ action: "import", entries });
+}
+
+async function serverPost(body: unknown): Promise<HistoryEntry[] | null> {
+  try {
+    const res = await fetch("/api/history", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    if (res.status === 503) return null;
+    if (!res.ok) throw new Error("server error");
+    const data = await res.json();
+    return (data.entries as HistoryEntry[]) ?? [];
+  } catch {
+    return null;
+  }
+}
+
+/* ---------------- 公開API（サーバー優先・local自動フォールバック） ---------------- */
+
+export interface HistoryResult {
+  entries: HistoryEntry[];
+  mode: StorageMode;
+}
+
+let migratedToServer = false;
+
+/**
+ * 履歴を読み込む。DB接続時はサーバー、未設定時はこのブラウザから。
+ * 初回サーバー接続時、ローカルの履歴を自動でサーバーへ移行（取り込み）する。
+ */
+export async function loadHistory(): Promise<HistoryResult> {
+  const server = await serverList();
+  if (server !== null) {
+    // 初回だけ、ローカルの履歴をサーバーへ取り込む（重複はupsertで無害）
+    if (!migratedToServer) {
+      migratedToServer = true;
+      const local = localLoad();
+      if (local.length > 0) {
+        const merged = await serverImport(local);
+        if (merged) return { entries: merged, mode: "server" };
+      }
+    }
+    return { entries: server, mode: "server" };
+  }
+  return { entries: localLoad(), mode: "local" };
 }
 
 /**
- * 求人票を履歴に保存する。
- * id を指定すると同じエントリを上書き（更新）、無ければ新規追加。
- * 保存後の全履歴を返す。
+ * 求人票を保存（id指定で上書き、無ければ新規）。保存後の全履歴を返す。
  */
-export function saveEntry(
+export async function saveEntry(
   job: JobPosting,
   id: string | null,
   timestamp: number,
-): { id: string; history: HistoryEntry[] } {
-  const list = loadHistory();
-  const title = makeTitle(job);
+): Promise<{ id: string; result: HistoryResult }> {
+  const entryId = id || `${timestamp}-${Math.floor(timestamp % 100000)}`;
+  const entry: HistoryEntry = {
+    id: entryId,
+    savedAt: timestamp,
+    title: makeTitle(job),
+    job,
+  };
 
-  if (id) {
-    const idx = list.findIndex((e) => e.id === id);
-    if (idx !== -1) {
-      list[idx] = { ...list[idx], job, title, savedAt: timestamp };
-      persist(list);
-      return { id, history: loadHistory() };
-    }
+  const server = await serverSave(entry);
+  if (server !== null) {
+    return { id: entryId, result: { entries: server, mode: "server" } };
   }
 
-  // 新規（idはタイムスタンプ + ランダム桁で一意化。Math.randomは使わずindexで代替）
-  const newId = `${timestamp}-${list.length}`;
-  const entry: HistoryEntry = { id: newId, savedAt: timestamp, title, job };
-  persist([entry, ...list]);
-  return { id: newId, history: loadHistory() };
+  // local
+  const list = localLoad();
+  const idx = list.findIndex((e) => e.id === entryId);
+  if (idx !== -1) list[idx] = entry;
+  else list.unshift(entry);
+  localPersist(list);
+  return { id: entryId, result: { entries: localLoad(), mode: "local" } };
 }
 
-/** 指定IDの履歴を削除し、残りを返す。 */
-export function deleteEntry(id: string): HistoryEntry[] {
-  const list = loadHistory().filter((e) => e.id !== id);
-  persist(list);
-  return list;
-}
+/** 複数IDを削除。残りを返す。 */
+export async function deleteEntries(ids: string[]): Promise<HistoryResult> {
+  const server = await serverDelete(ids);
+  if (server !== null) return { entries: server, mode: "server" };
 
-/** 複数IDをまとめて削除し、残りを返す。 */
-export function deleteEntries(ids: string[]): HistoryEntry[] {
   const set = new Set(ids);
-  const list = loadHistory().filter((e) => !set.has(e.id));
-  persist(list);
-  return list;
+  const list = localLoad().filter((e) => !set.has(e.id));
+  localPersist(list);
+  return { entries: localLoad(), mode: "local" };
 }
 
-/** 一括編集でまとめて設定できるテキスト系フィールド。 */
-export const BULK_FIELDS = [
-  { key: "companyWebsite", label: "会社HP" },
-  { key: "companyAddress", label: "本社所在地" },
-  { key: "industry", label: "業種" },
-  { key: "establishedYear", label: "設立年" },
-  { key: "employeeCount", label: "従業員数" },
-  { key: "listingStatus", label: "上場区分" },
-  { key: "averageAge", label: "平均年齢" },
-  { key: "genderRatio", label: "男女比率" },
-  { key: "employmentType", label: "雇用形態" },
-  { key: "workLocation", label: "勤務地" },
-  { key: "workHours", label: "勤務時間" },
-  { key: "holidays", label: "休日休暇" },
-  { key: "smokingPolicy", label: "受動喫煙対策" },
-] as const;
-
-export type BulkFieldKey = (typeof BULK_FIELDS)[number]["key"];
+/** 1件削除。 */
+export async function deleteEntry(id: string): Promise<HistoryResult> {
+  return deleteEntries([id]);
+}
 
 /**
- * 選択したIDの求人票の、指定フィールドを一括で値に設定する。
- * mode="overwrite": 常に上書き / mode="fillEmpty": 空欄のみ設定。
- * 保存後の全履歴を返す。
+ * 選択IDの指定フィールドを一括更新。変更後の全履歴を返す。
+ * サーバー時は変更したエントリのみupsertする。
  */
-export function bulkUpdateField(
+export async function bulkUpdateField(
   ids: string[],
   field: BulkFieldKey,
   value: string,
   mode: "overwrite" | "fillEmpty",
   timestamp: number,
-): HistoryEntry[] {
+): Promise<HistoryResult> {
   const set = new Set(ids);
-  const list = loadHistory().map((e) => {
-    if (!set.has(e.id)) return e;
-    const current = e.job[field];
-    if (mode === "fillEmpty" && current) return e; // 既に値あり→スキップ
-    const job = { ...e.job, [field]: value };
-    return { ...e, job, title: makeTitle(job), savedAt: timestamp };
-  });
-  persist(list);
-  return loadHistory();
-}
 
-/** 会社名・職種・キャッチ等で履歴を絞り込む（大文字小文字無視）。 */
-export function filterHistory(
-  entries: HistoryEntry[],
-  query: string,
-): HistoryEntry[] {
-  const q = query.trim().toLowerCase();
-  if (!q) return entries;
-  return entries.filter((e) => {
-    const j = e.job;
-    const haystack = [
-      j.companyName,
-      j.jobTitle,
-      j.catchphrase,
-      j.industry,
-      j.workLocation,
-      e.title,
-    ]
-      .join(" ")
-      .toLowerCase();
-    return haystack.includes(q);
-  });
-}
+  const server = await serverList();
+  if (server !== null) {
+    // 対象のうち、実際に値が変わるエントリだけをupsart対象にする
+    const changed = server
+      .filter((e) => set.has(e.id))
+      .map((e) => applyBulkField(e, field, value, mode, timestamp))
+      .filter((updated, i) => {
+        const original = server.filter((e) => set.has(e.id))[i];
+        return updated !== original; // applyBulkFieldは変更なしなら同一参照を返す
+      });
+    const merged = await serverImport(changed);
+    if (merged) return { entries: merged, mode: "server" };
+  }
 
-/** 保存時刻を「YYYY/MM/DD HH:mm」で整形する。 */
-export function formatSavedAt(ms: number): string {
-  const d = new Date(ms);
-  const p = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}/${p(d.getMonth() + 1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+  // local
+  const list = localLoad().map((e) =>
+    set.has(e.id) ? applyBulkField(e, field, value, mode, timestamp) : e,
+  );
+  localPersist(list);
+  return { entries: localLoad(), mode: "local" };
 }
