@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "description": "組織全体に適用される学習済みパターン（インスティンクト）",
-  "updated_at": "2026-04-12",
+  "updated_at": "2026-07-06",
   "instincts": [
     {
       "id": "GLB-001",
@@ -87,6 +87,54 @@
       "domain": "strategy",
       "created_at": "2026-04-08",
       "updated_at": "2026-04-12"
+    },
+    {
+      "id": "GLB-006",
+      "trigger": "エージェント出力（output.json）に対して QA レビューを開始しようとしている",
+      "action": "LLM レビューの前に必ず `bash scripts/qa-gate.sh <agent名>` で機械検証を行う。ERR は内容レビューせず即差し戻し、WARN は差し戻し指示に含める。機械で検出できる問題に LLM コストを使わない",
+      "confidence": 0.8,
+      "evidence": {
+        "count": 1,
+        "examples": [
+          "2026-07-06: 業務OS制定（docs/OPERATIONS.md）。qa-gate.sh --all の初回実行で 18 出力中 11 件の予算超過を機械検出"
+        ]
+      },
+      "scope": "global",
+      "domain": "quality",
+      "created_at": "2026-07-06",
+      "updated_at": "2026-07-06"
+    },
+    {
+      "id": "GLB-007",
+      "trigger": "パイプライン（戦略提案・補助金）が完了した",
+      "action": "各 output.json を agents/outputs/<案件slug>/<YYYY-MM-DD>/<agent名>_output.json にアーカイブしてから終了する。output.json は次回実行で上書きされ、アーカイブを省略すると案件履歴が失われる",
+      "confidence": 0.8,
+      "evidence": {
+        "count": 1,
+        "examples": [
+          "2026-07-06: 業務OS制定。過去案件（BSF新規事業等）は手動アーカイブで履歴が残ったが、未アーカイブ案件の中間成果物は消失していた"
+        ]
+      },
+      "scope": "global",
+      "domain": "operations",
+      "created_at": "2026-07-06",
+      "updated_at": "2026-07-06"
+    },
+    {
+      "id": "GLB-008",
+      "trigger": "日次/週次レポート・SNS制作ブリーフなど定型成果物をゼロから書き始めようとしている",
+      "action": "shared/templates/ の該当テンプレート（daily_report / weekly_report / sns_content_brief）を起点にする。書式の揺れを防ぎ、前回との数値比較を可能にする。集計は scripts/（qa-gate / context-budget / build-cockpit）で機械化し、LLM は診断・提案に集中する",
+      "confidence": 0.7,
+      "evidence": {
+        "count": 1,
+        "examples": [
+          "2026-07-06: 業務OS制定。daily_reports の書式が日によって揺れ、トレンド比較に手作業が必要だった"
+        ]
+      },
+      "scope": "global",
+      "domain": "operations",
+      "created_at": "2026-07-06",
+      "updated_at": "2026-07-06"
     }
   ]
 }

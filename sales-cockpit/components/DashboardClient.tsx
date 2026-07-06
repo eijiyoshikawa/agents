@@ -1,42 +1,57 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import clsx from "clsx";
-import type { DashboardData } from "@/lib/types";
+import { X, ExternalLink } from "lucide-react";
+import type { DashboardData, Goal, DrillCustomer } from "@/lib/types";
 import { KpiCard } from "./KpiCard";
-import { CallsChart, MrrChart, FunnelChart } from "./charts";
+import { MrrChart, FunnelChart, CategoryBar } from "./chartsDynamic";
+import CallButton from "./CallButton";
+import RefreshButton from "./RefreshButton";
 import { yen, pct, num } from "@/lib/format";
+import { monthKey, currentMonthKey, monthRangeLabel, jstDateKey } from "@/lib/period";
+import { isExcludedRep } from "@/lib/reps";
 
-type Period = "week" | "month";
+type Drill = { title: string; rows: DrillCustomer[] } | null;
 
 export default function DashboardClient({ data }: { data: DashboardData }) {
-  const [period, setPeriod] = useState<Period>("week");
-  const series = period === "week" ? data.weekly : data.monthly;
   const k = data.kpi;
+  const a = data.statusActivity;
+  const since = data.metricsSince;
+  // "2026-05-07" → "5/7以降"（コンタクト済みは累計ではなく当起点以降の集計）
+  const sinceLabel = `${Number(since.slice(5, 7))}/${Number(since.slice(8, 10))}以降`;
+  // 非稼働メンバーは集計（KPI合計・担当者別）から除外しているため、内訳ドリルも同じ母集団に揃える。
+  const worked = data.workedCustomers.filter((c) => !isExcludedRep(c.isRep));
+  const [drill, setDrill] = useState<Drill>(null);
+
+  const apptRows = useMemo(
+    () => worked.filter((c) => !!c.appointmentDate && c.appointmentDate.slice(0, 10) >= since),
+    [worked, since],
+  );
+  const curMonth = currentMonthKey();
+  const apptThisMonthRows = useMemo(() => {
+    // 今月＝暦月（1日〜末日）。アポ取得日がその期間内のもの。
+    return worked.filter((c) => !!c.appointmentDate && monthKey(c.appointmentDate) === curMonth);
+  }, [worked, curMonth]);
+
+  // 本日の架電（ステータス更新ベース）の内訳ドリル用: 本日更新 × 接触済み（アプローチ前以外）
+  const todayKey = jstDateKey(new Date());
+  const todayContactedRows = useMemo(
+    () => worked.filter((c) => c.lastEdited && jstDateKey(c.lastEdited) === todayKey && c.status && c.status !== "アプローチ前"),
+    [worked, todayKey],
+  );
+
+  const open = (title: string, rows: DrillCustomer[]) => setDrill({ title, rows });
 
   return (
     <div className="space-y-6">
-      {/* ヘッダ + 期間トグル */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-ink">営業ダッシュボード</h1>
           <p className="text-xs text-ink-muted mt-0.5">
-            週次会議用 · 最終更新 {new Date(data.generatedAt).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}
+            実績は {since} 以降（顧客ステータス基準・数字クリックで内訳表示） · 月次は暦月（毎月1日〜末日）。今月＝{curMonth.split("-")[1]}月（{monthRangeLabel(curMonth)}） · 最終更新{" "}
+            {new Date(data.generatedAt).toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" })}
           </p>
-        </div>
-        <div className="inline-flex rounded-lg bg-ink/[0.05] p-0.5">
-          {(["week", "month"] as Period[]).map((p) => (
-            <button
-              key={p}
-              onClick={() => setPeriod(p)}
-              className={clsx(
-                "px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ease-standard",
-                period === p ? "bg-surface text-brand shadow-sm" : "text-ink-muted hover:text-ink",
-              )}
-            >
-              {p === "week" ? "週次" : "月次"}
-            </button>
-          ))}
         </div>
       </div>
 
@@ -51,35 +66,88 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
         </div>
       )}
 
-      {/* KPIカード */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <KpiCard label="今週の架電数" value={num(k.weekCalls)} sub={`アポ ${k.weekAppts}件`} accent="brand" />
-        <KpiCard label="今週のアポ率" value={pct(k.weekApptRate)} accent="indigo" />
-        <KpiCard label="今月の架電数" value={num(k.monthCalls)} sub={`アポ ${k.monthAppts}件`} accent="brand" />
-        <KpiCard label="今月のアポ率" value={pct(k.monthApptRate)} accent="indigo" />
-        <KpiCard label="MRR（月次経常収益）" value={yen(k.mrr)} accent="teal" />
-        <KpiCard label="稼働中の契約数" value={num(k.activeContracts)} accent="teal" />
-        <KpiCard label="今月の新規契約" value={num(k.newContractsThisMonth)} accent="pink" />
-        <KpiCard label="今月の総アポ数" value={num(k.monthAppts)} accent="pink" />
-      </div>
-
-      {/* 架電推移 */}
-      <section className="card p-5">
-        <h2 className="text-sm font-semibold text-ink mb-3">
-          架電数・アポ率の推移（{period === "week" ? "直近12週" : "直近6ヶ月"}）
-        </h2>
-        <CallsChart data={series} />
+      {/* 本日の架電（Notion手動＋システム統合） */}
+      <section>
+        <div className="flex items-baseline justify-between mb-2">
+          <h2 className="text-sm font-semibold text-ink">本日の架電（{todayKey}・JST）</h2>
+          <span className="text-xs text-ink-muted">
+            内訳: ステータス更新 {num(data.today.statusCalls)} / システム架電記録 {num(data.today.systemCalls)}（重複は統合・最大値を採用）
+          </span>
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <KpiCard
+            label="本日の架電数（統合）"
+            value={num(data.today.calls)}
+            accent="brand"
+            onClick={() => open(`本日の架電（ステータス更新ベース ${num(data.today.statusCalls)}件）`, todayContactedRows)}
+          />
+          <KpiCard label="本日のアポ獲得（取得日基準）" value={num(data.today.appointments)} accent="pink" />
+        </div>
+        {data.today.byRep.length > 0 && (
+          <p className="text-xs text-ink-muted mt-2">
+            担当者別:{" "}
+            {data.today.byRep.map((r) => `${r.rep} ${r.calls}件${r.appointments ? `(アポ${r.appointments})` : ""}`).join(" ・ ")}
+          </p>
+        )}
+        <p className="text-xs text-ink-muted mt-1">
+          ※ Notionで顧客ステータスを更新した架電も計上（架電後にステータスを更新する運用前提）。過去日は最終更新日時が上書きされるため、本数値は本日分のみ。
+        </p>
       </section>
 
-      {/* 担当者別 + ファネル */}
+      {/* KPI（クリックで内訳） */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <KpiCard label={`コンタクト済み（${sinceLabel}）`} value={num(a.contacted)} accent="brand" onClick={() => open("コンタクト済み", worked)} />
+        <KpiCard label="アポ獲得（アポ取得日基準）" value={num(a.appointments)} accent="pink" onClick={() => open("アポ獲得", apptRows)} />
+        <KpiCard label="アポ率（アポ÷コンタクト）" value={pct(a.apptRate)} accent="indigo" />
+        <KpiCard label="今月のアポ獲得" value={num(data.goals.monthlyAppointments.actual)} accent="pink" onClick={() => open("今月のアポ獲得", apptThisMonthRows)} />
+        <KpiCard label="MRR（月次経常収益）" value={yen(k.mrr)} accent="teal" />
+        <KpiCard label="稼働中の契約数" value={num(k.activeContracts)} accent="teal" />
+        <KpiCard label="今月の新規契約：採用SNS" value={num(k.newContractsSnsThisMonth)} accent="amber" />
+        <KpiCard label="今月の新規契約：人材紹介" value={num(k.newContractsAgencyThisMonth)} accent="amber" />
+      </div>
+
+      {/* 目標達成状況 */}
+      <section>
+        <h2 className="text-sm font-semibold text-ink mb-2">目標達成状況（今月）</h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <GoalCard label="今月のアポ獲得" g={data.goals.monthlyAppointments} />
+          <GoalCard label="今月の契約数：採用SNS" g={data.goals.monthlyContractsSns} />
+          <GoalCard label="今月の契約数：人材紹介" g={data.goals.monthlyContractsAgency} />
+          <div className="card p-4">
+            <div className="text-xs font-medium text-ink-muted">コンタクト済み（{sinceLabel}）</div>
+            <div className="mt-1 text-2xl font-bold tabular-nums text-brand">{num(a.contacted)}</div>
+            <div className="mt-0.5 text-xs text-ink-muted">アポ率 {pct(a.apptRate)} ・ 全期間累計は分析ページ参照</div>
+          </div>
+        </div>
+        <p className="text-xs text-ink-muted mt-2">
+          ※ 架電日が記録されていないため週次/月次の架電推移は表示できません。アポは「アポ取得日」基準です。
+        </p>
+      </section>
+
+      {/* 担当者別 + 架電結果内訳 */}
       <div className="grid lg:grid-cols-2 gap-6">
         <section className="card p-5">
-          <h2 className="text-sm font-semibold text-ink mb-3">担当者別 実績（今月）</h2>
-          <RepTable data={data} />
+          <h2 className="text-sm font-semibold text-ink mb-3">担当者別 実績（行クリックで内訳）</h2>
+          <RepTable data={data} onPick={(rep) => open(`担当: ${rep}`, worked.filter((c) => (c.isRep ?? "未割当") === rep))} />
         </section>
+        <section className="card p-5">
+          <h2 className="text-sm font-semibold text-ink mb-3">架電結果の内訳（クリックで企業一覧）</h2>
+          <ResultTable
+            rows={a.byResult}
+            onPick={(status) => open(`結果: ${status}`, worked.filter((c) => c.status === status))}
+          />
+        </section>
+      </div>
+
+      {/* ファネル + アポ月次 */}
+      <div className="grid lg:grid-cols-2 gap-6">
         <section className="card p-5">
           <h2 className="text-sm font-semibold text-ink mb-3">パイプライン・ファネル（顧客ステータス）</h2>
           <FunnelChart data={data.funnel} />
+        </section>
+        <section className="card p-5">
+          <h2 className="text-sm font-semibold text-ink mb-3">アポ獲得 月次推移（アポ取得日・直近6ヶ月）</h2>
+          <CategoryBar data={a.apptMonthly.map((m) => ({ label: m.label, count: m.appointments }))} />
         </section>
       </div>
 
@@ -88,30 +156,129 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
         <h2 className="text-sm font-semibold text-ink mb-3">MRR・稼働契約数の推移（直近6ヶ月）</h2>
         <MrrChart data={data.mrrTrend} />
       </section>
+
+      {drill && <DrillPanel drill={drill} onClose={() => setDrill(null)} />}
     </div>
   );
 }
 
-function RepTable({ data }: { data: DashboardData }) {
-  if (data.reps.length === 0) {
-    return <p className="text-sm text-ink-muted py-8 text-center">今月の架電データがありません。</p>;
+function DrillPanel({ drill, onClose }: { drill: { title: string; rows: DrillCustomer[] }; onClose: () => void }) {
+  const rows = drill.rows;
+  return (
+    <div className="fixed inset-0 z-30 flex justify-end bg-black/40" onClick={onClose}>
+      <div
+        className="w-full max-w-2xl h-full bg-night-1 border-l border-white/10 shadow-lift overflow-y-auto animate-fadeIn"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="sticky top-0 bg-night-1/95 backdrop-blur border-b border-white/10 px-5 py-3 flex items-center justify-between">
+          <div>
+            <h3 className="font-bold text-ink">{drill.title}</h3>
+            <p className="text-xs text-ink-muted">{rows.length.toLocaleString()} 件</p>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-lg text-ink-muted hover:bg-white/10">
+            <X size={18} />
+          </button>
+        </div>
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-xs text-ink-muted border-b border-white/10">
+              <th className="text-left font-medium px-5 py-2">会社名</th>
+              <th className="text-left font-medium px-2 py-2">ステータス</th>
+              <th className="text-left font-medium px-2 py-2">アポ取得日</th>
+              <th className="text-left font-medium px-2 py-2">IS担当</th>
+              <th className="text-right font-medium px-5 py-2">発信</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.slice(0, 1000).map((c) => (
+              <tr key={c.id} className="border-b border-white/[0.06]">
+                <td className="px-5 py-2 max-w-56 truncate">
+                  <a href={c.url} target="_blank" rel="noreferrer" className="hover:text-brand-glow hover:underline inline-flex items-center gap-1">
+                    {c.name}
+                    <ExternalLink size={11} className="text-ink-muted" />
+                  </a>
+                </td>
+                <td className="px-2 py-2 text-xs text-ink-soft">{c.status ?? "—"}</td>
+                <td className="px-2 py-2 text-xs text-ink-muted">{c.appointmentDate?.slice(0, 10) ?? "—"}</td>
+                <td className="px-2 py-2 text-xs text-ink-soft">{c.isRep ?? "—"}</td>
+                <td className="px-5 py-2 text-right">{c.phone ? <CallButton phone={c.phone} /> : <span className="text-xs text-ink-muted">—</span>}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {rows.length > 1000 && <p className="text-xs text-ink-muted p-4">先頭1000件を表示しています。</p>}
+      </div>
+    </div>
+  );
+}
+
+function ResultTable({ rows, onPick }: { rows: { label: string; count: number }[]; onPick: (status: string) => void }) {
+  if (rows.length === 0) return <p className="text-sm text-ink-muted py-8 text-center">データがありません。</p>;
+  return (
+    <table className="w-full text-sm">
+      <tbody>
+        {rows.map((r) => (
+          <tr
+            key={r.label}
+            onClick={() => onPick(r.label)}
+            className="border-b border-white/[0.06] last:border-0 cursor-pointer hover:bg-white/[0.04]"
+          >
+            <td className="py-2 text-ink">{r.label}</td>
+            <td className="py-2 text-right tabular-nums text-ink-soft">{num(r.count)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
+function GoalCard({ label, g }: { label: string; g: Goal }) {
+  const color =
+    g.achievement == null
+      ? "text-ink-muted"
+      : g.achievement >= 100
+        ? "text-brand"
+        : g.achievement >= 70
+          ? "text-accent-amber"
+          : "text-accent-red";
+  return (
+    <div className="card p-4 animate-growFromBottom">
+      <div className="text-xs font-medium text-ink-muted">{label}</div>
+      <div className={clsx("mt-1 text-2xl font-bold tabular-nums", color)}>
+        {g.achievement != null ? pct(g.achievement) : "—"}
+      </div>
+      <div className="mt-0.5 text-xs text-ink-muted">
+        {g.target > 0 ? `${num(g.actual)} / ${num(g.target)} 件` : `実績 ${num(g.actual)} 件・目標未設定`}
+      </div>
+    </div>
+  );
+}
+
+function RepTable({ data, onPick }: { data: DashboardData; onPick: (rep: string) => void }) {
+  const reps = data.statusActivity.byRep;
+  if (reps.length === 0) {
+    return <p className="text-sm text-ink-muted py-8 text-center">コンタクト済みのデータがありません。</p>;
   }
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="text-xs text-ink-muted border-b border-ink/[0.07]">
+          <tr className="text-xs text-ink-muted border-b border-white/10">
             <th className="text-left font-medium py-2">担当</th>
-            <th className="text-right font-medium py-2">架電</th>
+            <th className="text-right font-medium py-2">コンタクト</th>
             <th className="text-right font-medium py-2">アポ</th>
             <th className="text-right font-medium py-2">アポ率</th>
           </tr>
         </thead>
         <tbody>
-          {data.reps.map((r) => (
-            <tr key={r.rep} className="border-b border-ink/[0.04] last:border-0">
+          {reps.map((r) => (
+            <tr
+              key={r.rep}
+              onClick={() => onPick(r.rep)}
+              className="border-b border-white/[0.06] last:border-0 cursor-pointer hover:bg-white/[0.04]"
+            >
               <td className="py-2 font-medium text-ink">{r.rep}</td>
-              <td className="py-2 text-right tabular-nums">{num(r.calls)}</td>
+              <td className="py-2 text-right tabular-nums">{num(r.contacted)}</td>
               <td className="py-2 text-right tabular-nums">{num(r.appointments)}</td>
               <td className="py-2 text-right tabular-nums text-accent-indigo">{pct(r.apptRate)}</td>
             </tr>

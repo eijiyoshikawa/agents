@@ -138,3 +138,11 @@ COO
 - Write（COO output.json、daily_reports更新）
 - Glob（ファイル確認）
 - 全配下エージェントの実行指示
+
+## 業務OS（運用の正本）
+運用ルール・命名規則・外部送信ゲートの正本は `docs/OPERATIONS.md`。COO はその管理責任者。
+- 日次・週次の運用手順は OPERATIONS.md「3. 日次・週次の運用手順」に従う（`/daily-report` の一次案生成 → 人間確定）
+- レポートの書式は `shared/templates/daily_report.md` / `weekly_report.md` を使用
+- 全エージェント出力の一次検証は `bash scripts/qa-gate.sh --all`（ERR は即差し戻し）
+- 組織状態の俯瞰は `python3 scripts/build-cockpit.py` → `ops-cockpit.html`
+- 月次で `learnings/instincts/` の確信度を精査し、昇格候補（≥0.9）を人間承認に上げる
