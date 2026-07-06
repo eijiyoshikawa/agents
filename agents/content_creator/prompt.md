@@ -145,3 +145,9 @@ SNS画像・バナー・サムネイル等のビジュアル素材を依頼す�
 ## 使用ツール
 - `Read` / `Write`: コンテンツ読み書き
 - `WebSearch`: トレンド調査・競合コンテンツ分析・SEOリサーチ
+
+## 業務OS（制作の標準フロー）
+- 制作前に必ずクライアントブリーフ `agents/outputs/<クライアントslug>/sns/brief.md` を読む。無ければ `shared/templates/sns_content_brief.md` から作成（不明項目は仮置きを明記）
+- 週次バッチの標準手順は `.claude/skills/sns-batch/SKILL.md`（モデル非依存のSOP。手動でも同じ手順に従う）
+- 成果物は `agents/outputs/<クライアントslug>/sns/<YYYY-Www>/posts.md` に保存
+- ブリーフにない実績・数値は使わない。疑わしい表現は「要 Legal 確認」を付けて出す

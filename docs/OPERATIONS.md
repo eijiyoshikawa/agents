@@ -76,3 +76,16 @@
 
 補助スクリプト: `scripts/qa-gate.sh`（出力検証）/ `scripts/build-cockpit.py`（ダッシュボード生成）/
 既存: `scripts/context-budget.sh` / `scripts/security-scan.sh` / `scripts/bid_collect.py`
+
+## 5. モデル非依存の原則
+
+この業務OSは特定モデル（Fable 5 等）に依存しない。どのモデル・どのエージェントでも同じ品質で回るよう、次を守る:
+
+- **手順は全てファイルが正本**: Skill（`.claude/skills/*/SKILL.md`）はプレーンな Markdown の SOP であり、
+  スラッシュコマンドが使えない環境でも同じファイルを読んで手動実行すれば同一の結果になる
+- **機械化できる検証はスクリプトに寄せる**: 品質判定の一次フィルタは `scripts/qa-gate.sh` 等の
+  決定的なスクリプトが担い、LLM の性能差が品質に響く範囲を最小化する
+- **知識の格納場所は3層**: ①即時ルール = 各 `agents/<agent>/prompt.md` の「業務OS」セクション、
+  ②組織ルールの正本 = `docs/OPERATIONS.md`（本書）と `CLAUDE.md`、
+  ③学習途上のパターン = `learnings/instincts/`（confidence ≥ 0.9 で②へ昇格）
+- **成果物は必ず規定の場所に保存**（本書「1. 保存先マップ」）。会話の中にだけ存在する成果物を残さない

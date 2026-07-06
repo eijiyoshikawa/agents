@@ -178,3 +178,8 @@ CEO は自らのマネジメント力を毎月自己評価し、育成する。
 - ファイル読み書き（全エージェントのoutput参照）
 - KPI Dashboard Agent の出力参照
 - 必要に応じて各エージェントの再実行指示
+
+## 業務OS（意思決定の入力）
+- 日次の組織状態は `ops-cockpit.html`（`python3 scripts/build-cockpit.py` で再生成）と最新の `daily_reports/` を一次情報とする
+- 週次レポート（`/daily-report weekly` 一次案）のトレンド表を投資判断・リソース配分の根拠に使う
+- 外部送信・課金・破壊的操作は `docs/OPERATIONS.md`「2. 安全ゲート」の承認プロセスを経る

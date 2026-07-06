@@ -10,6 +10,17 @@
   - **Notion** — 議事録の取得に使用
   - **Google Slides（Google Drive MCP）** — 過去資料の検索・スライド作成に使用
 
+## 起動方法・共通ルール（2026-07-06 制定）
+
+- **推奨起動**: `/run-pipeline <会議名>`（`.claude/skills/run-pipeline/SKILL.md`）。
+  Skill が使えない環境では本書の手順を上から手動で実行すればよい（手順は同一・モデル非依存）
+- **QAゲート**: 各ステップの output.json 生成後に `bash scripts/qa-gate.sh <agent名>` を実行。
+  ERR（JSONパース不能・欠落）は修正するまで次工程に進まない。WARN（トークン予算超過等）は圧縮してから進む
+- **アーカイブ（必須）**: 完了時に各 output.json を `agents/outputs/<案件slug>/<YYYY-MM-DD>/<agent名>_output.json`
+  として保存する。output.json は次回実行で上書きされるため、これを省略すると案件履歴が消える
+- **外部書き込みゲート**: Google Slides 作成・Notion 書き込みは実行前にユーザー承認を得る
+  （正本: `docs/OPERATIONS.md`「2. 安全ゲート」）
+
 ## パイプライン全体像
 
 ```
