@@ -189,6 +189,17 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 
 ## 実行方法
 
+### スラッシュコマンド（推奨・2026-07-06 導入）
+| コマンド | 用途 |
+|---------|------|
+| `/run-pipeline <会議名>` | 戦略提案パイプライン一括実行（QAゲート・アーカイブ込み） |
+| `/daily-report [weekly]` | 日次・週次レポート一次案の自動生成 |
+| `/sns-batch <クライアント>` | SNS週次投稿バッチ制作（実投稿はしない） |
+
+運用ルール・命名規則・外部送信ゲートは `docs/OPERATIONS.md` を正とする。
+組織状態の確認は `python3 scripts/build-cockpit.py` → `ops-cockpit.html`。
+出力検証は `bash scripts/qa-gate.sh --all`。
+
 ### 戦略提案パイプライン
 ```
 /agents/orchestrator/PIPELINE.md の手順に従って、
