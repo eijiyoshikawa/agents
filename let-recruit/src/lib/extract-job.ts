@@ -24,12 +24,15 @@ async function callClaude(
     );
   }
   const client = new Anthropic({ apiKey });
-  const message = await client.messages.create({
+  // max_tokensが大きい場合、SDKはストリーミングでの呼び出しを必須とするため
+  // stream()で受信し、完了メッセージを組み立てる（結果は非ストリーミングと同じ）
+  const stream = client.messages.stream({
     model: process.env.ANTHROPIC_MODEL || DEFAULT_MODEL,
     max_tokens: MAX_TOKENS,
     system,
     messages: [{ role: "user", content: userPrompt }],
   });
+  const message = await stream.finalMessage();
 
   const raw = firstText(message);
   const truncated = message.stop_reason === "max_tokens";

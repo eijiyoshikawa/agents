@@ -4,7 +4,8 @@ import { fetchPages } from "@/lib/fetch-html";
 import { extractJobPosting, generateFromText } from "@/lib/extract-job";
 
 export const runtime = "nodejs";
-export const maxDuration = 60;
+// 長い求人票の生成に備え、Proプラン上限の300秒まで許容
+export const maxDuration = 300;
 
 /** URL統合 または テキスト整理で求人票JSONを返す。 */
 export async function POST(req: Request): Promise<NextResponse> {
