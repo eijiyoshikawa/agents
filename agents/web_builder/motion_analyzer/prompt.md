@@ -61,6 +61,76 @@ JS ソースから以下のパターンを検出する:
 - テキストアニメーション（タイピング、文字ごとのフェードイン等）
 - スクロールバー連動のプログレスバー
 
+### Step 5.5: パフォーマンス影響評価
+
+検出した各モーションが Core Web Vitals に与える影響を推定し、Builder が安全に実装できる情報を提供する。
+
+#### CLS（Cumulative Layout Shift）への影響
+以下のパターンはレイアウトシフトを引き起こすリスクがある:
+
+| リスクパターン | CLS影響 | 対策 |
+|-------------|---------|------|
+| スクロールアニメーションで `height: 0 → auto` | **高** | `max-height` + `overflow-hidden` で代用、または `will-change: height` |
+| `transform: translateY()` からの登場 | **低** | transform は compositor 上で動作するため CLS に影響しない |
+| `width` / `margin` / `padding` のアニメーション | **中** | transform に置き換え推奨 |
+| フォント読み込み後のリフロー | **中** | `font-display: swap` + `size-adjust` |
+| 画像遅延読み込みでの領域確保なし | **高** | `aspect-ratio` or 固定 `width`/`height` 必須 |
+
+#### INP（Interaction to Next Paint）への影響
+インタラクションのレスポンス速度を阻害するパターンを評価する:
+
+| リスクパターン | INP影響 | 対策 |
+|-------------|---------|------|
+| 重い JS ライブラリの同期読み込み（GSAP全量等） | **高** | 動的 import + `requestIdleCallback` |
+| メインスレッドをブロックするアニメーション計算 | **中** | CSS アニメーション or `will-change` で GPU 委譲 |
+| 大量のDOM操作を伴うスタガーアニメーション | **中** | 可視範囲のみアニメーション（`IntersectionObserver`） |
+| `requestAnimationFrame` の過剰使用 | **低** | フレーム数制限、スロットリング |
+
+#### 各モーションへのリスクスコア付与
+検出した各モーションに `performance_risk` フィールドを追加する:
+
+```json
+{
+  "scroll_animations": [
+    {
+      "section_id": "hero",
+      "motion_key": "masking-reveal",
+      "performance_risk": {
+        "cls_impact": "none",
+        "inp_impact": "low",
+        "gpu_composited": true,
+        "recommendation": "transform + opacity のみ使用しており安全"
+      }
+    }
+  ]
+}
+```
+
+### Step 5.7: prefers-reduced-motion 対応の確認
+
+#### 参考サイトの対応状況を確認
+CSS から `@media (prefers-reduced-motion: reduce)` の有無を検出する:
+
+- **対応あり**: 定義内容（どのアニメーションが抑制されるか）を記録
+- **対応なし**: Builder に対応を必須として指示
+
+#### 推奨対応方針
+```json
+{
+  "reduced_motion": {
+    "reference_site_support": false,
+    "builder_requirement": "必須",
+    "policy": {
+      "scroll_animations": "完全無効化（即座に表示）",
+      "hover_effects": "維持（色変化のみ。transform は無効化）",
+      "page_transitions": "無効化（即座に切り替え）",
+      "decorative_animations": "完全無効化",
+      "essential_animations": "維持（ローディングスピナー等、情報伝達に必要なもの）"
+    }
+  }
+}
+```
+
 ### Step 6: 実装推奨の決定
 検出したアニメーションの複雑さに応じて、最適な実装方法を推奨する:
 
@@ -79,23 +149,37 @@ JS ソースから以下のパターンを検出する:
       "section_id": "hero",
       "target": "h1, p, buttons",
       "type": "fade-in-up",
+      "motion_key": "masking-reveal",
       "trigger": "on-load",
       "duration": "0.8s",
       "delay": "0.2s",
       "stagger": "0.15s",
       "easing": "ease-out",
-      "implementation": "framer-motion variants + staggerChildren"
+      "implementation": "framer-motion variants + staggerChildren",
+      "performance_risk": {
+        "cls_impact": "none",
+        "inp_impact": "low",
+        "gpu_composited": true,
+        "recommendation": "安全"
+      }
     },
     {
       "section_id": "features",
       "target": "各カード",
       "type": "fade-in-up",
+      "motion_key": "inbound-slide",
       "trigger": "scroll-into-view",
       "duration": "0.6s",
       "delay": "0",
       "stagger": "0.1s",
       "easing": "ease-out",
-      "implementation": "framer-motion useInView + stagger"
+      "implementation": "framer-motion useInView + stagger",
+      "performance_risk": {
+        "cls_impact": "none",
+        "inp_impact": "low",
+        "gpu_composited": true,
+        "recommendation": "安全"
+      }
     }
   ],
   "hover_effects": [
@@ -151,10 +235,22 @@ JS ソースから以下のパターンを検出する:
     "type": "none",
     "description": ""
   },
+  "reduced_motion": {
+    "reference_site_support": false,
+    "builder_requirement": "必須",
+    "policy": {
+      "scroll_animations": "完全無効化",
+      "hover_effects": "色変化のみ維持",
+      "page_transitions": "無効化",
+      "decorative_animations": "完全無効化",
+      "essential_animations": "維持"
+    }
+  },
   "recommended_library": "framer-motion",
   "recommended_library_reason": "React/Next.js環境で最も統合しやすく、スクロールアニメーション・ページ遷移・ホバーエフェクトを統一的に扱える",
   "complexity_level": "medium",
-  "total_animation_count": 12
+  "total_animation_count": 12,
+  "proposed_motion": []
 }
 ```
 
@@ -173,6 +269,12 @@ JS ソースから以下のパターンを検出する:
 3. 複数候補がある場合は演出の忠実度が高い方を優先
 4. 該当する `motion_key` が無い場合は `motion_key: "custom"` としたうえで、MOTION_30.md への追加候補として `proposed_motion` フィールドに詳細を記録
 
+**MOTION_30.md との照合チェックリスト:**
+- [ ] 検出した全モーションに `motion_key` が割り当てられているか
+- [ ] `motion_key` の選択根拠（演出の一致度）が明記されているか
+- [ ] MOTION_30.md に存在しないモーションは `proposed_motion` に記録されているか
+- [ ] 和文B2B案件では §6 の3モーション（`marquee-keywords` / `thinking-caret` / `scroll-progress-bar`）の適用可否を検討したか
+
 **output.json への追記フィールド:**
 ```json
 {
@@ -181,6 +283,8 @@ JS ソースから以下のパターンを検出する:
       "section_id": "hero",
       "target": "h1",
       "motion_key": "masking-reveal",
+      "motion_key_confidence": 0.9,
+      "motion_key_rationale": "テキストが下からマスクで現れる演出が masking-reveal と完全一致",
       "trigger": "on-load",
       "duration": "0.7s",
       "easing": "cubic-bezier(0.33, 1, 0.68, 1)",
@@ -199,3 +303,11 @@ JS ソースから以下のパターンを検出する:
 - 数字がドラムロール → `slot-counter`
 - カードが3D傾斜 → `card-tilt`
 - 常時ノイズ背景 → `overlay-texture`
+
+
+## 相互干渉（検証を受ける相手）
+- **Web Builder / builder**: モーション設計書の実装再現性を検証
+- **Web Builder / interaction_analyzer**: インタラクションとアニメーションの相互検証
+- **Web Builder / qa_reviewer**: デプロイ後のモーション動作確認
+- **QA Engineer**: パフォーマンス影響の技術レビュー
+- **QA Reviewer（横断）**: output.json のスキーマ・完全性検証
