@@ -28,6 +28,59 @@
 6. **送信ボタン**: テキスト、スタイル
 7. **確認画面/完了メッセージ**: 有無とその内容
 
+### Step 1.5: フォーム分析の深化
+
+#### バリデーション方式の特定
+フォームのバリデーション実装を詳細に分析する:
+
+| バリデーション方式 | 検出方法 | 記録内容 |
+|-----------------|---------|---------|
+| **HTML5 ネイティブ** | `required`, `pattern`, `type="email"`, `minlength`, `maxlength` 属性 | 各フィールドの制約 |
+| **JavaScript カスタム** | `addEventListener('submit')`, `onsubmit`, フォームライブラリのバリデーション | ライブラリ名・バリデーションタイミング |
+| **リアルタイム** | `input`/`change` イベントでのバリデーション | フィールド離脱時 or 入力中か |
+| **サーバーサイド** | フォーム送信後のエラーレスポンス | エラーメッセージの表示方法 |
+
+#### エラー表示パターンの分類
+| パターン | 説明 | 実装方法 |
+|---------|------|---------|
+| **インライン** | 各フィールド直下にエラーメッセージ表示 | `<span class="error">` + ARIA |
+| **トップサマリー** | フォーム上部に全エラー一覧 | スクロール + フォーカス移動 |
+| **ツールチップ** | フィールドの横にポップアップ表示 | CSS positioning |
+| **ボーダー変色** | フィールドの枠線を赤に変更 | `border-color` 変更 |
+
+各フォームについて使用されているパターンを記録する:
+```json
+{
+  "validation": {
+    "method": "html5 + javascript",
+    "timing": "on-blur（フィールド離脱時）",
+    "library": "none（カスタム実装）",
+    "error_display": "inline + border-color",
+    "error_position": "field-below",
+    "error_style": {
+      "color": "#EF4444",
+      "font_size": "12px",
+      "icon": "exclamation-circle"
+    },
+    "success_indicator": true,
+    "success_style": {
+      "border_color": "#10B981",
+      "icon": "check-circle"
+    }
+  }
+}
+```
+
+#### 送信フローの分析
+フォーム送信から完了までの全フローを記録する:
+
+1. **送信トリガー**: ボタンクリック / Enter キー
+2. **送信中の状態**: ローディングスピナー / ボタン無効化 / テキスト変更
+3. **送信方式**: フォームPOST / fetch API / axios
+4. **成功時**: メッセージ表示 / リダイレクト / モーダル / ページ内スクロール
+5. **エラー時**: エラーメッセージ / リトライボタン
+6. **確認画面**: 入力内容確認ステップの有無（日本のサイトに多い）
+
 ### Step 2: モーダル・ポップアップの解析
 モーダルやポップアップの実装を検出する:
 
@@ -80,6 +133,61 @@
 - **画像ギャラリー**: ライトボックス表示
 - **動画再生**: インライン再生 / モーダル再生
 
+### Step 7: WAI-ARIA パターン分類
+
+検出した全インタラクティブ要素を WAI-ARIA の設計パターンに分類し、Builder がアクセシブルな実装を行える情報を提供する。
+
+#### ARIA パターンマッピング
+
+| 検出要素 | WAI-ARIA パターン | 必須 ARIA 属性 | キーボード操作 |
+|---------|-----------------|---------------|--------------|
+| タブ | `role="tablist"` + `role="tab"` + `role="tabpanel"` | `aria-selected`, `aria-controls`, `aria-labelledby` | 左右矢印でタブ移動、Home/End |
+| アコーディオン | `<button>` + `aria-expanded` + `aria-controls` | `aria-expanded`, `id` 対応 | Enter/Space で開閉 |
+| モーダル | `role="dialog"` + `aria-modal="true"` | `aria-labelledby`, `aria-describedby` | Escape で閉じる、フォーカストラップ |
+| ドロップダウン | `role="menu"` + `role="menuitem"` | `aria-expanded`, `aria-haspopup` | 上下矢印で項目移動、Escape で閉じる |
+| スライダー | `role="group"` + `aria-roledescription="carousel"` | `aria-label`, `aria-live="polite"` | 前後矢印、自動再生の一時停止 |
+| ツールチップ | `role="tooltip"` | `aria-describedby` | Escape で非表示 |
+| ハンバーガーメニュー | `<button>` + `aria-expanded` + `aria-controls` | `aria-label="メニュー"` | Enter/Space で開閉 |
+
+#### アクセシビリティ評価
+
+各インタラクティブ要素について以下を評価する:
+
+**キーボード操作可能性:**
+- [ ] 全インタラクティブ要素がキーボードでアクセス可能か
+- [ ] Tab 順序が論理的か（`tabindex` の適切な使用）
+- [ ] フォーカスインジケーターが視認可能か
+- [ ] キーボードトラップ（抜けられない状態）がないか
+
+**フォーカス管理:**
+- [ ] モーダル表示時にフォーカスがモーダル内に移動するか
+- [ ] モーダル閉じた後にフォーカスがトリガー要素に戻るか
+- [ ] モーダル表示中のフォーカストラップが実装されているか
+- [ ] 動的コンテンツ更新時に適切なフォーカス移動があるか
+- [ ] `aria-live` による動的変更の通知がされているか
+
+**参考サイトのアクセシビリティ問題:**
+参考サイトで検出したアクセシビリティの問題は `accessibility_issues` フィールドに記録し、Builder が改善すべき項目として引き渡す:
+
+```json
+{
+  "accessibility_issues": [
+    {
+      "element": "FAQ アコーディオン",
+      "issue": "aria-expanded 属性が欠如。スクリーンリーダーで開閉状態が伝わらない",
+      "severity": "high",
+      "fix_requirement": "Builder は aria-expanded を必ず実装すること"
+    },
+    {
+      "element": "モバイルメニュー",
+      "issue": "フォーカストラップが未実装。メニュー外にフォーカスが漏れる",
+      "severity": "high",
+      "fix_requirement": "Builder はフォーカストラップを必ず実装すること"
+    }
+  ]
+}
+```
+
 ## 出力フォーマット
 
 `/agents/web_builder/interaction_analyzer/output.json` に保存:
@@ -101,7 +209,21 @@
         {"name": "message", "type": "textarea", "label": "お問い合わせ内容", "required": true, "placeholder": "お気軽にご相談ください", "rows": 6}
       ],
       "submit_button": {"text": "送信する", "style": "primary-full-width"},
-      "validation": "client-side (HTML5 + custom)",
+      "validation": {
+        "method": "html5 + javascript",
+        "timing": "on-blur",
+        "library": "none",
+        "error_display": "inline + border-color",
+        "error_position": "field-below",
+        "error_style": {"color": "#EF4444", "font_size": "12px"},
+        "success_indicator": true
+      },
+      "submit_flow": {
+        "loading_state": "ボタンテキスト変更（送信する → 送信中...）+ スピナー",
+        "success_action": "ページ内にサンクスメッセージ表示",
+        "error_action": "トップにエラーメッセージ表示",
+        "confirmation_step": false
+      },
       "privacy_checkbox": true,
       "privacy_text": "プライバシーポリシーに同意する",
       "completion_message": "お問い合わせありがとうございます。3営業日以内にご連絡いたします。"
@@ -115,7 +237,14 @@
       "animation": "fade-in + scale-up",
       "overlay": "rgba(0,0,0,0.6)",
       "close_methods": ["overlay-click", "x-button", "escape-key"],
-      "max_width": "600px"
+      "max_width": "600px",
+      "aria_pattern": {
+        "role": "dialog",
+        "aria_modal": true,
+        "aria_labelledby": "modal-title",
+        "focus_trap": true,
+        "focus_return": true
+      }
     }
   ],
   "accordions": [
@@ -129,7 +258,13 @@
       "items_preview": [
         {"question": "サービスの料金体系は？", "answer_length": "約100文字"},
         {"question": "導入までの流れは？", "answer_length": "約150文字"}
-      ]
+      ],
+      "aria_pattern": {
+        "trigger": "button",
+        "aria_expanded": true,
+        "aria_controls": true,
+        "keyboard": "Enter/Space"
+      }
     }
   ],
   "tabs": [
@@ -140,7 +275,13 @@
       "tab_labels": ["プランA", "プランB", "プランC"],
       "active_style": "bottom-border primary-color",
       "content_transition": "fade 0.3s",
-      "default_active": 0
+      "default_active": 0,
+      "aria_pattern": {
+        "tablist_role": true,
+        "tab_role": true,
+        "tabpanel_role": true,
+        "keyboard": "左右矢印 + Home/End"
+      }
     }
   ],
   "sliders": [
@@ -155,7 +296,13 @@
       "swipe": true,
       "slides_per_view": {"desktop": 3, "tablet": 2, "mobile": 1},
       "content_type": "testimonial-card（アイコン + テキスト + 名前 + 肩書き）",
-      "recommended_library": "swiper"
+      "recommended_library": "swiper",
+      "aria_pattern": {
+        "roledescription": "carousel",
+        "aria_label": "お客様の声",
+        "live_region": "polite",
+        "pause_on_hover": true
+      }
     }
   ],
   "navigation_behavior": {
@@ -163,7 +310,13 @@
       "type": "slide-in-right",
       "animation": "translateX(100%) → translateX(0) 0.3s ease",
       "overlay": true,
-      "items_animation": "stagger fade-in 0.05s"
+      "items_animation": "stagger fade-in 0.05s",
+      "aria_pattern": {
+        "trigger_aria_expanded": true,
+        "trigger_aria_label": "メニュー",
+        "focus_trap": true,
+        "focus_first_item": true
+      }
     },
     "smooth_scroll": true,
     "header_scroll_behavior": "shrink-on-scroll（80px → 60px、背景に白を追加）",
@@ -179,6 +332,14 @@
       "position": "bottom-bar",
       "dismissable": true,
       "buttons": ["すべて許可", "設定"]
+    }
+  ],
+  "accessibility_issues": [
+    {
+      "element": "要素名",
+      "issue": "問題の説明",
+      "severity": "high | medium | low",
+      "fix_requirement": "Builder への改善指示"
     }
   ]
 }
