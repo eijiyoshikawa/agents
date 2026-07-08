@@ -63,6 +63,28 @@
         ],
         "description": "セッション学習ログが未作成の場合にリマインド（git commit 時）"
       }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/hooks/notify.sh notification"
+          }
+        ],
+        "description": "承認待ち・入力待ちで停止した時に音声/プッシュ通知（ntfy or ローカル音声）"
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/hooks/notify.sh stop"
+          }
+        ],
+        "description": "Claude が応答を完了した時に音声/プッシュ通知（ntfy or ローカル音声）"
+      }
     ]
   }
 }

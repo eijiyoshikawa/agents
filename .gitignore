@@ -38,3 +38,6 @@ Thumbs.db
 
 # セキュリティスキャンレポート（機密情報を含む可能性）
 security-report.json
+
+# 通知フックのトピック設定（個人ごとに異なるため共有しない）
+.claude/ntfy-topic.txt

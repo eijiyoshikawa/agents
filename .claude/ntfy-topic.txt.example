@@ -1,0 +1,7 @@
+# このファイルを .claude/ntfy-topic.txt にコピーし、あなた専用の
+# 推測されにくいトピック名（= URL パス）を1行だけ記入してください。
+# 例: claude-eiji-8f3k2q7z
+#
+# スマホの ntfy アプリで同じトピック名を購読すると、
+# 承認待ち・作業完了のたびに音声プッシュ通知が届きます。
+claude-CHANGE-ME-to-a-secret-topic
