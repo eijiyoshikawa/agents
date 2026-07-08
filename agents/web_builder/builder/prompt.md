@@ -82,6 +82,80 @@ design_analyzerで抽出できた値を優先し、不足分はdesign-tokens.jso
 - `text-rendering: optimizeLegibility`
 - ダークモード変数（.darkクラス）
 
+### Step 3.5: Tailwind CSS カスタム設計
+
+#### design-tokens.json との整合
+`design_analyzer/output.json` から抽出したトークンを `tailwind.config.ts` のカスタム設定に落とし込む。
+design-tokens.json は以下の構造で Tailwind の `extend` セクションと対応する:
+
+```typescript
+// tailwind.config.ts
+import type { Config } from 'tailwindcss'
+
+const config: Config = {
+  content: ['./src/**/*.{ts,tsx}'],
+  theme: {
+    extend: {
+      // design_analyzer の colors をマッピング
+      colors: {
+        primary: 'var(--color-primary)',
+        secondary: 'var(--color-secondary)',
+        accent: 'var(--color-accent)',
+        background: {
+          DEFAULT: 'var(--color-bg)',
+          alt: 'var(--color-bg-alt)',
+        },
+        foreground: {
+          DEFAULT: 'var(--color-text)',
+          muted: 'var(--color-text-secondary)',
+        },
+      },
+      // design_analyzer の spacing_system をマッピング
+      spacing: {
+        'section': 'var(--spacing-section)',
+        'section-mobile': 'var(--spacing-section-mobile)',
+        'content': 'var(--spacing-content)',
+      },
+      // design_analyzer の border_radius_system をマッピング
+      borderRadius: {
+        sm: 'var(--radius-sm)',
+        md: 'var(--radius-md)',
+        lg: 'var(--radius-lg)',
+      },
+    },
+  },
+  plugins: [],
+}
+```
+
+#### カスタムユーティリティの設計
+プロジェクト固有の頻出パターンをユーティリティとして定義する:
+
+```css
+/* globals.css */
+@layer utilities {
+  /* セクション共通パディング */
+  .section-padding {
+    @apply py-section px-content;
+  }
+  @media (max-width: 768px) {
+    .section-padding {
+      @apply py-section-mobile px-4;
+    }
+  }
+
+  /* コンテナ */
+  .container-content {
+    @apply mx-auto w-full max-w-[var(--max-width)] px-content;
+  }
+
+  /* テキストバランス（日本語） */
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+```
+
 ### Step 4: 共通コンポーネントの実装
 `structure_analyzer/output.json` の `shared_components` を基に:
 
@@ -101,6 +175,51 @@ design_analyzerで抽出できた値を優先し、不足分はdesign-tokens.jso
    - Card: 共通カードコンポーネント
    - Container: max-width ラッパー
 
+### Step 4.5: コンポーネント設計原則
+
+#### 再利用性
+- **Props 設計**: 必須 props は最小限に。バリエーションは `variant` prop で制御
+- **Composition パターン**: children を活用し、コンポーネントの中身を柔軟に
+- **デフォルト値**: 頻出するパターンをデフォルトに設定し、例外時のみ props で上書き
+
+```tsx
+// 良い例: variant で制御
+type ButtonProps = {
+  variant?: 'primary' | 'secondary' | 'ghost'
+  size?: 'sm' | 'md' | 'lg'
+  children: React.ReactNode
+} & React.ButtonHTMLAttributes<HTMLButtonElement>
+
+// 悪い例: 個別 props の乱立
+type ButtonProps = {
+  bgColor?: string
+  textColor?: string
+  borderColor?: string
+  borderRadius?: string
+  // ...
+}
+```
+
+#### テスタビリティ
+- 全インタラクティブ要素に `data-testid` を付与
+- 状態を持つコンポーネントは状態と表示を分離（カスタムフック）
+- `aria-*` 属性を適切に設定（テストでのセレクタとしても活用）
+
+```tsx
+// カスタムフックで状態を分離
+function useAccordion(defaultOpen?: number) {
+  const [openIndex, setOpenIndex] = useState(defaultOpen ?? -1)
+  const toggle = (index: number) => setOpenIndex(prev => prev === index ? -1 : index)
+  return { openIndex, toggle }
+}
+```
+
+#### パフォーマンス
+- `React.memo` は再レンダリングが計測で問題になった場合のみ使用（過度な最適化を避ける）
+- 画像は全て `next/image` を使用（自動最適化）
+- 動的インポート（`next/dynamic`）: フォールド下のインタラクティブコンポーネント（モーダル、スライダー等）
+- CSS アニメーションを JS アニメーションより優先（GPU合成・メインスレッド非ブロック）
+
 ### Step 5: ページ・セクションの実装
 `structure_analyzer/output.json` の各ページ・セクションを順に実装する。
 
@@ -116,6 +235,121 @@ design_analyzerで抽出できた値を優先し、不足分はdesign-tokens.jso
 - アニメーション → `motion_analyzer/output.json`
 - インタラクション → `interaction_analyzer/output.json`
 - 画像・アイコン → `asset_collector/output.json`
+
+### Step 5.5: Next.js 最適化
+
+#### Image 最適化
+```tsx
+import Image from 'next/image'
+
+// ヒーロー画像: priority + sizes 指定
+<Image
+  src="/images/hero/hero-bg.jpg"
+  alt="メインビジュアル"
+  fill
+  priority
+  sizes="100vw"
+  className="object-cover"
+  quality={85}
+/>
+
+// コンテンツ画像: lazy loading（デフォルト）+ 適切な sizes
+<Image
+  src="/images/content/team.jpg"
+  alt="チームメンバー"
+  width={800}
+  height={600}
+  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+  className="rounded-lg object-cover"
+/>
+```
+
+#### Font 最適化
+```tsx
+// src/app/layout.tsx
+import { Noto_Sans_JP, Inter } from 'next/font/google'
+
+const notoSansJP = Noto_Sans_JP({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  display: 'swap',
+  variable: '--font-noto-sans-jp',
+  preload: true,
+})
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '600', '700'],
+  display: 'swap',
+  variable: '--font-inter',
+  preload: true,
+})
+
+// variable font が利用可能な場合
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+  // weight 指定なしで全ウェイト利用可能
+})
+```
+
+#### Metadata API
+```tsx
+// src/app/layout.tsx
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: {
+    default: 'サイト名',
+    template: '%s | サイト名',
+  },
+  description: 'サイトの説明',
+  openGraph: {
+    title: 'サイト名',
+    description: 'サイトの説明',
+    url: 'https://example.com',
+    siteName: 'サイト名',
+    locale: 'ja_JP',
+    type: 'website',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+  },
+  alternates: {
+    canonical: 'https://example.com',
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+}
+
+// サブページ: src/app/about/page.tsx
+export const metadata: Metadata = {
+  title: '会社概要',
+  description: '会社概要ページの説明',
+}
+```
+
+#### generateStaticParams（動的ルート時）
+コーポレートサイトでブログやニュース等の動的ページがある場合:
+
+```tsx
+// src/app/blog/[slug]/page.tsx
+export function generateStaticParams() {
+  // 静的にビルドするパスを定義
+  return [
+    { slug: 'first-post' },
+    { slug: 'second-post' },
+  ]
+}
+
+export default function BlogPost({ params }: { params: { slug: string } }) {
+  // ...
+}
+```
 
 ### Step 6: モーション実装
 `motion_analyzer/output.json` と `/shared/design-tokens.json` の motion セクションに基づいて実装。
@@ -158,6 +392,8 @@ const staggerContainer = {
 4. **タブ**: useState + コンテンツ切り替え
 5. **スライダー**: Swiper React コンポーネント
 6. **モバイルメニュー**: useState + framer-motion
+
+**ARIA 実装必須:** `interaction_analyzer` の `aria_pattern` に従い、全インタラクティブ要素にWAI-ARIA属性を実装する。
 
 ### Step 8: 画像・アセットの配置
 `asset_collector/output.json` に基づいて:
@@ -227,6 +463,13 @@ QA Reviewer の修正指示（`iteration_N.json`）を読み込み:
     "src/components/Header.tsx",
     "src/components/Footer.tsx"
   ],
+  "nextjs_optimizations": {
+    "image_optimization": true,
+    "font_optimization": true,
+    "metadata_api": true,
+    "static_params": false,
+    "dynamic_imports": ["Modal", "Slider"]
+  },
   "build_status": "success",
   "build_errors": [],
   "known_limitations": [
@@ -250,6 +493,11 @@ QA Reviewer の修正指示（`iteration_N.json`）を読み込み:
 - [ ] スクロールアニメーションがヒーロー+主要セクション限定か
 - [ ] hover: scale(1.05) を使っていないか
 - [ ] Tailwindデフォルト値にフォールバックしている箇所がないか
+- [ ] 全 `<Image>` に適切な `sizes` 属性が設定されているか
+- [ ] `next/font` でフォントが最適化されているか
+- [ ] Metadata API で各ページの meta 情報が設定されているか
+- [ ] 全インタラクティブ要素に WAI-ARIA 属性が実装されているか
+- [ ] `prefers-reduced-motion` 対応が globals.css に含まれているか
 
 ## 使用するツール
 - `Read`: 全エージェントの output.json、QA の iteration_N.json、**design-tokens.json**、**anti-ai-design-guidelines.md**
@@ -286,3 +534,11 @@ motion_analyzer の出力に含まれる `motion_key` は **すべて `/design-m
 - GSAP 系（kinetic-flow の複雑版 / path-animation の高度版）→ `npm install gsap`
 - tsParticles（particle-connect）→ `npm install @tsparticles/react @tsparticles/engine`
 - WebGL（liquid-hover）→ `npm install three` または `npm install ogl`
+
+
+## 相互干渉（検証を受ける相手）
+- **Web Builder / qa_reviewer**: ビルド成果物のデプロイ後比較検証
+- **Web Builder / site_scanner**: 検出技術スタック・ページ構成との整合性照合
+- **Tech Lead**: アーキテクチャ・コード品質のレビュー
+- **Frontend Engineer**: React/Next.js 実装の技術レビュー
+- **QA Reviewer（横断）**: output.json のスキーマ・完全性検証

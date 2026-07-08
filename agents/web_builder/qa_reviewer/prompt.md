@@ -77,6 +77,138 @@ Builder が生成した `/agents/web_builder/output/` を Vercel にデプロイ
 - [ ] ナビゲーションがモバイルでハンバーガーに変わるか
 - [ ] 画像がレスポンシブに表示されるか
 
+### Step 4.5: 比較検証の精度向上
+
+#### ピクセル差異の定量計測方法
+HTMLの構造比較だけでなく、定量的な差異計測を行い客観的なスコアリングの根拠とする。
+
+**計測項目と方法:**
+
+| 計測項目 | 方法 | 許容範囲 |
+|---------|------|---------|
+| **カラー差異** | 対応する要素のcolor/background-colorをHEXで比較。差分をDelta E（CIE76）で計算 | Delta E < 5（知覚的にほぼ同一） |
+| **フォントサイズ差異** | computed style の font-size を比較 | ±2px 以内 |
+| **スペーシング差異** | margin/padding の computed value を比較 | ±8px 以内 |
+| **レイアウト差異** | 要素の bounding box（位置・サイズ）を比較 | 位置 ±10px、サイズ ±5% |
+| **要素数差異** | セクション内の子要素数を比較 | 完全一致 |
+
+**差異レポートの出力形式:**
+```json
+{
+  "pixel_comparison": {
+    "color_deltas": [
+      {
+        "element": "h1.hero-title",
+        "property": "color",
+        "reference": "#1E293B",
+        "current": "#111827",
+        "delta_e": 3.2,
+        "verdict": "acceptable"
+      }
+    ],
+    "spacing_deltas": [
+      {
+        "element": "section.features",
+        "property": "padding-top",
+        "reference": "120px",
+        "current": "80px",
+        "delta_px": -40,
+        "verdict": "needs_fix"
+      }
+    ],
+    "layout_deltas": [
+      {
+        "element": "div.card-grid",
+        "property": "grid-template-columns",
+        "reference": "repeat(3, 1fr)",
+        "current": "repeat(3, 1fr)",
+        "verdict": "match"
+      }
+    ]
+  }
+}
+```
+
+### Step 4.7: パフォーマンス比較
+
+`site_scanner/output.json` の `performance_baseline` と比較し、再現サイトのパフォーマンスを評価する。
+
+#### Lighthouse スコア比較
+ビルド成果物から以下のパフォーマンス指標を推定・計測する:
+
+| 指標 | 参考サイト（推定） | 再現サイト | 目標 | 判定 |
+|------|-----------------|-----------|------|------|
+| Performance | 85 | 92 | 90+ | PASS |
+| Accessibility | 78 | 95 | 95+ | PASS |
+| Best Practices | 90 | 95 | 95+ | PASS |
+| SEO | 92 | 98 | 95+ | PASS |
+
+#### パフォーマンス固有のチェック項目
+- [ ] `next/image` が全画像で使用されているか（自動WebP変換）
+- [ ] ヒーロー画像に `priority` が設定されているか
+- [ ] `next/font` でフォントが最適化されているか（CLS回避）
+- [ ] 未使用の JavaScript が動的 import で遅延読み込みされているか
+- [ ] `prefers-reduced-motion` 対応が実装されているか
+- [ ] サードパーティスクリプトの読み込みが最適化されているか
+- [ ] CSS で `will-change` が適切に使用されているか（過剰使用はGPUメモリ浪費）
+- [ ] LCP 要素が2.5秒以内にレンダリングされる見込みか
+
+#### バンドルサイズの確認
+```bash
+# ビルド出力からバンドルサイズを確認
+npm run build 2>&1 | grep -E "Route|Size|First Load"
+```
+
+**バンドルサイズの基準:**
+| ページ | First Load JS 目安 |
+|--------|-------------------|
+| トップページ | 100KB 以下 |
+| サブページ | 80KB 以下 |
+| 合計（shared） | 85KB 以下 |
+
+### Step 4.9: アクセシビリティ改善判断
+
+参考サイトのアクセシビリティ問題を「忠実な再現」として引き継がず、改善する判断基準を定める。
+
+#### 原則: 参考サイトの問題は再現しない
+以下のアクセシビリティ問題は、参考サイトに存在していても再現サイトでは**必ず改善する**:
+
+| 問題カテゴリ | 参考サイトの状態 | 再現サイトの対応 |
+|-----------|---------------|---------------|
+| **コントラスト不足** | WCAG AA 不合格の色の組み合わせ | コントラスト比4.5:1以上に調整（色相は維持し明度で調整） |
+| **alt テキスト欠如** | `<img>` に alt 属性なし | 適切な alt テキストを付与（装飾画像は `alt=""` + `aria-hidden="true"`） |
+| **フォーカスインジケーター不在** | `outline: none` でフォーカス非表示 | カスタムフォーカスリング実装（`focus-visible` 使用） |
+| **キーボード操作不可** | マウスのみで操作可能な要素 | 全インタラクティブ要素をキーボード対応 |
+| **ARIA 属性欠如** | `aria-expanded`, `aria-label` 等が未実装 | `interaction_analyzer` の `aria_pattern` に従い実装 |
+| **見出し階層スキップ** | h1 → h3 等の飛ばし | 論理的な階層に修正（視覚的サイズは CSS で調整） |
+| **言語属性欠如** | `<html lang>` 属性なし | `<html lang="ja">` を設定 |
+| **フォーカストラップ欠如** | モーダルでフォーカスが漏れる | フォーカストラップを実装 |
+
+#### 改善時の視覚的一貫性ルール
+アクセシビリティ改善のために視覚的な変更が必要な場合:
+
+1. **色の調整**: 色相（Hue）と彩度（Saturation）は維持し、明度（Lightness）のみで調整
+2. **フォーカスリング**: サイトのプライマリカラーを使用した `2px solid` + `2px offset`
+3. **スキップリンク**: 視覚的には非表示（`sr-only`）、フォーカス時に表示
+4. **追加テキスト**: `aria-label` 等スクリーンリーダー用のテキストは視覚に影響しない
+
+#### アクセシビリティスコアカード
+```json
+{
+  "accessibility_scorecard": {
+    "reference_site_issues": 8,
+    "issues_fixed": 7,
+    "issues_intentionally_kept": 1,
+    "kept_reason": "装飾的な配色のため視覚デザインの忠実性を優先（コントラスト比 3.8:1 → 最低限の改善で 4.2:1 に）",
+    "improvements": [
+      {"issue": "FAQアコーディオンにaria-expanded欠如", "fix": "aria-expanded + aria-controls を実装"},
+      {"issue": "モバイルメニューにフォーカストラップ未実装", "fix": "focus-trap-react で実装"},
+      {"issue": "画像alt属性が空文字", "fix": "コンテンツに基づくalt テキストを付与"}
+    ]
+  }
+}
+```
+
 ### Step 5: スコアリング
 各カテゴリの項目を確認し、0〜100点でスコアを付ける:
 - 全項目OK → 100点
@@ -166,6 +298,22 @@ Builder が生成した `/agents/web_builder/output/` を Vercel にデプロイ
       ]
     }
   },
+  "pixel_comparison": {
+    "color_deltas": [],
+    "spacing_deltas": [],
+    "layout_deltas": []
+  },
+  "performance_comparison": {
+    "reference_estimated": {"performance": 85, "accessibility": 78, "best_practices": 90, "seo": 92},
+    "current": {"performance": 92, "accessibility": 95, "best_practices": 95, "seo": 98},
+    "bundle_size": {"first_load_js_kb": 89, "verdict": "acceptable"},
+    "performance_issues": []
+  },
+  "accessibility_scorecard": {
+    "reference_site_issues": 0,
+    "issues_fixed": 0,
+    "improvements": []
+  },
   "fix_instructions": [
     {
       "priority": "high",
@@ -236,11 +384,18 @@ Builder が生成した `/agents/web_builder/output/` を Vercel にデプロイ
   "final_score": 88,
   "deploy_url": "https://project-name.vercel.app",
   "iterations_completed": 2,
+  "performance_final": {
+    "performance": 92,
+    "accessibility": 95,
+    "best_practices": 95,
+    "seo": 98
+  },
+  "accessibility_improvements": 7,
   "remaining_issues": [
     "フォーム送信先APIの実装が必要",
     "本番画像の差し替えが必要"
   ],
-  "handoff_notes": "90%再現完了。残りは画像差し替えとフォームバックエンド接続。"
+  "handoff_notes": "90%再現完了。残りは画像差し替えとフォームバックエンド接続。アクセシビリティは参考サイトより7項目改善済み。"
 }
 ```
 
