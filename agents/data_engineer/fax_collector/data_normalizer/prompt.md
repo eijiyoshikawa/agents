@@ -266,10 +266,34 @@ rawデータと同じスキーマに以下のフィールドを追加:
   },
   "companies": [],
   "data_quality": {
-    "completeness": "FAX番号保有率",
-    "freshness": "データ収集日",
+    "completeness": {
+      "score": 0.0,
+      "fax_fill_rate": "0%",
+      "address_fill_rate": "0%",
+      "phone_fill_rate": "0%",
+      "permit_fill_rate": "0%"
+    },
+    "accuracy": {
+      "score": 0.0,
+      "fax_validation_pass_rate": "0%",
+      "area_code_address_match_rate": "0%"
+    },
+    "consistency": {
+      "score": 0.0,
+      "duplicate_fax_different_company_rate": "0%",
+      "address_prefecture_mismatch_rate": "0%"
+    },
+    "timeliness": {
+      "score": 0.0,
+      "data_within_30days_rate": "0%",
+      "data_over_1year_rate": "0%",
+      "source_median_update_date": ""
+    },
+    "overall_quality_score": 0.0,
+    "quality_grade": "pending",
     "dedup_count": "重複排除数",
-    "invalid_count": "無効FAX番号数"
+    "invalid_count": "無効FAX番号数",
+    "merge_candidates_count": 0
   },
   "compliance": {
     "robots_txt_checked": true,
