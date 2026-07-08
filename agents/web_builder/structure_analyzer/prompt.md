@@ -20,6 +20,37 @@
 - `<section>` や `<div>` によるセクション分割
 - セクションの出現順序と数
 
+### Step 1.5: HTML5セマンティクス分析
+
+各ページのセマンティック要素の使用パターンを精緻に記録する:
+
+#### セマンティック要素の使用マッピング
+
+| 要素 | 確認事項 |
+|------|---------|
+| `<header>` | ページレベル / セクションレベルの使い分け。`role="banner"` の有無 |
+| `<nav>` | メイン / サブ / フッター / パンくず等の用途区別。`aria-label` の付与状況 |
+| `<main>` | 1ページに1つのみか。`id="main-content"` 等のスキップリンク対応 |
+| `<footer>` | ページレベル / セクションレベルの使い分け。`role="contentinfo"` の有無 |
+| `<aside>` | サイドバー / 補足情報 / 関連リンクの用途。配置位置 |
+| `<section>` | 各セクションに見出し（h2〜h3）が含まれているか。`aria-labelledby` の有無 |
+| `<article>` | ブログ記事 / ニュース / カード等の自己完結コンテンツでの使用 |
+| `<figure>` / `<figcaption>` | 画像・図表への適用状況 |
+| `<details>` / `<summary>` | ネイティブアコーディオンの使用有無 |
+| `<dialog>` | ネイティブモーダルの使用有無 |
+
+#### 見出し階層の検証
+- h1〜h6 の出現順序と階層構造が論理的か
+- h1 が各ページに1つのみか
+- 見出しレベルの飛ばし（h2 → h4 等）がないか
+- セクション見出しとして適切なレベルが使われているか
+
+#### ランドマークの整理
+ページ全体のARIAランドマーク構成を記録する:
+```
+banner（header）→ navigation（nav）→ main → complementary（aside）→ contentinfo（footer）
+```
+
 ### Step 2: セクション単位の詳細解析
 各セクションについて以下を記録する:
 
@@ -35,6 +66,45 @@
 4. **配置方法**: Flexbox / CSS Grid / 絶対配置
 5. **子要素の構成**: 見出し + テキスト + ボタン、カード x 3、画像 + テキスト 等
 6. **推定高さ**: 100vh / auto / 特定px値
+
+### Step 2.5: レスポンシブパターンの体系化
+
+#### Flexbox vs CSS Grid の判定
+各レイアウトについて、使用されている配置方法を正確に判別する:
+
+| 判定基準 | Flexbox | CSS Grid |
+|---------|---------|----------|
+| **1次元 vs 2次元** | 行 or 列の一方向に並べる | 行と列の両方を制御 |
+| **CSS プロパティ** | `display: flex`, `flex-direction`, `justify-content`, `align-items` | `display: grid`, `grid-template-columns`, `grid-template-rows`, `grid-area` |
+| **典型用途** | ナビゲーション、ヘッダー内要素配置、カード横並び | カードグリッド、ダッシュボード、複雑なレイアウト |
+| **レスポンシブ挙動** | `flex-wrap` で折り返し | `auto-fit` / `auto-fill` + `minmax()` |
+
+#### ブレイクポイント特定手法
+CSSメディアクエリを解析し、実際に使用されているブレイクポイントを特定する:
+
+1. `@media` ルールの全ブレイクポイント値を抽出
+2. Tailwind CSS 使用時は標準ブレイクポイントとの一致を確認（`sm:640`, `md:768`, `lg:1024`, `xl:1280`, `2xl:1536`）
+3. カスタムブレイクポイントがある場合はその値と用途を記録
+4. モバイルファースト（`min-width`）かデスクトップファースト（`max-width`）かを判定
+
+#### レスポンシブ変換パターン
+各セクションのレスポンシブ時の変化を体系的に記録する:
+
+```json
+{
+  "responsive_patterns": [
+    {
+      "section_id": "features",
+      "desktop": "grid-cols-3 gap-8",
+      "tablet": "grid-cols-2 gap-6",
+      "mobile": "grid-cols-1 gap-4",
+      "method": "css-grid",
+      "breakpoint_tablet": "768px",
+      "breakpoint_desktop": "1024px"
+    }
+  ]
+}
+```
 
 ### Step 3: ナビゲーション構造の解析
 - ヘッダーナビゲーションの項目とリンク先
@@ -61,6 +131,48 @@
 - 共通コンポーネント: Header, Footer, CTA Section 等
 - ページ固有のセクション構成
 
+### Step 7: コンポーネント粒度の判断（Atomic Design 分類）
+
+検出した全UI要素を Atomic Design の粒度で分類し、Builder が再利用可能なコンポーネント設計を行えるようにする。
+
+#### 分類基準
+
+| レベル | 定義 | 例 |
+|--------|------|-----|
+| **Atom（原子）** | それ以上分解できない最小UI要素 | Button, Input, Label, Icon, Badge, Avatar, Logo |
+| **Molecule（分子）** | Atom の組み合わせで特定機能を持つ | SearchBar(Input+Button), NavItem(Icon+Label), FormField(Label+Input+Error) |
+| **Organism（有機体）** | Molecule / Atom の集合で独立セクションを構成 | Header, Footer, HeroSection, CardGrid, ContactForm, TestimonialSlider |
+| **Template** | Organism の配置パターン（ページレイアウト） | TopPageLayout, AboutPageLayout |
+| **Page** | Template にコンテンツを流し込んだ完成形 | `/`, `/about`, `/contact` |
+
+#### 出力形式
+```json
+{
+  "component_taxonomy": {
+    "atoms": [
+      {"name": "Button", "variants": ["primary", "secondary", "ghost"], "usage_count": 12},
+      {"name": "SectionHeading", "variants": ["centered", "left-aligned"], "usage_count": 8},
+      {"name": "Badge", "variants": ["filled", "outline"], "usage_count": 5}
+    ],
+    "molecules": [
+      {"name": "NavItem", "composition": ["Icon", "Label"], "usage_count": 6},
+      {"name": "FeatureCard", "composition": ["Icon", "Heading", "Text"], "usage_count": 3},
+      {"name": "FormField", "composition": ["Label", "Input", "ErrorMessage"], "usage_count": 7}
+    ],
+    "organisms": [
+      {"name": "Header", "composition": ["Logo", "NavItem x N", "Button(CTA)"], "shared": true},
+      {"name": "HeroSection", "composition": ["Heading", "Text", "Button x 2", "BackgroundImage"], "shared": false},
+      {"name": "CardGrid", "composition": ["SectionHeading", "FeatureCard x 3"], "shared": true}
+    ]
+  }
+}
+```
+
+#### 判断ガイドライン
+- 3箇所以上で再利用される要素 → 独立コンポーネントとして抽出
+- 2箇所で使用 → props でバリエーション対応可能なら統合
+- 1箇所のみ → ページ内インラインで実装（過度な分割を避ける）
+
 ## 出力フォーマット
 
 `/agents/web_builder/structure_analyzer/output.json` に保存:
@@ -71,6 +183,17 @@
     {
       "url": "https://example.com",
       "page_role": "top",
+      "semantic_structure": {
+        "has_header": true,
+        "has_main": true,
+        "has_footer": true,
+        "has_nav": true,
+        "nav_count": 2,
+        "has_aside": false,
+        "heading_hierarchy": ["h1", "h2", "h2", "h2", "h2", "h3", "h3"],
+        "heading_valid": true,
+        "landmarks": ["banner", "navigation", "main", "contentinfo"]
+      },
       "sections": [
         {
           "id": "hero",
@@ -124,14 +247,31 @@
     "header_height": "80px",
     "section_padding": "80px 0",
     "content_padding": "0 24px",
-    "responsive_breakpoints": ["640px", "768px", "1024px", "1280px"]
+    "responsive_breakpoints": ["640px", "768px", "1024px", "1280px"],
+    "responsive_approach": "mobile-first"
   },
+  "responsive_patterns": [
+    {
+      "section_id": "features",
+      "desktop": "grid-cols-3 gap-8",
+      "tablet": "grid-cols-2 gap-6",
+      "mobile": "grid-cols-1 gap-4",
+      "method": "css-grid",
+      "breakpoint_tablet": "768px",
+      "breakpoint_desktop": "1024px"
+    }
+  ],
   "shared_components": [
     "Header（全ページ共通）",
     "Footer（全ページ共通）",
     "CTA Section（複数ページで使用）",
     "Section Heading（共通見出しパターン）"
-  ]
+  ],
+  "component_taxonomy": {
+    "atoms": [],
+    "molecules": [],
+    "organisms": []
+  }
 }
 ```
 
