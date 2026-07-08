@@ -60,7 +60,138 @@ HTMLソースと読み込まれたリソースから技術を検出する:
 - Google Analytics / GTM
 - Facebook Pixel 等
 
-### Step 4: サイトの特徴メモ
+### Step 3.5: 技術検出の深化
+
+#### CDN / ホスティング判定
+HTTPレスポンスヘッダおよびHTMLソースから配信基盤を特定する:
+
+| 判定対象 | 検出パターン |
+|---------|-------------|
+| **Vercel** | `x-vercel-id` ヘッダ、`_vercel/` パス、`.vercel.app` ドメイン |
+| **Cloudflare** | `cf-ray` ヘッダ、`cf-cache-status`、`cdnjs.cloudflare.com` 参照 |
+| **Fastly** | `x-served-by` ヘッダに `cache-` プレフィックス、`fastly` 文字列 |
+| **AWS CloudFront** | `x-amz-cf-id` ヘッダ、`.cloudfront.net` ドメイン |
+| **Netlify** | `x-nf-request-id` ヘッダ、`.netlify.app` ドメイン |
+| **Firebase** | `.web.app` / `.firebaseapp.com` ドメイン |
+
+#### フレームワーク検出の精緻化
+基本検出に加え、バージョン情報と詳細な判別指標を収集する:
+
+| フレームワーク | 追加検出指標 |
+|--------------|-------------|
+| **Next.js** | `buildId` の存在、`_next/static/chunks/` のファイル構成、App Router vs Pages Router 判定（`__next_f` 属性 → App Router） |
+| **Nuxt.js** | `_nuxt/` 配下のファイル構成、Nuxt 2 vs 3 判定（`_payload.json` → Nuxt 3） |
+| **Gatsby** | `___gatsby` id、`page-data/` ディレクトリ、`/static/` パス |
+| **Remix** | `__remix` 属性、`/build/` パス |
+| **Astro** | `astro-island` カスタム要素、`/_astro/` パス |
+| **SvelteKit** | `__sveltekit/` パス、`.svelte-kit` |
+
+#### CMS検出
+静的サイト・ヘッドレスCMS の併用パターンも含めて判定する:
+
+| CMS | 検出パターン |
+|-----|-------------|
+| **WordPress** | `wp-content/`、`wp-includes/`、`wp-json/` API、`generator` meta |
+| **Strapi** | `/api/` エンドポイント構造、`strapi` 参照 |
+| **Contentful** | `contentful` 参照、`cdn.contentful.com` |
+| **microCMS** | `microcms` 参照、`.microcms.io` ドメイン |
+| **Newt** | `newt` 参照、`.newt.so` ドメイン |
+| **Shopify** | `cdn.shopify.com`、`Shopify.theme` JS オブジェクト |
+
+### Step 4: パフォーマンスベースライン計測
+
+参考サイトのパフォーマンス水準を事前に把握し、Builder / QA Reviewer が目標とするベースラインを設定する。
+
+#### 計測項目
+以下の指標をHTMLソースとリソース構成から推定する（Lighthouse 実行が不可能な環境では推定値で記録）:
+
+| 指標 | 推定方法 | 目標設定基準 |
+|------|---------|-------------|
+| **First Contentful Paint (FCP)** | リソース数・サイズ・外部依存から推定 | 参考サイト同等以下 |
+| **Largest Contentful Paint (LCP)** | ヒーロー画像サイズ・遅延読込の有無から推定 | 2.5秒以下 |
+| **Total Blocking Time (TBT)** | JS バンドルサイズ・サードパーティスクリプト数から推定 | 200ms以下 |
+| **Cumulative Layout Shift (CLS)** | 画像の width/height 属性有無、フォント読込方式から推定 | 0.1以下 |
+
+#### リソースサイズの概算
+- HTML ファイルサイズ
+- CSS 合計サイズ（外部 + インライン）
+- JS 合計サイズ（ファーストパーティ + サードパーティ）
+- 画像合計サイズ（推定）
+- フォントファイル数・推定サイズ
+
+#### パフォーマンス目標の設定
+```json
+{
+  "performance_baseline": {
+    "estimated_scores": {
+      "performance": 85,
+      "accessibility": 90,
+      "best_practices": 90,
+      "seo": 95
+    },
+    "target_scores": {
+      "performance": 90,
+      "accessibility": 95,
+      "best_practices": 95,
+      "seo": 95
+    },
+    "target_rationale": "参考サイトより高いスコアを目標。特にアクセシビリティはWCAG 2.1 AA準拠を必須とする"
+  }
+}
+```
+
+### Step 5: ページ構成の完全マッピング
+
+#### サイトマップの自動生成
+収集したページ一覧から、階層構造を持つサイトマップを生成する:
+
+```json
+{
+  "sitemap": {
+    "tree": {
+      "/": {
+        "title": "トップページ",
+        "children": {
+          "/about": {"title": "会社概要", "children": {}},
+          "/service": {
+            "title": "サービス",
+            "children": {
+              "/service/consulting": {"title": "コンサルティング"},
+              "/service/development": {"title": "開発支援"}
+            }
+          },
+          "/blog": {"title": "ブログ", "children": {}},
+          "/contact": {"title": "お問い合わせ", "children": {}}
+        }
+      }
+    },
+    "depth": 3,
+    "total_pages": 8
+  }
+}
+```
+
+#### リンク構造の可視化
+ページ間の相互リンク関係を隣接リストで記録し、孤立ページやリンク切れの有無を把握する:
+
+```json
+{
+  "link_graph": {
+    "nodes": ["/", "/about", "/service", "/contact"],
+    "edges": [
+      {"from": "/", "to": "/about", "context": "nav"},
+      {"from": "/", "to": "/service", "context": "nav"},
+      {"from": "/", "to": "/contact", "context": "nav + CTA"},
+      {"from": "/about", "to": "/contact", "context": "CTA"},
+      {"from": "/service", "to": "/contact", "context": "CTA"}
+    ],
+    "orphan_pages": [],
+    "hub_pages": ["/"]
+  }
+}
+```
+
+### Step 6: サイトの特徴メモ
 サイト全体の印象・特徴を簡潔にメモする:
 - デザインの方向性（ミニマル/リッチ/コーポレート等）
 - 主なビジュアル要素（動画背景/パララックス/大きな写真等）
@@ -88,9 +219,12 @@ HTMLソースと読み込まれたリソースから技術を検出する:
   ],
   "tech_stack": {
     "framework": "Next.js | WordPress | static | unknown",
+    "framework_version": "15.x（推定）",
+    "framework_detail": "App Router",
     "css": "Tailwind CSS | Bootstrap | custom",
-    "cms": "WordPress | none",
-    "analytics": "Google Analytics | GTM | none"
+    "cms": "WordPress | Strapi | microCMS | none",
+    "analytics": "Google Analytics | GTM | none",
+    "cdn": "Vercel | Cloudflare | Fastly | AWS CloudFront | unknown"
   },
   "external_libraries": ["GSAP", "Swiper", "AOS"],
   "meta": {
@@ -101,7 +235,39 @@ HTMLソースと読み込まれたリソースから技術を検出する:
   "total_pages": 5,
   "primary_language": "ja",
   "site_characteristics": "ミニマルデザイン。大きなヒーロー画像とスムーズスクロール。BtoB向けSaaS。",
-  "responsive": true
+  "responsive": true,
+  "performance_baseline": {
+    "estimated_scores": {
+      "performance": 85,
+      "accessibility": 90,
+      "best_practices": 90,
+      "seo": 95
+    },
+    "target_scores": {
+      "performance": 90,
+      "accessibility": 95,
+      "best_practices": 95,
+      "seo": 95
+    },
+    "resource_summary": {
+      "html_size_kb": 45,
+      "css_total_kb": 120,
+      "js_total_kb": 350,
+      "image_count": 15,
+      "font_count": 3
+    }
+  },
+  "sitemap": {
+    "tree": {},
+    "depth": 2,
+    "total_pages": 5
+  },
+  "link_graph": {
+    "nodes": [],
+    "edges": [],
+    "orphan_pages": [],
+    "hub_pages": ["/"]
+  }
 }
 ```
 
