@@ -70,6 +70,35 @@ export function JobEditor({ job, onChange }: Props) {
       </Group>
 
       <Group title="待遇・勤務条件">
+        <Row>
+          <Num
+            label="月給 下限（万円）"
+            value={job.salary.monthlyMin}
+            onChange={(v) => set("salary", { ...job.salary, monthlyMin: v })}
+          />
+          <Num
+            label="月給 上限（万円）"
+            value={job.salary.monthlyMax}
+            onChange={(v) => set("salary", { ...job.salary, monthlyMax: v })}
+          />
+        </Row>
+        <Row>
+          <Num
+            label="想定年収 下限（万円）"
+            value={job.salary.annualMin}
+            onChange={(v) => set("salary", { ...job.salary, annualMin: v })}
+          />
+          <Num
+            label="想定年収 上限（万円）"
+            value={job.salary.annualMax}
+            onChange={(v) => set("salary", { ...job.salary, annualMax: v })}
+          />
+        </Row>
+        <Text
+          label="給与の補足（賞与・昇給・固定残業代等）"
+          value={job.salary.note}
+          onChange={(v) => set("salary", { ...job.salary, note: v })}
+        />
         <Area label="給与・年収例の詳細" value={job.salaryDetail} onChange={(v) => set("salaryDetail", v)} />
         <Text label="勤務地" value={job.workLocation} onChange={(v) => set("workLocation", v)} />
         <Text label="勤務時間" value={job.workHours} onChange={(v) => set("workHours", v)} />
@@ -113,6 +142,34 @@ function Text({ label, value, onChange }: FieldProps) {
     <label className="block">
       <span className={labelCls}>{label}</span>
       <input className={inputCls} value={value} onChange={(e) => onChange(e.target.value)} />
+    </label>
+  );
+}
+
+function Num({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: number | null;
+  onChange: (value: number | null) => void;
+}) {
+  return (
+    <label className="block">
+      <span className={labelCls}>{label}</span>
+      <input
+        type="number"
+        inputMode="numeric"
+        min={0}
+        className={inputCls}
+        value={value ?? ""}
+        placeholder="未設定"
+        onChange={(e) => {
+          const raw = e.target.value;
+          onChange(raw === "" ? null : Math.max(0, Math.floor(Number(raw))));
+        }}
+      />
     </label>
   );
 }

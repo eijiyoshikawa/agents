@@ -60,7 +60,7 @@ describe("parseJobJson", () => {
     const job = parseJobJson('{"jobTitle":"エンジニア"}');
     expect(job.jobTitle).toBe("エンジニア");
     expect(job.responsibilities).toEqual([]);
-    expect(job.salary.type).toBe("月給");
+    expect(job.salary.monthlyMin).toBeNull();
   });
 
   it("途中切れの応答からも読める部分を復元する", () => {

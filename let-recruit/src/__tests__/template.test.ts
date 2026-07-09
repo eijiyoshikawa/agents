@@ -12,15 +12,41 @@ describe("esc", () => {
 });
 
 describe("formatSalary", () => {
-  it("min/maxを万円レンジで表示", () => {
+  it("月給・年収レンジ(万円)を表示", () => {
     const s = JobPostingSchema.parse({}).salary;
-    expect(formatSalary({ ...s, min: 300000, max: 500000 })).toContain("30万円");
-    expect(formatSalary({ ...s, min: 300000, max: 500000 })).toContain("50万円");
+    const out = formatSalary({
+      ...s,
+      monthlyMin: 30,
+      monthlyMax: 55,
+      annualMin: 420,
+      annualMax: 800,
+    });
+    expect(out).toContain("月給 30万円 〜 55万円");
+    expect(out).toContain("想定年収 420万円 〜 800万円");
   });
 
   it("数値が無ければnoteのみ", () => {
     const s = JobPostingSchema.parse({}).salary;
     expect(formatSalary({ ...s, note: "応相談" })).toBe("応相談");
+  });
+
+  it("旧形式(円)の保存データは万円へ自動変換される", () => {
+    const job = JobPostingSchema.parse({
+      salary: { type: "月給", min: 300000, max: 550000, note: "賞与年2回" },
+    });
+    expect(job.salary.monthlyMin).toBe(30);
+    expect(job.salary.monthlyMax).toBe(55);
+    expect(job.salary.annualMin).toBeNull();
+    expect(job.salary.note).toBe("賞与年2回");
+  });
+
+  it("旧形式(年収)はannual側へ変換される", () => {
+    const job = JobPostingSchema.parse({
+      salary: { type: "年収", min: 4200000, max: 5000000, note: "" },
+    });
+    expect(job.salary.annualMin).toBe(420);
+    expect(job.salary.annualMax).toBe(500);
+    expect(job.salary.monthlyMin).toBeNull();
   });
 });
 

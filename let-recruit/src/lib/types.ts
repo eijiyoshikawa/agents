@@ -4,12 +4,41 @@ import { z } from "zod";
  * 求人票の構造化スキーマ。
  * 他社求人URLからAI抽出した内容を、この形に正規化してLETデザインへ流し込む。
  */
-export const SalarySchema = z.object({
-  type: z.string().default("月給"), // 月給 / 年収 / 時給 など
-  min: z.number().nullable().default(null),
-  max: z.number().nullable().default(null),
-  note: z.string().default(""),
-});
+/**
+ * 給与。月給と年収それぞれのレンジを「万円」の数値で持つ。
+ * 旧形式 {type:"月給"|"年収", min, max(円), note} は自動変換して読み込む。
+ */
+export const SalarySchema = z.preprocess(
+  (val) => {
+    if (val && typeof val === "object" && "type" in val) {
+      // 旧形式からの移行
+      const old = val as {
+        type?: string;
+        min?: number | null;
+        max?: number | null;
+        note?: string;
+      };
+      const toMan = (n: number | null | undefined) =>
+        n == null ? null : n >= 10000 ? Math.round(n / 10000) : n;
+      const isAnnual = old.type === "年収";
+      return {
+        monthlyMin: isAnnual ? null : toMan(old.min),
+        monthlyMax: isAnnual ? null : toMan(old.max),
+        annualMin: isAnnual ? toMan(old.min) : null,
+        annualMax: isAnnual ? toMan(old.max) : null,
+        note: old.note ?? "",
+      };
+    }
+    return val;
+  },
+  z.object({
+    monthlyMin: z.number().nullable().default(null), // 月給下限（万円）
+    monthlyMax: z.number().nullable().default(null), // 月給上限（万円）
+    annualMin: z.number().nullable().default(null), // 想定年収下限（万円）
+    annualMax: z.number().nullable().default(null), // 想定年収上限（万円）
+    note: z.string().default(""), // 賞与・昇給・手当等の補足
+  }),
+);
 
 export const JobPostingSchema = z.object({
   // ── ヘッダー ──
@@ -50,7 +79,13 @@ export const JobPostingSchema = z.object({
   orgStructure: z.string().default(""), // 現在の組織構成
 
   // ── 待遇（AI抽出 + 手入力） ──
-  salary: SalarySchema.default({ type: "月給", min: null, max: null, note: "" }),
+  salary: SalarySchema.default({
+    monthlyMin: null,
+    monthlyMax: null,
+    annualMin: null,
+    annualMax: null,
+    note: "",
+  }),
   salaryDetail: z.string().default(""), // 給与・年収例の詳細
   workLocation: z.string().default(""), // 勤務地
   workHours: z.string().default(""), // 勤務時間

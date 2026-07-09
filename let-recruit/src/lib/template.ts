@@ -290,24 +290,33 @@ function list(items: string[]): string {
   return `<ul class="ul">${items.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>`;
 }
 
+/** 万円レンジを「420万円 〜 500万円」形式に整形（片側のみも可）。 */
+function manRange(min: number | null, max: number | null): string {
+  const man = (n: number) => `${n.toLocaleString("ja-JP")}万円`;
+  if (min != null && max != null) return `${man(min)} 〜 ${man(max)}`;
+  if (min != null) return `${man(min)} 〜`;
+  if (max != null) return `〜 ${man(max)}`;
+  return "";
+}
+
+/** 給与全体の1行表示（月給/年収の両方＋補足）。 */
 export function formatSalary(s: Salary): string {
-  const yen = (n: number) => `${(n / 10000).toLocaleString("ja-JP")}万円`;
-  let range = "";
-  if (s.min && s.max) range = `${yen(s.min)} 〜 ${yen(s.max)}`;
-  else if (s.min) range = `${yen(s.min)} 〜`;
-  else if (s.max) range = `〜 ${yen(s.max)}`;
-  const head = range ? `${s.type} ${range}` : "";
-  return [head, s.note].filter(Boolean).join("　");
+  const parts = [
+    manRange(s.annualMin, s.annualMax) &&
+      `想定年収 ${manRange(s.annualMin, s.annualMax)}`,
+    manRange(s.monthlyMin, s.monthlyMax) &&
+      `月給 ${manRange(s.monthlyMin, s.monthlyMax)}`,
+    s.note,
+  ].filter(Boolean);
+  return parts.join("　");
 }
 
 function formatSalaryAnnual(s: Salary): string {
-  if (s.type !== "年収") return "";
-  return formatSalary(s).replace(/^年収\s*/, "");
+  return manRange(s.annualMin, s.annualMax);
 }
 
 function formatSalaryMonthly(s: Salary): string {
-  if (s.type !== "月給") return "";
-  return formatSalary(s).replace(/^月給\s*/, "");
+  return manRange(s.monthlyMin, s.monthlyMax);
 }
 
 /** HTMLエスケープ（XSS対策）。 */
