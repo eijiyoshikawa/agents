@@ -45,14 +45,27 @@ const cachedTargets = unstable_cache(getStoredTargets, ["sc-targets-v2"], { reva
 const cachedFollowups = unstable_cache(fetchFollowups, ["sc-followups-v1"], { revalidate: TTL, tags: ["customers"] });
 const cachedFieldOptions = unstable_cache(fetchCustomerFieldOptions, ["sc-fieldopts-v1"], { revalidate: 3600, tags: ["schema"] });
 
-// Postgres(Neon)が設定されていればDBから読む（最速）。未設定ならNotionキャッシュにフォールバック。
+// Postgres(Neon)が設定されていればDBから読む（最速）。未設定・DB読取失敗時はNotionキャッシュにフォールバック。
 const cachedDbAll = unstable_cache(dbGetAllSlim, ["sc-db-all-v1"], { revalidate: TTL_FULL, tags: ["customers-full"] });
 const cachedDbContracts = unstable_cache(dbGetContracts, ["sc-db-contracts-v1"], { revalidate: TTL, tags: ["contracts"] });
-function loadAllSlim(): Promise<ListCustomer[]> {
-  return dbConfigured() ? cachedDbAll() : cachedCustomersSlim();
+async function loadAllSlim(): Promise<ListCustomer[]> {
+  if (!dbConfigured()) return cachedCustomersSlim();
+  try {
+    return await cachedDbAll();
+  } catch (e) {
+    // Neonの転送量超過(HTTP 402)やDB障害時は画面を止めず Notion 経路へ自動フォールバック。
+    console.error("[data] DB customers read failed, falling back to Notion:", (e as Error)?.message);
+    return cachedCustomersSlim();
+  }
 }
-function loadContracts(): Promise<Contract[]> {
-  return dbConfigured() ? cachedDbContracts() : cachedContracts();
+async function loadContracts(): Promise<Contract[]> {
+  if (!dbConfigured()) return cachedContracts();
+  try {
+    return await cachedDbContracts();
+  } catch (e) {
+    console.error("[data] DB contracts read failed, falling back to Notion:", (e as Error)?.message);
+    return cachedContracts();
+  }
 }
 
 /** 顧客の編集用フィールド選択肢（Notionスキーマ由来） */
