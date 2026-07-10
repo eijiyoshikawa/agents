@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { JobPosting } from "@/lib/types";
 
 interface Props {
@@ -146,9 +147,19 @@ function Text({ label, value, onChange }: FieldProps) {
   );
 }
 
+/** 全角数字→半角にし、数字以外（カンマ・円など）を除去して数値化。空ならnull。 */
+function parseYenText(raw: string): number | null {
+  const digits = raw
+    .replace(/[０-９]/g, (z) => String.fromCharCode(z.charCodeAt(0) - 0xfee0))
+    .replace(/[^\d]/g, "");
+  if (!digits) return null;
+  // 万円に変換（小数第1位まで保持: 196000円→19.6）
+  return Math.round(Number(digits) / 1000) / 10;
+}
+
 /**
- * 金額入力（円）。内部データは万円で保持しているため相互変換する。
- * 例: 196000円 ↔ 19.6（万円）
+ * 金額入力（円・テキスト直打ち）。内部データは万円で保持し相互変換する。
+ * 入力中は打った文字をそのまま表示し、フォーカスを外すと整形される。
  */
 function Yen({
   label,
@@ -159,25 +170,25 @@ function Yen({
   value: number | null; // 万円
   onChange: (value: number | null) => void; // 万円
 }) {
-  const yen = value == null ? "" : Math.round(value * 10000);
+  // 入力中だけ生テキストを保持（未フォーカス時はデータ由来の表示）
+  const [draft, setDraft] = useState<string | null>(null);
+  const display =
+    draft ?? (value == null ? "" : String(Math.round(value * 10000)));
   return (
     <label className="block">
       <span className={labelCls}>{label}</span>
       <input
-        type="number"
+        type="text"
         inputMode="numeric"
-        min={0}
-        step={1000}
         className={inputCls}
-        value={yen}
+        value={display}
         placeholder="例: 196000"
+        onFocus={(e) => setDraft(e.target.value)}
         onChange={(e) => {
-          const raw = e.target.value;
-          if (raw === "") return onChange(null);
-          const n = Math.max(0, Number(raw));
-          // 万円に変換（小数第1位まで保持: 196000円→19.6）
-          onChange(Math.round(n / 1000) / 10);
+          setDraft(e.target.value);
+          onChange(parseYenText(e.target.value));
         }}
+        onBlur={() => setDraft(null)}
       />
     </label>
   );
