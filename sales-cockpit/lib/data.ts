@@ -15,7 +15,7 @@ import {
 } from "./notion";
 import { dbConfigured, dbGetAllSlim, dbGetContracts } from "./db";
 import { buildDashboard, buildTargets, buildBreakdowns, type TargetsConfig } from "./aggregate";
-import { buildApptTiming, type ApptTiming } from "./timing";
+import { buildTimingBoard, type TimingBoard } from "./timing";
 import { searchInMemory } from "./search";
 import type { DashboardData, Customer, ListCustomer, CallEvent, Contract, Breakdowns, SearchParams, SearchResult } from "./types";
 import targetsRaw from "@/config/targets.json";
@@ -165,11 +165,11 @@ export async function getCalls(): Promise<{ calls: CallEvent[]; errors: string[]
   return { calls, errors };
 }
 
-/** アポ獲得タイミング（曜日×時間帯）。架電記録＋IS架電KPIの「アポ獲得」を集計。 */
-export async function getApptTiming(): Promise<{ timing: ApptTiming; errors: string[] }> {
+/** 架電・アポのタイミング分析（曜日×時間帯）。架電記録＋IS架電KPIを集計。 */
+export async function getTimingBoard(): Promise<{ board: TimingBoard; errors: string[] }> {
   const errors: string[] = [];
   if (!notionConfigured()) {
-    return { timing: buildApptTiming([]), errors: ["NOTION_TOKEN が未設定です。"] };
+    return { board: buildTimingBoard([]), errors: ["NOTION_TOKEN が未設定です。"] };
   }
   const recCalls = await safe("架電記録", cachedCalls, [] as CallEvent[], errors);
   let kpiCalls: CallEvent[] = [];
@@ -178,7 +178,7 @@ export async function getApptTiming(): Promise<{ timing: ApptTiming; errors: str
   } catch {
     kpiCalls = [];
   }
-  return { timing: buildApptTiming([...recCalls, ...kpiCalls]), errors };
+  return { board: buildTimingBoard([...recCalls, ...kpiCalls]), errors };
 }
 
 /** 契約一覧（MRR担当者別など） */
