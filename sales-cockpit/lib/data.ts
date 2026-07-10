@@ -15,6 +15,7 @@ import {
 } from "./notion";
 import { dbConfigured, dbGetAllSlim, dbGetContracts } from "./db";
 import { buildDashboard, buildTargets, buildBreakdowns, type TargetsConfig } from "./aggregate";
+import { buildTimingBoard, type TimingBoard } from "./timing";
 import { searchInMemory } from "./search";
 import type { DashboardData, Customer, ListCustomer, CallEvent, Contract, Breakdowns, SearchParams, SearchResult } from "./types";
 import targetsRaw from "@/config/targets.json";
@@ -45,14 +46,27 @@ const cachedTargets = unstable_cache(getStoredTargets, ["sc-targets-v2"], { reva
 const cachedFollowups = unstable_cache(fetchFollowups, ["sc-followups-v1"], { revalidate: TTL, tags: ["customers"] });
 const cachedFieldOptions = unstable_cache(fetchCustomerFieldOptions, ["sc-fieldopts-v1"], { revalidate: 3600, tags: ["schema"] });
 
-// Postgres(Neon)が設定されていればDBから読む（最速）。未設定ならNotionキャッシュにフォールバック。
+// Postgres(Neon)が設定されていればDBから読む（最速）。未設定・DB読取失敗時はNotionキャッシュにフォールバック。
 const cachedDbAll = unstable_cache(dbGetAllSlim, ["sc-db-all-v1"], { revalidate: TTL_FULL, tags: ["customers-full"] });
 const cachedDbContracts = unstable_cache(dbGetContracts, ["sc-db-contracts-v1"], { revalidate: TTL, tags: ["contracts"] });
-function loadAllSlim(): Promise<ListCustomer[]> {
-  return dbConfigured() ? cachedDbAll() : cachedCustomersSlim();
+async function loadAllSlim(): Promise<ListCustomer[]> {
+  if (!dbConfigured()) return cachedCustomersSlim();
+  try {
+    return await cachedDbAll();
+  } catch (e) {
+    // Neonの転送量超過(HTTP 402)やDB障害時は画面を止めず Notion 経路へ自動フォールバック。
+    console.error("[data] DB customers read failed, falling back to Notion:", (e as Error)?.message);
+    return cachedCustomersSlim();
+  }
 }
-function loadContracts(): Promise<Contract[]> {
-  return dbConfigured() ? cachedDbContracts() : cachedContracts();
+async function loadContracts(): Promise<Contract[]> {
+  if (!dbConfigured()) return cachedContracts();
+  try {
+    return await cachedDbContracts();
+  } catch (e) {
+    console.error("[data] DB contracts read failed, falling back to Notion:", (e as Error)?.message);
+    return cachedContracts();
+  }
 }
 
 /** 顧客の編集用フィールド選択肢（Notionスキーマ由来） */
@@ -149,6 +163,22 @@ export async function getCalls(): Promise<{ calls: CallEvent[]; errors: string[]
   if (!notionConfigured()) return { calls: [], errors: ["NOTION_TOKEN が未設定です。"] };
   const calls = await safe("架電記録", cachedCalls, [] as CallEvent[], errors);
   return { calls, errors };
+}
+
+/** 架電・アポのタイミング分析（曜日×時間帯）。架電記録＋IS架電KPIを集計。 */
+export async function getTimingBoard(): Promise<{ board: TimingBoard; errors: string[] }> {
+  const errors: string[] = [];
+  if (!notionConfigured()) {
+    return { board: buildTimingBoard([]), errors: ["NOTION_TOKEN が未設定です。"] };
+  }
+  const recCalls = await safe("架電記録", cachedCalls, [] as CallEvent[], errors);
+  let kpiCalls: CallEvent[] = [];
+  try {
+    kpiCalls = await fetchIsKpiCalls();
+  } catch {
+    kpiCalls = [];
+  }
+  return { board: buildTimingBoard([...recCalls, ...kpiCalls]), errors };
 }
 
 /** 契約一覧（MRR担当者別など） */
