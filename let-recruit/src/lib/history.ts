@@ -1,4 +1,4 @@
-import type { JobPosting } from "./types";
+import { JobPostingSchema, type JobPosting } from "./types";
 import {
   makeTitle,
   applyBulkField,
@@ -29,7 +29,12 @@ function localLoad(): HistoryEntry[] {
     if (!raw) return [];
     const list = JSON.parse(raw) as HistoryEntry[];
     if (!Array.isArray(list)) return [];
-    return list.sort((a, b) => b.savedAt - a.savedAt);
+    // スキーマ変換を通す（旧形式の給与→新形式など、過去の保存データを移行）
+    const normalized = list.flatMap((e) => {
+      const parsed = JobPostingSchema.safeParse(e.job);
+      return parsed.success ? [{ ...e, job: parsed.data }] : [];
+    });
+    return normalized.sort((a, b) => b.savedAt - a.savedAt);
   } catch {
     return [];
   }

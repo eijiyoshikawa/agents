@@ -125,6 +125,30 @@ describe("filterHistory", () => {
   });
 });
 
+describe("過去データの移行", () => {
+  it("旧形式の給与(円)で保存された履歴も新形式(万円)で読み込める", async () => {
+    // 旧アプリが保存した形をそのままlocalStorageに置く
+    const oldEntry = {
+      id: "old-1",
+      savedAt: 1000,
+      title: "旧データ",
+      job: {
+        jobTitle: "営業",
+        salary: { type: "月給", min: 300000, max: 550000, note: "賞与年2回" },
+      },
+    };
+    window.localStorage.setItem(
+      "let-recruit-history",
+      JSON.stringify([oldEntry]),
+    );
+    const { entries } = await loadHistory();
+    expect(entries).toHaveLength(1);
+    expect(entries[0].job.salary.monthlyMin).toBe(30);
+    expect(entries[0].job.salary.monthlyMax).toBe(55);
+    expect(entries[0].job.salary.note).toBe("賞与年2回");
+  });
+});
+
 describe("formatSavedAt", () => {
   it("YYYY/MM/DD HH:mm 形式で整形する", () => {
     const ms = new Date(2026, 5, 4, 9, 5).getTime();
