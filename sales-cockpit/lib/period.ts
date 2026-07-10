@@ -21,6 +21,13 @@ export function jstDateKey(input: string | Date): string | null {
   return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
 }
 
+/** JST の曜日(0=日..6=土)と時(0-23)。アポ獲得タイミングのバケット用。 */
+export function jstDowHour(input: string | Date): { dow: number; hour: number } | null {
+  const d = toJst(input);
+  if (!d) return null;
+  return { dow: d.getUTCDay(), hour: d.getUTCHours() };
+}
+
 // 月の区切り: 暦月（毎月1日〜末日）を1ヶ月として数える。
 // 例: 5/1〜5/31 = 5月。締め日運用に戻す場合は 16 にすると 16日〜翌月15日 になる。
 export const MONTH_CUTOVER_DAY = 1;
