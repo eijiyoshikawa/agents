@@ -9,7 +9,7 @@ export const EXTRACTION_SYSTEM_PROMPT = `あなたは採用のプロフェッシ
 - 事実が不明な項目は推測で埋めず空文字/空配列のままにする（虚偽を作らない）。
 - 募集している企業名が読み取れる場合は companyName に入れる。連絡先や固有のサービス名はそのまま転記しない。
 - コピーや業務内容は、転載ではなく要点を再構成した自然な日本語にする。
-- 給与の金額は必ず salary の各フィールド（万円の整数）に入れる。月給はmonthlyMin/monthlyMax、年収(想定年収)はannualMin/annualMaxへ。読み取れない場合のみnull。
+- 給与の金額は必ず salary の各フィールド（万円の数値、端数は小数で 例:19.6）に入れる。月給はmonthlyMin/monthlyMax、年収(想定年収)はannualMin/annualMaxへ。読み取れない場合のみnull。
 - 給与・年収の金額や待遇の数字を appealPoints（魅力）に入れない。金額はsalary系、詳細文はsalaryDetailへ。
 - 必ず指定されたJSONスキーマだけを出力する。前置き・説明・マークダウンは一切付けない。`;
 
@@ -22,7 +22,7 @@ export const TEXT_SYSTEM_PROMPT = `あなたは採用のプロフェッショナ
 - 与えられた情報を尊重し、書かれていない事実は推測で創作しない（不明な項目は空のまま）。
 - 雑なメモや口語を、求職者に伝わる自然で丁寧な日本語に整える。
 - 箇条書きにできる内容（業務・要件・福利厚生等）は適切に項目分けする。
-- 給与の金額は必ず salary の各フィールド（万円の整数）に入れる。月給はmonthlyMin/monthlyMax、年収(想定年収)はannualMin/annualMaxへ。読み取れない場合のみnull。
+- 給与の金額は必ず salary の各フィールド（万円の数値、端数は小数で 例:19.6）に入れる。月給はmonthlyMin/monthlyMax、年収(想定年収)はannualMin/annualMaxへ。読み取れない場合のみnull。
 - 給与・年収の金額や待遇の数字を appealPoints（魅力）に入れない。金額はsalary系、詳細文はsalaryDetailへ。
 - 必ず指定されたJSONスキーマだけを出力する。前置き・説明・マークダウンは一切付けない。`;
 
@@ -58,7 +58,7 @@ const JSON_SCHEMA_GUIDE = `JSONスキーマ（読み取れない項目は空文�
   "prPoints": "PRポイントの文章",
   "recruitBackground": "募集背景",
   "orgStructure": "現在の組織構成(例: 部署の人数: 5)",
-  "salary": { "monthlyMin": 月給下限(万円の整数)またはnull, "monthlyMax": 月給上限(万円の整数)またはnull, "annualMin": 想定年収下限(万円の整数)またはnull, "annualMax": 想定年収上限(万円の整数)またはnull, "note": "賞与回数・昇給・固定残業代等の補足" },
+  "salary": { "monthlyMin": 月給下限(万円の数値、19.6のような小数可)またはnull, "monthlyMax": 月給上限(万円の数値)またはnull, "annualMin": 想定年収下限(万円の数値)またはnull, "annualMax": 想定年収上限(万円の数値)またはnull, "note": "賞与回数・昇給・固定残業代等の補足" },
   "salaryDetail": "給与・年収例の詳細文章",
   "workLocation": "勤務地",
   "workHours": "勤務時間",

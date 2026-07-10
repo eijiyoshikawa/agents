@@ -71,25 +71,25 @@ export function JobEditor({ job, onChange }: Props) {
 
       <Group title="待遇・勤務条件">
         <Row>
-          <Num
-            label="月給 下限（万円）"
+          <Yen
+            label="月給 下限（円）"
             value={job.salary.monthlyMin}
             onChange={(v) => set("salary", { ...job.salary, monthlyMin: v })}
           />
-          <Num
-            label="月給 上限（万円）"
+          <Yen
+            label="月給 上限（円）"
             value={job.salary.monthlyMax}
             onChange={(v) => set("salary", { ...job.salary, monthlyMax: v })}
           />
         </Row>
         <Row>
-          <Num
-            label="想定年収 下限（万円）"
+          <Yen
+            label="想定年収 下限（円）"
             value={job.salary.annualMin}
             onChange={(v) => set("salary", { ...job.salary, annualMin: v })}
           />
-          <Num
-            label="想定年収 上限（万円）"
+          <Yen
+            label="想定年収 上限（円）"
             value={job.salary.annualMax}
             onChange={(v) => set("salary", { ...job.salary, annualMax: v })}
           />
@@ -146,15 +146,20 @@ function Text({ label, value, onChange }: FieldProps) {
   );
 }
 
-function Num({
+/**
+ * 金額入力（円）。内部データは万円で保持しているため相互変換する。
+ * 例: 196000円 ↔ 19.6（万円）
+ */
+function Yen({
   label,
   value,
   onChange,
 }: {
   label: string;
-  value: number | null;
-  onChange: (value: number | null) => void;
+  value: number | null; // 万円
+  onChange: (value: number | null) => void; // 万円
 }) {
+  const yen = value == null ? "" : Math.round(value * 10000);
   return (
     <label className="block">
       <span className={labelCls}>{label}</span>
@@ -162,12 +167,16 @@ function Num({
         type="number"
         inputMode="numeric"
         min={0}
+        step={1000}
         className={inputCls}
-        value={value ?? ""}
-        placeholder="未設定"
+        value={yen}
+        placeholder="例: 196000"
         onChange={(e) => {
           const raw = e.target.value;
-          onChange(raw === "" ? null : Math.max(0, Math.floor(Number(raw))));
+          if (raw === "") return onChange(null);
+          const n = Math.max(0, Number(raw));
+          // 万円に変換（小数第1位まで保持: 196000円→19.6）
+          onChange(Math.round(n / 1000) / 10);
         }}
       />
     </label>

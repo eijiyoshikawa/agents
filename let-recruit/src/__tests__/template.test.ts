@@ -40,6 +40,17 @@ describe("formatSalary", () => {
     expect(job.salary.note).toBe("賞与年2回");
   });
 
+  it("端数のある金額(196000円)は19.6万円として扱える", () => {
+    const job = JobPostingSchema.parse({
+      salary: { type: "月給", min: 196000, max: 250000, note: "" },
+    });
+    expect(job.salary.monthlyMin).toBe(19.6);
+    expect(job.salary.monthlyMax).toBe(25);
+    const out = formatSalary(job.salary);
+    expect(out).toContain("19.6万円");
+    expect(out).toContain("25万円");
+  });
+
   it("旧形式(年収)はannual側へ変換される", () => {
     const job = JobPostingSchema.parse({
       salary: { type: "年収", min: 4200000, max: 5000000, note: "" },

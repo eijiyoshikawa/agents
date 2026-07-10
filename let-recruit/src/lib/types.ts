@@ -19,7 +19,7 @@ export const SalarySchema = z.preprocess(
         note?: string;
       };
       const toMan = (n: number | null | undefined) =>
-        n == null ? null : n >= 10000 ? Math.round(n / 10000) : n;
+        n == null ? null : n >= 10000 ? Math.round(n / 1000) / 10 : n;
       const isAnnual = old.type === "年収";
       return {
         monthlyMin: isAnnual ? null : toMan(old.min),
