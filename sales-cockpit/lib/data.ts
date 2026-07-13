@@ -17,6 +17,7 @@ import { dbConfigured, dbGetAllSlim, dbGetContracts } from "./db";
 import { buildDashboard, buildTargets, buildBreakdowns, type TargetsConfig } from "./aggregate";
 import { buildTimingBoard, type TimingBoard } from "./timing";
 import { searchInMemory } from "./search";
+import { computeDuplicates, agencyReason } from "./leadflags";
 import type { DashboardData, Customer, ListCustomer, CallEvent, Contract, Breakdowns, SearchParams, SearchResult } from "./types";
 import targetsRaw from "@/config/targets.json";
 
@@ -68,6 +69,25 @@ async function loadContracts(): Promise<Contract[]> {
     return cachedContracts();
   }
 }
+
+// 検索用インデックス。重い全件走査（重複判定・人材紹介判定・正規化）を
+// データ単位で1回だけ計算してキャッシュする。ページ送り・検索の毎リクエストで
+// 再計算しないためのメモ化（tag "customers-full" で同期/編集時に無効化）。
+type SearchIndex = { all: ListCustomer[]; dupIds: string[]; agency: [string, string][] };
+async function buildSearchIndex(): Promise<SearchIndex> {
+  const all = await loadAllSlim();
+  const { dupIds } = computeDuplicates(all);
+  const agency: [string, string][] = [];
+  for (const c of all) {
+    const r = agencyReason(c);
+    if (r) agency.push([c.id, r]);
+  }
+  return { all, dupIds: [...dupIds], agency };
+}
+const cachedSearchIndex = unstable_cache(buildSearchIndex, ["sc-search-index-v1"], {
+  revalidate: TTL_FULL,
+  tags: ["customers-full"],
+});
 
 /** 顧客の編集用フィールド選択肢（Notionスキーマ由来） */
 export async function getFieldOptions(): Promise<Record<string, string[]>> {
@@ -202,8 +222,14 @@ export async function searchCustomers(params: SearchParams): Promise<{ result: S
   const errors: string[] = [];
   const empty: SearchResult = { rows: [], total: 0, totalDup: 0, totalAgency: 0, page: params.page ?? 1, pageSize: params.pageSize ?? 50 };
   if (!notionConfigured() && !dbConfigured()) return { result: empty, errors: ["NOTION_TOKEN が未設定です。"] };
-  const all = await safe("顧客管理", loadAllSlim, [] as ListCustomer[], errors);
-  return { result: searchInMemory(all, params), errors };
+  const idx = await safe(
+    "顧客管理",
+    cachedSearchIndex,
+    { all: [] as ListCustomer[], dupIds: [] as string[], agency: [] as [string, string][] },
+    errors,
+  );
+  const pre = { dupIds: new Set(idx.dupIds), agency: new Map(idx.agency) };
+  return { result: searchInMemory(idx.all, params, pre), errors };
 }
 
 function minus1(ymd: string): string {

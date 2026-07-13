@@ -12,13 +12,27 @@ const SORT_VAL: Record<string, (c: ListCustomer) => string | number> = {
   lastCallDate: (c) => c.lastCallDate ?? "",
 };
 
-export function searchInMemory(all: ListCustomer[], p: SearchParams): SearchResult {
-  const dup = computeDuplicates(all);
-  const agency = new Map<string, string>();
-  for (const c of all) {
-    const r = agencyReason(c);
-    if (r) agency.set(c.id, r);
-  }
+/**
+ * 全件配列を絞り込み・並べ替え・ページングして1ページ分を返す。
+ * 重複判定・人材紹介判定は全件走査で重いため、呼び出し側で事前計算した
+ * `pre`（dupIds / agency）を渡せる。未指定時のみここで計算する（後方互換）。
+ */
+export function searchInMemory(
+  all: ListCustomer[],
+  p: SearchParams,
+  pre?: { dupIds: Set<string>; agency: Map<string, string> },
+): SearchResult {
+  const dupIds = pre?.dupIds ?? computeDuplicates(all).dupIds;
+  const agency =
+    pre?.agency ??
+    (() => {
+      const m = new Map<string, string>();
+      for (const c of all) {
+        const r = agencyReason(c);
+        if (r) m.set(c.id, r);
+      }
+      return m;
+    })();
 
   const q = (p.q ?? "").trim().toLowerCase();
   const filtered = all.filter((c) => {
@@ -31,13 +45,13 @@ export function searchInMemory(all: ListCustomer[], p: SearchParams): SearchResu
     if (p.rank && c.rank !== p.rank) return false;
     if (p.industry && c.industry !== p.industry) return false;
     if (q && !(c.name.toLowerCase().includes(q) || (c.phone ?? "").includes(q))) return false;
-    if (p.dupOnly && !dup.dupIds.has(c.id)) return false;
+    if (p.dupOnly && !dupIds.has(c.id)) return false;
     if (p.agencyMode === "exclude" && agency.has(c.id)) return false;
     if (p.agencyMode === "only" && !agency.has(c.id)) return false;
     return true;
   });
 
-  const totalDup = filtered.reduce((n, c) => n + (dup.dupIds.has(c.id) ? 1 : 0), 0);
+  const totalDup = filtered.reduce((n, c) => n + (dupIds.has(c.id) ? 1 : 0), 0);
   const totalAgency = filtered.reduce((n, c) => n + (agency.has(c.id) ? 1 : 0), 0);
 
   const sortKey = p.sort && SORT_VAL[p.sort] ? p.sort : "lastCallDate";
@@ -56,7 +70,7 @@ export function searchInMemory(all: ListCustomer[], p: SearchParams): SearchResu
   const start = (page - 1) * pageSize;
   const rows: SearchRow[] = filtered.slice(start, start + pageSize).map((c) => ({
     ...c,
-    dup: dup.dupIds.has(c.id),
+    dup: dupIds.has(c.id),
     agency: agency.get(c.id) ?? null,
   }));
   return { rows, total, totalDup, totalAgency, page, pageSize };
