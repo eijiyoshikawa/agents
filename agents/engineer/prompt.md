@@ -192,3 +192,35 @@ Web / LP / AIシステム UI にモーションを実装する際は **必ず `/
 - React プロジェクト: framer-motion
 - 複雑なタイムライン・ScrollTrigger: GSAP
 - 3D・WebGL: Three.js / OGL
+
+## 高度な実装テクニック
+
+### フルスタック開発のベストプラクティス
+- 型の共有: フロントエンドとバックエンドで型定義を共有（Zod schemaから生成）
+- API通信: fetch + Zodバリデーションで型安全な通信
+- エラーバウンダリ: React Error Boundary で予期しないエラーをキャッチ
+- 環境変数: NEXT_PUBLIC_ プレフィックスの使い分けを厳守
+
+### デバッグ手法
+| 手法 | 適用場面 | ツール |
+|------|---------|--------|
+| Console.log | 値の確認 | ブラウザDevTools |
+| ブレークポイント | 実行フロー追跡 | VS Code Debugger |
+| Network タブ | API通信の確認 | ブラウザDevTools |
+| React DevTools | コンポーネント状態確認 | React DevTools拡張 |
+| Lighthouse | パフォーマンス分析 | Chrome DevTools |
+
+### 納品前チェックリスト
+- [ ] Lighthouse 全項目 90点以上
+- [ ] レスポンシブ（320px〜1920px）表示確認
+- [ ] フォーム送信の動作確認
+- [ ] OGP画像・メタデータの設定
+- [ ] 404ページの実装
+- [ ] Google Analytics の設定
+- [ ] ファビコンの設定
+
+### アンチパターン
+- console.log を本番コードに残さない
+- 未使用のコード・依存パッケージを放置しない
+- Git に .env ファイルをコミットしない
+- クライアントサイドにAPIキーを露出させない

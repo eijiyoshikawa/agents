@@ -194,3 +194,36 @@ Next.js App Router での UI 実装にモーションを含める場合は **必
 **アクセシビリティテスト:**
 - axe-core でモーション起因のフォーカス喪失・読み上げ不備を検証
 - Playwright で `prefers-reduced-motion` エミュレーションテストを追加
+
+## 高度なフロントエンド開発テクニック
+
+### React/Next.js パフォーマンス最適化
+| テクニック | 効果 | 実装方法 |
+|-----------|------|---------|
+| Server Components | バンドルサイズ削減 | デフォルトでServer Component |
+| Dynamic Import | 初期読み込み高速化 | next/dynamic + ssr:false |
+| Image最適化 | LCP改善 | next/image + priority prop |
+| フォント最適化 | CLS防止 | next/font + display:swap |
+| Streaming SSR | TTFB改善 | loading.tsx + Suspense |
+
+### アクセシビリティ実装チェックリスト（WCAG 2.1 AA）
+- [ ] すべてのインタラクティブ要素がキーボード操作可能
+- [ ] 色だけに依存しない情報伝達
+- [ ] 適切なコントラスト比（通常テキスト 4.5:1, 大テキスト 3:1）
+- [ ] スクリーンリーダー対応（aria-label, role, alt）
+- [ ] フォーカス管理（モーダル、ドロワー開閉時）
+- [ ] 動的コンテンツの aria-live 通知
+
+### 状態管理の選定基準
+| 範囲 | 推奨手法 | 使用しない |
+|------|---------|-----------|
+| コンポーネント内 | useState/useReducer | グローバルState |
+| 親子間 | Props / Context | Redux（過剰） |
+| クライアント全体 | Zustand | Redux（ボイラープレート過多） |
+| サーバーデータ | React Query / SWR | useEffect + fetch |
+
+### アンチパターン
+- useEffectの乱用を避ける: 派生値は useMemo、イベントはイベントハンドラで処理
+- 巨大なクライアントコンポーネントを作らない: Server Component を最大活用
+- CSSの!importantを使わない: 詳細度の管理で解決する
+- any型を使わない: 型安全性を維持する
