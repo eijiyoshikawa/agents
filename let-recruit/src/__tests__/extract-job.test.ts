@@ -55,6 +55,25 @@ describe("repairTruncatedJson", () => {
   });
 });
 
+describe("parseJobJson（応答の揺れへの耐性）", () => {
+  it("文字列内に生の改行があっても解析できる", () => {
+    const raw =
+      '{"jobTitle":"営業","philosophy":"ミッション: 可能性を解き放つ。\nビジョン: 日本をアップデートする。"}';
+    const job = parseJobJson(raw);
+    expect(job.jobTitle).toBe("営業");
+    expect(job.philosophy).toContain("ミッション");
+    expect(job.philosophy).toContain("ビジョン");
+  });
+
+  it("給与の数値が文字列で来ても数値化される", () => {
+    const job = parseJobJson(
+      '{"salary":{"monthlyMin":"19.6","monthlyMax":"30万円","annualMin":null,"annualMax":null,"note":""}}',
+    );
+    expect(job.salary.monthlyMin).toBe(19.6);
+    expect(job.salary.monthlyMax).toBe(30);
+  });
+});
+
 describe("parseJobJson", () => {
   it("スキーマで正規化し欠損はデフォルト補完", () => {
     const job = parseJobJson('{"jobTitle":"エンジニア"}');

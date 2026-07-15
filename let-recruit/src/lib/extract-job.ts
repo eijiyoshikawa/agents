@@ -81,20 +81,79 @@ function firstText(message: Anthropic.Message): string {
 
 /** テキストからJSONを取り出し、スキーマで正規化する。 */
 export function parseJobJson(raw: string): JobPosting {
-  const jsonText = extractJsonBlock(raw);
+  // 文字列内の生改行等を先にエスケープ（AIが長文フィールドで出しがち）
+  const jsonText = sanitizeJsonControlChars(extractJsonBlock(raw));
   let parsed: unknown;
   try {
     parsed = JSON.parse(jsonText);
   } catch {
     // 途中切れ等で壊れたJSONの修復を試みる
-    const repaired = repairTruncatedJson(jsonText);
     try {
-      parsed = JSON.parse(repaired);
+      parsed = JSON.parse(repairTruncatedJson(jsonText));
     } catch {
+      console.error(
+        "[extract-job] JSON解析失敗。応答先頭:",
+        raw.slice(0, 300),
+        "…応答末尾:",
+        raw.slice(-200),
+      );
       throw new Error("AIの応答をJSONとして解析できませんでした。");
     }
   }
-  return JobPostingSchema.parse(parsed);
+  try {
+    return JobPostingSchema.parse(parsed);
+  } catch (err) {
+    console.error("[extract-job] スキーマ検証失敗:", err);
+    throw new Error(
+      "AIの応答形式が想定と異なりました。もう一度お試しください。",
+    );
+  }
+}
+
+/**
+ * JSON文字列リテラル内の生の改行・タブを \n \t にエスケープする。
+ * （JSONでは文字列中の生制御文字は不正だが、AIが長文で出すことがある）
+ */
+export function sanitizeJsonControlChars(text: string): string {
+  let out = "";
+  let inString = false;
+  let escaped = false;
+  for (const ch of text) {
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+        out += ch;
+        continue;
+      }
+      if (ch === "\\") {
+        escaped = true;
+        out += ch;
+        continue;
+      }
+      if (ch === '"') {
+        inString = false;
+        out += ch;
+        continue;
+      }
+      if (ch === "\n") {
+        out += "\\n";
+        continue;
+      }
+      if (ch === "\r") {
+        out += "\\r";
+        continue;
+      }
+      if (ch === "\t") {
+        out += "\\t";
+        continue;
+      }
+      out += ch;
+      continue;
+    }
+    if (ch === '"') inString = true;
+    out += ch;
+  }
+  return out;
 }
 
 /** ```json フェンスや前後の文章を除去して純粋なJSON文字列を得る。 */

@@ -10,16 +10,29 @@ import { z } from "zod";
  */
 export const SalarySchema = z.preprocess(
   (val) => {
+    // 数値項目に "19.6" や "30万円" のような文字列が来ても数値化する
+    const num = (n: unknown): number | null => {
+      if (n == null) return null;
+      if (typeof n === "number") return Number.isFinite(n) ? n : null;
+      if (typeof n === "string") {
+        const m = n.replace(/[^\d.]/g, "");
+        const v = parseFloat(m);
+        return Number.isFinite(v) ? v : null;
+      }
+      return null;
+    };
     if (val && typeof val === "object" && "type" in val) {
       // 旧形式からの移行
       const old = val as {
         type?: string;
-        min?: number | null;
-        max?: number | null;
+        min?: unknown;
+        max?: unknown;
         note?: string;
       };
-      const toMan = (n: number | null | undefined) =>
-        n == null ? null : n >= 10000 ? Math.round(n / 1000) / 10 : n;
+      const toMan = (raw: unknown) => {
+        const n = num(raw);
+        return n == null ? null : n >= 10000 ? Math.round(n / 1000) / 10 : n;
+      };
       const isAnnual = old.type === "年収";
       return {
         monthlyMin: isAnnual ? null : toMan(old.min),
@@ -27,6 +40,16 @@ export const SalarySchema = z.preprocess(
         annualMin: isAnnual ? toMan(old.min) : null,
         annualMax: isAnnual ? toMan(old.max) : null,
         note: old.note ?? "",
+      };
+    }
+    if (val && typeof val === "object") {
+      const v = val as Record<string, unknown>;
+      return {
+        monthlyMin: num(v.monthlyMin),
+        monthlyMax: num(v.monthlyMax),
+        annualMin: num(v.annualMin),
+        annualMax: num(v.annualMax),
+        note: typeof v.note === "string" ? v.note : "",
       };
     }
     return val;
