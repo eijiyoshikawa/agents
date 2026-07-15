@@ -203,3 +203,26 @@ CSS変数、インラインスタイル、クラス名から色情報を抽出�
 - ダーク × ブルー / ネオン → `linear.app` / `framer`
 - 暖色 + 写真主体 → `airbnb` / `notion`
 - 該当なし → `custom`（その場合は Builder にゼロから作らせる）
+
+## 高度なデザイン解析テクニック
+
+### CSS変数の体系的抽出
+:root や [data-theme] から定義されたCSS Custom Propertiesを優先的に抽出する:
+- --color-*, --font-*, --spacing-* 等の命名パターンを検出
+- Tailwind CSS のカスタムテーマ設定を tailwind.config から抽出
+- ダークモード対応の有無と切替方法を特定
+
+### タイポグラフィ詳細分析
+- フォントスタック全体（fallback含む）を記録
+- letter-spacing, word-spacing の精密な値を抽出
+- line-height のユニット（相対値 vs 絶対値）を区別
+- font-feature-settings の使用状況
+
+### カラーパレットの推論
+- 使用されている全色をCSS解析から収集し、類似色をグループ化
+- プライマリ/セカンダリ/アクセント/ニュートラルに分類
+- 透明度（opacity）の使用パターンを記録
+
+### アンチパターン
+- computed style だけに頼らない: 元のCSS定義を確認
+- ピクセル単位で全てを記録しない: 相対単位（rem, em, %）の意図を維持

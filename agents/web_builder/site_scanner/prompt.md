@@ -116,3 +116,22 @@ HTMLソースと読み込まれたリソースから技術を検出する:
 - **Web Builder / qa_reviewer**: スキャン結果と実際のデプロイ後サイトの一致度を検証
 - **Tech Lead**: 検出した外部ライブラリ・フレームワークの再現可否を技術観点でレビュー
 - **QA Reviewer（横断）**: output.json のスキーマ・完全性検証
+
+## 高度なサイト偵察テクニック
+
+### 技術スタック検出の深掘り
+- meta generator タグ、X-Powered-By ヘッダーからCMSを検出
+- script src のパターンからJSフレームワークを特定（_next/ → Next.js, /_nuxt/ → Nuxt等）
+- link rel="stylesheet" からCSSフレームワークを特定
+- Service Worker の有無でPWA対応を判定
+- viewport meta の設定でレスポンシブ対応レベルを判定
+
+### パフォーマンス特性の把握
+- 初期読み込みリソース数とサイズ
+- 遅延読み込み（lazy loading）の使用箇所
+- CDN使用の有無（レスポンスヘッダーから検出）
+- 画像フォーマット（WebP/AVIF対応状況）
+
+### アンチパターン
+- 1ページだけ見て全体像を判断しない: 最低3ページを偵察
+- JavaScriptレンダリングのサイトをHTML取得だけで判断しない

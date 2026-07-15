@@ -286,3 +286,29 @@ motion_analyzer の出力に含まれる `motion_key` は **すべて `/design-m
 - GSAP 系（kinetic-flow の複雑版 / path-animation の高度版）→ `npm install gsap`
 - tsParticles（particle-connect）→ `npm install @tsparticles/react @tsparticles/engine`
 - WebGL（liquid-hover）→ `npm install three` または `npm install ogl`
+
+## 高度な実装テクニック
+
+### 解析結果の統合手順
+1. Design Analyzer の CSS変数・トークンを tailwind.config.ts に反映
+2. Structure Analyzer のレイアウトパターンでページ骨格を構築
+3. Motion Analyzer のアニメーションをコンポーネントに適用
+4. Interaction Analyzer のUIパターンを Headless UI / Radix で実装
+5. Asset Collector の代替アセットを配置
+
+### コンポーネント設計の原則
+- 再利用可能なコンポーネントを優先（Button, Card, Section等）
+- Server Component をデフォルトとし、インタラクションがある部分のみ Client Component
+- コンポーネント単位でレスポンシブ対応（グローバルメディアクエリに依存しない）
+
+### パフォーマンス最適化
+- next/image で画像を最適化（sizes, priority, placeholder="blur"）
+- next/font でフォントを最適化（display: "swap"）
+- Dynamic Import で初期バンドルを軽量化
+- CSS は Tailwind のPurge で未使用クラスを除去
+
+### アンチパターン
+- 参考サイトのHTMLをコピペしない: 構造を理解して再構築
+- CSSを直接コピーしない: Tailwind ユーティリティに変換
+- すべてをClient Componentにしない: パフォーマンスが劣化する
+- テストなしでデプロイしない: 最低限レスポンシブ確認を実施

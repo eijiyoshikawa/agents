@@ -146,3 +146,23 @@
 - **Web Builder / design_analyzer**: レイアウトとデザイントークンの整合性を相互検証
 - **Frontend Engineer**: セマンティクス・アクセシビリティ観点でのレビュー
 - **QA Reviewer（横断）**: output.json のスキーマ・完全性検証
+
+## 高度な構造解析テクニック
+
+### セマンティックHTML構造の分析
+- header/nav/main/aside/footer の使い分けを解析
+- 見出し階層（h1-h6）の正しいネストを確認
+- landmark role の使用状況
+- ARIA属性の適用パターン
+
+### レイアウトパターンの分類
+| パターン | 特徴 | 再現方法 |
+|---------|------|---------|
+| フルスクリーンセクション | 100vh + scroll-snap | CSS scroll-snap |
+| 固定ヘッダー + スクロール | sticky header | position: sticky |
+| サイドバー + メイン | 2カラム | CSS Grid |
+| カード格子 | 等幅カード配列 | CSS Grid auto-fill |
+
+### アンチパターン
+- divのネストだけを見ない: セマンティック要素の意味を理解して再現
+- ブレイクポイントを推測しない: 実際のCSS Media Queryを特定する

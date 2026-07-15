@@ -199,3 +199,27 @@ JS ソースから以下のパターンを検出する:
 - 数字がドラムロール → `slot-counter`
 - カードが3D傾斜 → `card-tilt`
 - 常時ノイズ背景 → `overlay-texture`
+
+## 高度なモーション解析テクニック
+
+### アニメーション分類
+| タイプ | 検出方法 | 再現アプローチ |
+|--------|---------|-------------|
+| CSS Transition | transition プロパティ | Tailwind transition + duration |
+| CSS Animation | @keyframes | カスタムキーフレーム定義 |
+| JS Animation | requestAnimationFrame, GSAP等 | framer-motion or GSAP |
+| Scroll-driven | IntersectionObserver, ScrollTrigger | framer-motion whileInView |
+
+### イージング関数の精密抽出
+- cubic-bezier の値を正確に記録（0.4, 0, 0.2, 1 等）
+- spring アニメーションのパラメータ（stiffness, damping, mass）を推定
+- MOTION_30.md の既存 motion_key との対応付け
+
+### パフォーマンス配慮
+- transform と opacity のみの GPU アクセラレーション対象プロパティを優先
+- will-change の使用箇所と値を記録
+- 同時発火するアニメーション数を確認
+
+### アンチパターン
+- すべてのホバーエフェクトを記録する必要はない: 主要なものに絞る
+- 3Dエフェクトを安易にコピーしない: パフォーマンスコストを考慮
