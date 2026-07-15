@@ -1,7 +1,7 @@
 # Phase 1 (MVP) 実装着手仕様 — 画面遷移 & API
 
 > 別リポジトリでの実装着手資料。DESIGN.md のアーキテクチャを前提に、**画面遷移・API・状態遷移・中核アルゴリズム**を1段深掘り。
-> スタック: Next.js(App Router)+TypeScript+Tailwind / PostgreSQL(RLS) / Cloudflare Stream(or Mux)
+> スタック: Next.js(App Router)+TypeScript+Tailwind / PostgreSQL(RLS) / **Cloudflare R2 + CDN 自前HLS配信（egress無料）** ＋ ffmpeg エンコード
 > 最終更新: 2026-07-15
 
 ---
@@ -100,13 +100,22 @@ POST  /api/tenant/users            (admin)    { email, name, employee_no } → 2
 POST  /api/tenant/users/import     (admin)    multipart CSV(email,name,employee_no) → 202 { imported, errors:[] }
 ```
 
-### 4.3 コース / 教材 / 動画
+### 4.3 コース / 教材 / 動画（R2 + 自前HLS）
 ```
 POST /api/courses                  (operator) { title, category, required_watch_ratio, pass_score } → 201
 POST /api/courses/{id}/lessons     (operator) { title, order, video_asset_id, duration_sec } → 201
-POST /api/videos/upload-url        (operator) { filename } → 201 { upload_url, video_asset_id }  ← Stream/Mux 署名アップロード
-GET  /api/lessons/{id}/playback    (learner)  → 200 { hls_url(署名/短命), duration_sec }
+
+# 1) アップロード用の署名URLを発行（原本を R2 の ingest バケットへ直接PUT）
+POST /api/videos/upload-url        (operator) { filename, content_type }
+    → 201 { upload_url(R2署名PUT), video_asset_id }
+# 2) アップロード完了を通知 → エンコードジョブ起動（ffmpeg で HLS/ABR 化 → 配信バケットへ）
+POST /api/videos/{asset_id}/complete (operator) → 202 { status:"encoding" }
+GET  /api/videos/{asset_id}          (operator) → 200 { status:"ready"|"encoding"|"failed", duration_sec }
+
+# 3) 視聴時：署名付きの短命 HLS URL を返す（CDN 経由・egress無料）
+GET  /api/lessons/{id}/playback    (learner)  → 200 { hls_url(署名/短命 .m3u8), duration_sec }
 ```
+> 配信は Cloudflare CDN 前段の R2 から HLS 配信。アクセス制御は署名付き短命URL（Worker 署名 or presigned）。**egress 課金なし**のため視聴量が増えても配信費はほぼ増えない。エンコードは**アップロード時の一度きり**で、実視聴には比例しない。
 
 ### 4.4 受講登録
 ```
@@ -265,6 +274,18 @@ CREATE TABLE watch_event (
 );
 -- UPDATE/DELETE をロール権限で禁止（append-only）
 
+-- 動画アセット（実体は R2、DBは参照とエンコード状態のみ）
+CREATE TABLE video_asset (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id uuid,                                 -- 共有教材は NULL 可
+  status text NOT NULL DEFAULT 'uploading'
+    CHECK (status IN ('uploading','encoding','ready','failed')),
+  r2_master_key text,                             -- 原本の R2 キー
+  r2_hls_prefix text,                             -- 配信用 HLS(.m3u8/segments) の R2 プレフィックス
+  duration_sec integer,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
 CREATE TABLE lesson_progress (
   enrollment_id uuid NOT NULL, lesson_id uuid NOT NULL,
   covered_ratio real NOT NULL DEFAULT 0,
@@ -288,6 +309,7 @@ CREATE POLICY tenant_isolation ON enrollment
 - [ ] 同一区間の複数回視聴が二重計上されない（E2E: 同じ1分×3回 = covered_sec 60s）
 - [ ] タブ非アクティブ／離席区間が実視聴に加算されない
 - [ ] テナント越境参照が RLS で遮断される（別テナントの enrollment を取得できない）
+- [ ] 動画は R2 に保管され、エンコード完了後に**署名付き短命HLS URL**で配信される（原本の直リンク・DL不可）
 - [ ] watch_event が UPDATE/DELETE 不可、hash チェーンが検証可能
 - [ ] 監査エクスポート（受講記録/明細/サマリ）がハッシュ付きで出力できる
 - [ ] 修了証 PDF に 受講者名・コース名・実受講時間・修了日・証明番号 が入る
@@ -300,7 +322,7 @@ CREATE POLICY tenant_isolation ON enrollment
 | Sprint | 内容 | 主な DoD |
 |--------|------|---------|
 | S1 | 認証・RBAC・マルチテナント(RLS)・スキーマ | 越境遮断・ログイン |
-| S2 | コース/教材/動画アップロード・受講登録 | 割当→受講者に表示 |
+| S2 | コース/教材・**動画アップロード→ffmpegエンコード→R2配信(署名HLS)**・受講登録 | 割当→受講者に表示・署名URLで再生 |
 | S3 | **プレイヤー + イベント投入 + 集計エンジン** | カバレッジ正確・不正加算不可 |
 | S4 | 確認テスト・修了判定・修了証PDF | 修了フロー一気通貫 |
 | S5 | 監査エクスポート・管理ダッシュボード | 帳票ハッシュ付き出力 |
