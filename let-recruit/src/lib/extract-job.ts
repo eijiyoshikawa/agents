@@ -111,14 +111,32 @@ export function parseJobJson(raw: string): JobPosting {
 }
 
 /**
- * JSON文字列リテラル内の生の改行・タブを \n \t にエスケープする。
- * （JSONでは文字列中の生制御文字は不正だが、AIが長文で出すことがある）
+ * AI応答のJSONによくある不正を修復する。
+ * - 文字列リテラル内の生の改行・タブ → \n \t にエスケープ
+ * - 文字列リテラル内の未エスケープ " → \" にエスケープ
+ *   （例: "キャッチ"引用"コピー" のようにAIが引用符を素で埋め込むケース。
+ *    " の直後が , } ] : か空白+それらの場合のみ「文字列の終端」とみなす）
  */
 export function sanitizeJsonControlChars(text: string): string {
   let out = "";
   let inString = false;
   let escaped = false;
-  for (const ch of text) {
+  const chars = Array.from(text);
+
+  /** i番目の " が文字列の終端らしいか（直後の非空白が構造文字か末尾） */
+  const looksLikeStringEnd = (i: number): boolean => {
+    for (let j = i + 1; j < chars.length; j++) {
+      const c = chars[j];
+      if (c === " " || c === "\t") continue;
+      // 改行を挟んで次行が構造文字/新キーで始まるケースも終端とみなす
+      if (c === "\n" || c === "\r") continue;
+      return c === "," || c === "}" || c === "]" || c === ":";
+    }
+    return true; // 末尾
+  };
+
+  for (let i = 0; i < chars.length; i++) {
+    const ch = chars[i];
     if (inString) {
       if (escaped) {
         escaped = false;
@@ -131,8 +149,12 @@ export function sanitizeJsonControlChars(text: string): string {
         continue;
       }
       if (ch === '"') {
-        inString = false;
-        out += ch;
+        if (looksLikeStringEnd(i)) {
+          inString = false;
+          out += ch;
+        } else {
+          out += '\\"'; // 文中の引用符→エスケープ
+        }
         continue;
       }
       if (ch === "\n") {

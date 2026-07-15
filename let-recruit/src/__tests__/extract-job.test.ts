@@ -65,6 +65,20 @@ describe("parseJobJson（応答の揺れへの耐性）", () => {
     expect(job.philosophy).toContain("ビジョン");
   });
 
+  it("文字列内の未エスケープ引用符を修復できる（本番ログの実例）", () => {
+    // AIが「"細かいことに気づける"」を素の"で埋め込んだ実際の失敗応答パターン
+    const raw = `{
+      "catchphrase": "【土日祝休み×賞与年2回】"細かいことに気づける"が武器になる事務職／段取り・整理が得意な方にぴったりのポジション",
+      "jobTitle": "建築事務",
+      "benefits": ["社会保険完備", "定年後再雇用制度あり"]
+    }`;
+    const job = parseJobJson(raw);
+    expect(job.jobTitle).toBe("建築事務");
+    expect(job.catchphrase).toContain("細かいことに気づける");
+    expect(job.catchphrase).toContain("ポジション");
+    expect(job.benefits).toContain("社会保険完備");
+  });
+
   it("給与の数値が文字列で来ても数値化される", () => {
     const job = parseJobJson(
       '{"salary":{"monthlyMin":"19.6","monthlyMax":"30万円","annualMin":null,"annualMax":null,"note":""}}',
