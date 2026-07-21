@@ -16,6 +16,7 @@
   "rewrites": [
     { "source": "/sales", "destination": "/sales.html" },
     { "source": "/marketing", "destination": "/marketing.html" },
+    { "source": "/marketing/v2", "destination": "/marketing/v2.html" },
     { "source": "/bpo", "destination": "/bpo.html" },
     { "source": "/demo/sales", "destination": "/demo/sales.html" },
     { "source": "/demo/marketing", "destination": "/demo/marketing.html" },
