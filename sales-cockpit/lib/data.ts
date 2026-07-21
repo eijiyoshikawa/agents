@@ -13,7 +13,7 @@ import {
   notionConfigured,
   getStoredTargets,
 } from "./notion";
-import { dbConfigured, dbGetAllSlim, dbGetContracts } from "./db";
+import { dbConfigured, dbGetAllSlim, dbGetContracts, dbSearchCustomers } from "./db";
 import { buildDashboard, buildTargets, buildBreakdowns, type TargetsConfig } from "./aggregate";
 import { buildTimingBoard, type TimingBoard } from "./timing";
 import { searchInMemory } from "./search";
@@ -222,6 +222,18 @@ export async function searchCustomers(params: SearchParams): Promise<{ result: S
   const errors: string[] = [];
   const empty: SearchResult = { rows: [], total: 0, totalDup: 0, totalAgency: 0, page: params.page ?? 1, pageSize: params.pageSize ?? 50 };
   if (!notionConfigured() && !dbConfigured()) return { result: empty, errors: ["NOTION_TOKEN が未設定です。"] };
+
+  // 高速経路: DB(Neon)側でSQL検索・ページング（全件をアプリに読み込まない）。
+  if (dbConfigured()) {
+    try {
+      return { result: await dbSearchCustomers(params), errors };
+    } catch (e) {
+      // Neon障害/転送量超過(402)時は Notion 経路にフォールバック（遅いが画面は止めない）。
+      console.error("[data] DB search failed, falling back to Notion:", (e as Error)?.message);
+    }
+  }
+
+  // フォールバック: Notion全件をメモ化して従来のメモリ内検索。
   const idx = await safe(
     "顧客管理",
     cachedSearchIndex,

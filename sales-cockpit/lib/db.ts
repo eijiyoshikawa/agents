@@ -2,8 +2,8 @@
 // 未設定なら dbConfigured()=false となり、アプリは従来のNotionキャッシュ経路で動作する（フォールバック）。
 import { neon } from "@neondatabase/serverless";
 import { fetchCustomersSlim, fetchContracts, NOTION_MAX_PAGES } from "./notion";
-import { normalizeCompanyName, normalizePhone } from "./leadflags";
-import type { ListCustomer, Contract } from "./types";
+import { normalizeCompanyName, normalizePhone, computeDuplicates, agencyReason } from "./leadflags";
+import type { ListCustomer, Contract, SearchParams, SearchResult, SearchRow } from "./types";
 
 // 接続文字列を解決：標準名 → 無ければ postgres:// 形式の環境変数を自動検出（Custom Prefix対策）。
 function resolveConn(): string {
@@ -51,6 +51,10 @@ export async function ensureSchema(): Promise<void> {
   await sql`CREATE INDEX IF NOT EXISTS idx_sc_customers_appt ON sc_customers(appointment_date)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_sc_customers_name_norm ON sc_customers(name_norm)`;
   await sql`CREATE INDEX IF NOT EXISTS idx_sc_customers_phone_norm ON sc_customers(phone_norm)`;
+  // 重複候補 / 人材紹介の疑い を同期時に事前計算して保存する列（検索・件数をSQL側で高速に出すため）
+  await sql`ALTER TABLE sc_customers ADD COLUMN IF NOT EXISTS is_dup boolean`;
+  await sql`ALTER TABLE sc_customers ADD COLUMN IF NOT EXISTS agency_reason text`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_sc_customers_is_dup ON sc_customers(is_dup)`;
   await sql`CREATE TABLE IF NOT EXISTS sc_contracts (
     id text PRIMARY KEY, name text, status text, monthly bigint, start_date text, end_date text,
     kinds text, churn_risk text, next_renewal text, s_rep text, cs_rep text, health text,
@@ -59,8 +63,13 @@ export async function ensureSchema(): Promise<void> {
   await sql`CREATE TABLE IF NOT EXISTS sc_sync_meta ( key text PRIMARY KEY, value text )`;
 }
 
-const CUST_COLS = 21;
-async function upsertCustomers(rows: ListCustomer[], stamp: string): Promise<void> {
+const CUST_COLS = 23;
+async function upsertCustomers(
+  rows: ListCustomer[],
+  stamp: string,
+  dupIds: Set<string>,
+  agency: Map<string, string>,
+): Promise<void> {
   const sql = db();
   const BATCH = 400;
   for (let i = 0; i < rows.length; i += BATCH) {
@@ -72,13 +81,14 @@ async function upsertCustomers(rows: ListCustomer[], stamp: string): Promise<voi
       values.push(
         c.id, c.url, c.name, normalizeCompanyName(c.name), c.phone, normalizePhone(c.phone),
         c.status, c.rank, c.industry, c.phase, c.method, c.pref, c.isRep, c.sRep,
-        c.callCount, c.lastCallDate, c.appointmentDate, c.lastEdited, c.address, c.confirm, stamp,
+        c.callCount, c.lastCallDate, c.appointmentDate, c.lastEdited, c.address, c.confirm,
+        dupIds.has(c.id), agency.get(c.id) ?? null, stamp,
       );
       return `(${ph})`;
     });
     const text =
-      `INSERT INTO sc_customers (id,url,name,name_norm,phone,phone_norm,status,rank,industry,phase,method,pref,is_rep,s_rep,call_count,last_call_date,appointment_date,last_edited,address,confirm,synced_at) VALUES ${tuples.join(",")} ` +
-      `ON CONFLICT (id) DO UPDATE SET url=EXCLUDED.url,name=EXCLUDED.name,name_norm=EXCLUDED.name_norm,phone=EXCLUDED.phone,phone_norm=EXCLUDED.phone_norm,status=EXCLUDED.status,rank=EXCLUDED.rank,industry=EXCLUDED.industry,phase=EXCLUDED.phase,method=EXCLUDED.method,pref=EXCLUDED.pref,is_rep=EXCLUDED.is_rep,s_rep=EXCLUDED.s_rep,call_count=EXCLUDED.call_count,last_call_date=EXCLUDED.last_call_date,appointment_date=EXCLUDED.appointment_date,last_edited=EXCLUDED.last_edited,address=EXCLUDED.address,confirm=EXCLUDED.confirm,synced_at=EXCLUDED.synced_at`;
+      `INSERT INTO sc_customers (id,url,name,name_norm,phone,phone_norm,status,rank,industry,phase,method,pref,is_rep,s_rep,call_count,last_call_date,appointment_date,last_edited,address,confirm,is_dup,agency_reason,synced_at) VALUES ${tuples.join(",")} ` +
+      `ON CONFLICT (id) DO UPDATE SET url=EXCLUDED.url,name=EXCLUDED.name,name_norm=EXCLUDED.name_norm,phone=EXCLUDED.phone,phone_norm=EXCLUDED.phone_norm,status=EXCLUDED.status,rank=EXCLUDED.rank,industry=EXCLUDED.industry,phase=EXCLUDED.phase,method=EXCLUDED.method,pref=EXCLUDED.pref,is_rep=EXCLUDED.is_rep,s_rep=EXCLUDED.s_rep,call_count=EXCLUDED.call_count,last_call_date=EXCLUDED.last_call_date,appointment_date=EXCLUDED.appointment_date,last_edited=EXCLUDED.last_edited,address=EXCLUDED.address,confirm=EXCLUDED.confirm,is_dup=EXCLUDED.is_dup,agency_reason=EXCLUDED.agency_reason,synced_at=EXCLUDED.synced_at`;
     await sql.query(text, values);
   }
 }
@@ -112,7 +122,15 @@ export async function syncAll(): Promise<{ customers: number; contracts: number;
   await ensureSchema();
   const stamp = new Date().toISOString();
   const [customers, contracts] = await Promise.all([fetchCustomersSlim(), fetchContracts()]);
-  await upsertCustomers(customers, stamp);
+  // 重複候補・人材紹介の疑いを「同期時に1回だけ」全件計算し、フラグとして保存する。
+  // これにより検索時はSQLのフィルタ/COUNTだけで済み、全件走査が不要になる。
+  const { dupIds } = computeDuplicates(customers);
+  const agency = new Map<string, string>();
+  for (const c of customers) {
+    const r = agencyReason(c);
+    if (r) agency.set(c.id, r);
+  }
+  await upsertCustomers(customers, stamp, dupIds, agency);
   await upsertContracts(contracts, stamp);
   const sql = db();
   // 取得上限に達している＝Notionを取り切れていない可能性。その場合は削除を行わない（誤削除防止）。
@@ -145,6 +163,91 @@ export async function dbGetContracts(): Promise<Contract[]> {
     start: r.start_date, end: r.end_date, kinds: safeArr(r.kinds), churnRisk: r.churn_risk,
     nextRenewal: r.next_renewal, sRep: r.s_rep, csRep: r.cs_rep, health: r.health, customerId: r.customer_id,
   }));
+}
+
+// 並べ替え可能な列（SQLインジェクション防止のホワイトリスト）
+const SORT_COL: Record<string, string> = {
+  name: "name",
+  status: "status",
+  rank: "rank",
+  industry: "industry",
+  isRep: "is_rep",
+  callCount: "call_count",
+  lastCallDate: "last_call_date",
+};
+
+/**
+ * 顧客検索・ページングをSQL側で実行する（全件をアプリに読み込まない）。
+ * 重複/人材紹介は同期時に保存済みの is_dup / agency_reason を使う。
+ * 該当ページの行＋件数(total/dup/agency)だけを返すため、大量データでも高速・低転送。
+ */
+export async function dbSearchCustomers(p: SearchParams): Promise<SearchResult> {
+  const sql = db();
+  const where: string[] = [];
+  const vals: unknown[] = [];
+  const add = (v: unknown) => {
+    vals.push(v);
+    return `$${vals.length}`;
+  };
+
+  if (p.rep) {
+    if (p.rep === "__none__") where.push(`(is_rep IS NULL OR is_rep = '')`);
+    else where.push(`is_rep = ${add(p.rep)}`);
+  }
+  if (p.status) {
+    if (p.status === "__none__") where.push(`(status IS NULL OR status = '')`);
+    else where.push(`status = ${add(p.status)}`);
+  }
+  if (p.rank) where.push(`rank = ${add(p.rank)}`);
+  if (p.industry) where.push(`industry = ${add(p.industry)}`);
+  const q = (p.q ?? "").trim();
+  if (q) {
+    // LIKE のメタ文字をエスケープして部分一致（会社名・電話番号）
+    const like = `%${q.replace(/[\\%_]/g, (m) => "\\" + m)}%`;
+    const ph = add(like);
+    where.push(`(name ILIKE ${ph} OR phone ILIKE ${ph})`);
+  }
+  if (p.dupOnly) where.push(`is_dup = true`);
+  if (p.agencyMode === "exclude") where.push(`agency_reason IS NULL`);
+  if (p.agencyMode === "only") where.push(`agency_reason IS NOT NULL`);
+  const whereSql = where.length ? `WHERE ${where.join(" AND ")}` : "";
+
+  const pageSize = Math.min(Math.max(p.pageSize ?? 50, 1), 200);
+  const page = Math.max(p.page ?? 1, 1);
+  const offset = (page - 1) * pageSize;
+  const sortCol = SORT_COL[p.sort ?? ""] ?? "last_call_date";
+  const dir = p.dir === "asc" ? "ASC" : "DESC";
+  const nulls = dir === "ASC" ? "NULLS FIRST" : "NULLS LAST";
+
+  // 件数（フィルタ後の total / 重複 / 人材紹介）を1回のスキャンで
+  const countText =
+    `SELECT COUNT(*)::int AS total, ` +
+    `COUNT(*) FILTER (WHERE is_dup)::int AS dup, ` +
+    `COUNT(*) FILTER (WHERE agency_reason IS NOT NULL)::int AS agency ` +
+    `FROM sc_customers ${whereSql}`;
+  const countRows = (await sql.query(countText, vals)) as Array<{ total: number; dup: number; agency: number }>;
+  const cnt = countRows[0] ?? { total: 0, dup: 0, agency: 0 };
+
+  // 該当ページの行だけを取得（LIMIT/OFFSET）。id 二次ソートでページ安定化。
+  const rowsText =
+    `SELECT id,url,name,phone,status,rank,industry,phase,method,pref,is_rep,s_rep,` +
+    `call_count,last_call_date,appointment_date,last_edited,address,confirm,` +
+    `COALESCE(is_dup,false) AS is_dup, agency_reason ` +
+    `FROM sc_customers ${whereSql} ` +
+    `ORDER BY ${sortCol} ${dir} ${nulls}, id ASC ` +
+    `LIMIT ${add(pageSize)} OFFSET ${add(offset)}`;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  const rows = (await sql.query(rowsText, vals)) as any[];
+
+  const mapped: SearchRow[] = rows.map((r) => ({
+    id: r.id, url: r.url, name: r.name, phone: r.phone, status: r.status, rank: r.rank,
+    industry: r.industry, phase: r.phase, method: r.method, pref: r.pref, isRep: r.is_rep, sRep: r.s_rep,
+    callCount: r.call_count, lastCallDate: r.last_call_date, appointmentDate: r.appointment_date,
+    lastEdited: r.last_edited, address: r.address, confirm: r.confirm,
+    dup: !!r.is_dup, agency: r.agency_reason ?? null,
+  }));
+
+  return { rows: mapped, total: cnt.total ?? 0, totalDup: cnt.dup ?? 0, totalAgency: cnt.agency ?? 0, page, pageSize };
 }
 
 export async function dbLastSync(): Promise<string | null> {
