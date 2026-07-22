@@ -1,0 +1,1684 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LET BPO・不動産事業部 粗利ベース評価制度</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --ink: #0D0D0D;
+  --ink-2: #3D3D3D;
+  --ink-3: #888;
+  --rule: #E0E0E0;
+  --page: #F7F6F3;
+  --white: #FFFFFF;
+
+  --g1: #1A7A4A;
+  --g1-light: #EAF7F0;
+  --g2: #1A5FA8;
+  --g2-light: #EAF1FB;
+  --g3: #B85C00;
+  --g3-light: #FEF5EA;
+  --g4: #5B21B6;
+  --g4-light: #F3F0FD;
+
+  --red: #DC2626;
+  --orange: #EA580C;
+  --yellow: #D97706;
+  --green: #16A34A;
+  --blue: #1D4ED8;
+
+  --accent: #B85C00;
+  --accent-light: #FEF5EA;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--page);
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.mono { font-family: 'IBM Plex Mono', monospace; }
+
+.page { max-width: 1080px; margin: 0 auto; padding: 52px 32px 80px; }
+
+.nav-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--ink-3);
+  text-decoration: none;
+  margin-bottom: 20px;
+  padding: 6px 12px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: var(--white);
+}
+.nav-back:hover { color: var(--ink); border-color: var(--ink); }
+
+header { margin-bottom: 48px; }
+.header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  border-bottom: 2.5px solid var(--ink);
+  gap: 24px;
+}
+.doc-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 8px;
+}
+h1 { font-size: 28px; font-weight: 900; letter-spacing: -0.8px; line-height: 1.15; }
+h1 em { font-style: normal; color: var(--accent); }
+.doc-meta {
+  text-align: right;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  color: var(--ink-3);
+  line-height: 2;
+  flex-shrink: 0;
+}
+
+.philosophy {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.phil-item { background: var(--white); padding: 14px 18px; }
+.phil-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 5px;
+}
+.phil-val { font-size: 13px; font-weight: 700; color: var(--ink); }
+
+.sec-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 14px;
+  margin-top: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sec-title::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
+
+.cost-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 10px; }
+.cost-card { background: var(--white); border: 1.5px solid; border-radius: 8px; overflow: hidden; }
+.cost-head { padding: 10px 14px 8px; border-bottom: 1px solid var(--rule); }
+.cost-grade {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.cost-title { font-size: 12px; font-weight: 700; }
+.cost-body { padding: 12px 14px; }
+.cost-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 3px 0;
+  border-bottom: 1px dashed var(--rule);
+  font-size: 12px;
+  gap: 8px;
+}
+.cost-row:last-child { border-bottom: none; }
+.cost-row-label { color: var(--ink-3); }
+.cost-row-val { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; color: var(--ink); }
+.cost-total {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1.5px solid var(--ink);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.cost-total-label { font-size: 11px; font-weight: 700; }
+.cost-total-val { font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 600; }
+
+.cg1 { border-color: var(--g1); }
+.cg2 { border-color: var(--g2); }
+.cg3 { border-color: var(--g3); }
+.cg4 { border-color: var(--g4); }
+.bg-g1 { background: var(--g1); }
+.bg-g2 { background: var(--g2); }
+.bg-g3 { background: var(--g3); }
+.bg-g4 { background: var(--g4); }
+
+.cost-note {
+  background: #FFFBEB;
+  border: 1px solid #FCD34D;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--ink-2);
+  margin-top: 10px;
+}
+
+.kpi-table-wrap { background: var(--white); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+.kpi-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.kpi-table th {
+  padding: 10px 14px;
+  text-align: left;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--page);
+  border-bottom: 1px solid var(--rule);
+  font-weight: 500;
+}
+.kpi-table td { padding: 14px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.kpi-table tr:last-child td { border-bottom: none; }
+.kpi-table tr:hover td { background: #FAFAFA; }
+
+.grade-pill {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.big-num { font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 600; line-height: 1.2; }
+.big-num-sub { font-size: 11px; color: var(--ink-3); font-family: 'IBM Plex Mono', monospace; }
+
+.rank-grid { display: flex; flex-direction: column; gap: 4px; }
+.rank-row { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.rank-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 3px;
+  color: #fff;
+  flex-shrink: 0;
+  min-width: 32px;
+  text-align: center;
+}
+.rb-s { background: var(--green); }
+.rb-a { background: var(--blue); }
+.rb-b { background: var(--yellow); }
+.rb-c { background: var(--orange); }
+.rb-d { background: var(--red); }
+.rank-val { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--ink); }
+.rank-desc { font-size: 11.5px; color: var(--ink-3); }
+
+.score-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.score-box { background: var(--white); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+.score-box-head {
+  padding: 14px 18px;
+  background: var(--ink);
+  color: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.score-box-title { font-size: 13px; font-weight: 700; }
+.score-box-pts { font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 600; }
+.score-items { padding: 0 18px; }
+.score-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--rule);
+  gap: 16px;
+}
+.score-item:last-child { border-bottom: none; }
+.score-item-name { font-size: 12.5px; color: var(--ink-2); flex: 1; }
+.score-item-pts { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500; color: var(--ink); white-space: nowrap; }
+
+.rating-table-wrap { background: var(--white); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+.rating-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.rating-table th {
+  padding: 10px 16px;
+  text-align: left;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--page);
+  border-bottom: 1px solid var(--rule);
+  font-weight: 500;
+}
+.rating-table td { padding: 12px 16px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+.rating-table tr:last-child td { border-bottom: none; }
+
+.rt-score { font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 700; }
+.rt-label { font-size: 13px; font-weight: 700; }
+.rt-raise { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; }
+.positive { color: var(--green); }
+.negative { color: var(--red); }
+.neutral { color: var(--ink-3); }
+
+.bonus-wrap { background: var(--white); border: 1px solid var(--rule); border-radius: 10px; padding: 24px; }
+.bonus-formula {
+  background: var(--ink);
+  color: #fff;
+  border-radius: 8px;
+  padding: 20px 24px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  line-height: 2;
+  margin-bottom: 20px;
+}
+.bonus-formula .comment { color: #6B7280; font-size: 12px; }
+.bonus-formula .highlight { color: #FBBF77; }
+.bonus-formula .danger { color: #F87171; font-weight: 600; }
+
+.coef-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+.coef-box { border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
+.coef-head {
+  padding: 10px 14px;
+  background: var(--page);
+  font-size: 12px;
+  font-weight: 700;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.coef-head .coef-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--ink-3);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.coef-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.coef-table td { padding: 8px 14px; border-bottom: 1px dashed var(--rule); }
+.coef-table tr:last-child td { border-bottom: none; }
+.coef-table .coef-range { font-family: 'IBM Plex Mono', monospace; color: var(--ink-2); }
+.coef-table .coef-val { font-family: 'IBM Plex Mono', monospace; font-weight: 700; text-align: right; font-size: 13px; }
+.coef-table .coef-val.boost { color: var(--green); }
+.coef-table .coef-val.mid { color: var(--yellow); }
+.coef-table .coef-val.cut { color: var(--red); }
+
+.matrix-wrap { border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+.matrix-head {
+  padding: 12px 16px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.matrix-head .matrix-sub { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #BBB; font-weight: 400; }
+.matrix-table { width: 100%; border-collapse: collapse; font-size: 12px; background: var(--white); }
+.matrix-table th {
+  padding: 10px 12px;
+  background: var(--page);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 500;
+  text-align: center;
+  border-bottom: 1px solid var(--rule);
+}
+.matrix-table td {
+  padding: 10px 12px;
+  text-align: center;
+  border-bottom: 1px solid var(--rule);
+  border-right: 1px solid var(--rule);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+}
+.matrix-table td:last-child { border-right: none; }
+.matrix-table tr:last-child td { border-bottom: none; }
+.matrix-table td.row-label { background: var(--page); font-weight: 600; color: var(--ink-2); text-align: left; }
+.mx-boost { background: #DCFCE7; color: #166534; font-weight: 600; }
+.mx-ok { background: #FEFCE8; color: #854D0E; font-weight: 500; }
+.mx-warn { background: #FFEDD5; color: #9A3412; font-weight: 500; }
+.mx-danger { background: #FEE2E2; color: #991B1B; font-weight: 600; }
+
+.examples { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.example { border: 1px solid var(--rule); border-radius: 8px; padding: 14px; background: var(--white); }
+.ex-label {
+  font-size: 11px;
+  color: var(--ink-3);
+  margin-bottom: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.ex-scenario { font-size: 12px; color: var(--ink-2); margin-bottom: 10px; line-height: 1.5; }
+.ex-calc { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--ink-3); line-height: 1.7; }
+.ex-result { font-family: 'IBM Plex Mono', monospace; font-size: 14px; font-weight: 700; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--rule); }
+.ex-result.pos { color: var(--accent); }
+.ex-result.neg { color: var(--red); }
+.ex-result.mid { color: var(--yellow); }
+
+.special-wrap {
+  background: linear-gradient(135deg, var(--accent-light) 0%, var(--white) 100%);
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+}
+.special-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--accent);
+  color: #fff;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 5px 11px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+.special-title {
+  font-size: 18px;
+  font-weight: 900;
+  color: var(--accent);
+  margin-bottom: 8px;
+  padding-right: 110px;
+}
+.special-sub {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  margin-bottom: 20px;
+}
+
+.special-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.special-box {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 16px;
+}
+.special-box-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 8px;
+}
+.special-box-val {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.special-box-val .accent-text { color: var(--accent); font-size: 22px; }
+.special-box-sub {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  margin-top: 4px;
+}
+
+.special-amounts {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+.special-amounts table { width: 100%; border-collapse: collapse; }
+.special-amounts th {
+  padding: 10px 14px;
+  background: var(--page);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 500;
+  text-align: left;
+  border-bottom: 1px solid var(--rule);
+}
+.special-amounts td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 12.5px;
+}
+.special-amounts tr:last-child td { border-bottom: none; }
+.special-amounts .sa-amount {
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--accent);
+  text-align: right;
+}
+
+.special-condition {
+  background: var(--ink);
+  color: #fff;
+  border-radius: 8px;
+  padding: 16px 20px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  line-height: 1.9;
+}
+.special-condition .label { color: #9CA3AF; font-size: 11px; }
+.special-condition .accent-text { color: #FBBF77; font-weight: 600; }
+
+.timeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.tl-card { background: var(--white); border: 1px solid var(--rule); border-radius: 8px; padding: 16px; position: relative; }
+.tl-timing {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 8px;
+}
+.tl-action { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+.tl-desc { font-size: 12px; color: var(--ink-2); line-height: 1.6; }
+
+.doc-footer {
+  margin-top: 60px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+
+@media (max-width: 768px) {
+  .page { padding: 32px 16px 60px; }
+  h1 { font-size: 22px; }
+  .header-top { flex-direction: column; }
+  .doc-meta { text-align: left; }
+
+  .cost-grid { grid-template-columns: 1fr 1fr; }
+  .philosophy { grid-template-columns: 1fr; }
+  .score-section { grid-template-columns: 1fr; }
+  .examples { grid-template-columns: 1fr; }
+  .timeline { grid-template-columns: 1fr 1fr; }
+  .coef-grid { grid-template-columns: 1fr; }
+  .special-grid { grid-template-columns: 1fr; }
+
+  .kpi-table-wrap,
+  .rating-table-wrap,
+  .matrix-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .kpi-table { min-width: 640px; }
+  .rating-table { min-width: 560px; }
+  .matrix-table { min-width: 560px; }
+
+  .kpi-table th, .kpi-table td { padding: 10px 8px; font-size: 11.5px; }
+  .rating-table th, .rating-table td { padding: 10px 12px; font-size: 11.5px; }
+  .matrix-table th, .matrix-table td { padding: 8px 6px; font-size: 11px; }
+
+  .bonus-formula { font-size: 12px; padding: 16px 18px; line-height: 1.9; word-break: break-word; }
+  .bonus-wrap { padding: 16px; }
+  .special-wrap { padding: 20px 16px; }
+  .special-title { font-size: 16px; padding-right: 90px; }
+  .special-badge { font-size: 9px; padding: 4px 8px; top: 12px; right: 12px; }
+  .special-condition { font-size: 11.5px; padding: 14px 16px; }
+  .score-box-pts { font-size: 18px; }
+  .big-num { font-size: 17px; }
+  .sec-title { margin-top: 36px; font-size: 9.5px; }
+
+  .cost-head { padding: 8px 10px 6px; }
+  .cost-body { padding: 10px; }
+  .cost-row { font-size: 11px; }
+  .cost-total-val { font-size: 12px; }
+
+  .doc-footer { flex-direction: column; gap: 4px; }
+}
+
+@media (max-width: 480px) {
+  .page { padding: 20px 12px 40px; }
+  h1 { font-size: 19px; }
+  .cost-grid { grid-template-columns: 1fr; }
+  .timeline { grid-template-columns: 1fr; }
+  .bonus-formula { font-size: 11px; line-height: 1.8; }
+  .doc-eyebrow { font-size: 9px; }
+  .special-title { font-size: 15px; padding-right: 80px; }
+}
+
+/* === 事業構造マップ（Step 0） === */
+.biz-wrap {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 20px;
+}
+.biz-bar {
+  display: flex;
+  height: 36px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 18px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+.biz-seg-bpo { background: var(--accent); display: flex; align-items: center; justify-content: center; }
+.biz-seg-real { background: var(--g4); display: flex; align-items: center; justify-content: center; }
+
+.biz-overview {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.biz-summary-card {
+  border: 1.5px solid var(--accent);
+  background: var(--accent-light);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+.biz-summary-card.real { border-color: var(--g4); background: var(--g4-light); }
+.biz-summary-name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 4px;
+}
+.biz-summary-share {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.biz-summary-card.real .biz-summary-share { color: var(--g4); }
+.biz-summary-policy { font-size: 12px; color: var(--ink-2); margin-top: 4px; line-height: 1.5; }
+
+.biz-detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.biz-detail-card {
+  background: var(--white);
+  border: 1.5px solid var(--rule);
+  border-radius: 8px;
+  padding: 14px;
+}
+.biz-detail-card.improve { border-color: var(--orange); background: #FFF7ED; }
+.biz-detail-card.maintain { border-color: var(--blue); background: #EFF6FF; }
+.biz-detail-status {
+  display: inline-block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 3px;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.biz-detail-card.improve .biz-detail-status { background: var(--orange); }
+.biz-detail-card.maintain .biz-detail-status { background: var(--blue); }
+.biz-detail-name { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+.biz-detail-share { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-3); margin-bottom: 10px; }
+.biz-detail-issue {
+  font-size: 12px;
+  color: var(--ink-2);
+  line-height: 1.5;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--rule);
+}
+.biz-detail-target { font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; color: var(--ink); font-weight: 600; line-height: 1.6; }
+
+/* === 翌年度方針（Step 7） === */
+.next-year-wrap {
+  background: linear-gradient(135deg, #EFF6FF 0%, var(--white) 100%);
+  border: 2px solid var(--blue);
+  border-radius: 12px;
+  padding: 28px;
+  position: relative;
+}
+.ny-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: var(--blue);
+  color: #fff;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 5px 11px;
+  border-radius: 4px;
+  font-weight: 700;
+}
+.ny-title { font-size: 18px; font-weight: 900; color: var(--blue); margin-bottom: 8px; padding-right: 110px; line-height: 1.3; }
+.ny-sub { font-size: 12.5px; color: var(--ink-2); margin-bottom: 22px; line-height: 1.7; }
+
+.ny-block {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+}
+.ny-block:last-child { margin-bottom: 0; }
+.ny-block-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--blue);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.ny-block-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.ny-block-desc { font-size: 12px; color: var(--ink-2); line-height: 1.7; }
+.ny-block-formula {
+  background: var(--ink);
+  color: #fff;
+  padding: 14px 16px;
+  border-radius: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  margin-top: 10px;
+  line-height: 1.8;
+}
+.ny-block-formula .accent-text { color: #FBBF77; font-weight: 600; }
+
+.ny-targets-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+.ny-target-card { border: 1px solid var(--rule); border-radius: 6px; padding: 12px; background: var(--page); }
+.ny-target-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--ink-3); letter-spacing: 1px; margin-bottom: 4px; }
+.ny-target-name { font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+.ny-target-value { font-family: 'IBM Plex Mono', monospace; font-size: 16px; font-weight: 700; color: var(--accent); }
+
+@media (max-width: 768px) {
+  .biz-overview { grid-template-columns: 1fr; }
+  .biz-detail-grid { grid-template-columns: 1fr; }
+  .ny-targets-grid { grid-template-columns: 1fr; }
+  .ny-title { padding-right: 90px; font-size: 16px; }
+  .next-year-wrap { padding: 22px 18px; }
+  .ny-block-formula { font-size: 11px; }
+}
+
+
+/* === 経営側P&L === */
+.pnl-wrap {
+  background: var(--white);
+  border: 2px solid var(--ink);
+  border-radius: 12px;
+  padding: 28px;
+}
+.pnl-intro {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  margin-bottom: 18px;
+  line-height: 1.7;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--rule);
+}
+.pnl-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 10px 14px;
+  background: var(--page);
+  border-radius: 6px;
+}
+.pnl-meta-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.pnl-meta-val { font-size: 13px; font-weight: 700; }
+.pnl-section { margin-bottom: 18px; }
+.pnl-section-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 10px;
+}
+.pnl-table {
+  background: var(--page);
+  border-radius: 8px;
+  padding: 4px 18px;
+}
+.pnl-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px dashed var(--rule);
+  font-size: 12.5px;
+  gap: 8px;
+}
+.pnl-row:last-of-type { border-bottom: none; }
+.pnl-label { color: var(--ink-2); }
+.pnl-val {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pnl-val.pos { color: var(--green); }
+.pnl-val.neg { color: var(--red); }
+.pnl-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+  padding: 14px 0 4px;
+  border-top: 2px solid var(--ink);
+}
+.pnl-total-label { font-size: 14px; font-weight: 700; }
+.pnl-total-val {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.pnl-timeline-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.pnl-timeline-card {
+  border: 1.5px solid var(--accent);
+  background: var(--accent-light);
+  border-radius: 8px;
+  padding: 14px;
+  text-align: center;
+}
+.pnl-timeline-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 6px;
+}
+.pnl-timeline-val {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.pnl-note {
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: #FFFBEB;
+  border: 1px solid #FCD34D;
+  border-radius: 6px;
+  font-size: 11.5px;
+  color: var(--ink-2);
+  line-height: 1.6;
+}
+@media (max-width: 768px) {
+  .pnl-timeline-grid { grid-template-columns: 1fr; }
+  .pnl-wrap { padding: 20px 16px; }
+  .pnl-total-val { font-size: 17px; }
+  .pnl-row { font-size: 11.5px; }
+  .pnl-val { font-size: 13px; }
+}
+
+/* === Auth Gate === */
+#auth-gate {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--page);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+}
+.auth-card {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 40px 36px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+.auth-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 14px;
+}
+.auth-title {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+.auth-desc {
+  font-size: 12.5px;
+  color: var(--ink-2);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+.auth-form { display: flex; flex-direction: column; gap: 12px; }
+.auth-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--rule);
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  background: var(--white);
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.auth-input:focus { border-color: var(--accent); }
+.auth-button {
+  padding: 12px 14px;
+  border: none;
+  border-radius: 6px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'Noto Sans JP', sans-serif;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.auth-button:hover { background: var(--accent); }
+.auth-button:active { transform: scale(0.98); }
+.auth-error {
+  font-size: 12px;
+  color: var(--red);
+  margin-top: 6px;
+  display: none;
+}
+.auth-error.show { display: block; }
+.auth-footer {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--ink-3);
+  text-align: center;
+  letter-spacing: 1px;
+}
+@media (max-width: 480px) {
+  .auth-card { padding: 32px 24px; }
+  .auth-title { font-size: 19px; }
+}
+</style>
+</head>
+<body>
+
+<div id="auth-gate">
+  <div class="auth-card">
+    <div class="auth-eyebrow">LET / BPO・不動産事業部 評価制度</div>
+    <div class="auth-title">パスワードを入力</div>
+    <div class="auth-desc">
+      この資料は社外秘です。<br>BPO・不動産事業部メンバー専用のパスワードを入力してください。
+    </div>
+    <form id="auth-form" class="auth-form" autocomplete="off">
+      <input type="password" id="auth-input" class="auth-input" placeholder="パスワード" autofocus required />
+      <button type="submit" class="auth-button">ログイン</button>
+      <div id="auth-error" class="auth-error">パスワードが違います</div>
+    </form>
+    <div class="auth-footer">CONFIDENTIAL — 株式会社LET</div>
+  </div>
+</div>
+
+<div class="page" id="main-content" style="display:none;">
+<header>
+  <div class="header-top">
+    <div>
+      <div class="doc-eyebrow">株式会社LET — 社外秘 / BPO・不動産事業部 / 経営陣向け試算</div>
+      <h1>粗利ベース × 個人達成率 + 年次特別<br><em>評価制度</em></h1>
+    </div>
+    <div class="doc-meta">
+      Ver. 1.0<br>
+      2026-04-22<br>
+      対象：BPO・不動産事業部 全員
+    </div>
+  </div>
+  <div class="philosophy">
+    <div class="phil-item">
+      <div class="phil-label">評価の2軸</div>
+      <div class="phil-val">個人達成率 × 定性評価 の掛け合わせで決定（チーム評価なし）</div>
+    </div>
+    <div class="phil-item">
+      <div class="phil-label">事業部固有の追加軸</div>
+      <div class="phil-val">外注費40%以下達成で全員に月給1ヶ月分の特別ボーナス</div>
+    </div>
+    <div class="phil-item">
+      <div class="phil-label">ボーナス</div>
+      <div class="phil-val">半期ボーナス（月給×1ヶ月）+ 年次特別ボーナス（条件達成時）</div>
+    </div>
+  </div>
+</header>
+<div class="sec-title">Step 0 — 事業構造と評価方針</div>
+<div class="biz-wrap">
+  <div class="biz-bar">
+    <div class="biz-seg-bpo" style="width: 66%">BPO 66.2%</div>
+    <div class="biz-seg-real" style="width: 34%">不動産 33.8%</div>
+  </div>
+
+  <div class="biz-overview">
+    <div class="biz-summary-card">
+      <div class="biz-summary-name">BPO事業</div>
+      <div class="biz-summary-share">66.2%</div>
+      <div class="biz-summary-policy">主力事業 / 直近の原価率 36.4%（現年度目標40%以下クリア中）</div>
+    </div>
+    <div class="biz-summary-card real">
+      <div class="biz-summary-name">不動産事業</div>
+      <div class="biz-summary-share">33.8%</div>
+      <div class="biz-summary-policy">直近の外注費比率 68.8%（粗利率 31.2%）。3部門で運営。</div>
+    </div>
+  </div>
+
+  <div class="biz-detail-grid">
+    <div class="biz-detail-card improve">
+      <div class="biz-detail-status">改善対象</div>
+      <div class="biz-detail-name">① 自社反響不動産仲介</div>
+      <div class="biz-detail-share">不動産部門の 10%</div>
+      <div class="biz-detail-issue">
+        反響不足 / 仕組み化が未着手。1対応あたりヒアリング外注3,000円発生、成約ゼロで赤字。AI活用やSNS自動化で人件費・運用費を圧縮する余地大。
+      </div>
+      <div class="biz-detail-target">
+        目標：月間売上 50万円<br>仕組み化で粗利率最大化
+      </div>
+    </div>
+    <div class="biz-detail-card improve">
+      <div class="biz-detail-status">改善対象</div>
+      <div class="biz-detail-name">② 自社エージェント仲介</div>
+      <div class="biz-detail-share">不動産部門の 85%</div>
+      <div class="biz-detail-issue">
+        外注費比率は約80%（構造的に変えにくい）。粗利率は低いが、売上拡大で粗利金額の絶対額を増やす方向で運営。
+      </div>
+      <div class="biz-detail-target">
+        目標：月間売上 50万円<br>売上拡大で粗利金額増
+      </div>
+    </div>
+    <div class="biz-detail-card maintain">
+      <div class="biz-detail-status">現状維持</div>
+      <div class="biz-detail-name">③ 不動産管理業</div>
+      <div class="biz-detail-share">不動産部門の 5%</div>
+      <div class="biz-detail-issue">
+        伸長計画なし。既存契約の維持運用のみ。
+      </div>
+      <div class="biz-detail-target">
+        ノークレーム維持でOK<br>（成長対象外・評価指標なし）
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sec-title">Step 1 — 実質人件費の計算（経営陣向け試算）</div>
+<div class="cost-grid">
+  <div class="cost-card cg1">
+    <div class="cost-head">
+      <div class="cost-grade bg-g1">G1</div>
+      <div class="cost-title">ジュニアオペレーター</div>
+    </div>
+    <div class="cost-body">
+      <div class="cost-row">
+        <span class="cost-row-label">支給額（新人スタート）</span>
+        <span class="cost-row-val">220,000</span>
+      </div>
+      <div class="cost-row">
+        <span class="cost-row-label">社保・法定福利費等（+5万）</span>
+        <span class="cost-row-val">+ 50,000</span>
+      </div>
+      <div class="cost-row">
+        <span class="cost-row-label">月間試算額</span>
+        <span class="cost-row-val">270,000</span>
+      </div>
+      <div class="cost-total">
+        <span class="cost-total-label">年間試算額</span>
+        <span class="cost-total-val">≈ 324万円</span>
+      </div>
+    </div>
+  </div>
+  <div class="cost-card cg2">
+    <div class="cost-head">
+      <div class="cost-grade bg-g2">G2</div>
+      <div class="cost-title">スタンダード（実務担当）</div>
+    </div>
+    <div class="cost-body">
+      <div class="cost-row">
+        <span class="cost-row-label">支給額</span>
+        <span class="cost-row-val">270,000</span>
+      </div>
+      <div class="cost-row">
+        <span class="cost-row-label">社保・法定福利費等（+5万）</span>
+        <span class="cost-row-val">+ 50,000</span>
+      </div>
+      <div class="cost-row">
+        <span class="cost-row-label">月間試算額</span>
+        <span class="cost-row-val">320,000</span>
+      </div>
+      <div class="cost-total">
+        <span class="cost-total-label">年間試算額</span>
+        <span class="cost-total-val">≈ 384万円</span>
+      </div>
+    </div>
+  </div>
+  <div class="cost-card cg3">
+    <div class="cost-head">
+      <div class="cost-grade bg-g3">G3</div>
+      <div class="cost-title">シニア（プロジェクトリード）</div>
+    </div>
+    <div class="cost-body">
+      <div class="cost-row">
+        <span class="cost-row-label">支給額</span>
+        <span class="cost-row-val">320,000</span>
+      </div>
+      <div class="cost-row">
+        <span class="cost-row-label">社保・法定福利費等（+5万）</span>
+        <span class="cost-row-val">+ 50,000</span>
+      </div>
+      <div class="cost-row">
+        <span class="cost-row-label">月間試算額</span>
+        <span class="cost-row-val">370,000</span>
+      </div>
+      <div class="cost-total">
+        <span class="cost-total-label">年間試算額</span>
+        <span class="cost-total-val">≈ 444万円</span>
+      </div>
+    </div>
+  </div>
+  <div class="cost-card cg4">
+    <div class="cost-head">
+      <div class="cost-grade bg-g4">G4</div>
+      <div class="cost-title">事業部マネージャー</div>
+    </div>
+    <div class="cost-body">
+      <div class="cost-row">
+        <span class="cost-row-label">支給額</span>
+        <span class="cost-row-val">380,000</span>
+      </div>
+      <div class="cost-row">
+        <span class="cost-row-label">社保・法定福利費等（+5万）</span>
+        <span class="cost-row-val">+ 50,000</span>
+      </div>
+      <div class="cost-row">
+        <span class="cost-row-label">月間試算額</span>
+        <span class="cost-row-val">430,000</span>
+      </div>
+      <div class="cost-total">
+        <span class="cost-total-label">年間試算額</span>
+        <span class="cost-total-val">≈ 516万円</span>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="cost-note">
+  ✦ 不動産業界特化型BPOの専門オペレーション。 <strong>支給額 + 社会保険料等5万円</strong> を加算した「経営陣向け試算額」。外注費比率を40%以下に抑え、粗利率60%以上を維持することが事業の生命線。
+</div>
+<div class="sec-title">Step 2 — 等級別 粗利KPI一覧</div>
+<div class="kpi-table-wrap">
+  <table class="kpi-table">
+    <thead>
+      <tr>
+        <th>等級</th>
+        <th>月次粗利目標</th>
+        <th>半期粗利目標</th>
+        <th>人件費倍率（月次）</th>
+        <th>ランク別の粗利目安（月次）</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+          <span class="grade-pill bg-g1">G1</span>
+          <div style="font-size:11px;color:var(--ink-3);margin-top:4px">ジュニアオペレーター</div>
+        </td>
+        <td>
+          <div class="big-num" style="color:var(--g1)">60万円</div>
+          <div class="big-num-sub">年間720万目安</div>
+        </td>
+        <td>
+          <div class="big-num" style="color:var(--g1)">360万円</div>
+          <div class="big-num-sub">半期ごとに審査</div>
+        </td>
+        <td>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600">2.2倍</div>
+          <div style="font-size:11px;color:var(--ink-3)">赤字ライン = 月27万（試算額×1.0）</div>
+        </td>
+        <td>
+          <div class="rank-grid">
+            <div class="rank-row"><span class="rank-badge rb-s">S</span><span class="rank-val">85万+</span><span class="rank-desc">/ 年1,020万+</span></div>
+            <div class="rank-row"><span class="rank-badge rb-a">A</span><span class="rank-val">72〜85万</span><span class="rank-desc">/ 年864〜1,020万</span></div>
+            <div class="rank-row"><span class="rank-badge rb-b">B</span><span class="rank-val">60〜72万</span><span class="rank-desc">/ 年720〜864万 ✦必達</span></div>
+            <div class="rank-row"><span class="rank-badge rb-c">C</span><span class="rank-val">40〜60万</span><span class="rank-desc">/ 年480〜720万（要改善）</span></div>
+            <div class="rank-row"><span class="rank-badge rb-d">D</span><span class="rank-val">40万未満</span><span class="rank-desc">/ 赤字ライン</span></div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <span class="grade-pill bg-g2">G2</span>
+          <div style="font-size:11px;color:var(--ink-3);margin-top:4px">スタンダード</div>
+        </td>
+        <td>
+          <div class="big-num" style="color:var(--g2)">90万円</div>
+          <div class="big-num-sub">年間1,080万目安</div>
+        </td>
+        <td>
+          <div class="big-num" style="color:var(--g2)">540万円</div>
+          <div class="big-num-sub">半期ごとに審査</div>
+        </td>
+        <td>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600">2.8倍</div>
+          <div style="font-size:11px;color:var(--ink-3)">赤字ライン = 月32万（試算額×1.0）</div>
+        </td>
+        <td>
+          <div class="rank-grid">
+            <div class="rank-row"><span class="rank-badge rb-s">S</span><span class="rank-val">130万+</span><span class="rank-desc">/ 年1,560万+</span></div>
+            <div class="rank-row"><span class="rank-badge rb-a">A</span><span class="rank-val">110〜130万</span><span class="rank-desc">/ 年1,320〜1,560万</span></div>
+            <div class="rank-row"><span class="rank-badge rb-b">B</span><span class="rank-val">90〜110万</span><span class="rank-desc">/ 年1,080〜1,320万 ✦必達</span></div>
+            <div class="rank-row"><span class="rank-badge rb-c">C</span><span class="rank-val">65〜90万</span><span class="rank-desc">/ 年780〜1,080万（要改善）</span></div>
+            <div class="rank-row"><span class="rank-badge rb-d">D</span><span class="rank-val">65万未満</span><span class="rank-desc">/ 赤字ライン</span></div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <span class="grade-pill bg-g3">G3</span>
+          <div style="font-size:11px;color:var(--ink-3);margin-top:4px">シニア</div>
+        </td>
+        <td>
+          <div class="big-num" style="color:var(--g3)">130万円</div>
+          <div class="big-num-sub">年間1,560万目安</div>
+        </td>
+        <td>
+          <div class="big-num" style="color:var(--g3)">780万円</div>
+          <div class="big-num-sub">半期ごとに審査</div>
+        </td>
+        <td>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600">3.5倍</div>
+          <div style="font-size:11px;color:var(--ink-3)">プロジェクトリード／業務設計担当</div>
+        </td>
+        <td>
+          <div class="rank-grid">
+            <div class="rank-row"><span class="rank-badge rb-s">S</span><span class="rank-val">190万+</span><span class="rank-desc">/ 年2,280万+</span></div>
+            <div class="rank-row"><span class="rank-badge rb-a">A</span><span class="rank-val">160〜190万</span><span class="rank-desc">/ 年1,920〜2,280万</span></div>
+            <div class="rank-row"><span class="rank-badge rb-b">B</span><span class="rank-val">130〜160万</span><span class="rank-desc">/ 年1,560〜1,920万 ✦必達</span></div>
+            <div class="rank-row"><span class="rank-badge rb-c">C</span><span class="rank-val">90〜130万</span><span class="rank-desc">/ 年1,080〜1,560万（要改善）</span></div>
+            <div class="rank-row"><span class="rank-badge rb-d">D</span><span class="rank-val">90万未満</span><span class="rank-desc">/ 赤字ライン</span></div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <span class="grade-pill bg-g4">G4</span>
+          <div style="font-size:11px;color:var(--ink-3);margin-top:4px">事業部マネージャー</div>
+        </td>
+        <td>
+          <div class="big-num" style="color:var(--g4)">250万円</div>
+          <div class="big-num-sub">チーム合計 / 年間3,000万目安</div>
+        </td>
+        <td>
+          <div class="big-num" style="color:var(--g4)">1,500万円</div>
+          <div class="big-num-sub">チーム全体で達成</div>
+        </td>
+        <td>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600">5.8倍</div>
+          <div style="font-size:11px;color:var(--ink-3)">事業部運営 + 外注費40%以下管理</div>
+        </td>
+        <td>
+          <div class="rank-grid">
+            <div class="rank-row"><span class="rank-badge rb-s">S</span><span class="rank-val">370万+</span><span class="rank-desc">/ 年4,440万+（チーム計）</span></div>
+            <div class="rank-row"><span class="rank-badge rb-a">A</span><span class="rank-val">310〜370万</span><span class="rank-desc">/ 年3,720〜4,440万</span></div>
+            <div class="rank-row"><span class="rank-badge rb-b">B</span><span class="rank-val">250〜310万</span><span class="rank-desc">/ 年3,000〜3,720万 ✦必達</span></div>
+            <div class="rank-row"><span class="rank-badge rb-c">C</span><span class="rank-val">170〜250万</span><span class="rank-desc">/ 年2,040〜3,000万（要改善）</span></div>
+            <div class="rank-row"><span class="rank-badge rb-d">D</span><span class="rank-val">170万未満</span><span class="rank-desc">/ 事業継続検討</span></div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="sec-title">Step 2.5 — 四半期・通期目標</div>
+<div class="kpi-table-wrap">
+  <table class="kpi-table">
+    <thead>
+      <tr>
+        <th>等級</th>
+        <th>月次</th>
+        <th>四半期 (3ヶ月)</th>
+        <th>半期 (6ヶ月)</th>
+        <th>年間 (12ヶ月)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="grade-pill bg-g1">G1</span> ジュニアオペレーター</td>
+        <td><span class="big-num" style="color:var(--g1)">60万</span></td>
+        <td><span class="big-num" style="color:var(--g1)">180万</span></td>
+        <td><span class="big-num" style="color:var(--g1)">360万</span></td>
+        <td><span class="big-num" style="color:var(--g1)">720万</span></td>
+      </tr>
+      <tr>
+        <td><span class="grade-pill bg-g2">G2</span> スタンダード</td>
+        <td><span class="big-num" style="color:var(--g2)">90万</span></td>
+        <td><span class="big-num" style="color:var(--g2)">270万</span></td>
+        <td><span class="big-num" style="color:var(--g2)">540万</span></td>
+        <td><span class="big-num" style="color:var(--g2)">1,080万</span></td>
+      </tr>
+      <tr>
+        <td><span class="grade-pill bg-g3">G3</span> シニア</td>
+        <td><span class="big-num" style="color:var(--g3)">130万</span></td>
+        <td><span class="big-num" style="color:var(--g3)">390万</span></td>
+        <td><span class="big-num" style="color:var(--g3)">780万</span></td>
+        <td><span class="big-num" style="color:var(--g3)">1,560万</span></td>
+      </tr>
+      <tr>
+        <td><span class="grade-pill bg-g4">G4</span> マネージャー(チーム計)</td>
+        <td><span class="big-num" style="color:var(--g4)">250万</span></td>
+        <td><span class="big-num" style="color:var(--g4)">750万</span></td>
+        <td><span class="big-num" style="color:var(--g4)">1,500万</span></td>
+        <td><span class="big-num" style="color:var(--g4)">3,000万</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="cost-note">
+  ✦ 四半期スケジュール: <strong>Q1 (4-6月) / Q2 (7-9月) / Q3 (10-12月) / Q4 (1-3月)</strong>　／　上期評価: Q1+Q2 = 9月末締め・10月支給　／　下期評価: Q3+Q4 = 3月末締め・4月支給
+</div>
+
+<div class="sec-title">Step 3 — 総合評価スコア設計（100点満点）</div>
+<div class="score-section">
+  <div class="score-box">
+    <div class="score-box-head">
+      <div class="score-box-title">定量評価</div>
+      <div class="score-box-pts">60点</div>
+    </div>
+    <div class="score-items">
+      <div class="score-item">
+        <div class="score-item-name">月次粗利達成率（半期平均）<br><span style="font-size:11px;color:var(--ink-3)">B達成=30点、S=40点、D=0点</span></div>
+        <div class="score-item-pts">MAX 40点</div>
+      </div>
+      <div class="score-item">
+        <div class="score-item-name">担当案件継続率<br><span style="font-size:11px;color:var(--ink-3)">90%以上=満点。クライアント満足度の指標</span></div>
+        <div class="score-item-pts">MAX 10点</div>
+      </div>
+      <div class="score-item">
+        <div class="score-item-name">外注費比率達成度（BPO特化）<br><span style="font-size:11px;color:var(--ink-3)">40%以下=満点、50%以上=0点</span></div>
+        <div class="score-item-pts">MAX 10点</div>
+      </div>
+    </div>
+  </div>
+  <div class="score-box">
+    <div class="score-box-head">
+      <div class="score-box-title">定性評価</div>
+      <div class="score-box-pts">40点</div>
+    </div>
+    <div class="score-items">
+      <div class="score-item">
+        <div class="score-item-name">業務効率化・原価削減提案<br><span style="font-size:11px;color:var(--ink-3)">外注→内製化、自動化、AI活用での削減</span></div>
+        <div class="score-item-pts">MAX 15点</div>
+      </div>
+      <div class="score-item">
+        <div class="score-item-name">クライアント対応品質<br><span style="font-size:11px;color:var(--ink-3)">レスポンス速度・正確性・追加提案力</span></div>
+        <div class="score-item-pts">MAX 15点</div>
+      </div>
+      <div class="score-item">
+        <div class="score-item-name">ナレッジ共有・チーム貢献<br><span style="font-size:11px;color:var(--ink-3)">業務マニュアル整備・後輩サポート</span></div>
+        <div class="score-item-pts">MAX 10点</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="sec-title">Step 4 — 総合スコア → 昇給・昇格連動</div>
+<div class="rating-table-wrap">
+  <table class="rating-table">
+    <thead>
+      <tr>
+        <th>スコア</th>
+        <th>ランク</th>
+        <th>基本給への影響</th>
+        <th>等級への影響</th>
+        <th>判定概要</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="rt-score positive">80点以上</span></td>
+        <td><span class="rank-badge rb-a" style="font-size:13px;padding:3px 10px">A</span></td>
+        <td><span class="rt-raise positive">+10,000円/月</span></td>
+        <td>昇格候補にリストアップ</td>
+        <td>非常に優秀。2期連続Aで昇格審査に入る</td>
+      </tr>
+      <tr>
+        <td><span class="rt-score" style="color:var(--yellow)">60〜79点</span></td>
+        <td><span class="rank-badge rb-b" style="font-size:13px;padding:3px 10px">B</span></td>
+        <td><span class="rt-raise neutral">±0円</span></td>
+        <td>現等級を維持</td>
+        <td>必達ライン達成。標準的な成長を継続</td>
+      </tr>
+      <tr>
+        <td><span class="rt-score negative">60点未満</span></td>
+        <td><span class="rank-badge rb-c" style="font-size:13px;padding:3px 10px">C</span></td>
+        <td><span class="rt-raise negative">−5,000円/月</span></td>
+        <td>2期連続で降格審査</td>
+        <td>要改善。翌月末までに改善アクションプラン提出、役員面談</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="sec-title">Step 5 — 半期ボーナス設計（個人達成率のみ）</div>
+<div class="bonus-wrap">
+  <div class="bonus-formula">
+    <span class="comment">// 半期ボーナス計算式（BPO・不動産事業部はチーム評価なし）</span><br>
+    半期ボーナス = <span class="highlight">基準額</span> × <span class="highlight">個人達成率</span><br><br>
+    <span class="comment">// 基準額（月給 × 1ヶ月）</span><br>
+    G1 ジュニアオペレーター : 220,000 × 1 = <span class="highlight">220,000円</span>（= 固定残業代を引いた金額 × 1ヶ月）<br>
+    G2 スタンダード         : 270,000 × 1 = <span class="highlight">270,000円</span>（= 固定残業代を引いた金額 × 1ヶ月）<br>
+    G3 シニア              : 320,000 × 1 = <span class="highlight">320,000円</span>（= 固定残業代を引いた金額 × 1ヶ月）<br>
+    G4 マネージャー         : 380,000 × 1 = <span class="highlight">380,000円</span>（= 固定残業代を引いた金額 × 1ヶ月）<br><br>
+    <span class="comment">// 個人達成率：半期粗利達成率をそのまま反映</span><br>
+    <span class="comment">// 定性評価はStep 4の昇給連動に反映</span><br>
+    <span class="comment">// （固定残業代を引いた金額）が基準。ボーナス基準額は実質月給の1ヶ月分相当</span><br>
+    <span class="comment">// 支給タイミング：上期＝9月末、下期＝3月末 ／ 支給月：10月・4月</span>
+  </div>
+
+  <div class="coef-grid" style="grid-template-columns: 1fr;">
+    <div class="coef-box">
+      <div class="coef-head">
+        <span>個人達成率（そのまま反映）</span>
+        <span class="coef-tag">Individual</span>
+      </div>
+      <table class="coef-table">
+        <tr><td class="coef-range">130% 以上</td><td class="coef-val boost">× 1.30 〜</td></tr>
+        <tr><td class="coef-range">100 〜 129%</td><td class="coef-val boost">× 1.00 〜 1.29</td></tr>
+        <tr><td class="coef-range">80 〜 99%</td><td class="coef-val mid">× 0.80 〜 0.99</td></tr>
+        <tr><td class="coef-range">60 〜 79%</td><td class="coef-val cut">× 0.60 〜 0.79</td></tr>
+        <tr><td class="coef-range">60% 未満</td><td class="coef-val cut">× 0.30 〜 0.59</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="examples">
+    <div class="example">
+      <div class="ex-label">Example 01 — 標準達成</div>
+      <div class="ex-scenario">G2 スタンダード<br>個人 100% 達成</div>
+      <div class="ex-calc">
+        基準額：540,000<br>
+        個人：× 1.00<br>
+        540,000 × 1.00
+      </div>
+      <div class="ex-result pos">＋270,000 円</div>
+    </div>
+    <div class="example">
+      <div class="ex-label">Example 02 — 上振れ</div>
+      <div class="ex-scenario">G2 スタンダード<br>個人 120% 達成</div>
+      <div class="ex-calc">
+        基準額：540,000<br>
+        個人：× 1.20<br>
+        540,000 × 1.20
+      </div>
+      <div class="ex-result pos">＋324,000 円</div>
+    </div>
+    <div class="example">
+      <div class="ex-label">Example 03 — 大幅未達</div>
+      <div class="ex-scenario">G2 スタンダード<br>個人 60% 達成</div>
+      <div class="ex-calc">
+        基準額：540,000<br>
+        個人：× 0.60<br>
+        540,000 × 0.60
+      </div>
+      <div class="ex-result neg">＋162,000 円（▲108,000）</div>
+    </div>
+  </div>
+</div>
+<div class="sec-title">Step 6 — 年次特別インセンティブ【現年度 2025/10〜2026/9】</div>
+<div class="special-wrap">
+  <span class="special-badge">FY 2025/10 - 2026/9</span>
+  <div class="special-title">BPO売上の原価40%以下達成で<br>全員に月給1ヶ月分の特別ボーナス</div>
+  <div class="special-sub">
+    本年度（2025/10〜2026/9）はBPO単独評価。<strong>BPO売上に対する原価比率</strong>を年間通算で40%以下に抑えられた場合、
+    事業部に所属する正社員<strong>全員</strong>に対し、半期ボーナスとは<strong>別建て</strong>で月給1ヶ月分の特別ボーナスを支給する。翌年度以降は不動産事業も評価軸に組み込む（Step 7参照）。
+  </div>
+
+  <div class="special-grid">
+    <div class="special-box">
+      <div class="special-box-label">対象期間</div>
+      <div class="special-box-val"><span class="accent-text">2025/10</span> 〜 <span class="accent-text">2026/9</span></div>
+      <div class="special-box-sub">12ヶ月間の通算で判定</div>
+    </div>
+    <div class="special-box">
+      <div class="special-box-label">達成条件</div>
+      <div class="special-box-val">外注費比率 <span class="accent-text">≤ 40%</span></div>
+      <div class="special-box-sub">対象期間の通算売上に対する外注費（原価）の比率</div>
+    </div>
+  </div>
+
+  <div class="special-amounts">
+    <table>
+      <thead>
+        <tr>
+          <th>等級</th>
+          <th>月給（支給額）</th>
+          <th style="text-align:right">特別ボーナス支給額</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="grade-pill bg-g1">G1</span> ジュニアオペレーター</td>
+          <td>220,000円</td>
+          <td class="sa-amount">+ 220,000円</td>
+        </tr>
+        <tr>
+          <td><span class="grade-pill bg-g2">G2</span> スタンダード</td>
+          <td>270,000円</td>
+          <td class="sa-amount">+ 270,000円</td>
+        </tr>
+        <tr>
+          <td><span class="grade-pill bg-g3">G3</span> シニア</td>
+          <td>320,000円</td>
+          <td class="sa-amount">+ 320,000円</td>
+        </tr>
+        <tr>
+          <td><span class="grade-pill bg-g4">G4</span> マネージャー</td>
+          <td>380,000円</td>
+          <td class="sa-amount">+ 380,000円</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="special-condition">
+    <span class="label">// 支給ルール</span><br>
+    対象者&nbsp;　&nbsp;: BPO・不動産事業部に所属する<span class="accent-text">正社員全員</span>（現在1名）<br>
+    支給額　&nbsp;: 各メンバーの<span class="accent-text">月給 × 1ヶ月分</span>（支給額ベース）<br>
+    支給時期 : <span class="accent-text">2026年10月給与</span> と同時に支給<br>
+    並列性　&nbsp;: 半期ボーナス（4月・10月）とは<span class="accent-text">完全に別建て</span>で加算<br>
+    途中入社 : 入社月数に応じて月割り計算（例：6ヶ月在籍なら 月給×0.5）<br>
+    未達時　&nbsp;: 41%以上で着地した場合は支給なし（部分支給なし／オール・オア・ナッシング）
+  </div>
+</div>
+<div class="sec-title">Step 7 — 翌年度方針【FY 2026/10〜】</div>
+<div class="next-year-wrap">
+  <span class="ny-badge">FY 2026/10〜</span>
+  <div class="ny-title">2軸評価制度への移行と<br>事業再投資型インセンティブ</div>
+  <div class="ny-sub">
+    現年度（Step 6）はBPO単独の年次特別ボーナス（外注費40%以下）。翌年度からは <strong>BPO 50% : 不動産 50%</strong> の2軸並列評価へ移行し、
+    BPO原価率は <strong>28%以下</strong> を通年目標へ大幅ハードルアップ。<strong>25%以下達成時の削減分</strong> は事業再投資（自社不動産の広告投資・外注マネージャークラスへの追加報酬等）に活用する制度設計を進める。
+  </div>
+
+  <div class="ny-block">
+    <div class="ny-block-num">01 / Multi-Axis Weighting</div>
+    <div class="ny-block-title">BPO 50% : 不動産 50% の2軸定量評価</div>
+    <div class="ny-block-desc">
+      BPO単独評価から、BPO・不動産の<strong>2軸完全並列</strong>へ移行。両事業の達成度を等しく評価し、事業部全体の総合評価を算出する。
+    </div>
+    <div class="ny-block-formula">
+      <span class="accent-text">事業部 総合達成率 = (BPO達成率 × 50%) + (不動産達成率 × 50%)</span><br><br>
+      [BPO軸] 　原価率 28%以下達成で達成率100%（後述 02ブロック）<br>
+      [不動産軸] 月間粗利目標の達成率（後述 03ブロック）
+    </div>
+  </div>
+
+  <div class="ny-block">
+    <div class="ny-block-num">02 / BPO Cost Targets</div>
+    <div class="ny-block-title">BPO原価率の2段階目標と再配分制度</div>
+    <div class="ny-block-desc">
+      BPOの原価率について2段階の目標を設定。<strong>28%以下</strong>を翌年度の通年目標とし、<strong>25%以下</strong>を達成した場合は削減分を事業再投資へ回す。
+      個人への直接還元ではなく、事業成長と組織強化のための原資として活用する。
+    </div>
+    <div class="ny-block-formula">
+      <span class="accent-text">[現状]</span>　　原価率 <span class="accent-text">36.4%</span>　（直近実績）<br>
+      <span class="accent-text">[通年目標]</span>　原価率 ≤ <span class="accent-text">28%</span>　（現状から▲8.4pt圧縮）<br>
+      <span class="accent-text">[再配分発動]</span>　原価率 ≤ <span class="accent-text">25%</span>　達成で削減分を再投資<br><br>
+      <span class="accent-text">削減差分 = 25% − (実績原価率)</span>　× BPO売上<br><br>
+      用途A : 自社不動産事業の<span class="accent-text">広告投資</span>（リード獲得強化）<br>
+      用途B : 外注マネージャークラスへの<span class="accent-text">追加報酬</span>（組織強化）<br>
+      用途C : 上記の組み合わせ（経営判断で配分）
+    </div>
+  </div>
+
+  <div class="ny-block">
+    <div class="ny-block-num">03 / Real Estate Targets</div>
+    <div class="ny-block-title">不動産事業 主指標：月間粗利金額 / 粗利率</div>
+    <div class="ny-block-desc">
+      不動産事業は <strong>月間粗利金額・粗利率</strong> を主KPIに設定。エージェント仲介の外注費構造（約80%）は変えにくいため、
+      <strong>反響仲介の仕組み化（AI活用・SNS自動化）</strong>で人件費・運用費を圧縮し、粗利率の改善を図る。
+    </div>
+    <div class="ny-block-formula">
+      <span class="accent-text">[現状実績]</span>　月間売上 <span class="accent-text">¥3,837,404</span>　/ 月間粗利 <span class="accent-text">¥1,196,681</span>　/ 粗利率 <span class="accent-text">31.2%</span><br><br>
+      <span class="accent-text">[通年目標]</span><br>
+      　・月間売上目標　 反響 <span class="accent-text">¥500,000</span> + エージェント <span class="accent-text">¥500,000</span>　= 合計 <span class="accent-text">¥1,000,000</span>/月（必達ライン）<br>
+      　・月間粗利目標　 <span class="accent-text">¥1,200,000以上</span>　（現状維持〜上振れ / 仕組み化で粗利率改善）<br><br>
+      <span class="accent-text">[達成率]</span>　実績粗利 ÷ 目標粗利 で算出（営業・マーケと同じ評価方式）<br><br>
+      <span class="accent-text">事業部 総合達成率 = (BPO達成率 × 50%) + (不動産達成率 × 50%)</span>
+    </div>
+    <div class="ny-targets-grid">
+      <div class="ny-target-card">
+        <div class="ny-target-label">① 反響仲介</div>
+        <div class="ny-target-name">仕組み化で粗利率最大化</div>
+        <div class="ny-target-value" style="font-size:12px;">AI活用 / SNS自動化<br>人件費・運用費圧縮</div>
+      </div>
+      <div class="ny-target-card">
+        <div class="ny-target-label">② エージェント仲介</div>
+        <div class="ny-target-name">外注費構造維持・売上拡大</div>
+        <div class="ny-target-value" style="font-size:12px;">月間売上 ¥500,000<br>粗利金額の絶対額UP</div>
+      </div>
+      <div class="ny-target-card">
+        <div class="ny-target-label">③ 管理業</div>
+        <div class="ny-target-name">ノークレーム維持</div>
+        <div class="ny-target-value" style="color:var(--blue);font-size:13px;">— 成長対象外</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sec-title">Step 8 — 評価サイクル</div>
+<div class="timeline">
+  <div class="tl-card">
+    <div class="tl-timing">毎月末</div>
+    <div class="tl-action">月次粗利 & 外注費レビュー</div>
+    <div class="tl-desc">月次粗利の着地・外注費比率の推移を確認。マネージャーとの1on1（30分）で改善点を抽出。</div>
+  </div>
+  <div class="tl-card">
+    <div class="tl-timing">四半期</div>
+    <div class="tl-action">外注費40%進捗確認</div>
+    <div class="tl-desc">通算外注費比率を確認。40%超過リスクがあれば内製化プランを早期着手。</div>
+  </div>
+  <div class="tl-card">
+    <div class="tl-timing">6ヶ月ごと</div>
+    <div class="tl-action">半期評価・ボーナス支給</div>
+    <div class="tl-desc">個人達成率で半期ボーナス算定。翌月（10月/4月）に支給。グレード審査も同時実施。</div>
+  </div>
+  <div class="tl-card">
+    <div class="tl-timing">2026/10</div>
+    <div class="tl-action">年次特別ボーナス判定 + 翌年度制度発動</div>
+    <div class="tl-desc">2025/10〜2026/9の通算でBPO原価40%以下を判定 → 達成なら全員に月給1ヶ月分加算。同時にStep 7の2軸評価・25%再投資制度に移行。</div>
+  </div>
+</div>
+<div class="doc-footer">
+  <span>株式会社LET ／ 人事部</span>
+  <span>CONFIDENTIAL — 社内限定資料 ／ Ver 1.0 ／ 2026-04-22</span>
+</div>
+</div>
+
+
+<script>
+(function() {
+  const PASS_HASH = "ca8266858a2df9fd49181dbb7f3568fb53ec1764eafd1ddc55dc992688f0889a";
+  const STORAGE_KEY = "let_auth_bpo";
+
+  async function sha256(text) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  function show() {
+    document.getElementById('auth-gate').style.display = 'none';
+    document.getElementById('main-content').style.display = '';
+  }
+
+  if (sessionStorage.getItem(STORAGE_KEY) === '1') {
+    show();
+  }
+
+  document.getElementById('auth-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const input = document.getElementById('auth-input').value;
+    const hash = await sha256(input);
+    const errEl = document.getElementById('auth-error');
+    if (hash === PASS_HASH) {
+      sessionStorage.setItem(STORAGE_KEY, '1');
+      show();
+    } else {
+      errEl.classList.add('show');
+      document.getElementById('auth-input').value = '';
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
