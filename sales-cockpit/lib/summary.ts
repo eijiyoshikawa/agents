@@ -32,6 +32,22 @@ export function ymdLabel(ymd: string): string {
   return `${m}/${d}(${WD[dow]})`;
 }
 
+/**
+ * バックフィルで補完したアポ取得日を、キャッシュ済み顧客データへメモリ上で反映する。
+ * （キャッシュには古い状態が残っているため、通知直前の集計にはこれで上書きする）
+ */
+export function patchAppointments(
+  customers: ListCustomer[],
+  filled: { id: string; date: string }[],
+): ListCustomer[] {
+  if (filled.length === 0) return customers;
+  const map = new Map(filled.map((f) => [f.id, f.date]));
+  return customers.map((c) => {
+    const d = map.get(c.id);
+    return d && !c.appointmentDate ? { ...c, appointmentDate: d } : c;
+  });
+}
+
 export type RepCount = { rep: string; count: number };
 export type PeriodStats = {
   calls: number; // 架電数（統合: ステータス更新ベース と システムログ の最大）

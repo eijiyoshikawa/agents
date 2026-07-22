@@ -325,6 +325,40 @@ export async function fetchRecentlyEditedSlim(since: string): Promise<ListCustom
   return pages.map(mapListCustomer);
 }
 
+/**
+ * アポイント取得日のバックフィル。
+ * Notionで直接ステータスを「アポイント獲得」にした顧客は「アポイント取得日」が
+ * 空のままで、日次/週次のアポ集計に乗らない。ここで取得日が空のアポ獲得顧客を探し、
+ * ページの最終更新時刻(JST)＝ほぼステータス変更日 を取得日として書き込む。
+ * sync cron(30分毎)と日次/週次レポート送信直前に実行するため、日付のズレは最小。
+ * @returns 埋めた顧客の { id, date } 一覧（呼び出し側でメモリ上のデータにも反映できる）
+ */
+export async function backfillAppointmentDates(): Promise<{ id: string; date: string }[]> {
+  const pages = await queryAll(DB.customers, {
+    and: [
+      { property: "ステータス", status: { equals: "アポイント獲得" } },
+      { property: "アポイント取得日", date: { is_empty: true } },
+    ],
+  });
+  const filled: { id: string; date: string }[] = [];
+  // 手入力の取りこぼし補完が目的なので一度に大量更新はしない（安全のため上限50件/回）
+  for (const pg of pages.slice(0, 50)) {
+    const edited = pg.last_edited_time ?? new Date().toISOString();
+    // JSTの日付（UTC+9時間してから日付部分を取る）
+    const date = new Date(new Date(edited).getTime() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+    try {
+      await client().pages.update({
+        page_id: pg.id,
+        properties: { アポイント取得日: { date: { start: date } } },
+      });
+      filled.push({ id: pg.id, date });
+    } catch (e) {
+      console.error("アポ取得日バックフィル失敗:", pg.id, (e as Error)?.message);
+    }
+  }
+  return filled;
+}
+
 /** アポイント取得日が入っている顧客のみ（軽量）。アポ月次/週次サマリ用。 */
 export async function fetchAppointedSlim(): Promise<ListCustomer[]> {
   const ids = await fetchListPropertyIds();

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getDashboard, getSummaryCustomers, getContracts, getCalls } from "@/lib/data";
+import { backfillAppointmentDates } from "@/lib/notion";
+import { patchAppointments } from "@/lib/summary";
 import { notifySlack } from "@/lib/notify";
 import { statsForRange, ranges, dailySlackText, addDays } from "@/lib/summary";
 import { verifySession, SESSION_COOKIE } from "@/lib/session";
@@ -33,12 +35,16 @@ export async function GET(req: Request) {
 
   const r = ranges();
   const target = dateParam && /^\d{4}-\d{2}-\d{2}$/.test(dateParam) ? dateParam : addDays(r.today, offset);
-  const [dash, { customers }, { contracts }, { calls }] = await Promise.all([
+  // Notionで直接「アポイント獲得」にした顧客の取得日を送信直前に補完（手入力の取りこぼし対策）
+  const backfilled = await backfillAppointmentDates().catch(() => [] as { id: string; date: string }[]);
+  const [dash, { customers: rawCustomers }, { contracts }, { calls }] = await Promise.all([
     getDashboard(),
     getSummaryCustomers(target),
     getContracts(),
     getCalls(),
   ]);
+  // キャッシュ済みデータには補完した取得日が乗っていないため、メモリ上でも反映する
+  const customers = patchAppointments(rawCustomers, backfilled);
   // Slack通知は全担当分を集計し、担当別内訳を含める（非稼働メンバーは集計側で除外）。
   const monthStart = `${target.slice(0, 7)}-01`; // 暦月の月初
   const stats = statsForRange(customers, contracts, calls, target, target);
