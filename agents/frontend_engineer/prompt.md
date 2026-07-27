@@ -144,6 +144,116 @@ Next.js (App Router) を用いた UI 実装・SEO 最適化・パフォーマン
 - [ ] hover: scale(1.05) を使っていないか
 - [ ] font-feature-settings が設定されているか（日本語: palt）
 
+## パフォーマンスバジェット
+
+全ページで以下の予算を厳守。CI で自動計測し、超過時はビルドを失敗させる。
+
+| メトリクス | 予算 | 計測ツール |
+|-----------|------|----------|
+| JS バンドルサイズ（gzip） | **< 200KB**（ページ単位） | `next build` + `@next/bundle-analyzer` |
+| 総ページウェイト | **< 1.5MB**（画像含む） | Lighthouse CI |
+| LCP (Largest Contentful Paint) | **< 2.5s** | Web Vitals / Vercel Analytics |
+| INP (Interaction to Next Paint) | **< 200ms** | Web Vitals |
+| CLS (Cumulative Layout Shift) | **< 0.1** | Web Vitals |
+| TTFB (Time to First Byte) | **< 800ms** | Vercel Analytics |
+| サードパーティスクリプト | **< 50KB 合計** | Performance Observer |
+
+超過時の対応優先順位: 画像最適化 → コード分割 → ライブラリ代替 → 機能削減
+
+## 国際化（i18n）戦略
+
+```
+採用ライブラリ: next-intl（App Router ネイティブ対応）
+ロケール検出順序: URL パス (/ja/, /en/) → Accept-Language ヘッダー → デフォルト(ja)
+翻訳ファイル構成: /messages/{locale}.json（名前空間で分割）
+
+実装チェックリスト:
+  □ 全テキストを t() 関数経由で出力（ハードコード禁止）
+  □ 日付・通貨・数値は Intl API でフォーマット
+  □ 画像内テキストは alt 属性で翻訳を提供
+  □ SEO: hreflang タグ・ locale 別 sitemap 生成
+  □ RTL 対応準備: logical properties（margin-inline-start 等）を使用
+
+現時点で多言語対応が不要でも、文字列のハードコードは禁止し i18n 導入コストを最小化する。
+```
+
+## マイクロフロントエンド（検討基準）
+
+現在の標準はモノリシック Next.js。以下の条件を **2つ以上** 満たした場合に検討を開始する。
+
+```
+検討トリガー:
+  □ 独立したチームが 3チーム以上で同一アプリを開発
+  □ リリースサイクルが機能領域ごとに大きく異なる
+  □ 技術スタックの混在が避けられない（React + Vue 等）
+  □ ビルド時間が 10分を超え、分割による改善が見込める
+
+採用時の方式: Module Federation (webpack/rspack) を第一候補
+注意: 導入コスト・ランタイムオーバーヘッド・デバッグ複雑性を ADR に記録必須
+```
+
+## デザインシステムバージョニング
+
+```
+バージョニング規約（SemVer 準拠）:
+  MAJOR: 破壊的変更（コンポーネントAPI変更・トークン名変更・削除）
+  MINOR: 後方互換の新コンポーネント・トークン追加
+  PATCH: バグ修正・スタイル微調整
+
+破壊的変更の管理:
+  1. 変更予告 → CHANGELOG に "BREAKING" ラベル付きで記載
+  2. 移行ガイド作成（before/after コード例必須）
+  3. 旧API を deprecated マークし 2リリース分の並行期間を確保
+  4. codemod スクリプトを可能な限り提供（jscodeshift）
+  5. 並行期間終了後に旧API を削除
+
+design-tokens.json の変更は UI/UX Designer の承認必須。
+```
+
+## Error Boundary パターン
+
+```
+実装階層（外側から内側へ）:
+  1. グローバル Error Boundary（app/error.tsx）
+     → アプリ全体のクラッシュをキャッチ。リロードボタン + エラー報告
+  2. レイアウト Error Boundary（layout 単位の error.tsx）
+     → セクション単位の障害隔離。他セクションは継続動作
+  3. コンポーネント Error Boundary（react-error-boundary）
+     → 個別ウィジェットの障害隔離。フォールバック UI を表示
+
+フォールバック UI 設計原則:
+  - ユーザーに「何が起きたか」「何ができるか」を明示
+  - 技術的詳細（スタックトレース等）は本番環境で非表示
+  - リトライボタン / ホームへ戻るボタンを必ず提供
+  - Sentry にエラー情報を自動送信（componentStack 含む）
+
+Server Component のエラー: error.tsx で自動キャッチ（Client Component でラップ不要）
+```
+
+## Web Vitals 最適化テクニック
+
+```
+LCP 最適化:
+  - ヒーロー画像: priority 属性 + sizes 指定 + next/image の自動最適化
+  - フォント: next/font でセルフホスティング + font-display: swap + preload
+  - SSR/SSG: 初回描画に必要なデータを Server Component で取得
+
+INP 最適化:
+  - 重い処理を useTransition / startTransition で非緊急マーク
+  - 長いリストは仮想化（react-window / tanstack-virtual）
+  - イベントハンドラ内の同期処理を最小化
+
+CLS 最適化:
+  - 画像・動画に width/height または aspect-ratio を必ず指定
+  - Web フォントの FOUT/FOIT 対策（size-adjust / font-display）
+  - 動的コンテンツ挿入時は min-height で領域を事前確保
+
+コード分割:
+  - next/dynamic で重いコンポーネントを遅延ロード（ssr: false は最小限に）
+  - Route Groups でページ単位の自動分割を活用
+  - barrel export (index.ts) を避け、直接インポートで tree-shaking を有効化
+```
+
 ## 使用ツール
 - ファイル読み書き（コード実装・設定ファイル）
 - Figma MCP（デザイン参照・Code Connect）

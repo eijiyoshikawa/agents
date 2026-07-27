@@ -97,3 +97,96 @@
 - `WebFetch`: 参考サイトのHTML取得
 - `Bash`: npm コマンド実行
 - Vercel MCP: デプロイ・プレビュー確認
+
+## パフォーマンス最適化パイプライン
+
+再構築サイトは以下の4段階で最適化を実施する。
+
+| 段階 | 内容 | 目標 |
+|------|------|------|
+| 1. Lighthouse監査 | デプロイ後にLighthouse CIで全ページ計測 | Performance **90+** |
+| 2. Core Web Vitals改善 | LCP **2.5秒以内** / FID **100ms以内** / CLS **0.1以下** | 全指標グリーン |
+| 3. バンドル分析 | `next/bundle-analyzer` でページ別JS予算管理 | 初期ロード **150KB以下** |
+| 4. 最適化実行 | 画像・フォント・コード分割の一括改善 | 全スコア維持 |
+
+- **画像最適化**: `next/image` + WebP/AVIF自動変換、適切な `sizes` 属性設定、ATFはpriority指定
+- **フォント最適化**: `next/font` でセルフホスティング、`display:swap`、日本語フォントはサブセット化
+- **コード分割**: `dynamic()` で重いコンポーネントを遅延読み込み、不要なポリフィルを除去
+
+## アクセシビリティ監査統合
+
+QAフェーズで **WCAG 2.1 AA準拠** を必須チェックとする。
+
+**自動テスト（CI統合）:**
+- axe-core による全ページスキャン（違反0件が合格条件）
+- Lighthouse Accessibility スコア **90+** 目標
+
+**手動チェック項目（QA Reviewer担当）:**
+- キーボード操作: Tab/Shift+Tab/Enter/Escape で全機能操作可能
+- スクリーンリーダー: VoiceOver/NVDA で主要フローを読み上げ確認
+- 色覚多様性: コントラスト比4.5:1以上、色のみに依存しない情報伝達
+- 拡大表示: 200%拡大でレイアウト崩れ・情報欠落なし
+
+**実装ルール:**
+- WAI-ARIAランドマーク（`banner`/`main`/`navigation`/`contentinfo`）を適切に配置
+- ライブリージョン（`aria-live`）で動的コンテンツの変更を通知
+- visible focus indicator 必須、モーダルにはフォーカストラップ、ページ先頭に skip link 設置
+
+## 再構築サイトのSEO監査
+
+参考サイトの再構築時、SEO資産の損失を防ぐために以下を必須で実施する。
+
+| チェック項目 | 実施内容 |
+|-------------|---------|
+| リダイレクトマッピング | 旧URL→新URLの301リダイレクト一覧を作成、`next.config.js` の `redirects` に設定、404を防止 |
+| canonical タグ | 全ページに `<link rel="canonical">` を設定、www/non-www統一、重複コンテンツ防止 |
+| サイトマップ | `next-sitemap` で自動生成、`robots.txt` と連携、Google Search Console に送信 |
+| 構造化データ | JSON-LD形式で `Organization` / `BreadcrumbList` / `FAQ` / `Product` を適切に埋め込み |
+| メタデータ移行 | 旧サイトの `title` / `description` / OGP（og:image等）を新サイトに引き継ぎ確認 |
+
+- 移行前に旧サイトの主要ページURL・メタデータをスプレッドシートに記録
+- デプロイ後に Google Search Console でカバレッジエラーを監視
+
+## クロスブラウザテストマトリクス
+
+再構築サイトは以下のブラウザ × デバイスの組み合わせで動作確認を実施する。
+
+| ブラウザ | デスクトップ | モバイル |
+|---------|------------|---------|
+| Chrome | 最新 | Android 最新 |
+| Safari | macOS 最新 | iOS 最新 + 1世代前 |
+| Firefox | 最新 | — |
+| Edge | 最新 | — |
+
+**テスト項目:**
+- レイアウト崩れ（Flexbox/Grid の挙動差異）
+- フォント表示（日本語フォントのレンダリング差異）
+- アニメーション（`transform`/`opacity` の GPU アクセラレーション確認）
+- フォーム動作（バリデーション・送信・autocomplete）
+- タッチ操作（スワイプ・ピンチズーム・タップターゲット44px以上）
+- CSS互換性は Can I Use で対象ブラウザのサポートを確認、未対応機能には polyfill またはフォールバックを適用
+
+## アセット最適化戦略
+
+参考サイトから収集・再構築するアセットの最適化方針。
+
+**画像フォーマット選定:**
+| 用途 | 推奨フォーマット | 理由 |
+|------|----------------|------|
+| 写真・スクリーンショット | WebP / AVIF | 高圧縮・高品質 |
+| アイコン・ロゴ | SVG | 解像度非依存・軽量 |
+| アニメーション | CSS / Lottie | GIF比で大幅軽量化 |
+
+**読み込み戦略:**
+- ATF（Above the Fold）: `loading="eager"` + `priority` 指定
+- BTF（Below the Fold）: `loading="lazy"` + Intersection Observer で制御
+- 重要画像には `fetchpriority="high"` を設定
+
+**CDN・キャッシュ戦略:**
+- Vercel Edge Network を活用、静的アセットは `Cache-Control: public, max-age=31536000, immutable`
+- ハッシュ付きファイル名で確実なキャッシュ破棄
+
+**日本語フォント最適化:**
+- サブセット化で **100KB以下** に圧縮（`woff2` 形式必須）
+- `font-display: swap` で FOIT 防止
+- 使用文字を抽出し、必要最小限のグリフのみ含める
