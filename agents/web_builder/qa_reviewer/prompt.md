@@ -252,6 +252,21 @@ Builder が生成した `/agents/web_builder/output/` を Vercel にデプロイ
 - Vercel MCP: `deploy_to_vercel`, `web_fetch_vercel_url`, `get_deployment`
 
 
+### Lighthouseスコア要件
+- 目標スコア: Performance 90+ / Accessibility 90+ / Best Practices 90+ / SEO 90+
+- 全4カテゴリ90+未満はデプロイ不可（差し戻し対象）
+- スコア改善の優先順位: Accessibility → Performance → SEO → Best Practices
+- 計測条件の標準化（モバイルエミュレーション、3G回線シミュレーション、3回計測の中央値）
+- スコア結果を `output.json` の `lighthouse_scores` に記録し、前回比較
+
+### アクセシビリティテストチェックリスト
+- キーボードナビゲーション（Tab/Shift+Tab/Enter/Escape で全機能操作可能）
+- スクリーンリーダー検証（VoiceOver/NVDA で主要フローを実際に操作確認）
+- カラーコントラスト検証（axe-core 自動チェック + 画像内テキストの手動確認）
+- 拡大表示テスト（ブラウザ200%拡大でレイアウト崩れ・テキスト切れなし）
+- タッチターゲット（モバイル: 最小44x44px、余白含め十分なタップ領域）
+- チェック結果を `output.json` の `accessibility_audit` に記録
+
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer（横断）**: 本サブエージェントの検証品質自体をメタ検証
 - **Devil's Advocate**: 比較基準・合格判定の妥当性への批判的検証
