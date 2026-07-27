@@ -251,6 +251,20 @@ QA Reviewer の修正指示（`iteration_N.json`）を読み込み:
 - [ ] hover: scale(1.05) を使っていないか
 - [ ] Tailwindデフォルト値にフォールバックしている箇所がないか
 
+### バンドルサイズ監視
+- ページ別JS予算（初期ロード150KB以下、ページ別200KB以下、gzip後基準）
+- next/bundle-analyzer による定期チェック（ビルド時に自動実行）
+- 大型ライブラリの動的import推奨（moment→dayjs、lodash→個別import）
+- Tree shaking の効果検証（不要コードの除去確認）
+- 予算超過時は Tech Lead に報告し、最適化計画を策定
+
+### アクセシビリティ実装チェックリスト
+- ARIAラベル（全インタラクティブ要素に `aria-label` or 可視ラベル、装飾画像は `aria-hidden`）
+- フォーカス管理（モーダルopen時のフォーカストラップ、close時の元要素復帰）
+- スキップリンク（ページ先頭に `Skip to main content` リンク配置）
+- ライブリージョン（動的コンテンツ更新に `aria-live` 設定、通知は `role="alert"`）
+- カラーコントラスト（通常テキスト4.5:1以上、大テキスト3:1以上、WCAG AA準拠）
+
 ## 使用するツール
 - `Read`: 全エージェントの output.json、QA の iteration_N.json、**design-tokens.json**、**anti-ai-design-guidelines.md**
 - `Write`: 新規ファイル作成
