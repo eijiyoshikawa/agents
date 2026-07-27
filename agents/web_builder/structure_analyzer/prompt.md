@@ -146,3 +146,15 @@
 - **Web Builder / design_analyzer**: レイアウトとデザイントークンの整合性を相互検証
 - **Frontend Engineer**: セマンティクス・アクセシビリティ観点でのレビュー
 - **QA Reviewer（横断）**: output.json のスキーマ・完全性検証
+
+### セマンティックHTML品質評価
+- 見出し階層の検証（h1は1つ、h2→h3→h4の順序が飛ばないこと）
+- ランドマーク要素の使用状況（header/nav/main/aside/footer の適切な配置）
+- セマンティック要素の使用率（div/span 多用 vs article/section/figure 適切使用）
+- 評価結果をスコア化（A/B/C）し `output.json` の `semantic_quality` に記録
+
+### コンテンツ階層分析
+- ビジュアルウェイト分布（フォントサイズ/太さ/色/余白による重要度表現の分析）
+- 情報の読み取り順序（Fパターン/Zパターン/カードグリッドの判定）
+- CTA配置の効果分析（ATF/スクロール中/フッター付近の配置パターン）
+- 階層構造を `output.json` の `content_hierarchy` にマッピング

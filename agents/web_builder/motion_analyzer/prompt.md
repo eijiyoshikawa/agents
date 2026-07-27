@@ -199,3 +199,15 @@ JS ソースから以下のパターンを検出する:
 - 数字がドラムロール → `slot-counter`
 - カードが3D傾斜 → `card-tilt`
 - 常時ノイズ背景 → `overlay-texture`
+
+### アニメーション別パフォーマンス影響評価
+- CLS リスク判定（レイアウトシフトを引き起こすアニメーションの特定と警告）
+- ペイントコスト分析（GPU合成可能=transform/opacity vs CPU描画=width/height/margin）
+- will-change / contain プロパティの使用状況チェック
+- パフォーマンス影響度を Low/Medium/High で分類し `output.json` に記録
+
+### reduced-motion フォールバック文書化
+- `prefers-reduced-motion: reduce` 時の代替表現を各アニメーションに記録
+- 必須フォールバック: スクロールトリガーアニメーション → 即時表示、自動再生 → 停止
+- フォールバック有無のチェックリスト（既存サイトの対応状況を監査）
+- 再構築時のフォールバック実装仕様を `output.json` の `reduced_motion_fallbacks` に出力

@@ -116,3 +116,15 @@ HTMLソースと読み込まれたリソースから技術を検出する:
 - **Web Builder / qa_reviewer**: スキャン結果と実際のデプロイ後サイトの一致度を検証
 - **Tech Lead**: 検出した外部ライブラリ・フレームワークの再現可否を技術観点でレビュー
 - **QA Reviewer（横断）**: output.json のスキーマ・完全性検証
+
+### パフォーマンスベースライン取得
+- ページロード時間（TTFB/FCP/LCP/TTI）の初回計測と記録
+- リソース数・総サイズの集計（HTML/CSS/JS/画像/フォント別）
+- サードパーティスクリプトの特定と影響度評価
+- 計測結果を `output.json` の `performance_baseline` に構造化記録
+
+### PWA検出
+- Service Worker の有無と登録スコープの確認
+- manifest.json の存在と主要プロパティ（name/icons/start_url/display）の抽出
+- オフライン対応レベルの判定（完全オフライン/キャッシュファースト/オンラインのみ）
+- PWA対応状況を `output.json` の `pwa_status` に記録
