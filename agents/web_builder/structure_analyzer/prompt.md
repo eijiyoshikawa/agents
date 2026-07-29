@@ -11,6 +11,9 @@
 
 ## 実行手順
 
+### Step 0: セマンティックHTML分析方針
+HTML5 セマンティック要素（`<header>`, `<nav>`, `<main>`, `<article>`, `<section>`, `<aside>`, `<footer>`）の使用状況を記録する。`<div>` のみで構成されている場合は、再現時にセマンティック化する方針を `semantic_upgrade_notes` に記載。ARIA ランドマーク（`role="banner"`, `role="navigation"` 等）の有無も確認し、アクセシビリティ対応の基盤情報とする。
+
 ### Step 1: 各ページのHTML取得と全体構造の把握
 `site_scanner/output.json` の `pages` 配列から各ページURLを取得し、
 `WebFetch` でHTMLを取得する。
@@ -53,9 +56,15 @@
 全ページを通じた共通パターンを抽出する:
 - コンテンツの最大幅（max-width）
 - セクション間のスペーシング
-- レスポンシブブレークポイント（768px, 1024px, 1280px 等）
+- レスポンシブブレークポイント（実際のメディアクエリから抽出。768px, 1024px, 1280px 等）
 - ヘッダー高さ
 - 共通パディング
+
+**レスポンシブブレークポイント分析:**
+CSSメディアクエリを収集し、実際に使用されているブレークポイントを列挙。各ブレークポイントでのレイアウト変化（カラム数・要素の表示/非表示・フォントサイズ変更）を記録。
+
+**コンポーネント階層マッピング:**
+共通コンポーネントの入れ子関係を整理（例: Page → Layout → Section → Container → Card → Content）。Builder がコンポーネント分割の粒度を判断する材料とする。
 
 ### Step 6: ページ間の共通/固有要素の整理
 - 共通コンポーネント: Header, Footer, CTA Section 等
@@ -131,7 +140,23 @@
     "Footer（全ページ共通）",
     "CTA Section（複数ページで使用）",
     "Section Heading（共通見出しパターン）"
-  ]
+  ],
+  "component_hierarchy": [
+    "Page → Layout(Header+Main+Footer) → Section → Container → Card/Grid → Content"
+  ],
+  "semantic_html": {
+    "uses_semantic_elements": true,
+    "landmark_roles": ["banner", "navigation", "main", "contentinfo"],
+    "semantic_upgrade_notes": "セマンティック要素は適切に使用済み。再現時もそのまま踏襲"
+  },
+  "layout_patterns": {
+    "dominant_pattern": "contained-center",
+    "grid_system": "CSS Grid（features/pricing）+ Flexbox（header/cards）",
+    "breakpoint_changes": {
+      "1024px": "3col → 2col、ナビ → ハンバーガー",
+      "640px": "2col → 1col、パディング縮小"
+    }
+  }
 }
 ```
 

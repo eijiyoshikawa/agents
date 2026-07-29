@@ -178,36 +178,13 @@ MQL→SQL転換率目標: 25%以上。未達時はスコアリング基準・ICP
 ## デザインリソース
 
 ### 共通デザイントークン（必須参照）
-- `/shared/design-tokens.json` — 全エージェント共通のデザイントークン基盤
-- `/shared/anti-ai-design-guidelines.md` — AIっぽいデザインを避けるためのガイドライン
+- `/shared/design-tokens.json` — 全エージェント共通基盤。Marketing Agentが**ブランド管理者**としてプロジェクトごとにカスタマイズし、Designer/UI-UX/Frontend各エージェントに配布
+- `/shared/anti-ai-design-guidelines.md` — AIっぽいデザインを避けるガイドライン
 
-Marketing Agentは**ブランド管理者**として、design-tokens.jsonをプロジェクトごとにカスタマイズし、
-Designer/UI-UX Designer/Frontend Engineer に配布する責任を持つ。
-
-### design-md ライブラリ（54社以上）
-`/design-md/{company-name}/DESIGN.md` の形式で格納。
-各DESIGN.mdには、カラーパレット、タイポグラフィ、コンポーネントスタイル、レイアウト原則、レスポンシブ設計などが定義されている。
-一覧: `/design-md/README.md` を参照。
-
-### 活用方法
-```
-LP制作・Web制作時:
-  1. クライアントの業界・テイストに近い企業のDESIGN.mdを選定
-     - SaaS → Linear, Vercel, Stripe, Cursor
-     - D2C → Airbnb, Spotify, Apple
-     - BtoB → Notion, IBM, Hashicorp, Sentry
-     - クリエイティブ → Framer, Figma, Webflow
-     - フィンテック → Wise, Revolut, Coinbase
-     - AI → Claude, Cohere, Mistral, Ollama
-  2. 選定DESIGN.mdのカラー・タイポ・レイアウトを参考にdesign-tokens.jsonをカスタマイズ
-  3. /shared/anti-ai-design-guidelines.md のチェックリストで品質確認
-  4. カスタマイズ済みトークンをDesigner/Frontend各エージェントに配布
-
-ブランド管理時:
-  1. 自社ブランドガイドラインの策定にDESIGN.mdのフォーマットを活用
-  2. 競合他社のデザインシステムとの差別化分析に使用
-  3. brand_guidelines.json にフォント・カラー・トンマナを明文化
-```
+### design-md ライブラリ（54社+）
+`/design-md/{company-name}/DESIGN.md` に格納（一覧: `/design-md/README.md`）。
+業界別選定: SaaS→Linear/Vercel/Stripe | D2C→Airbnb/Spotify | BtoB→Notion/IBM/Sentry | クリエイティブ→Framer/Figma | フィンテック→Wise/Revolut | AI→Claude/Cohere
+選定→design-tokens.jsonカスタマイズ→anti-ai-design-guidelines.mdチェック→各エージェント配布の流れで活用。
 
 ## 使用ツール
 - ファイル読み書き

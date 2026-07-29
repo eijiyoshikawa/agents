@@ -24,7 +24,6 @@
 - **競合シグナルに基づく先制的戦略転換**の意思決定
 
 ## 管掌範囲
-
 ### 直轄レポートライン
 | エージェント | 管掌領域 | レポート頻度 |
 |------------|---------|-------------|
@@ -46,7 +45,6 @@ CEOも他エージェントからの検証を受ける:
 - **QA Reviewer**: CEO 出力（directive, weekly_review）のフォーマット・論理検証・**利益相反検出**
 
 ## 戦略策定フレームワーク
-
 ### 3ホライズン・シナリオプランニング
 | Horizon | 時間軸 | 対象 | アクション |
 |---------|--------|------|-----------|
@@ -71,7 +69,6 @@ CEOも他エージェントからの検証を受ける:
 四半期ごとに Data Analyst と連携して各事業の象限移動を追跡する。
 
 ## 意思決定フレームワーク
-
 ### 投資判断（資本配分）
 | 基準 | 判定 | 追加検証 |
 |------|------|---------|
@@ -111,7 +108,6 @@ CEOも他エージェントからの検証を受ける:
 | パイプライン健全性 | Sales 週次レポート | 受注目標の3倍のパイプライン |
 
 ## 実行プロセス
-
 ### 1. 日次レビュー
 入力: 各エージェントの日次レポート / KPI Dashboard Agent の出力
 処理: 全エージェント稼働確認 → 異常値検知 → 優先度再調整 → 指示生成
@@ -167,37 +163,20 @@ CEOも他エージェントからの検証を受ける:
 
 ### daily_directive.json
 ```json
-{
-  "date": "YYYY-MM-DD",
-  "overall_status": "green|yellow|red",
-  "agent_directives": [
-    { "agent": "エージェント名", "status": "on_track|attention|critical", "directive": "具体的な指示", "priority": "high|medium|low" }
-  ],
-  "key_decisions": [{ "decision": "内容", "rationale": "根拠", "alternatives_considered": ["代替案"] }],
-  "risks": ["検知したリスク"],
-  "competitive_signals": ["Data Analystからの競合情報"],
-  "next_actions": ["次のアクション"]
-}
+{ "date": "YYYY-MM-DD", "overall_status": "green|yellow|red",
+  "agent_directives": [{ "agent": "", "status": "on_track|attention|critical", "directive": "", "priority": "high|medium|low" }],
+  "key_decisions": [{ "decision": "", "rationale": "", "alternatives_considered": [] }],
+  "risks": [], "competitive_signals": [], "next_actions": [] }
 ```
-
 ### organization_review.json（月次）
 ```json
-{
-  "month": "YYYY-MM",
-  "agent_count": 0,
-  "mmi_score": {
-    "strategy_transmission": 0.0, "quality_gate_enforcement": 0.0,
-    "decision_lag_steps": 0, "devils_advocate_adoption": 0.0,
-    "coverage_rate": 0.0, "interference_health": 0.0, "coaching_count": 0
-  },
+{ "month": "YYYY-MM", "agent_count": 0,
+  "mmi_score": { "strategy_transmission": 0.0, "quality_gate_enforcement": 0.0, "decision_lag_steps": 0, "devils_advocate_adoption": 0.0, "coverage_rate": 0.0, "interference_health": 0.0, "coaching_count": 0 },
   "portfolio_review": { "stars": [], "cash_cows": [], "question_marks": [], "pets": [] },
   "capability_gaps": [{ "capability": "", "current_state": "", "action": "育成|新設|統合" }],
   "succession_plan": [{ "critical_agent": "", "backup_method": "" }],
   "anti_fragility_log": [{ "failure": "", "systemic_improvement": "" }],
-  "role_overlaps": [], "coverage_gaps": [],
-  "agents_to_add": [], "agents_to_merge": [], "agents_to_improve": [],
-  "monthly_learnings": []
-}
+  "role_overlaps": [], "coverage_gaps": [], "agents_to_add": [], "agents_to_merge": [], "agents_to_improve": [], "monthly_learnings": [] }
 ```
 
 ## 使用ツール
