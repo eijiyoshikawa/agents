@@ -65,22 +65,13 @@ Agent 3（Market Researcher）、Agent 4（Analogy Finder）と **並列で実�
 - ファネル上のボトルネック仮説を提示する
 
 **ファネル指標（推定）:**
-各段階間の推定コンバージョン率を可能な範囲で記載する:
-- TOFU→MOFU: 認知→興味転換率
-- MOFU→BOFU: 検討→購入/問合せ率
-- BOFU→成約: 問合せ→成約率
+各段階間の推定コンバージョン率を可能な範囲で記載する（TOFU→MOFU / MOFU→BOFU / BOFU→成約）。
 
 **アトリビューションモデルの考慮:**
-競合のチャネルミックスを分析する際、以下の視点を持つ:
-- ファーストタッチ: 最初の接触チャネル（認知獲得に強いチャネル）
-- ラストタッチ: コンバージョン直前のチャネル（刈り取りに強いチャネル）
-- マルチタッチ: 複数接触点の組み合わせパターン
+- ファーストタッチ（認知獲得チャネル）/ ラストタッチ（刈り取りチャネル）/ マルチタッチ（組み合わせパターン）の3視点で競合チャネルミックスを分析する。
 
 **カスタマージャーニーマッピング:**
-ターゲット顧客の典型的な購買行動を以下の軸で整理する:
-- タッチポイント: 各段階で接触するチャネル・コンテンツ
-- 顧客の思考・感情: 各段階での関心事・不安・期待
-- コンテンツギャップ: 競合が手薄な段階（自社の差別化機会）
+ターゲット顧客の購買行動を整理する: タッチポイント / 顧客の思考・感情 / コンテンツギャップ（競合が手薄な段階 = 自社の差別化機会）。
 
 ### Step 5: キャンペーン分析（campaign_analysis）
 - 競合が実施している代表的なキャンペーンの構造（期間、インセンティブ、チャネル）
@@ -97,6 +88,22 @@ Agent 3（Market Researcher）、Agent 4（Analogy Finder）と **並列で実�
 - 不動産業界特化型BPO（AIエージェント活用による業務効率化）
 - AIシステム制作（補助金活用）
 - LP等のWeb制作
+
+**キャンペーン効果スコアリング（各施策提案に付与）:**
+
+| 評価軸 | 配点 | 基準 |
+|-------|------|------|
+| 競合との差別化度 | 20 | 競合が未実施=20, 一部実施=10, 全社実施=5 |
+| 実行容易性 | 20 | 社内完結=20, 外部協力要=10, 大規模投資要=5 |
+| 期待インパクト | 20 | KPI2倍以上=20, 50%改善=15, 微改善=5 |
+| 測定可能性 | 20 | 直接測定可=20, 間接測定=10, 測定困難=5 |
+| 持続性 | 20 | 蓄積型=20, 一時的効果=10, 消耗型=5 |
+
+**ブランド認知・センチメント分析:**
+可能な範囲で以下を調査する:
+- 競合ブランドに対するオンラインセンチメント（肯定/中立/否定の傾向）
+- レビューサイト・SNSでの評判パターン
+- 業界ベンチマーク比較（エンゲージメント率、フォロワー成長率等の業界平均値）
 
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer**: 分析品質・データソースの検証
@@ -143,7 +150,14 @@ Agent 3（Market Researcher）、Agent 4（Analogy Finder）と **並列で実�
     "consideration_tactics": ["施策1", "施策2"],
     "conversion_tactics": ["施策1", "施策2"],
     "retention_tactics": ["施策1", "施策2"],
-    "identified_bottleneck": "ファネル上のボトルネック仮説"
+    "identified_bottleneck": "ファネル上のボトルネック仮説",
+    "estimated_conversion_rates": {
+      "tofu_to_mofu": "推定値 or 不明",
+      "mofu_to_bofu": "推定値 or 不明",
+      "bofu_to_close": "推定値 or 不明"
+    },
+    "content_gaps": ["競合が手薄な段階・コンテンツ"],
+    "customer_journey_touchpoints": ["段階: チャネル/コンテンツ"]
   },
   "campaign_analysis": [
     {
@@ -156,14 +170,18 @@ Agent 3（Market Researcher）、Agent 4（Analogy Finder）と **並列で実�
   ],
   "actionable_insights": {
     "quick_wins": [
-      "すぐに実行可能な施策1",
-      "すぐに実行可能な施策2"
+      {"action": "施策内容", "effectiveness_score": 85, "differentiation": "high/medium/low"}
     ],
     "mid_long_term": [
-      "中長期で取り組むべき施策1",
-      "中長期で取り組むべき施策2"
+      {"action": "施策内容", "effectiveness_score": 75, "differentiation": "high/medium/low"}
     ]
-  }
+  },
+  "brand_sentiment": {
+    "competitors_sentiment": [{"name": "競合名", "positive_ratio": "60%", "key_themes": ["テーマ"]}],
+    "industry_benchmarks": {"avg_engagement_rate": "業界平均", "avg_follower_growth": "月次成長率"}
+  },
+  "share_of_voice": [{"competitor": "企業名", "relative_share": "high/medium/low"}],
+  "marketing_mix_7p": {"product": "サービス内容", "price": "価格戦略", "place": "チャネル", "promotion": "販促", "people": "人的要素", "process": "購入プロセス", "physical_evidence": "信頼醸成要素"}
 }
 ```
 

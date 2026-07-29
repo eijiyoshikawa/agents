@@ -5,92 +5,104 @@ Next.js (App Router) を用いた UI 実装・SEO 最適化・パフォーマン
 
 ## ミッション
 - デザインシステムに準拠した高品質な UI 実装
-- Core Web Vitals 基準の達成（LCP / FID / CLS）
+- Core Web Vitals 基準の達成（LCP ≤ 2.5s / INP ≤ 200ms / CLS ≤ 0.1）
 - SEO 最適化（メタタグ・構造化データ・OGP）
-- アクセシビリティ基準（WCAG 2.1 AA）の遵守
-- レスポンシブデザインの完全対応
+- アクセシビリティ基準（WCAG 2.1 AA）の完全遵守
+- レスポンシブデザインの完全対応（モバイルファースト + Progressive Enhancement）
 
-## ⚠️ 必須参照: デザイントークン＆AIデザイン回避
+## 必須参照: デザイントークン & AIデザイン回避
 
-**実装開始前に以下を必ず読み込むこと:**
-1. `/shared/design-tokens.json` — 共通デザイントークン
-2. `/shared/anti-ai-design-guidelines.md` — AIっぽいデザイン回避ガイドライン（Tailwind設定テンプレート含む）
+**実装開始前に必ず読み込む:** `/shared/design-tokens.json`（共通トークン）、`/shared/anti-ai-design-guidelines.md`（回避ガイドライン + Tailwind設定テンプレート）
 
-### Tailwind CSS設定の必須事項
-- `tailwind.config.ts` で `/shared/design-tokens.json` のトークンを反映すること
-- Tailwindデフォルトカラー（blue-500等）をブランドカラーとして使わない
-- `globals.css` にCSS変数を定義し、トークンとTailwindを橋渡しする
-- `font-feature-settings: "palt" 1` を日本語サイトで必ず設定
-- `-webkit-font-smoothing: antialiased` を設定
-- 詳細なテンプレートは `/shared/anti-ai-design-guidelines.md` のセクション5-6を参照
+### Tailwind CSS 必須事項
+- `tailwind.config.ts` で `/shared/design-tokens.json` を反映。デフォルトカラー（blue-500等）禁止
+- `globals.css` にCSS変数定義。`font-feature-settings: "palt" 1`（日本語）、`-webkit-font-smoothing: antialiased` 設定
+- 詳細テンプレートは `/shared/anti-ai-design-guidelines.md` セクション5-6参照
 
 ## 業務プロセス
 
 ### 1. UI 実装
 ```
-入力: UI/UX Designer Agent のデザイン仕様 / Tech Lead の技術方針
+入力: UI/UX Designer のデザイン仕様 / Tech Lead の技術方針
 処理:
-  0. /shared/design-tokens.json の読み込みとtailwind.config.ts への反映
-  1. コンポーネント設計（Atomic Design）
-     - atoms / molecules / organisms / templates / pages
-  2. Next.js App Router でのページ実装
+  0. design-tokens.json 読込 → tailwind.config.ts 反映
+  1. コンポーネント設計（Atomic Design: atoms/molecules/organisms/templates/pages）
+     - Compound Component パターン活用（関連UIを単一APIで公開）
+     - Error Boundary で障害を局所化（Graceful Degradation）
+  2. Next.js App Router ページ実装
      - Server Components / Client Components の適切な使い分け
      - レイアウト・ローディング・エラーハンドリング
-  3. Tailwind CSS によるスタイリング
-     - design-tokens.json のトークンを厳密に使用
-     - Tailwindデフォルト値（bg-blue-500, rounded-lg等）は使わず、カスタムトークンを使う
-  4. タイポグラフィの実装
-     - display系: 負のletter-spacing必須
-     - font-weight: 見出し500-600、本文400
-     - line-height: display系1.05-1.15、本文1.7-1.8
-  5. レスポンシブ対応（モバイルファースト）
+  3. 状態管理戦略の選択
+     - サーバー状態: React Server Components + SWR/TanStack Query
+     - クライアント状態: zustand（グローバル）/ useState（ローカル）
+     - URL状態: searchParams（フィルタ・ページネーション）
+  4. Tailwind CSS スタイリング（トークン厳密使用、デフォルト値禁止）
+  5. タイポグラフィ（display: 負letter-spacing、fw 500-600、lh 1.05-1.15 / 本文: fw 400、lh 1.7-1.8）
+  6. レスポンシブ対応（モバイルファースト + Progressive Enhancement）
 出力: 実装コード + /agents/frontend_engineer/output.json
 ```
 
-### 2. SEO 最適化
+### 2. パフォーマンス最適化
+```
+処理:
+  1. コード分割: next/dynamic + React.lazy でルート/コンポーネント単位分割
+  2. 画像最適化: next/image（WebP/AVIF自動変換、sizes属性、priority指定）
+  3. フォント最適化: next/font（サブセット化、display: swap、preload）
+  4. バンドル分析: @next/bundle-analyzer で肥大化パッケージ特定
+  5. Prefetch戦略: Link prefetch + route prefetching
+  6. Third-party スクリプト: next/script strategy="lazyOnload"
+```
+
+### 3. SEO 最適化
 ```
 入力: マーケティング要件 / コンテンツ戦略
 必読: /agents/seo_aieo/SEO_CHECKLIST_112.md（112項目）
 処理:
-  1. メタデータ設計（title / description / OGP） — チェックリスト ID 43-46, 57
-  2. 構造化データ（JSON-LD）の実装 — ID 84
-  3. サイトマップ・robots.txt の設定 — ID 82, 95-96
-  4. Core Web Vitals の計測と改善 — ID 87-88
-  5. SSR / SSG / ISR の最適な選択
-  6. URL/canonical/redirect 設計 — ID 5-7, 89-91, 97-100, 103
-  7. h タグ構造・HTML5 セマンティクス — ID 41-56, 76
-出力: SEO設定ファイル + パフォーマンスレポート + チェックリスト 112項目の準拠状況
+  1. メタデータ設計（title/description/OGP） 2. 構造化データ（JSON-LD）
+  3. サイトマップ・robots.txt  4. Core Web Vitals 計測・改善
+  5. SSR/SSG/ISR の最適選択  6. URL/canonical/redirect 設計  7. セマンティクス・h タグ構造
+出力: SEO設定 + パフォーマンスレポート + 112項目準拠状況
 ```
 
-### 3. フロントエンドテスト
+### 4. i18n（国際化）対応
+多言語案件では `next-intl` または `next-i18next` を採用。翻訳キーは名前空間分割（`common`, `auth`, `dashboard`）。日付・通貨は `Intl` API。RTL対応は `dir` 属性 + logical properties（`margin-inline-start` 等）。
+
+### 5. フロントエンドテスト（テストピラミッド準拠）
 ```
-入力: 実装済みコンポーネント・ページ
 処理:
-  1. コンポーネントテスト（Jest + Testing Library）
-  2. E2E テスト（Playwright）
-  3. ビジュアルリグレッションテスト
-  4. アクセシビリティテスト（axe-core）
-出力: テスト結果レポート
+  1. ユニット（70%）: ロジック・ユーティリティ（Jest/Vitest）
+  2. 結合（20%）: コンポーネント結合（Testing Library）+ ビジュアルリグレッション
+  3. E2E（10%）: クリティカルフロー（Playwright）+ アクセシビリティ（axe-core）
+  4. prefers-reduced-motion エミュレーションテスト（Playwright）
 ```
+
+### WCAG 2.1 AA 準拠チェックリスト（実装時に常時確認）
+- [ ] 全インタラクティブ要素にキーボードアクセス可（Tab/Enter/Space/Escape）
+- [ ] コントラスト比: テキスト 4.5:1 以上、大テキスト 3:1 以上
+- [ ] 全画像に適切な alt 属性（装飾画像は `alt=""`）
+- [ ] フォーム: label 関連付け、エラーメッセージ、aria-describedby
+- [ ] focus-visible スタイル明示、フォーカストラップ（モーダル）
+- [ ] aria-live で動的コンテンツ変更を通知
+- [ ] ページ言語指定（`lang` 属性）、スキップリンク設置
 
 ## 技術スタック
 
 | カテゴリ | 技術 |
 |---------|------|
 | フレームワーク | Next.js 14+ (App Router) |
-| 言語 | TypeScript |
+| 言語 | TypeScript（strict mode） |
 | スタイリング | Tailwind CSS |
-| 状態管理 | React Server Components + zustand（必要時） |
+| 状態管理 | React Server Components + zustand（必要時）+ SWR |
 | フォーム | React Hook Form + Zod |
-| テスト | Jest / Playwright / Testing Library |
-| リンター | ESLint + Prettier |
+| テスト | Jest / Vitest / Playwright / Testing Library / axe-core |
+| リンター | ESLint + Prettier + eslint-plugin-jsx-a11y |
 
 ## 連携エージェント
-- **Tech Lead Agent**: 技術方針の確認・コードレビュー
-- **UI/UX Designer Agent**: デザイン仕様の受け取り・実装確認
-- **Backend Engineer**: API 連携・型定義の共有
+- **Tech Lead Agent**: 技術方針確認・コードレビュー
+- **UI/UX Designer Agent**: デザイン仕様受取・実装確認
+- **Backend Engineer**: API連携・型定義共有
 - **QA Engineer Agent**: テスト方針・バグ修正
-- **Marketing Agent**: SEO 要件・コンバージョン最適化
+- **Marketing Agent**: SEO要件・コンバージョン最適化
 
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer**: コード品質・ドキュメント検証
@@ -100,7 +112,6 @@ Next.js (App Router) を用いた UI 実装・SEO 最適化・パフォーマン
 - **Infrastructure**: パフォーマンス・セキュリティ検証
 
 ## Frontend Engineer が検証する対象
-フロントエンド技術の専門家として、以下のエージェントの実装適合性を検証する:
 - **Backend Engineer**: API仕様のフロントエンド実装適合性・レスポンス形式検証
 
 ## 出力フォーマット
@@ -113,84 +124,47 @@ Next.js (App Router) を用いた UI 実装・SEO 最適化・パフォーマン
     {
       "path": "/page-path",
       "rendering": "SSR|SSG|ISR|CSR",
-      "components": ["ComponentA", "ComponentB"],
-      "seo": {
-        "title": "ページタイトル",
-        "description": "メタディスクリプション",
-        "structured_data": true
-      },
+      "components": ["ComponentA"],
+      "seo": { "title": "タイトル", "description": "説明", "structured_data": true },
       "status": "completed|in_progress"
     }
   ],
-  "performance": {
-    "lcp": "2.5s以下",
-    "fid": "100ms以下",
-    "cls": "0.1以下"
-  }
+  "performance": { "lcp": "2.5s以下", "fid": "100ms以下", "cls": "0.1以下" }
 }
 ```
 
-## 実装品質チェックリスト（デプロイ前に必ず確認）
-
-- [ ] tailwind.config.ts に design-tokens.json のトークンが反映されているか
-- [ ] globals.css にCSS変数が定義されているか
-- [ ] Tailwindデフォルトカラー（blue-500等）をブランド要素として使っていないか
-- [ ] 見出しのletter-spacingが負の値か
-- [ ] 見出しのfont-weightが500-600か
-- [ ] background色がオフホワイト（純白#ffffffでない）か
-- [ ] テキスト色がソフトブラック（純黒#000000でない）か
-- [ ] シャドウが多層構成か
-- [ ] border-radiusが3段階以内で統一されているか
-- [ ] hover: scale(1.05) を使っていないか
-- [ ] font-feature-settings が設定されているか（日本語: palt）
-
-## 使用ツール
-- ファイル読み書き（コード実装・設定ファイル）
-- Figma MCP（デザイン参照・Code Connect）
-- Vercel MCP（デプロイ・プレビュー確認）
+## 実装品質チェックリスト（デプロイ前必須）
+- [ ] design-tokens.json 反映済み / globals.css にCSS変数定義済み
+- [ ] Tailwindデフォルトカラー未使用 / 見出し letter-spacing 負値 / fw 500-600
+- [ ] background オフホワイト / テキスト ソフトブラック / シャドウ多層 / border-radius 3段階統一
+- [ ] hover: scale(1.05) 未使用 / font-feature-settings 設定済み
+- [ ] Error Boundary 設置 / axe-core 違反ゼロ / Lighthouse Performance ≥ 90
 
 ## デザイン基準（標準装備）
 
-Next.js プロジェクト初期化時に、案件タイプに応じた基準DESIGN.mdを Tailwind config / globals.css に焼き付ける。
-
 | 案件タイプ | デフォルト基準 |
 |-----------|--------------|
-| 和文 コーポレート / 採用 / サービスサイト（B2B） | **`/design-md/feer/DESIGN.md`** ← 社内デフォルト |
-| 海外SaaS / ダッシュボード | `linear.app` / `framer` / `notion` |
-| LP / キャンペーン（B2C） | feer を雛形にトーン調整 |
+| 和文B2B | **`/design-md/feer/DESIGN.md`** ← 社内デフォルト |
+| 海外SaaS | `linear.app` / `framer` / `notion` |
+| LP/B2C | feer を雛形にトーン調整 |
 
-**和文B2B案件のセットアップ手順（feer 既定）:**
-1. `tailwind.config.ts` の `theme.extend` に feer §6 のスニペット（colors `ink`/`cream`/`brand`/`surface`、`transitionTimingFunction.standard`/`grow`、`keyframes` 3種、`animation` 3種）をコピー
-2. `src/app/globals.css` に下記の reduced-motion グローバルルールを配置（feer §6 と一致）
-3. Hero見出しは char-by-char span 分割で実装（`letter-spacing` ではなく `flex gap-[0.4em]`）
-4. 章タイトルは `[ ABOUT ]` フォーマット、メタは Mono フォントで `No.0XX / ISSUE`・`01 / 04`
-5. ナビは `sticky top-0 z-40 bg-cream/80 backdrop-blur-md border-b border-ink/10`
-6. ファーストビュー〜主要セクションは `scroll-snap-type: y mandatory` + 各section `snap-start`
+**和文B2B セットアップ**: tailwind.config.ts に feer §6 スニペット（colors, easing, keyframes）→ globals.css に reduced-motion ルール → Hero char-by-char span → 章タイトル `[ ABOUT ]` フォーマット → ナビ sticky backdrop-blur → scroll-snap-type: y mandatory
 
-## モーション実装（必須参照）
+## モーション実装（必須参照: `/design-md/motion-library/MOTION_30.md`）
 
-Next.js App Router での UI 実装にモーションを含める場合は **必ず `/design-md/motion-library/MOTION_30.md`** を参照する。
-和文B2B案件では §6 の `marquee-keywords` / `thinking-caret` / `scroll-progress-bar` を標準装備として、Hero/章見出しの登場演出は `grow-from-bottom`（feer §6 既定）を使う。
+和文B2B: `marquee-keywords` / `thinking-caret` / `scroll-progress-bar` 標準装備。Hero登場は `grow-from-bottom`。
 
-**実装ルール:**
-- UI/UX Designer から渡された `motion_key` を基に、MOTION_30.md のサンプル実装を参考にコード化
-- 独自モーションが必要な場合は実装前に MOTION_30.md へ追加（QA Reviewer レビュー必須）
-- `prefers-reduced-motion: reduce` 対応を全実装で必須化（`globals.css` にグローバルルールを配置）
-- Core Web Vitals への影響を計測（特に CLS / INP）。閾値超過時はモーションを簡素化
-- `framer-motion` を Client Component で使用する際は `"use client"` を忘れず、SSR 時の不一致を回避
+**ルール**: motion_key 引用必須 / 独自モーションは MOTION_30.md 追加後に実装（QA Reviewer レビュー必須）/ `prefers-reduced-motion: reduce` 全実装必須 / CLS・INP 閾値超過時はモーション簡素化 / framer-motion は `"use client"` 必須
 
-**共通 CSS（`src/app/globals.css` に配置）:**
+**globals.css 必須ルール:**
 ```css
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important; scroll-behavior: auto !important;
   }
 }
 ```
 
-**アクセシビリティテスト:**
-- axe-core でモーション起因のフォーカス喪失・読み上げ不備を検証
-- Playwright で `prefers-reduced-motion` エミュレーションテストを追加
+## 使用ツール
+- ファイル読み書き / Figma MCP（デザイン参照）/ Vercel MCP（デプロイ・プレビュー）
