@@ -17,6 +17,19 @@
 - `<html lang="...">` から言語を判定
 - viewport meta タグからレスポンシブ対応状況を確認
 
+### Step 1.5: robots.txt / sitemap.xml の確認
+`WebFetch` で `/robots.txt` と `/sitemap.xml` を取得し:
+- **robots.txt**: Disallow パス（クロール不可領域）を記録。再現対象ページの制限有無を確認
+- **sitemap.xml**: 全ページURLと `<lastmod>` を取得。priority 値からサイト構造の重要度を推定
+- **存在しない場合**: `has_robots: false` / `has_sitemap: false` として記録
+
+### Step 1.6: パフォーマンスベースライン取得
+トップページの基本的なパフォーマンス指標を記録する:
+- HTML ドキュメントサイズ（KB）
+- 外部リソース数（CSS / JS / 画像 / フォント）
+- `<script>` タグの数と async/defer 属性の有無
+- Builder が再現時のパフォーマンス目標値として使用
+
 ### Step 2: サイト内リンクの収集
 HTMLから内部リンク（同一ドメイン）を収集し、ページ一覧を作成する:
 
@@ -60,6 +73,11 @@ HTMLソースと読み込まれたリソースから技術を検出する:
 - Google Analytics / GTM
 - Facebook Pixel 等
 
+**セキュリティヘッダー検出:**
+- `Content-Security-Policy` の有無と主要ディレクティブ
+- `X-Frame-Options`, `Strict-Transport-Security` の設定状況
+- HTTPS リダイレクト有無（Builder の実装参考情報として記録）
+
 ### Step 4: サイトの特徴メモ
 サイト全体の印象・特徴を簡潔にメモする:
 - デザインの方向性（ミニマル/リッチ/コーポレート等）
@@ -101,7 +119,33 @@ HTMLソースと読み込まれたリソースから技術を検出する:
   "total_pages": 5,
   "primary_language": "ja",
   "site_characteristics": "ミニマルデザイン。大きなヒーロー画像とスムーズスクロール。BtoB向けSaaS。",
-  "responsive": true
+  "responsive": true,
+  "robots_txt": {
+    "exists": true,
+    "disallowed_paths": ["/admin/", "/api/"],
+    "sitemap_url": "https://example.com/sitemap.xml"
+  },
+  "sitemap": {
+    "exists": true,
+    "total_urls": 15,
+    "top_priority_pages": ["https://example.com/", "https://example.com/service"]
+  },
+  "performance_baseline": {
+    "html_size_kb": 45,
+    "external_resources": {"css": 3, "js": 8, "images": 12, "fonts": 2},
+    "script_count": 8,
+    "async_defer_ratio": 0.75
+  },
+  "security_headers": {
+    "csp": false,
+    "hsts": true,
+    "x_frame_options": "SAMEORIGIN"
+  },
+  "tech_stack_confidence": {
+    "framework": 0.95,
+    "css": 0.9,
+    "notes": "Next.js: __NEXT_DATA__ 確認済み、バージョン推定14.x"
+  }
 }
 ```
 
