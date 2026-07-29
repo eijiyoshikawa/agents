@@ -77,6 +77,19 @@ Builder が生成した `/agents/web_builder/output/` を Vercel にデプロイ
 - [ ] ナビゲーションがモバイルでハンバーガーに変わるか
 - [ ] 画像がレスポンシブに表示されるか
 
+#### 4-6: Accessibility（アクセシビリティ）— 参考配点（ボーナス）
+- [ ] 全 `<img>` に適切な `alt` 属性があるか
+- [ ] フォーカス可能要素に `:focus-visible` スタイルがあるか
+- [ ] カラーコントラスト比が WCAG AA 基準（4.5:1）を満たすか
+- [ ] `prefers-reduced-motion: reduce` が実装されているか
+- [ ] フォームに適切な `<label>` と `aria-describedby` があるか
+
+#### 4-7: Performance（パフォーマンス比較）— 参考配点（ボーナス）
+- [ ] `npm run build` でエラー・警告がないか
+- [ ] バンドルサイズが参考サイトの同等規模以内か
+- [ ] `next/image` による画像最適化が適用されているか
+- [ ] 不要な `'use client'` ディレクティブがないか
+
 ### Step 5: スコアリング
 各カテゴリの項目を確認し、0〜100点でスコアを付ける:
 - 全項目OK → 100点
@@ -99,6 +112,11 @@ Builder が生成した `/agents/web_builder/output/` を Vercel にデプロイ
 6. **expected**: 参考サイトではどうなっているか
 7. **current**: 現在の再現サイトではどうなっているか
 8. **fix_suggestion**: 具体的な修正方法（コード例があれば含む）
+
+**クロスブラウザ検証マトリクス（目視確認対象）:**
+- Chrome (latest) / Safari (latest) / Firefox (latest) — デスクトップ
+- Chrome Mobile / Safari iOS — モバイル
+- 差異が見つかった場合は `browser_issues` フィールドにブラウザ名と症状を記録
 
 **修正指示の優先順位ルール:**
 - **high**: 構造の欠落、主要セクションのレイアウト崩れ、カラーの大きなズレ

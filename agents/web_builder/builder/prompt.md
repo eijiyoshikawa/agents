@@ -82,6 +82,25 @@ design_analyzerで抽出できた値を優先し、不足分はdesign-tokens.jso
 - `text-rendering: optimizeLegibility`
 - ダークモード変数（.darkクラス）
 
+### Step 3.5: コンポーネント駆動開発（CDD）方針
+実装はアトミックデザインの考え方に基づき、小 → 大の順で構築する:
+1. **Atoms**: Button, Badge, Input, Icon wrapper
+2. **Molecules**: Card, FormField, NavItem
+3. **Organisms**: Header, Footer, HeroSection, ContactForm
+4. **Templates**: PageLayout（Header + main + Footer の共通ラッパー）
+各コンポーネントは `src/components/` 配下に1ファイル1コンポーネントで配置。Props に TypeScript 型定義を必ず付与。
+
+**パフォーマンス予算:**
+- LCP < 2.5s / FID < 100ms / CLS < 0.1（Core Web Vitals 基準）
+- 初回ロードの JS バンドル < 150KB（gzip 後）
+- `'use client'` ディレクティブは最小限に。Server Components を優先
+
+**アクセシビリティ実装チェック:**
+- `alt` 属性: 全 `<img>` に設定（装飾画像は `alt=""`）
+- `aria-label`: アイコンのみのボタンに必須
+- フォーカス管理: モーダル開閉時のフォーカストラップ実装
+- セマンティック HTML: `<section>`, `<nav>`, `<main>` を適切に使用
+
 ### Step 4: 共通コンポーネントの実装
 `structure_analyzer/output.json` の `shared_components` を基に:
 
