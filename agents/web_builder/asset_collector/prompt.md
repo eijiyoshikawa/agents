@@ -44,6 +44,13 @@ HTMLから全 `<img>` タグと CSS `background-image` を抽出する:
 3. **カスタムフォント**: woff2 ファイルのURL（取得可能な場合）
 4. **フォールバック**: 各フォントに対する適切なフォールバック指定
 
+### Step 2.5: フォントサブセッティング戦略
+日本語フォントの最適化方針を記録する:
+- **Google Fonts**: `&text=` パラメータ or `display=swap` + `unicode-range` 指定
+- **サブセット範囲**: 第一水準漢字のみ / JIS第二水準含む / ページ使用文字のみ
+- **推定ファイルサイズ**: フルセット vs サブセット時の比較（日本語フォントは 1-5MB → サブセットで 100-500KB に削減可能）
+- next/font の自動最適化に委ねる場合はその旨を記録
+
 ### Step 3: アイコンの収集
 ページ内で使われているアイコンを分類する:
 
@@ -55,6 +62,18 @@ HTMLから全 `<img>` タグと CSS `background-image` を抽出する:
    - `heroicons`: Tailwind CSS 公式
    - `react-icons`: 複数ライブラリを統合
    各アイコンに対して推奨ライブラリのアイコン名を対応付ける
+
+### Step 3.5: アイコンシステム方針
+サイトのアイコン使用パターンに基づき、最適な配信方式を選定する:
+- **SVGインライン**: アイコン数 < 15、色の動的変更が必要な場合 → 推奨
+- **SVGスプライト**: アイコン数 15-50、共通パレットの場合
+- **アイコンフォント**: 既存サイトが Font Awesome 等を使用していた場合の代替提案
+- 各アイコンに `aria-label` または `aria-hidden="true"` の方針を記録
+
+### Step 3.6: ライセンス検証
+- 画像: 参考サイトの画像は原則コピー不可。`placeholder_strategy` で代替
+- フォント: Google Fonts（OFL）/ Adobe Fonts（ライセンス要確認）を明記
+- アイコンライブラリ: MIT / Apache 2.0 等のライセンス種別を `license` フィールドに記録
 
 ### Step 4: ファビコン・OGP画像
 - ファビコン: 形状・色の説明とプレースホルダー生成方針
@@ -152,7 +171,21 @@ Next.js の `/public` ディレクトリ構成を設計する:
   },
   "total_images": 12,
   "images_requiring_placeholder": 10,
-  "images_extractable": 2
+  "images_extractable": 2,
+  "optimization_targets": {
+    "hero_images": {"format": "WebP", "max_kb": 200, "sizes": "100vw"},
+    "content_images": {"format": "WebP", "max_kb": 100, "sizes": "(max-width: 768px) 100vw, 50vw"},
+    "icons": {"format": "SVG inline", "max_kb": 5}
+  },
+  "font_subsetting": {
+    "strategy": "next/font auto-optimization",
+    "estimated_savings_kb": 2500
+  },
+  "icon_system": {
+    "method": "svg-inline",
+    "library": "lucide-react",
+    "license": "ISC"
+  }
 }
 ```
 

@@ -68,6 +68,17 @@ JS ソースから以下のパターンを検出する:
 - **framer-motion**: React向けスクロールアニメーション、ページ遷移
 - **GSAP**: 複雑なタイムライン、ScrollTrigger連動、パフォーマンス重視
 
+**パフォーマンス影響評価:**
+- GPU合成プロパティ（transform, opacity）のみ使用 → `perf_impact: "low"`
+- layout 発火プロパティ（width, height, top）使用 → `perf_impact: "high"`、CSS containment 推奨
+- 同時発火アニメーション数が3以上 → Builder に間引きを推奨
+
+**Reduced Motion 代替仕様:**
+各アニメーションに `prefers-reduced-motion: reduce` 時の代替を明記（例: fade-in-up → 即表示 or opacity のみ）
+
+**イージング精度:**
+`cubic-bezier()` 値は CSS から正確に抽出。`ease` / `ease-in-out` 等の汎用名は cubic-bezier 値に変換して記録
+
 ## 出力フォーマット
 
 `/agents/web_builder/motion_analyzer/output.json` に保存:

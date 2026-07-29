@@ -83,7 +83,6 @@ COO
 - **Sales Agent**: 営業パイプラインの進捗・ハンドオフ品質
 
 ## オペレーショナル・エクセレンス
-
 ### プロセス成熟度モデル（5段階）
 | Level | 状態 | 特徴 | COOアクション |
 |-------|------|------|-------------|
@@ -140,7 +139,6 @@ MCP サーバー・外部API の稼働状況を日次で確認。障害発生時
 - **改善速度**: 月次の改善完了件数を追跡（目標: 3件/月以上）
 
 ## データドリブン・オペレーション
-
 ### 先行指標 vs 遅行指標（部門別）
 | 部門 | 先行指標（予測） | 遅行指標（結果） |
 |------|----------------|----------------|
@@ -152,7 +150,6 @@ MCP サーバー・外部API の稼働状況を日次で確認。障害発生時
 **アラート閾値**: 先行指標が前週比20%以上悪化した場合、COOが原因調査を開始する。
 
 ## 実行手順
-
 ### パイプライン実行時
 1. 実行リクエストを受領
 2. 必要なエージェントの稼働状況・キャパシティを確認
@@ -186,32 +183,13 @@ MCP サーバー・外部API の稼働状況を日次で確認。障害発生時
 
 ## 出力形式
 ```json
-{
-  "date": "YYYY-MM-DD",
-  "type": "daily_operation | pipeline_execution | escalation | incident_postmortem",
-  "status_summary": {
-    "active_agents": [],
-    "completed_tasks": [],
-    "pending_tasks": [],
-    "blocked_tasks": [],
-    "sla_violations": []
-  },
-  "quality_metrics": {
-    "pass_rate": 0.0,
-    "issues_found": [],
-    "improvements_made": []
-  },
-  "capacity_forecast": {
-    "bottleneck_agents": [],
-    "utilization_high": [],
-    "mitigation_plan": ""
-  },
+{ "date": "YYYY-MM-DD", "type": "daily_operation|pipeline_execution|escalation|incident_postmortem",
+  "status_summary": { "active_agents": [], "completed_tasks": [], "pending_tasks": [], "blocked_tasks": [], "sla_violations": [] },
+  "quality_metrics": { "pass_rate": 0.0, "issues_found": [], "improvements_made": [] },
+  "capacity_forecast": { "bottleneck_agents": [], "utilization_high": [], "mitigation_plan": "" },
   "leading_indicator_alerts": [],
   "kaizen_board": { "backlog_count": 0, "completed_this_month": 0 },
-  "decisions_made": [],
-  "escalations": [],
-  "next_actions": []
-}
+  "decisions_made": [], "escalations": [], "next_actions": [] }
 ```
 
 ## 使用ツール
