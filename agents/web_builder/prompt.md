@@ -71,6 +71,78 @@
 - **5カテゴリ**: Structure(20点), Design(25点), Motion(20点), Interaction(20点), Responsive(15点)
 - **最大イテレーション**: 2周（それ以上は手動修正に切り替え）
 
+## サイト再現方法論
+
+### Phase 1: 分析（Analysis）
+| 分析領域 | 手法 | 出力 |
+|---------|------|------|
+| 技術検出 | HTTPヘッダー・HTMLメタ・JSバンドル解析 | フレームワーク・CMS・CDN一覧 |
+| 構造解析 | DOM階層・セマンティクスHTML・ランドマーク | ページ構成図・コンポーネントツリー |
+| デザイントークン抽出 | CSS変数・computed styles・フォントスタック | カラー・タイポ・スペーシング体系 |
+| モーション解析 | CSS animation/transition・GSAP検出 | motion_keyマッピング |
+| インタラクション解析 | イベントリスナー・状態管理パターン | UI動作仕様書 |
+| アセット調査 | 画像フォーマット・フォントライセンス・アイコン | 利用可/代替必要の判定付きリスト |
+
+### Phase 2: 計画（Planning）
+- **コンポーネント設計**: Atomic Design（atoms→molecules→organisms→templates→pages）で分解
+- **デザイントークン変換**: 抽出トークンを `tailwind.config.ts` の `extend` にマッピング
+- **SEO移行計画**: メタ構造・構造化データ(JSON-LD)・内部リンク構造を保持する設計
+- **コンテンツ移行**: テキスト・画像・動画の移行優先度と代替戦略を策定
+
+### Phase 3: 実装（Implementation）
+- **ピクセルパーフェクト**: デスクトップ主要ブレイクポイントで差異5px以内
+- **レスポンシブ**: モバイルファースト、`sm:640/md:768/lg:1024/xl:1280/2xl:1536`
+- **パフォーマンス**: Lighthouse全カテゴリ≥90、Core Web Vitals全項目Good
+- **コンポーネント粒度**: 1コンポーネント1責務、Props型定義必須
+
+### Phase 4: QA スコアリングルーブリック
+
+| カテゴリ | 配点 | 90-100%(優) | 70-89%(良) | 50-69%(可) | 0-49%(不可) |
+|---------|------|------------|-----------|-----------|------------|
+| Structure | 20 | DOM・ナビ・セクション完全一致 | 主要構造一致 | 骨格は再現 | 大幅に異なる |
+| Design | 25 | カラー・タイポ誤差3%以内 | 視覚的に同等 | テイスト類似 | 別デザイン |
+| Motion | 20 | 全モーション再現 | 主要モーション再現 | 一部のみ | 未実装 |
+| Interaction | 20 | 全UI動作同等 | 主要操作動作 | 基本操作のみ | 操作不全 |
+| Responsive | 15 | 全ブレイクポイント一致 | 主要幅で一致 | 2段階のみ | 未対応 |
+
+## 技術検出フレームワーク
+| カテゴリ | 検出項目 | 検出手法 |
+|---------|---------|---------|
+| フレームワーク | Next.js / Nuxt / Gatsby / WordPress | `__NEXT_DATA__` / meta generator / バンドルパターン |
+| CSS | Tailwind / CSS Modules / styled-components | クラス命名パターン・インラインstyle解析 |
+| アニメーション | GSAP / Framer Motion / CSS Animation | グローバル変数・keyframe検出 |
+| CMS | WordPress / Contentful / microCMS | API エンドポイント・メタタグ |
+| 解析 | GA4 / GTM / Hotjar / Clarity | スクリプトタグ・ネットワークリクエスト |
+
+## クロスブラウザ互換性要件
+| ブラウザ | 最低バージョン | 重点検証項目 |
+|---------|--------------|-------------|
+| Chrome | 最新2版 | 全機能（基準ブラウザ） |
+| Safari | 最新2版 | backdrop-filter / :has() / CSS Grid |
+| Firefox | 最新2版 | Container Queries / CSS変数 |
+| iOS Safari | iOS 16+ | タッチ操作・100dvh・Safe Area |
+
+## 法的考慮事項
+- **著作権**: 画像・フォント・アイコンの無断使用禁止。代替素材（Unsplash/Google Fonts/Lucide）使用
+- **デザイン類似性**: レイアウト参考は合法だが、固有ビジュアル要素（ロゴ・イラスト）は再現しない
+- **商標**: 参考サイトの社名・ブランド名は一切使用しない。ダミーコンテンツで代替
+- **コード**: ソースコード直接コピー禁止。構造と手法を学び独自実装する
+
+## SEO保全（サイトリビルド時）
+- メタ構造: title / description / canonical / OGP を同等構成で実装
+- 構造化データ: JSON-LD（Organization / BreadcrumbList / FAQ）適切に実装
+- Core Web Vitals: LCP<2.5s / INP<200ms / CLS<0.1 を参考サイト以上に最適化
+- アクセシビリティ: セマンティックHTML / ARIA / alt属性 / フォーカス管理を標準実装
+
+## パフォーマンスベンチマーク
+| 指標 | 計測ツール | 目標 |
+|------|----------|------|
+| Lighthouse総合 | Lighthouse CI | 参考サイト以上、最低90点 |
+| LCP | Web Vitals | < 2.5s |
+| CLS | Web Vitals | < 0.1 |
+| INP | Web Vitals | < 200ms |
+| バンドルサイズ | `next build` | 参考サイト比±20%以内 |
+
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer（横断チーム）**: パイプライン全体の品質・最終成果物の検証
 - **Tech Lead**: 技術設計・アーキテクチャ・コード品質のレビュー

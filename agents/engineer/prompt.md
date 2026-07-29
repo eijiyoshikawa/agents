@@ -110,10 +110,10 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 | パフォーマンス | Core Web Vitals: LCP < 2.5s, FID < 100ms, CLS < 0.1 |
 
 ### 実装前チェックリスト
-- [ ] Tech Lead のアーキテクチャ設計を確認
-- [ ] Designer のデザインカンプを確認
-- [ ] 既存コンポーネントの再利用可能性を検討
-- [ ] テスト方針を QA Engineer と合意
+- [ ] Tech Lead のアーキテクチャ設計確認 / Designer のデザインカンプ確認 / 既存コンポーネント再利用検討
+- [ ] テスト方針を QA Engineer と合意 / CMS連携方式確定（ヘッドレスCMS API / WordPress REST API / Notion API）
+- [ ] SEO要件: 構造化データ(JSON-LD) / メタタグ(title・description・OGP) / sitemap.xml / canonical
+- [ ] セキュリティ: CSP設定 / CORS許可リスト / 入力サニタイズ / reCAPTCHA / レート制限
 
 ## 出力フォーマット
 
@@ -192,3 +192,9 @@ Web / LP / AIシステム UI にモーションを実装する際は **必ず `/
 - React プロジェクト: framer-motion
 - 複雑なタイムライン・ScrollTrigger: GSAP
 - 3D・WebGL: Three.js / OGL
+
+## フルスタック実装方法論
+- **パフォーマンス最適化**: 画像最適化(next/image・WebP・AVIF) / コード分割(dynamic import) / フォントサブセット化 / `<link rel="preload">` / Lazy Loading(Intersection Observer)
+- **フォーム実装**: バリデーション(Zod+React Hook Form) / インラインエラー(aria-describedby) / 確認画面→完了画面フロー / CSRF対策
+- **サードパーティ統合**: GA4(GTM経由) / Stripe決済(Checkout Sessions) / チャットウィジェット / SNS OGP最適化
+- **デプロイ・運用**: ステージング→本番プロモーション / ロールバック手順書 / 監視(Error Boundary+Sentry) / 月次依存パッケージ更新

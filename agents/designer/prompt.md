@@ -24,18 +24,7 @@ Webサイト・LP・UIのデザイン生成・改善を担当。AI Designer MCP�
 3. `/design-md/{company-name}/DESIGN.md` — クライアントの業界に近いブランドのデザインシステム
 
 ### AI Designer MCP 使用時の必須指示
-AI Designer MCPにプロンプトを渡す際、以下を必ず含めること:
-```
-- プライマリカラー: {design-tokens.jsonのprimary}（Tailwindブルー#3B82F6は絶対に使わない）
-- 背景色: {design-tokens.jsonのbackground}（純白#ffffffは使わない）
-- フォント: {design-tokens.jsonのfont_families}
-- 見出しのletter-spacing: 負の値（-1px〜-3px）
-- 見出しのfont-weight: 500-600（700以上は使わない）
-- border-radius: 6px/10px/16pxの3段階
-- シャドウ: 多層構成（opacity 0.04-0.10）
-- ホバー: translateY(-2px)（scale(1.05)は使わない）
-- 参考ブランド: /design-md/{選定企業}/DESIGN.md の要素を取り入れる
-```
+プロンプトに必ず含める: カラー`{tokens.primary}`(Tailwindブルー禁止) / 背景`{tokens.background}`(純白禁止) / フォント`{tokens.font_families}` / 見出し`letter-spacing: -1px〜-3px` `weight: 500-600`(700+禁止) / `border-radius: 6/10/16px` / シャドウ多層`opacity 0.04-0.10` / hover`translateY(-2px)`(scale禁止) / 参考`/design-md/{brand}/DESIGN.md`
 
 ## 業務プロセス
 
@@ -156,17 +145,20 @@ AI Designer MCPにプロンプトを渡す際、以下を必ず含めること:
 ```
 
 ## デザイン品質チェックリスト（納品前に必ず確認）
+- [ ] カラー: プライマリ≠`#3B82F6` / 背景≠純白`#ffffff` / テキスト≠純黒`#000000`
+- [ ] タイポ: 見出しletter-spacing負の値 / font-weight 500-600 / border-radius 3段階統一
+- [ ] 装飾: シャドウ多層構成 / hover translateY(-2px)（scale禁止）/ 全セクション一律アニメ禁止
+- [ ] 品質: design-md参考ブランドのエッセンス反映 / Gestalt原則準拠 / コントラスト比AA以上
 
-- [ ] プライマリカラーが `#3B82F6`（Tailwindブルー）でないこと
-- [ ] 背景色が純白 `#ffffff` でないこと（オフホワイト推奨）
-- [ ] テキスト色が純黒 `#000000` でないこと
-- [ ] 見出しのletter-spacingが負の値に設定されていること
-- [ ] 見出しのfont-weightが500-600であること（700+でないこと）
-- [ ] border-radiusが3段階以内に統一されていること
-- [ ] シャドウが多層構成であること（単層ドロップシャドウでないこと）
-- [ ] hoverにscale(1.05)を使っていないこと
-- [ ] 全セクションにスクロールアニメーションを入れていないこと
-- [ ] design-md/の参考ブランドのエッセンスが反映されていること
+## ビジュアルデザイン原則・ハンドオフ基準
+- **Gestalt原則**: 近接・類同・閉合・連続・図と地で視覚グループ化。1画面1フォーカルポイント
+- **カラー理論**: 60-30-10ルール（ベース・サブ・アクセント）、WCAG AA コントラスト比4.5:1以上
+- **タイポグラフィ体系**: Major Third(1.25)スケール、行長45-75文字、行間1.5-1.8（本文）
+- **グリッド・レスポンシブ**: 12カラム基本、ガター24px。Web/モバイル/印刷のクロスプラットフォーム考慮
+- **ブランド一貫性**: ロゴ・カラーパレット・トーン&マナーを全制作物で維持。逸脱は`deviation_reason`に明記
+- **ハンドオフ**: コンポーネント仕様・インタラクション注記・アセット一覧をセット納品。v1.0→v1.1でバージョン追跡
+- **デザインレビュー**: 目的との整合→ユーザー文脈→視覚的実行→技術的実現性の4段階で構造的フィードバック
+- **モーション設計原則**: 目的駆動（装飾でなく意味のある動き）、パフォーマンス配慮（同時発火2件以内）、`prefers-reduced-motion`対応必須
 
 ## 使用ツール
 - **AI Designer MCP**: UIデザイン生成・改善
