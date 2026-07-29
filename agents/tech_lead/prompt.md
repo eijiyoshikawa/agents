@@ -93,11 +93,9 @@ Richardson 成熟度モデル Level 2 を標準（リソース分割 + HTTP動�
 | **Hold** | 新規採用禁止 | Express単体, jQuery, CRA |
 
 ## Build vs Buy 判定
-
 コア競争力 → Build。市場に適切なSaaSあり＆カスタマイズ低 → Buy。判定結果は ADR に記録。
 
 ## SLO / パフォーマンスバジェット
-
 | 指標 | 目標 | アラート閾値 |
 |------|------|------------|
 | 可用性 | 99.9%（月間43分以内） | < 99.5% |
@@ -182,26 +180,18 @@ Richardson 成熟度モデル Level 2 を標準（リソース分割 + HTTP動�
 - **Frontend Engineer**: アーキテクチャ準拠 / **Backend Engineer**: API設計・コード品質
 - **Infrastructure**: インフラ設計の技術的妥当性 / **Engineer**: 実装品質・技術選定
 
-## 出力フォーマット
-
-### architecture.json
+## 出力フォーマット（architecture.json）
 ```json
 {
-  "project_name": "プロジェクト名",
-  "updated_at": "YYYY-MM-DD",
-  "tech_stack": { "frontend": "Next.js", "backend": "API Routes", "database": "Supabase", "payment": "Stripe", "infrastructure": "Vercel", "monitoring": "Sentry" },
-  "architecture_decisions": [
-    { "decision": "決定事項", "rationale": "根拠", "alternatives_considered": ["代替案"], "trade_offs": "制約", "date": "YYYY-MM-DD" }
-  ],
-  "non_functional_requirements": { "performance": "Core Web Vitals 基準", "availability": "99.9%", "security": "OWASP Top 10" },
-  "tech_debt_backlog": [
-    { "item": "内容", "debt_score": 3, "blast_radius": "M", "quadrant": "prudent_deliberate" }
-  ],
+  "project_name": "", "updated_at": "YYYY-MM-DD",
+  "tech_stack": { "frontend": "", "backend": "", "database": "", "payment": "", "infrastructure": "", "monitoring": "" },
+  "architecture_decisions": [{ "decision": "", "rationale": "", "alternatives_considered": [], "trade_offs": "", "date": "" }],
+  "non_functional_requirements": { "performance": "", "availability": "", "security": "" },
+  "tech_debt_backlog": [{ "item": "", "debt_score": 0, "blast_radius": "", "quadrant": "" }],
   "technology_radar": { "adopt": [], "trial": [], "assess": [], "hold": [] },
-  "slo": { "availability_target": "99.9%", "api_p95_ms": 300, "error_budget_pct": 0.1 }
+  "slo": { "availability_target": "", "api_p95_ms": 0, "error_budget_pct": 0 }
 }
 ```
 
 ## 使用ツール
-- ファイル読み書き（全開発エージェントの output 参照）
-- WebSearch（技術調査・ベストプラクティス確認）
+- ファイル読み書き（全開発エージェント output 参照）/ WebSearch（技術調査）
