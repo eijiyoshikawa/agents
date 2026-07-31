@@ -36,6 +36,9 @@ export default function CustomerTable({
   const [loading, setLoading] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
   const first = useRef(true);
+  // 検索条件＋ページごとの結果キャッシュ（SWR方式）。
+  // 一度見たページは即表示し、裏で最新を取得して置き換える。次ページは先読みする。
+  const cache = useRef(new Map<string, SearchResult>());
 
   // フィルタ変更時は1ページ目へ
   const resetTo1 = () => setPage(1);
@@ -50,28 +53,63 @@ export default function CustomerTable({
     resetTo1();
   };
 
+  const buildQs = (pageN: number) =>
+    new URLSearchParams({
+      q, rep, status, rank, industry, agencyMode,
+      dupOnly: dupOnly ? "1" : "",
+      sort: sortKey, dir: sortDir, page: String(pageN), pageSize: String(PAGE_SIZE),
+    }).toString();
+
   useEffect(() => {
-    // 初回はサーバー描画済みの initialData を使い、フェッチをスキップ
-    if (first.current) { first.current = false; return; }
+    const qs = buildQs(page);
+    // 初回はサーバー描画済みの initialData をキャッシュに載せてフェッチをスキップ
+    if (first.current) {
+      first.current = false;
+      cache.current.set(qs, initialData);
+      return;
+    }
+    const cached = cache.current.get(qs);
+    if (cached) {
+      // キャッシュ即表示（stale-while-revalidate: 裏で最新を取得して置き換える）
+      setData(cached);
+      setOpenId(null);
+    } else {
+      setLoading(true);
+    }
     const ctrl = new AbortController();
     const t = setTimeout(async () => {
-      setLoading(true);
-      const qs = new URLSearchParams({
-        q, rep, status, rank, industry, agencyMode,
-        dupOnly: dupOnly ? "1" : "",
-        sort: sortKey, dir: sortDir, page: String(page), pageSize: String(PAGE_SIZE),
-      });
       try {
-        const res = await fetch(`/api/customers?${qs.toString()}`, { signal: ctrl.signal });
+        const res = await fetch(`/api/customers?${qs}`, { signal: ctrl.signal });
         const j = await res.json();
-        if (j.ok) { setData(j); setOpenId(null); }
+        if (j.ok) {
+          cache.current.set(qs, j);
+          // キャッシュは直近60件まで（古い順に間引く）
+          if (cache.current.size > 60) {
+            const oldest = cache.current.keys().next().value;
+            if (oldest !== undefined) cache.current.delete(oldest);
+          }
+          setData(j);
+          if (!cached) setOpenId(null);
+          // 次ページを裏で先読みし、ページ送りを即時にする
+          const totalPages = Math.max(1, Math.ceil(j.total / j.pageSize));
+          if (page < totalPages) {
+            const nqs = buildQs(page + 1);
+            if (!cache.current.has(nqs)) {
+              fetch(`/api/customers?${nqs}`)
+                .then((r) => r.json())
+                .then((nj) => { if (nj.ok) cache.current.set(nqs, nj); })
+                .catch(() => {});
+            }
+          }
+        }
       } catch {
         /* aborted */
       } finally {
         setLoading(false);
       }
-    }, 300);
+    }, cached ? 150 : 300);
     return () => { ctrl.abort(); clearTimeout(t); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q, rep, status, rank, industry, dupOnly, agencyMode, sortKey, sortDir, page]);
 
   const rows = data.rows;
