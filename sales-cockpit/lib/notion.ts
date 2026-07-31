@@ -308,9 +308,14 @@ function mapListCustomer(pg: any): ListCustomer {
 }
 
 /** 全顧客（軽量版・必要項目のみ）。一覧/分析/重複/品質用。詳細はIDで都度取得。 */
-export async function fetchCustomersSlim(): Promise<ListCustomer[]> {
+export async function fetchCustomersSlim(editedSince?: string): Promise<ListCustomer[]> {
   const ids = await fetchListPropertyIds();
-  const pages = await queryAll(DB.customers, undefined, ids.length ? ids : undefined);
+  // editedSince 指定時は「その時刻以降に更新されたページのみ」取得（増分同期用）。
+  // 全2万件超の取り直しを避け、Notion API 呼び出しを数回に抑える。
+  const filter = editedSince
+    ? { timestamp: "last_edited_time", last_edited_time: { on_or_after: editedSince } }
+    : undefined;
+  const pages = await queryAll(DB.customers, filter, ids.length ? ids : undefined);
   return pages.map(mapListCustomer);
 }
 
