@@ -2,7 +2,7 @@
 
 ## プロジェクト概要
 法人経営を0から100まで遂行可能なAIエージェント組織。
-CEO Agentを頂点とし、COO Agentが業務執行を統括する38体のエージェント（+ Web Builder サブエージェント8体）が、相互に検証（チェック&バランス）しながら経営全機能をカバーする。
+CEO Agentを頂点とし、COO Agentが業務執行を統括する47体のエージェント（+ Web Builder サブエージェント8体）が、相互に検証（チェック&バランス）しながら経営全機能をカバーする。
 企画・戦略立案から実際のプロダクト開発・サービス化まで一気通貫で実行可能。
 Claude Code の Maxプラン内で動作し、追加API費用なし。
 開発部門（8体）を擁し、プロダクト開発も組織内で完結可能。
@@ -35,9 +35,18 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
                              Document B.      Engineer
                                               Web Builder
                                                 └─ 8 sub-agents
+
+     ┌──────────────────────────────────────────────┐
+     │ 建設事業部（COO直下・2026-07-31新設）            │
+     │  Construction Manager（統括・RFI管理）          │
+     │  ├─ 図面読取4体: Arch / Struct / Fixture / MEP │
+     │  ├─ Quantity Surveyor → Cost Estimator        │
+     │  └─ Consistency Checker / Constructability R.  │
+     └──────────────────────────────────────────────┘
 ```
 
-## エージェント構成（全38体 + サブ8体 = 46名 / 上限50名）
+## エージェント構成（全47体 + サブ8体 = 55名 / 上限60名）
+※ 上限は50名から60名に拡張（2026-07-31 建設事業部9体新設に伴うCEO承認。根拠: 図面積算・施工レビュー事業の内製化）。
 各エージェントのプロンプトは `/agents/<agent_name>/prompt.md` に定義。
 出力は `/agents/<agent_name>/output.json` に保存される。
 
@@ -98,6 +107,18 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 36. **QA Reviewer Agent** (`qa_reviewer`) — 全出力の品質検証・相互整合性チェック（Quality Assurance機能統合済み）
 37. **KPI Dashboard Agent** (`kpi_dashboard`) — 全社KPI集計・異常検知・レポーティング
 38. **Data Analyst** (`data_analyst`) — 横断データ分析・インサイト抽出・意思決定支援
+
+### 建設事業部（9名・2026-07-31新設）
+図面読取から積算・施工性レビューまでを担当。全員が「積算4原則」（①意匠・構造・建具・設備の分野別読取 ②全数量に算出式と図面番号 ③精度ランク A=明記/B=算出/C=推定 ④不明点は推測せずRFI=質疑書へ）を厳守する。
+39. **Construction Manager** (`construction_manager`) — 事業部統括・図面インデックス・RFI（質疑書）集約発行・成果物承認
+40. **Drawing Reader Arch** (`drawing_reader_arch`) — 意匠図読取（平面・立面・断面・仕上表・面積表）
+41. **Drawing Reader Struct** (`drawing_reader_struct`) — 構造図読取（伏図・軸組図・部材リスト・配筋・鉄骨）
+42. **Drawing Reader Fixture** (`drawing_reader_fixture`) — 建具表・建具詳細図読取（符号・寸法・ガラス・防火性能）
+43. **Drawing Reader MEP** (`drawing_reader_mep`) — 設備図読取（電気・給排水衛生・空調換気）
+44. **Quantity Surveyor** (`quantity_surveyor`) — 数量拾い・BOQ作成（建築数量積算基準準拠・全行に算出式）
+45. **Cost Estimator** (`cost_estimator`) — 単価適用・見積書・見積条件書・実行予算（単価出典必須）
+46. **Drawing Consistency Checker** (`drawing_consistency_checker`) — 図面間矛盾検出（意匠×構造×建具×設備）・数量凍結指示
+47. **Constructability Reviewer** (`constructability_reviewer`) — 施工性・納まり・仮設・法規懸念・安全レビュー
 
 ### 廃止済み
 - ~~Quality Assurance (`quality_assurance`)~~ — 2026-04-08 QA Reviewer に統合
@@ -178,6 +199,14 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 | Subsidy Strategist ↔ Legal / Finance | 法務レビュー依頼 ↔ 実質コスト算出 |
 | Subsidy Strategist → Subsidy Writer | 執筆ブリーフ発行 |
 | Subsidy Writer → Legal / Devil's Advocate | 最終ドラフトの法的サインオフ・審査員視点レビュー |
+| Construction Mgr → 図面読取4体 | 図面インデックス・分野別読取タスクの割当（並列実行） |
+| 図面読取4体 → Consistency Checker | 読取データの突合・矛盾検出 |
+| Consistency Checker → Quantity Surveyor | 矛盾箇所の数量凍結指示 |
+| Quantity Surveyor → Cost Estimator | BOQ（数量内訳書）の引き渡し |
+| Cost Estimator ↔ Finance | 粗利率・キャッシュフロー・支払条件の検証 |
+| Constructability Rev. → Legal | 法規懸念（防火区画・避難・斜線等）の確認依頼 |
+| Construction Mgr → Sales / PM | 客先提出見積・質疑書の引き渡し・受注後の工程引き継ぎ |
+| Devil's Advocate → 建設事業部 | 拾い漏れ・二重計上・単価楽観バイアスの批判的検証 |
 
 ## エージェント定義
 各エージェントのプロンプトは `/agents/<agent_name>/prompt.md` に定義。
@@ -212,6 +241,15 @@ Notion の議事録ページ「会議名」からパイプラインを実行し�
 対象補助金（例: IT導入補助金2026 通常枠）の申請準備を進めてください。
 ```
 Subsidy Scout → Strategist → Devil's Advocate → Legal / Finance / Writer 並列 → Writer 最終整形 → CEO 承認までを一気通貫で実行する。
+
+### 建設積算パイプライン
+```
+/agents/orchestrator/CONSTRUCTION_PIPELINE.md の手順に従って、
+プロジェクト（例: ○○ビル新築工事）の図面積算を実行してください。
+図面は /agents/construction_manager/projects/{project_id}/drawings/ に配置済みです。
+```
+Construction Manager（図面登録）→ 図面読取4体並列 → 矛盾検出 → 数量拾い → 見積 → 施工性レビュー → Devil's Advocate → RFI発行 → Finance / CEO 承認までを一気通貫で実行する。
+全数量に算出式・図面番号・精度ランク（A=明記/B=算出/C=推定）が付き、不明点は推測せず質疑書（RFI）に出る。
 
 ### ワンショット実行（コピペ用プロンプト）
 `/agents/orchestrator/run.md` にコピペ用プロンプトを用意。
@@ -266,10 +304,11 @@ LP・Webサイト・ダッシュボード等の制作時に、Designer / UI/UX D
 - 不動産業界特化型BPO（AIエージェント活用）
 - AIシステム制作（補助金活用）
 - LP等のWeb制作
+- 建設積算・図面レビュー（図面読取→数量拾い→見積、矛盾検出・施工性レビュー・質疑書作成）
 
 ## ゴール
 全ての業務に対してプロのエージェントが存在し、法人経営を0から100まで行える組織配置と、マネジメント力のある統括エージェント（CEO Agent）の育成。
-エージェント上限は50名。追加が必要な場合はその根拠と提案をCEOに上申する。
+エージェント上限は60名（2026-07-31 建設事業部新設時に50名から拡張）。追加が必要な場合はその根拠と提案をCEOに上申する。
 
 ## 開発標準（Development Standards）
 
@@ -491,13 +530,17 @@ ECC の Continuous Learning v2 を参考にした、セッション間のパタ�
 
 小規模な修正（バグ修正・コピー変更・設定変更）はこのプロセスを省略可。
 
-## 組織拡張の予備枠（残り4名）
+## 組織拡張の予備枠（残り5名 / 上限60名）
 | 候補 | 理由 | 優先度 |
 |------|------|--------|
 | Security Reviewer | 全開発成果物のセキュリティ専門レビュー・脆弱性スキャン・OWASP準拠検証 | **高** |
 | Knowledge Manager | エージェント間ナレッジ蓄積・ベストプラクティス共有・継続学習 | 中 |
 | BizDev Agent（事業開発） | 新規事業探索・パートナーシップ・M&A | 中 |
+| Construction Scheduler（工程計画） | 受注後の工程表作成・出来高管理（建設事業部の受注実績が増えたら） | 中 |
 | 予備枠 x1 | 事業拡大時の追加枠（海外展開、新規事業等） | - |
 
 ### 採用済み（2026-04-17）
 - Subsidy Scout / Subsidy Strategist / Subsidy Writer — 日本国内の補助金・助成金申請を一気通貫で担当
+
+### 採用済み（2026-07-31）
+- 建設事業部9体（Construction Manager / 図面読取4体 / Quantity Surveyor / Cost Estimator / Drawing Consistency Checker / Constructability Reviewer）— 図面積算・矛盾検出・施工性レビューを一気通貫で担当。上限を50→60名に拡張

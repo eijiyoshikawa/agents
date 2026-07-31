@@ -1,0 +1,17 @@
+{
+  "_comment": "自社単価マスタ。運用開始時に実績単価を登録する。source は 実績/協力会社見積/物価資料 のいずれか。単価未登録の工種は見積時に『要見積』扱いとなる。",
+  "updated_at": "2026-07-31",
+  "overhead_defaults": {
+    "common_temporary_pct": 5.0,
+    "site_management_pct": 8.0,
+    "general_admin_pct": 8.0,
+    "_note": "案件規模・工期により調整。変更時は estimate.json に根拠を記録"
+  },
+  "loss_rate_defaults": {
+    "concrete": 0.03,
+    "rebar": 0.04,
+    "boards": 0.05,
+    "tiles": 0.05
+  },
+  "unit_prices": []
+}
