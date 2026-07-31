@@ -36,7 +36,9 @@ export async function GET(req: Request) {
       console.error("アポ取得日バックフィル失敗:", e?.message);
       return [] as { id: string; date: string }[];
     });
-    const r = await syncAll();
+    // 既定は増分同期（前回以降の更新分のみ）。?mode=full で全件同期を強制。
+    const url = new URL(req.url);
+    const r = await syncAll({ mode: url.searchParams.get("mode") === "full" ? "full" : "incremental" });
     revalidateTag("customers-full");
     revalidateTag("contracts");
     if (backfilled.length > 0) revalidateTag("customers");
