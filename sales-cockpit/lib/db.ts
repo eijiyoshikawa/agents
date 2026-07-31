@@ -3,7 +3,7 @@
 import { neon } from "@neondatabase/serverless";
 import { fetchCustomersSlim, fetchContracts, NOTION_MAX_PAGES } from "./notion";
 import { normalizeCompanyName, normalizePhone, agencyReason } from "./leadflags";
-import type { ListCustomer, Contract, SearchParams, SearchResult, SearchRow } from "./types";
+import type { ListCustomer, Contract, SearchParams, SearchResult, SearchRow, Breakdowns } from "./types";
 
 // 接続文字列を解決：標準名 → 無ければ postgres:// 形式の環境変数を自動検出（Custom Prefix対策）。
 function resolveConn(): string {
@@ -201,15 +201,111 @@ export async function syncAll(opts?: { mode?: "full" | "incremental" }): Promise
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export async function dbGetAllSlim(): Promise<ListCustomer[]> {
-  const sql = db();
-  const rows = (await sql`SELECT id,url,name,phone,status,rank,industry,phase,method,pref,is_rep,s_rep,call_count,last_call_date,appointment_date,last_edited,address,confirm FROM sc_customers`) as any[];
-  return rows.map((r) => ({
+const SLIM_COLS =
+  "id,url,name,phone,status,rank,industry,phase,method,pref,is_rep,s_rep,call_count,last_call_date,appointment_date,last_edited,address,confirm";
+
+function mapSlimRow(r: any): ListCustomer {
+  return {
     id: r.id, url: r.url, name: r.name, phone: r.phone, status: r.status, rank: r.rank,
     industry: r.industry, phase: r.phase, method: r.method, pref: r.pref, isRep: r.is_rep, sRep: r.s_rep,
     callCount: r.call_count, lastCallDate: r.last_call_date, appointmentDate: r.appointment_date,
     lastEdited: r.last_edited, address: r.address, confirm: r.confirm,
-  }));
+  };
+}
+
+export async function dbGetAllSlim(): Promise<ListCustomer[]> {
+  const rows = (await db().query(`SELECT ${SLIM_COLS} FROM sc_customers`, [])) as any[];
+  return rows.map(mapSlimRow);
+}
+
+/** 商談パイプライン対象のみ（WHERE status IN）。全件転送を避ける軽量版。 */
+export async function dbGetPipelineSlim(statuses: string[]): Promise<ListCustomer[]> {
+  if (statuses.length === 0) return [];
+  const ph = statuses.map((_, i) => `$${i + 1}`).join(",");
+  const rows = (await db().query(
+    `SELECT ${SLIM_COLS} FROM sc_customers WHERE status IN (${ph})`,
+    statuses,
+  )) as any[];
+  return rows.map(mapSlimRow);
+}
+
+/** アポ取得日あり顧客のみ（アポ月次履歴用・軽量）。 */
+export async function dbGetAppointedSlim(): Promise<ListCustomer[]> {
+  const rows = (await db().query(
+    `SELECT ${SLIM_COLS} FROM sc_customers WHERE appointment_date IS NOT NULL AND appointment_date <> ''`,
+    [],
+  )) as any[];
+  return rows.map(mapSlimRow);
+}
+
+/**
+ * サマリ集計用: 指定日以降に更新された or アポ取得日が指定日以降 の顧客のみ。
+ * 日次/週次レポートの statsForRange が参照する範囲だけを取得し、全件転送を避ける。
+ * 文字列比較（ISO/YYYY-MM-DD の辞書順）で期間を絞る。
+ */
+export async function dbGetActiveSince(sinceYmd: string): Promise<ListCustomer[]> {
+  const rows = (await db().query(
+    `SELECT ${SLIM_COLS} FROM sc_customers WHERE last_edited >= $1 OR (appointment_date IS NOT NULL AND appointment_date >= $1)`,
+    [sinceYmd],
+  )) as any[];
+  return rows.map(mapSlimRow);
+}
+
+/**
+ * 分析ページの項目別内訳をDB内で集計（GROUP BY）。全件をアプリに読まない。
+ * groupCount と同一仕様: 空/NULL は「(未設定)」、件数降順、industry/pref は上位15件。
+ * excludedReps は IS担当の内訳から除外する非稼働メンバー。
+ */
+export async function dbGetBreakdowns(
+  excludedReps: string[],
+): Promise<{ breakdowns: Breakdowns; total: number }> {
+  const dims: Array<{ key: string; col: string; limit: number }> = [
+    { key: "rank", col: "rank", limit: 0 },
+    { key: "industry", col: "industry", limit: 15 },
+    { key: "method", col: "method", limit: 0 },
+    { key: "phase", col: "phase", limit: 0 },
+    { key: "pref", col: "pref", limit: 15 },
+  ];
+  const parts = dims.map(
+    (d) =>
+      `SELECT '${d.key}' AS dim, COALESCE(NULLIF(${d.col},''),'(未設定)') AS label, COUNT(*)::int AS count FROM sc_customers GROUP BY 1,2`,
+  );
+  const vals: unknown[] = [];
+  let repWhere = "";
+  if (excludedReps.length > 0) {
+    const ph = excludedReps.map((_, i) => `$${i + 1}`).join(",");
+    vals.push(...excludedReps);
+    repWhere = `WHERE is_rep IS NULL OR is_rep = '' OR is_rep NOT IN (${ph})`;
+  }
+  parts.push(
+    `SELECT 'isRep' AS dim, COALESCE(NULLIF(is_rep,''),'(未設定)') AS label, COUNT(*)::int AS count FROM sc_customers ${repWhere} GROUP BY 1,2`,
+  );
+  const rows = (await db().query(parts.join(" UNION ALL "), vals)) as Array<{
+    dim: string;
+    label: string;
+    count: number;
+  }>;
+
+  const pick = (key: string, limit: number) => {
+    const arr = rows
+      .filter((r) => r.dim === key)
+      .map((r) => ({ label: r.label, count: Number(r.count) }))
+      .sort((a, b) => b.count - a.count);
+    return limit > 0 ? arr.slice(0, limit) : arr;
+  };
+  // rank は全行を漏れなく分類するため、その合計＝総顧客数
+  const total = rows.filter((r) => r.dim === "rank").reduce((s, r) => s + Number(r.count), 0);
+  return {
+    breakdowns: {
+      rank: pick("rank", 0),
+      industry: pick("industry", 15),
+      method: pick("method", 0),
+      phase: pick("phase", 0),
+      pref: pick("pref", 15),
+      isRep: pick("isRep", 0),
+    },
+    total,
+  };
 }
 
 export async function dbGetContracts(): Promise<Contract[]> {
