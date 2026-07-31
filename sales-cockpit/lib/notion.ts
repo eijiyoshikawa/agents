@@ -375,7 +375,7 @@ export async function fetchAppointedSlim(): Promise<ListCustomer[]> {
   return pages.map(mapListCustomer);
 }
 
-const PIPELINE_STATUSES = ["アポイント獲得", "提案中", "商談中", "契約中", "パートナー"];
+export const PIPELINE_STATUSES = ["アポイント獲得", "提案中", "商談中", "契約中", "パートナー"];
 /** 商談中ステータスの顧客のみ（軽量）。パイプライン用。 */
 export async function fetchPipelineSlim(): Promise<ListCustomer[]> {
   const ids = await fetchListPropertyIds();

@@ -13,7 +13,18 @@ import {
   notionConfigured,
   getStoredTargets,
 } from "./notion";
-import { dbConfigured, dbGetAllSlim, dbGetContracts, dbSearchCustomers } from "./db";
+import {
+  dbConfigured,
+  dbGetAllSlim,
+  dbGetContracts,
+  dbSearchCustomers,
+  dbGetBreakdowns,
+  dbGetPipelineSlim,
+  dbGetAppointedSlim,
+  dbGetActiveSince,
+} from "./db";
+import { PIPELINE_STATUSES } from "./notion";
+import { EXCLUDED_REPS } from "./reps";
 import { buildDashboard, buildTargets, buildBreakdowns, type TargetsConfig } from "./aggregate";
 import { buildTimingBoard, type TimingBoard } from "./timing";
 import { searchInMemory } from "./search";
@@ -173,6 +184,15 @@ export async function getDashboard(): Promise<DashboardData> {
 export async function getAnalytics(): Promise<{ breakdowns: Breakdowns; total: number; errors: string[] }> {
   const errors: string[] = [];
   if (!notionConfigured()) return { breakdowns: buildBreakdowns([]), total: 0, errors: ["NOTION_TOKEN が未設定です。"] };
+  // 高速経路: DB内で GROUP BY 集計（全件をアプリに読み込まない）
+  if (dbConfigured()) {
+    try {
+      const r = await dbGetBreakdowns(EXCLUDED_REPS);
+      return { ...r, errors };
+    } catch (e) {
+      console.error("[data] DB breakdowns failed, falling back:", (e as Error)?.message);
+    }
+  }
   const customers = await safe("顧客管理", loadAllSlim, [] as ListCustomer[], errors);
   return { breakdowns: buildBreakdowns(customers), total: customers.length, errors };
 }
@@ -261,10 +281,19 @@ function dedupeById(list: ListCustomer[]): ListCustomer[] {
 export async function getSummaryCustomers(sinceYmd: string): Promise<{ customers: ListCustomer[]; errors: string[] }> {
   const errors: string[] = [];
   if (!notionConfigured()) return { customers: [], errors: ["NOTION_TOKEN が未設定です。"] };
-  // DBがあれば全件（高速・キャッシュ済）を使い集計側で絞る。無ければNotionから必要範囲のみ取得。
+  // DBがあれば「対象月の月初以降に動きのあった顧客だけ」をSQLで絞って取得（全件転送を避ける）。
+  //   statsForRange は 当日/当週 と 月初〜当日(MTD) を集計するため、
+  //   sinceYmd を含む月の月初 −1日 まで遡れば必要範囲を全てカバーできる。
   if (dbConfigured()) {
-    const customers = await safe("顧客管理", loadAllSlim, [] as ListCustomer[], errors);
-    return { customers, errors };
+    try {
+      const monthStart = `${sinceYmd.slice(0, 7)}-01`;
+      const customers = await dbGetActiveSince(minus1(monthStart));
+      return { customers, errors };
+    } catch (e) {
+      console.error("[data] DB summary customers failed, falling back:", (e as Error)?.message);
+      const customers = await safe("顧客管理", loadAllSlim, [] as ListCustomer[], errors);
+      return { customers, errors };
+    }
   }
   const since = minus1(sinceYmd); // UTC/JSTの差を吸収するため1日多めに取得（集計側でJST日付に絞る）
   const [recent, appointed] = await Promise.all([
@@ -279,8 +308,15 @@ export async function getPipelineCustomers(): Promise<{ customers: ListCustomer[
   const errors: string[] = [];
   if (!notionConfigured()) return { customers: [], errors: ["NOTION_TOKEN が未設定です。"] };
   if (dbConfigured()) {
-    const customers = await safe("顧客管理", loadAllSlim, [] as ListCustomer[], errors);
-    return { customers, errors };
+    try {
+      // 商談ステータスの顧客だけをSQLで取得（全件転送を避ける）
+      const customers = await dbGetPipelineSlim(PIPELINE_STATUSES);
+      return { customers, errors };
+    } catch (e) {
+      console.error("[data] DB pipeline failed, falling back:", (e as Error)?.message);
+      const customers = await safe("顧客管理", loadAllSlim, [] as ListCustomer[], errors);
+      return { customers, errors };
+    }
   }
   const customers = await safe("商談", cachedPipeline, [] as ListCustomer[], errors);
   return { customers, errors };
@@ -291,8 +327,15 @@ export async function getAppointedCustomers(): Promise<{ customers: ListCustomer
   const errors: string[] = [];
   if (!notionConfigured()) return { customers: [], errors: ["NOTION_TOKEN が未設定です。"] };
   if (dbConfigured()) {
-    const customers = await safe("顧客管理", loadAllSlim, [] as ListCustomer[], errors);
-    return { customers, errors };
+    try {
+      // アポ取得日ありの顧客だけをSQLで取得（全件転送を避ける）
+      const customers = await dbGetAppointedSlim();
+      return { customers, errors };
+    } catch (e) {
+      console.error("[data] DB appointed failed, falling back:", (e as Error)?.message);
+      const customers = await safe("顧客管理", loadAllSlim, [] as ListCustomer[], errors);
+      return { customers, errors };
+    }
   }
   const customers = await safe("アポ有り", cachedAppointed, [] as ListCustomer[], errors);
   return { customers, errors };
