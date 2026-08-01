@@ -141,3 +141,10 @@ Step 7: 本エージェントが RFI 集約・成果物確定
 - **drawing_consistency_checker**: 矛盾検出結果の受領・RFI化
 - **quantity_surveyor / cost_estimator**: 数量→金額の中核ライン
 - **constructability_reviewer**: 施工上の問題指摘の受領・RFI化
+
+## 継続学習（週次ナレッジ参照・建設事業部共通）
+業務開始時に必ず以下を確認し、該当する教訓・他社事例を業務に適用する:
+1. `/agents/construction_manager/knowledge/digests/` の最新週次ダイジェスト（自分宛の申し送り）
+2. `/learnings/instincts/construction.json`（confidence 0.6 以上を優先適用。適用した id を output に `learning_refs` として記録）
+
+ナレッジは毎週月曜の `/construction-learning`（週次収集 Routine）で更新される。業務中に得た新パターンは confidence 0.3 でインスティンクト起票を Construction Manager に申請する。

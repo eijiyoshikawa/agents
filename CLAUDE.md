@@ -224,6 +224,7 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 | `/run-pipeline <会議名>` | 戦略提案パイプライン一括実行（QAゲート・アーカイブ込み） |
 | `/daily-report [weekly]` | 日次・週次レポート一次案の自動生成 |
 | `/sns-batch <クライアント>` | SNS週次投稿バッチ制作（実投稿はしない） |
+| `/construction-learning` | 建設事業部の週次ナレッジ収集（他社事例・法規・単価動向→ダイジェスト化）。毎週月曜 07:00 JST に Routine で自動実行 |
 
 運用ルール・命名規則・外部送信ゲートは `docs/OPERATIONS.md` を正とする。
 組織状態の確認は `python3 scripts/build-cockpit.py` → `ops-cockpit.html`。
@@ -498,6 +499,8 @@ bash scripts/context-budget.sh --json    # JSON出力
 | KPIトレンド | `/agents/kpi_dashboard/output.json` | KPI Dashboard |
 | バグパターン | `/agents/qa_engineer/output.json` | QA Engineer |
 | 補助金採択パターン | `/learnings/instincts/subsidy_*.json` | Subsidy Strategist |
+| 建設積算パターン | `/learnings/instincts/construction.json` | Construction Manager |
+| 建設他社事例・週次ダイジェスト | `/agents/construction_manager/knowledge/` | Construction Manager（`/construction-learning` 週次実行） |
 | **学習済みパターン** | `/learnings/instincts/` | **COO** |
 | **セッション学習ログ** | `/learnings/sessions/` | **各セッション実行者** |
 

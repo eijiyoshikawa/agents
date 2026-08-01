@@ -1,0 +1,18 @@
+{
+  "schema_version": "1.0",
+  "description": "建設事業部 他社事例ライブラリ。週次ナレッジ収集（/construction-learning）で追記される。全件に出典必須。",
+  "updated_at": "2026-08-01",
+  "cases": [
+    {
+      "case_id": "CASE-20260731-01",
+      "category": "AI積算・建設DX他社事例",
+      "title": "実施図面125枚のAI積算で4原則を適用（分野別読取・根拠開示・精度ランク・質疑出し）",
+      "source_url": "https://www.instagram.com/sena_archisoft/",
+      "source_name": "Instagram @sena_archisoft",
+      "checked_at": "2026-07-31",
+      "summary": "意匠・構造・建具・設備を別々のサブエージェントに読ませ、全数量に算出式と図面番号、精度ランク（A=明記/B=算出/C=推定）を付け、不明点は質疑に出す運用で「それっぽい嘘」の混入を防止。",
+      "implication": "建設事業部の設立時設計思想として全プロンプトに採用済み（積算4原則）",
+      "related_agents": ["construction_manager", "quantity_surveyor", "cost_estimator"]
+    }
+  ]
+}

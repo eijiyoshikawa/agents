@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "description": "建設事業部（図面読取・積算・施工性レビュー）の学習済みパターン。週次ナレッジ収集と案件実績から起票し、COO 月次レビューで昇格・廃止を判断する。",
+  "updated_at": "2026-08-01",
+  "instincts": [
+    {
+      "id": "CON-001",
+      "trigger": "図面読取・数量拾いで根拠（算出式・図面番号・精度ランク）の記載を省略しようとしている",
+      "action": "積算4原則に従い、全数値に formula / refs / rank を必ず付ける。省略すると『それっぽい嘘』が混入し検証不能になる",
+      "confidence": 0.9,
+      "evidence": {
+        "count": 1,
+        "examples": [
+          "2026-07-31: 事業部設立時に他社事例（CASE-20260731-01）から採用。設計原則として全プロンプトに反映済み"
+        ]
+      },
+      "scope": "construction",
+      "domain": "estimation",
+      "created_at": "2026-07-31",
+      "updated_at": "2026-07-31"
+    },
+    {
+      "id": "CON-002",
+      "trigger": "精度ランクC（推定）の項目をそのまま見積に計上しようとしている",
+      "action": "C項目は必ずRFI（質疑書）に登録し、見積上の当方仮定を明記する。C比率が金額ベース10%超なら見積を『概算』と明示する",
+      "confidence": 0.9,
+      "evidence": {
+        "count": 1,
+        "examples": [
+          "2026-07-31: 事業部設立時に採用。cost_estimator の rank_amount_summary に実装済み"
+        ]
+      },
+      "scope": "construction",
+      "domain": "estimation",
+      "created_at": "2026-07-31",
+      "updated_at": "2026-07-31"
+    }
+  ]
+}
