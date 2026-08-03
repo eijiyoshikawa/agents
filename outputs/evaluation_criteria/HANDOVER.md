@@ -1,0 +1,115 @@
+# 引き継ぎ文書 — LET評価制度プロジェクト（let-hyoka）
+
+最終更新: 2026-07-27 ／ 前セッション: claude/evaluation-criteria-framework-mkp6W
+
+---
+
+## 1. プロジェクト概要
+
+株式会社LETの3部門（営業・マーケティング・BPO/不動産）の評価制度を、静的HTMLページとして `let-hyoka.vercel.app` で公開・運用している。経営陣用と従業員用（パスワード保護）の2系統。
+
+## 2. 公開URL・パスワード一覧
+
+### 経営陣用（パスワードなし）
+| URL | 内容 |
+|-----|------|
+| `let-hyoka.vercel.app/` | 部門選択トップ |
+| `let-hyoka.vercel.app/sales` | 営業部 v1.4 |
+| `let-hyoka.vercel.app/marketing` | マーケ部 v1.4（上下にv2.0誘導バナーあり）|
+| `let-hyoka.vercel.app/bpo` | BPO・不動産事業部 v1.4拡張版 |
+
+### 従業員用・新制度（パスワード保護 / SHA-256 + sessionStorage）
+| URL | パスワード | 内容 |
+|-----|-----------|------|
+| `/demo/sales` | `saleslet1117` | 営業従業員用（P&Lなし・四半期表あり）|
+| `/demo/marketing` | `makematsu2026` | マーケ従業員用（同上）|
+| `/demo/bpo` | `sawaletinc2026` | BPO従業員用（同上）|
+| `/marketing/v2` | `makematsu2026` | **マーケ評価制度 v2.0（チーム評価版）** |
+
+## 3. Git / デプロイ構成（重要）
+
+```
+リポジトリ: eijiyoshikawa/agents
+作業ブランチ: claude/evaluation-criteria-framework-mkp6W（開発コミット先）
+デプロイブランチ: let-hyoka（ここへのpushで let-hyoka.vercel.app が更新される）
+```
+
+### Vercelプロジェクトは2つある（混同注意！）
+
+| プロジェクト | 配信内容 | Root Directory | 触ってよいか |
+|------------|---------|---------------|------------|
+| **agents** | 評価制度ページ（let-hyoka.vercel.app は let-hyokaブランチのbranchドメイン）| `outputs/evaluation_criteria` / Framework=Other / 各Override OFF | 本プロジェクトの対象 |
+| **let-hyoka** | let-recruit（求人票Next.jsアプリ・別件）| `let-recruit` / Next.js | **触らない** |
+
+- agentsプロジェクトの main ブランチには `outputs/evaluation_criteria` が存在しないため、**mainブランチのデプロイは常に失敗する（仕様・無害）**。Redeployはlet-hyokaブランチの行のみ行うこと
+- 過去にRoot Directoryが書き換えられて全ビルドが失敗（STATIC_BUILD_NO_OUT_DIR）した事故あり（2026-07-21復旧）。保険として `public/` ミラーを配置している
+
+### 更新手順（定型フロー）
+
+```bash
+# 1. 作業ブランチで outputs/evaluation_criteria/ 配下を編集・コミット・push
+git checkout claude/evaluation-criteria-framework-mkp6W
+# （編集）
+git add outputs/evaluation_criteria/ && git commit -m "..." && git push origin claude/evaluation-criteria-framework-mkp6W
+
+# 2. let-hyokaにマージ + ミラー同期 + push（これでVercelが自動デプロイ）
+git checkout let-hyoka
+git merge claude/evaluation-criteria-framework-mkp6W --no-ff -m "merge: ..."
+# ルートミラー（let-hyokaブランチのみ存在）
+cp outputs/evaluation_criteria/*.html ./ 2>/dev/null
+cp outputs/evaluation_criteria/demo/*.html ./demo/
+cp outputs/evaluation_criteria/marketing/v2.html ./marketing/
+cp outputs/evaluation_criteria/vercel.json ./vercel.json
+# public/ミラー（両方）
+cp outputs/evaluation_criteria/{index,sales,marketing,bpo}.html outputs/evaluation_criteria/public/
+cp outputs/evaluation_criteria/demo/*.html outputs/evaluation_criteria/public/demo/
+cp outputs/evaluation_criteria/marketing/v2.html outputs/evaluation_criteria/public/marketing/
+cp -r outputs/evaluation_criteria/public/* ./public/
+git add -A && git commit -m "feat(deploy): ミラー同期" && git push origin let-hyoka
+git checkout claude/evaluation-criteria-framework-mkp6W
+```
+
+※ 実際に配信されているのは `outputs/evaluation_criteria/` 直下（Root Directory）。ルート/publicミラーは事故時の保険。
+
+## 4. 各部門の制度バージョン現状
+
+| 部門 | 公開中 | 備考 |
+|------|--------|------|
+| 営業 | v1.4（個人×チーム6段階係数・ボーナス月給×1ヶ月）| 安定 |
+| BPO・不動産 | v1.4拡張（チーム評価なし・事業構造/実績スナップショット/翌年度方針=BPO原価28%・50:50、外注費40%特別ボーナス）| 安定 |
+| マーケ | v1.4（実質粗利+継続率係数）+ **v2.0ページ**（/marketing/v2・チーム評価版）| **v2.1改定が進行中** |
+
+## 5. 進行中タスク（次セッションの最優先）
+
+### マーケ評価制度 v2.1（コミット型主軸・チーム評価版）の確定と反映
+
+- 代表からv2.1全文を受領済み → レビュー実施済み（懸念点洗い出し完了）
+- レビュー結果は **Notion「2026/07/27 役員会議 アジェンダ」ページ末尾に追記済み**
+  - ページID: `23e4a4d1b8424a9b9bfd999376fce672`
+- **要決定7項目**（①定着率係数の中間値ルール ②内定承諾辞退時処理 ③昇給凍結の扱い ④最低母数 ⑤定着率の除外規定 ⑥有効並走件数の定義 ⑦公開範囲）を役員会議で判断待ち
+- **決定が出たら**: v2.1確定版として `/marketing/v2` ページ（`outputs/evaluation_criteria/marketing/v2.html`）を更新
+  - Ex04を再計算（推奨連続式なら ¥106,838）
+  - Section 10.2のボーナス額再計算（新定着率係数なら▲58.5万）
+  - 決定された条文（クローバック・最低母数・除外規定等）を追記
+- 検算で発見済みの誤り: 7.4 Ex04と10.2が旧v2.0係数のまま（v2.1原文の誤り）
+
+### その他の未完タスク
+- 就業規則改定3項目（降格規定・査定給減額・賞与変動条項）の労務TODO反映
+- 営業部制度とv2.1受注基準の整合改定（未着手）
+
+## 6. Notion関連ページ
+
+| ページ | ID / 場所 |
+|--------|----------|
+| 定性評価チェックリスト（20問）| `34fc57ee1f60813b8668d660fb3ba4db`（役員専用配下）|
+| 2026/07/27 役員会議 アジェンダ（v2.1レビュー追記済み）| `23e4a4d1b8424a9b9bfd999376fce672` |
+| 第9期役員会議 2026-04-22（制度の原点議事録）| `34ac57ee1f60802da2a0c8bce04585e7` |
+
+## 7. 設計上の重要な経緯（Why）
+
+- ボーナス基準は当初「月給×2ヶ月」→ **「月給×1ヶ月」に変更済み**（全部門）
+- チーム係数は6段階（120%+=1.10 / 100-119=1.00 / 80-99=0.90 / 70-79=0.80 / 60-69=0.70 / <60=0.60）
+- BPOはチーム評価なし（個人達成率のみ）
+- マーケv1.4は新規/継続の配分逆転を撤廃し「実質粗利=売上−実費」に統一
+- 従業員ページの demo/ は経営側P&L非表示、ボーナス注記は「固定残業代を引いた金額×1ヶ月」表記
+- 有料職業紹介の許可は**取得済み**（v2.1の他社紹介モデルの前提）
