@@ -217,6 +217,55 @@ h1 {
   letter-spacing: 1px;
 }
 
+/* 社内ツール導線（求人票ジェネレーター等） */
+.tools {
+  max-width: 720px;
+  margin: 40px auto 0;
+}
+.tools-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  text-align: center;
+  margin-bottom: 14px;
+}
+.tool-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 20px 24px;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color .2s ease, background .2s ease, transform .2s ease;
+}
+.tool-card:hover {
+  border-color: var(--sales);
+  background: var(--sales-light);
+  transform: translateY(-2px);
+}
+.tool-icon {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: var(--sales);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
+.tool-body { flex: 1 1 auto; min-width: 0; }
+.tool-name { font-size: 16px; font-weight: 700; color: var(--ink); }
+.tool-desc { font-size: 12.5px; color: var(--ink-3); margin-top: 3px; }
+.tool-arrow { flex: 0 0 auto; font-size: 20px; color: var(--ink-3); transition: transform .2s ease, color .2s ease; }
+.tool-card:hover .tool-arrow { transform: translateX(4px); color: var(--sales); }
+
 @media (max-width: 1024px) {
   .cards { grid-template-columns: 1fr 1fr; }
 }
@@ -359,6 +408,18 @@ h1 {
       </div>
     </div>
     <div class="footer-meta">CONFIDENTIAL — 経営陣向け試算（支給額 + 社保5万円加算）／ Ver 1.0 ／ 2026-04-22</div>
+  </div>
+
+  <div class="tools">
+    <div class="tools-title">社内ツール</div>
+    <a href="https://let-hyoka.vercel.app/" class="tool-card" target="_blank" rel="noopener">
+      <span class="tool-icon">📝</span>
+      <div class="tool-body">
+        <div class="tool-name">求人票ジェネレーター</div>
+        <div class="tool-desc">他社求人URLを貼るだけで、LETデザインの求人票をWeb表示・PDF出力</div>
+      </div>
+      <span class="tool-arrow">→</span>
+    </a>
   </div>
 
 </div>
