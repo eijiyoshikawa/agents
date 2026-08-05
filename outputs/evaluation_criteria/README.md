@@ -22,6 +22,7 @@ outputs/evaluation_criteria/          ← Vercel「agents」プロジェクト�
 ├── public/             # 事故時保険のミラー（配信の本体ではない）
 ├── vercel.json         # クリーンURL・rewrites・セキュリティヘッダ
 ├── HANDOVER.md         # 引き継ぎ文書（デプロイ構成・進行中タスク）
+├── MARKETING_DATA_AUDIT.md  # マーケ実績データの出所・精度の記録／不明項目の回収状況
 └── README.md           # 本ファイル
 ```
 
