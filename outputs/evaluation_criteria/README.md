@@ -52,7 +52,7 @@ outputs/evaluation_criteria/          ← Vercel「agents」プロジェクト�
 ## デプロイ構成（詳細は HANDOVER.md）
 
 - **リポジトリ**: `eijiyoshikawa/agents`
-- **作業ブランチ**: `claude/evaluation-criteria-framework-mkp6W`
+- **作業ブランチ**: `claude/evaluation-finance-dashboard-50w8t9`（旧 `claude/evaluation-criteria-framework-mkp6W` をマージ済み）
 - **デプロイブランチ**: `let-hyoka`（pushで自動デプロイ）
 - **Vercel「agents」プロジェクト**: Root Directory = `outputs/evaluation_criteria` / Framework = Other / Build・Output・Install Override 全てOFF
 - ⚠️ 別プロジェクト「let-hyoka」（let-recruit求人アプリ・Root=let-recruit）とは**無関係。触らない**

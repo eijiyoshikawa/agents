@@ -1,6 +1,6 @@
 # 引き継ぎ文書 — LET評価制度プロジェクト（let-hyoka）
 
-最終更新: 2026-08-05 ／ 前セッション: claude/evaluation-criteria-framework-mkp6W
+最終更新: 2026-08-05 ／ 現行作業ブランチ: claude/evaluation-finance-dashboard-50w8t9（旧 claude/evaluation-criteria-framework-mkp6W をマージ済み）
 
 ---
 
@@ -30,7 +30,7 @@
 
 ```
 リポジトリ: eijiyoshikawa/agents
-作業ブランチ: claude/evaluation-criteria-framework-mkp6W（開発コミット先）
+作業ブランチ: claude/evaluation-finance-dashboard-50w8t9（開発コミット先 ※旧 claude/evaluation-criteria-framework-mkp6W をマージ済み）
 デプロイブランチ: let-hyoka（ここへのpushで let-hyoka.vercel.app が更新される）
 ```
 
@@ -48,13 +48,13 @@
 
 ```bash
 # 1. 作業ブランチで outputs/evaluation_criteria/ 配下を編集・コミット・push
-git checkout claude/evaluation-criteria-framework-mkp6W
+git checkout claude/evaluation-finance-dashboard-50w8t9
 # （編集）
-git add outputs/evaluation_criteria/ && git commit -m "..." && git push origin claude/evaluation-criteria-framework-mkp6W
+git add outputs/evaluation_criteria/ && git commit -m "..." && git push origin claude/evaluation-finance-dashboard-50w8t9
 
 # 2. let-hyokaにマージ + ミラー同期 + push（これでVercelが自動デプロイ）
 git checkout let-hyoka
-git merge claude/evaluation-criteria-framework-mkp6W --no-ff -m "merge: ..."
+git merge claude/evaluation-finance-dashboard-50w8t9 --no-ff -m "merge: ..."
 # ルートミラー（let-hyokaブランチのみ存在）
 cp outputs/evaluation_criteria/*.html ./ 2>/dev/null
 cp outputs/evaluation_criteria/demo/*.html ./demo/
@@ -66,7 +66,7 @@ cp outputs/evaluation_criteria/demo/*.html outputs/evaluation_criteria/public/de
 cp outputs/evaluation_criteria/marketing/v2.html outputs/evaluation_criteria/public/marketing/
 cp -r outputs/evaluation_criteria/public/* ./public/
 git add -A && git commit -m "feat(deploy): ミラー同期" && git push origin let-hyoka
-git checkout claude/evaluation-criteria-framework-mkp6W
+git checkout claude/evaluation-finance-dashboard-50w8t9
 ```
 
 ※ 実際に配信されているのは `outputs/evaluation_criteria/` 直下（Root Directory）。ルート/publicミラーは事故時の保険。
