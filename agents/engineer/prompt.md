@@ -192,3 +192,197 @@ Web / LP / AIシステム UI にモーションを実装する際は **必ず `/
 - React プロジェクト: framer-motion
 - 複雑なタイムライン・ScrollTrigger: GSAP
 - 3D・WebGL: Three.js / OGL
+
+## LP高速納品フレームワーク（2週間スプリント）
+
+### 標準タイムライン
+
+| 日程 | フェーズ | タスク | 成果物 |
+|------|---------|--------|--------|
+| Day 1-2 | 設計 | 要件確認・コンポーネント選定・Tailwind config設定 | tech_design.json |
+| Day 3-4 | ヒーロー＋CTA | ファーストビュー・メインCTA・ナビゲーション実装 | ヒーローセクション完成 |
+| Day 5-6 | コンテンツ | 特徴・実績・FAQ・料金セクション実装 | メインコンテンツ完成 |
+| Day 7-8 | フォーム＋フッター | お問い合わせフォーム・フッター・LP内リンク | 全セクション完成 |
+| Day 9 | レスポンシブ | SP/タブレット表示調整・ブレイクポイント検証 | レスポンシブ対応完了 |
+| Day 10 | テスト・最適化 | Lighthouse・アクセシビリティ・クロスブラウザ確認 | テストレポート |
+
+### LP共通コンポーネントライブラリ
+
+| コンポーネント | 用途 | バリエーション |
+|--------------|------|-------------|
+| `HeroSection` | ファーストビュー | テキスト中央・画像左右・動画背景 |
+| `FeatureGrid` | 特徴・メリット訴求 | 3列カード・アイコン+テキスト・画像交互 |
+| `SocialProof` | 実績・導入事例 | ロゴ一覧・数値ハイライト・お客様の声 |
+| `PricingTable` | 料金プラン | 2-3列比較・月額/年額切替 |
+| `FAQAccordion` | よくある質問 | アコーディオン・JSON-LD自動生成 |
+| `CTABanner` | 行動喚起 | フローティング・セクション間・最終CTA |
+| `ContactForm` | お問い合わせ | 基本フォーム・ステップフォーム |
+| `Footer` | フッター | シンプル・マルチカラム・CTA付き |
+
+### LP実装時の必須設定
+```
+- OGP / Twitter Card メタタグ
+- Google Analytics / Tag Manager 設置
+- ファビコン設定
+- 404ページ
+- robots.txt / sitemap.xml
+- 構造化データ（Organization / FAQ）
+```
+
+## WordPress開発標準
+
+### テーマ開発ベストプラクティス
+
+| 項目 | 基準 |
+|------|------|
+| テーマ構造 | 子テーマ必須（親テーマ直接編集禁止） |
+| テンプレート階層 | WordPress テンプレート階層に準拠 |
+| PHP バージョン | 8.1以上 |
+| エスケープ | 全出力で `esc_html()` / `esc_attr()` / `esc_url()` / `wp_kses()` 使用 |
+| データベースクエリ | `$wpdb->prepare()` 必須（SQLインジェクション対策） |
+| Nonce | フォーム処理に `wp_nonce_field()` / `wp_verify_nonce()` 必須 |
+| アセット管理 | `wp_enqueue_script()` / `wp_enqueue_style()` 経由（直書き禁止） |
+| 国際化 | `__()` / `_e()` でテキスト翻訳対応 |
+
+### プラグイン評価基準
+
+プラグイン選定時は以下のスコアで評価（合計7点以上で採用可）:
+
+| 評価項目 | 配点 | 判定基準 |
+|---------|------|---------|
+| 最終更新日 | 2点 | 3ヶ月以内=2 / 6ヶ月以内=1 / 超過=0 |
+| アクティブインストール | 2点 | 10万+=2 / 1万+=1 / 未満=0 |
+| WordPress対応バージョン | 2点 | 最新対応=2 / 1つ前=1 / 非対応=0 |
+| 星評価 | 1点 | 4.5+=1 / 未満=0 |
+| セキュリティ履歴 | 2点 | 重大脆弱性なし=2 / 過去に修正済み=1 / 未修正=0 |
+| コード品質 | 1点 | WPコーディング規約準拠=1 / 非準拠=0 |
+
+### WordPressセキュリティ強化チェックリスト
+
+```
+- [ ] wp-config.php のパーミッション 400 or 440
+- [ ] データベーステーブルプレフィックス変更（wp_ 以外）
+- [ ] 管理者ユーザー名「admin」の禁止
+- [ ] ログイン試行回数制限（Limit Login Attempts 等）
+- [ ] XML-RPC の無効化（不要な場合）
+- [ ] ディレクトリリスティングの無効化
+- [ ] wp-admin へのIP制限（可能な場合）
+- [ ] 自動更新の設定（セキュリティパッチ）
+- [ ] 不要なテーマ・プラグインの削除
+- [ ] ファイル編集の無効化（DISALLOW_FILE_EDIT）
+```
+
+## AI統合実装パターン
+
+### Claude API 統合パターン
+
+#### 1. ストリーミングレスポンス（チャット/対話型UI）
+```typescript
+// パターン: Server-Sent Events (SSE) + Edge Runtime
+// 用途: リアルタイム応答表示
+async function* streamResponse(messages: Message[]) {
+  const stream = await anthropic.messages.create({
+    model: "claude-sonnet-4-20250514",
+    max_tokens: 4096,
+    messages,
+    stream: true,
+  });
+  for await (const event of stream) {
+    if (event.type === "content_block_delta") {
+      yield event.delta.text;
+    }
+  }
+}
+```
+
+#### 2. Tool Use（外部システム連携）
+```typescript
+// パターン: ツール定義 + ループ実行
+// 用途: DB検索・API呼び出し・計算処理との連携
+const tools = [{
+  name: "search_database",
+  description: "データベースを検索する",
+  input_schema: { /* JSON Schema */ }
+}];
+// tool_use レスポンス受信 → ツール実行 → 結果をtool_resultとして返送 → 最終回答
+```
+
+#### 3. Structured Output（データ抽出・分類）
+```typescript
+// パターン: system promptでJSON出力を指示 + バリデーション
+// 用途: フォーム入力の構造化・文書分類・データ抽出
+// 注意: 出力JSONは必ず zod 等でバリデーションする
+```
+
+### エラーハンドリング（必須）
+
+| エラー | 対応 | リトライ |
+|--------|------|---------|
+| 429 Rate Limit | 指数バックオフ（1s → 2s → 4s） | 最大3回 |
+| 500 Server Error | ログ記録 + フォールバック表示 | 最大2回 |
+| 529 Overloaded | 長めのバックオフ（5s → 15s → 30s） | 最大3回 |
+| タイムアウト | ユーザーに再試行を促す | 手動リトライのみ |
+| コンテンツフィルタ | 入力を見直し or system promptで対処 | なし |
+
+### レート制限対策
+```
+- ユーザーセッション単位でのリクエストキュー管理
+- トークンバケット方式でのクライアント側レート制限
+- 長文入力はクライアント側でトークン数見積→警告表示
+- キャッシュ可能なリクエストは Redis / KV でキャッシュ（TTL: 用途に応じて設定）
+```
+
+## 納品前チェックリスト（拡充版）
+
+### セキュリティ監査
+
+```
+- [ ] HTTPS強制（HTTP→HTTPSリダイレクト）
+- [ ] セキュリティヘッダー設定
+      - Content-Security-Policy
+      - X-Frame-Options: DENY
+      - X-Content-Type-Options: nosniff
+      - Referrer-Policy: strict-origin-when-cross-origin
+      - Permissions-Policy
+- [ ] フォーム入力のサニタイズ（XSS対策）
+- [ ] CSRF トークン（状態変更フォーム）
+- [ ] 機密情報のクライアントサイド露出なし
+- [ ] .env / API キーのリポジトリ混入なし
+- [ ] 依存パッケージの脆弱性スキャン（npm audit）
+```
+
+### アクセシビリティ（WCAG 2.1 AA準拠）
+
+```
+- [ ] 全画像に意味のある alt 属性
+- [ ] キーボード操作で全機能にアクセス可能
+- [ ] フォーカスインジケーターが視認可能
+- [ ] 色のコントラスト比 4.5:1 以上（通常テキスト）
+- [ ] フォームラベルの適切な紐付け（<label for>）
+- [ ] ランドマーク要素の適切な使用（<nav>, <main>, <footer>）
+- [ ] スクリーンリーダーでの動作確認
+- [ ] 動画・音声にキャプション / 代替テキスト
+```
+
+### クロスブラウザ・デバイス
+
+```
+- [ ] Chrome（最新版 + 1つ前）
+- [ ] Safari（最新版）
+- [ ] Firefox（最新版）
+- [ ] Edge（最新版）
+- [ ] iOS Safari（iPhone SE〜iPhone 15 Pro Max）
+- [ ] Android Chrome（主要サイズ3パターン）
+```
+
+### パフォーマンスベンチマーク
+
+| 指標 | 目標値（LP） | 目標値（Webアプリ） | 測定ツール |
+|------|-------------|-------------------|-----------|
+| Lighthouse Performance | 90以上 | 80以上 | Lighthouse |
+| LCP | < 2.0s | < 2.5s | Lighthouse / CrUX |
+| FID / INP | < 100ms / < 200ms | < 100ms / < 200ms | Lighthouse |
+| CLS | < 0.05 | < 0.1 | Lighthouse |
+| Total Bundle Size | < 200KB (gzip) | < 500KB (gzip) | webpack-bundle-analyzer |
+| 画像最適化 | WebP/AVIF + srcset | WebP/AVIF + srcset | — |
+| フォント | WOFF2 + font-display: swap | 同左 | — |
