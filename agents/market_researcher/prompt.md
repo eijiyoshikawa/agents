@@ -181,20 +181,70 @@ Web検索とGoogle Driveの既存資料から、市場・競合・ベンチマ�
 {
   "insights": [
     {
-      "category": "market",
+      "category": "market | competitor | benchmark | customer",
       "title": "インサイトのタイトル",
       "summary": "要約（200字以内）",
       "source": "情報源URL or ドキュメント名",
-      "relevance": "クライアントの課題との関連性"
+      "source_tier": "tier1 | tier2 | tier3 | tier4 | tier5 | tier6",
+      "relevance": "クライアントの課題との関連性",
+      "confidence": "high | medium | low",
+      "data_freshness": "current | aging | stale",
+      "data_date": "2026-01-15",
+      "precision": "exact | estimate | rough",
+      "cross_validated": true
     }
   ],
+  "market_sizing": {
+    "tam": {
+      "value": "〇〇億円",
+      "method": "トップダウン | ボトムアップ | 類推",
+      "calculation": "算出根拠の説明",
+      "source": "情報源"
+    },
+    "sam": {
+      "value": "〇〇億円",
+      "method": "トップダウン | ボトムアップ | 類推",
+      "calculation": "絞り込み条件の説明",
+      "source": "情報源"
+    },
+    "som": {
+      "value": "〇〇億円",
+      "method": "ボトムアップ",
+      "calculation": "想定シェア率と根拠",
+      "source": "情報源"
+    }
+  },
+  "pest_analysis": {
+    "political": ["政治的要因1"],
+    "economic": ["経済的要因1"],
+    "social": ["社会的要因1"],
+    "technological": ["技術的要因1"]
+  },
+  "five_forces": {
+    "industry_rivalry": { "level": "strong | moderate | weak", "rationale": "理由" },
+    "new_entrants": { "level": "strong | moderate | weak", "rationale": "理由" },
+    "substitutes": { "level": "strong | moderate | weak", "rationale": "理由" },
+    "buyer_power": { "level": "strong | moderate | weak", "rationale": "理由" },
+    "supplier_power": { "level": "strong | moderate | weak", "rationale": "理由" }
+  },
+  "technology_adoption_stage": "innovator | early_adopter | early_majority | late_majority | laggard",
   "customer_segments": [
-    "セグメント1: 説明",
-    "セグメント2: 説明"
+    {
+      "name": "セグメント名",
+      "description": "説明",
+      "size_estimate": "推定規模",
+      "needs": ["ニーズ1"],
+      "pain_points": ["ペインポイント1"]
+    }
   ],
   "market_trends": [
-    "トレンド1",
-    "トレンド2"
+    {
+      "trend": "トレンド名",
+      "direction": "成長 | 縮小 | 変化",
+      "timeframe": "短期(1年以内) | 中期(1-3年) | 長期(3年超)",
+      "impact": "high | medium | low",
+      "source": "情報源"
+    }
   ],
   "competitive_landscape": "競合環境の全体像を200字程度で"
 }
