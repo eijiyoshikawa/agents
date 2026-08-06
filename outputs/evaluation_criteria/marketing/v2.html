@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LET マーケティング部 評価制度 v2.0（チーム評価版）</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --ink: #0D0D0D;
+  --ink-2: #3D3D3D;
+  --ink-3: #888;
+  --rule: #E0E0E0;
+  --page: #F7F6F3;
+  --white: #FFFFFF;
+
+  --g1: #1A7A4A;
+  --g1-light: #EAF7F0;
+  --g2: #1A5FA8;
+  --g2-light: #EAF1FB;
+  --g3: #B85C00;
+  --g3-light: #FEF5EA;
+  --g4: #5B21B6;
+  --g4-light: #F3F0FD;
+
+  --red: #DC2626;
+  --orange: #EA580C;
+  --yellow: #D97706;
+  --green: #16A34A;
+  --blue: #1D4ED8;
+
+  --accent: #5B21B6;
+  --accent-light: #F3F0FD;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--page);
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.mono { font-family: 'IBM Plex Mono', monospace; }
+
+.page { max-width: 1080px; margin: 0 auto; padding: 52px 32px 80px; }
+
+header { margin-bottom: 48px; }
+.header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  border-bottom: 2.5px solid var(--ink);
+  gap: 24px;
+}
+.doc-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 8px;
+}
+h1 { font-size: 28px; font-weight: 900; letter-spacing: -0.8px; line-height: 1.15; }
+h1 em { font-style: normal; color: var(--accent); }
+.doc-meta {
+  text-align: right;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  color: var(--ink-3);
+  line-height: 2;
+  flex-shrink: 0;
+}
+
+.v2-note {
+  margin-top: 16px;
+  background: var(--accent-light);
+  border: 1.5px solid var(--accent);
+  border-radius: 8px;
+  padding: 14px 18px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  line-height: 1.7;
+}
+.v2-note strong { color: var(--accent); }
+
+.philosophy {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.phil-item { background: var(--white); padding: 14px 18px; }
+.phil-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 5px;
+}
+.phil-val { font-size: 13px; font-weight: 700; color: var(--ink); }
+
+.sec-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 14px;
+  margin-top: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sec-title::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
+
+.kpi-table-wrap { background: var(--white); border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; }
+.kpi-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.kpi-table th {
+  padding: 10px 14px;
+  text-align: left;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  background: var(--page);
+  border-bottom: 1px solid var(--rule);
+  font-weight: 500;
+}
+.kpi-table td { padding: 12px 14px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+.kpi-table tr:last-child td { border-bottom: none; }
+.kpi-table tr:hover td { background: #FAFAFA; }
+
+.grade-pill {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  color: #fff;
+  white-space: nowrap;
+}
+.bg-g1 { background: var(--g1); }
+.bg-g2 { background: var(--g2); }
+.bg-g3 { background: var(--g3); }
+.bg-g4 { background: var(--g4); }
+
+.big-num { font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 600; line-height: 1.2; }
+.big-num-sub { font-size: 11px; color: var(--ink-3); font-family: 'IBM Plex Mono', monospace; }
+
+.rank-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 3px;
+  color: #fff;
+  display: inline-block;
+  min-width: 32px;
+  text-align: center;
+}
+.rb-s { background: var(--green); }
+.rb-a { background: var(--blue); }
+.rb-b { background: var(--yellow); }
+.rb-c { background: var(--orange); }
+.rb-d { background: var(--red); }
+
+.cost-note {
+  background: #FFFBEB;
+  border: 1px solid #FCD34D;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--ink-2);
+  margin-top: 10px;
+}
+
+.bonus-formula {
+  background: var(--ink);
+  color: #fff;
+  border-radius: 8px;
+  padding: 20px 24px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  line-height: 2;
+  margin-bottom: 16px;
+}
+.bonus-formula .comment { color: #6B7280; font-size: 12px; }
+.bonus-formula .highlight { color: #C4B5FD; }
+
+.role-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px; }
+.role-card {
+  background: var(--white);
+  border: 1.5px solid var(--accent);
+  border-radius: 8px;
+  padding: 16px;
+}
+.role-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--accent);
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 3px;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+.role-name { font-size: 14px; font-weight: 900; margin-bottom: 8px; }
+.role-list { font-size: 12px; color: var(--ink-2); line-height: 1.7; padding-left: 16px; }
+.role-list li { margin-bottom: 4px; }
+.role-list strong { color: var(--accent); }
+
+.coef-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+.coef-box { border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; background: var(--white); }
+.coef-head {
+  padding: 10px 14px;
+  background: var(--page);
+  font-size: 12px;
+  font-weight: 700;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.coef-head .coef-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--ink-3);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.coef-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.coef-table td { padding: 8px 14px; border-bottom: 1px dashed var(--rule); }
+.coef-table tr:last-child td { border-bottom: none; }
+.coef-table .coef-range { font-family: 'IBM Plex Mono', monospace; color: var(--ink-2); }
+.coef-table .coef-val { font-family: 'IBM Plex Mono', monospace; font-weight: 700; text-align: right; font-size: 13px; }
+.coef-table .coef-val.boost { color: var(--green); }
+.coef-table .coef-val.mid { color: var(--yellow); }
+.coef-table .coef-val.cut { color: var(--red); }
+
+.examples { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.example { border: 1px solid var(--rule); border-radius: 8px; padding: 14px; background: var(--white); }
+.ex-label {
+  font-size: 11px;
+  color: var(--ink-3);
+  margin-bottom: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.ex-scenario { font-size: 12px; color: var(--ink-2); margin-bottom: 10px; line-height: 1.5; }
+.ex-result { font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 700; margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--rule); }
+.ex-result.pos { color: var(--g4); }
+.ex-result.neg { color: var(--red); }
+.ex-result.mid { color: var(--yellow); }
+
+.timeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.tl-card { background: var(--white); border: 1px solid var(--rule); border-radius: 8px; padding: 16px; }
+.tl-timing {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 8px;
+}
+.tl-action { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+.tl-desc { font-size: 12px; color: var(--ink-2); line-height: 1.6; }
+
+.check-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+.check-card { background: var(--white); border: 1px solid var(--rule); border-radius: 8px; padding: 14px 16px; }
+.check-cat { font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 4px; }
+.check-items { font-size: 12px; color: var(--ink-2); }
+
+.todo-list { background: var(--white); border: 1px solid var(--rule); border-radius: 10px; padding: 18px 22px; }
+.todo-item {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px dashed var(--rule);
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
+.todo-item:last-child { border-bottom: none; }
+.todo-check {
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--ink-3);
+  flex-shrink: 0;
+}
+
+.doc-footer {
+  margin-top: 60px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  color: var(--ink-3);
+}
+
+/* === Auth Gate === */
+#auth-gate {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--page);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+}
+.auth-card {
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 40px 36px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+.auth-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 14px;
+}
+.auth-title { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 8px; line-height: 1.3; }
+.auth-desc { font-size: 12.5px; color: var(--ink-2); margin-bottom: 24px; line-height: 1.6; }
+.auth-form { display: flex; flex-direction: column; gap: 12px; }
+.auth-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid var(--rule);
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  background: var(--white);
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.auth-input:focus { border-color: var(--accent); }
+.auth-button {
+  padding: 12px 14px;
+  border: none;
+  border-radius: 6px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'Noto Sans JP', sans-serif;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.auth-button:hover { background: var(--accent); }
+.auth-button:active { transform: scale(0.98); }
+.auth-error { font-size: 12px; color: var(--red); margin-top: 6px; display: none; }
+.auth-error.show { display: block; }
+.auth-footer {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--ink-3);
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 768px) {
+  .page { padding: 32px 16px 60px; }
+  h1 { font-size: 22px; }
+  .header-top { flex-direction: column; }
+  .doc-meta { text-align: left; }
+  .philosophy { grid-template-columns: 1fr; }
+  .role-grid { grid-template-columns: 1fr; }
+  .coef-grid { grid-template-columns: 1fr; }
+  .examples { grid-template-columns: 1fr 1fr; }
+  .timeline { grid-template-columns: 1fr 1fr; }
+  .check-grid { grid-template-columns: 1fr; }
+
+  .kpi-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .kpi-table { min-width: 640px; }
+  .kpi-table th, .kpi-table td { padding: 10px 8px; font-size: 11.5px; }
+
+  .bonus-formula { font-size: 11.5px; padding: 16px 18px; line-height: 1.9; word-break: break-word; }
+  .big-num { font-size: 15px; }
+  .sec-title { margin-top: 36px; font-size: 9.5px; }
+  .doc-footer { flex-direction: column; gap: 4px; }
+}
+
+@media (max-width: 480px) {
+  .page { padding: 20px 12px 40px; }
+  h1 { font-size: 19px; }
+  .examples { grid-template-columns: 1fr; }
+  .timeline { grid-template-columns: 1fr; }
+  .bonus-formula { font-size: 11px; line-height: 1.8; }
+  .doc-eyebrow { font-size: 9px; }
+  .auth-card { padding: 32px 24px; }
+  .auth-title { font-size: 19px; }
+}
+</style>
+</head>
+<body>
+
+<div id="auth-gate">
+  <div class="auth-card">
+    <div class="auth-eyebrow">LET / マーケティング部 評価制度 v2.0</div>
+    <div class="auth-title">パスワードを入力</div>
+    <div class="auth-desc">
+      この資料は社外秘です。<br>マーケティング部メンバー専用のパスワードを入力してください。
+    </div>
+    <form id="auth-form" class="auth-form" autocomplete="off">
+      <input type="password" id="auth-input" class="auth-input" placeholder="パスワード" autofocus required />
+      <button type="submit" class="auth-button">ログイン</button>
+      <div id="auth-error" class="auth-error">パスワードが違います</div>
+    </form>
+    <div class="auth-footer">CONFIDENTIAL — 株式会社LET</div>
+  </div>
+</div>
+
+<div class="page" id="main-content" style="display:none;">
+
+<header>
+  <div class="header-top">
+    <div>
+      <div class="doc-eyebrow">株式会社LET — 社外秘 / マーケティング部 / チーム評価版・確定</div>
+      <h1>チーム業績 × 個人格付け<br><em>評価制度 v2.0</em></h1>
+    </div>
+    <div class="doc-meta">
+      Ver. 2.0<br>
+      最終更新: 2026-07<br>
+      承認: COO<br>
+      対象: マーケ部 3名チーム
+    </div>
+  </div>
+  <div class="v2-note">
+    本書は <strong>v1.4（個人評価版）を全面改定した確定版</strong>。個人業績評価を廃止し、3名チームによるチーム業績評価へ移行。昇給・昇格・降格のみ個人単位で判定する。
+  </div>
+  <div class="philosophy">
+    <div class="phil-item">
+      <div class="phil-label">ボーナス（業績連動）</div>
+      <div class="phil-val">チーム（3名一律）— 半期累計の実質粗利達成率 × 継続率</div>
+    </div>
+    <div class="phil-item">
+      <div class="phil-label">昇給（査定給 ±）</div>
+      <div class="phil-val">個人 — 総合スコア100点（Section 5）</div>
+    </div>
+    <div class="phil-item">
+      <div class="phil-label">昇格・降格</div>
+      <div class="phil-val">個人 — 定性評価 + 役割遂行 + 審査面談</div>
+    </div>
+  </div>
+</header>
+
+<div class="sec-title">Section 0 — 制度の基本思想</div>
+<div class="bonus-formula">
+  <span class="comment">// 原則</span><br>
+  業績（カネ）は<span class="highlight">チーム</span>で割り、格付け（ヒト）は<span class="highlight">個人</span>で判断する<br><br>
+  <span class="comment">// 個人別の案件粗利は評価に使用しないが、計測は継続する</span><br>
+  <span class="comment">// （昇格・降格審査時の参考資料としてのみ開示）</span>
+</div>
+
+<div class="sec-title">Section 1 — 実質粗利の定義</div>
+<div class="bonus-formula">
+  <span class="highlight">実質粗利</span> = 売上 − （<span class="highlight">広告費</span> + <span class="highlight">交通費</span> + <span class="highlight">外注費</span> + <span class="highlight">その他案件実費</span>）<br><br>
+  <span class="comment">// 社内人件費は差し引かない</span><br>
+  <span class="comment">// 新規/継続、案件タイプの区分なく全案件統一</span>
+</div>
+
+<div class="kpi-table-wrap" style="margin-bottom: 12px;">
+  <table class="kpi-table">
+    <thead>
+      <tr><th style="width:30%">1.1 月額リテーナー型</th><th>計上ルール</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="font-weight:700">毎月計上</td>
+        <td>毎月の請求額から当月実費を差し引き、当月粗利として計上。<br>
+        <span style="color:var(--ink-3);font-size:11.5px">標準案件例: 月額30万円 − 実費12.5万円（広告費9万 + 交通費0.5万 + 外注費3万）= 実質粗利17.5万円（粗利率58%）</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="kpi-table-wrap">
+  <table class="kpi-table">
+    <thead>
+      <tr><th style="width:30%">1.2 コミット型（採用予算前受型）★v2.0新設</th><th>計上ルール</th></tr>
+    </thead>
+    <tbody>
+      <tr><td style="font-weight:700">前受金入金時</td><td>粗利計上しない（預り金）</td></tr>
+      <tr><td style="font-weight:700">運用中の各月</td><td>粗利計上しない（消化実費を管理するのみ）</td></tr>
+      <tr><td style="font-weight:700;color:var(--accent)">採用決定月</td><td><strong>残額（100万 − 累計消化実費）を当月粗利として一括計上</strong></td></tr>
+      <tr><td style="font-weight:700">予算枯渇・失注確定月</td><td>粗利0円で案件クローズ</td></tr>
+      <tr><td style="font-weight:700">2人目の前受受領</td><td>新規案件として同ルールを適用</td></tr>
+    </tbody>
+  </table>
+</div>
+<div class="cost-note">
+  ✦ 構造: 採用1名分の予算100万円を前受けし広告運用で消化 → 採用決定で残額が粗利化。想定案件構成比: <strong>月額型 50% : コミット型 50%</strong>。コミット型の平均決着期間: 6ヶ月以内 / 期待粗利: 約40〜50万円/件（仮置き。実績で更新すること）
+</div>
+
+<div class="sec-title">Section 2 — チーム構成と役割定義</div>
+<div class="cost-note" style="margin-bottom: 12px; margin-top: 0;">
+  ✦ 3名チーム。等級は役割と独立（どの役割からもM4まで昇格可能）。G4マネージャーはチーム外の将来枠。
+</div>
+<div class="role-grid">
+  <div class="role-card">
+    <span class="role-num">Role 01</span>
+    <div class="role-name">① 広告・求人担当<br><span style="font-size:11px;color:var(--ink-3);font-weight:400">ペイド運用</span></div>
+    <ul class="role-list">
+      <li>広告運用（Meta / Indeed / TikTok / LINE 等）、求人媒体運用</li>
+      <li><strong>CPA・ROASの一次責任</strong>（運用実行・入札・配信調整の裁量）</li>
+      <li>コミット型案件の予算消化ペース管理・決着スピード責任</li>
+      <li>運用実績データの③への連携</li>
+    </ul>
+  </div>
+  <div class="role-card">
+    <span class="role-num">Role 02</span>
+    <div class="role-name">② クリエイティブ担当<br><span style="font-size:11px;color:var(--ink-3);font-weight:400">制作 + SNSオーガニック + 撮影品質責任</span></div>
+    <ul class="role-list">
+      <li>広告クリエイティブ・LP・バナー制作</li>
+      <li>SNSアカウントのオーガニック運用・企画</li>
+      <li><strong>撮影計画・ショットリスト作成・素材品質基準の策定</strong></li>
+      <li>大型撮影（企画撮影・動画）の主導</li>
+      <li>③が撮影した素材の検収（品質不足時の撮り直し指示権）</li>
+    </ul>
+  </div>
+  <div class="role-card">
+    <span class="role-num">Role 03</span>
+    <div class="role-name">③ アカウントディレクター<br><span style="font-size:11px;color:var(--ink-3);font-weight:400">窓口 + 分析改善 + 撮影実行</span></div>
+    <ul class="role-list">
+      <li>クライアント窓口、レポーティング、進行管理</li>
+      <li><strong>継続率のオーナー</strong>（月額型案件の解約防止責任）</li>
+      <li>データ分析、改善提案の作成と顧客合意の取得</li>
+      <li>コミット型案件の進捗報告・期待値調整</li>
+      <li><strong>訪問時の撮影実行</strong>（②のショットリストに準拠。クリエイティブ判断は持たない）</li>
+      <li>大型撮影時の現場調整（日程・クライアント側手配）</li>
+    </ul>
+  </div>
+</div>
+<div class="cost-note">
+  ✦ <strong>撮影の運用ルール</strong>: 撮影実務=③ / 企画・品質責任=②。撮り直し指示は ②→③ へ<strong>ショットリスト修正版として Notion 書面で出す（口頭指示不可）</strong>。修正履歴は役割遂行評価の判定材料として保存する。
+</div>
+
+<div class="sec-title">Section 3 — 等級・賃金テーブル</div>
+<div class="bonus-formula">
+  <span class="comment">// 賃金構造（2階建て）</span><br>
+  月給 = <span class="highlight">等級給</span>（等級で決まる） + <span class="highlight">査定給</span>（半期評価の累積、−1万〜+3万）
+</div>
+<div class="kpi-table-wrap">
+  <table class="kpi-table">
+    <thead>
+      <tr>
+        <th>等級</th>
+        <th>等級給（支給額）</th>
+        <th>内訳（基本給+固定残業代）</th>
+        <th>試算額（社保込）</th>
+        <th>個人KPI責任額（月次）</th>
+        <th>月給レンジ</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="grade-pill bg-g1">M1</span><div style="font-size:11px;color:var(--ink-3);margin-top:4px">アソシエイト</div></td>
+        <td><span class="big-num" style="color:var(--g1)">¥250,000</span></td>
+        <td class="mono">¥210,000 + ¥40,000</td>
+        <td class="mono">¥300,000</td>
+        <td><span class="big-num" style="color:var(--g1)">75万円</span><div class="big-num-sub">倍率2.5</div></td>
+        <td class="mono">¥240,000〜¥280,000</td>
+      </tr>
+      <tr>
+        <td><span class="grade-pill bg-g2">M2</span><div style="font-size:11px;color:var(--ink-3);margin-top:4px">ディレクター</div></td>
+        <td><span class="big-num" style="color:var(--g2)">¥300,000</span></td>
+        <td class="mono">¥252,000 + ¥48,000</td>
+        <td class="mono">¥350,000</td>
+        <td><span class="big-num" style="color:var(--g2)">105万円</span><div class="big-num-sub">倍率3.0</div></td>
+        <td class="mono">¥290,000〜¥330,000</td>
+      </tr>
+      <tr>
+        <td><span class="grade-pill bg-g3">M3</span><div style="font-size:11px;color:var(--ink-3);margin-top:4px">シニアディレクター</div></td>
+        <td><span class="big-num" style="color:var(--g3)">¥380,000</span></td>
+        <td class="mono">¥319,000 + ¥61,000</td>
+        <td class="mono">¥430,000</td>
+        <td><span class="big-num" style="color:var(--g3)">150万円</span><div class="big-num-sub">倍率3.5</div></td>
+        <td class="mono">¥370,000〜¥410,000</td>
+      </tr>
+      <tr>
+        <td><span class="grade-pill bg-g4">M4</span><div style="font-size:11px;color:var(--ink-3);margin-top:4px">リードディレクター</div></td>
+        <td><span class="big-num" style="color:var(--g4)">¥450,000</span></td>
+        <td class="mono">¥378,000 + ¥72,000</td>
+        <td class="mono">¥500,000</td>
+        <td><span class="big-num" style="color:var(--g4)">200万円</span><div class="big-num-sub">倍率4.0</div></td>
+        <td class="mono">¥440,000〜¥480,000</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="cost-note">
+  ✦ 全員 <strong>M1スタート</strong>（同率）。基本給:固定残業代 = <strong>84:16</strong> の比率で全等級比例配分（M1 = 21万+4万 基準）。固定残業代は約26時間分相当（就業規則への明記と時間単価の適法性は労務確認済みであること）。KPI責任額 = 試算額 × 人件費倍率。等級間で月給レンジは重ならない（M1上限28万 &lt; M2下限29万）。
+</div>
+
+<div class="sec-title">Section 4 — チーム目標</div>
+<div class="kpi-table-wrap" style="margin-bottom: 12px;">
+  <table class="kpi-table">
+    <thead>
+      <tr><th>期間</th><th>月次目標</th><th>半期目標</th><th>備考</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="font-weight:700">初年度上期（助走期間）</td>
+        <td><span class="big-num" style="color:var(--accent)">180万円</span></td>
+        <td><span class="big-num" style="color:var(--accent)">1,080万円</span></td>
+        <td>立ち上げ配慮の一度限りの特例</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700">初年度下期以降（M1×3の場合）</td>
+        <td><span class="big-num" style="color:var(--accent)">225万円</span></td>
+        <td><span class="big-num" style="color:var(--accent)">1,350万円</span></td>
+        <td>標準倍率2.5適用</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="cost-note" style="margin-bottom: 16px;">
+  ✦ 目標は在籍者のKPI責任額の合算。昇格者が出た場合、翌期からチーム目標を自動増額（例: 1名M2昇格 → 225万→255万/月）。目標分解イメージ（225万・構成比50:50）: 月額型112.5万 ≒ 6.5社 / コミット型112.5万 ≒ 並走13〜14件（決着ペース月2.2件）
+</div>
+
+<div class="coef-grid">
+  <div class="coef-box">
+    <div class="coef-head">
+      <span>半期達成率ランク ★月次ランク判定は廃止</span>
+      <span class="coef-tag">Semi-Annual</span>
+    </div>
+    <table class="coef-table">
+      <tr><td class="coef-range"><span class="rank-badge rb-s">S</span></td><td class="coef-val boost">150%以上</td></tr>
+      <tr><td class="coef-range"><span class="rank-badge rb-a">A</span></td><td class="coef-val boost">125〜150%未満</td></tr>
+      <tr><td class="coef-range"><span class="rank-badge rb-b">B</span> ✦必達</td><td class="coef-val mid">100〜125%未満</td></tr>
+      <tr><td class="coef-range"><span class="rank-badge rb-c">C</span></td><td class="coef-val cut">70〜100%未満</td></tr>
+      <tr><td class="coef-range"><span class="rank-badge rb-d">D</span></td><td class="coef-val cut">70%未満</td></tr>
+    </table>
+  </div>
+  <div class="coef-box">
+    <div class="coef-head">
+      <span>欠員・増員時の目標修正</span>
+      <span class="coef-tag">Adjustment</span>
+    </div>
+    <table class="coef-table">
+      <tr><td class="coef-range">欠員</td><td style="font-size:12px;text-align:right">発生月は目標維持 → <strong>翌月から</strong>在籍者合算に自動修正</td></tr>
+      <tr><td class="coef-range">増員</td><td style="font-size:12px;text-align:right">入社翌月から加算 / <strong>3ヶ月間は50%換算</strong>（育成猶予）</td></tr>
+      <tr><td class="coef-range">再計算</td><td style="font-size:12px;text-align:right">ランク帯・半期目標も同比率で再計算</td></tr>
+    </table>
+  </div>
+</div>
+<div class="bonus-formula">
+  <span class="highlight">半期達成率</span> = 半期累計実質粗利 ÷ 半期目標
+</div>
+
+<div class="sec-title">Section 5 — 総合評価スコア（100点・個人別）</div>
+<div class="kpi-table-wrap" style="margin-bottom: 16px;">
+  <table class="kpi-table">
+    <thead>
+      <tr><th>区分</th><th>配点</th><th>判定単位</th><th>内容</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="font-weight:700">チーム定量評価</td>
+        <td><span class="big-num" style="color:var(--accent)">50点</span></td>
+        <td>チーム共通（3名同一点）</td>
+        <td>半期達成率ランクで換算</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700">定性評価</td>
+        <td><span class="big-num" style="color:var(--accent)">40点</span></td>
+        <td>個人</td>
+        <td>20問チェックリスト（Section 9）</td>
+      </tr>
+      <tr>
+        <td style="font-weight:700">役割遂行評価</td>
+        <td><span class="big-num" style="color:var(--accent)">10点</span></td>
+        <td>個人</td>
+        <td>役割別観点でマネージャー評定</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="coef-grid">
+  <div class="coef-box">
+    <div class="coef-head">
+      <span>5.1 チーム定量評価の換算</span>
+      <span class="coef-tag">Team Score</span>
+    </div>
+    <table class="coef-table">
+      <tr><td class="coef-range"><span class="rank-badge rb-s">S</span></td><td class="coef-val boost">50点</td></tr>
+      <tr><td class="coef-range"><span class="rank-badge rb-a">A</span></td><td class="coef-val boost">45点</td></tr>
+      <tr><td class="coef-range"><span class="rank-badge rb-b">B</span></td><td class="coef-val mid">40点</td></tr>
+      <tr><td class="coef-range"><span class="rank-badge rb-c">C</span></td><td class="coef-val cut">20点</td></tr>
+      <tr><td class="coef-range"><span class="rank-badge rb-d">D</span></td><td class="coef-val cut">0点</td></tr>
+    </table>
+  </div>
+  <div class="coef-box">
+    <div class="coef-head">
+      <span>5.2 役割遂行評価（10点）の観点</span>
+      <span class="coef-tag">Role Score</span>
+    </div>
+    <table class="coef-table">
+      <tr><td class="coef-range">① 広告・求人</td><td style="font-size:11.5px;text-align:right">運用精度 / 予算消化管理 / CPA目標達成 / 決着スピード / 入稿スピード</td></tr>
+      <tr><td class="coef-range">② クリエイティブ</td><td style="font-size:11.5px;text-align:right">制作量と品質 / SNS成長指標 / 納期遵守 / ショットリストの的確さ / 検収基準運用</td></tr>
+      <tr><td class="coef-range">③ アカウントD</td><td style="font-size:11.5px;text-align:right">継続率 / レポート品質 / 改善提案実行率 / ショットリスト充足率 / 期待値調整</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="sec-title">Section 6 — 昇給・昇格・降格（個人）</div>
+<div class="kpi-table-wrap" style="margin-bottom: 12px;">
+  <table class="kpi-table">
+    <thead>
+      <tr><th>評価</th><th>スコア</th><th>査定給</th><th>等級への影響</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="rank-badge rb-a" style="font-size:13px;padding:3px 10px">A</span></td>
+        <td class="mono" style="font-weight:700;color:var(--green)">80点以上</td>
+        <td class="mono" style="font-weight:700;color:var(--green)">+10,000円/月</td>
+        <td>昇格候補にリストアップ</td>
+      </tr>
+      <tr>
+        <td><span class="rank-badge rb-b" style="font-size:13px;padding:3px 10px">B</span></td>
+        <td class="mono" style="font-weight:700;color:var(--yellow)">60〜79点</td>
+        <td class="mono">±0円</td>
+        <td>現等級を維持</td>
+      </tr>
+      <tr>
+        <td><span class="rank-badge rb-c" style="font-size:13px;padding:3px 10px">C</span></td>
+        <td class="mono" style="font-weight:700;color:var(--red)">60点未満</td>
+        <td class="mono" style="font-weight:700;color:var(--red)">−5,000円/月</td>
+        <td>（降格は6.3の条件のみで判定）</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="cost-note" style="margin-bottom: 16px;">
+  ✦ <strong>査定給の上限・下限</strong>: 上限 <strong>+30,000円</strong>（到達後のA評価は昇給せず昇格審査への加点のみ）／ 下限 <strong>−10,000円</strong>で打ち止め（以降のC評価は降格審査で対応）
+</div>
+<div class="bonus-formula">
+  <span class="comment">// 昇格ルール</span><br>
+  条件: <span class="highlight">A評価2期連続 + 昇格面談通過</span> → 翌期から等級改定<br>
+  ・昇格時、査定給はリセットし新等級給からスタート<br>
+  ・査定給上限+3万の設計により、昇格は常に実質プラス（最小でも+2万円）<br>
+  ・昇格に伴いチーム目標が自動増額 → 本人の実力とチームの受容力の両面で判断<br><br>
+  <span class="comment">// 降格ルール</span><br>
+  審査条件: <span class="highlight">個人評価50点（定性40+役割10）中25点未満が2期連続</span>の場合のみ<br>
+  ・チーム定量不振（達成率C/D）を理由とする降格は行わない<br>
+  ・原則: <span class="highlight">チームが負けても個人は降格しない。役割を果たさない個人は、チームが勝っていても審査対象</span>
+</div>
+
+<div class="sec-title">Section 7 — 半期ボーナス（チーム完全一律）</div>
+<div class="bonus-formula">
+  <span class="comment">// 計算式</span><br>
+  ボーナス = <span class="highlight">基準額</span> × <span class="highlight">チーム達成率係数</span> × <span class="highlight">継続率係数</span><br><br>
+  <span class="comment">// 基準額 = 各自の等級給のうち基本給部分 × 1ヶ月分（固定残業代・査定給は含まない）</span><br>
+  M1 : <span class="highlight">¥210,000</span> ／ M2 : <span class="highlight">¥252,000</span> ／ M3 : <span class="highlight">¥319,000</span> ／ M4 : <span class="highlight">¥378,000</span><br><br>
+  <span class="comment">// 個人係数なし。同一等級間では完全同額</span>
+</div>
+
+<div class="coef-grid">
+  <div class="coef-box">
+    <div class="coef-head">
+      <span>チーム達成率係数（半期達成率をそのまま適用）</span>
+      <span class="coef-tag">Team</span>
+    </div>
+    <table class="coef-table">
+      <tr><td class="coef-range">130% 以上</td><td class="coef-val boost">達成率そのまま（上限 ×1.50）</td></tr>
+      <tr><td class="coef-range">100 〜 129%</td><td class="coef-val boost">× 1.00 〜 1.29</td></tr>
+      <tr><td class="coef-range">80 〜 99%</td><td class="coef-val mid">× 0.80 〜 0.99</td></tr>
+      <tr><td class="coef-range">60 〜 79%</td><td class="coef-val cut">× 0.60 〜 0.79</td></tr>
+      <tr><td class="coef-range">60% 未満</td><td class="coef-val cut">× 0.30 〜 0.59</td></tr>
+    </table>
+  </div>
+  <div class="coef-box">
+    <div class="coef-head">
+      <span>継続率係数（分母は月額リテーナー型のみ）</span>
+      <span class="coef-tag">Retention</span>
+    </div>
+    <table class="coef-table">
+      <tr><td class="coef-range">100%</td><td class="coef-val boost">× 1.00</td></tr>
+      <tr><td class="coef-range">95%</td><td class="coef-val boost">× 0.95</td></tr>
+      <tr><td class="coef-range">90%</td><td class="coef-val mid">× 0.90</td></tr>
+      <tr><td class="coef-range">85%</td><td class="coef-val mid">× 0.85</td></tr>
+      <tr><td class="coef-range">80%</td><td class="coef-val mid">× 0.80</td></tr>
+      <tr><td class="coef-range">80% 未満</td><td class="coef-val cut">継続率 ÷ 100（連続的）</td></tr>
+    </table>
+  </div>
+</div>
+<div class="cost-note" style="margin-bottom: 16px;">
+  ✦ コミット型の正常終了（採用決定・予算枯渇クローズ）は解約に含めない。
+</div>
+
+<div class="examples">
+  <div class="example">
+    <div class="ex-label">Ex01 — 標準達成</div>
+    <div class="ex-scenario">半期達成率100%<br>継続率100%</div>
+    <div class="ex-result pos">¥210,000</div>
+  </div>
+  <div class="example">
+    <div class="ex-label">Ex02 — ブースト</div>
+    <div class="ex-scenario">半期達成率125%<br>継続率100%</div>
+    <div class="ex-result pos">¥262,500</div>
+  </div>
+  <div class="example">
+    <div class="ex-label">Ex03 — 未達</div>
+    <div class="ex-scenario">半期達成率85%<br>継続率90%</div>
+    <div class="ex-result mid">¥160,650</div>
+  </div>
+  <div class="example">
+    <div class="ex-label">Ex04 — 大幅未達</div>
+    <div class="ex-scenario">半期達成率55%<br>継続率85%</div>
+    <div class="ex-result neg">¥98,175</div>
+  </div>
+</div>
+<div class="cost-note" style="margin-top: 12px;">
+  ✦ シミュレーションは M1（基準額 ¥210,000）の1人あたり支給額。
+</div>
+
+<div class="sec-title">Section 8 — 評価サイクル</div>
+<div class="timeline">
+  <div class="tl-card">
+    <div class="tl-timing">毎月末</div>
+    <div class="tl-action">パイプラインレビュー</div>
+    <div class="tl-desc">ランク判定の場ではない。半期累計進捗・コミット型パイプライン・解約予兆を確認 + マネージャー1on1（30分）。</div>
+  </div>
+  <div class="tl-card">
+    <div class="tl-timing">隔週</div>
+    <div class="tl-action">ナレッジ共有会</div>
+    <div class="tl-desc">AI活用事例・運用TIPS・失敗事例の共有。定性評価（Section 9）の判定材料。</div>
+  </div>
+  <div class="tl-card">
+    <div class="tl-timing">6ヶ月ごと</div>
+    <div class="tl-action">半期評価</div>
+    <div class="tl-desc">スコア確定・ボーナス支給・査定給改定・昇格/降格審査を一括実施。</div>
+  </div>
+  <div class="tl-card">
+    <div class="tl-timing">年1回</div>
+    <div class="tl-action">キャリア面談</div>
+    <div class="tl-desc">役割ローテーション・専門深化・M4/マネジメント志向の確認。</div>
+  </div>
+</div>
+<div class="cost-note" style="margin-top: 12px;">
+  ✦ <strong>月次パイプラインレビュー必須項目</strong>: ①半期累計粗利の進捗率（3ヶ月経過で累計40%未満なら警告） ②コミット型パイプライン表（進行中件数/予算消化率/決着見込み月 — <strong>消化率70%超で未決着は「粗利消失リスク案件」として個別対策発動</strong>） ③月額型の継続状況・解約予兆<br>
+  ✦ <strong>事業側トリガー</strong>: チーム達成率がCランク帯（70%未満）で2四半期継続 → 案件ポートフォリオ（受注基準・案件ミックス）の見直しを実施
+</div>
+
+<div class="sec-title">Section 9 — 定性評価チェックリスト（20問・5段階採点）</div>
+<div class="cost-note" style="margin-top: 0; margin-bottom: 12px;">
+  ✦ 5カテゴリ × 4問 = 20問。素点100点 × 0.4 = <strong>40点満点</strong>に換算。v1.4から変更なし。
+</div>
+<div class="check-grid">
+  <div class="check-card">
+    <div class="check-cat">A: 自走力・問題解決力（4問）</div>
+    <div class="check-items">課題発見 / 判断実行 / トラブル対処 / 学習行動</div>
+  </div>
+  <div class="check-card">
+    <div class="check-cat">B: 顧客対応・関係構築（4問）</div>
+    <div class="check-items">ヒアリング力 / 信頼構築 / 期待超え / CS姿勢</div>
+  </div>
+  <div class="check-card">
+    <div class="check-cat">C: チーム貢献・ナレッジ共有（4問）</div>
+    <div class="check-items">共有量 / 後輩サポート / 協力 / AI効率化共有</div>
+  </div>
+  <div class="check-card">
+    <div class="check-cat">D: 業務品質・効率化（4問）</div>
+    <div class="check-items">品質 / 仕組み化思考 / コスト意識 / 納期遵守</div>
+  </div>
+  <div class="check-card">
+    <div class="check-cat">E: プロフェッショナリズム・成長（4問）</div>
+    <div class="check-items">専門性 / 報連相 / キャリア意識 / 理念共感</div>
+  </div>
+</div>
+
+<div class="sec-title">Section 10 — 会社側収支シミュレーション（参考・半期）</div>
+<div class="cost-note" style="margin-top: 0; margin-bottom: 12px;">
+  ✦ 前提: M1×3名 / 人件費 = 試算額30万×3名×6ヶ月 = 540万 / ボーナス社保 ≒ 15%。チーム3名分のみ（G4人件費・ツール費・間接費は含まない）。
+</div>
+<div class="kpi-table-wrap" style="margin-bottom: 12px;">
+  <table class="kpi-table">
+    <thead>
+      <tr><th>10.1 初年度上期（目標1,080万）</th><th>標準100%</th><th>ブースト125%</th><th>未達85%</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>実質粗利</td><td class="mono">1,080万</td><td class="mono">1,350万</td><td class="mono">918万</td></tr>
+      <tr><td>人件費</td><td class="mono" style="color:var(--red)">▲540万</td><td class="mono" style="color:var(--red)">▲540万</td><td class="mono" style="color:var(--red)">▲540万</td></tr>
+      <tr><td>ボーナス（継続率100%/100%/90%）</td><td class="mono" style="color:var(--red)">▲63.0万</td><td class="mono" style="color:var(--red)">▲78.8万</td><td class="mono" style="color:var(--red)">▲48.2万</td></tr>
+      <tr><td>ボーナス社保</td><td class="mono" style="color:var(--red)">▲9.5万</td><td class="mono" style="color:var(--red)">▲11.8万</td><td class="mono" style="color:var(--red)">▲7.2万</td></tr>
+      <tr>
+        <td style="font-weight:900">チーム貢献利益</td>
+        <td><span class="big-num" style="color:var(--accent)">約468万</span></td>
+        <td><span class="big-num" style="color:var(--accent)">約720万</span></td>
+        <td><span class="big-num" style="color:var(--accent)">約323万</span></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="kpi-table-wrap" style="margin-bottom: 12px;">
+  <table class="kpi-table">
+    <thead>
+      <tr><th>10.2 下期以降（目標1,350万）</th><th>標準100%</th><th>ブースト125%</th><th>未達85%</th><th>大幅未達55%</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>実質粗利</td><td class="mono">1,350万</td><td class="mono">1,688万</td><td class="mono">1,148万</td><td class="mono">743万</td></tr>
+      <tr><td>人件費</td><td class="mono" style="color:var(--red)">▲540万</td><td class="mono" style="color:var(--red)">▲540万</td><td class="mono" style="color:var(--red)">▲540万</td><td class="mono" style="color:var(--red)">▲540万</td></tr>
+      <tr><td>ボーナス関連（社保込）</td><td class="mono" style="color:var(--red)">▲72.5万</td><td class="mono" style="color:var(--red)">▲90.6万</td><td class="mono" style="color:var(--red)">▲55.4万</td><td class="mono" style="color:var(--red)">▲33.9万</td></tr>
+      <tr>
+        <td style="font-weight:900">チーム貢献利益</td>
+        <td><span class="big-num" style="color:var(--accent)">約738万</span></td>
+        <td><span class="big-num" style="color:var(--accent)">約1,057万</span></td>
+        <td><span class="big-num" style="color:var(--accent)">約552万</span></td>
+        <td><span class="big-num" style="color:var(--accent)">約169万</span></td>
+      </tr>
+      <tr><td>粗利対利益率</td><td class="mono">54.6%</td><td class="mono">62.6%</td><td class="mono">48.1%</td><td class="mono">22.7%</td></tr>
+    </tbody>
+  </table>
+</div>
+<div class="cost-note">
+  ✦ 損益分岐（チーム単体）: 達成率約45%（月次約101万円）。査定給満額時の追加コスト: 月+9万（3名×3万）。昇格時は目標増分（+30万/月〜）がコスト増分を大幅に上回るため、利益構造は昇格のたびに改善する。
+</div>
+
+<div class="sec-title">Section 11 — v1.4からの主要変更点一覧</div>
+<div class="kpi-table-wrap">
+  <table class="kpi-table">
+    <thead>
+      <tr><th>項目</th><th>v1.4</th><th>v2.0</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>業績評価単位</td><td>個人（G1〜G4別KPI）</td><td style="font-weight:700;color:var(--accent)">チーム（3名合算）</td></tr>
+      <tr><td>等級</td><td>G1〜G4（KPI逆転あり）</td><td style="font-weight:700;color:var(--accent)">M1〜M4（倍率2.5→4.0で単調増加）</td></tr>
+      <tr><td>スタート給与</td><td>等級別</td><td style="font-weight:700;color:var(--accent)">全員M1・25万円（21万+4万）</td></tr>
+      <tr><td>定量判定</td><td>月次ランクの半期平均</td><td style="font-weight:700;color:var(--accent)">半期累計達成率で一発判定</td></tr>
+      <tr><td>ボーナス個人係数</td><td>あり</td><td style="font-weight:700;color:var(--accent)">廃止（完全一律）</td></tr>
+      <tr><td>ボーナス基準額</td><td>月給1ヶ月</td><td style="font-weight:700;color:var(--accent)">基本給部分1ヶ月（固定残業・査定給除外）</td></tr>
+      <tr><td>昇給</td><td>±1万/−5千（無制限累積）</td><td style="font-weight:700;color:var(--accent)">査定給として上限+3万/下限−1万</td></tr>
+      <tr><td>降格審査</td><td>スコアC×2期</td><td style="font-weight:700;color:var(--accent)">個人50点中25点未満×2期のみ（チーム不振では降格しない）</td></tr>
+      <tr><td>コミット型計上</td><td>未定義</td><td style="font-weight:700;color:var(--accent)">採用決定月に残額一括計上</td></tr>
+      <tr><td>継続率の分母</td><td>全案件</td><td style="font-weight:700;color:var(--accent)">月額型のみ</td></tr>
+      <tr><td>月次レビュー</td><td>ランク判定</td><td style="font-weight:700;color:var(--accent)">パイプライン管理</td></tr>
+      <tr><td>撮影分担</td><td>未定義</td><td style="font-weight:700;color:var(--accent)">実務③ / 品質責任②</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="sec-title">Section 12 — 未確定・運用開始までのTODO</div>
+<div class="todo-list">
+  <div class="todo-item"><span class="todo-check">[ ]</span>3名の実アサイン（誰を①②③に置くか）</div>
+  <div class="todo-item"><span class="todo-check">[ ]</span>コミット型の平均消化額の実績検証（仮置き50万の更新）</div>
+  <div class="todo-item"><span class="todo-check">[ ]</span>固定残業代の時間単価・就業規則記載の労務確認</div>
+  <div class="todo-item"><span class="todo-check">[ ]</span>定性チェックリスト20問の設問文の最終化</div>
+  <div class="todo-item"><span class="todo-check">[ ]</span>昇格面談の実施要領（面談者・評価シート）</div>
+  <div class="todo-item"><span class="todo-check">[ ]</span>Notion上のパイプライン管理表・撮影ショットリストのテンプレート整備</div>
+  <div class="todo-item"><span class="todo-check">[ ]</span>G4ポジション設置時の評価設計（チーム達成率＝本人定量評価とする方針のみ確定済み）</div>
+  <div class="todo-item"><span class="todo-check">[ ]</span>降格規定（M3→M2等の月5万円減となる不利益変更に耐える就業規則の規程整備）</div>
+  <div class="todo-item"><span class="todo-check">[ ]</span>査定給の減額規定（−5,000円）の就業規則への明記</div>
+  <div class="todo-item"><span class="todo-check">[ ]</span>賞与の変動支給条項（最低24%まで下がりうる設計）の就業規則への明記</div>
+</div>
+
+<div class="sec-title">Section 13 — 実績パフォーマンス（Google Drive連携・2026-08-03時点）</div>
+<div class="cost-note" style="margin-bottom: 12px;">
+  ✦ Google Drive上の契約書・クライアント別管理シートから2026-08-03時点でセッション内取得した実データ。<strong>自動更新ではなく都度手動反映</strong>。全23クライアント中、契約金額・実績が確認できたのは10社のみで、残りはデータ未整備または記載が確認できず「不明」としている（詳細は下表）。広告費・利益は取得できた期間がクライアントごとに異なるため、担当者集計には合算していない（個別行を参照）。
+</div>
+<div class="kpi-table-wrap" style="margin-bottom: 16px;">
+  <table class="kpi-table">
+    <thead>
+      <tr><th>担当者</th><th>確定データ社数/担当社数</th><th>月間予算合計（確定分）</th><th>平均継続月数（確定分）</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>松本</td><td>6 / 11社</td><td class="mono">¥3,121,000</td><td class="mono">約6.8ヶ月</td></tr>
+      <tr><td>松岡</td><td>4 / 12社</td><td class="mono">¥1,105,000</td><td class="mono">約13.4ヶ月（清一建設は開始日不明のため除く3社平均）</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="cost-note" style="margin-bottom: 8px; margin-top: 0;">クライアント別内訳 — 松本担当（11社）</div>
+<div class="kpi-table-wrap" style="margin-bottom: 16px;">
+  <table class="kpi-table">
+    <thead>
+      <tr><th>クライアント</th><th>契約開始</th><th>月額予算</th><th>状況</th><th>広告費（参考・期間は個別）</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>柄谷工務店</td><td>2026/4/15</td><td class="mono">¥300,000</td><td>継続中</td><td class="mono">¥0（準備・企画段階）</td></tr>
+      <tr><td>セントラルフルーツ（八百一）</td><td>2026/4/1</td><td class="mono">¥300,000</td><td>継続中</td><td class="mono">累計¥46,518</td></tr>
+      <tr><td>株式会社弘陽電設</td><td>2025/12/1</td><td class="mono">¥300,000（延長後）</td><td>継続中（延長）</td><td class="mono">累計¥68,564</td></tr>
+      <tr><td>株式会社タキオンワタナベ</td><td>2025/10/1</td><td class="mono">¥200,000</td><td>契約終了（2026/3/31満了）</td><td class="mono">累計¥48,773</td></tr>
+      <tr><td>ビッグ測量設計株式会社</td><td>2026/4/1</td><td class="mono">¥275,000</td><td>継続中</td><td class="mono">累計¥4,888</td></tr>
+      <tr><td>Reve Career Agency株式会社</td><td>2025/5〜6月</td><td class="mono">約¥1,746,000（2アカウント合算・要確認）</td><td>継続中と推測</td><td class="mono">黒崎社長分累計¥72,895</td></tr>
+      <tr><td>新日本住設株式会社</td><td>不明</td><td>データ未整備</td><td>不明</td><td>—</td></tr>
+      <tr><td>株式会社オンテックス</td><td>不明</td><td>データ未整備</td><td>不明</td><td class="mono">累計¥0</td></tr>
+      <tr><td>クロムス</td><td>不明</td><td>データ未整備</td><td>不明</td><td>—</td></tr>
+      <tr><td>アルファガード株式会社</td><td>2025/10/1</td><td>データ未整備</td><td>継続中と推測</td><td class="mono">累計¥82,852</td></tr>
+      <tr><td>tetote</td><td>不明</td><td>データ未整備</td><td>不明</td><td class="mono">累計¥1,588</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="cost-note" style="margin-bottom: 8px; margin-top: 0;">クライアント別内訳 — 松岡担当（12社）</div>
+<div class="kpi-table-wrap" style="margin-bottom: 12px;">
+  <table class="kpi-table">
+    <thead>
+      <tr><th>クライアント</th><th>契約開始</th><th>月額予算</th><th>状況</th><th>広告費・原価（参考・期間は個別）</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>株式会社清一建設</td><td>不明（契約6ヶ月）</td><td class="mono">¥210,000</td><td>継続中と推定</td><td class="mono">累計¥25,800（2026年1-3月分）</td></tr>
+      <tr><td>翔星建設株式会社</td><td>2025/9/1</td><td class="mono">¥295,000（増額後）</td><td>継続中（2026/8末満了予定）</td><td class="mono">原価150,000/月</td></tr>
+      <tr><td>株式会社cantera</td><td>2024/8/1</td><td class="mono">¥300,000</td><td>継続中（名目終了日超過も実態継続）</td><td class="mono">Airwork広告累計¥470,703（25/12-26/6）</td></tr>
+      <tr><td>株式会社桝本レッカー</td><td>2026/3/1（新契約）</td><td class="mono">¥300,000</td><td>継続中（2026/8末満了予定）</td><td class="mono">原価160,000/月</td></tr>
+      <tr><td>株式会社宮村建設</td><td>2025/5/1</td><td>データ未整備</td><td>SNS運用契約は終了（2025/11末）</td><td>—</td></tr>
+      <tr><td>株式会社TECNES</td><td>不明</td><td>データ未整備</td><td>不明（管理シートに他社データ混入を検出・要修正）</td><td>—</td></tr>
+      <tr><td>エスコプロモーション株式会社</td><td>不明</td><td>データ未整備</td><td>不明（数値不整合あり）</td><td>—</td></tr>
+      <tr><td>ゼロワットパワー株式会社</td><td>不明</td><td>データ未整備</td><td>不明（SNS運用の契約・実績データなし）</td><td>—</td></tr>
+      <tr><td>株式会社ビック測量</td><td>不明</td><td>データ未整備</td><td>不明</td><td>—</td></tr>
+      <tr><td>モデルノ（株式会社クルマクション）</td><td>不明</td><td>データ未整備</td><td>不明（提案段階、契約締結証跡なし）</td><td>—</td></tr>
+      <tr><td>株式会社ナワショウ</td><td>2026/3頃</td><td>データ未整備</td><td>継続中と推測</td><td>—</td></tr>
+      <tr><td>豊和開発株式会社</td><td>不明</td><td>データ未整備</td><td>不明（資料未検出）</td><td>—</td></tr>
+    </tbody>
+  </table>
+</div>
+<div class="cost-note">
+  ✦ 本セクションはGoogle Drive手動取得によるスナップショットで自動更新されない。次回更新時はClaudeに再取得を依頼すること。データ未整備のクライアントは担当者への確認が必要（HANDOVER.md参照）。
+</div>
+
+<div class="doc-footer">
+  <span>株式会社LET ／ 人事部</span>
+  <span>CONFIDENTIAL — 社内限定資料 ／ Ver 2.0 ／ 2026-07 ／ 承認: COO</span>
+</div>
+
+</div>
+
+<script>
+(function() {
+  const PASS_HASH = "06d54e2513a16422a07ef460dd6b5c4c4b42d770b78527653e654ea10774572e";
+  const STORAGE_KEY = "let_auth_marketing";
+
+  async function sha256(text) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  function show() {
+    document.getElementById('auth-gate').style.display = 'none';
+    document.getElementById('main-content').style.display = '';
+  }
+
+  if (sessionStorage.getItem(STORAGE_KEY) === '1') {
+    show();
+  }
+
+  document.getElementById('auth-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const input = document.getElementById('auth-input').value;
+    const hash = await sha256(input);
+    const errEl = document.getElementById('auth-error');
+    if (hash === PASS_HASH) {
+      sessionStorage.setItem(STORAGE_KEY, '1');
+      show();
+    } else {
+      errEl.classList.add('show');
+      document.getElementById('auth-input').value = '';
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
