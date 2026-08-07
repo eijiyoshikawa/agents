@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <base target="_top">
+  <style>
+    :root {
+      --ink: #1a1a1a; --sub: #6b6b6b; --line: #e3e0da; --bg: #faf9f6;
+      --brand: #1f6feb; --ok-bg: #eef7ee; --ok-line: #bfe3bf;
+      --err-bg: #fdf0ef; --err-line: #f2c4c0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", Meiryo, sans-serif;
+      background: var(--bg); color: var(--ink); line-height: 1.7;
+      display: flex; justify-content: center; padding: 48px 16px;
+    }
+    .card {
+      width: 100%; max-width: 620px; background: #fff;
+      border: 1px solid var(--line); border-radius: 12px; padding: 36px 32px;
+    }
+    h1 { font-size: 1.25rem; margin-bottom: 4px; }
+    .lead { color: var(--sub); font-size: .85rem; margin-bottom: 24px; }
+    label { display: block; font-size: .8rem; font-weight: 600; margin-bottom: 6px; }
+    input[type=text] {
+      width: 100%; padding: 12px 14px; font-size: .95rem;
+      border: 1px solid var(--line); border-radius: 8px; background: var(--bg);
+    }
+    input[type=text]:focus { outline: 2px solid var(--brand); background: #fff; }
+    .hint { font-size: .75rem; color: var(--sub); margin-top: 6px; }
+    button {
+      margin-top: 20px; width: 100%; padding: 13px; font-size: .95rem; font-weight: 600;
+      color: #fff; background: var(--ink); border: none; border-radius: 8px; cursor: pointer;
+      transition: opacity .2s;
+    }
+    button:hover { opacity: .85; }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    .status { margin-top: 20px; padding: 14px 16px; border-radius: 8px; font-size: .88rem; display: none; }
+    .status.running { display: block; background: var(--bg); border: 1px solid var(--line); }
+    .status.ok { display: block; background: var(--ok-bg); border: 1px solid var(--ok-line); }
+    .status.err { display: block; background: var(--err-bg); border: 1px solid var(--err-line); }
+    .status a { color: var(--brand); font-weight: 600; word-break: break-all; }
+    .mode { font-size: .78rem; color: var(--sub); margin-top: 6px; }
+    .spinner {
+      display: inline-block; width: 14px; height: 14px; margin-right: 8px;
+      border: 2px solid var(--line); border-top-color: var(--ink); border-radius: 50%;
+      animation: spin .8s linear infinite; vertical-align: -2px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+    ol.steps { margin: 24px 0 0 1.2em; font-size: .78rem; color: var(--sub); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>SNS分析レポート生成</h1>
+    <p class="lead">提出分フォルダのURLを貼って実行すると、Google Slides 15枚のレポートが自動生成されます。</p>
+
+    <label for="folder">提出分フォルダのURL（または フォルダID）</label>
+    <input type="text" id="folder" placeholder="https://drive.google.com/drive/folders/…" autocomplete="off">
+    <p class="hint">対象フォルダに report_data.json が入っていることが前提です（Claudeでの数値抽出＝Step 2 完了後）。</p>
+
+    <button id="run" onclick="run()">レポートを生成する</button>
+
+    <div id="status" class="status"></div>
+
+    <ol class="steps">
+      <li>フォルダ内に既存デッキ（事前命名したスライド）があればそれを上書き、無ければテンプレを複製します。</li>
+      <li>生成後はClaudeでのPDF検証（Step 4）と、コメント抜粋・画像貼付の仕上げ（Step 5）を忘れずに。</li>
+    </ol>
+  </div>
+
+  <script>
+    function setStatus(cls, html) {
+      var el = document.getElementById('status');
+      el.className = 'status ' + cls;
+      el.innerHTML = html;
+    }
+    function run() {
+      var input = document.getElementById('folder').value.trim();
+      if (!input) { setStatus('err', 'フォルダのURLまたはIDを入力してください。'); return; }
+      var btn = document.getElementById('run');
+      btn.disabled = true;
+      setStatus('running', '<span class="spinner"></span>生成中です… そのままお待ちください（通常1分以内）。');
+      google.script.run
+        .withSuccessHandler(function (res) {
+          btn.disabled = false;
+          if (res && res.ok) {
+            setStatus('ok',
+              '✅ 生成完了（フォルダ: ' + esc(res.folderName) + '）<br>' +
+              '<a href="' + esc(res.deckUrl) + '" target="_blank" rel="noopener">デッキを開く</a>' +
+              '<div class="mode">' + esc(res.mode) + '</div>');
+          } else {
+            setStatus('err', '⚠️ ' + esc(res && res.error ? res.error : '不明なエラーが発生しました。'));
+          }
+        })
+        .withFailureHandler(function (e) {
+          btn.disabled = false;
+          setStatus('err', '⚠️ 実行に失敗しました: ' + esc(e && e.message ? e.message : String(e)));
+        })
+        .webGenerate(input);
+    }
+    function esc(s) {
+      return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    }
+    document.getElementById('folder').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') run();
+    });
+  </script>
+</body>
+</html>

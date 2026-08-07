@@ -39,6 +39,23 @@
 > テンプレのレイアウトを変えた場合のみ、`Inspect.gs` を再実行して `deck_structure.json` を取得し、
 > `Code.gs` の `TEXT_MAP`/`TABLE_MAP`/`IMAGE_MAP`/`REPLACE_MAP` の座標を更新する（開発担当）。
 
+### 1.5 Web App化（推奨・フォルダURLを貼るだけの実行ページ）
+Apps Scriptエディタを開かずに、**ブラウザのフォームにフォルダURLを貼って実行**できるページを公開する。
+コード編集が不要になるため、チームの誰でもレポート生成を実行できる。
+
+| # | 作業 | 補足 |
+|---|------|------|
+| 1 | `WebApp.gs` を既存プロジェクトに追加 | ファイル → スクリプト。`Code.gs` と同居させる |
+| 2 | `WebAppUi.html` を追加 | ファイル → HTML。**ファイル名は `WebAppUi` 固定**（拡張子なしで入力） |
+| 3 | デプロイ → 新しいデプロイ → 種類「ウェブアプリ」 | 説明は任意（例: レポート生成 v1） |
+| 4 | **実行ユーザー: アクセスしているユーザー**（推奨） | 各自のDrive権限で動く＝フォルダ権限がそのままアクセス制御になる |
+| 5 | アクセスできるユーザー: **Googleアカウントを持つ全員** | 権限の無い人はフォルダを開けないため実行不可 |
+| 6 | 発行された `…/exec` URLをチームに共有 | 各自、初回アクセス時にGoogleの権限承認が1回必要 |
+
+- 使い方: ページを開く → 提出分フォルダのURLを貼る → 「レポートを生成する」→ 完成デッキのリンクが表示される。
+- `Code.gs` を更新したら「デプロイを管理 → 編集 → 新バージョン」で反映（URLは変わらない）。
+- ⚠️ 「実行ユーザー: 自分」で公開すると、URLを知る全員が**管理者の権限で**生成できてしまうため非推奨。
+
 ### オプション: 完全自動化（ウォッチャー）
 `Watcher.gs` を同じプロジェクトに同居させると、**フォルダに `report_data.json` を置くだけ**で
 デッキが自動生成される（手動実行が不要になる）。
@@ -86,9 +103,12 @@ python3 scripts/report-generator/qa_check.py path/to/report_data.json
 - `📝 TODO` … 提出前の手作業リスト（コメントピックアップ等）。生成はそのまま進めてよい
 - 終了コード: ERROR=2 / 要確認のみ=1 / 全通過=0（CI・スクリプト連携用。`--json` でJSON出力）
 
-### Step 3. Apps Script で生成（メンバー）
-共有Apps Scriptプロジェクトを開き、関数 `generateReportForFolder` を実行。
-引数に月次フォルダIDを渡す（下記のように一時関数を作って実行が簡単）:
+### Step 3. 生成を実行（メンバー）
+**方法A（推奨・Web App）**: 共有された生成ページ（`…/exec` URL）を開き、
+月次フォルダのURLを貼って「レポートを生成する」を押す → 完成デッキのリンクが表示される。
+
+**方法B（Apps Scriptエディタ）**: プロジェクトを開き `generateReportForFolder` を実行。
+引数に月次フォルダIDを渡す（一時関数を作って実行が簡単）:
 ```javascript
 function run() { generateReportForFolder('{{月次フォルダID}}'); }
 ```
@@ -171,6 +191,7 @@ python3 scripts/report-generator/notion_row.py path/to/report_data.json \
 
 ## 関連ファイル
 - `Code.gs` … レンダラ（位置ベース・全クライアント共通）
+- `WebApp.gs` / `WebAppUi.html` … Web App（フォルダURLを貼るだけの実行ページ）
 - `Inspect.gs` … テンプレ構造ダンパ（レイアウト変更時のみ）
 - `build_report_data.py` … 抽出マスター→report_data 変換（CLI・再利用可）
 - `qa_check.py` … report_data の自動QAチェックリスト（提出前の抜け漏れ・誤読検知）

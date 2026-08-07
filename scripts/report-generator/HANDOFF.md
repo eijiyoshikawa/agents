@@ -40,6 +40,9 @@
   クライアント名・対象月・主要KPI・デッキURL・ステータス・QA結果の1行データを生成（ドライラン専用・
   Notionへの書き込みは外部送信ゲートに従い承認後にClaudeがMCPで実行）。**一覧DB自体はまだ未作成**。
 - `OPERATOR_GUIDE.md` に Step 2.5（QAチェック）と Step 6（Notion記録）を追記。
+- `WebApp.gs` / `WebAppUi.html` — **Web App化のコード完成**（次の一手 4.）。フォルダURLを貼って
+  ボタンを押すだけの生成ページ。コード編集不要で誰でも実行可能に。**デプロイは管理者の手作業**
+  （OPERATOR_GUIDE「1.5 Web App化」の6手順・約5分。実行ユーザー=アクセスユーザー推奨）。
 
 ---
 
@@ -72,6 +75,7 @@
 | ファイル | 役割 |
 |---|---|
 | `Code.gs` | 位置ベース・レンダラ（全社共通）。`render_` は既存デッキ上書き対応済み |
+| `WebApp.gs` / `WebAppUi.html` | Web App（フォルダURL貼付→ボタンで生成。誰でも実行可能） |
 | `Inspect.gs` | テンプレ構造を `deck_structure.json` に出力（レイアウト変更時のみ） |
 | `Watcher.gs` | 5分毎トリガー。`report_data.json` を置くだけで自動生成 |
 | `build_report_data.py` | 抽出マスター→report_data 変換（CLI・クライアント非依存） |
@@ -116,7 +120,8 @@
    ②承認を得て REVECAREERAGENCY / TECNES の2行を初回追記 ③以降は Step 6 の運用に乗せる。
 2. ~~**抽出値の自動QAチェックリスト**~~ — ✅ 完了（`qa_check.py`）。
 3. **別企業でのさらなるドライラン** — パース耐性の追加検証。
-4. **Web App化** — 5分トリガー待ちを無くし即時生成。
+4. **Web App化** — ✅ コード完成（`WebApp.gs` / `WebAppUi.html`）。残タスクは管理者による
+   デプロイのみ（OPERATOR_GUIDE「1.5」参照）。デプロイ後、Step 3 は「URLを貼って実行」に置き換わる。
 
 ---
 
