@@ -1,0 +1,131 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SNS分析レポート データ契約 (report_data.json)",
+  "description": "Driveの月次『提出分』フォルダ内スクショから Claude が抽出し、Apps Script レンダラ(Code.gs)が消費する構造化データ。テンプレ『【テンプレ】分析レポート』(15枚)のプレースホルダに対応する。数値は文字列(カンマ区切り可)で保持し、不明値は空文字 \"\" とし、勝手に推定しない。",
+  "type": "object",
+  "required": ["meta", "summary", "account_analytics"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "description": "表紙(slide1)・各見出しの基本情報",
+      "required": ["client_name", "account_name", "report_ym"],
+      "properties": {
+        "client_name": { "type": "string", "description": "クライアント名フォルダ名 例: REVECAREERAGENCY" },
+        "account_name": { "type": "string", "description": "アカウント表示名 例: 黒崎子就職エージェント" },
+        "account_handle": { "type": "string", "description": "@ハンドル 例: kurosaki_shacho" },
+        "platform": { "type": "string", "enum": ["TikTok", "Instagram", "YouTube"], "default": "TikTok" },
+        "report_ym": { "type": "string", "description": "レポート対象年月 例: 2026年6月" },
+        "operation_period": { "type": "string", "description": "運用期間 例: 2025年6月〜2026年5月" },
+        "operation_purpose": { "type": "string", "description": "運用目的 例: 採用応募の獲得 / ブランド認知 / フォロワー増加" },
+        "data_fetch_date": { "type": "string", "description": "データ取得日 例: 2026年6月3日" },
+        "created_by": { "type": "string", "description": "作成者 例: 株式会社LET マーケティング 〇〇" },
+        "created_date": { "type": "string", "description": "作成日 例: 2026年6月7日" },
+        "source_folder_id": { "type": "string", "description": "元となったDriveフォルダID" }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "description": "総括(slide4) 自由記述。Claudeが数値傾向から下書き、人がレビュー",
+      "properties": {
+        "summary_text": { "type": "string", "description": "総括本文(基本情報側)" },
+        "result_text": { "type": "string", "description": "結果本文" }
+      }
+    },
+    "account_analytics": {
+      "type": "object",
+      "description": "アカウント分析(slide6)。概要_*.png / オーディエンス_*.png から抽出。change_pct は前月比/前回比(符号付き文字列)",
+      "properties": {
+        "followers_start": { "type": "string" },
+        "followers_current": { "type": "string" },
+        "follower_change_pct": { "type": "string" },
+        "likes": { "type": "string" },
+        "likes_change_pct": { "type": "string" },
+        "comments": { "type": "string" },
+        "comments_change_pct": { "type": "string" },
+        "shares": { "type": "string" },
+        "shares_change_pct": { "type": "string" },
+        "post_count_total": { "type": "string", "description": "累計投稿数" },
+        "post_frequency_monthly": { "type": "string", "description": "月間投稿頻度" },
+        "video_views": { "type": "string" },
+        "video_views_change_pct": { "type": "string" },
+        "pf_access": { "type": "string", "description": "プロフィールアクセス/閲覧回数" },
+        "pf_access_change_pct": { "type": "string" },
+        "reach": { "type": "string", "description": "リーチ(視聴者リーチ)" },
+        "reach_change_pct": { "type": "string" }
+      }
+    },
+    "post_analysis_monthly": {
+      "type": "array",
+      "description": "投稿分析テーブル(slide8)。月次集計の各行",
+      "items": {
+        "type": "object",
+        "properties": {
+          "month": { "type": "string" },
+          "posts": { "type": "string" },
+          "avg_impressions": { "type": "string" },
+          "avg_reach": { "type": "string" },
+          "avg_likes": { "type": "string" },
+          "avg_saves": { "type": "string" },
+          "avg_seconds": { "type": "string" },
+          "avg_play_seconds": { "type": "string" },
+          "avg_retention": { "type": "string" }
+        }
+      }
+    },
+    "popular_posts": {
+      "type": "array",
+      "description": "伸びた投稿分析テーブル(slide9)。投稿別インサイト/*.png から抽出",
+      "items": {
+        "type": "object",
+        "properties": {
+          "post_date": { "type": "string" },
+          "views": { "type": "string" },
+          "likes": { "type": "string" },
+          "comments": { "type": "string" },
+          "shares": { "type": "string" },
+          "saves": { "type": "string" },
+          "new_followers": { "type": "string" },
+          "retention": { "type": "string" }
+        }
+      }
+    },
+    "highlighted_posts": {
+      "type": "array",
+      "maxItems": 3,
+      "description": "よかった投稿(slide10-12)。最大3件。image_file_id は投稿スクショのDriveファイルID(任意挿入)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "post_date": { "type": "string" },
+          "theme": { "type": "string" },
+          "eval_point": { "type": "string", "description": "評価ポイント本文" },
+          "comment_pickup": { "type": "string", "description": "コメントピックアップ本文" },
+          "image_file_id": { "type": "string" }
+        }
+      }
+    },
+    "next_actions": {
+      "type": "object",
+      "description": "次回施策(slide14-15)",
+      "properties": {
+        "reflection": { "type": "string", "description": "振り返り" },
+        "current_issue": { "type": "string", "description": "現状の課題" },
+        "action_plan": { "type": "string", "description": "目標達成の為のアクションプラン" },
+        "future_measure_1": { "type": "string", "description": "今後の施策①" },
+        "future_measure_2": { "type": "string", "description": "今後の施策②" }
+      }
+    },
+    "dashboard_images": {
+      "type": "object",
+      "description": "アカウント分析スライドに『グラフ』として貼り込むダッシュボードのDriveファイルID。推移グラフはスクショをそのまま挿入する方式(数値はテーブルへ、グラフは画像で再現)",
+      "properties": {
+        "overview_28d": { "type": "string", "description": "概要_28日間.png の fileId" },
+        "overview_60d": { "type": "string" },
+        "overview_365d": { "type": "string" },
+        "audience_28d": { "type": "string", "description": "オーディエンス_28日間.png の fileId" },
+        "audience_365d": { "type": "string" },
+        "account_overview": { "type": "string", "description": "アカウント概要.png の fileId" }
+      }
+    }
+  }
+}
