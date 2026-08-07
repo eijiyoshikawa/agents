@@ -2,7 +2,7 @@
 
 > **新しいセッションを開いたら、まず下の「キックオフ文」をそのまま貼ってください。**
 > このファイル1枚で状況・ID・次の一手まで把握できます。
-> 最終更新: 2026-08-03 / ブランチ: `claude/wizardly-hopper-tK90k`
+> 最終更新: 2026-08-07 / ブランチ: `claude/report-generator-handoff-w82m62`
 
 ---
 
@@ -31,6 +31,15 @@
 **このセッションで仕組みに追加した改良:**
 - `Code.gs` の `render_` を拡張 → **提出フォルダに既存デッキがあれば、それを直接上書き**（運用者が出力デッキを事前命名して置ける。無ければ従来どおりテンプレ複製）。
 - `OPERATOR_GUIDE.md` / Notionマニュアルに **他社展開の実地知見**（命名不問・空PNGはビジョン読取・スパース時は推定せず空欄）を追記。
+
+**2026-08-07 セッションの追加分（ブランチ `claude/report-generator-handoff-w82m62`）:**
+- `qa_check.py` — **自動QAチェックリスト実装完了**（次の一手 2.）。ERROR/要確認/TODO の3段階で
+  「@ハンドル未設定・累計投稿数が空・桁誤読/符号反転疑い・表の列数不一致・提出前TODO残り」を検知。
+  TECNESサンプルで §6 の残手当てを正しく検出することを確認済み。終了コードでCI連携可。
+- `notion_row.py` — **Notion一覧DB追記の準備実装**（次の一手 1. の前半）。report_data.json から
+  クライアント名・対象月・主要KPI・デッキURL・ステータス・QA結果の1行データを生成（ドライラン専用・
+  Notionへの書き込みは外部送信ゲートに従い承認後にClaudeがMCPで実行）。**一覧DB自体はまだ未作成**。
+- `OPERATOR_GUIDE.md` に Step 2.5（QAチェック）と Step 6（Notion記録）を追記。
 
 ---
 
@@ -66,6 +75,8 @@
 | `Inspect.gs` | テンプレ構造を `deck_structure.json` に出力（レイアウト変更時のみ） |
 | `Watcher.gs` | 5分毎トリガー。`report_data.json` を置くだけで自動生成 |
 | `build_report_data.py` | 抽出マスター→report_data 変換（CLI・クライアント非依存） |
+| `qa_check.py` | report_data の自動QAチェックリスト（ERROR/要確認/TODO・終了コード連携） |
+| `notion_row.py` | Notion一覧DB追記用の1行データ生成（ドライラン専用・書き込みは承認後） |
 | `schema/report_data.schema.json` | データ契約 |
 | `OPERATOR_GUIDE.md` | チーム共通・多クライアント運用手順（他社展開の知見入り） |
 | `SESSION_SUMMARY.md` | REVECAREERAGENCY本番の詳細まとめ |
@@ -98,10 +109,12 @@
 
 ---
 
-## 7. 次の一手（優先順・未着手）
+## 7. 次の一手（優先順）
 
-1. **Notion 一覧DBへの自動追記**（最優先）— クライアント名・対象月・主要KPI・デッキURL・ステータスを `report_data.json` から1行生成。社数が増えても所在・過去比較を一元管理。
-2. **抽出値の自動QAチェックリスト** — 「@ハンドル未設定」「累計投稿数が空」「桁誤読/符号反転」を生成時に `[要確認]` 表示。提出前の抜け漏れを機械的に防止。
+1. **Notion 一覧DBへの自動追記**（最優先・残り半分）— 行データ生成は `notion_row.py` で完了。
+   残タスク: ①一覧DBをNotionに作成（プロパティ設計は `notion_row.py` docstring 参照。親は「🏢 全社マニュアル」配下を想定）
+   ②承認を得て REVECAREERAGENCY / TECNES の2行を初回追記 ③以降は Step 6 の運用に乗せる。
+2. ~~**抽出値の自動QAチェックリスト**~~ — ✅ 完了（`qa_check.py`）。
 3. **別企業でのさらなるドライラン** — パース耐性の追加検証。
 4. **Web App化** — 5分トリガー待ちを無くし即時生成。
 
@@ -112,4 +125,4 @@
 - 外部送信・SNS実投稿・メール送信は**必ず事前承認**（`docs/OPERATIONS.md`）。
 - 画像（グラフ・投稿スクショ）の自動貼付は**行わない**（手貼り）。
 - 改善案・提案コメントは約2倍量で記述（`CLAUDE.md`「アウトプット作法」）。
-- 全作業は `claude/wizardly-hopper-tK90k` で開発・コミット・プッシュ。
+- 全作業は `claude/report-generator-handoff-w82m62` で開発・コミット・プッシュ（旧 `claude/wizardly-hopper-tK90k` はマージ済み）。

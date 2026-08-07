@@ -77,6 +77,15 @@ Drive フォルダ {{月次フォルダID}} の採用SNS分析レポートを作
 ```
 → Claude が `extraction_master.json` と `report_data.json` をフォルダに書き込む。
 
+### Step 2.5. 自動QAチェック（Claude または手元のPython）
+```bash
+python3 scripts/report-generator/qa_check.py path/to/report_data.json
+```
+- `❌ ERROR` … 生成に進む前に必ず修正（必須メタ欠落・表の列数不一致・数値解釈不能）
+- `⚠️ 要確認` … 元スクショと突合（@ハンドル未設定・累計投稿数が空・桁誤読/符号反転の疑い）
+- `📝 TODO` … 提出前の手作業リスト（コメントピックアップ等）。生成はそのまま進めてよい
+- 終了コード: ERROR=2 / 要確認のみ=1 / 全通過=0（CI・スクリプト連携用。`--json` でJSON出力）
+
 ### Step 3. Apps Script で生成（メンバー）
 共有Apps Scriptプロジェクトを開き、関数 `generateReportForFolder` を実行。
 引数に月次フォルダIDを渡す（下記のように一時関数を作って実行が簡単）:
@@ -94,6 +103,16 @@ function run() { generateReportForFolder('{{月次フォルダID}}'); }
 ### Step 5. 手作業で仕上げ
 - slide10-12「コメントピックアップ」に実コメントを追記
 - グラフ画像・各投稿スクショを該当位置へ貼付（テンプレに画像枠が無いため手貼り）
+- 仕上げ後にもう一度 `qa_check.py` を通し、`要確認` と `TODO` が解消されたことを確認
+
+### Step 6. Notion一覧DBへ記録（承認後）
+```bash
+python3 scripts/report-generator/notion_row.py path/to/report_data.json \
+    --deck-url {{デッキURL}} --status 納品済み
+```
+- クライアント名・対象月・主要KPI・デッキURL・ステータス・QA結果の1行データが出力される
+- スクリプトは**Notionに書き込まない**（ドライラン）。出力を確認・承認したうえで、
+  Claude に「この行をNotion一覧DBに追記して」と依頼する（外部送信ゲート準拠）
 
 ---
 
@@ -154,5 +173,7 @@ function run() { generateReportForFolder('{{月次フォルダID}}'); }
 - `Code.gs` … レンダラ（位置ベース・全クライアント共通）
 - `Inspect.gs` … テンプレ構造ダンパ（レイアウト変更時のみ）
 - `build_report_data.py` … 抽出マスター→report_data 変換（CLI・再利用可）
+- `qa_check.py` … report_data の自動QAチェックリスト（提出前の抜け漏れ・誤読検知）
+- `notion_row.py` … Notion一覧DB追記用の1行データ生成（ドライラン専用）
 - `schema/report_data.schema.json` … データ契約
 - `samples/REVECAREERAGENCY_2026-06.*` … 実例（extraction_master / report_data）
