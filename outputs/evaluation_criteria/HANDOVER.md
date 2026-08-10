@@ -97,6 +97,27 @@ git checkout claude/evaluation-finance-dashboard-50w8t9
   - Section 10.2のボーナス額再計算（新定着率係数なら▲58.5万）
   - 決定された条文（クローバック・最低母数・除外規定等）を追記
 
+### 【2026-08-10 実装完了】リアルタイム実績セクション（MF実仕訳 × 評価制度）
+
+経営陣用 `sales.html` / `marketing.html` と従業員用 `demo/sales.html` / `demo/marketing.html` の末尾に
+「📊 リアルタイム実績」セクションを追加。slack-let の担当者別集計をページ別パスワードで
+**AES-GCM暗号化**して静的焼き付けする方式（平文はリポジトリにもHTMLにも残らない）。
+
+- 計算ルール（2026-08-10 役員決定）: 売上=MF実仕訳／人件費=実額表示／営業原価=江原の人件費+精算後PL科目（取引先=江原）／マーケ原価=人件費+広告宣伝費+外注費（自社SNS外注は部門共通費）。詳細は slack_let リポジトリ `docs/eval-contribution.md`
+- 構成: `assets/eval-section.js`（復号+描画）／`scripts/bake-eval-data.mjs`（データ焼き付け）／`scripts/inject-eval-section.js`（ページ注入・冪等）
+- 認証ゲートは通過時にパスワードを `sessionStorage(<key>_pw)` へ保持し、それが復号鍵になる（ゲート改修済み）
+- **データ反映手順（ターミナルから・週次目安）**:
+  ```bash
+  cd outputs/evaluation_criteria
+  CRON_SECRET=xxxx node scripts/bake-eval-data.mjs   # data/ と public/data/ に暗号化JSONを生成
+  git add data public/data && git commit -m "chore(eval): 実績データ反映" && git push
+  # → let-hyoka ブランチへマージ+push（§3の定型フロー）で本番反映
+  ```
+- **前提となる残作業（数字が出るまで）**:
+  1. Notion「メンバーマスタ」の **月額人件費（法定福利込み実額）** と **月次粗利目標** を役員が記入（未記入は「要設定」表示）
+  2. 担当マッピングDBの **MF取引先名の名寄せ**完了（未名寄せ分は「共通・未名寄せ」に集約される）
+  3. 記帳ルールの経理共有（広告費・外注費・経費精算に取引先/補助科目を必ず付ける）
+
 ### その他の未完タスク
 - 就業規則改定3項目（降格規定・査定給減額・賞与変動条項）の労務TODO反映 → 2026-08-03に `marketing/v2.html` Section 12（未確定・運用開始までのTODO）に追記済み
 - 営業部制度とv2.1受注基準の整合改定（未着手・v2.1確定後に着手予定）
