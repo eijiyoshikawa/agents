@@ -8,6 +8,10 @@
  *
  * 使い方 (ターミナルから):
  *   CRON_SECRET=xxxx node scripts/bake-eval-data.mjs [--fy 2025]
+ *
+ * 本番APIが使えない間 (Vercelフラグ等) のファイル入力モード:
+ *   slack_let リポジトリで `node scripts/local-eval-run.js out.json` を実行後、
+ *   EVAL_INPUT_FILE=out.json node scripts/bake-eval-data.mjs
  *   git add data public/data && git commit -m "chore: 実績データ反映" \
  *     && git push origin <作業ブランチ> && git checkout let-hyoka \
  *     && git merge <作業ブランチ> && git push origin let-hyoka
@@ -55,9 +59,15 @@ async function encrypt(obj, password) {
   return { v: 1, alg: "AES-GCM", kdf: "PBKDF2-SHA256", iter: ITER, salt: b64(salt), iv: b64(iv), ct: b64(ct) };
 }
 
-async function main() {
+async function loadData() {
+  const inputFile = process.env.EVAL_INPUT_FILE;
+  if (inputFile) {
+    console.log(`ファイル入力モード: ${inputFile}`);
+    const { readFileSync } = await import("node:fs");
+    return JSON.parse(readFileSync(inputFile, "utf8"));
+  }
   if (!SECRET) {
-    console.error("エラー: 環境変数 CRON_SECRET を設定してください (slack-let の認証トークン)");
+    console.error("エラー: 環境変数 CRON_SECRET を設定してください (slack-let の認証トークン)。本番APIが使えない場合は EVAL_INPUT_FILE=... を使用");
     process.exit(1);
   }
   const url = `${BASE}/api/eval/contribution?token=${encodeURIComponent(SECRET)}${fyArg()}`;
@@ -67,7 +77,11 @@ async function main() {
     console.error(`エラー: ${res.status} ${await res.text()}`);
     process.exit(1);
   }
-  const data = await res.json();
+  return res.json();
+}
+
+async function main() {
+  const data = await loadData();
   console.log(`${data.fy_label} / メンバー${data.members.length}名 / 生成 ${data.generated_at}`);
 
   for (const t of TARGETS) {
