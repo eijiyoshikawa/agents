@@ -294,8 +294,49 @@ h1 {
   .footer-meta { font-size: 9.5px; word-break: break-all; }
 }
 </style>
+
+<style>
+/* === Auth Gate (経営陣共通) === */
+#auth-gate { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #f7f6f2;
+  display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 1000; }
+.auth-card { background: #fff; border: 1px solid #e3e1da; border-radius: 12px; padding: 40px 36px;
+  max-width: 420px; width: 100%; box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  font-family: 'Noto Sans JP', -apple-system, sans-serif; color: #1a1a1a; }
+.auth-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px;
+  text-transform: uppercase; color: #8a877e; margin-bottom: 14px; }
+.auth-title { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 8px; line-height: 1.3; }
+.auth-desc { font-size: 12.5px; color: #55524a; margin-bottom: 24px; line-height: 1.6; }
+.auth-form { display: flex; flex-direction: column; gap: 12px; }
+.auth-input { width: 100%; box-sizing: border-box; padding: 12px 14px; border: 1.5px solid #e3e1da;
+  border-radius: 6px; font-size: 14px; font-family: 'IBM Plex Mono', monospace; background: #fff;
+  color: #1a1a1a; outline: none; transition: border-color 0.15s ease; }
+.auth-input:focus { border-color: #1a1a1a; }
+.auth-button { padding: 12px 14px; border: none; border-radius: 6px; background: #1a1a1a; color: #fff;
+  font-size: 13px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; }
+.auth-button:active { transform: scale(0.98); }
+.auth-error { font-size: 12px; color: #c0392b; margin-top: 6px; display: none; }
+.auth-error.show { display: block; }
+.auth-footer { margin-top: 20px; padding-top: 16px; border-top: 1px solid #e3e1da;
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #8a877e; text-align: center; letter-spacing: 1px; }
+@media (max-width: 480px) { .auth-card { padding: 32px 24px; } .auth-title { font-size: 19px; } }
+</style>
 </head>
 <body>
+<div id="auth-gate">
+  <div class="auth-card">
+    <div class="auth-eyebrow">LET / 経営陣ページ</div>
+    <div class="auth-title">パスワードを入力</div>
+    <div class="auth-desc">この資料は社外秘です。<br>経営陣専用のパスワードを入力してください（1回のログインで全部門ページが開きます）。</div>
+    <form id="auth-form" class="auth-form" autocomplete="off">
+      <input type="password" id="auth-input" class="auth-input" placeholder="パスワード" autofocus required />
+      <button type="submit" class="auth-button">ログイン</button>
+      <div id="auth-error" class="auth-error">パスワードが違います</div>
+    </form>
+    <div class="auth-footer">CONFIDENTIAL — 株式会社LET</div>
+  </div>
+</div>
+<div id="main-content" style="display:none;">
+
 <div class="container">
 
   <div class="hero">
@@ -423,5 +464,35 @@ h1 {
   </div>
 
 </div>
+</div>
+
+<script>
+(function() {
+  const PASS_HASH = "1e980b5384f2ce83258b28faa11cba9393191c5c95720fc1ca3b7fc464708ea4";
+  const STORAGE_KEY = "let_auth_exec";
+  async function sha256(text) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+  function show() {
+    document.getElementById('auth-gate').style.display = 'none';
+    document.getElementById('main-content').style.display = '';
+  }
+  if (sessionStorage.getItem(STORAGE_KEY) === '1') { show(); }
+  document.getElementById('auth-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const input = document.getElementById('auth-input').value;
+    const hash = await sha256(input);
+    const errEl = document.getElementById('auth-error');
+    if (hash === PASS_HASH) {
+      sessionStorage.setItem(STORAGE_KEY, '1');
+      show();
+    } else {
+      errEl.classList.add('show');
+      document.getElementById('auth-input').value = '';
+    }
+  });
+})();
+</script>
 </body>
 </html>

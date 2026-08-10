@@ -10,13 +10,16 @@
 
 ## 2. 公開URL・パスワード一覧
 
-### 経営陣用（パスワードなし）
-| URL | 内容 |
-|-----|------|
-| `let-hyoka.vercel.app/` | 部門選択トップ |
-| `let-hyoka.vercel.app/sales` | 営業部 v1.4 |
-| `let-hyoka.vercel.app/marketing` | マーケ部 v1.4（上下にv2.0誘導バナーあり）|
-| `let-hyoka.vercel.app/bpo` | BPO・不動産事業部 v1.4拡張版 |
+### 経営陣用（パスワード保護 / 2026-08-08 に L0→L3 化）
+| URL | パスワード | 内容 |
+|-----|-----------|------|
+| `let-hyoka.vercel.app/` | `letyakuin2026` | 部門選択トップ |
+| `let-hyoka.vercel.app/sales` | 同上 | 営業部 v1.4 |
+| `let-hyoka.vercel.app/marketing` | 同上 | マーケ部 v1.4（上下にv2.0誘導バナーあり）|
+| `let-hyoka.vercel.app/bpo` | 同上 | BPO・不動産事業部 v1.4拡張版 |
+
+- 4ページ共通の sessionStorage キー `let_auth_exec` — **1回のログインで経営陣4ページすべて解錠**
+- 従来はパスワード無し（URLを知っていれば誰でも閲覧可）だったが、経営側P&Lを含むため保護を追加
 
 ### 従業員用・新制度（パスワード保護 / SHA-256 + sessionStorage）
 | URL | パスワード | 内容 |
