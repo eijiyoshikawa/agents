@@ -28,14 +28,16 @@ outputs/evaluation_criteria/          ← Vercel「agents」プロジェクト�
 
 ## 公開URL・パスワード
 
-### 経営陣用（パスワードなし）
+### 経営陣用（パスワード保護・4ページ共通解錠）
 
-| URL | 内容 |
-|-----|-----|
-| `https://let-hyoka.vercel.app/` | 部門選択トップ |
-| `https://let-hyoka.vercel.app/sales` | 営業部 |
-| `https://let-hyoka.vercel.app/marketing` | マーケ部（上下にv2.0誘導バナー）|
-| `https://let-hyoka.vercel.app/bpo` | BPO・不動産事業部 |
+| URL | パスワード | 内容 |
+|-----|-----------|-----|
+| `https://let-hyoka.vercel.app/` | `letyakuin2026` | 部門選択トップ |
+| `https://let-hyoka.vercel.app/sales` | 同上 | 営業部 |
+| `https://let-hyoka.vercel.app/marketing` | 同上 | マーケ部（上下にv2.0誘導バナー）|
+| `https://let-hyoka.vercel.app/bpo` | 同上 | BPO・不動産事業部 |
+
+2026-08-08 に保護追加（従来はパスワード無し）。sessionStorage キーは4ページ共通 `let_auth_exec`。
 
 ### 従業員用・新制度（パスワード保護）
 

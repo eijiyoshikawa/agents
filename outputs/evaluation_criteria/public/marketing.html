@@ -633,8 +633,49 @@ h1 em { font-style: normal; color: var(--accent); }
   .v2-banner { flex-direction: column; align-items: flex-start; padding: 14px 16px; }
 }
 </style>
+
+<style>
+/* === Auth Gate (経営陣共通) === */
+#auth-gate { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #f7f6f2;
+  display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 1000; }
+.auth-card { background: #fff; border: 1px solid #e3e1da; border-radius: 12px; padding: 40px 36px;
+  max-width: 420px; width: 100%; box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+  font-family: 'Noto Sans JP', -apple-system, sans-serif; color: #1a1a1a; }
+.auth-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px;
+  text-transform: uppercase; color: #8a877e; margin-bottom: 14px; }
+.auth-title { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 8px; line-height: 1.3; }
+.auth-desc { font-size: 12.5px; color: #55524a; margin-bottom: 24px; line-height: 1.6; }
+.auth-form { display: flex; flex-direction: column; gap: 12px; }
+.auth-input { width: 100%; box-sizing: border-box; padding: 12px 14px; border: 1.5px solid #e3e1da;
+  border-radius: 6px; font-size: 14px; font-family: 'IBM Plex Mono', monospace; background: #fff;
+  color: #1a1a1a; outline: none; transition: border-color 0.15s ease; }
+.auth-input:focus { border-color: #1a1a1a; }
+.auth-button { padding: 12px 14px; border: none; border-radius: 6px; background: #1a1a1a; color: #fff;
+  font-size: 13px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; }
+.auth-button:active { transform: scale(0.98); }
+.auth-error { font-size: 12px; color: #c0392b; margin-top: 6px; display: none; }
+.auth-error.show { display: block; }
+.auth-footer { margin-top: 20px; padding-top: 16px; border-top: 1px solid #e3e1da;
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #8a877e; text-align: center; letter-spacing: 1px; }
+@media (max-width: 480px) { .auth-card { padding: 32px 24px; } .auth-title { font-size: 19px; } }
+</style>
 </head>
 <body>
+<div id="auth-gate">
+  <div class="auth-card">
+    <div class="auth-eyebrow">LET / 経営陣ページ</div>
+    <div class="auth-title">パスワードを入力</div>
+    <div class="auth-desc">この資料は社外秘です。<br>経営陣専用のパスワードを入力してください（1回のログインで全部門ページが開きます）。</div>
+    <form id="auth-form" class="auth-form" autocomplete="off">
+      <input type="password" id="auth-input" class="auth-input" placeholder="パスワード" autofocus required />
+      <button type="submit" class="auth-button">ログイン</button>
+      <div id="auth-error" class="auth-error">パスワードが違います</div>
+    </form>
+    <div class="auth-footer">CONFIDENTIAL — 株式会社LET</div>
+  </div>
+</div>
+<div id="main-content" style="display:none;">
+
 <div class="page">
 <a href="index.html" class="nav-back">← 部門選択に戻る</a>
 <a href="/marketing/v2" class="v2-banner">
@@ -1210,6 +1251,70 @@ h1 em { font-style: normal; color: var(--accent); }
   </div>
 </div>
 
+<div class="sec-title">Step 8 — 実績パフォーマンス（Google Drive連携・2026-08-03時点）</div>
+<div class="cost-note" style="margin-bottom: 12px;">
+  ✦ Google Drive上の契約書・クライアント別管理シートから2026-08-03時点でセッション内取得した実データ。<strong>自動更新ではなく都度手動反映</strong>。全23クライアント中、契約金額・実績が確認できたのは10社のみで、残りはデータ未整備または記載が確認できず「不明」としている（詳細は下表）。広告費・利益は取得できた期間がクライアントごとに異なるため、担当者集計には合算していない（個別行を参照）。
+</div>
+<div class="kpi-table-wrap" style="margin-bottom: 16px;">
+  <table class="kpi-table">
+    <thead>
+      <tr><th>担当者</th><th>確定データ社数/担当社数</th><th>月間予算合計（確定分）</th><th>平均継続月数（確定分）</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>松本</td><td>6 / 11社</td><td class="mono">¥3,121,000</td><td class="mono">約6.8ヶ月</td></tr>
+      <tr><td>松岡</td><td>4 / 12社</td><td class="mono">¥1,105,000</td><td class="mono">約13.4ヶ月（清一建設は開始日不明のため除く3社平均）</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="cost-note" style="margin-bottom: 8px; margin-top: 0;">クライアント別内訳 — 松本担当（11社）</div>
+<div class="kpi-table-wrap" style="margin-bottom: 16px;">
+  <table class="kpi-table">
+    <thead>
+      <tr><th>クライアント</th><th>契約開始</th><th>月額予算</th><th>状況</th><th>広告費（参考・期間は個別）</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>柄谷工務店</td><td>2026/4/15</td><td class="mono">¥300,000</td><td>継続中</td><td class="mono">¥0（準備・企画段階）</td></tr>
+      <tr><td>セントラルフルーツ（八百一）</td><td>2026/4/1</td><td class="mono">¥300,000</td><td>継続中</td><td class="mono">累計¥46,518</td></tr>
+      <tr><td>株式会社弘陽電設</td><td>2025/12/1</td><td class="mono">¥300,000（延長後）</td><td>継続中（延長）</td><td class="mono">累計¥68,564</td></tr>
+      <tr><td>株式会社タキオンワタナベ</td><td>2025/10/1</td><td class="mono">¥200,000</td><td>契約終了（2026/3/31満了）</td><td class="mono">累計¥48,773</td></tr>
+      <tr><td>ビッグ測量設計株式会社</td><td>2026/4/1</td><td class="mono">¥275,000</td><td>継続中</td><td class="mono">累計¥4,888</td></tr>
+      <tr><td>Reve Career Agency株式会社</td><td>2025/5〜6月</td><td class="mono">約¥1,746,000（2アカウント合算・要確認）</td><td>継続中と推測</td><td class="mono">黒崎社長分累計¥72,895</td></tr>
+      <tr><td>新日本住設株式会社</td><td>不明</td><td>データ未整備</td><td>不明</td><td>—</td></tr>
+      <tr><td>株式会社オンテックス</td><td>不明</td><td>データ未整備</td><td>不明</td><td class="mono">累計¥0</td></tr>
+      <tr><td>クロムス</td><td>不明</td><td>データ未整備</td><td>不明</td><td>—</td></tr>
+      <tr><td>アルファガード株式会社</td><td>2025/10/1</td><td>データ未整備</td><td>継続中と推測</td><td class="mono">累計¥82,852</td></tr>
+      <tr><td>tetote</td><td>不明</td><td>データ未整備</td><td>不明</td><td class="mono">累計¥1,588</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="cost-note" style="margin-bottom: 8px; margin-top: 0;">クライアント別内訳 — 松岡担当（12社）</div>
+<div class="kpi-table-wrap" style="margin-bottom: 12px;">
+  <table class="kpi-table">
+    <thead>
+      <tr><th>クライアント</th><th>契約開始</th><th>月額予算</th><th>状況</th><th>広告費・原価（参考・期間は個別）</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>株式会社清一建設</td><td>不明（契約6ヶ月）</td><td class="mono">¥210,000</td><td>継続中と推定</td><td class="mono">累計¥25,800（2026年1-3月分）</td></tr>
+      <tr><td>翔星建設株式会社</td><td>2025/9/1</td><td class="mono">¥295,000（増額後）</td><td>継続中（2026/8末満了予定）</td><td class="mono">原価150,000/月</td></tr>
+      <tr><td>株式会社cantera</td><td>2024/8/1</td><td class="mono">¥300,000</td><td>継続中（名目終了日超過も実態継続）</td><td class="mono">Airwork広告累計¥470,703（25/12-26/6）</td></tr>
+      <tr><td>株式会社桝本レッカー</td><td>2026/3/1（新契約）</td><td class="mono">¥300,000</td><td>継続中（2026/8末満了予定）</td><td class="mono">原価160,000/月</td></tr>
+      <tr><td>株式会社宮村建設</td><td>2025/5/1</td><td>データ未整備</td><td>SNS運用契約は終了（2025/11末）</td><td>—</td></tr>
+      <tr><td>株式会社TECNES</td><td>不明</td><td>データ未整備</td><td>不明（管理シートに他社データ混入を検出・要修正）</td><td>—</td></tr>
+      <tr><td>エスコプロモーション株式会社</td><td>不明</td><td>データ未整備</td><td>不明（数値不整合あり）</td><td>—</td></tr>
+      <tr><td>ゼロワットパワー株式会社</td><td>不明</td><td>データ未整備</td><td>不明（SNS運用の契約・実績データなし）</td><td>—</td></tr>
+      <tr><td>株式会社ビック測量</td><td>不明</td><td>データ未整備</td><td>不明</td><td>—</td></tr>
+      <tr><td>モデルノ（株式会社クルマクション）</td><td>不明</td><td>データ未整備</td><td>不明（提案段階、契約締結証跡なし）</td><td>—</td></tr>
+      <tr><td>株式会社ナワショウ</td><td>2026/3頃</td><td>データ未整備</td><td>継続中と推測</td><td>—</td></tr>
+      <tr><td>豊和開発株式会社</td><td>不明</td><td>データ未整備</td><td>不明（資料未検出）</td><td>—</td></tr>
+    </tbody>
+  </table>
+</div>
+<div class="cost-note">
+  ✦ 本セクションはGoogle Drive手動取得によるスナップショットで自動更新されない。次回更新時はClaudeに再取得を依頼すること。データ未整備のクライアントは担当者への確認が必要（HANDOVER.md参照）。
+</div>
+
 <a href="/marketing/v2" class="v2-banner bottom">
   <span>📢 このページは旧制度（v1.4）です。最新の <strong>v2.0（チーム評価版）</strong>をご確認ください</span>
   <span class="v2-banner-btn">更新版はこちら →</span>
@@ -1220,5 +1325,35 @@ h1 em { font-style: normal; color: var(--accent); }
 </div>
 </div>
 
+</div>
+
+<script>
+(function() {
+  const PASS_HASH = "1e980b5384f2ce83258b28faa11cba9393191c5c95720fc1ca3b7fc464708ea4";
+  const STORAGE_KEY = "let_auth_exec";
+  async function sha256(text) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+  function show() {
+    document.getElementById('auth-gate').style.display = 'none';
+    document.getElementById('main-content').style.display = '';
+  }
+  if (sessionStorage.getItem(STORAGE_KEY) === '1') { show(); }
+  document.getElementById('auth-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const input = document.getElementById('auth-input').value;
+    const hash = await sha256(input);
+    const errEl = document.getElementById('auth-error');
+    if (hash === PASS_HASH) {
+      sessionStorage.setItem(STORAGE_KEY, '1');
+      show();
+    } else {
+      errEl.classList.add('show');
+      document.getElementById('auth-input').value = '';
+    }
+  });
+})();
+</script>
 </body>
 </html>
