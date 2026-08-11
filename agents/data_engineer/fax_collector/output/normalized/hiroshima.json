@@ -1,0 +1,19 @@
+{
+  "prefecture": "広島県",
+  "normalized_at": "2026-04-15",
+  "companies": [
+    {"company_name": "宮田建設株式会社", "prefecture": "広島県", "city": "広島市南区", "address": "広島県広島市南区出島一丁目33番46号", "phone": "082-258-1609", "fax": "082-258-1619", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "八光建設工業株式会社", "prefecture": "広島県", "city": "広島市東区", "address": "広島県広島市東区光町2丁目4番23号八光ビル", "phone": "082-262-8166", "fax": "082-263-8189", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "大和建設株式会社", "prefecture": "広島県", "city": "福山市", "address": "広島県福山市若松町8番4号", "phone": "084-924-4411", "fax": "084-925-3931", "fax_validated": true, "business_category": "総合建設", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"},
+    {"company_name": "復建調査設計株式会社 三次事務所", "prefecture": "広島県", "city": "三次市", "address": "広島県三次市十日市東三丁目10-8", "phone": "0824-65-0760", "fax": "0824-65-0761", "fax_validated": true, "business_category": "設備", "source": "企業公式サイト", "collected_at": "2026-04-15", "confidence": "high"}
+  ],
+  "stats": {
+    "total_raw": 4,
+    "after_dedup": 4,
+    "duplicates_removed": 0,
+    "no_fax_removed": 0,
+    "confidence_high": 4,
+    "confidence_medium": 0,
+    "confidence_low": 0
+  }
+}

@@ -25,6 +25,9 @@ Instagram・TikTok・YouTubeの日常運用・投稿管理・エンゲージメ�
      - YouTube: 動画公開・コミュニティ投稿・ショート
   3. ハッシュタグ・キャプション最終調整
   4. コミュニティマネジメント（コメント・DM対応方針）
+  5. ビジュアル投稿のブランド整合性確認
+     - /shared/design-tokens.json のカラーパレット・フォントに準拠しているか
+     - AIっぽいテンプレートデザインを使っていないか（/shared/anti-ai-design-guidelines.md 参照）
 出力: /agents/sns_operator/schedule/{platform}_{month}.json
 ```
 
@@ -144,3 +147,8 @@ SNS運用の実務知見に基づき、以下のエージェントのSNS関連�
 ## 使用ツール
 - `Read` / `Write`: データ読み書き
 - `WebSearch`: トレンド調査・競合分析
+
+## 業務OS（運用の標準フロー）
+- 投稿ドラフトの受け取り元は `agents/outputs/<クライアントslug>/sns/<YYYY-Www>/posts.md`（Content Creator 制作・セルフQA済み）
+- **実投稿・予約投稿は行わない。** 人間の投稿実行を前提に、推奨日時・チェック済み事項を添えて引き渡す（正本: `docs/OPERATIONS.md`「2. 安全ゲート」）
+- ブリーフ（`.../sns/brief.md`）の変更が必要な場合は差分を提示し、承認後に更新する

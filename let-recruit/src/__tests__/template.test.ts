@@ -12,6 +12,7 @@ describe("esc", () => {
 });
 
 describe("formatSalary", () => {
+<<<<<<< HEAD
   it("月給・年収レンジ(万円)を表示", () => {
     const s = JobPostingSchema.parse({}).salary;
     const out = formatSalary({
@@ -23,12 +24,19 @@ describe("formatSalary", () => {
     });
     expect(out).toContain("月給 30万円 〜 55万円");
     expect(out).toContain("想定年収 420万円 〜 800万円");
+=======
+  it("min/maxを万円レンジで表示", () => {
+    const s = JobPostingSchema.parse({}).salary;
+    expect(formatSalary({ ...s, min: 300000, max: 500000 })).toContain("30万円");
+    expect(formatSalary({ ...s, min: 300000, max: 500000 })).toContain("50万円");
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
   });
 
   it("数値が無ければnoteのみ", () => {
     const s = JobPostingSchema.parse({}).salary;
     expect(formatSalary({ ...s, note: "応相談" })).toBe("応相談");
   });
+<<<<<<< HEAD
 
   it("旧形式(円)の保存データは万円へ自動変換される", () => {
     const job = JobPostingSchema.parse({
@@ -59,6 +67,8 @@ describe("formatSalary", () => {
     expect(job.salary.annualMax).toBe(500);
     expect(job.salary.monthlyMin).toBeNull();
   });
+=======
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
 });
 
 describe("buildJobPostingHtml", () => {
@@ -69,6 +79,7 @@ describe("buildJobPostingHtml", () => {
     expect(html).toContain(LET_COMPANY.brand.accent);
   });
 
+<<<<<<< HEAD
   it("コピーが反映され、危険な入力はエスケープされる", () => {
     const job = emptyJobPosting();
     job.companyName = "テスト社<img>";
@@ -82,5 +93,20 @@ describe("buildJobPostingHtml", () => {
   it("空の求人票では概要セクションを描画しない", () => {
     const html = buildJobPostingHtml(emptyJobPosting(), LET_COMPANY);
     expect(html).not.toContain("求人概要");
+=======
+  it("職種・コピーが反映され、危険な入力はエスケープされる", () => {
+    const job = emptyJobPosting();
+    job.jobTitle = "エンジニア<img>";
+    job.catchphrase = "成長しよう";
+    const html = buildJobPostingHtml(job, LET_COMPANY);
+    expect(html).toContain("成長しよう");
+    expect(html).toContain("エンジニア&lt;img&gt;");
+    expect(html).not.toContain("エンジニア<img>");
+  });
+
+  it("空セクションは描画しない", () => {
+    const html = buildJobPostingHtml(emptyJobPosting(), LET_COMPANY);
+    expect(html).not.toContain("選考プロセス");
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
   });
 });

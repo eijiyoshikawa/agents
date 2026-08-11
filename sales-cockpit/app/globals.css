@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  @apply text-ink font-sans;
+  min-height: 100vh;
+  background-color: #091630;
+  background-image:
+    radial-gradient(1100px 560px at 18% -12%, rgba(37, 99, 235, 0.28), transparent 55%),
+    radial-gradient(900px 520px at 100% 0%, rgba(13, 148, 196, 0.16), transparent 55%),
+    linear-gradient(160deg, #0a1a38 0%, #0b2148 48%, #081328 100%);
+  background-attachment: fixed;
+}
+
+@layer components {
+  .card {
+    @apply bg-surface/70 backdrop-blur-sm rounded-2xl ring-1 ring-white/10 shadow-lift;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+}
+
+/* ネイティブselectのドロップダウンを暗色に */
+select option {
+  background-color: #0e1f40;
+  color: #eaf1fb;
+}
+
+/* 印刷／PDF出力（レポート） */
+@media print {
+  header,
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #ffffff !important;
+    color: #111111 !important;
+  }
+  .card {
+    background: #ffffff !important;
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+  }
+  .print-light,
+  .print-light * {
+    color: #111111 !important;
+  }
+}
+
+/* アクセシビリティ: モーション低減設定を尊重 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

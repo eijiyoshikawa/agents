@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Mistral AI</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-mistral-ai">Design System: Mistral AI</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Mistral AI's interface is a sun-drenched landscape rendered in code — a warm, bold, unapologetically European design that trades the typical blue-screen AI aesthetic for golden amber, burnt orange, and the feeling of late-afternoon light in southern France. Every surface glows with warmth: backgrounds fade from pale cream to deep amber, shadows carry golden undertones (<code>rgba(127, 99, 21, ...)</code>), and the brand's signature orange (<code>#fa520f</code>) burns through the page like a signal fire.</p>
+<p>The design language is maximalist in its warmth but minimalist in its structure. Huge display headlines (82px) crash into the viewport with aggressive negative tracking (-2.05px), creating text blocks that feel like billboards or protest posters — declarations rather than descriptions. The typography uses Arial (likely a custom font with Arial as fallback) at extreme sizes, creating a raw, unadorned voice that says "we build frontier AI" with no decoration needed.</p>
+<p>What makes Mistral distinctive is the complete commitment to a warm color temperature. The signature "block" identity — a gradient system flowing from bright yellow (<code>#ffd900</code>) through amber (<code>#ffa110</code>) to burnt orange (<code>#fa520f</code>) — creates a visual identity that's immediately recognizable. Even the shadows are warm, using amber-tinted blacks instead of cool grays. Combined with dramatic landscape photography in golden tones, the design feels less like a tech company and more like a European luxury brand that happens to build language models.</p>
+<p><strong>Key Characteristics:</strong>
+- Golden-amber color universe: every tone from pale cream (#fffaeb) to burnt orange (#fa520f)
+- Massive display typography (82px) with aggressive negative letter-spacing (-2.05px)
+- Warm golden shadow system using amber-tinted rgba values
+- The Mistral "M" block identity — a gradient from yellow to orange
+- Dramatic landscape photography in warm golden tones
+- Uppercase typography used strategically for section labels and CTAs
+- Near-zero border-radius — sharp, architectural geometry
+- French-European confidence: bold, warm, declarative</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>Mistral Orange</strong> (<code>#fa520f</code>): The core brand color — a vivid, saturated orange-red that anchors the entire identity. Used for primary emphasis, the brand block, and the highest-signal moments.</li>
+<li><strong>Mistral Flame</strong> (<code>#fb6424</code>): A slightly warmer, lighter variant of the brand orange used for secondary brand moments and hover states.</li>
+<li><strong>Block Orange</strong> (<code>#ff8105</code>): A pure orange used in the gradient block system — warmer and less red than Mistral Orange.</li>
+</ul>
+<h3 id="secondary-accent">Secondary &amp; Accent</h3>
+<ul>
+<li><strong>Sunshine 900</strong> (<code>#ff8a00</code>): Deep golden amber — the darkest sunshine tone, used for strong accent moments.</li>
+<li><strong>Sunshine 700</strong> (<code>#ffa110</code>): Warm amber-gold — the core sunshine accent for backgrounds and interactive elements.</li>
+<li><strong>Sunshine 500</strong> (<code>#ffb83e</code>): Medium golden — balanced warmth for mid-level emphasis.</li>
+<li><strong>Sunshine 300</strong> (<code>#ffd06a</code>): Light golden — for subtle warm tints and secondary backgrounds.</li>
+<li><strong>Block Gold</strong> (<code>#ffe295</code>): Pale gold — soft background accents and gentle warmth.</li>
+<li><strong>Bright Yellow</strong> (<code>#ffd900</code>): The brightest tone in the gradient — used at the "top" of the block identity.</li>
+</ul>
+<h3 id="surface-background">Surface &amp; Background</h3>
+<ul>
+<li><strong>Warm Ivory</strong> (<code>#fffaeb</code>): The lightest page background — barely tinted with warmth, the foundation canvas.</li>
+<li><strong>Cream</strong> (<code>#fff0c2</code>): The primary warm surface and secondary button background — noticeably golden.</li>
+<li><strong>Pure White</strong> (<code>#ffffff</code>): Used for maximum contrast elements and popover surfaces.</li>
+<li><strong>Mistral Black</strong> (<code>#1f1f1f</code>): The primary dark surface for buttons, text, and dark sections.</li>
+<li><strong>Accent Orange</strong> (defined as <code>hsl(17, 96%, 52%)</code>): The functional accent color for interactive states.</li>
+</ul>
+<h3 id="neutrals-text">Neutrals &amp; Text</h3>
+<ul>
+<li><strong>Mistral Black</strong> (<code>#1f1f1f</code>): Primary text color and dark button backgrounds — a near-black that's warmer than pure #000.</li>
+<li><strong>Black Tint</strong> (defined as <code>hsl(0, 0%, 24%)</code>): A medium dark gray for secondary text on light backgrounds.</li>
+<li><strong>Pure White</strong> (<code>#ffffff</code>): Text on dark surfaces and CTA labels.</li>
+</ul>
+<h3 id="semantic-accent">Semantic &amp; Accent</h3>
+<ul>
+<li><strong>Input Border</strong> (defined as <code>hsl(240, 5.9%, 90%)</code>): A cool-tinted light gray for form borders — one of the few cool tones in the system.</li>
+<li><strong>White Overlay</strong> (<code>oklab(1, 0, 0 / 0.088–0.1)</code>): Semi-transparent white for frosted glass effects and button overlays.</li>
+</ul>
+<h3 id="gradient-system">Gradient System</h3>
+<ul>
+<li><strong>Mistral Block Gradient</strong>: The signature identity — a multi-step gradient flowing through Yellow (<code>#ffd900</code>) → Gold (<code>#ffe295</code>) → Amber (<code>#ffa110</code>) → Orange (<code>#ff8105</code>) → Flame (<code>#fb6424</code>) → Mistral Orange (<code>#fa520f</code>). This gradient appears in the logo blocks, section backgrounds, and decorative elements.</li>
+<li><strong>Golden Landscape Wash</strong>: Photography and backgrounds use warm amber overlays creating a consistent golden temperature across the page.</li>
+<li><strong>Warm Shadow Cascade</strong>: Multi-layered golden shadows that build depth with amber-tinted transparency rather than gray.</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-family">Font Family</h3>
+<ul>
+<li><strong>Primary</strong>: Likely a custom font (Font Source detected) with <code>Arial</code> as fallback, and extended stack: <code>ui-sans-serif, system-ui, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji</code></li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display / Hero</td>
+<td>Arial (custom)</td>
+<td>82px (5.13rem)</td>
+<td>400</td>
+<td>1.00 (tight)</td>
+<td>-2.05px</td>
+<td>Maximum impact, billboard scale</td>
+</tr>
+<tr>
+<td>Section Heading</td>
+<td>Arial (custom)</td>
+<td>56px (3.5rem)</td>
+<td>400</td>
+<td>0.95 (ultra-tight)</td>
+<td>normal</td>
+<td>Feature section anchors</td>
+</tr>
+<tr>
+<td>Sub-heading Large</td>
+<td>Arial (custom)</td>
+<td>48px (3rem)</td>
+<td>400</td>
+<td>0.95 (ultra-tight)</td>
+<td>normal</td>
+<td>Secondary section titles</td>
+</tr>
+<tr>
+<td>Sub-heading</td>
+<td>Arial (custom)</td>
+<td>32px (2rem)</td>
+<td>400</td>
+<td>1.15 (tight)</td>
+<td>normal</td>
+<td>Card headings, feature names</td>
+</tr>
+<tr>
+<td>Card Title</td>
+<td>Arial (custom)</td>
+<td>30px (1.88rem)</td>
+<td>400</td>
+<td>1.20 (tight)</td>
+<td>normal</td>
+<td>Mid-level headings</td>
+</tr>
+<tr>
+<td>Feature Title</td>
+<td>Arial (custom)</td>
+<td>24px (1.5rem)</td>
+<td>400</td>
+<td>1.33</td>
+<td>normal</td>
+<td>Small headings</td>
+</tr>
+<tr>
+<td>Body / Button</td>
+<td>Arial (custom)</td>
+<td>16px (1rem)</td>
+<td>400</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Standard body, button text</td>
+</tr>
+<tr>
+<td>Button Uppercase</td>
+<td>Arial (custom)</td>
+<td>16px (1rem)</td>
+<td>400</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Uppercase CTA labels</td>
+</tr>
+<tr>
+<td>Caption / Link</td>
+<td>Arial (custom)</td>
+<td>14px (0.88rem)</td>
+<td>400</td>
+<td>1.43</td>
+<td>normal</td>
+<td>Metadata, secondary links</td>
+</tr>
+</tbody>
+</table>
+<h3 id="principles">Principles</h3>
+<ul>
+<li><strong>Single weight, maximum impact</strong>: The entire system uses weight 400 (regular) — even at 82px. This creates a surprisingly elegant effect where the size alone carries authority without needing bold weight.</li>
+<li><strong>Ultra-tight at scale</strong>: Line-heights of 0.95–1.00 at display sizes create text blocks where ascenders nearly touch descenders from the line above — creating dense, poster-like composition.</li>
+<li><strong>Aggressive tracking on display</strong>: -2.05px letter-spacing at 82px compresses the hero text into a monolithic block.</li>
+<li><strong>Uppercase as emphasis</strong>: Strategic <code>text-transform: uppercase</code> on button labels and section markers creates a formal, European signage quality.</li>
+<li><strong>No weight variation</strong>: Unlike most systems that use 300–700 weight range, Mistral uses 400 everywhere. Hierarchy comes from size and color, never weight.</li>
+</ul>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<p><strong>Cream Surface</strong>
+- Background: Cream (<code>#fff0c2</code>)
+- Text: Mistral Black (<code>#1f1f1f</code>)
+- No visible border
+- The warm, inviting secondary CTA</p>
+<p><strong>Dark Solid</strong>
+- Background: Mistral Black (<code>#1f1f1f</code>)
+- Text: Pure White (<code>#ffffff</code>)
+- Padding: 12px (all sides)
+- No visible border
+- The primary action button — dark on warm</p>
+<p><strong>Ghost / Transparent</strong>
+- Background: transparent with slight dark overlay (<code>oklab(0, 0, 0 / 0.1)</code>)
+- Text: Mistral Black (<code>#1f1f1f</code>)
+- Opacity: 0.4
+- For secondary/de-emphasized actions</p>
+<p><strong>Text / Underline</strong>
+- Background: transparent
+- Text: Mistral Black (<code>#1f1f1f</code>)
+- Padding: 8px 0px 0px (top-only)
+- Minimal styling — text link as button
+- For tertiary navigation actions</p>
+<h3 id="cards-containers">Cards &amp; Containers</h3>
+<ul>
+<li>Background: Warm Ivory (<code>#fffaeb</code>), Cream (<code>#fff0c2</code>), or Pure White</li>
+<li>Border: minimal to none — containers defined by background color</li>
+<li>Radius: near-zero — sharp, architectural corners</li>
+<li>Shadow: warm golden multi-layer (<code>rgba(127, 99, 21, 0.12) -8px 16px 39px, rgba(127, 99, 21, 0.1) -33px 64px 72px, rgba(127, 99, 21, 0.06) -73px 144px 97px, ...</code>) — a dramatic, cascading warm shadow</li>
+<li>Distinctive: the golden shadow creates a "golden hour" lighting effect</li>
+</ul>
+<h3 id="inputs-forms">Inputs &amp; Forms</h3>
+<ul>
+<li>Border: <code>hsl(240, 5.9%, 90%)</code> — the sole cool-toned element</li>
+<li>Focus: accent color ring</li>
+<li>Minimal styling consistent with sparse aesthetic</li>
+</ul>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li>Transparent nav overlaying the warm hero</li>
+<li>Logo: Mistral "M" wordmark</li>
+<li>Links: Dark text (white on dark sections)</li>
+<li>CTA: Dark solid button or cream surface button</li>
+<li>Minimal, wide-spaced layout</li>
+</ul>
+<h3 id="image-treatment">Image Treatment</h3>
+<ul>
+<li>Dramatic landscape photography in warm golden tones</li>
+<li>The winding road through golden hills — a recurring visual motif</li>
+<li>The Mistral "M" rendered at large scale on golden backgrounds</li>
+<li>Warm color grading on all photography</li>
+<li>Full-bleed sections with photography</li>
+</ul>
+<h3 id="distinctive-components">Distinctive Components</h3>
+<p><strong>Mistral Block Identity</strong>
+- A row of colored blocks forming the gradient: yellow → amber → orange → burnt orange
+- Each block gets progressively more orange/red
+- The visual DNA of the brand — recognizable at any size</p>
+<p><strong>Golden Shadow Cards</strong>
+- Cards elevated with warm amber multi-layered shadows
+- 5 layers of shadow from 16px to 400px offset
+- Creates a "floating in golden light" effect unique to Mistral</p>
+<p><strong>Dark Footer Gradient</strong>
+- Footer transitions from warm amber to dark through a dramatic gradient
+- Creates a "sunset" effect as the page ends</p>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-system">Spacing System</h3>
+<ul>
+<li>Base unit: 8px</li>
+<li>Scale: 2px, 4px, 8px, 10px, 12px, 16px, 20px, 24px, 32px, 40px, 48px, 64px, 80px, 98px, 100px</li>
+<li>Button padding: 12px or 8px 0px (compact)</li>
+<li>Section vertical spacing: very generous (80px–100px)</li>
+</ul>
+<h3 id="grid-container">Grid &amp; Container</h3>
+<ul>
+<li>Max container width: approximately 1280px, centered</li>
+<li>Hero: full-width with massive typography overlaying warm backgrounds</li>
+<li>Feature sections: wide-format layouts with dramatic imagery</li>
+<li>Card grids: 2–3 column layouts</li>
+</ul>
+<h3 id="whitespace-philosophy">Whitespace Philosophy</h3>
+<ul>
+<li><strong>Bold declarations</strong>: Huge headlines surrounded by generous whitespace create billboard-like impact — each statement gets its own breathing space.</li>
+<li><strong>Warm void</strong>: Empty space itself feels warm because the backgrounds are tinted ivory/cream rather than pure white.</li>
+<li><strong>Photography as space-filler</strong>: Large landscape images serve double duty as content and decorative whitespace.</li>
+</ul>
+<h3 id="border-radius-scale">Border Radius Scale</h3>
+<ul>
+<li>Near-zero: The dominant radius — sharp, architectural corners on most elements</li>
+<li>This extreme sharpness contrasts with the warmth of the colors, creating a tension between soft color and hard geometry.</li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Treatment</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flat (Level 0)</td>
+<td>No shadow</td>
+<td>Page backgrounds, text blocks</td>
+</tr>
+<tr>
+<td>Golden Float (Level 1)</td>
+<td>Multi-layer warm shadow (5 layers, 12%→0% opacity, amber-tinted)</td>
+<td>Feature cards, product showcases, elevated content</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Shadow Philosophy</strong>: Mistral uses a single but extraordinarily complex shadow — <strong>five cascading layers</strong> of amber-tinted shadow (<code>rgba(127, 99, 21, ...)</code>) that build from a close 16px offset to a distant 400px offset. The result is a rich, warm, "golden hour" lighting effect that makes elevated elements look like they're bathed in afternoon sunlight. This is the most distinctive shadow system in any major AI brand.</p>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use the warm color spectrum exclusively: ivory, cream, amber, gold, orange</li>
+<li>Keep display typography at 82px+ with -2.05px letter-spacing for hero sections</li>
+<li>Use the Mistral block gradient (yellow → amber → orange) for brand moments</li>
+<li>Apply warm golden shadows (amber-tinted rgba) for elevated elements</li>
+<li>Use Mistral Black (#1f1f1f) for text — never pure #000000</li>
+<li>Keep font weight at 400 throughout — let size and color carry hierarchy</li>
+<li>Use sharp, architectural corners — near-zero border-radius</li>
+<li>Apply uppercase on button labels and section markers for European formality</li>
+<li>Use warm landscape photography with golden color grading</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Don't introduce cool colors (blue, green, purple) — the palette is exclusively warm</li>
+<li>Don't use bold (700+) weight — 400 is the only weight</li>
+<li>Don't round corners — the sharp geometry is intentional</li>
+<li>Don't use cool-toned shadows — shadows must carry amber warmth</li>
+<li>Don't use pure white as a page background — always warm-tinted (#fffaeb minimum)</li>
+<li>Don't reduce hero text below 48px on desktop — the billboard scale is core</li>
+<li>Don't use more than 2 font weights — size variation replaces weight variation</li>
+<li>Don't add gradients outside the warm spectrum — no blue-to-purple, no cool transitions</li>
+<li>Don't use generic gray for text — even neutrals should be warm-tinted</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<h3 id="breakpoints">Breakpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Width</th>
+<th>Key Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mobile</td>
+<td>&lt;640px</td>
+<td>Single column, stacked everything, hero text reduces to ~32px</td>
+</tr>
+<tr>
+<td>Tablet</td>
+<td>640–768px</td>
+<td>Minor layout adjustments</td>
+</tr>
+<tr>
+<td>Small Desktop</td>
+<td>768–1024px</td>
+<td>2-column layouts begin</td>
+</tr>
+<tr>
+<td>Desktop</td>
+<td>1024–1280px</td>
+<td>Full layout with maximum typography scale</td>
+</tr>
+</tbody>
+</table>
+<h3 id="touch-targets">Touch Targets</h3>
+<ul>
+<li>Buttons use generous padding (12px minimum)</li>
+<li>Navigation elements adequately spaced</li>
+<li>Cards serve as large touch targets</li>
+</ul>
+<h3 id="collapsing-strategy">Collapsing Strategy</h3>
+<ul>
+<li><strong>Navigation</strong>: Collapses to hamburger on mobile</li>
+<li><strong>Hero text</strong>: 82px → 56px → 48px → 32px progressive scaling</li>
+<li><strong>Feature sections</strong>: Multi-column → stacked</li>
+<li><strong>Photography</strong>: Scales proportionally, may crop on mobile</li>
+<li><strong>Block identity</strong>: Scales down proportionally</li>
+</ul>
+<h3 id="image-behavior">Image Behavior</h3>
+<ul>
+<li>Landscape photography scales proportionally</li>
+<li>Warm color grading maintained at all sizes</li>
+<li>Block gradient elements resize fluidly</li>
+<li>No art direction changes — same warm composition at all sizes</li>
+</ul>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Brand Orange: "Mistral Orange (#fa520f)"</li>
+<li>Page Background: "Warm Ivory (#fffaeb)"</li>
+<li>Warm Surface: "Cream (#fff0c2)"</li>
+<li>Primary Text: "Mistral Black (#1f1f1f)"</li>
+<li>Sunshine Amber: "Sunshine 700 (#ffa110)"</li>
+<li>Bright Gold: "Bright Yellow (#ffd900)"</li>
+<li>Text on Dark: "Pure White (#ffffff)"</li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create a hero section on Warm Ivory (#fffaeb) with a massive headline at 82px Arial weight 400, line-height 1.0, letter-spacing -2.05px. Mistral Black (#1f1f1f) text. Add a dark solid CTA button (#1f1f1f bg, white text, 12px padding, sharp corners) and a cream secondary button (#fff0c2 bg)."</li>
+<li>"Design a feature card on Cream (#fff0c2) with sharp corners (no border-radius). Apply the golden shadow system: rgba(127, 99, 21, 0.12) -8px 16px 39px as the primary layer. Title at 32px weight 400, body at 16px."</li>
+<li>"Build the Mistral block identity: a row of colored blocks from Bright Yellow (#ffd900) through Sunshine 700 (#ffa110) to Mistral Orange (#fa520f). Sharp corners, no gaps."</li>
+<li>"Create a dark footer section on Mistral Black (#1f1f1f) with Pure White (#ffffff) text. Footer links at 14px. Add a warm gradient from Sunshine 700 (#ffa110) at the top fading to Mistral Black."</li>
+</ul>
+<h3 id="iteration-guide">Iteration Guide</h3>
+<ol>
+<li>Keep the warm temperature — "shift toward amber" not "shift toward gray"</li>
+<li>Use size for hierarchy — 82px → 56px → 48px → 32px → 24px → 16px</li>
+<li>Never add border-radius — sharp corners only</li>
+<li>Shadows are always warm: "golden shadow with amber tones"</li>
+<li>Font weight is always 400 — describe emphasis through size and color</li>
+</ol>
+</main>
+</body>
+</html>

@@ -1,5 +1,6 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { JobPostingSchema, type JobPosting } from "./types";
+<<<<<<< HEAD
 import {
   EXTRACTION_SYSTEM_PROMPT,
   buildExtractionUserPrompt,
@@ -16,6 +17,19 @@ const MAX_TOKENS = 32000;
 async function callClaude(
   system: string,
   userPrompt: string,
+=======
+import { EXTRACTION_SYSTEM_PROMPT, buildExtractionUserPrompt } from "./prompt";
+import type { FetchedPage } from "./fetch-html";
+
+const DEFAULT_MODEL = "claude-sonnet-4-6";
+
+/**
+ * 取得済みページ群からClaudeで求人票を1つに統合抽出する。
+ * APIキー未設定や抽出失敗時は明確なエラーを投げる。
+ */
+export async function extractJobPosting(
+  pages: FetchedPage[],
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
 ): Promise<JobPosting> {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
@@ -23,6 +37,7 @@ async function callClaude(
       "ANTHROPIC_API_KEY が未設定です。.env.local に設定してください。",
     );
   }
+<<<<<<< HEAD
   const client = new Anthropic({ apiKey });
   // max_tokensが大きい場合、SDKはストリーミングでの呼び出しを必須とするため
   // stream()で受信し、完了メッセージを組み立てる（結果は非ストリーミングと同じ）
@@ -68,6 +83,22 @@ export async function extractJobPosting(
     );
   }
   return callClaude(EXTRACTION_SYSTEM_PROMPT, buildExtractionUserPrompt(pages));
+=======
+  if (!pages.some((p) => p.fetched && p.text)) {
+    throw new Error("有効な求人ページを取得できませんでした。URLをご確認ください。");
+  }
+
+  const client = new Anthropic({ apiKey });
+  const message = await client.messages.create({
+    model: process.env.ANTHROPIC_MODEL || DEFAULT_MODEL,
+    max_tokens: 4096,
+    system: EXTRACTION_SYSTEM_PROMPT,
+    messages: [{ role: "user", content: buildExtractionUserPrompt(pages) }],
+  });
+
+  const raw = firstText(message);
+  return parseJobJson(raw);
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
 }
 
 /** Claudeレスポンスから最初のテキストブロックを取り出す。 */
@@ -81,12 +112,17 @@ function firstText(message: Anthropic.Message): string {
 
 /** テキストからJSONを取り出し、スキーマで正規化する。 */
 export function parseJobJson(raw: string): JobPosting {
+<<<<<<< HEAD
   // 文字列内の生改行等を先にエスケープ（AIが長文フィールドで出しがち）
   const jsonText = sanitizeJsonControlChars(extractJsonBlock(raw));
+=======
+  const jsonText = extractJsonBlock(raw);
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
   let parsed: unknown;
   try {
     parsed = JSON.parse(jsonText);
   } catch {
+<<<<<<< HEAD
     // 途中切れ等で壊れたJSONの修復を試みる
     try {
       parsed = JSON.parse(repairTruncatedJson(jsonText));
@@ -176,10 +212,16 @@ export function sanitizeJsonControlChars(text: string): string {
     out += ch;
   }
   return out;
+=======
+    throw new Error("AIの応答をJSONとして解析できませんでした。");
+  }
+  return JobPostingSchema.parse(parsed);
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
 }
 
 /** ```json フェンスや前後の文章を除去して純粋なJSON文字列を得る。 */
 export function extractJsonBlock(raw: string): string {
+<<<<<<< HEAD
   const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)(?:```|$)/i);
   const candidate = fenced ? fenced[1] : raw;
   const start = candidate.indexOf("{");
@@ -256,3 +298,14 @@ function lastCommaOutsideString(text: string): number {
   }
   return last;
 }
+=======
+  const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const candidate = fenced ? fenced[1] : raw;
+  const start = candidate.indexOf("{");
+  const end = candidate.lastIndexOf("}");
+  if (start === -1 || end === -1 || end <= start) {
+    throw new Error("AIの応答にJSONが含まれていませんでした。");
+  }
+  return candidate.slice(start, end + 1);
+}
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9

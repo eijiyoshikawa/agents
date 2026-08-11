@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent 2: Design Analyzer（デザイン解析）</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="agent-2-design-analyzer">Agent 2: Design Analyzer（デザイン解析）</h1>
+<h2 id="_1">役割</h2>
+<p>参考サイトのビジュアルデザインを詳細に分析し、カラーパレット・タイポグラフィ・
+スペーシング・ビジュアルスタイルを体系的に抽出する。Builder が Tailwind CSS の
+設定とスタイリングを正確に再現できるデザイントークンを生成する。</p>
+<h2 id="_2">入力</h2>
+<ul>
+<li><code>/agents/web_builder/site_scanner/output.json</code> を読み込む</li>
+<li>各ページのHTML/CSSを <code>WebFetch</code> で取得</li>
+</ul>
+<h2 id="_3">実行手順</h2>
+<h3 id="step-1-css">Step 1: CSSの取得と解析</h3>
+<p><code>WebFetch</code> でページのHTMLを取得し、以下のCSS情報を収集する:</p>
+<ul>
+<li><code>&lt;link rel="stylesheet"&gt;</code> で読み込まれている外部CSS</li>
+<li><code>&lt;style&gt;</code> タグ内のインラインCSS</li>
+<li>CSS カスタムプロパティ（<code>--primary-color</code> 等）の定義</li>
+<li><code>:root</code> や <code>body</code> に定義されたグローバルスタイル</li>
+</ul>
+<h3 id="step-2">Step 2: カラーパレットの抽出</h3>
+<p>サイト全体で使用されているカラーを分類する:</p>
+<ol>
+<li><strong>プライマリカラー</strong>: メインのブランドカラー（CTA ボタン、アクセント等）</li>
+<li><strong>セカンダリカラー</strong>: サブカラー</li>
+<li><strong>アクセントカラー</strong>: 強調色</li>
+<li><strong>背景色</strong>: メイン背景、セクション背景のバリエーション</li>
+<li><strong>テキストカラー</strong>: 見出し色、本文色、薄いテキスト色</li>
+<li><strong>グレースケール</strong>: ボーダー、区切り線等に使われるグレー</li>
+</ol>
+<p>CSS変数、インラインスタイル、クラス名から色情報を抽出する。
+色は HEX コード（<code>#RRGGBB</code>）で統一して記録する。</p>
+<h3 id="step-3">Step 3: タイポグラフィの抽出</h3>
+<p>フォント関連の情報を体系的に記録する:</p>
+<ol>
+<li><strong>フォントファミリー</strong>:
+   - 日本語フォント（Noto Sans JP, Yu Gothic, etc.）
+   - 欧文フォント（Inter, Poppins, etc.）
+   - Google Fonts のインポートURLを確認</li>
+<li><strong>見出しスタイル</strong> (h1〜h4):
+   - font-size（px または rem）
+   - font-weight
+   - line-height
+   - letter-spacing
+   - モバイル時のサイズ変化</li>
+<li><strong>本文スタイル</strong>:
+   - font-size
+   - font-weight
+   - line-height（日本語は 1.8〜2.0 が多い）</li>
+<li><strong>その他</strong>:
+   - キャプション、ラベル、ボタンテキスト等の小さいテキスト</li>
+</ol>
+<h3 id="step-4">Step 4: スペーシングシステムの解析</h3>
+<p>セクション間・要素間の余白パターンを記録する:</p>
+<ul>
+<li>セクション間の上下マージン/パディング</li>
+<li>コンテンツ領域の左右パディング</li>
+<li>カード間のギャップ</li>
+<li>見出しと本文の間隔</li>
+<li>ボタンの内部パディング</li>
+</ul>
+<h3 id="step-5-ui">Step 5: UIコンポーネントのスタイル</h3>
+<p>よく使われるUIパーツのスタイルを記録する:</p>
+<ol>
+<li><strong>ボタン</strong>:
+   - プライマリボタン（背景色、テキスト色、角丸、パディング）
+   - セカンダリボタン/ゴーストボタン
+   - ホバー時の変化</li>
+<li><strong>カード</strong>:
+   - 背景色、ボーダー、シャドウ、角丸</li>
+<li><strong>画像の扱い</strong>:
+   - 角丸、オーバーレイ、アスペクト比</li>
+<li><strong>アイコン</strong>:
+   - スタイル（線画/塗り）、サイズ、色</li>
+</ol>
+<h3 id="step-6">Step 6: セクション別デザインノート</h3>
+<p>各セクションのビジュアル的な特徴を記録する:
+- 背景処理（色/画像/グラデーション/動画）
+- テキスト色（背景に応じた変化）
+- 特殊な装飾要素（斜めの区切り線、波形、パターン背景等）</p>
+<h2 id="_4">出力フォーマット</h2>
+<p><code>/agents/web_builder/design_analyzer/output.json</code> に保存:</p>
+<pre class="codehilite"><code class="language-json">{
+  &quot;colors&quot;: {
+    &quot;primary&quot;: &quot;#3B82F6&quot;,
+    &quot;secondary&quot;: &quot;#10B981&quot;,
+    &quot;accent&quot;: &quot;#F59E0B&quot;,
+    &quot;background&quot;: {
+      &quot;main&quot;: &quot;#FFFFFF&quot;,
+      &quot;alt&quot;: &quot;#F8FAFC&quot;,
+      &quot;dark&quot;: &quot;#0F172A&quot;
+    },
+    &quot;text&quot;: {
+      &quot;primary&quot;: &quot;#1E293B&quot;,
+      &quot;secondary&quot;: &quot;#64748B&quot;,
+      &quot;on_dark&quot;: &quot;#F8FAFC&quot;,
+      &quot;on_primary&quot;: &quot;#FFFFFF&quot;
+    },
+    &quot;border&quot;: &quot;#E2E8F0&quot;,
+    &quot;full_palette&quot;: [&quot;#0F172A&quot;, &quot;#1E293B&quot;, &quot;#3B82F6&quot;, &quot;#10B981&quot;, &quot;#F59E0B&quot;, &quot;#F8FAFC&quot;, &quot;#FFFFFF&quot;]
+  },
+  &quot;typography&quot;: {
+    &quot;font_families&quot;: {
+      &quot;heading&quot;: &quot;Noto Sans JP&quot;,
+      &quot;body&quot;: &quot;Noto Sans JP&quot;,
+      &quot;accent&quot;: &quot;Inter&quot;,
+      &quot;google_fonts_url&quot;: &quot;https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&amp;family=Inter:wght@400;600;700&amp;display=swap&quot;
+    },
+    &quot;h1&quot;: {&quot;size&quot;: &quot;48px&quot;, &quot;size_mobile&quot;: &quot;32px&quot;, &quot;weight&quot;: &quot;700&quot;, &quot;line_height&quot;: &quot;1.2&quot;, &quot;letter_spacing&quot;: &quot;0&quot;},
+    &quot;h2&quot;: {&quot;size&quot;: &quot;36px&quot;, &quot;size_mobile&quot;: &quot;24px&quot;, &quot;weight&quot;: &quot;700&quot;, &quot;line_height&quot;: &quot;1.3&quot;, &quot;letter_spacing&quot;: &quot;0&quot;},
+    &quot;h3&quot;: {&quot;size&quot;: &quot;24px&quot;, &quot;size_mobile&quot;: &quot;20px&quot;, &quot;weight&quot;: &quot;600&quot;, &quot;line_height&quot;: &quot;1.4&quot;, &quot;letter_spacing&quot;: &quot;0&quot;},
+    &quot;h4&quot;: {&quot;size&quot;: &quot;20px&quot;, &quot;size_mobile&quot;: &quot;18px&quot;, &quot;weight&quot;: &quot;600&quot;, &quot;line_height&quot;: &quot;1.4&quot;, &quot;letter_spacing&quot;: &quot;0&quot;},
+    &quot;body&quot;: {&quot;size&quot;: &quot;16px&quot;, &quot;weight&quot;: &quot;400&quot;, &quot;line_height&quot;: &quot;1.8&quot;, &quot;letter_spacing&quot;: &quot;0.02em&quot;},
+    &quot;small&quot;: {&quot;size&quot;: &quot;14px&quot;, &quot;weight&quot;: &quot;400&quot;, &quot;line_height&quot;: &quot;1.6&quot;},
+    &quot;caption&quot;: {&quot;size&quot;: &quot;12px&quot;, &quot;weight&quot;: &quot;400&quot;, &quot;line_height&quot;: &quot;1.5&quot;}
+  },
+  &quot;spacing&quot;: {
+    &quot;section_gap&quot;: &quot;120px&quot;,
+    &quot;section_gap_mobile&quot;: &quot;80px&quot;,
+    &quot;content_padding&quot;: &quot;24px&quot;,
+    &quot;content_padding_mobile&quot;: &quot;16px&quot;,
+    &quot;component_gap&quot;: &quot;16px&quot;,
+    &quot;heading_to_text&quot;: &quot;16px&quot;,
+    &quot;heading_to_content&quot;: &quot;48px&quot;
+  },
+  &quot;ui_components&quot;: {
+    &quot;button_primary&quot;: {
+      &quot;bg&quot;: &quot;#3B82F6&quot;,
+      &quot;text&quot;: &quot;#FFFFFF&quot;,
+      &quot;border_radius&quot;: &quot;8px&quot;,
+      &quot;padding&quot;: &quot;12px 32px&quot;,
+      &quot;font_size&quot;: &quot;16px&quot;,
+      &quot;font_weight&quot;: &quot;600&quot;,
+      &quot;hover_bg&quot;: &quot;#2563EB&quot;,
+      &quot;transition&quot;: &quot;all 0.3s ease&quot;
+    },
+    &quot;button_secondary&quot;: {
+      &quot;bg&quot;: &quot;transparent&quot;,
+      &quot;text&quot;: &quot;#3B82F6&quot;,
+      &quot;border&quot;: &quot;2px solid #3B82F6&quot;,
+      &quot;border_radius&quot;: &quot;8px&quot;,
+      &quot;padding&quot;: &quot;12px 32px&quot;
+    },
+    &quot;card&quot;: {
+      &quot;bg&quot;: &quot;#FFFFFF&quot;,
+      &quot;border&quot;: &quot;none&quot;,
+      &quot;border_radius&quot;: &quot;12px&quot;,
+      &quot;shadow&quot;: &quot;0 4px 6px -1px rgba(0,0,0,0.1)&quot;,
+      &quot;padding&quot;: &quot;24px&quot;,
+      &quot;hover_shadow&quot;: &quot;0 10px 15px -3px rgba(0,0,0,0.1)&quot;
+    },
+    &quot;image_style&quot;: {
+      &quot;border_radius&quot;: &quot;12px&quot;,
+      &quot;object_fit&quot;: &quot;cover&quot;,
+      &quot;overlay&quot;: &quot;none&quot;
+    }
+  },
+  &quot;visual_style&quot;: {
+    &quot;overall_tone&quot;: &quot;modern-clean | corporate | playful | luxury | minimal&quot;,
+    &quot;border_radius_system&quot;: &quot;small: 4px, medium: 8px, large: 12px, xl: 24px&quot;,
+    &quot;shadow_style&quot;: &quot;subtle | medium | dramatic | none&quot;,
+    &quot;decorative_elements&quot;: [&quot;斜めセクション区切り&quot;, &quot;ドットパターン背景&quot;, &quot;グラデーションオーバーレイ&quot;]
+  },
+  &quot;sections_design&quot;: [
+    {
+      &quot;section_id&quot;: &quot;hero&quot;,
+      &quot;background&quot;: &quot;画像 + ダークオーバーレイ(rgba(0,0,0,0.5))&quot;,
+      &quot;text_color&quot;: &quot;#FFFFFF&quot;,
+      &quot;special_notes&quot;: &quot;背景画像は固定（parallax風）、CTAボタン2つ（primary + ghost）&quot;
+    }
+  ]
+}
+</code></pre>
+
+<h2 id="_5">使用するツール</h2>
+<ul>
+<li><code>Read</code>: site_scanner/output.json の読み込み</li>
+<li><code>WebFetch</code>: ページHTML・外部CSSファイルの取得</li>
+<li><code>Write</code>: output.json への書き出し</li>
+</ul>
+</main>
+</body>
+</html>

@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Raycast</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-raycast">Design System: Raycast</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Raycast's marketing site feels like the dark interior of a precision instrument — a Swiss watch case carved from obsidian. The background isn't just dark, it's an almost-black blue-tint (<code>#07080a</code>) that creates a sense of being inside a macOS native application rather than a website. Every surface, every border, every shadow is calibrated to evoke the feeling of a high-performance desktop utility: fast, minimal, trustworthy.</p>
+<p>The signature move is the layered shadow system borrowed from macOS window chrome: multi-layer box-shadows with inset highlights that simulate physical depth, as if cards and buttons are actual pressed or raised glass elements on a dark desk. Combined with Raycast Red (<code>#FF6363</code>) — deployed almost exclusively in the hero's iconic diagonal stripe pattern — the palette creates a brand that reads as "powerful tool with personality." The red doesn't dominate; it punctuates.</p>
+<p>Inter is used everywhere — headings, body, buttons, captions — with extensive OpenType features (<code>calt</code>, <code>kern</code>, <code>liga</code>, <code>ss03</code>) creating a consistent, readable typographic voice. The positive letter-spacing (0.2px–0.4px on body text) is unusual for a dark UI and gives the text an airy, breathable quality that counterbalances the dense, dark surfaces. GeistMono appears for code elements, reinforcing the developer-tool identity.</p>
+<p><strong>Key Characteristics:</strong>
+- Near-black blue-tinted background (<code>#07080a</code>) — not pure black, subtly blue-shifted
+- macOS-native shadow system with multi-layer inset highlights simulating physical depth
+- Raycast Red (<code>#FF6363</code>) as a punctuation color — hero stripes, not pervasive
+- Inter with positive letter-spacing (0.2px) for an airy, readable dark-mode experience
+- Radix UI component primitives powering the interaction layer
+- Subtle rgba white borders (0.06–0.1 opacity) for containment on dark surfaces
+- Keyboard shortcut styling with gradient key caps and heavy shadows</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>Near-Black Blue</strong> (<code>#07080a</code>): Primary page background — the foundational void with a subtle blue-cold undertone</li>
+<li><strong>Pure White</strong> (<code>#ffffff</code>): Primary heading text, high-emphasis elements</li>
+<li><strong>Raycast Red</strong> (<code>#FF6363</code> / <code>hsl(0, 100%, 69%)</code>): Brand accent — hero stripes, danger states, critical highlights</li>
+</ul>
+<h3 id="secondary-accent">Secondary &amp; Accent</h3>
+<ul>
+<li><strong>Raycast Blue</strong> (<code>hsl(202, 100%, 67%)</code> / ~<code>#55b3ff</code>): Interactive accent — links, focus states, selected items</li>
+<li><strong>Raycast Green</strong> (<code>hsl(151, 59%, 59%)</code> / ~<code>#5fc992</code>): Success states, positive indicators</li>
+<li><strong>Raycast Yellow</strong> (<code>hsl(43, 100%, 60%)</code> / ~<code>#ffbc33</code>): Warning accents, highlights</li>
+<li><strong>Blue Transparent</strong> (<code>hsla(202, 100%, 67%, 0.15)</code>): Blue tint overlay for interactive surfaces</li>
+<li><strong>Red Transparent</strong> (<code>hsla(0, 100%, 69%, 0.15)</code>): Red tint overlay for danger/error surfaces</li>
+</ul>
+<h3 id="surface-background">Surface &amp; Background</h3>
+<ul>
+<li><strong>Deep Background</strong> (<code>#07080a</code>): Page canvas, the darkest surface</li>
+<li><strong>Surface 100</strong> (<code>#101111</code>): Elevated surface, card backgrounds</li>
+<li><strong>Key Start</strong> (<code>#121212</code>): Keyboard key gradient start</li>
+<li><strong>Key End</strong> (<code>#0d0d0d</code>): Keyboard key gradient end</li>
+<li><strong>Card Surface</strong> (<code>#1b1c1e</code>): Badge backgrounds, tag fills, elevated containers</li>
+<li><strong>Button Foreground</strong> (<code>#18191a</code>): Dark surface for button text on light backgrounds</li>
+</ul>
+<h3 id="neutrals-text">Neutrals &amp; Text</h3>
+<ul>
+<li><strong>Near White</strong> (<code>#f9f9f9</code> / <code>hsl(240, 11%, 96%)</code>): Primary body text, high-emphasis content</li>
+<li><strong>Light Gray</strong> (<code>#cecece</code> / <code>#cdcdce</code>): Secondary body text, descriptions</li>
+<li><strong>Silver</strong> (<code>#c0c0c0</code>): Tertiary text, subdued labels</li>
+<li><strong>Medium Gray</strong> (<code>#9c9c9d</code>): Link default color, secondary navigation</li>
+<li><strong>Dim Gray</strong> (<code>#6a6b6c</code>): Disabled text, low-emphasis labels</li>
+<li><strong>Dark Gray</strong> (<code>#434345</code>): Muted borders, inactive navigation links</li>
+<li><strong>Border</strong> (<code>hsl(195, 5%, 15%)</code> / ~<code>#252829</code>): Standard border color for cards and dividers</li>
+<li><strong>Dark Border</strong> (<code>#2f3031</code>): Separator lines, table borders</li>
+</ul>
+<h3 id="semantic-accent">Semantic &amp; Accent</h3>
+<ul>
+<li><strong>Error Red</strong> (<code>hsl(0, 100%, 69%)</code>): Error states, destructive actions</li>
+<li><strong>Success Green</strong> (<code>hsl(151, 59%, 59%)</code>): Success confirmations, positive states</li>
+<li><strong>Warning Yellow</strong> (<code>hsl(43, 100%, 60%)</code>): Warnings, attention-needed states</li>
+<li><strong>Info Blue</strong> (<code>hsl(202, 100%, 67%)</code>): Informational highlights, links</li>
+</ul>
+<h3 id="gradient-system">Gradient System</h3>
+<ul>
+<li><strong>Keyboard Key Gradient</strong>: Linear gradient from <code>#121212</code> (top) to <code>#0d0d0d</code> (bottom) — simulates physical key depth</li>
+<li><strong>Warm Glow</strong>: <code>rgba(215, 201, 175, 0.05)</code> radial spread — subtle warm ambient glow behind featured elements</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-family">Font Family</h3>
+<ul>
+<li><strong>Primary</strong>: <code>Inter</code> — humanist sans-serif, used everywhere. Fallbacks: <code>Inter Fallback</code>, system sans-serif</li>
+<li><strong>System</strong>: <code>SF Pro Text</code> — Apple system font for select macOS-native UI elements. Fallbacks: <code>SF Pro Icons</code>, <code>Inter</code>, <code>Inter Fallback</code></li>
+<li><strong>Monospace</strong>: <code>GeistMono</code> — Vercel's monospace font for code elements. Fallbacks: <code>ui-monospace</code>, <code>SFMono-Regular</code>, <code>Roboto Mono</code>, <code>Menlo</code>, <code>Monaco</code></li>
+<li><strong>OpenType features</strong>: <code>calt</code>, <code>kern</code>, <code>liga</code>, <code>ss03</code> enabled globally; <code>ss02</code>, <code>ss08</code> on display text; <code>liga</code> disabled (<code>"liga" 0</code>) on hero headings</li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display Hero</td>
+<td>64px</td>
+<td>600</td>
+<td>1.10</td>
+<td>0px</td>
+<td>OpenType: liga 0, ss02, ss08</td>
+</tr>
+<tr>
+<td>Section Display</td>
+<td>56px</td>
+<td>400</td>
+<td>1.17</td>
+<td>0.2px</td>
+<td>OpenType: calt, kern, liga, ss03</td>
+</tr>
+<tr>
+<td>Section Heading</td>
+<td>24px</td>
+<td>500</td>
+<td>normal</td>
+<td>0.2px</td>
+<td>OpenType: calt, kern, liga, ss03</td>
+</tr>
+<tr>
+<td>Card Heading</td>
+<td>22px</td>
+<td>400</td>
+<td>1.15</td>
+<td>0px</td>
+<td>OpenType: calt, kern, liga, ss03</td>
+</tr>
+<tr>
+<td>Sub-heading</td>
+<td>20px</td>
+<td>500</td>
+<td>1.60</td>
+<td>0.2px</td>
+<td>Relaxed line-height for readability</td>
+</tr>
+<tr>
+<td>Body Large</td>
+<td>18px</td>
+<td>400</td>
+<td>1.15</td>
+<td>0.2px</td>
+<td>OpenType: calt, kern, liga, ss03</td>
+</tr>
+<tr>
+<td>Body</td>
+<td>16px</td>
+<td>500</td>
+<td>1.60</td>
+<td>0.2px</td>
+<td>Primary body text, relaxed rhythm</td>
+</tr>
+<tr>
+<td>Body Tight</td>
+<td>16px</td>
+<td>400</td>
+<td>1.15</td>
+<td>0.1px</td>
+<td>UI labels, compact contexts</td>
+</tr>
+<tr>
+<td>Button</td>
+<td>16px</td>
+<td>600</td>
+<td>1.15</td>
+<td>0.3px</td>
+<td>Semibold, slightly wider tracking</td>
+</tr>
+<tr>
+<td>Nav Link</td>
+<td>16px</td>
+<td>500</td>
+<td>1.40</td>
+<td>0.3px</td>
+<td>Links in navigation</td>
+</tr>
+<tr>
+<td>Caption</td>
+<td>14px</td>
+<td>500</td>
+<td>1.14</td>
+<td>0.2px</td>
+<td>Small labels, metadata</td>
+</tr>
+<tr>
+<td>Caption Bold</td>
+<td>14px</td>
+<td>600</td>
+<td>1.40</td>
+<td>0px</td>
+<td>Emphasized captions</td>
+</tr>
+<tr>
+<td>Small</td>
+<td>12px</td>
+<td>600</td>
+<td>1.33</td>
+<td>0px</td>
+<td>Badges, tags, micro-labels</td>
+</tr>
+<tr>
+<td>Small Link</td>
+<td>12px</td>
+<td>400</td>
+<td>1.50</td>
+<td>0.4px</td>
+<td>Footer links, fine print</td>
+</tr>
+<tr>
+<td>Code</td>
+<td>14px (GeistMono)</td>
+<td>500</td>
+<td>1.60</td>
+<td>0.3px</td>
+<td>Code blocks, technical content</td>
+</tr>
+<tr>
+<td>Code Small</td>
+<td>12px (GeistMono)</td>
+<td>400</td>
+<td>1.60</td>
+<td>0.2px</td>
+<td>Inline code, terminal output</td>
+</tr>
+</tbody>
+</table>
+<h3 id="principles">Principles</h3>
+<ul>
+<li><strong>Positive tracking on dark</strong>: Unlike most dark UIs that use tight or neutral letter-spacing, Raycast applies +0.2px to +0.4px — creating an airy, readable feel that compensates for the dark background</li>
+<li><strong>Weight 500 as baseline</strong>: Most body text uses medium weight (500), not regular (400) — subtle extra heft improves legibility on dark surfaces</li>
+<li><strong>Display restraint</strong>: Hero text at 64px/600 is confident but not oversized — Raycast avoids typographic spectacle in favor of functional elegance</li>
+<li><strong>OpenType everywhere</strong>: <code>ss03</code> (stylistic set 3) is enabled globally across Inter, giving the typeface a slightly more geometric, tool-like quality</li>
+</ul>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<ul>
+<li><strong>Primary Pill</strong>: Transparent background, white text, pill shape (86px radius), multi-layer inset shadow (<code>rgba(255, 255, 255, 0.1) 0px 1px 0px 0px inset</code>). Hover: opacity 0.6</li>
+<li><strong>Secondary Button</strong>: Transparent background, white text, 6px radius, <code>1px solid rgba(255, 255, 255, 0.1)</code> border, subtle drop shadow (<code>rgba(0, 0, 0, 0.03) 0px 7px 3px</code>). Hover: opacity 0.6</li>
+<li><strong>Ghost Button</strong>: No background or border, gray text (<code>#6a6b6c</code>), 86px radius, same inset shadow. Hover: opacity 0.6, text brightens to white</li>
+<li><strong>CTA (Download)</strong>: Semi-transparent white background (<code>hsla(0, 0%, 100%, 0.815)</code>), dark text (<code>#18191a</code>), pill shape. Hover: full white background (<code>hsl(0, 0%, 100%)</code>)</li>
+<li><strong>Transition</strong>: All buttons use opacity transition for hover rather than background-color change — a signature Raycast interaction pattern</li>
+</ul>
+<h3 id="cards-containers">Cards &amp; Containers</h3>
+<ul>
+<li><strong>Standard Card</strong>: <code>#101111</code> surface, <code>1px solid rgba(255, 255, 255, 0.06)</code> border, 12px–16px border-radius</li>
+<li><strong>Elevated Card</strong>: Ring shadow <code>rgb(27, 28, 30) 0px 0px 0px 1px</code> outer + <code>rgb(7, 8, 10) 0px 0px 0px 1px inset</code> inner — creates a double-ring containment</li>
+<li><strong>Feature Card</strong>: 16px–20px border-radius, subtle warm glow (<code>rgba(215, 201, 175, 0.05) 0px 0px 20px 5px</code>) behind hero elements</li>
+<li><strong>Hover</strong>: Cards brighten slightly via border opacity increase or subtle shadow enhancement</li>
+</ul>
+<h3 id="inputs-forms">Inputs &amp; Forms</h3>
+<ul>
+<li>Dark input fields with <code>#07080a</code> background, <code>1px solid rgba(255, 255, 255, 0.08)</code> border, 8px border-radius</li>
+<li>Focus state: Border brightens, blue glow (<code>hsla(202, 100%, 67%, 0.15)</code>) ring appears</li>
+<li>Text: <code>#f9f9f9</code> input color, <code>#6a6b6c</code> placeholder</li>
+<li>Labels: <code>#9c9c9d</code> at 14px weight 500</li>
+</ul>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li><strong>Top nav</strong>: Dark background blending with page, white text links at 16px weight 500</li>
+<li><strong>Nav links</strong>: Gray text (<code>#9c9c9d</code>) → white on hover, underline decoration on hover</li>
+<li><strong>CTA button</strong>: Semi-transparent white pill at nav end</li>
+<li><strong>Mobile</strong>: Collapses to hamburger, maintains dark theme</li>
+<li><strong>Sticky</strong>: Nav fixed at top with subtle border separator</li>
+</ul>
+<h3 id="image-treatment">Image Treatment</h3>
+<ul>
+<li><strong>Product screenshots</strong>: macOS window chrome style — rounded corners (12px), deep shadows simulating floating windows</li>
+<li><strong>Full-bleed sections</strong>: Dark screenshots blend seamlessly into the dark background</li>
+<li><strong>Hero illustration</strong>: Diagonal stripe pattern in Raycast Red — abstract, geometric, brand-defining</li>
+<li><strong>App UI embeds</strong>: Showing actual Raycast command palette and extensions — product as content</li>
+</ul>
+<h3 id="keyboard-shortcut-keys">Keyboard Shortcut Keys</h3>
+<ul>
+<li><strong>Key cap styling</strong>: Gradient background (<code>#121212</code> → <code>#0d0d0d</code>), heavy multi-layer shadow (<code>rgba(0, 0, 0, 0.4) 0px 1.5px 0.5px 2.5px</code> + inset shadows), creating realistic physical key appearance</li>
+<li>Border-radius: 4px–6px for individual keys</li>
+</ul>
+<h3 id="badges-tags">Badges &amp; Tags</h3>
+<ul>
+<li><strong>Neutral badge</strong>: <code>#1b1c1e</code> background, white text, 6px radius, 14px font at weight 500, <code>0px 6px</code> padding</li>
+<li>Compact, pill-like treatment for categorization</li>
+</ul>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-system">Spacing System</h3>
+<ul>
+<li><strong>Base unit</strong>: 8px</li>
+<li><strong>Scale</strong>: 1px, 2px, 3px, 4px, 8px, 10px, 12px, 16px, 20px, 24px, 32px, 40px</li>
+<li><strong>Section padding</strong>: 80px–120px vertical between major sections</li>
+<li><strong>Card padding</strong>: 16px–32px internal spacing</li>
+<li><strong>Component gaps</strong>: 8px–16px between related elements</li>
+</ul>
+<h3 id="grid-container">Grid &amp; Container</h3>
+<ul>
+<li><strong>Max width</strong>: ~1200px container (breakpoint at 1204px), centered</li>
+<li><strong>Column patterns</strong>: Single-column hero, 2–3 column feature grids, full-width showcase sections</li>
+<li><strong>App showcase</strong>: Product UI presented in centered window frames</li>
+</ul>
+<h3 id="whitespace-philosophy">Whitespace Philosophy</h3>
+<ul>
+<li><strong>Dramatic negative space</strong>: Sections float in vast dark void, creating cinematic pacing between features</li>
+<li><strong>Dense product, sparse marketing</strong>: The product UI screenshots are information-dense, but the surrounding marketing copy uses minimal text with generous spacing</li>
+<li><strong>Vertical rhythm</strong>: Consistent 24px–32px gaps between elements within sections</li>
+</ul>
+<h3 id="border-radius-scale">Border Radius Scale</h3>
+<ul>
+<li><strong>2px–3px</strong>: Micro-elements, code spans, tiny indicators</li>
+<li><strong>4px–5px</strong>: Keyboard keys, small interactive elements</li>
+<li><strong>6px</strong>: Buttons, badges, tags — the workhorse radius</li>
+<li><strong>8px</strong>: Input fields, inline components</li>
+<li><strong>9px–11px</strong>: Images, medium containers</li>
+<li><strong>12px</strong>: Standard cards, product screenshots</li>
+<li><strong>16px</strong>: Large cards, feature sections</li>
+<li><strong>20px</strong>: Hero cards, prominent containers</li>
+<li><strong>86px+</strong>: Pill buttons, nav CTAs — full pill shape</li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Treatment</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Level 0 (Void)</td>
+<td>No shadow, <code>#07080a</code> surface</td>
+<td>Page background</td>
+</tr>
+<tr>
+<td>Level 1 (Subtle)</td>
+<td><code>rgba(0, 0, 0, 0.28) 0px 1.189px 2.377px</code></td>
+<td>Minimal lift, inline elements</td>
+</tr>
+<tr>
+<td>Level 2 (Ring)</td>
+<td><code>rgb(27, 28, 30) 0px 0px 0px 1px</code> outer + <code>rgb(7, 8, 10) 0px 0px 0px 1px inset</code> inner</td>
+<td>Card containment, double-ring technique</td>
+</tr>
+<tr>
+<td>Level 3 (Button)</td>
+<td><code>rgba(255, 255, 255, 0.05) 0px 1px 0px 0px inset</code> + <code>rgba(255, 255, 255, 0.25) 0px 0px 0px 1px</code> + <code>rgba(0, 0, 0, 0.2) 0px -1px 0px 0px inset</code></td>
+<td>macOS-native button press — white highlight top, dark inset bottom</td>
+</tr>
+<tr>
+<td>Level 4 (Key)</td>
+<td>5-layer shadow stack with inset press effects</td>
+<td>Keyboard shortcut key caps — physical 3D appearance</td>
+</tr>
+<tr>
+<td>Level 5 (Floating)</td>
+<td><code>rgba(0, 0, 0, 0.5) 0px 0px 0px 2px</code> + <code>rgba(255, 255, 255, 0.19) 0px 0px 14px</code> + insets</td>
+<td>Command palette, floating panels — heavy depth with glow</td>
+</tr>
+</tbody>
+</table>
+<h3 id="shadow-philosophy">Shadow Philosophy</h3>
+<p>Raycast's shadow system is the most macOS-native on the web. Multi-layer shadows combine:
+- <strong>Outer rings</strong> for containment (replacing traditional borders)
+- <strong>Inset top highlights</strong> (<code>rgba(255, 255, 255, 0.05–0.25)</code>) simulating light source from above
+- <strong>Inset bottom darks</strong> (<code>rgba(0, 0, 0, 0.2)</code>) simulating shadow underneath
+- The effect is physical: elements feel like glass or brushed metal, not flat rectangles</p>
+<h3 id="decorative-depth">Decorative Depth</h3>
+<ul>
+<li><strong>Warm glow</strong>: <code>rgba(215, 201, 175, 0.05) 0px 0px 20px 5px</code> behind featured elements — a subtle warm aura on the cold dark canvas</li>
+<li><strong>Blue info glow</strong>: <code>rgba(0, 153, 255, 0.15)</code> for interactive state emphasis</li>
+<li><strong>Red danger glow</strong>: <code>rgba(255, 99, 99, 0.15)</code> for error/destructive state emphasis</li>
+</ul>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use <code>#07080a</code> (not pure black) as the background — the blue-cold tint is essential to the Raycast feel</li>
+<li>Apply positive letter-spacing (+0.2px) on body text — this is deliberately different from most dark UIs</li>
+<li>Use multi-layer shadows with inset highlights for interactive elements — the macOS-native depth is signature</li>
+<li>Keep Raycast Red (<code>#FF6363</code>) as punctuation, not pervasive — reserve it for hero moments and error states</li>
+<li>Use <code>rgba(255, 255, 255, 0.06)</code> borders for card containment — barely visible, structurally essential</li>
+<li>Apply weight 500 as the body text baseline — medium weight improves dark-mode legibility</li>
+<li>Use pill shapes (86px+ radius) for primary CTAs, rectangular shapes (6px–8px) for secondary actions</li>
+<li>Enable OpenType features <code>calt</code>, <code>kern</code>, <code>liga</code>, <code>ss03</code> on all Inter text</li>
+<li>Use opacity transitions (hover: opacity 0.6) for button interactions, not color changes</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Use pure black (<code>#000000</code>) as the background — the blue tint differentiates Raycast from generic dark themes</li>
+<li>Apply negative letter-spacing on body text — Raycast deliberately uses positive spacing for readability</li>
+<li>Use Raycast Blue as the primary accent for everything — blue is for interactive/info, red is the brand color</li>
+<li>Create single-layer flat shadows — the multi-layer inset system is core to the macOS-native aesthetic</li>
+<li>Use regular weight (400) for body text when 500 is available — the extra weight prevents dark-mode text from feeling thin</li>
+<li>Mix warm and cool borders — stick to the cool gray (<code>hsl(195, 5%, 15%)</code>) border palette</li>
+<li>Apply heavy drop shadows without inset companions — shadows always come in pairs (outer + inset)</li>
+<li>Use decorative elements, gradients, or colorful backgrounds — the dark void is the stage, content is the performer</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<h3 id="breakpoints">Breakpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Width</th>
+<th>Key Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mobile</td>
+<td>&lt;600px</td>
+<td>Single column, stacked cards, hamburger nav, hero text reduces to ~40px</td>
+</tr>
+<tr>
+<td>Small Tablet</td>
+<td>600px–768px</td>
+<td>2-column grid begins, nav partially visible</td>
+</tr>
+<tr>
+<td>Tablet</td>
+<td>768px–1024px</td>
+<td>2–3 column features, nav expanding, screenshots scale</td>
+</tr>
+<tr>
+<td>Desktop</td>
+<td>1024px–1200px</td>
+<td>Full layout, all nav links visible, 64px hero display</td>
+</tr>
+<tr>
+<td>Large Desktop</td>
+<td>&gt;1200px</td>
+<td>Max-width container centered, generous side margins</td>
+</tr>
+</tbody>
+</table>
+<h3 id="touch-targets">Touch Targets</h3>
+<ul>
+<li>Pill buttons: 86px radius with 20px padding — well above 44px minimum</li>
+<li>Secondary buttons: 8px padding minimum, but border provides visual target expansion</li>
+<li>Nav links: 16px text with surrounding padding for accessible touch targets</li>
+</ul>
+<h3 id="collapsing-strategy">Collapsing Strategy</h3>
+<ul>
+<li><strong>Navigation</strong>: Full horizontal nav → hamburger at mobile with slide-out menu</li>
+<li><strong>Hero</strong>: 64px display → 48px → 36px across breakpoints</li>
+<li><strong>Feature grids</strong>: 3-column → 2-column → single-column stack</li>
+<li><strong>Product screenshots</strong>: Scale within containers, maintaining macOS window chrome proportions</li>
+<li><strong>Keyboard shortcut displays</strong>: Simplify or hide on mobile where keyboard shortcuts are irrelevant</li>
+</ul>
+<h3 id="image-behavior">Image Behavior</h3>
+<ul>
+<li>Product screenshots scale responsively within fixed-ratio containers</li>
+<li>Hero diagonal stripe pattern scales proportionally</li>
+<li>macOS window chrome rounded corners maintained at all sizes</li>
+<li>No lazy-loading artifacts — images are critical to the product narrative</li>
+</ul>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Primary Background: Near-Black Blue (<code>#07080a</code>)</li>
+<li>Primary Text: Near White (<code>#f9f9f9</code>)</li>
+<li>Brand Accent: Raycast Red (<code>#FF6363</code>)</li>
+<li>Interactive Blue: Raycast Blue (<code>hsl(202, 100%, 67%)</code> / ~<code>#55b3ff</code>)</li>
+<li>Secondary Text: Medium Gray (<code>#9c9c9d</code>)</li>
+<li>Card Surface: Surface 100 (<code>#101111</code>)</li>
+<li>Border: Dark Border (<code>hsl(195, 5%, 15%)</code> / ~<code>#252829</code>)</li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create a hero section on #07080a background with 64px Inter heading (weight 600, line-height 1.1), near-white text (#f9f9f9), and a semi-transparent white pill CTA button (hsla(0,0%,100%,0.815), 86px radius, dark text #18191a)"</li>
+<li>"Design a feature card with #101111 background, 1px solid rgba(255,255,255,0.06) border, 16px border-radius, double-ring shadow (rgb(27,28,30) 0px 0px 0px 1px outer), 22px Inter heading, and #9c9c9d body text"</li>
+<li>"Build a navigation bar on dark background (#07080a), Inter links at 16px weight 500 in #9c9c9d, hover to white, and a translucent white pill button at the right end"</li>
+<li>"Create a keyboard shortcut display with key caps using gradient background (#121212→#0d0d0d), 5-layer shadow for physical depth, 4px radius, Inter 12px weight 600 text"</li>
+<li>"Design an alert card with #101111 surface, Raycast Red (#FF6363) left border accent, translucent red glow (hsla(0,100%,69%,0.15)), white heading, and #cecece description text"</li>
+</ul>
+<h3 id="iteration-guide">Iteration Guide</h3>
+<p>When refining existing screens generated with this design system:
+1. Check the background is <code>#07080a</code> not pure black — the blue tint is critical
+2. Verify letter-spacing is positive (+0.2px) on body text — negative spacing breaks the Raycast aesthetic
+3. Ensure shadows have both outer and inset layers — single-layer shadows look flat and wrong
+4. Confirm Inter has OpenType features <code>calt</code>, <code>kern</code>, <code>liga</code>, <code>ss03</code> enabled
+5. Test that hover states use opacity transitions (0.6) not color swaps — this is a core interaction pattern</p>
+</main>
+</body>
+</html>

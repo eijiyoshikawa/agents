@@ -4,6 +4,7 @@ import { z } from "zod";
  * 求人票の構造化スキーマ。
  * 他社求人URLからAI抽出した内容を、この形に正規化してLETデザインへ流し込む。
  */
+<<<<<<< HEAD
 /**
  * 給与。月給と年収それぞれのレンジを「万円」の数値で持つ。
  * 旧形式 {type:"月給"|"年収", min, max(円), note} は自動変換して読み込む。
@@ -122,12 +123,38 @@ export const JobPostingSchema = z.object({
   companyBriefing: z.string().default(""), // 会社説明会の有無
   aptitudeTest: z.string().default(""), // 適性テストの有無
   selectionProcess: z.array(z.string()).default([]), // 選考フロー
+=======
+export const SalarySchema = z.object({
+  type: z.string().default("月給"), // 月給 / 年収 / 時給 など
+  min: z.number().nullable().default(null),
+  max: z.number().nullable().default(null),
+  note: z.string().default(""),
+});
+
+export const JobPostingSchema = z.object({
+  jobTitle: z.string().default(""), // 募集職種
+  catchphrase: z.string().default(""), // キャッチコピー（1行）
+  summary: z.string().default(""), // 仕事内容の概要（2〜3文）
+  responsibilities: z.array(z.string()).default([]), // 具体的な業務内容
+  requiredSkills: z.array(z.string()).default([]), // 必須要件
+  preferredSkills: z.array(z.string()).default([]), // 歓迎要件
+  idealCandidate: z.array(z.string()).default([]), // 求める人物像
+  appealPoints: z.array(z.string()).default([]), // この仕事の魅力・アピール
+  employmentType: z.string().default(""), // 雇用形態
+  salary: SalarySchema.default({ type: "月給", min: null, max: null, note: "" }),
+  workLocation: z.string().default(""), // 勤務地
+  workHours: z.string().default(""), // 勤務時間
+  holidays: z.string().default(""), // 休日・休暇
+  benefits: z.array(z.string()).default([]), // 福利厚生
+  selectionProcess: z.array(z.string()).default([]), // 選考プロセス
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
 });
 
 export type Salary = z.infer<typeof SalarySchema>;
 export type JobPosting = z.infer<typeof JobPostingSchema>;
 
 /** 抽出API のリクエスト/レスポンス */
+<<<<<<< HEAD
 /** URLモード: 他社求人URLを統合 */
 export const ExtractUrlRequestSchema = z.object({
   mode: z.literal("url"),
@@ -146,6 +173,11 @@ export const ExtractRequestSchema = z.union([
   ExtractTextRequestSchema,
   z.object({ urls: z.array(z.string().url()).min(1).max(8) }),
 ]);
+=======
+export const ExtractRequestSchema = z.object({
+  urls: z.array(z.string().url()).min(1).max(8),
+});
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
 export type ExtractRequest = z.infer<typeof ExtractRequestSchema>;
 
 export interface ExtractResponse {
@@ -153,7 +185,11 @@ export interface ExtractResponse {
   sources: { url: string; fetched: boolean; note?: string }[];
 }
 
+<<<<<<< HEAD
 /** LET（自社）情報 = 求人票の発行元/提供元 */
+=======
+/** LET（自社）情報 */
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
 export interface CompanyProfile {
   name: string;
   nameEn: string;
@@ -163,12 +199,15 @@ export interface CompanyProfile {
   email: string;
   tel: string;
   address: string;
+<<<<<<< HEAD
   /** 求人提供元（有料職業紹介事業者）情報 */
   agency: {
     name: string; // 事業者名
     address: string; // 本社所在地
     licenseNumber: string; // 有料職業紹介許可番号
   };
+=======
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
   /** ブランドカラー（feerベース。ロゴ確定後に差し替え可能） */
   brand: {
     ink: string;

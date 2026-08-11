@@ -1,5 +1,9 @@
 # パイプライン一括実行プロンプト
 
+> **推奨**: 2026-07-06 以降は `/run-pipeline <会議名>` スラッシュコマンドを使ってください
+> （QAゲート・アーカイブ・途中再開が組み込み済み。定義: `.claude/skills/run-pipeline/SKILL.md`）。
+> 以下のコピペ用プロンプトは、Skill が使えない環境向けのフォールバックとして残しています。
+
 以下のプロンプトを Claude Code にそのまま貼り付けて実行してください。
 `{{会議名}}` を実際の Notion 議事録ページ名に置き換えてから使ってください。
 
@@ -31,6 +35,7 @@
 
 5. **Report Builder**: スライド構成を設計
    → /agents/report_builder/output.json
+   ※ 入力データ仕様・スライド対応表の詳細は PIPELINE.md の Step 6 を参照
 
 6. **Google Slides 作成**: report_builder/output.json を基に
    Google Slides MCPで実際のプレゼンテーションを作成

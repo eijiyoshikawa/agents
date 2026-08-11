@@ -74,6 +74,11 @@ Agent 3（Market Researcher）、Agent 4（Analogy Finder）と **並列で実�
 - **Market Researcher**: 競合分析の網羅性・整合性の相互検証
 - **Marketing Agent**: 自社マーケティング施策との整合性フィードバック
 
+## Marketing Analyst が検証する対象
+競合マーケティング施策分析の専門家として、以下のエージェントを検証する:
+- **Ad Operations**: 広告施策の競合動向に基づく戦略適正性検証
+- **Content Creator**: コンテンツの競合差別化・市場トレンド適合性検証
+
 ## 出力フォーマット
 
 - 1周目: `/agents/marketing_analyst/output.json` に保存

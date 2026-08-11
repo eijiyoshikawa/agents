@@ -1,0 +1,19 @@
+{
+  "period": null,
+  "checks_performed": 0,
+  "results": {
+    "passed": 0,
+    "critical": 0,
+    "high": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "active_issues": [],
+  "audits_completed": [],
+  "privacy_status": {
+    "cookie_consent": true,
+    "privacy_policy_updated": true,
+    "opt_out_functional": true
+  },
+  "recommendations": []
+}

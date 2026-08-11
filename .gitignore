@@ -38,3 +38,5 @@ Thumbs.db
 
 # セキュリティスキャンレポート（機密情報を含む可能性）
 security-report.json
+.vercel
+.env*

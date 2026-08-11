@@ -116,6 +116,11 @@
 - **Customer Success**: 顧客関係性・アップセル機会のフィードバック
 - **Data Analyst**: 営業KPIの分析・受注確度予測の検証
 
+## 相互干渉（検証を行う相手）
+- **Marketing Agent**: リード品質のフィードバック（MQL→SQL 転換率・リードの質）
+- **Customer Success**: 顧客情報・商談履歴の共有による引き継ぎ品質検証
+- **Finance Agent**: 見積依頼時の案件情報正確性・市場適正価格との整合性フィードバック
+
 ## 出力フォーマット
 
 ### pipeline.json

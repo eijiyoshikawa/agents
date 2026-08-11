@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Clay</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-clay">Design System: Clay</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Clay's website is a warm, playful celebration of color that treats B2B data enrichment like a craft rather than an enterprise chore. The design language is built on a foundation of warm cream backgrounds (<code>#faf9f7</code>) and oat-toned borders (<code>#dad4c8</code>, <code>#eee9df</code>) that give every surface the tactile quality of handmade paper. Against this artisanal canvas, a vivid swatch palette explodes with personality — Matcha green, Slushie cyan, Lemon gold, Ube purple, Pomegranate pink, Blueberry navy, and Dragonfruit magenta — each named like flavors at a juice bar, not colors in an enterprise UI kit.</p>
+<p>The typography is anchored by Roobert, a geometric sans-serif with character, loaded with an extensive set of OpenType stylistic sets (<code>"ss01"</code>, <code>"ss03"</code>, <code>"ss10"</code>, <code>"ss11"</code>, <code>"ss12"</code>) that give the text a distinctive, slightly quirky personality. At display scale (80px, weight 600), Roobert uses aggressive negative letter-spacing (-3.2px) that compresses headlines into punchy, billboard-like statements. Space Mono serves as the monospace companion for code and technical labels, completing the craft-meets-tech duality.</p>
+<p>What makes Clay truly distinctive is its hover micro-animations: buttons on hover rotate slightly (<code>rotateZ(-8deg)</code>), translate upward (<code>translateY(-80%)</code>), change background to a contrasting swatch color, and cast a hard offset shadow (<code>rgb(0,0,0) -7px 7px</code>). This playful hover behavior — where a button literally tilts and jumps on interaction — creates a sense of physical delight that's rare in B2B software. Combined with generously rounded containers (24px–40px radius), dashed borders alongside solid ones, and a multi-layer shadow system that includes inset highlights, Clay feels like a design system that was made by people who genuinely enjoy making things.</p>
+<p><strong>Key Characteristics:</strong>
+- Warm cream canvas (<code>#faf9f7</code>) with oat-toned borders (<code>#dad4c8</code>) — artisanal, not clinical
+- Named swatch palette: Matcha, Slushie, Lemon, Ube, Pomegranate, Blueberry, Dragonfruit
+- Roobert font with 5 OpenType stylistic sets — quirky geometric character
+- Playful hover animations: rotateZ(-8deg) + translateY(-80%) + hard offset shadow
+- Space Mono for code and technical labels
+- Generous border radius: 24px cards, 40px sections, 1584px pills
+- Mixed border styles: solid + dashed in the same interface
+- Multi-layer shadow with inset highlight: <code>0px 1px 1px</code> + <code>-1px inset</code> + <code>-0.5px</code></p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>Clay Black</strong> (<code>#000000</code>): Text, headings, pricing card text, <code>--_theme--pricing-cards---text</code></li>
+<li><strong>Pure White</strong> (<code>#ffffff</code>): Card backgrounds, button backgrounds, inverse text</li>
+<li><strong>Warm Cream</strong> (<code>#faf9f7</code>): Page background — the warm, paper-like canvas</li>
+</ul>
+<h3 id="swatch-palette-named-colors">Swatch Palette — Named Colors</h3>
+<p><strong>Matcha (Green)</strong>
+- <strong>Matcha 300</strong> (<code>#84e7a5</code>): <code>--_swatches---color--matcha-300</code>, light green accent
+- <strong>Matcha 600</strong> (<code>#078a52</code>): <code>--_swatches---color--matcha-600</code>, mid green
+- <strong>Matcha 800</strong> (<code>#02492a</code>): <code>--_swatches---color--matcha-800</code>, deep green for dark sections</p>
+<p><strong>Slushie (Cyan)</strong>
+- <strong>Slushie 500</strong> (<code>#3bd3fd</code>): <code>--_swatches---color--slushie-500</code>, bright cyan accent
+- <strong>Slushie 800</strong> (<code>#0089ad</code>): <code>--_swatches---color--slushie-800</code>, deep teal</p>
+<p><strong>Lemon (Gold)</strong>
+- <strong>Lemon 400</strong> (<code>#f8cc65</code>): <code>--_swatches---color--lemon-400</code>, warm pale gold
+- <strong>Lemon 500</strong> (<code>#fbbd41</code>): <code>--_swatches---color--lemon-500</code>, primary gold
+- <strong>Lemon 700</strong> (<code>#d08a11</code>): <code>--_swatches---color--lemon-700</code>, deep amber
+- <strong>Lemon 800</strong> (<code>#9d6a09</code>): <code>--_swatches---color--lemon-800</code>, dark amber</p>
+<p><strong>Ube (Purple)</strong>
+- <strong>Ube 300</strong> (<code>#c1b0ff</code>): <code>--_swatches---color--ube-300</code>, soft lavender
+- <strong>Ube 800</strong> (<code>#43089f</code>): <code>--_swatches---color--ube-800</code>, deep purple
+- <strong>Ube 900</strong> (<code>#32037d</code>): <code>--_swatches---color--ube-900</code>, darkest purple</p>
+<p><strong>Pomegranate (Pink/Red)</strong>
+- <strong>Pomegranate 400</strong> (<code>#fc7981</code>): <code>--_swatches---color--pomegranate-400</code>, warm coral-pink</p>
+<p><strong>Blueberry (Navy Blue)</strong>
+- <strong>Blueberry 800</strong> (<code>#01418d</code>): <code>--_swatches---color--blueberry-800</code>, deep navy</p>
+<h3 id="neutral-scale-warm">Neutral Scale (Warm)</h3>
+<ul>
+<li><strong>Warm Silver</strong> (<code>#9f9b93</code>): Secondary/muted text, footer links</li>
+<li><strong>Warm Charcoal</strong> (<code>#55534e</code>): Tertiary text, dark muted links</li>
+<li><strong>Dark Charcoal</strong> (<code>#333333</code>): Link text on light backgrounds</li>
+</ul>
+<h3 id="surface-border">Surface &amp; Border</h3>
+<ul>
+<li><strong>Oat Border</strong> (<code>#dad4c8</code>): Primary border — warm, cream-toned structural lines</li>
+<li><strong>Oat Light</strong> (<code>#eee9df</code>): Secondary lighter border</li>
+<li><strong>Cool Border</strong> (<code>#e6e8ec</code>): Cool-toned border for contrast sections</li>
+<li><strong>Dark Border</strong> (<code>#525a69</code>): Border on dark sections</li>
+<li><strong>Light Frost</strong> (<code>#eff1f3</code>): Subtle button background (at 0% opacity on hover)</li>
+</ul>
+<h3 id="badges">Badges</h3>
+<ul>
+<li><strong>Badge Blue Bg</strong> (<code>#f0f8ff</code>): Blue-tinted badge surface</li>
+<li><strong>Badge Blue Text</strong> (<code>#3859f9</code>): Vivid blue badge text</li>
+<li><strong>Focus Ring</strong> (<code>rgb(20, 110, 245) solid 2px</code>): Accessibility focus indicator</li>
+</ul>
+<h3 id="shadows">Shadows</h3>
+<ul>
+<li><strong>Clay Shadow</strong> (<code>rgba(0,0,0,0.1) 0px 1px 1px, rgba(0,0,0,0.04) 0px -1px 1px inset, rgba(0,0,0,0.05) 0px -0.5px 1px</code>): Multi-layer with inset highlight — the signature</li>
+<li><strong>Hard Offset</strong> (<code>rgb(0,0,0) -7px 7px</code>): Hover state — playful hard shadow</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-families">Font Families</h3>
+<ul>
+<li><strong>Primary</strong>: <code>Roobert</code>, fallback: <code>Arial</code></li>
+<li><strong>Monospace</strong>: <code>Space Mono</code></li>
+<li><strong>OpenType Features</strong>: <code>"ss01"</code>, <code>"ss03"</code>, <code>"ss10"</code>, <code>"ss11"</code>, <code>"ss12"</code> on all Roobert text (display uses all 5; body/UI uses <code>"ss03"</code>, <code>"ss10"</code>, <code>"ss11"</code>, <code>"ss12"</code>)</li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display Hero</td>
+<td>Roobert</td>
+<td>80px (5.00rem)</td>
+<td>600</td>
+<td>1.00 (tight)</td>
+<td>-3.2px</td>
+<td>All 5 stylistic sets</td>
+</tr>
+<tr>
+<td>Display Secondary</td>
+<td>Roobert</td>
+<td>60px (3.75rem)</td>
+<td>600</td>
+<td>1.00 (tight)</td>
+<td>-2.4px</td>
+<td>All 5 stylistic sets</td>
+</tr>
+<tr>
+<td>Section Heading</td>
+<td>Roobert</td>
+<td>44px (2.75rem)</td>
+<td>600</td>
+<td>1.10 (tight)</td>
+<td>-0.88px to -1.32px</td>
+<td>All 5 stylistic sets</td>
+</tr>
+<tr>
+<td>Card Heading</td>
+<td>Roobert</td>
+<td>32px (2.00rem)</td>
+<td>600</td>
+<td>1.10 (tight)</td>
+<td>-0.64px</td>
+<td>All 5 stylistic sets</td>
+</tr>
+<tr>
+<td>Feature Title</td>
+<td>Roobert</td>
+<td>20px (1.25rem)</td>
+<td>600</td>
+<td>1.40</td>
+<td>-0.4px</td>
+<td>All 5 stylistic sets</td>
+</tr>
+<tr>
+<td>Sub-heading</td>
+<td>Roobert</td>
+<td>20px (1.25rem)</td>
+<td>500</td>
+<td>1.50</td>
+<td>-0.16px</td>
+<td>4 stylistic sets (no ss01)</td>
+</tr>
+<tr>
+<td>Body Large</td>
+<td>Roobert</td>
+<td>20px (1.25rem)</td>
+<td>400</td>
+<td>1.40</td>
+<td>normal</td>
+<td>4 stylistic sets</td>
+</tr>
+<tr>
+<td>Body</td>
+<td>Roobert</td>
+<td>18px (1.13rem)</td>
+<td>400</td>
+<td>1.60 (relaxed)</td>
+<td>-0.36px</td>
+<td>4 stylistic sets</td>
+</tr>
+<tr>
+<td>Body Standard</td>
+<td>Roobert</td>
+<td>16px (1.00rem)</td>
+<td>400</td>
+<td>1.50</td>
+<td>normal</td>
+<td>4 stylistic sets</td>
+</tr>
+<tr>
+<td>Body Medium</td>
+<td>Roobert</td>
+<td>16px (1.00rem)</td>
+<td>500</td>
+<td>1.20–1.40</td>
+<td>-0.16px to -0.32px</td>
+<td>4–5 stylistic sets</td>
+</tr>
+<tr>
+<td>Button</td>
+<td>Roobert</td>
+<td>16px (1.00rem)</td>
+<td>500</td>
+<td>1.50</td>
+<td>-0.16px</td>
+<td>4 stylistic sets</td>
+</tr>
+<tr>
+<td>Button Large</td>
+<td>Roobert</td>
+<td>24px (1.50rem)</td>
+<td>400</td>
+<td>1.50</td>
+<td>normal</td>
+<td>4 stylistic sets</td>
+</tr>
+<tr>
+<td>Button Small</td>
+<td>Roobert</td>
+<td>12.8px (0.80rem)</td>
+<td>500</td>
+<td>1.50</td>
+<td>-0.128px</td>
+<td>4 stylistic sets</td>
+</tr>
+<tr>
+<td>Nav Link</td>
+<td>Roobert</td>
+<td>15px (0.94rem)</td>
+<td>500</td>
+<td>1.60 (relaxed)</td>
+<td>normal</td>
+<td>4 stylistic sets</td>
+</tr>
+<tr>
+<td>Caption</td>
+<td>Roobert</td>
+<td>14px (0.88rem)</td>
+<td>400</td>
+<td>1.50–1.60</td>
+<td>-0.14px</td>
+<td>4 stylistic sets</td>
+</tr>
+<tr>
+<td>Small</td>
+<td>Roobert</td>
+<td>12px (0.75rem)</td>
+<td>400</td>
+<td>1.50</td>
+<td>normal</td>
+<td>4 stylistic sets</td>
+</tr>
+<tr>
+<td>Uppercase Label</td>
+<td>Roobert</td>
+<td>12px (0.75rem)</td>
+<td>600</td>
+<td>1.20 (tight)</td>
+<td>1.08px</td>
+<td><code>text-transform: uppercase</code>, 4 sets</td>
+</tr>
+<tr>
+<td>Badge</td>
+<td>Roobert</td>
+<td>9.6px</td>
+<td>600</td>
+<td>—</td>
+<td>—</td>
+<td>Pill badges</td>
+</tr>
+</tbody>
+</table>
+<h3 id="principles">Principles</h3>
+<ul>
+<li><strong>Five stylistic sets as identity</strong>: The combination of <code>"ss01"</code>, <code>"ss03"</code>, <code>"ss10"</code>, <code>"ss11"</code>, <code>"ss12"</code> on Roobert creates a distinctive typographic personality. <code>ss01</code> is reserved for headings and emphasis — body text omits it, creating a subtle hierarchy through glyph variation.</li>
+<li><strong>Aggressive display compression</strong>: -3.2px at 80px, -2.4px at 60px — the most compressed display tracking alongside the most generous body spacing (1.60 line-height), creating dramatic contrast.</li>
+<li><strong>Weight 600 for headings, 500 for UI, 400 for body</strong>: Clean three-tier system where each weight has a strict role.</li>
+<li><strong>Uppercase labels with positive tracking</strong>: 12px uppercase at 1.08px letter-spacing creates the systematic wayfinding pattern.</li>
+</ul>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<p><strong>Primary (Transparent with Hover Animation)</strong>
+- Background: transparent (<code>rgba(239, 241, 243, 0)</code>)
+- Text: <code>#000000</code>
+- Padding: 6.4px 12.8px
+- Border: none (or <code>1px solid #717989</code> for outlined variant)
+- Hover: background shifts to swatch color (e.g., <code>#434346</code>), text to white, <code>rotateZ(-8deg)</code>, <code>translateY(-80%)</code>, hard shadow <code>rgb(0,0,0) -7px 7px</code>
+- Focus: <code>rgb(20, 110, 245) solid 2px</code> outline</p>
+<p><strong>White Solid</strong>
+- Background: <code>#ffffff</code>
+- Text: <code>#000000</code>
+- Padding: 6.4px
+- Hover: oat-200 swatch color, animated rotation + shadow
+- Use: Primary CTA on colored sections</p>
+<p><strong>Ghost Outlined</strong>
+- Background: transparent
+- Text: <code>#000000</code>
+- Padding: 8px
+- Border: <code>1px solid #717989</code>
+- Radius: 4px
+- Hover: dragonfruit swatch color, white text, animated rotation</p>
+<h3 id="cards-containers">Cards &amp; Containers</h3>
+<ul>
+<li>Background: <code>#ffffff</code> on cream canvas</li>
+<li>Border: <code>1px solid #dad4c8</code> (warm oat) or <code>1px dashed #dad4c8</code></li>
+<li>Radius: 12px (standard cards), 24px (feature cards/images), 40px (section containers/footer)</li>
+<li>Shadow: <code>rgba(0,0,0,0.1) 0px 1px 1px, rgba(0,0,0,0.04) 0px -1px 1px inset, rgba(0,0,0,0.05) 0px -0.5px 1px</code></li>
+<li>Colorful section backgrounds using swatch palette (matcha, slushie, ube, lemon)</li>
+</ul>
+<h3 id="inputs-forms">Inputs &amp; Forms</h3>
+<ul>
+<li>Text: <code>#000000</code></li>
+<li>Border: <code>1px solid #717989</code></li>
+<li>Radius: 4px</li>
+<li>Focus: <code>rgb(20, 110, 245) solid 2px</code> outline</li>
+</ul>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li>Sticky top nav on cream background</li>
+<li>Roobert 15px weight 500 for nav links</li>
+<li>Clay logo left-aligned</li>
+<li>CTA buttons right-aligned with pill radius</li>
+<li>Border bottom: <code>1px solid #dad4c8</code></li>
+<li>Mobile: hamburger collapse at 767px</li>
+</ul>
+<h3 id="image-treatment">Image Treatment</h3>
+<ul>
+<li>Product screenshots in white cards with oat borders</li>
+<li>Colorful illustrated sections with swatch background colors</li>
+<li>8px–24px radius on images</li>
+<li>Full-width colorful section backgrounds</li>
+</ul>
+<h3 id="distinctive-components">Distinctive Components</h3>
+<p><strong>Swatch Color Sections</strong>
+- Full-width sections with swatch-colored backgrounds (matcha green, slushie cyan, ube purple, lemon gold)
+- White text on dark swatches, black text on light swatches
+- Each section tells a distinct product story through its color</p>
+<p><strong>Playful Hover Buttons</strong>
+- Rotate -8deg + translate upward on hover
+- Hard offset shadow (<code>-7px 7px</code>) instead of soft blur
+- Background transitions to contrasting swatch color
+- Creates a physical, toy-like interaction quality</p>
+<p><strong>Dashed Border Elements</strong>
+- Dashed borders (<code>1px dashed #dad4c8</code>) alongside solid borders
+- Used for secondary containers and decorative elements
+- Adds a hand-drawn, craft-like quality</p>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-system">Spacing System</h3>
+<ul>
+<li>Base unit: 8px</li>
+<li>Scale: 1px, 2px, 4px, 6.4px, 8px, 12px, 12.8px, 16px, 18px, 20px, 24px</li>
+</ul>
+<h3 id="grid-container">Grid &amp; Container</h3>
+<ul>
+<li>Max content width centered</li>
+<li>Feature sections alternate between white cards and colorful swatch backgrounds</li>
+<li>Card grids: 2–3 columns on desktop</li>
+<li>Full-width colorful sections break the grid</li>
+<li>Footer with generous 40px radius container</li>
+</ul>
+<h3 id="whitespace-philosophy">Whitespace Philosophy</h3>
+<ul>
+<li><strong>Warm, generous breathing</strong>: The cream background provides a warm rest between content blocks. Spacing is generous but not austere — it feels inviting, like a well-set table.</li>
+<li><strong>Color as spatial rhythm</strong>: The alternating swatch-colored sections create visual rhythm through hue rather than just whitespace. Each color section is its own "room."</li>
+<li><strong>Craft-like density inside cards</strong>: Within cards, content is compact and well-organized, contrasting with the generous outer spacing.</li>
+</ul>
+<h3 id="border-radius-scale">Border Radius Scale</h3>
+<ul>
+<li>Sharp (4px): Ghost buttons, inputs</li>
+<li>Standard (8px): Small cards, images, links</li>
+<li>Badge (11px): Tag badges</li>
+<li>Card (12px): Standard cards, buttons</li>
+<li>Feature (24px): Feature cards, images, panels</li>
+<li>Section (40px): Large sections, footer, containers</li>
+<li>Pill (1584px): CTAs, pill-shaped buttons</li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Treatment</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flat (Level 0)</td>
+<td>No shadow, cream canvas</td>
+<td>Page background</td>
+</tr>
+<tr>
+<td>Clay Shadow (Level 1)</td>
+<td><code>rgba(0,0,0,0.1) 0px 1px 1px, rgba(0,0,0,0.04) 0px -1px inset, rgba(0,0,0,0.05) 0px -0.5px</code></td>
+<td>Cards, buttons — multi-layer with inset highlight</td>
+</tr>
+<tr>
+<td>Hover Hard (Level 2)</td>
+<td><code>rgb(0,0,0) -7px 7px</code></td>
+<td>Hover state — playful hard offset shadow</td>
+</tr>
+<tr>
+<td>Focus (Level 3)</td>
+<td><code>rgb(20, 110, 245) solid 2px</code></td>
+<td>Keyboard focus ring</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Shadow Philosophy</strong>: Clay's shadow system is uniquely three-layered: a downward cast (<code>0px 1px 1px</code>), an upward inset highlight (<code>0px -1px 1px inset</code>), and a subtle edge (<code>0px -0.5px 1px</code>). This creates a "pressed into clay" quality where elements feel both raised AND embedded — like a clay tablet where content is stamped into the surface. The hover hard shadow (<code>-7px 7px</code>) is deliberately retro-graphic, referencing print-era drop shadows and adding physical playfulness.</p>
+<h3 id="decorative-depth">Decorative Depth</h3>
+<ul>
+<li>Full-width swatch-colored sections create dramatic depth through color contrast</li>
+<li>Dashed borders add visual texture alongside solid borders</li>
+<li>Product illustrations with warm, organic art style</li>
+</ul>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use warm cream (<code>#faf9f7</code>) as the page background — the warmth is the identity</li>
+<li>Apply all 5 OpenType stylistic sets on Roobert headings: <code>"ss01", "ss03", "ss10", "ss11", "ss12"</code></li>
+<li>Use the named swatch palette (Matcha, Slushie, Lemon, Ube, Pomegranate, Blueberry) for section backgrounds</li>
+<li>Apply the playful hover animation: <code>rotateZ(-8deg)</code>, <code>translateY(-80%)</code>, hard shadow <code>-7px 7px</code></li>
+<li>Use warm oat borders (<code>#dad4c8</code>) — not neutral gray</li>
+<li>Mix solid and dashed borders for visual variety</li>
+<li>Use generous radius: 24px for cards, 40px for sections</li>
+<li>Use weight 600 exclusively for headings, 500 for UI, 400 for body</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Don't use cool gray backgrounds — the warm cream (<code>#faf9f7</code>) is non-negotiable</li>
+<li>Don't use neutral gray borders (<code>#ccc</code>, <code>#ddd</code>) — always use the warm oat tones</li>
+<li>Don't mix more than 2 swatch colors in the same section</li>
+<li>Don't skip the OpenType stylistic sets — they define Roobert's character</li>
+<li>Don't use subtle hover effects — the rotation + hard shadow is the signature interaction</li>
+<li>Don't use small border radius (&lt;12px) on feature cards — the generous rounding is structural</li>
+<li>Don't use standard shadows (blur-based) — Clay uses hard offset and multi-layer inset</li>
+<li>Don't forget the uppercase labels with 1.08px tracking — they're the wayfinding system</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<h3 id="breakpoints">Breakpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Width</th>
+<th>Key Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mobile Small</td>
+<td>&lt;479px</td>
+<td>Single column, tight padding</td>
+</tr>
+<tr>
+<td>Mobile</td>
+<td>479–767px</td>
+<td>Standard mobile, stacked layout</td>
+</tr>
+<tr>
+<td>Tablet</td>
+<td>768–991px</td>
+<td>2-column grids, condensed nav</td>
+</tr>
+<tr>
+<td>Desktop</td>
+<td>992px+</td>
+<td>Full layout, 3-column grids, expanded sections</td>
+</tr>
+</tbody>
+</table>
+<h3 id="touch-targets">Touch Targets</h3>
+<ul>
+<li>Buttons: minimum 6.4px + 12.8px padding for adequate touch area</li>
+<li>Nav links: 15px font with generous spacing</li>
+<li>Mobile: full-width buttons for easy tapping</li>
+</ul>
+<h3 id="collapsing-strategy">Collapsing Strategy</h3>
+<ul>
+<li>Hero: 80px → 60px → smaller display text</li>
+<li>Navigation: horizontal → hamburger at 767px</li>
+<li>Feature sections: multi-column → stacked</li>
+<li>Colorful sections: maintain full-width but compress padding</li>
+<li>Card grids: 3-column → 2-column → single column</li>
+</ul>
+<h3 id="image-behavior">Image Behavior</h3>
+<ul>
+<li>Product screenshots scale proportionally</li>
+<li>Colorful section illustrations adapt to viewport width</li>
+<li>Rounded corners maintained across breakpoints</li>
+</ul>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Background: Warm Cream (<code>#faf9f7</code>)</li>
+<li>Text: Clay Black (<code>#000000</code>)</li>
+<li>Secondary text: Warm Silver (<code>#9f9b93</code>)</li>
+<li>Border: Oat Border (<code>#dad4c8</code>)</li>
+<li>Green accent: Matcha 600 (<code>#078a52</code>)</li>
+<li>Cyan accent: Slushie 500 (<code>#3bd3fd</code>)</li>
+<li>Gold accent: Lemon 500 (<code>#fbbd41</code>)</li>
+<li>Purple accent: Ube 800 (<code>#43089f</code>)</li>
+<li>Pink accent: Pomegranate 400 (<code>#fc7981</code>)</li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create a hero on warm cream (#faf9f7) background. Headline at 80px Roobert weight 600, line-height 1.00, letter-spacing -3.2px, OpenType 'ss01 ss03 ss10 ss11 ss12', black text. Subtitle at 20px weight 400, line-height 1.40, #9f9b93 text. Two buttons: white solid pill (12px radius) and ghost outlined (4px radius, 1px solid #717989)."</li>
+<li>"Design a colorful section with Matcha 800 (#02492a) background. Heading at 44px Roobert weight 600, letter-spacing -1.32px, white text. Body at 18px weight 400, line-height 1.60, #84e7a5 text. White card inset with oat border (#dad4c8), 24px radius."</li>
+<li>"Build a button with playful hover: default transparent background, black text, 16px Roobert weight 500. On hover: background #434346, text white, transform rotateZ(-8deg) translateY(-80%), hard shadow rgb(0,0,0) -7px 7px."</li>
+<li>"Create a card: white background, 1px solid #dad4c8 border, 24px radius. Shadow: rgba(0,0,0,0.1) 0px 1px 1px, rgba(0,0,0,0.04) 0px -1px 1px inset. Title at 32px Roobert weight 600, letter-spacing -0.64px."</li>
+<li>"Design an uppercase label: 12px Roobert weight 600, text-transform uppercase, letter-spacing 1.08px, OpenType 'ss03 ss10 ss11 ss12'."</li>
+</ul>
+<h3 id="iteration-guide">Iteration Guide</h3>
+<ol>
+<li>Start with warm cream (#faf9f7) — never cool white</li>
+<li>Swatch colors are for full sections, not small accents — go bold with matcha, slushie, ube</li>
+<li>Oat borders (#dad4c8) everywhere — dashed variants for decoration</li>
+<li>OpenType stylistic sets are mandatory — they make Roobert look like Roobert</li>
+<li>Hover animations are the signature — rotation + hard shadow, not subtle fades</li>
+<li>Generous radius: 24px cards, 40px sections — nothing looks sharp or corporate</li>
+<li>Three weights: 600 (headings), 500 (UI), 400 (body) — strict roles</li>
+</ol>
+</main>
+</body>
+</html>

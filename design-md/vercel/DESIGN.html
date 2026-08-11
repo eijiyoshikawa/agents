@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Vercel</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-vercel">Design System: Vercel</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Vercel's website is the visual thesis of developer infrastructure made invisible — a design system so restrained it borders on philosophical. The page is overwhelmingly white (<code>#ffffff</code>) with near-black (<code>#171717</code>) text, creating a gallery-like emptiness where every element earns its pixel. This isn't minimalism as decoration; it's minimalism as engineering principle. The Geist design system treats the interface like a compiler treats code — every unnecessary token is stripped away until only structure remains.</p>
+<p>The custom Geist font family is the crown jewel. Geist Sans uses aggressive negative letter-spacing (-2.4px to -2.88px at display sizes), creating headlines that feel compressed, urgent, and engineered — like code that's been minified for production. At body sizes, the tracking relaxes but the geometric precision persists. Geist Mono completes the system as the monospace companion for code, terminal output, and technical labels. Both fonts enable OpenType <code>"liga"</code> (ligatures) globally, adding a layer of typographic sophistication that rewards close reading.</p>
+<p>What distinguishes Vercel from other monochrome design systems is its shadow-as-border philosophy. Instead of traditional CSS borders, Vercel uses <code>box-shadow: 0px 0px 0px 1px rgba(0,0,0,0.08)</code> — a zero-offset, zero-blur, 1px-spread shadow that creates a border-like line without the box model implications. This technique allows borders to exist in the shadow layer, enabling smoother transitions, rounded corners without clipping, and a subtler visual weight than traditional borders. The entire depth system is built on layered, multi-value shadow stacks where each layer serves a specific purpose: one for the border, one for soft elevation, one for ambient depth.</p>
+<p><strong>Key Characteristics:</strong>
+- Geist Sans with extreme negative letter-spacing (-2.4px to -2.88px at display) — text as compressed infrastructure
+- Geist Mono for code and technical labels with OpenType <code>"liga"</code> globally
+- Shadow-as-border technique: <code>box-shadow 0px 0px 0px 1px</code> replaces traditional borders throughout
+- Multi-layer shadow stacks for nuanced depth (border + elevation + ambient in single declarations)
+- Near-pure white canvas with <code>#171717</code> text — not quite black, creating micro-contrast softness
+- Workflow-specific accent colors: Ship Red (<code>#ff5b4f</code>), Preview Pink (<code>#de1d8d</code>), Develop Blue (<code>#0a72ef</code>)
+- Focus ring system using <code>hsla(212, 100%, 48%, 1)</code> — a saturated blue for accessibility
+- Pill badges (9999px) with tinted backgrounds for status indicators</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>Vercel Black</strong> (<code>#171717</code>): Primary text, headings, dark surface backgrounds. Not pure black — the slight warmth prevents harshness.</li>
+<li><strong>Pure White</strong> (<code>#ffffff</code>): Page background, card surfaces, button text on dark.</li>
+<li><strong>True Black</strong> (<code>#000000</code>): Secondary use, <code>--geist-console-text-color-default</code>, used in specific console/code contexts.</li>
+</ul>
+<h3 id="workflow-accent-colors">Workflow Accent Colors</h3>
+<ul>
+<li><strong>Ship Red</strong> (<code>#ff5b4f</code>): <code>--ship-text</code>, the "ship to production" workflow step — warm, urgent coral-red.</li>
+<li><strong>Preview Pink</strong> (<code>#de1d8d</code>): <code>--preview-text</code>, the preview deployment workflow — vivid magenta-pink.</li>
+<li><strong>Develop Blue</strong> (<code>#0a72ef</code>): <code>--develop-text</code>, the development workflow — bright, focused blue.</li>
+</ul>
+<h3 id="console-code-colors">Console / Code Colors</h3>
+<ul>
+<li><strong>Console Blue</strong> (<code>#0070f3</code>): <code>--geist-console-text-color-blue</code>, syntax highlighting blue.</li>
+<li><strong>Console Purple</strong> (<code>#7928ca</code>): <code>--geist-console-text-color-purple</code>, syntax highlighting purple.</li>
+<li><strong>Console Pink</strong> (<code>#eb367f</code>): <code>--geist-console-text-color-pink</code>, syntax highlighting pink.</li>
+</ul>
+<h3 id="interactive">Interactive</h3>
+<ul>
+<li><strong>Link Blue</strong> (<code>#0072f5</code>): Primary link color with underline decoration.</li>
+<li><strong>Focus Blue</strong> (<code>hsla(212, 100%, 48%, 1)</code>): <code>--ds-focus-color</code>, focus ring on interactive elements.</li>
+<li><strong>Ring Blue</strong> (<code>rgba(147, 197, 253, 0.5)</code>): <code>--tw-ring-color</code>, Tailwind ring utility.</li>
+</ul>
+<h3 id="neutral-scale">Neutral Scale</h3>
+<ul>
+<li><strong>Gray 900</strong> (<code>#171717</code>): Primary text, headings, nav text.</li>
+<li><strong>Gray 600</strong> (<code>#4d4d4d</code>): Secondary text, description copy.</li>
+<li><strong>Gray 500</strong> (<code>#666666</code>): Tertiary text, muted links.</li>
+<li><strong>Gray 400</strong> (<code>#808080</code>): Placeholder text, disabled states.</li>
+<li><strong>Gray 100</strong> (<code>#ebebeb</code>): Borders, card outlines, dividers.</li>
+<li><strong>Gray 50</strong> (<code>#fafafa</code>): Subtle surface tint, inner shadow highlight.</li>
+</ul>
+<h3 id="surface-overlay">Surface &amp; Overlay</h3>
+<ul>
+<li><strong>Overlay Backdrop</strong> (<code>hsla(0, 0%, 98%, 1)</code>): <code>--ds-overlay-backdrop-color</code>, modal/dialog backdrop.</li>
+<li><strong>Selection Text</strong> (<code>hsla(0, 0%, 95%, 1)</code>): <code>--geist-selection-text-color</code>, text selection highlight.</li>
+<li><strong>Badge Blue Bg</strong> (<code>#ebf5ff</code>): Pill badge background, tinted blue surface.</li>
+<li><strong>Badge Blue Text</strong> (<code>#0068d6</code>): Pill badge text, darker blue for readability.</li>
+</ul>
+<h3 id="shadows-depth">Shadows &amp; Depth</h3>
+<ul>
+<li><strong>Border Shadow</strong> (<code>rgba(0, 0, 0, 0.08) 0px 0px 0px 1px</code>): The signature — replaces traditional borders.</li>
+<li><strong>Subtle Elevation</strong> (<code>rgba(0, 0, 0, 0.04) 0px 2px 2px</code>): Minimal lift for cards.</li>
+<li><strong>Card Stack</strong> (<code>rgba(0,0,0,0.08) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 2px, rgba(0,0,0,0.04) 0px 8px 8px -8px, #fafafa 0px 0px 0px 1px</code>): Full multi-layer card shadow.</li>
+<li><strong>Ring Border</strong> (<code>rgb(235, 235, 235) 0px 0px 0px 1px</code>): Light gray ring-border for tabs and images.</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-family">Font Family</h3>
+<ul>
+<li><strong>Primary</strong>: <code>Geist</code>, with fallbacks: <code>Arial, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol</code></li>
+<li><strong>Monospace</strong>: <code>Geist Mono</code>, with fallbacks: <code>ui-monospace, SFMono-Regular, Roboto Mono, Menlo, Monaco, Liberation Mono, DejaVu Sans Mono, Courier New</code></li>
+<li><strong>OpenType Features</strong>: <code>"liga"</code> enabled globally on all Geist text; <code>"tnum"</code> for tabular numbers on specific captions.</li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display Hero</td>
+<td>Geist</td>
+<td>48px (3.00rem)</td>
+<td>600</td>
+<td>1.00–1.17 (tight)</td>
+<td>-2.4px to -2.88px</td>
+<td>Maximum compression, billboard impact</td>
+</tr>
+<tr>
+<td>Section Heading</td>
+<td>Geist</td>
+<td>40px (2.50rem)</td>
+<td>600</td>
+<td>1.20 (tight)</td>
+<td>-2.4px</td>
+<td>Feature section titles</td>
+</tr>
+<tr>
+<td>Sub-heading Large</td>
+<td>Geist</td>
+<td>32px (2.00rem)</td>
+<td>600</td>
+<td>1.25 (tight)</td>
+<td>-1.28px</td>
+<td>Card headings, sub-sections</td>
+</tr>
+<tr>
+<td>Sub-heading</td>
+<td>Geist</td>
+<td>32px (2.00rem)</td>
+<td>400</td>
+<td>1.50</td>
+<td>-1.28px</td>
+<td>Lighter sub-headings</td>
+</tr>
+<tr>
+<td>Card Title</td>
+<td>Geist</td>
+<td>24px (1.50rem)</td>
+<td>600</td>
+<td>1.33</td>
+<td>-0.96px</td>
+<td>Feature cards</td>
+</tr>
+<tr>
+<td>Card Title Light</td>
+<td>Geist</td>
+<td>24px (1.50rem)</td>
+<td>500</td>
+<td>1.33</td>
+<td>-0.96px</td>
+<td>Secondary card headings</td>
+</tr>
+<tr>
+<td>Body Large</td>
+<td>Geist</td>
+<td>20px (1.25rem)</td>
+<td>400</td>
+<td>1.80 (relaxed)</td>
+<td>normal</td>
+<td>Introductions, feature descriptions</td>
+</tr>
+<tr>
+<td>Body</td>
+<td>Geist</td>
+<td>18px (1.13rem)</td>
+<td>400</td>
+<td>1.56</td>
+<td>normal</td>
+<td>Standard reading text</td>
+</tr>
+<tr>
+<td>Body Small</td>
+<td>Geist</td>
+<td>16px (1.00rem)</td>
+<td>400</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Standard UI text</td>
+</tr>
+<tr>
+<td>Body Medium</td>
+<td>Geist</td>
+<td>16px (1.00rem)</td>
+<td>500</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Navigation, emphasized text</td>
+</tr>
+<tr>
+<td>Body Semibold</td>
+<td>Geist</td>
+<td>16px (1.00rem)</td>
+<td>600</td>
+<td>1.50</td>
+<td>-0.32px</td>
+<td>Strong labels, active states</td>
+</tr>
+<tr>
+<td>Button / Link</td>
+<td>Geist</td>
+<td>14px (0.88rem)</td>
+<td>500</td>
+<td>1.43</td>
+<td>normal</td>
+<td>Buttons, links, captions</td>
+</tr>
+<tr>
+<td>Button Small</td>
+<td>Geist</td>
+<td>14px (0.88rem)</td>
+<td>400</td>
+<td>1.00 (tight)</td>
+<td>normal</td>
+<td>Compact buttons</td>
+</tr>
+<tr>
+<td>Caption</td>
+<td>Geist</td>
+<td>12px (0.75rem)</td>
+<td>400–500</td>
+<td>1.33</td>
+<td>normal</td>
+<td>Metadata, tags</td>
+</tr>
+<tr>
+<td>Mono Body</td>
+<td>Geist Mono</td>
+<td>16px (1.00rem)</td>
+<td>400</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Code blocks</td>
+</tr>
+<tr>
+<td>Mono Caption</td>
+<td>Geist Mono</td>
+<td>13px (0.81rem)</td>
+<td>500</td>
+<td>1.54</td>
+<td>normal</td>
+<td>Code labels</td>
+</tr>
+<tr>
+<td>Mono Small</td>
+<td>Geist Mono</td>
+<td>12px (0.75rem)</td>
+<td>500</td>
+<td>1.00 (tight)</td>
+<td>normal</td>
+<td><code>text-transform: uppercase</code>, technical labels</td>
+</tr>
+<tr>
+<td>Micro Badge</td>
+<td>Geist</td>
+<td>7px (0.44rem)</td>
+<td>700</td>
+<td>1.00 (tight)</td>
+<td>normal</td>
+<td><code>text-transform: uppercase</code>, tiny badges</td>
+</tr>
+</tbody>
+</table>
+<h3 id="principles">Principles</h3>
+<ul>
+<li><strong>Compression as identity</strong>: Geist Sans at display sizes uses -2.4px to -2.88px letter-spacing — the most aggressive negative tracking of any major design system. This creates text that feels <em>minified</em>, like code optimized for production. The tracking progressively relaxes as size decreases: -1.28px at 32px, -0.96px at 24px, -0.32px at 16px, and normal at 14px.</li>
+<li><strong>Ligatures everywhere</strong>: Every Geist text element enables OpenType <code>"liga"</code>. Ligatures aren't decorative — they're structural, creating tighter, more efficient glyph combinations.</li>
+<li><strong>Three weights, strict roles</strong>: 400 (body/reading), 500 (UI/interactive), 600 (headings/emphasis). No bold (700) except for tiny micro-badges. This narrow weight range creates hierarchy through size and tracking, not weight.</li>
+<li><strong>Mono for identity</strong>: Geist Mono in uppercase with <code>"tnum"</code> or <code>"liga"</code> serves as the "developer console" voice — compact technical labels that connect the marketing site to the product.</li>
+</ul>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<p><strong>Primary White (Shadow-bordered)</strong>
+- Background: <code>#ffffff</code>
+- Text: <code>#171717</code>
+- Padding: 0px 6px (minimal — content-driven width)
+- Radius: 6px (subtly rounded)
+- Shadow: <code>rgb(235, 235, 235) 0px 0px 0px 1px</code> (ring-border)
+- Hover: background shifts to <code>var(--ds-gray-1000)</code> (dark)
+- Focus: <code>2px solid var(--ds-focus-color)</code> outline + <code>var(--ds-focus-ring)</code> shadow
+- Use: Standard secondary button</p>
+<p><strong>Primary Dark (Inferred from Geist system)</strong>
+- Background: <code>#171717</code>
+- Text: <code>#ffffff</code>
+- Padding: 8px 16px
+- Radius: 6px
+- Use: Primary CTA ("Start Deploying", "Get Started")</p>
+<p><strong>Pill Button / Badge</strong>
+- Background: <code>#ebf5ff</code> (tinted blue)
+- Text: <code>#0068d6</code>
+- Padding: 0px 10px
+- Radius: 9999px (full pill)
+- Font: 12px weight 500
+- Use: Status badges, tags, feature labels</p>
+<p><strong>Large Pill (Navigation)</strong>
+- Background: transparent or <code>#171717</code>
+- Radius: 64px–100px
+- Use: Tab navigation, section selectors</p>
+<h3 id="cards-containers">Cards &amp; Containers</h3>
+<ul>
+<li>Background: <code>#ffffff</code></li>
+<li>Border: via shadow — <code>rgba(0, 0, 0, 0.08) 0px 0px 0px 1px</code></li>
+<li>Radius: 8px (standard), 12px (featured/image cards)</li>
+<li>Shadow stack: <code>rgba(0,0,0,0.08) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 2px, #fafafa 0px 0px 0px 1px</code></li>
+<li>Image cards: <code>1px solid #ebebeb</code> with 12px top radius</li>
+<li>Hover: subtle shadow intensification</li>
+</ul>
+<h3 id="inputs-forms">Inputs &amp; Forms</h3>
+<ul>
+<li>Radio: standard styling with focus <code>var(--ds-gray-200)</code> background</li>
+<li>Focus shadow: <code>1px 0 0 0 var(--ds-gray-alpha-600)</code></li>
+<li>Focus outline: <code>2px solid var(--ds-focus-color)</code> — consistent blue focus ring</li>
+<li>Border: via shadow technique, not traditional border</li>
+</ul>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li>Clean horizontal nav on white, sticky</li>
+<li>Vercel logotype left-aligned, 262x52px</li>
+<li>Links: Geist 14px weight 500, <code>#171717</code> text</li>
+<li>Active: weight 600 or underline</li>
+<li>CTA: dark pill buttons ("Start Deploying", "Contact Sales")</li>
+<li>Mobile: hamburger menu collapse</li>
+<li>Product dropdowns with multi-level menus</li>
+</ul>
+<h3 id="image-treatment">Image Treatment</h3>
+<ul>
+<li>Product screenshots with <code>1px solid #ebebeb</code> border</li>
+<li>Top-rounded images: <code>12px 12px 0px 0px</code> radius</li>
+<li>Dashboard/code preview screenshots dominate feature sections</li>
+<li>Soft gradient backgrounds behind hero images (pastel multi-color)</li>
+</ul>
+<h3 id="distinctive-components">Distinctive Components</h3>
+<p><strong>Workflow Pipeline</strong>
+- Three-step horizontal pipeline: Develop → Preview → Ship
+- Each step has its own accent color: Blue → Pink → Red
+- Connected with lines/arrows
+- The visual metaphor for Vercel's core value proposition</p>
+<p><strong>Trust Bar / Logo Grid</strong>
+- Company logos (Perplexity, ChatGPT, Cursor, etc.) in grayscale
+- Horizontal scroll or grid layout
+- Subtle <code>#ebebeb</code> border separation</p>
+<p><strong>Metric Cards</strong>
+- Large number display (e.g., "10x faster")
+- Geist 48px weight 600 for the metric
+- Description below in gray body text
+- Shadow-bordered card container</p>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-system">Spacing System</h3>
+<ul>
+<li>Base unit: 8px</li>
+<li>Scale: 1px, 2px, 3px, 4px, 5px, 6px, 8px, 10px, 12px, 14px, 16px, 32px, 36px, 40px</li>
+<li>Notable gap: jumps from 16px to 32px — no 20px or 24px in primary scale</li>
+</ul>
+<h3 id="grid-container">Grid &amp; Container</h3>
+<ul>
+<li>Max content width: approximately 1200px</li>
+<li>Hero: centered single-column with generous top padding</li>
+<li>Feature sections: 2–3 column grids for cards</li>
+<li>Full-width dividers using <code>border-bottom: 1px solid #171717</code></li>
+<li>Code/dashboard screenshots as full-width or contained with border</li>
+</ul>
+<h3 id="whitespace-philosophy">Whitespace Philosophy</h3>
+<ul>
+<li><strong>Gallery emptiness</strong>: Massive vertical padding between sections (80px–120px+). The white space IS the design — it communicates that Vercel has nothing to prove and nothing to hide.</li>
+<li><strong>Compressed text, expanded space</strong>: The aggressive negative letter-spacing on headlines is counterbalanced by generous surrounding whitespace. The text is dense; the space around it is vast.</li>
+<li><strong>Section rhythm</strong>: White sections alternate with white sections — there's no color variation between sections. Separation comes from borders (shadow-borders) and spacing alone.</li>
+</ul>
+<h3 id="border-radius-scale">Border Radius Scale</h3>
+<ul>
+<li>Micro (2px): Inline code snippets, small spans</li>
+<li>Subtle (4px): Small containers</li>
+<li>Standard (6px): Buttons, links, functional elements</li>
+<li>Comfortable (8px): Cards, list items</li>
+<li>Image (12px): Featured cards, image containers (top-rounded)</li>
+<li>Large (64px): Tab navigation pills</li>
+<li>XL (100px): Large navigation links</li>
+<li>Full Pill (9999px): Badges, status pills, tags</li>
+<li>Circle (50%): Menu toggle, avatar containers</li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Treatment</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flat (Level 0)</td>
+<td>No shadow</td>
+<td>Page background, text blocks</td>
+</tr>
+<tr>
+<td>Ring (Level 1)</td>
+<td><code>rgba(0,0,0,0.08) 0px 0px 0px 1px</code></td>
+<td>Shadow-as-border for most elements</td>
+</tr>
+<tr>
+<td>Light Ring (Level 1b)</td>
+<td><code>rgb(235,235,235) 0px 0px 0px 1px</code></td>
+<td>Lighter ring for tabs, images</td>
+</tr>
+<tr>
+<td>Subtle Card (Level 2)</td>
+<td>Ring + <code>rgba(0,0,0,0.04) 0px 2px 2px</code></td>
+<td>Standard cards with minimal lift</td>
+</tr>
+<tr>
+<td>Full Card (Level 3)</td>
+<td>Ring + Subtle + <code>rgba(0,0,0,0.04) 0px 8px 8px -8px</code> + inner <code>#fafafa</code> ring</td>
+<td>Featured cards, highlighted panels</td>
+</tr>
+<tr>
+<td>Focus (Accessibility)</td>
+<td><code>2px solid hsla(212, 100%, 48%, 1)</code> outline</td>
+<td>Keyboard focus on all interactive elements</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Shadow Philosophy</strong>: Vercel has arguably the most sophisticated shadow system in modern web design. Rather than using shadows for elevation in the traditional Material Design sense, Vercel uses multi-value shadow stacks where each layer has a distinct architectural purpose: one creates the "border" (0px spread, 1px), another adds ambient softness (2px blur), another handles depth at distance (8px blur with negative spread), and an inner ring (<code>#fafafa</code>) creates the subtle highlight that makes the card "glow" from within. This layered approach means cards feel built, not floating.</p>
+<h3 id="decorative-depth">Decorative Depth</h3>
+<ul>
+<li>Hero gradient: soft, pastel multi-color gradient wash behind hero content (barely visible, atmospheric)</li>
+<li>Section borders: <code>1px solid #171717</code> (full dark line) between major sections</li>
+<li>No background color variation — depth comes entirely from shadow layering and border contrast</li>
+</ul>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use Geist Sans with aggressive negative letter-spacing at display sizes (-2.4px to -2.88px at 48px)</li>
+<li>Use shadow-as-border (<code>0px 0px 0px 1px rgba(0,0,0,0.08)</code>) instead of traditional CSS borders</li>
+<li>Enable <code>"liga"</code> on all Geist text — ligatures are structural, not optional</li>
+<li>Use the three-weight system: 400 (body), 500 (UI), 600 (headings)</li>
+<li>Apply workflow accent colors (Red/Pink/Blue) only in their workflow context</li>
+<li>Use multi-layer shadow stacks for cards (border + elevation + ambient + inner highlight)</li>
+<li>Keep the color palette achromatic — grays from <code>#171717</code> to <code>#ffffff</code> are the system</li>
+<li>Use <code>#171717</code> instead of <code>#000000</code> for primary text — the micro-warmth matters</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Don't use positive letter-spacing on Geist Sans — it's always negative or zero</li>
+<li>Don't use weight 700 (bold) on body text — 600 is the maximum, used only for headings</li>
+<li>Don't use traditional CSS <code>border</code> on cards — use the shadow-border technique</li>
+<li>Don't introduce warm colors (oranges, yellows, greens) into the UI chrome</li>
+<li>Don't apply the workflow accent colors (Ship Red, Preview Pink, Develop Blue) decoratively</li>
+<li>Don't use heavy shadows (&gt; 0.1 opacity) — the shadow system is whisper-level</li>
+<li>Don't increase body text letter-spacing — Geist is designed to run tight</li>
+<li>Don't use pill radius (9999px) on primary action buttons — pills are for badges/tags only</li>
+<li>Don't skip the inner <code>#fafafa</code> ring in card shadows — it's the glow that makes the system work</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<h3 id="breakpoints">Breakpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Width</th>
+<th>Key Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mobile Small</td>
+<td>&lt;400px</td>
+<td>Tight single column, minimal padding</td>
+</tr>
+<tr>
+<td>Mobile</td>
+<td>400–600px</td>
+<td>Standard mobile, stacked layout</td>
+</tr>
+<tr>
+<td>Tablet Small</td>
+<td>600–768px</td>
+<td>2-column grids begin</td>
+</tr>
+<tr>
+<td>Tablet</td>
+<td>768–1024px</td>
+<td>Full card grids, expanded padding</td>
+</tr>
+<tr>
+<td>Desktop Small</td>
+<td>1024–1200px</td>
+<td>Standard desktop layout</td>
+</tr>
+<tr>
+<td>Desktop</td>
+<td>1200–1400px</td>
+<td>Full layout, maximum content width</td>
+</tr>
+<tr>
+<td>Large Desktop</td>
+<td>&gt;1400px</td>
+<td>Centered, generous margins</td>
+</tr>
+</tbody>
+</table>
+<h3 id="touch-targets">Touch Targets</h3>
+<ul>
+<li>Buttons use comfortable padding (8px–16px vertical)</li>
+<li>Navigation links at 14px with adequate spacing</li>
+<li>Pill badges have 10px horizontal padding for tap targets</li>
+<li>Mobile menu toggle uses 50% radius circular button</li>
+</ul>
+<h3 id="collapsing-strategy">Collapsing Strategy</h3>
+<ul>
+<li>Hero: display 48px → scales down, maintains negative tracking proportionally</li>
+<li>Navigation: horizontal links + CTAs → hamburger menu</li>
+<li>Feature cards: 3-column → 2-column → single column stacked</li>
+<li>Code screenshots: maintain aspect ratio, may horizontally scroll</li>
+<li>Trust bar logos: grid → horizontal scroll</li>
+<li>Footer: multi-column → stacked single column</li>
+<li>Section spacing: 80px+ → 48px on mobile</li>
+</ul>
+<h3 id="image-behavior">Image Behavior</h3>
+<ul>
+<li>Dashboard screenshots maintain border treatment at all sizes</li>
+<li>Hero gradient softens/simplifies on mobile</li>
+<li>Product screenshots use responsive images with consistent border radius</li>
+<li>Full-width sections maintain edge-to-edge treatment</li>
+</ul>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Primary CTA: Vercel Black (<code>#171717</code>)</li>
+<li>Background: Pure White (<code>#ffffff</code>)</li>
+<li>Heading text: Vercel Black (<code>#171717</code>)</li>
+<li>Body text: Gray 600 (<code>#4d4d4d</code>)</li>
+<li>Border (shadow): <code>rgba(0, 0, 0, 0.08) 0px 0px 0px 1px</code></li>
+<li>Link: Link Blue (<code>#0072f5</code>)</li>
+<li>Focus ring: Focus Blue (<code>hsla(212, 100%, 48%, 1)</code>)</li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create a hero section on white background. Headline at 48px Geist weight 600, line-height 1.00, letter-spacing -2.4px, color #171717. Subtitle at 20px Geist weight 400, line-height 1.80, color #4d4d4d. Dark CTA button (#171717, 6px radius, 8px 16px padding) and ghost button (white, shadow-border rgba(0,0,0,0.08) 0px 0px 0px 1px, 6px radius)."</li>
+<li>"Design a card: white background, no CSS border. Use shadow stack: rgba(0,0,0,0.08) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 2px, #fafafa 0px 0px 0px 1px. Radius 8px. Title at 24px Geist weight 600, letter-spacing -0.96px. Body at 16px weight 400, #4d4d4d."</li>
+<li>"Build a pill badge: #ebf5ff background, #0068d6 text, 9999px radius, 0px 10px padding, 12px Geist weight 500."</li>
+<li>"Create navigation: white sticky header. Geist 14px weight 500 for links, #171717 text. Dark pill CTA 'Start Deploying' right-aligned. Shadow-border on bottom: rgba(0,0,0,0.08) 0px 0px 0px 1px."</li>
+<li>"Design a workflow section showing three steps: Develop (text color #0a72ef), Preview (#de1d8d), Ship (#ff5b4f). Each step: 14px Geist Mono uppercase label + 24px Geist weight 600 title + 16px weight 400 description in #4d4d4d."</li>
+</ul>
+<h3 id="iteration-guide">Iteration Guide</h3>
+<ol>
+<li>Always use shadow-as-border instead of CSS border — <code>0px 0px 0px 1px rgba(0,0,0,0.08)</code> is the foundation</li>
+<li>Letter-spacing scales with font size: -2.4px at 48px, -1.28px at 32px, -0.96px at 24px, normal at 14px</li>
+<li>Three weights only: 400 (read), 500 (interact), 600 (announce)</li>
+<li>Color is functional, never decorative — workflow colors (Red/Pink/Blue) mark pipeline stages only</li>
+<li>The inner <code>#fafafa</code> ring in card shadows is what gives Vercel cards their subtle inner glow</li>
+<li>Geist Mono uppercase for technical labels, Geist Sans for everything else</li>
+</ol>
+</main>
+</body>
+</html>

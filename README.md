@@ -1,6 +1,6 @@
 # AI Agent Organization — 法人経営エージェント群
 
-法人経営を0から100まで遂行可能な**32体のAIエージェント**（+ Web Builderサブ8体）。
+法人経営を0から100まで遂行可能な**39体のAIエージェント**（+ Web Builderサブ8体＝計47体）。
 企画・戦略立案からプロダクト開発・サービス化まで一気通貫で実行可能。
 Claude Code の Maxプラン内で動作し、追加API費用なし。
 
@@ -14,10 +14,10 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
      ┌──────────┬───────────────┼───────────────┬──────────┐
      │          │               │               │          │
  営業部門    管理部門     コンサル事業部      開発部門     横断チーム
-  (6体)      (3体)         (8体)           (10体)       (4体)
+ (11体)      (4体)         (8体)           (10体)       (5体)
 ```
 
-## エージェント一覧（全32体 + サブ8体）
+## エージェント一覧（全39体 + サブ8体）
 
 ### 統括
 | # | 呼び出し名 | 役割 |
@@ -36,7 +36,7 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 | 8 | `report_builder` | Google Slides提案資料の構成作成 |
 | 9 | `document_builder` | 対話型提案資料作成（テンプレート活用） |
 
-### 営業・マーケティング部門（6体）
+### 営業・マーケティング部門（11体）
 | # | 呼び出し名 | 役割 |
 |---|-----------|------|
 | 10 | `sales` | リード管理・商談パイプライン・受注管理 |
@@ -45,27 +45,33 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 | 13 | `sns_operator` | Instagram/TikTok/YouTube日常運用・エンゲージメント管理 |
 | 14 | `ad_operations` | Google/Meta/TikTok広告運用・ROAS最適化 |
 | 15 | `content_creator` | SNS投稿・ブログ・動画脚本・広告コピー制作 |
+| 16 | `seo_aieo` | SEO・AI検索最適化・ディスクリプション/タグ選定・ブログ自動はめ込み |
+| 17 | `copywriter` | LP・広告・セールスレターのCVR最大化コピー制作 |
+| 18 | `pr` | 広報・プレスリリース・メディアリレーション・危機管理広報 |
+| 19 | `crm` | 顧客データベース管理・セグメンテーション・LTV最大化 |
+| 20 | `chatbot` | Webチャット・LINE・SNS自動応答・FAQ対応・エスカレーション |
 
-### 管理部門（3体）
+### 管理部門（4体）
 | # | 呼び出し名 | 役割 |
 |---|-----------|------|
-| 16 | `finance` | 経理・財務・見積・請求・PL管理・補助金 |
-| 17 | `hr` | 組織設計・採用・評価・エージェント組織管理 |
-| 18 | `legal` | 契約書・コンプライアンス・知財・リスク法務 |
+| 21 | `finance` | 経理・財務・見積・請求・PL管理・補助金 |
+| 22 | `hr` | 組織設計・採用・評価・エージェント組織管理 |
+| 23 | `legal` | 契約書・コンプライアンス・知財・リスク法務 |
+| 24 | `compliance` | 景品表示法・薬機法・個人情報保護法等の法令適合チェック |
 
 ### 開発部門（10体）
 | # | 呼び出し名 | 役割 |
 |---|-----------|------|
-| 19 | `tech_lead` | CTO的技術統括・アーキテクチャ設計・技術選定 |
-| 20 | `frontend_engineer` | Next.js App Router UI実装・SEO最適化 |
-| 21 | `backend_engineer` | API設計・DB・認証・Stripe決済連携 |
-| 22 | `infrastructure` | デプロイ・CI/CD・監視・セキュリティ・コスト管理 |
-| 23 | `qa_engineer` | テスト自動化・品質保証（Jest/Playwright） |
-| 24 | `ui_ux_designer` | デザインシステム構築・Figma連携・ユーザビリティ改善 |
-| 25 | `data_engineer` | クローラー・データパイプライン・データ品質管理 |
-| 26 | `designer` | Web/LP/UIデザイン生成（AI Designer MCP活用） |
-| 27 | `engineer` | LP/Web/AIシステム実装（Next.js/Python/WordPress） |
-| 28 | `web_builder` | 参考サイト分析→Next.js再現パイプライン |
+| 25 | `tech_lead` | CTO的技術統括・アーキテクチャ設計・技術選定 |
+| 26 | `frontend_engineer` | Next.js App Router UI実装・SEO最適化 |
+| 27 | `backend_engineer` | API設計・DB・認証・Stripe決済連携 |
+| 28 | `infrastructure` | デプロイ・CI/CD・監視・セキュリティ・コスト管理 |
+| 29 | `qa_engineer` | テスト自動化・品質保証（Jest/Playwright） |
+| 30 | `ui_ux_designer` | デザインシステム構築・Figma連携・ユーザビリティ改善 |
+| 31 | `data_engineer` | クローラー・データパイプライン・データ品質管理 |
+| 32 | `designer` | Web/LP/UIデザイン生成（AI Designer MCP活用） |
+| 33 | `engineer` | LP/Web/AIシステム実装（Next.js/Python/WordPress） |
+| 34 | `web_builder` | 参考サイト分析→Next.js再現パイプライン |
 
 ### Web Builder サブエージェント（8体）
 | | 呼び出し名 | 役割 |
@@ -79,13 +85,42 @@ Claude Code の Maxプラン内で動作し、追加API費用なし。
 | - | `web_builder/builder` | 全解析結果統合→Next.js + Tailwind CSS実装 |
 | - | `web_builder/qa_reviewer` | Vercelデプロイ後の比較検証・修正指示 |
 
-### 横断チーム（4体）
+### 横断チーム（5体）
 | # | 呼び出し名 | 役割 |
 |---|-----------|------|
-| 29 | `project_manager` | プロジェクト進捗・リソース配分・納期管理 |
-| 30 | `qa_reviewer` | 全出力の品質検証・相互整合性チェック |
-| 31 | `kpi_dashboard` | 全社KPI集計・異常検知・レポーティング |
-| 32 | `data_analyst` | 横断データ分析・インサイト抽出・意思決定支援 |
+| 35 | `project_manager` | プロジェクト進捗・リソース配分・納期管理 |
+| 36 | `qa_reviewer` | 全出力の品質検証・相互整合性チェック |
+| 37 | `kpi_dashboard` | 全社KPI集計・異常検知・レポーティング |
+| 38 | `data_analyst` | 横断データ分析・インサイト抽出・意思決定支援 |
+| 39 | `analytics` | GA4/GSC/広告データ統合分析・マーケティングROI最適化 |
+
+## 相互干渉（チェック&バランス）
+
+全エージェントはQA Reviewerによる品質チェックを受ける。主要な相互連携:
+
+| 連携 | 内容 |
+|------|------|
+| Sales → Retriever | 商談ヒアリング議事録の取得トリガー |
+| Sales → Finance | 見積依頼・受注通知 |
+| Sales → PM | 受注後プロジェクト立ち上げ |
+| PM → Tech Lead | 開発プロジェクトの技術方針決定 |
+| Tech Lead → Frontend/Backend/Infra | 開発タスクの振り分け・技術レビュー |
+| Designer → Frontend Engineer | デザイン→実装ハンドオフ |
+| UI/UX Designer → Designer | デザインシステム・トークン提供 |
+| Backend Engineer → Infrastructure | デプロイ依頼・インフラ構成 |
+| QA Engineer → Frontend/Backend | テスト結果・バグ報告 |
+| Data Engineer → KPI Dashboard | データパイプライン→集計基盤 |
+| PM → Finance | 工数実績・請求トリガー |
+| PM → CS | 納品後ハンドオフ |
+| CS → Sales | アップセル機会・リファラル |
+| Marketing → Content Creator → SNS Op. | コンテンツ企画→制作→配信 |
+| Marketing → Ad Operations | 広告戦略→運用実行 |
+| Marketing → Sales | リード引き渡し |
+| Data Analyst → CEO | 分析レポート・意思決定支援 |
+| Finance → CEO | 週次PL・キャッシュフロー |
+| KPI Dashboard → CEO | 日次KPI・異常アラート |
+| QA Reviewer → 全体 | 品質差し戻し・改善指示 |
+| CEO → 全体 | 優先度指示・リソース配分・最終承認 |
 
 ## 戦略提案パイプライン
 
@@ -121,6 +156,8 @@ agents/
 │   └── {company-name}/DESIGN.md
 ├── daily_reports/                         # 日次レポート
 └── agents/
+    ├── orchestrator/                      # エージェント間オーケストレーション
+    ├── outputs/                           # エージェント出力保存先
     ├── ceo/prompt.md                      # 統括
     ├── retriever/prompt.md                # コンサル事業部
     ├── issue_structurer/prompt.md
@@ -136,9 +173,15 @@ agents/
     ├── sns_operator/prompt.md
     ├── ad_operations/prompt.md
     ├── content_creator/prompt.md
+    ├── seo_aieo/prompt.md
+    ├── copywriter/prompt.md
+    ├── pr/prompt.md
+    ├── crm/prompt.md
+    ├── chatbot/prompt.md
     ├── finance/prompt.md                  # 管理部門
     ├── hr/prompt.md
     ├── legal/prompt.md
+    ├── compliance/prompt.md
     ├── tech_lead/prompt.md                # 開発部門
     ├── frontend_engineer/prompt.md
     ├── backend_engineer/prompt.md
@@ -161,7 +204,8 @@ agents/
     ├── project_manager/prompt.md          # 横断チーム
     ├── qa_reviewer/prompt.md
     ├── kpi_dashboard/prompt.md
-    └── data_analyst/prompt.md
+    ├── data_analyst/prompt.md
+    └── analytics/prompt.md
 ```
 
 ## 事業領域

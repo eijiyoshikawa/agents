@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Agent Report - 2026-04-04</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="daily-agent-report-2026-04-04">Daily Agent Report - 2026-04-04</h1>
+<h2 id="_1">現在のエージェント一覧と業務内容</h2>
+<h3 id="6">組織構成: 6体 + オーケストレーター</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>エージェント名</th>
+<th>役割</th>
+<th>入力</th>
+<th>出力</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Retriever</strong></td>
+<td>Notion議事録の取得・構造化</td>
+<td>Notion会議ページ</td>
+<td>retriever/output.json</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>Issue Structurer</strong></td>
+<td>ビジネス課題の言語化・検索クエリ生成</td>
+<td>retriever/output.json</td>
+<td>issue_structurer/output.json</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>Market Researcher</strong></td>
+<td>市場・競合・顧客データの収集</td>
+<td>issue_structurer/output.json</td>
+<td>market_researcher/output.json</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Analogy Finder</strong></td>
+<td>異業種アナロジー事例の収集</td>
+<td>issue_structurer/output.json</td>
+<td>analogy_finder/output.json</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Strategist</strong></td>
+<td>戦略構築 + Devil's Advocate批判的検証</td>
+<td>issue/market/analogy の output.json</td>
+<td>strategist/output.json</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>Report Builder</strong></td>
+<td>Google Slides提案資料の構成作成</td>
+<td>全エージェントの output.json</td>
+<td>report_builder/output.json</td>
+</tr>
+<tr>
+<td>-</td>
+<td><strong>Orchestrator</strong></td>
+<td>パイプライン実行制御（手順書のみ）</td>
+<td>ユーザー入力</td>
+<td>実行指示</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_2">各エージェント業務詳細</h2>
+<h3 id="1-retriever">1. Retriever（議事録取得・分解）</h3>
+<ul>
+<li><strong>業務</strong>: Notion MCPを使い会議議事録を検索・取得し、構造化データに変換</li>
+<li><strong>出力項目</strong>: 会議タイトル、日時、参加者、議題、キーポイント、アクションアイテム、クライアント情報</li>
+<li><strong>使用ツール</strong>: notion-search, notion-fetch, ファイル書き込み</li>
+<li><strong>強み</strong>: 議事録の自動取得と標準フォーマットへの変換</li>
+<li><strong>課題</strong>: Google Drive過去資料の検索がオプショナルで活用度が低い</li>
+</ul>
+<h3 id="2-issue-structurer">2. Issue Structurer（イシュー言語化・構造化）</h3>
+<ul>
+<li><strong>業務</strong>: クライアントの事業文脈を整理し、最重要コアクエスチョンを定義。課題を4カテゴリ（市場・競合・顧客・内部）に分解し、リサーチクエリを生成</li>
+<li><strong>出力項目</strong>: core_question, issues（カテゴリ別・優先度付き）, research_queries（5-10個）</li>
+<li><strong>使用ツール</strong>: ファイル読み書きのみ</li>
+<li><strong>強み</strong>: 構造化された課題分解により後続エージェントの精度向上に寄与</li>
+<li><strong>課題</strong>: フレームワーク（3C, SWOT等）の明示的適用がない</li>
+</ul>
+<h3 id="3-market-researcher">3. Market Researcher（市場調査 + 顧客分析）</h3>
+<ul>
+<li><strong>業務</strong>: WebSearchで市場規模・成長率・トレンド・競合戦略・ベンチマーク・顧客行動を収集</li>
+<li><strong>出力項目</strong>: insights（market/competitor/benchmark/customer）, customer_segments（3-5個）</li>
+<li><strong>使用ツール</strong>: WebSearch, WebFetch, ファイル読み書き</li>
+<li><strong>強み</strong>: Web検索による最新データ収集、顧客セグメント定義</li>
+<li><strong>課題</strong>: データの信頼性検証プロセスがない</li>
+</ul>
+<h3 id="4-analogy-finder">4. Analogy Finder（異業種アナロジー事例収集）</h3>
+<ul>
+<li><strong>業務</strong>: 課題構造を抽象化し、異業種の類似事例を5-8件収集。転用可能なインサイトを抽出</li>
+<li><strong>出力項目</strong>: cases（業界・企業・要約・転用インサイト・ソースURL）</li>
+<li><strong>使用ツール</strong>: WebSearch, WebFetch, ファイル読み書き</li>
+<li><strong>強み</strong>: 異業種からの発想転換による独自性のある提案</li>
+<li><strong>課題</strong>: アナロジーの適用可能性評価が主観的</li>
+</ul>
+<h3 id="5-strategist">5. Strategist（戦略構築 + 批判的検証）</h3>
+<ul>
+<li><strong>業務</strong>: 全リサーチを統合し戦略オプション3-5個を構築。Devil's Advocate（前提検証・リスク分析・問題再定義）を経て最終推奨戦略を選定</li>
+<li><strong>出力項目</strong>: strategic_options, critical_reviews, recommended_strategy</li>
+<li><strong>使用ツール</strong>: ファイル読み込み（3ファイル）、ファイル書き込み</li>
+<li><strong>強み</strong>: 批判的検証プロセスが組み込まれた戦略立案</li>
+<li><strong>課題</strong>: 実行計画（タイムライン・KPI・予算）の具体性が不足</li>
+</ul>
+<h3 id="6-report-builder">6. Report Builder（提案資料構成作成）</h3>
+<ul>
+<li><strong>業務</strong>: 10-15枚のスライド構成を設計。各スライドのタイトル・箇条書き・スピーカーノートを作成</li>
+<li><strong>出力項目</strong>: slides配列（slide_number, type, title, bullets, speaker_notes）</li>
+<li><strong>使用ツール</strong>: ファイル読み込み（4ファイル）、ファイル書き込み</li>
+<li><strong>強み</strong>: 標準的なコンサル提案書フォーマットに準拠</li>
+<li><strong>課題</strong>: ビジュアルデザイン指示・データ可視化指示がない</li>
+</ul>
+<hr />
+<h2 id="_3">組織診断</h2>
+<h3 id="_4">現状評価</h3>
+<h4 id="6_1">エージェント数: 6体（+ オーケストレーター）</h4>
+<p><strong>判定: 戦略提案パイプラインとしては適正。法人経営全体としては大幅に不足。</strong></p>
+<h4 id="_5">役割適正度</h4>
+<table>
+<thead>
+<tr>
+<th>エージェント</th>
+<th>適正度</th>
+<th>理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Retriever</td>
+<td>★★★★☆</td>
+<td>議事録取得に特化し明確。CRM連携があればなお良い</td>
+</tr>
+<tr>
+<td>Issue Structurer</td>
+<td>★★★★★</td>
+<td>パイプラインの要。後続全体の精度を左右する重要ポジション</td>
+</tr>
+<tr>
+<td>Market Researcher</td>
+<td>★★★★☆</td>
+<td>調査範囲は適切。データ検証レイヤーが欲しい</td>
+</tr>
+<tr>
+<td>Analogy Finder</td>
+<td>★★★★☆</td>
+<td>独自性の源泉。適用可能性スコアリングがあればより良い</td>
+</tr>
+<tr>
+<td>Strategist</td>
+<td>★★★★★</td>
+<td>Devil's Advocate内蔵は優秀。実行計画の具体化が次の課題</td>
+</tr>
+<tr>
+<td>Report Builder</td>
+<td>★★★☆☆</td>
+<td>構成のみでスライド生成まで完結しない。デザイン指示不足</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_6">相互干渉（チェック&amp;バランス）の状態</h4>
+<pre class="codehilite"><code>Retriever ──→ Issue Structurer ──→ Market Researcher ──→ Strategist ──→ Report Builder
+                                 └→ Analogy Finder  ──→↗
+</code></pre>
+
+<p><strong>問題点:</strong>
+1. <strong>一方向フロー</strong>: データが上流から下流への一方通行。フィードバックループがない
+2. <strong>品質チェック不在</strong>: 各エージェントの出力を検証するレビュアーがいない
+3. <strong>Retriever が孤立</strong>: 他のエージェントからのフィードバックを受けない
+4. <strong>Report Builder が末端</strong>: 戦略の実行可能性を提案書視点で検証する仕組みがない</p>
+<hr />
+<h2 id="0100">法人経営 0→100 に向けた不足領域</h2>
+<h3 id="_7">現在カバーしている領域</h3>
+<ul>
+<li>[x] 議事録管理（Retriever）</li>
+<li>[x] 課題分析（Issue Structurer）</li>
+<li>[x] 市場調査（Market Researcher）</li>
+<li>[x] 事例収集（Analogy Finder）</li>
+<li>[x] 戦略立案（Strategist）</li>
+<li>[x] 提案資料作成（Report Builder）</li>
+</ul>
+<h3 id="_8">不足している領域（優先度順）</h3>
+<h4 id="tier-1">Tier 1: 即座に必要</h4>
+<ul>
+<li>[ ] <strong>CEO / 統括エージェント</strong> — 全エージェントの統括・意思決定・品質管理</li>
+<li>[ ] <strong>Finance Agent（経理・財務）</strong> — 見積作成・請求管理・PL管理・キャッシュフロー</li>
+<li>[ ] <strong>Sales Agent（営業）</strong> — リード管理・商談進捗・CRM・受注率分析</li>
+<li>[ ] <strong>QA Reviewer Agent（品質管理）</strong> — 各エージェント出力の相互レビュー</li>
+</ul>
+<h4 id="tier-2">Tier 2: 成長に必要</h4>
+<ul>
+<li>[ ] <strong>Project Manager Agent</strong> — プロジェクト進捗・タスク管理・リソース配分</li>
+<li>[ ] <strong>HR Agent（人事・採用）</strong> — 組織設計・採用計画・評価制度</li>
+<li>[ ] <strong>Legal Agent（法務）</strong> — 契約書レビュー・コンプライアンス・知財管理</li>
+</ul>
+<h4 id="tier-3">Tier 3: スケールに必要</h4>
+<ul>
+<li>[ ] <strong>Marketing Agent</strong> — 自社マーケティング・ブランディング・LP改善</li>
+<li>[ ] <strong>Customer Success Agent</strong> — 顧客満足度・リテンション・アップセル</li>
+<li>[ ] <strong>KPI Dashboard Agent</strong> — 全社KPIの自動集計・異常検知・レポーティング</li>
+</ul>
+<hr />
+<h2 id="_9">本日のアクション</h2>
+<ol>
+<li>日次レポート体制の構築（本ファイル）</li>
+<li>組織診断と改善計画の策定</li>
+<li>Tier 1 エージェント（CEO, Finance, Sales, QA Reviewer）の設計・作成</li>
+<li>既存エージェントの相互干渉（フィードバックループ）改善</li>
+<li>CLAUDE.md・PIPELINE.mdの更新</li>
+</ol>
+<hr />
+<p><em>Generated: 2026-04-04 | Next update: 2026-04-05</em></p>
+</main>
+</body>
+</html>

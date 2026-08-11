@@ -19,9 +19,16 @@ outputs/evaluation_criteria/          ← Vercel「agents」プロジェクト�
 │   └── bpo.html
 ├── marketing/
 │   └── v2.html         # マーケ評価制度 v2.0（チーム評価版）※v2.1改定進行中
+├── assets/
+│   └── eval-section.js # リアルタイム実績セクション（暗号化データの復号+描画）
+├── data/               # 暗号化済み実績データ（bake-eval-data.mjs が生成）
+├── scripts/
+│   ├── bake-eval-data.mjs      # slack-let→暗号化焼き付け（要CRON_SECRET）
+│   └── inject-eval-section.js  # 実績セクションのページ注入（冪等）
 ├── public/             # 事故時保険のミラー（配信の本体ではない）
 ├── vercel.json         # クリーンURL・rewrites・セキュリティヘッダ
 ├── HANDOVER.md         # 引き継ぎ文書（デプロイ構成・進行中タスク）
+├── MARKETING_DATA_AUDIT.md  # マーケ実績データの出所・精度の記録／不明項目の回収状況
 └── README.md           # 本ファイル
 ```
 
@@ -53,7 +60,7 @@ outputs/evaluation_criteria/          ← Vercel「agents」プロジェクト�
 ## デプロイ構成（詳細は HANDOVER.md）
 
 - **リポジトリ**: `eijiyoshikawa/agents`
-- **作業ブランチ**: `claude/evaluation-criteria-framework-mkp6W`
+- **作業ブランチ**: `claude/evaluation-finance-dashboard-50w8t9`（旧 `claude/evaluation-criteria-framework-mkp6W` をマージ済み）
 - **デプロイブランチ**: `let-hyoka`（pushで自動デプロイ）
 - **Vercel「agents」プロジェクト**: Root Directory = `outputs/evaluation_criteria` / Framework = Other / Build・Output・Install Override 全てOFF
 - ⚠️ 別プロジェクト「let-hyoka」（let-recruit求人アプリ・Root=let-recruit）とは**無関係。触らない**

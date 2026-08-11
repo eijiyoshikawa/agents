@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Wise</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-wise">Design System: Wise</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Wise's website is a bold, confident fintech platform that communicates "money without borders" through massive typography and a distinctive lime-green accent. The design operates on a warm off-white canvas with near-black text (<code>#0e0f0c</code>) and a signature Wise Green (<code>#9fe870</code>) — a fresh, lime-bright color that feels alive and optimistic, unlike the corporate blues of traditional banking.</p>
+<p>The typography uses Wise Sans — a proprietary font used at extreme weight 900 (black) for display headings with a remarkably tight line-height of 0.85 and OpenType <code>"calt"</code> (contextual alternates). At 126px, the text is so dense it feels like a protest sign — bold, urgent, and impossible to ignore. Inter serves as the body font with weight 600 as the default for emphasis, creating a consistently confident voice.</p>
+<p>What distinguishes Wise is its green-on-white-on-black material palette. Lime Green (<code>#9fe870</code>) appears on buttons with dark green text (<code>#163300</code>), creating a nature-inspired CTA that feels fresh. Hover states use <code>scale(1.05)</code> expansion rather than color changes — buttons physically grow on interaction. The border-radius system uses 9999px for buttons (pill), 30px–40px for cards, and the shadow system is minimal — just <code>rgba(14,15,12,0.12) 0px 0px 0px 1px</code> ring shadows.</p>
+<p><strong>Key Characteristics:</strong>
+- Wise Sans at weight 900, 0.85 line-height — billboard-scale bold headlines
+- Lime Green (<code>#9fe870</code>) accent with dark green text (<code>#163300</code>) — nature-inspired fintech
+- Inter body at weight 600 as default — confident, not light
+- Near-black (<code>#0e0f0c</code>) primary with warm green undertone
+- Scale(1.05) hover animations — buttons physically grow
+- OpenType <code>"calt"</code> on all text
+- Pill buttons (9999px) and large rounded cards (30px–40px)
+- Semantic color system with comprehensive state management</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary-brand">Primary Brand</h3>
+<ul>
+<li><strong>Near Black</strong> (<code>#0e0f0c</code>): Primary text, background for dark sections</li>
+<li><strong>Wise Green</strong> (<code>#9fe870</code>): Primary CTA button, brand accent</li>
+<li><strong>Dark Green</strong> (<code>#163300</code>): Button text on green, deep green accent</li>
+<li><strong>Light Mint</strong> (<code>#e2f6d5</code>): Soft green surface, badge backgrounds</li>
+<li><strong>Pastel Green</strong> (<code>#cdffad</code>): <code>--color-interactive-contrast-hover</code>, hover accent</li>
+</ul>
+<h3 id="semantic">Semantic</h3>
+<ul>
+<li><strong>Positive Green</strong> (<code>#054d28</code>): <code>--color-sentiment-positive-primary</code>, success</li>
+<li><strong>Danger Red</strong> (<code>#d03238</code>): <code>--color-interactive-negative-hover</code>, error/destructive</li>
+<li><strong>Warning Yellow</strong> (<code>#ffd11a</code>): <code>--color-sentiment-warning-hover</code>, warnings</li>
+<li><strong>Background Cyan</strong> (<code>rgba(56,200,255,0.10)</code>): <code>--color-background-accent</code>, info tint</li>
+<li><strong>Bright Orange</strong> (<code>#ffc091</code>): <code>--color-bright-orange</code>, warm accent</li>
+</ul>
+<h3 id="neutral">Neutral</h3>
+<ul>
+<li><strong>Warm Dark</strong> (<code>#454745</code>): Secondary text, borders</li>
+<li><strong>Gray</strong> (<code>#868685</code>): Muted text, tertiary</li>
+<li><strong>Light Surface</strong> (<code>#e8ebe6</code>): Subtle green-tinted light surface</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-families">Font Families</h3>
+<ul>
+<li><strong>Display</strong>: <code>Wise Sans</code>, fallback: <code>Inter</code> — OpenType <code>"calt"</code> on all text</li>
+<li><strong>Body / UI</strong>: <code>Inter</code>, fallbacks: <code>Helvetica, Arial</code></li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display Mega</td>
+<td>Wise Sans</td>
+<td>126px (7.88rem)</td>
+<td>900</td>
+<td>0.85 (ultra-tight)</td>
+<td>normal</td>
+<td><code>"calt"</code></td>
+</tr>
+<tr>
+<td>Display Hero</td>
+<td>Wise Sans</td>
+<td>96px (6.00rem)</td>
+<td>900</td>
+<td>0.85</td>
+<td>normal</td>
+<td><code>"calt"</code></td>
+</tr>
+<tr>
+<td>Section Heading</td>
+<td>Wise Sans</td>
+<td>64px (4.00rem)</td>
+<td>900</td>
+<td>0.85</td>
+<td>normal</td>
+<td><code>"calt"</code></td>
+</tr>
+<tr>
+<td>Sub-heading</td>
+<td>Wise Sans</td>
+<td>40px (2.50rem)</td>
+<td>900</td>
+<td>0.85</td>
+<td>normal</td>
+<td><code>"calt"</code></td>
+</tr>
+<tr>
+<td>Alt Heading</td>
+<td>Inter</td>
+<td>78px (4.88rem)</td>
+<td>600</td>
+<td>1.10 (tight)</td>
+<td>-2.34px</td>
+<td><code>"calt"</code></td>
+</tr>
+<tr>
+<td>Card Title</td>
+<td>Inter</td>
+<td>26px (1.62rem)</td>
+<td>600</td>
+<td>1.23 (tight)</td>
+<td>-0.39px</td>
+<td><code>"calt"</code></td>
+</tr>
+<tr>
+<td>Feature Title</td>
+<td>Inter</td>
+<td>22px (1.38rem)</td>
+<td>600</td>
+<td>1.25 (tight)</td>
+<td>-0.396px</td>
+<td><code>"calt"</code></td>
+</tr>
+<tr>
+<td>Body</td>
+<td>Inter</td>
+<td>18px (1.13rem)</td>
+<td>400</td>
+<td>1.44</td>
+<td>0.18px</td>
+<td><code>"calt"</code></td>
+</tr>
+<tr>
+<td>Body Semibold</td>
+<td>Inter</td>
+<td>18px (1.13rem)</td>
+<td>600</td>
+<td>1.44</td>
+<td>-0.108px</td>
+<td><code>"calt"</code></td>
+</tr>
+<tr>
+<td>Button</td>
+<td>Inter</td>
+<td>18px–22px</td>
+<td>600</td>
+<td>1.00–1.44</td>
+<td>-0.108px</td>
+<td><code>"calt"</code></td>
+</tr>
+<tr>
+<td>Caption</td>
+<td>Inter</td>
+<td>14px (0.88rem)</td>
+<td>400–600</td>
+<td>1.50–1.86</td>
+<td>-0.084px to -0.108px</td>
+<td><code>"calt"</code></td>
+</tr>
+<tr>
+<td>Small</td>
+<td>Inter</td>
+<td>12px (0.75rem)</td>
+<td>400–600</td>
+<td>1.00–2.17</td>
+<td>-0.084px to -0.108px</td>
+<td><code>"calt"</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="principles">Principles</h3>
+<ul>
+<li><strong>Weight 900 as identity</strong>: Wise Sans Black (900) is used exclusively for display — the heaviest weight in any analyzed system. It creates text that feels stamped, pressed, physical.</li>
+<li><strong>0.85 line-height</strong>: The tightest display line-height analyzed. Letters overlap vertically, creating dense, billboard-like text blocks.</li>
+<li><strong>"calt" everywhere</strong>: Contextual alternates enabled on ALL text — both Wise Sans and Inter.</li>
+<li><strong>Weight 600 as body default</strong>: Inter Semibold is the standard reading weight — confident, not light.</li>
+</ul>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<p><strong>Primary Green Pill</strong>
+- Background: <code>#9fe870</code> (Wise Green)
+- Text: <code>#163300</code> (Dark Green)
+- Padding: 5px 16px
+- Radius: 9999px
+- Hover: scale(1.05) — button physically grows
+- Active: scale(0.95) — button compresses
+- Focus: inset ring + outline</p>
+<p><strong>Secondary Subtle Pill</strong>
+- Background: <code>rgba(22, 51, 0, 0.08)</code> (dark green at 8% opacity)
+- Text: <code>#0e0f0c</code>
+- Padding: 8px 12px 8px 16px
+- Radius: 9999px
+- Same scale hover/active behavior</p>
+<h3 id="cards-containers">Cards &amp; Containers</h3>
+<ul>
+<li>Radius: 16px (small), 30px (medium), 40px (large cards/tables)</li>
+<li>Border: <code>1px solid rgba(14,15,12,0.12)</code> or <code>1px solid #9fe870</code> (green accent)</li>
+<li>Shadow: <code>rgba(14,15,12,0.12) 0px 0px 0px 1px</code> (ring shadow)</li>
+</ul>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li>Green-tinted navigation hover: <code>rgba(211,242,192,0.4)</code></li>
+<li>Clean header with Wise wordmark</li>
+<li>Pill CTAs right-aligned</li>
+</ul>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-system">Spacing System</h3>
+<ul>
+<li>Base unit: 8px</li>
+<li>Scale: 1px, 2px, 3px, 4px, 5px, 8px, 10px, 11px, 12px, 16px, 18px, 19px, 20px, 22px, 24px</li>
+</ul>
+<h3 id="border-radius-scale">Border Radius Scale</h3>
+<ul>
+<li>Minimal (2px): Links, inputs</li>
+<li>Standard (10px): Comboboxes, inputs</li>
+<li>Card (16px): Small cards, buttons, radio</li>
+<li>Medium (20px): Links, medium cards</li>
+<li>Large (30px): Feature cards</li>
+<li>Section (40px): Tables, large cards</li>
+<li>Mega (1000px): Presentation elements</li>
+<li>Pill (9999px): All buttons, images</li>
+<li>Circle (50%): Icons, badges</li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Treatment</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flat (Level 0)</td>
+<td>No shadow</td>
+<td>Default</td>
+</tr>
+<tr>
+<td>Ring (Level 1)</td>
+<td><code>rgba(14,15,12,0.12) 0px 0px 0px 1px</code></td>
+<td>Card borders</td>
+</tr>
+<tr>
+<td>Inset (Level 2)</td>
+<td><code>rgb(134,134,133) 0px 0px 0px 1px inset</code></td>
+<td>Input focus</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Shadow Philosophy</strong>: Wise uses minimal shadows — ring shadows only. Depth comes from the bold green accent against the neutral canvas.</p>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use Wise Sans weight 900 for display — the extreme boldness IS the brand</li>
+<li>Apply line-height 0.85 on Wise Sans display — ultra-tight is intentional</li>
+<li>Use Lime Green (#9fe870) for primary CTAs with Dark Green (#163300) text</li>
+<li>Apply scale(1.05) hover and scale(0.95) active on buttons</li>
+<li>Enable "calt" on all text</li>
+<li>Use Inter weight 600 as the body default</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Don't use light font weights for Wise Sans — only 900</li>
+<li>Don't relax the 0.85 line-height on display — the density is the identity</li>
+<li>Don't use the Wise Green as background for large surfaces — it's for buttons and accents</li>
+<li>Don't skip the scale animation on buttons</li>
+<li>Don't use traditional shadows — ring shadows only</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<h3 id="breakpoints">Breakpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Width</th>
+<th>Key Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mobile</td>
+<td>&lt;576px</td>
+<td>Single column</td>
+</tr>
+<tr>
+<td>Tablet</td>
+<td>576–992px</td>
+<td>2-column</td>
+</tr>
+<tr>
+<td>Desktop</td>
+<td>992–1440px</td>
+<td>Full layout</td>
+</tr>
+<tr>
+<td>Large</td>
+<td>&gt;1440px</td>
+<td>Expanded</td>
+</tr>
+</tbody>
+</table>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Text: Near Black (<code>#0e0f0c</code>)</li>
+<li>Background: White (<code>#ffffff</code> / off-white)</li>
+<li>Accent: Wise Green (<code>#9fe870</code>)</li>
+<li>Button text: Dark Green (<code>#163300</code>)</li>
+<li>Secondary: Gray (<code>#868685</code>)</li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create hero: white background. Headline at 96px Wise Sans weight 900, line-height 0.85, 'calt' enabled, #0e0f0c text. Green pill CTA (#9fe870, 9999px radius, 5px 16px padding, #163300 text). Hover: scale(1.05)."</li>
+<li>"Build a card: 30px radius, 1px solid rgba(14,15,12,0.12). Title at 22px Inter weight 600, body at 18px weight 400."</li>
+</ul>
+<h3 id="iteration-guide">Iteration Guide</h3>
+<ol>
+<li>Wise Sans 900 at 0.85 line-height — the extreme weight IS the brand</li>
+<li>Lime Green for buttons only — dark green text on green background</li>
+<li>Scale animations (1.05 hover, 0.95 active) on all interactive elements</li>
+<li>"calt" on everything — contextual alternates are mandatory</li>
+<li>Inter 600 for body — confident reading weight</li>
+</ol>
+</main>
+</body>
+</html>

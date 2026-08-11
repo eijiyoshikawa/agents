@@ -1,9 +1,13 @@
 import { describe, it, expect } from "vitest";
+<<<<<<< HEAD
 import {
   extractJsonBlock,
   parseJobJson,
   repairTruncatedJson,
 } from "@/lib/extract-job";
+=======
+import { extractJsonBlock, parseJobJson } from "@/lib/extract-job";
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
 
 describe("extractJsonBlock", () => {
   it("```json フェンスから抽出する", () => {
@@ -19,6 +23,7 @@ describe("extractJsonBlock", () => {
   it("JSONが無ければ例外", () => {
     expect(() => extractJsonBlock("テキストのみ")).toThrow();
   });
+<<<<<<< HEAD
 
   it("閉じ括弧が無い途中切れでも先頭から返す（修復に回す）", () => {
     const raw = '結果: {"jobTitle":"エンジニア","summary":"仕事';
@@ -86,6 +91,8 @@ describe("parseJobJson（応答の揺れへの耐性）", () => {
     expect(job.salary.monthlyMin).toBe(19.6);
     expect(job.salary.monthlyMax).toBe(30);
   });
+=======
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
 });
 
 describe("parseJobJson", () => {
@@ -93,6 +100,7 @@ describe("parseJobJson", () => {
     const job = parseJobJson('{"jobTitle":"エンジニア"}');
     expect(job.jobTitle).toBe("エンジニア");
     expect(job.responsibilities).toEqual([]);
+<<<<<<< HEAD
     expect(job.salary.monthlyMin).toBeNull();
   });
 
@@ -106,5 +114,12 @@ describe("parseJobJson", () => {
 
   it("JSONを含まない応答は例外", () => {
     expect(() => parseJobJson("すみません、できませんでした")).toThrow();
+=======
+    expect(job.salary.type).toBe("月給");
+  });
+
+  it("不正JSONは例外", () => {
+    expect(() => parseJobJson("{壊れた")).toThrow();
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
   });
 });

@@ -1,0 +1,79 @@
+{
+  "description": "Subsidy Scout が巡回する監視ソース定義。公式（.go.jp）を一次とし、民間まとめサイトは補助ソース扱い。",
+  "updated_at": "2026-04-17",
+  "primary_sources": [
+    {
+      "id": "jgrants",
+      "name": "jGrants（補助金電子申請システム）",
+      "url": "https://www.jgrants-portal.go.jp/",
+      "type": "portal",
+      "priority": "high"
+    },
+    {
+      "id": "mirasapo",
+      "name": "ミラサポplus",
+      "url": "https://mirasapo-plus.go.jp/",
+      "type": "portal",
+      "priority": "high"
+    },
+    {
+      "id": "meti",
+      "name": "経済産業省（補助金・助成金）",
+      "url": "https://www.meti.go.jp/",
+      "type": "ministry",
+      "priority": "high"
+    },
+    {
+      "id": "chusho",
+      "name": "中小企業庁",
+      "url": "https://www.chusho.meti.go.jp/",
+      "type": "agency",
+      "priority": "high"
+    },
+    {
+      "id": "mhlw",
+      "name": "厚生労働省（雇用関連助成金）",
+      "url": "https://www.mhlw.go.jp/",
+      "type": "ministry",
+      "priority": "high"
+    }
+  ],
+  "target_subsidies": [
+    {
+      "id": "it2026-general",
+      "keyword": "IT導入補助金 2026 通常枠",
+      "category": "DX",
+      "typical_max_jpy": 4500000
+    },
+    {
+      "id": "monozukuri",
+      "keyword": "ものづくり補助金",
+      "category": "設備投資",
+      "typical_max_jpy": 12500000
+    },
+    {
+      "id": "jizokuka",
+      "keyword": "小規模事業者持続化補助金",
+      "category": "販路開拓",
+      "typical_max_jpy": 2000000
+    },
+    {
+      "id": "jigyou-saikouchiku",
+      "keyword": "事業再構築補助金",
+      "category": "事業転換",
+      "typical_max_jpy": 100000000
+    },
+    {
+      "id": "jinzai-kaihatsu",
+      "keyword": "人材開発支援助成金",
+      "category": "人材育成",
+      "typical_max_jpy": null
+    }
+  ],
+  "scan_frequency": "weekly",
+  "alert_threshold_days": 30,
+  "notes": [
+    "自治体補助金は案件発生時に都度追加する",
+    "PDF本文の解析は Claude の読み取り能力に依存。重要案件は人手で原本確認を併用する"
+  ]
+}

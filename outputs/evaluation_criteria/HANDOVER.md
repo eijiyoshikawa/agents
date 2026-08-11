@@ -1,6 +1,6 @@
 # 引き継ぎ文書 — LET評価制度プロジェクト（let-hyoka）
 
-最終更新: 2026-08-03 ／ 前セッション: claude/evaluation-criteria-framework-mkp6W
+最終更新: 2026-08-05 ／ 現行作業ブランチ: claude/evaluation-finance-dashboard-50w8t9（旧 claude/evaluation-criteria-framework-mkp6W をマージ済み）
 
 ---
 
@@ -33,7 +33,7 @@
 
 ```
 リポジトリ: eijiyoshikawa/agents
-作業ブランチ: claude/evaluation-criteria-framework-mkp6W（開発コミット先）
+作業ブランチ: claude/evaluation-finance-dashboard-50w8t9（開発コミット先 ※旧 claude/evaluation-criteria-framework-mkp6W をマージ済み）
 デプロイブランチ: let-hyoka（ここへのpushで let-hyoka.vercel.app が更新される）
 ```
 
@@ -51,13 +51,13 @@
 
 ```bash
 # 1. 作業ブランチで outputs/evaluation_criteria/ 配下を編集・コミット・push
-git checkout claude/evaluation-criteria-framework-mkp6W
+git checkout claude/evaluation-finance-dashboard-50w8t9
 # （編集）
-git add outputs/evaluation_criteria/ && git commit -m "..." && git push origin claude/evaluation-criteria-framework-mkp6W
+git add outputs/evaluation_criteria/ && git commit -m "..." && git push origin claude/evaluation-finance-dashboard-50w8t9
 
 # 2. let-hyokaにマージ + ミラー同期 + push（これでVercelが自動デプロイ）
 git checkout let-hyoka
-git merge claude/evaluation-criteria-framework-mkp6W --no-ff -m "merge: ..."
+git merge claude/evaluation-finance-dashboard-50w8t9 --no-ff -m "merge: ..."
 # ルートミラー（let-hyokaブランチのみ存在）
 cp outputs/evaluation_criteria/*.html ./ 2>/dev/null
 cp outputs/evaluation_criteria/demo/*.html ./demo/
@@ -69,7 +69,7 @@ cp outputs/evaluation_criteria/demo/*.html outputs/evaluation_criteria/public/de
 cp outputs/evaluation_criteria/marketing/v2.html outputs/evaluation_criteria/public/marketing/
 cp -r outputs/evaluation_criteria/public/* ./public/
 git add -A && git commit -m "feat(deploy): ミラー同期" && git push origin let-hyoka
-git checkout claude/evaluation-criteria-framework-mkp6W
+git checkout claude/evaluation-finance-dashboard-50w8t9
 ```
 
 ※ 実際に配信されているのは `outputs/evaluation_criteria/` 直下（Root Directory）。ルート/publicミラーは事故時の保険。
@@ -97,6 +97,27 @@ git checkout claude/evaluation-criteria-framework-mkp6W
   - Section 10.2のボーナス額再計算（新定着率係数なら▲58.5万）
   - 決定された条文（クローバック・最低母数・除外規定等）を追記
 
+### 【2026-08-10 実装完了】リアルタイム実績セクション（MF実仕訳 × 評価制度）
+
+経営陣用 `sales.html` / `marketing.html` と従業員用 `demo/sales.html` / `demo/marketing.html` の末尾に
+「📊 リアルタイム実績」セクションを追加。slack-let の担当者別集計をページ別パスワードで
+**AES-GCM暗号化**して静的焼き付けする方式（平文はリポジトリにもHTMLにも残らない）。
+
+- 計算ルール（2026-08-10 役員決定）: 売上=MF実仕訳／人件費=実額表示／営業原価=江原の人件費+精算後PL科目（取引先=江原）／マーケ原価=人件費+広告宣伝費+外注費（自社SNS外注は部門共通費）。詳細は slack_let リポジトリ `docs/eval-contribution.md`
+- 構成: `assets/eval-section.js`（復号+描画）／`scripts/bake-eval-data.mjs`（データ焼き付け）／`scripts/inject-eval-section.js`（ページ注入・冪等）
+- 認証ゲートは通過時にパスワードを `sessionStorage(<key>_pw)` へ保持し、それが復号鍵になる（ゲート改修済み）
+- **データ反映手順（ターミナルから・週次目安）**:
+  ```bash
+  cd outputs/evaluation_criteria
+  CRON_SECRET=xxxx node scripts/bake-eval-data.mjs   # data/ と public/data/ に暗号化JSONを生成
+  git add data public/data && git commit -m "chore(eval): 実績データ反映" && git push
+  # → let-hyoka ブランチへマージ+push（§3の定型フロー）で本番反映
+  ```
+- **前提となる残作業（数字が出るまで）**:
+  1. Notion「メンバーマスタ」の **月額人件費（法定福利込み実額）** と **月次粗利目標** を役員が記入（未記入は「要設定」表示）
+  2. 担当マッピングDBの **MF取引先名の名寄せ**完了（未名寄せ分は「共通・未名寄せ」に集約される）
+  3. 記帳ルールの経理共有（広告費・外注費・経費精算に取引先/補助科目を必ず付ける）
+
 ### その他の未完タスク
 - 就業規則改定3項目（降格規定・査定給減額・賞与変動条項）の労務TODO反映 → 2026-08-03に `marketing/v2.html` Section 12（未確定・運用開始までのTODO）に追記済み
 - 営業部制度とv2.1受注基準の整合改定（未着手・v2.1確定後に着手予定）
@@ -111,10 +132,72 @@ git checkout claude/evaluation-criteria-framework-mkp6W
   - 宮村建設はSNS運用契約が2025年11月末で終了（解約）だが、2026年5-6月にHP/採用LP制作の別提案が進行中の様子
   - **次アクション**: 松本・松岡本人または営業担当（吉田氏）に上記の不足・矛盾を確認し、管理シートを整備してもらう。Financeとの入金実績突合も未実施（現状の「売上」は契約金額ベースの推定値で実入金記録ではない）
 
+### 【2026-08-05 完了】マーケ実績データ 不明項目のNotion表作成
+
+**Notionデータベース作成済み** — 松本・松岡本人の記入待ち。
+
+| 項目 | 内容 |
+|------|------|
+| DB名 | マーケ実績データ 不明項目 確認シート（松本・松岡 記入用）|
+| URL | https://app.notion.com/p/269046ec262d441f8b7858e14ba8f224 |
+| database_id | `269046ec262d441f8b7858e14ba8f224` |
+| data_source_id | `78cf093b-8ee8-40fe-abc4-fd71d9b6886e` |
+| 親ページ | 2026/07/27 役員会議 アジェンダ (`23e4a4d1b8424a9b9bfd999376fce672`) の子 |
+| 行数 | 23件（松本11社・松岡12社）投入済み・全件ステータス=未記入 |
+
+**列構成**（HANDOVER当初案からの変更点あり）
+- クライアント名（title）/ 担当者（select: 松本夢莉乃・松岡秀人）/ 不明項目（multi-select）/ 現状の備考（text）/ **回答（本人記入）（text）** / 記入者（person）/ 記入日（date）/ ステータス（select: 未記入・記入済み・確認完了）
+- 当初案は「『不明項目』列のみ空欄で本人に記入してもらう」だったが、不明項目自体は調査で特定済みのため、**不明項目・備考は事前入力し、本人が値を書き込む「回答（本人記入）」列を追加**した。「何が不明か」ではなく「その値は何か」を回収する形。
+- ビュータブ: 全体 / 「松本夢莉乃 記入用（11社）」/「松岡秀人 記入用（12社）」（担当者でフィルタ済み）
+- 親ページ末尾に記入方法・確認依頼事項（社名酷似のビッグ測量設計/ビック測量、TECNESのデータ汚染、契約終了日超過の実績更新等）を追記済み
+
+**運用**: 本人に**都度記入**してもらい、完了報告を受けてから反映する流れ。ステータスが「確認完了」になった社から順に反映可能（全23社の回収待ちは不要）。ただし社名酷似（ビッグ測量設計／ビック測量）の法人重複は担当者別集計の前提に影響するため、個別社の反映より先に解消する。
+
+**次アクション**: 松本・松岡へ記入依頼を連絡 → 記入完了後、`marketing.html`（Step 8）/`marketing/v2.html`（Section 13）/`demo/marketing.html`（Step 7）の実績表へ反映。あわせて営業担当（吉田氏）への管理シート整備依頼、Financeとの入金実績突合も実施。
+
+> 📋 **監査記録の詳細は [`MARKETING_DATA_AUDIT.md`](./MARKETING_DATA_AUDIT.md) を参照**（23社の不明項目一覧・データ品質上の5つの問題・反映手順）
+
+<details>
+<summary>作成時の元データ（23クライアントの不明項目一覧）</summary>
+
+**松本担当（11社）の不明項目**
+| クライアント | 不明・未確定の項目 | 備考 |
+|---|---|---|
+| 柄谷工務店 | 利益 | 予算・売上・継続月数は確定 |
+| セントラルフルーツ（八百一） | 利益 | 原価集計期間と契約期間の粒度不一致のため算出不可 |
+| 新日本住設株式会社 | 契約開始日／月額予算／売上／広告費／契約状況 | ほぼ全項目不明。原価管理シート自体が存在しない |
+| 株式会社弘陽電設 | 利益 | 予算・売上・広告費・継続月数は確定（延長後） |
+| 株式会社オンテックス | 契約開始日／月額予算／売上／利益／契約状況 | 広告費のみ累計¥0と判明 |
+| Reve Career Agency株式会社 | 正式契約金額（要確認）／利益 | 月額換算値は算出したが2アカウント合算・要人力確認。ユメキャリ側の原価データ未確認 |
+| クロムス | 契約開始日／月額予算／売上／広告費／契約状況 | ほぼ全項目不明。原価管理シート自体が存在しない |
+| 株式会社タキオンワタナベ | 利益 | 予算・売上・広告費・契約終了日は確定 |
+| 株式会社アルファガード | 月額予算／売上／利益 | 契約開始日・広告費累計は判明 |
+| 株式会社ビッグ測量設計 | 利益 | 予算・売上・広告費・継続月数は確定 |
+| tetote | 契約開始日／月額予算／売上／契約状況 | 広告費はわずかに判明（累計¥1,588） |
+
+**松岡担当（12社）の不明項目**
+| クライアント | 不明・未確定の項目 | 備考 |
+|---|---|---|
+| エスコプロモーション株式会社 | 契約開始日／月額予算／売上／広告費／利益／契約状況 | 広告費はタブ間で数値不一致・信頼不可 |
+| ゼロワットパワー株式会社 | 契約開始日／月額予算／売上／広告費／利益／契約状況 | SNS運用の契約・実績データ自体が存在しない |
+| 株式会社ビック測量 | 契約開始日／月額予算／売上／利益／契約状況 | 広告費は週次実績のみ判明（要月次再集計） |
+| 株式会社TECNES | 契約開始日／月額予算／売上／広告費／利益／契約状況 | 管理シートに翔星建設のデータが混入しており実質すべて信頼不可 |
+| モデルノ（株式会社クルマクション） | 契約開始日／月額予算／売上／広告費／利益／契約状況 | 提案資料のみ確認、契約締結の証跡なし |
+| 株式会社ナワショウ | 月額予算／売上／利益 | 契約開始日は推定判明。広告費は週次実績のみ（要再集計） |
+| 豊和開発株式会社 | 契約開始日／月額予算／売上／広告費／利益／契約状況 | 企画構成案pptx1点のみで実績データ自体が未検出 |
+| 株式会社清一建設 | 契約開始日／利益 | 予算・広告費は確定（推定含む） |
+| 株式会社宮村建設 | 月額予算／売上／広告費 | SNS運用契約は2025年11月末で終了（解約）済み |
+| 翔星建設株式会社 | 契約更新の有無（2026年8月末以降） | 予算・原価・利益は確定。契約満了間近で更新未確認 |
+| 株式会社cantera | 契約更新の有無（2026年2月末以降） | 予算・原価・利益は確定。名目上の契約終了日を過ぎても実績更新が継続 |
+| 株式会社桝本レッカー | （特になし） | ほぼ全項目確定 |
+
+</details>
+
 ## 6. Notion関連ページ
 
 | ページ | ID / 場所 |
 |--------|----------|
+| マーケ実績データ 不明項目 確認シート（DB・記入待ち）| `269046ec262d441f8b7858e14ba8f224` / data_source `78cf093b-8ee8-40fe-abc4-fd71d9b6886e` |
 | 定性評価チェックリスト（20問）| `34fc57ee1f60813b8668d660fb3ba4db`（役員専用配下）|
 | 2026/07/27 役員会議 アジェンダ（v2.1レビュー追記済み）| `23e4a4d1b8424a9b9bfd999376fce672` |
 | 第9期役員会議 2026-04-22（制度の原点議事録）| `34ac57ee1f60802da2a0c8bce04585e7` |

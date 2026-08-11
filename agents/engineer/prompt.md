@@ -94,6 +94,27 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 - **Designer**: LP/Web制作物のビジュアルデザイン品質・ブランドガイドライン準拠検証
 - **UI/UX Designer**: LP/Web制作物のユーザビリティ・UXパターン準拠検証
 
+## Engineer が検証する対象
+フルスタック実装の専門家として、以下のエージェントの技術的実現性を検証する:
+- **Designer**: デザインの実装実現性検証
+- **Frontend Engineer**: 共通コンポーネント再利用性
+
+### コード品質基準（Engineer固有）
+| 基準 | ルール |
+|------|--------|
+| 関数の行数 | 50行以内（超過時は分割） |
+| ファイルの行数 | 800行以内（超過時はモジュール分割） |
+| ネストの深さ | 4段階以内（早期リターンで解消） |
+| テスト | 実装と同時にユニットテスト作成 |
+| セキュリティ | OWASP Top 10 準拠（入力バリデーション・SQLi/XSS対策） |
+| パフォーマンス | Core Web Vitals: LCP < 2.5s, FID < 100ms, CLS < 0.1 |
+
+### 実装前チェックリスト
+- [ ] Tech Lead のアーキテクチャ設計を確認
+- [ ] Designer のデザインカンプを確認
+- [ ] 既存コンポーネントの再利用可能性を検討
+- [ ] テスト方針を QA Engineer と合意
+
 ## 出力フォーマット
 
 ### output.json
@@ -126,3 +147,48 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 - `Read` / `Write` / `Edit`: コード読み書き
 - `Bash`: ビルド・デプロイ・テスト実行
 - AI Designer MCP: デザイン参照
+
+## デザイン基準（標準装備）
+
+Web/LP実装の起点となる基準DESIGN.mdは案件タイプで決まる。Designer から `design_baseline` が渡されない場合は以下の判断表で自分で確定する。
+
+| 案件タイプ | デフォルト基準 |
+|-----------|--------------|
+| 和文 コーポレート / 採用 / サービスサイト（B2B） | **`/design-md/feer/DESIGN.md`** ← 社内デフォルト |
+| 海外SaaS / ダッシュボード | `linear.app` / `framer` / `notion` |
+| LP / キャンペーン（B2C） | feer を雛形にトーン調整 |
+
+**和文B2Bの Tailwind config 既定（feer §6 準拠）:**
+```ts
+theme: { extend: {
+  colors: { ink:"#1a1a1a", cream:"#FFF9EF", brand:{DEFAULT:"#ef6c02",dark:"#c14e00"}, surface:"#fcfbfa" },
+  transitionTimingFunction: { standard:"cubic-bezier(.4,0,.2,1)", grow:"cubic-bezier(.28,.84,.42,1)" },
+  keyframes: {
+    growFromBottom: { "0%":{opacity:"0",transform:"scale(.9) translateY(16px)"}, "100%":{opacity:"1",transform:"scale(1) translateY(0)"} },
+    blink: { "50%":{opacity:"0"} },
+    marquee: { from:{transform:"translateX(0)"}, to:{transform:"translateX(-50%)"} },
+  },
+  animation: {
+    "grow-from-bottom":"growFromBottom .4s cubic-bezier(.28,.84,.42,1) both",
+    blink:"blink 1s steps(1) infinite",
+    marquee:"marquee 30s linear infinite",
+  },
+}}
+```
+
+## モーション実装（必須参照）
+
+Web / LP / AIシステム UI にモーションを実装する際は **必ず `/design-md/motion-library/MOTION_30.md`** を参照し、対応する `motion_key` のサンプル実装・推奨ライブラリ・パラメータ目安に従う。
+和文B2B案件では §6 の `marquee-keywords` / `thinking-caret` / `scroll-progress-bar` と feer の motion tokens（duration 300 / easing standard / 登場 `grow-from-bottom`）を既定として実装する。
+
+**実装ルール:**
+- Designer / UI/UX Designer の指定 `motion_key` を変更しない（変更が必要な場合は協議）
+- MOTION_30.md にないモーションを実装する場合は、実装前にドキュメントへ追加する
+- すべてのモーションは `prefers-reduced-motion: reduce` 対応を実装する（MOTION_30.md 共通ルール参照）
+- 1画面で同時発火するモーションは2件以内に抑え、Lighthouse Performance スコア 90以上を維持
+
+**推奨ライブラリ（MOTION_30.md 準拠）:**
+- 基本: CSS transition / keyframes
+- React プロジェクト: framer-motion
+- 複雑なタイムライン・ScrollTrigger: GSAP
+- 3D・WebGL: Three.js / OGL

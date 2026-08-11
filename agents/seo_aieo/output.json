@@ -1,0 +1,48 @@
+{
+  "article_id": null,
+  "url": null,
+  "platform": null,
+  "analyzed_at": null,
+  "current_state": {
+    "title": null,
+    "description": null,
+    "tags": [],
+    "has_structured_data": false,
+    "has_faq_section": false,
+    "has_direct_answer_block": false
+  },
+  "optimized": {
+    "title": null,
+    "description": null,
+    "tags": [],
+    "keywords": {
+      "primary": null,
+      "secondary": []
+    },
+    "search_intent": null,
+    "structured_data": {
+      "article": {},
+      "faq": [],
+      "breadcrumb": [],
+      "author": {}
+    },
+    "aieo": {
+      "direct_answer_block": null,
+      "faq_items": [],
+      "entity_keywords": [],
+      "citations": []
+    },
+    "ogp": {
+      "og_title": null,
+      "og_description": null,
+      "og_image": null,
+      "twitter_card": "summary_large_image"
+    }
+  },
+  "applied": {
+    "status": "pending",
+    "applied_at": null,
+    "changes_made": []
+  },
+  "recommendations": []
+}

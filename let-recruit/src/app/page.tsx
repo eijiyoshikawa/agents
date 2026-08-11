@@ -1,5 +1,6 @@
 "use client";
 
+<<<<<<< HEAD
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import {
@@ -69,6 +70,24 @@ export default function Home() {
       cancelled = true;
     };
   }, []);
+=======
+import { useState } from "react";
+import { Download, AlertCircle } from "lucide-react";
+import type { ExtractResponse, JobPosting } from "@/lib/types";
+import { LET_COMPANY } from "@/lib/company";
+import { letMarkSvg } from "@/lib/logo";
+import { requestExtract, downloadPdf } from "@/lib/client";
+import { UrlInputForm } from "@/components/UrlInputForm";
+import { JobEditor } from "@/components/JobEditor";
+import { JobPreview } from "@/components/JobPreview";
+
+export default function Home() {
+  const [loading, setLoading] = useState(false);
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [job, setJob] = useState<JobPosting | null>(null);
+  const [sources, setSources] = useState<ExtractResponse["sources"]>([]);
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
 
   async function handleExtract(urls: string[]) {
     setLoading(true);
@@ -77,7 +96,10 @@ export default function Home() {
       const res = await requestExtract(urls);
       setJob(res.job);
       setSources(res.sources);
+<<<<<<< HEAD
       setActiveId(null); // 新規生成なので未保存扱い
+=======
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
     } catch (e) {
       setError(e instanceof Error ? e.message : "エラーが発生しました。");
     } finally {
@@ -85,6 +107,7 @@ export default function Home() {
     }
   }
 
+<<<<<<< HEAD
   async function handleText(text: string) {
     setLoading(true);
     setError("");
@@ -197,6 +220,26 @@ export default function Home() {
         ) : (
           <TextInputForm loading={loading} onSubmit={handleText} />
         )}
+=======
+  async function handleDownload() {
+    if (!job) return;
+    setPdfLoading(true);
+    setError("");
+    try {
+      await downloadPdf(job);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "PDF生成に失敗しました。");
+    } finally {
+      setPdfLoading(false);
+    }
+  }
+
+  return (
+    <main className="mx-auto max-w-[1280px] px-6 py-12 md:px-10">
+      <Header />
+      <section className="mt-10 rounded-3xl border border-border-soft bg-surface p-6 md:p-8">
+        <UrlInputForm loading={loading} onSubmit={handleExtract} />
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
       </section>
 
       {error && (
@@ -208,6 +251,7 @@ export default function Home() {
 
       {sources.length > 0 && <SourceList sources={sources} />}
 
+<<<<<<< HEAD
       {history.length > 0 && (
         <div className="mt-8">
           <div className="flex items-center gap-2">
@@ -256,6 +300,8 @@ export default function Home() {
         </div>
       )}
 
+=======
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
       {job && (
         <section className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[420px_1fr]">
           <div className="grow-in">
@@ -263,6 +309,7 @@ export default function Home() {
               <h2 className="text-sm font-semibold tracking-[0.06em] text-brand-dark">
                 [ STEP 02 ] 内容を確認・編集
               </h2>
+<<<<<<< HEAD
               <div className="flex items-center gap-2">
                 {savedNote && (
                   <span className="text-xs font-medium text-[#0fa388]">
@@ -277,6 +324,8 @@ export default function Home() {
                   {activeId ? "上書き保存" : "履歴に保存"}
                 </button>
               </div>
+=======
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
             </div>
             <JobEditor job={job} onChange={setJob} />
           </div>
@@ -287,6 +336,7 @@ export default function Home() {
                 [ STEP 03 ] プレビュー & 出力
               </h2>
               <button
+<<<<<<< HEAD
                 onClick={() => previewRef.current?.print()}
                 className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-cream transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand"
               >
@@ -300,6 +350,17 @@ export default function Home() {
               を選ぶと、求人票をPDFファイルとして保存できます。
             </p>
             <JobPreview ref={previewRef} job={job} company={LET_COMPANY} />
+=======
+                onClick={handleDownload}
+                disabled={pdfLoading}
+                className="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-cream transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand disabled:opacity-40"
+              >
+                <Download className="h-4 w-4" />
+                {pdfLoading ? "生成中…" : "PDFダウンロード"}
+              </button>
+            </div>
+            <JobPreview job={job} company={LET_COMPANY} />
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
           </div>
         </section>
       )}
@@ -307,6 +368,7 @@ export default function Home() {
   );
 }
 
+<<<<<<< HEAD
 function ModeTab({
   active,
   onClick,
@@ -330,13 +392,27 @@ function ModeTab({
   );
 }
 
+=======
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
 function Header() {
   return (
     <header className="border-b border-ink pb-6">
       <div className="flex items-center gap-3">
+<<<<<<< HEAD
         <span className="text-xl font-bold tracking-[0.04em] text-brand">
           株式会社LET - 求人票様式
         </span>
+=======
+        <span
+          className="text-brand"
+          aria-hidden
+          dangerouslySetInnerHTML={{ __html: letMarkSvg(30) }}
+        />
+        <span className="text-xl font-bold tracking-[0.06em] text-brand">
+          LET inc.
+        </span>
+        <span className="text-xs tracking-[0.08em] text-ink">求人票ジェネレーター</span>
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
       </div>
       <h1 className="mt-6 text-3xl font-bold leading-tight md:text-4xl">
         他社求人URLを貼るだけ。
@@ -344,8 +420,13 @@ function Header() {
         <span className="text-brand">LETデザイン</span>の求人票へ。
       </h1>
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-ink">
+<<<<<<< HEAD
         参考にしたい求人ページのURLを貼り付けると、AIが内容を読み取り求人票に整理。
         作成した求人票は履歴に保存でき、後から再編集・PDF出力できます。
+=======
+        参考にしたい求人ページのURLを貼り付けると、AIが内容を読み取り1枚の求人票に統合。
+        Web上で確認でき、そのままPDFとしても出力できます。
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
       </p>
     </header>
   );

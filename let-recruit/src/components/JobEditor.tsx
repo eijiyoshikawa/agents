@@ -1,6 +1,9 @@
 "use client";
 
+<<<<<<< HEAD
 import { useState } from "react";
+=======
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
 import type { JobPosting } from "@/lib/types";
 
 interface Props {
@@ -8,7 +11,11 @@ interface Props {
   onChange: (job: JobPosting) => void;
 }
 
+<<<<<<< HEAD
 /** 抽出結果を出力前に調整する編集パネル（全項目対応）。 */
+=======
+/** 抽出結果を出力前に微調整するための編集パネル。 */
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
 export function JobEditor({ job, onChange }: Props) {
   const set = <K extends keyof JobPosting>(key: K, value: JobPosting[K]) =>
     onChange({ ...job, [key]: value });
@@ -17,6 +24,7 @@ export function JobEditor({ job, onChange }: Props) {
     set(key, text.split(/\r?\n/).map((s) => s.trim()).filter(Boolean) as never);
 
   return (
+<<<<<<< HEAD
     <div className="space-y-5">
       <Group title="基本情報（求人サイトに無い項目は手入力）">
         <Text label="タイトル/キャッチコピー" value={job.catchphrase} onChange={(v) => set("catchphrase", v)} />
@@ -115,6 +123,27 @@ export function JobEditor({ job, onChange }: Props) {
         <Text label="適性テストの有無" value={job.aptitudeTest} onChange={(v) => set("aptitudeTest", v)} />
         <ListArea label="選考フロー" items={job.selectionProcess} onChange={(t) => setList("selectionProcess", t)} />
       </Group>
+=======
+    <div className="space-y-4">
+      <Text label="募集職種" value={job.jobTitle} onChange={(v) => set("jobTitle", v)} />
+      <Text
+        label="キャッチコピー"
+        value={job.catchphrase}
+        onChange={(v) => set("catchphrase", v)}
+      />
+      <Area label="仕事内容の概要" value={job.summary} onChange={(v) => set("summary", v)} />
+      <ListArea label="業務内容" items={job.responsibilities} onChange={(t) => setList("responsibilities", t)} />
+      <ListArea label="必須要件" items={job.requiredSkills} onChange={(t) => setList("requiredSkills", t)} />
+      <ListArea label="歓迎要件" items={job.preferredSkills} onChange={(t) => setList("preferredSkills", t)} />
+      <ListArea label="求める人物像" items={job.idealCandidate} onChange={(t) => setList("idealCandidate", t)} />
+      <ListArea label="この仕事の魅力" items={job.appealPoints} onChange={(t) => setList("appealPoints", t)} />
+      <Text label="雇用形態" value={job.employmentType} onChange={(v) => set("employmentType", v)} />
+      <Text label="勤務地" value={job.workLocation} onChange={(v) => set("workLocation", v)} />
+      <Text label="勤務時間" value={job.workHours} onChange={(v) => set("workHours", v)} />
+      <Text label="休日・休暇" value={job.holidays} onChange={(v) => set("holidays", v)} />
+      <ListArea label="福利厚生" items={job.benefits} onChange={(t) => setList("benefits", t)} />
+      <ListArea label="選考プロセス" items={job.selectionProcess} onChange={(t) => setList("selectionProcess", t)} />
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
     </div>
   );
 }
@@ -123,6 +152,7 @@ const labelCls = "mb-1 block text-xs font-semibold text-ink";
 const inputCls =
   "w-full rounded-xl border border-border-soft bg-white p-2.5 text-sm outline-none focus:border-ink";
 
+<<<<<<< HEAD
 function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <fieldset className="rounded-2xl border border-border-soft p-3">
@@ -138,6 +168,8 @@ function Row({ children }: { children: React.ReactNode }) {
   return <div className="grid grid-cols-2 gap-3">{children}</div>;
 }
 
+=======
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
 function Text({ label, value, onChange }: FieldProps) {
   return (
     <label className="block">
@@ -147,6 +179,7 @@ function Text({ label, value, onChange }: FieldProps) {
   );
 }
 
+<<<<<<< HEAD
 /** 全角数字→半角にし、数字以外（カンマ・円など）を除去して数値化。空ならnull。 */
 function parseYenText(raw: string): number | null {
   const digits = raw
@@ -194,11 +227,22 @@ function Yen({
   );
 }
 
+=======
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
 function Area({ label, value, onChange }: FieldProps) {
   return (
     <label className="block">
       <span className={labelCls}>{label}</span>
+<<<<<<< HEAD
       <textarea className={inputCls} rows={3} value={value} onChange={(e) => onChange(e.target.value)} />
+=======
+      <textarea
+        className={inputCls}
+        rows={3}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+      />
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
     </label>
   );
 }
@@ -217,7 +261,11 @@ function ListArea({
       <span className={labelCls}>{label}（1行に1項目）</span>
       <textarea
         className={inputCls}
+<<<<<<< HEAD
         rows={Math.min(Math.max(items.length, 2), 8)}
+=======
+        rows={Math.min(Math.max(items.length, 2), 6)}
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
         value={items.join("\n")}
         onChange={(e) => onChange(e.target.value)}
       />

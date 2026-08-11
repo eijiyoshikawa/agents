@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>パイプライン実行ガイド</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="_1">パイプライン実行ガイド</h1>
+<p>このドキュメントは、AIエージェント組織によるパイプライン実行の手順書です。
+COO統括エージェントの管理下で、品質保証プロセスを含む形で実行されます。</p>
+<h2 id="_2">全体フロー</h2>
+<pre class="codehilite"><code>Step 0: COO                → パイプライン実行準備・品質基準設定
+           ↓
+Step 1: Retriever          → 議事録取得・分解
+           ↓
+     QA Check Point 1      → Retriever出力の品質検証
+           ↓
+Step 2: Issue Structurer   → イシュー構造化
+           ↓
+     QA Check Point 2      → Issue Structurer出力の品質検証
+           ↓
+Step 3: Market Researcher  ┐
+        Analogy Finder     ┘ 並列実行
+           ↓
+     QA Check Point 3      → リサーチ出力の品質検証（2件）
+           ↓
+Step 4: Strategist         → 戦略構築 + 内部批判的検証
+           ↓
+Step 5: Devil's Advocate   → 独立した批判的検証（外部）
+           ↓
+     QA Check Point 4      → 戦略＋検証結果の品質検証
+           ↓
+Step 6: Report Builder     → 提案資料作成
+           ↓
+     QA Check Point 5      → 最終成果物の品質検証
+           ↓
+Step 7: COO Final Review   → 最終レビュー・承認
+</code></pre>
+
+<h2 id="_3">組織体制</h2>
+<h3 id="_4">統括</h3>
+<ul>
+<li><strong>COO</strong> — 全体統括・品質管理・意思決定</li>
+</ul>
+<h3 id="_5">品質管理部門</h3>
+<ul>
+<li><strong>Quality Assurance</strong> — 各工程の出力品質検証</li>
+<li><strong>Devil's Advocate</strong> — 戦略の独立批判的検証</li>
+</ul>
+<h3 id="_6">戦略提案部門</h3>
+<ul>
+<li><strong>Retriever</strong> — Notion議事録取得・構造化</li>
+<li><strong>Issue Structurer</strong> — ビジネス課題の言語化・構造化</li>
+<li><strong>Market Researcher</strong> — 市場・競合・顧客分析</li>
+<li><strong>Analogy Finder</strong> — 異業種アナロジー事例収集</li>
+<li><strong>Strategist</strong> — 戦略構築 + 内部Devil's Advocate</li>
+<li><strong>Report Builder</strong> — Google Slides提案資料の構成作成</li>
+</ul>
+<h2 id="_7">実行方法</h2>
+<h3 id="_8">一括実行</h3>
+<p>Claude Code に以下のように指示する:</p>
+<pre class="codehilite"><code>/agents/orchestrator/PIPELINE.md の手順に従って、
+Notion の議事録ページ「〇〇会議」からパイプラインを実行してください。
+</code></pre>
+
+<h3 id="_9">ステップ別実行</h3>
+<h4 id="step-0-coo">Step 0: COO 実行準備</h4>
+<pre class="codehilite"><code>/agents/coo/prompt.md に従って、
+パイプライン実行の準備と品質基準を設定してください。
+</code></pre>
+
+<h4 id="step-1">Step 1: 議事録取得</h4>
+<pre class="codehilite"><code>/agents/retriever/prompt.md に従って、
+Notion の「〇〇会議」議事録を取得・構造化してください。
+</code></pre>
+
+<h4 id="qa-check-1-retriever">QA Check 1: Retriever出力検証</h4>
+<pre class="codehilite"><code>/agents/quality_assurance/prompt.md に従って、
+retriever/output.json の品質を検証してください。
+スコア70未満の場合、Step 1を再実行してください。
+</code></pre>
+
+<h4 id="step-2">Step 2: イシュー構造化</h4>
+<pre class="codehilite"><code>/agents/issue_structurer/prompt.md に従って、
+retriever の出力からイシューを構造化してください。
+</code></pre>
+
+<h4 id="qa-check-2-issue-structurer">QA Check 2: Issue Structurer出力検証</h4>
+<pre class="codehilite"><code>/agents/quality_assurance/prompt.md に従って、
+issue_structurer/output.json の品質を検証してください。
+</code></pre>
+
+<h4 id="step-3">Step 3: 並列リサーチ</h4>
+<pre class="codehilite"><code>以下の2つのエージェントを並列で実行してください:
+- /agents/market_researcher/prompt.md
+- /agents/analogy_finder/prompt.md
+</code></pre>
+
+<h4 id="qa-check-3">QA Check 3: リサーチ出力検証</h4>
+<pre class="codehilite"><code>/agents/quality_assurance/prompt.md に従って、
+market_researcher/output.json と analogy_finder/output.json の品質を検証してください。
+</code></pre>
+
+<h4 id="step-4">Step 4: 戦略構築</h4>
+<pre class="codehilite"><code>/agents/strategist/prompt.md に従って、
+全リサーチ結果を統合し戦略を構築してください。
+</code></pre>
+
+<h4 id="step-5">Step 5: 独立批判的検証</h4>
+<pre class="codehilite"><code>/agents/devils_advocate/prompt.md に従って、
+strategist/output.json の戦略を独立した視点で批判的に検証してください。
+</code></pre>
+
+<h4 id="qa-check-4">QA Check 4: 戦略＋検証結果の品質検証</h4>
+<pre class="codehilite"><code>/agents/quality_assurance/prompt.md に従って、
+strategist/output.json と devils_advocate/output.json の品質を検証してください。
+robustness_scoreが60未満の場合、Strategistに修正を指示してください。
+</code></pre>
+
+<h4 id="step-6">Step 6: 資料作成</h4>
+<pre class="codehilite"><code>/agents/report_builder/prompt.md に従って、
+提案資料のスライド構成を作成してください。
+Devil's Advocateの検証結果もリスクスライドに反映してください。
+</code></pre>
+
+<h4 id="qa-check-5">QA Check 5: 最終成果物検証</h4>
+<pre class="codehilite"><code>/agents/quality_assurance/prompt.md に従って、
+report_builder/output.json の最終品質を検証してください。
+</code></pre>
+
+<h4 id="step-7-coo">Step 7: COO最終レビュー</h4>
+<pre class="codehilite"><code>/agents/coo/prompt.md に従って、
+パイプライン全体の実行結果をレビューし、最終承認を行ってください。
+</code></pre>
+
+<h2 id="_10">データフロー</h2>
+<p>各エージェントの出力は以下のファイルに保存される:</p>
+<pre class="codehilite"><code>agents/
+├── coo/output.json                ← Step 0, 7 の出力
+├── retriever/output.json          ← Step 1 の出力
+├── issue_structurer/output.json   ← Step 2 の出力
+├── market_researcher/output.json  ← Step 3 の出力
+├── analogy_finder/output.json     ← Step 3 の出力
+├── strategist/output.json         ← Step 4 の出力
+├── devils_advocate/output.json    ← Step 5 の出力
+├── quality_assurance/output.json  ← 各QA Checkの出力
+└── report_builder/output.json     ← Step 6 の出力
+</code></pre>
+
+<h2 id="_11">前提条件</h2>
+<ol>
+<li><strong>Notion MCP 接続済み</strong>: Claude Code に Notion MCP が接続されていること</li>
+<li><strong>Web検索 MCP 接続済み</strong>: Web検索が使用可能であること</li>
+<li><strong>議事録ページの共有</strong>: Notion インテグレーションが議事録ページにアクセス可能であること</li>
+</ol>
+</main>
+</body>
+</html>

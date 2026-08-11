@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Airbnb</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-airbnb">Design System: Airbnb</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Airbnb's website is a warm, photography-forward marketplace that feels like flipping through a travel magazine where every page invites you to book. The design operates on a foundation of pure white (<code>#ffffff</code>) with the iconic Rausch Red (<code>#ff385c</code>) — named after Airbnb's first street address — serving as the singular brand accent. The result is a clean, airy canvas where listing photography, category icons, and the red CTA button are the only sources of color.</p>
+<p>The typography uses Airbnb Cereal VF — a custom variable font that's warm and approachable, with rounded terminals that echo the brand's "belong anywhere" philosophy. The font operates in a tight weight range: 500 (medium) for most UI, 600 (semibold) for emphasis, and 700 (bold) for primary headings. Slight negative letter-spacing (-0.18px to -0.44px) on headings creates a cozy, intimate reading experience rather than the compressed efficiency of tech companies.</p>
+<p>What distinguishes Airbnb is its palette-based token system (<code>--palette-*</code>) and multi-layered shadow approach. The primary card shadow uses a three-layer stack (<code>rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 6px, rgba(0,0,0,0.1) 0px 4px 8px</code>) that creates a subtle, warm lift. Combined with generous border-radius (8px–32px), circular navigation controls (50%), and a category pill bar with horizontal scrolling, the interface feels tactile and inviting — designed for browsing, not commanding.</p>
+<p><strong>Key Characteristics:</strong>
+- Pure white canvas with Rausch Red (<code>#ff385c</code>) as singular brand accent
+- Airbnb Cereal VF — custom variable font with warm, rounded terminals
+- Palette-based token system (<code>--palette-*</code>) for systematic color management
+- Three-layer card shadows: border ring + soft blur + stronger blur
+- Generous border-radius: 8px buttons, 14px badges, 20px cards, 32px large elements
+- Circular navigation controls (50% radius)
+- Photography-first listing cards — images are the hero content
+- Near-black text (<code>#222222</code>) — warm, not cold
+- Luxe Purple (<code>#460479</code>) and Plus Magenta (<code>#92174d</code>) for premium tiers</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary-brand">Primary Brand</h3>
+<ul>
+<li><strong>Rausch Red</strong> (<code>#ff385c</code>): <code>--palette-bg-primary-core</code>, primary CTA, brand accent, active states</li>
+<li><strong>Deep Rausch</strong> (<code>#e00b41</code>): <code>--palette-bg-tertiary-core</code>, pressed/dark variant of brand red</li>
+<li><strong>Error Red</strong> (<code>#c13515</code>): <code>--palette-text-primary-error</code>, error text on light</li>
+<li><strong>Error Dark</strong> (<code>#b32505</code>): <code>--palette-text-secondary-error-hover</code>, error hover</li>
+</ul>
+<h3 id="premium-tiers">Premium Tiers</h3>
+<ul>
+<li><strong>Luxe Purple</strong> (<code>#460479</code>): <code>--palette-bg-primary-luxe</code>, Airbnb Luxe tier branding</li>
+<li><strong>Plus Magenta</strong> (<code>#92174d</code>): <code>--palette-bg-primary-plus</code>, Airbnb Plus tier branding</li>
+</ul>
+<h3 id="text-scale">Text Scale</h3>
+<ul>
+<li><strong>Near Black</strong> (<code>#222222</code>): <code>--palette-text-primary</code>, primary text — warm, not cold</li>
+<li><strong>Focused Gray</strong> (<code>#3f3f3f</code>): <code>--palette-text-focused</code>, focused state text</li>
+<li><strong>Secondary Gray</strong> (<code>#6a6a6a</code>): Secondary text, descriptions</li>
+<li><strong>Disabled</strong> (<code>rgba(0,0,0,0.24)</code>): <code>--palette-text-material-disabled</code>, disabled state</li>
+<li><strong>Link Disabled</strong> (<code>#929292</code>): <code>--palette-text-link-disabled</code>, disabled links</li>
+</ul>
+<h3 id="interactive">Interactive</h3>
+<ul>
+<li><strong>Legal Blue</strong> (<code>#428bff</code>): <code>--palette-text-legal</code>, legal links, informational</li>
+<li><strong>Border Gray</strong> (<code>#c1c1c1</code>): Border color for cards and dividers</li>
+<li><strong>Light Surface</strong> (<code>#f2f2f2</code>): Circular navigation buttons, secondary surfaces</li>
+</ul>
+<h3 id="surface-shadows">Surface &amp; Shadows</h3>
+<ul>
+<li><strong>Pure White</strong> (<code>#ffffff</code>): Page background, card surfaces</li>
+<li><strong>Card Shadow</strong> (<code>rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 6px, rgba(0,0,0,0.1) 0px 4px 8px</code>): Three-layer warm lift</li>
+<li><strong>Hover Shadow</strong> (<code>rgba(0,0,0,0.08) 0px 4px 12px</code>): Button hover elevation</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-family">Font Family</h3>
+<ul>
+<li><strong>Primary</strong>: <code>Airbnb Cereal VF</code>, fallbacks: <code>Circular, -apple-system, system-ui, Roboto, Helvetica Neue</code></li>
+<li><strong>OpenType Features</strong>: <code>"salt"</code> (stylistic alternates) on specific caption elements</li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Section Heading</td>
+<td>Airbnb Cereal VF</td>
+<td>28px (1.75rem)</td>
+<td>700</td>
+<td>1.43</td>
+<td>normal</td>
+<td>Primary headings</td>
+</tr>
+<tr>
+<td>Card Heading</td>
+<td>Airbnb Cereal VF</td>
+<td>22px (1.38rem)</td>
+<td>600</td>
+<td>1.18 (tight)</td>
+<td>-0.44px</td>
+<td>Category/card titles</td>
+</tr>
+<tr>
+<td>Card Heading Medium</td>
+<td>Airbnb Cereal VF</td>
+<td>22px (1.38rem)</td>
+<td>500</td>
+<td>1.18 (tight)</td>
+<td>-0.44px</td>
+<td>Lighter variant</td>
+</tr>
+<tr>
+<td>Sub-heading</td>
+<td>Airbnb Cereal VF</td>
+<td>21px (1.31rem)</td>
+<td>700</td>
+<td>1.43</td>
+<td>normal</td>
+<td>Bold sub-headings</td>
+</tr>
+<tr>
+<td>Feature Title</td>
+<td>Airbnb Cereal VF</td>
+<td>20px (1.25rem)</td>
+<td>600</td>
+<td>1.20 (tight)</td>
+<td>-0.18px</td>
+<td>Feature headings</td>
+</tr>
+<tr>
+<td>UI Medium</td>
+<td>Airbnb Cereal VF</td>
+<td>16px (1.00rem)</td>
+<td>500</td>
+<td>1.25 (tight)</td>
+<td>normal</td>
+<td>Nav, emphasized text</td>
+</tr>
+<tr>
+<td>UI Semibold</td>
+<td>Airbnb Cereal VF</td>
+<td>16px (1.00rem)</td>
+<td>600</td>
+<td>1.25 (tight)</td>
+<td>normal</td>
+<td>Strong emphasis</td>
+</tr>
+<tr>
+<td>Button</td>
+<td>Airbnb Cereal VF</td>
+<td>16px (1.00rem)</td>
+<td>500</td>
+<td>1.25 (tight)</td>
+<td>normal</td>
+<td>Button labels</td>
+</tr>
+<tr>
+<td>Body / Link</td>
+<td>Airbnb Cereal VF</td>
+<td>14px (0.88rem)</td>
+<td>400</td>
+<td>1.43</td>
+<td>normal</td>
+<td>Standard body</td>
+</tr>
+<tr>
+<td>Body Medium</td>
+<td>Airbnb Cereal VF</td>
+<td>14px (0.88rem)</td>
+<td>500</td>
+<td>1.29 (tight)</td>
+<td>normal</td>
+<td>Medium body</td>
+</tr>
+<tr>
+<td>Caption Salt</td>
+<td>Airbnb Cereal VF</td>
+<td>14px (0.88rem)</td>
+<td>600</td>
+<td>1.43</td>
+<td>normal</td>
+<td><code>"salt"</code> feature</td>
+</tr>
+<tr>
+<td>Small</td>
+<td>Airbnb Cereal VF</td>
+<td>13px (0.81rem)</td>
+<td>400</td>
+<td>1.23 (tight)</td>
+<td>normal</td>
+<td>Descriptions</td>
+</tr>
+<tr>
+<td>Tag</td>
+<td>Airbnb Cereal VF</td>
+<td>12px (0.75rem)</td>
+<td>400–700</td>
+<td>1.33</td>
+<td>normal</td>
+<td>Tags, prices</td>
+</tr>
+<tr>
+<td>Badge</td>
+<td>Airbnb Cereal VF</td>
+<td>11px (0.69rem)</td>
+<td>600</td>
+<td>1.18 (tight)</td>
+<td>normal</td>
+<td><code>"salt"</code> feature</td>
+</tr>
+<tr>
+<td>Micro Uppercase</td>
+<td>Airbnb Cereal VF</td>
+<td>8px (0.50rem)</td>
+<td>700</td>
+<td>1.25 (tight)</td>
+<td>0.32px</td>
+<td><code>text-transform: uppercase</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="principles">Principles</h3>
+<ul>
+<li><strong>Warm weight range</strong>: 500–700 dominate. No weight 300 or 400 for headings — Airbnb's type is always at least medium weight, creating a warm, confident voice.</li>
+<li><strong>Negative tracking on headings</strong>: -0.18px to -0.44px letter-spacing on display creates intimate, cozy headings rather than cold, compressed ones.</li>
+<li><strong>"salt" OpenType feature</strong>: Stylistic alternates on specific UI elements (badges, captions) create subtle glyph variations that add visual interest.</li>
+<li><strong>Variable font precision</strong>: Cereal VF enables continuous weight interpolation, though the design system uses discrete stops at 500, 600, and 700.</li>
+</ul>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<p><strong>Primary Dark</strong>
+- Background: <code>#222222</code> (near-black, not pure black)
+- Text: <code>#ffffff</code>
+- Padding: 0px 24px
+- Radius: 8px
+- Hover: transitions to error/brand accent via <code>var(--accent-bg-error)</code>
+- Focus: <code>0 0 0 2px var(--palette-grey1000)</code> ring + scale(0.92)</p>
+<p><strong>Circular Nav</strong>
+- Background: <code>#f2f2f2</code>
+- Text: <code>#222222</code>
+- Radius: 50% (circle)
+- Hover: shadow <code>rgba(0,0,0,0.08) 0px 4px 12px</code> + translateX(50%)
+- Active: 4px white border ring + focus shadow
+- Focus: scale(0.92) shrink animation</p>
+<h3 id="cards-containers">Cards &amp; Containers</h3>
+<ul>
+<li>Background: <code>#ffffff</code></li>
+<li>Radius: 14px (badges), 20px (cards/buttons), 32px (large)</li>
+<li>Shadow: <code>rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 6px, rgba(0,0,0,0.1) 0px 4px 8px</code> (three-layer)</li>
+<li>Listing cards: full-width photography on top, details below</li>
+<li>Carousel controls: circular 50% buttons</li>
+</ul>
+<h3 id="inputs">Inputs</h3>
+<ul>
+<li>Search: <code>#222222</code> text</li>
+<li>Focus: <code>var(--palette-bg-primary-error)</code> background tint + <code>0 0 0 2px</code> ring</li>
+<li>Radius: depends on context (search bar uses pill-like rounding)</li>
+</ul>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li>White sticky header with search bar centered</li>
+<li>Airbnb logo (Rausch Red) left-aligned</li>
+<li>Category filter pills: horizontal scroll below search</li>
+<li>Circular nav controls for carousel navigation</li>
+<li>"Become a Host" text link, avatar/menu right-aligned</li>
+</ul>
+<h3 id="image-treatment">Image Treatment</h3>
+<ul>
+<li>Listing photography fills card top with generous height</li>
+<li>Image carousel with dot indicators</li>
+<li>Heart/wishlist icon overlay on images</li>
+<li>8px–14px radius on contained images</li>
+</ul>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-system">Spacing System</h3>
+<ul>
+<li>Base unit: 8px</li>
+<li>Scale: 2px, 3px, 4px, 6px, 8px, 10px, 11px, 12px, 15px, 16px, 22px, 24px, 32px</li>
+</ul>
+<h3 id="grid-container">Grid &amp; Container</h3>
+<ul>
+<li>Full-width header with centered search</li>
+<li>Category pill bar: horizontal scrollable row</li>
+<li>Listing grid: responsive multi-column (3–5 columns on desktop)</li>
+<li>Full-width footer with link columns</li>
+</ul>
+<h3 id="whitespace-philosophy">Whitespace Philosophy</h3>
+<ul>
+<li><strong>Travel-magazine spacing</strong>: Generous vertical padding between sections creates a leisurely browsing pace — you're meant to scroll slowly, like browsing a magazine.</li>
+<li><strong>Photography density</strong>: Listing cards are packed relatively tightly, but each image is large enough to feel immersive.</li>
+<li><strong>Search bar prominence</strong>: The search bar gets maximum vertical space in the header — finding your destination is the primary action.</li>
+</ul>
+<h3 id="border-radius-scale">Border Radius Scale</h3>
+<ul>
+<li>Subtle (4px): Small links</li>
+<li>Standard (8px): Buttons, tabs, search elements</li>
+<li>Badge (14px): Status badges, labels</li>
+<li>Card (20px): Feature cards, large buttons</li>
+<li>Large (32px): Large containers, hero elements</li>
+<li>Circle (50%): Nav controls, avatars, icons</li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Treatment</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flat (Level 0)</td>
+<td>No shadow</td>
+<td>Page background, text blocks</td>
+</tr>
+<tr>
+<td>Card (Level 1)</td>
+<td><code>rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 6px, rgba(0,0,0,0.1) 0px 4px 8px</code></td>
+<td>Listing cards, search bar</td>
+</tr>
+<tr>
+<td>Hover (Level 2)</td>
+<td><code>rgba(0,0,0,0.08) 0px 4px 12px</code></td>
+<td>Button hover, interactive lift</td>
+</tr>
+<tr>
+<td>Active Focus (Level 3)</td>
+<td><code>rgb(255,255,255) 0px 0px 0px 4px</code> + focus ring</td>
+<td>Active/focused elements</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Shadow Philosophy</strong>: Airbnb's three-layer shadow system creates a warm, natural lift. Layer 1 (<code>0px 0px 0px 1px</code> at 0.02 opacity) is an ultra-subtle border. Layer 2 (<code>0px 2px 6px</code> at 0.04) provides soft ambient shadow. Layer 3 (<code>0px 4px 8px</code> at 0.1) adds the primary lift. This graduated approach creates shadows that feel like natural light rather than CSS effects.</p>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use <code>#222222</code> (warm near-black) for text — never pure <code>#000000</code></li>
+<li>Apply Rausch Red (<code>#ff385c</code>) only for primary CTAs and brand moments — it's the singular accent</li>
+<li>Use Airbnb Cereal VF at weight 500–700 — the warm weight range is intentional</li>
+<li>Apply the three-layer card shadow for all elevated surfaces</li>
+<li>Use generous border-radius: 8px for buttons, 20px for cards, 50% for controls</li>
+<li>Use photography as the primary visual content — listings are image-first</li>
+<li>Apply negative letter-spacing (-0.18px to -0.44px) on headings for intimacy</li>
+<li>Use circular (50%) buttons for carousel/navigation controls</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Don't use pure black (<code>#000000</code>) for text — always <code>#222222</code> (warm)</li>
+<li>Don't apply Rausch Red to backgrounds or large surfaces — it's an accent only</li>
+<li>Don't use thin font weights (300, 400) for headings — 500 minimum</li>
+<li>Don't use heavy shadows (&gt;0.1 opacity as primary layer) — keep them warm and graduated</li>
+<li>Don't use sharp corners (0–4px) on cards — the generous rounding (20px+) is core</li>
+<li>Don't introduce additional brand colors beyond the Rausch/Luxe/Plus system</li>
+<li>Don't override the palette token system — use <code>--palette-*</code> variables consistently</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<h3 id="breakpoints">Breakpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Width</th>
+<th>Key Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mobile Small</td>
+<td>&lt;375px</td>
+<td>Single column, compact search</td>
+</tr>
+<tr>
+<td>Mobile</td>
+<td>375–550px</td>
+<td>Standard mobile listing grid</td>
+</tr>
+<tr>
+<td>Tablet Small</td>
+<td>550–744px</td>
+<td>2-column listings</td>
+</tr>
+<tr>
+<td>Tablet</td>
+<td>744–950px</td>
+<td>Search bar expansion</td>
+</tr>
+<tr>
+<td>Desktop Small</td>
+<td>950–1128px</td>
+<td>3-column listings</td>
+</tr>
+<tr>
+<td>Desktop</td>
+<td>1128–1440px</td>
+<td>4-column grid, full header</td>
+</tr>
+<tr>
+<td>Large Desktop</td>
+<td>1440–1920px</td>
+<td>5-column grid</td>
+</tr>
+<tr>
+<td>Ultra-wide</td>
+<td>&gt;1920px</td>
+<td>Maximum grid width</td>
+</tr>
+</tbody>
+</table>
+<p><em>Note: Airbnb has 61 detected breakpoints — one of the most granular responsive systems observed, reflecting their obsession with layout at every possible screen size.</em></p>
+<h3 id="touch-targets">Touch Targets</h3>
+<ul>
+<li>Circular nav buttons: adequate 50% radius sizing</li>
+<li>Listing cards: full-card tap target on mobile</li>
+<li>Search bar: prominently sized for thumb interaction</li>
+<li>Category pills: horizontally scrollable with generous padding</li>
+</ul>
+<h3 id="collapsing-strategy">Collapsing Strategy</h3>
+<ul>
+<li>Listing grid: 5 → 4 → 3 → 2 → 1 columns</li>
+<li>Search: expanded bar → compact bar → overlay</li>
+<li>Category pills: horizontal scroll at all sizes</li>
+<li>Navigation: full header → mobile simplified</li>
+<li>Map: side panel → overlay/toggle</li>
+</ul>
+<h3 id="image-behavior">Image Behavior</h3>
+<ul>
+<li>Listing photos: carousel with swipe on mobile</li>
+<li>Responsive image sizing with aspect ratio maintained</li>
+<li>Heart overlay positioned consistently across sizes</li>
+<li>Photo quality adjusts based on viewport</li>
+</ul>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Background: Pure White (<code>#ffffff</code>)</li>
+<li>Text: Near Black (<code>#222222</code>)</li>
+<li>Brand accent: Rausch Red (<code>#ff385c</code>)</li>
+<li>Secondary text: <code>#6a6a6a</code></li>
+<li>Disabled: <code>rgba(0,0,0,0.24)</code></li>
+<li>Card border: <code>rgba(0,0,0,0.02) 0px 0px 0px 1px</code></li>
+<li>Card shadow: full three-layer stack</li>
+<li>Button surface: <code>#f2f2f2</code></li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create a listing card: white background, 20px radius. Three-layer shadow: rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 6px, rgba(0,0,0,0.1) 0px 4px 8px. Photo area on top (16:10 ratio), details below: 16px Airbnb Cereal VF weight 600 title, 14px weight 400 description in #6a6a6a."</li>
+<li>"Design search bar: white background, full card shadow, 32px radius on container. Search text at 14px Cereal VF weight 400. Red search button (#ff385c, 50% radius, white icon)."</li>
+<li>"Build category pill bar: horizontal scrollable row. Each pill: 14px Cereal VF weight 600, #222222 text, bottom border on active. Circular prev/next arrows (#f2f2f2 bg, 50% radius)."</li>
+<li>"Create a CTA button: #222222 background, white text, 8px radius, 16px Cereal VF weight 500, 0px 24px padding. Hover: brand red accent."</li>
+<li>"Design a heart/wishlist button: transparent background, 50% radius, white heart icon with dark shadow outline."</li>
+</ul>
+<h3 id="iteration-guide">Iteration Guide</h3>
+<ol>
+<li>Start with white — the photography provides all the color</li>
+<li>Rausch Red (#ff385c) is the singular accent — use sparingly for CTAs only</li>
+<li>Near-black (#222222) for text — the warmth matters</li>
+<li>Three-layer shadows create natural, warm lift — always use all three layers</li>
+<li>Generous radius: 8px buttons, 20px cards, 50% controls</li>
+<li>Cereal VF at 500–700 weight — no thin weights for any heading</li>
+<li>Photography is hero — every listing card is image-first</li>
+</ol>
+</main>
+</body>
+</html>

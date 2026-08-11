@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WEBコンテンツ・モーション 30選</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="web-30">WEBコンテンツ・モーション 30選</h1>
+<blockquote>
+<p><strong>目的</strong>: Web制作・システム開発時のモーション演出リファレンス。デザイン段階から実装段階まで、一貫した語彙で演出を指定・再現できるようにする。</p>
+<p><strong>適用範囲</strong>: LP / コーポレートサイト / サービスサイト / ダッシュボード / 採用ページ など全Web成果物</p>
+<p><strong>参照エージェント</strong>: Designer / UI/UX Designer / Engineer / Frontend Engineer / Web Builder（motion_analyzer / builder）</p>
+<p><strong>運用原則</strong>:
+- モーションを追加・変更する際は、まず本ドキュメントから該当する motion_key を選ぶ
+- 該当するものがなければ本ドキュメントに新規追加してから実装（勝手に実装しない）
+- すべてのモーションは <code>prefers-reduced-motion: reduce</code> に対応し、ユーザー設定を尊重する
+- ページ内に同時発火する重いモーションは 2 つまで（パフォーマンス確保）</p>
+</blockquote>
+<h2 id="_1">使い方</h2>
+<h3 id="designer-uiux-designer">デザイン段階（Designer / UI/UX Designer）</h3>
+<p>デザイン指示書に <code>motion_key: circle-reveal</code> のように記載する。</p>
+<h3 id="engineer-frontend-engineer-web-builder-builder">実装段階（Engineer / Frontend Engineer / Web Builder builder）</h3>
+<p><code>motion_key</code> を元に本ドキュメントの「推奨実装」「サンプル」セクションを参照する。</p>
+<h3 id="web-builder-motion_analyzer">解析段階（Web Builder motion_analyzer）</h3>
+<p>参考サイトで検出したモーションを、最も近い <code>motion_key</code> にマッピングして出力する。</p>
+<h2 id="_2">カテゴリ索引</h2>
+<ol>
+<li><a href="#1-ナビゲーション遷移系">ナビゲーション・遷移系</a>（6）</li>
+<li><a href="#2-テキストタイポグラフィ系">テキスト・タイポグラフィ系</a>（6）</li>
+<li><a href="#3-インタラクションホバークリック系">インタラクション系</a>（6）</li>
+<li><a href="#4-スクロール背景系">スクロール・背景系</a>（6）</li>
+<li><a href="#5-ベンチャー先進性特化系">ベンチャー・先進性特化系</a>（6）</li>
+</ol>
+<h2 id="_3">アクセシビリティ共通ルール</h2>
+<pre class="codehilite"><code class="language-css">@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</code></pre>
+
+<p>すべてのモーション実装は上記グローバル CSS を前提とする。加えて、モーションに依存して情報を伝える演出（例: タイピング・エフェクト）は、reduced-motion 環境では <strong>即時表示</strong> にフォールバックする。</p>
+<hr />
+<h2 id="1">1. ナビゲーション・遷移系</h2>
+<h3 id="11-circle-reveal">1.1 サークル・リビール (<code>circle-reveal</code>)</h3>
+<ul>
+<li><strong>演出</strong>: 円形がボタンから画面全体へ広がる</li>
+<li><strong>活用例</strong>: ハンバーガーメニュー、モーダル起動</li>
+<li><strong>言語化</strong>: ボタンを起点に円形が拡大し、画面を塗りつぶす</li>
+<li><strong>推奨実装</strong>: CSS <code>clip-path: circle()</code> + transition、または framer-motion の <code>animate={{ clipPath }}</code></li>
+<li><strong>パラメータ目安</strong>: duration 0.6s / easing <code>cubic-bezier(0.77, 0, 0.175, 1)</code> / 起点座標 = クリック位置</li>
+</ul>
+<pre class="codehilite"><code class="language-tsx">// framer-motion
+&lt;motion.div
+  initial={{ clipPath: &quot;circle(0% at var(--x) var(--y))&quot; }}
+  animate={{ clipPath: &quot;circle(150% at var(--x) var(--y))&quot; }}
+  transition={{ duration: 0.6, ease: [0.77, 0, 0.175, 1] }}
+/&gt;
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: reduced-motion では即時フェードに差し替え。キーボード操作時は起点を画面中央に固定</li>
+</ul>
+<h3 id="12-slanted-slide">1.2 スランテッド・スライド (<code>slanted-slide</code>)</h3>
+<ul>
+<li><strong>演出</strong>: 斜めの面が高速で画面を横切る</li>
+<li><strong>活用例</strong>: ページ遷移、メインビジュアルの登場</li>
+<li><strong>言語化</strong>: 鋭い角度の面がハイスピードでスライドし画面を切り替える</li>
+<li><strong>推奨実装</strong>: 全画面オーバーレイ div を <code>transform: skewX(-12deg) translateX()</code> で滑走</li>
+<li><strong>パラメータ目安</strong>: duration 0.5s / skew -12deg / easing <code>cubic-bezier(0.86, 0, 0.07, 1)</code></li>
+</ul>
+<pre class="codehilite"><code class="language-tsx">&lt;motion.div
+  className=&quot;fixed inset-0 origin-right bg-black&quot;
+  style={{ transform: &quot;skewX(-12deg)&quot; }}
+  initial={{ x: &quot;-110%&quot; }}
+  animate={{ x: &quot;110%&quot; }}
+  transition={{ duration: 0.5, ease: [0.86, 0, 0.07, 1] }}
+/&gt;
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: reduced-motion 時は skew を 0 にしフェードに置換</li>
+</ul>
+<h3 id="13-droste-zoom">1.3 ドロステ・ズーム (<code>droste-zoom</code>)</h3>
+<ul>
+<li><strong>演出</strong>: 画面中央へ吸い込まれるように進む</li>
+<li><strong>活用例</strong>: ギャラリー → 詳細ページ遷移、ブランドイントロ</li>
+<li><strong>言語化</strong>: 視点を中央に固定し、奥行きを突き抜けるような没入感</li>
+<li><strong>推奨実装</strong>: framer-motion <code>layoutId</code> + <code>scale</code> / GSAP timeline</li>
+<li><strong>パラメータ目安</strong>: scale 1 → 8 / duration 0.8s / easing <code>power3.inOut</code></li>
+</ul>
+<pre class="codehilite"><code class="language-tsx">&lt;motion.img layoutId={`card-${id}`} src={src} /&gt;
+// 詳細ページで同じ layoutId を持つ要素へ共有遷移
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: reduced-motion では <code>layoutId</code> 共有のみでスケール無効化</li>
+</ul>
+<h3 id="14-split-curtain">1.4 スプリット・カーテン (<code>split-curtain</code>)</h3>
+<ul>
+<li><strong>演出</strong>: 画面が中央から上下または左右に割れる</li>
+<li><strong>活用例</strong>: サイトのオープニング、章の区切り</li>
+<li><strong>言語化</strong>: 幕が開くように、中央から外側へパネルが分割移動する</li>
+<li><strong>推奨実装</strong>: 2枚のオーバーレイ div を <code>translateY(-100%)</code> / <code>translateY(100%)</code> へ</li>
+<li><strong>パラメータ目安</strong>: duration 0.9s / easing <code>cubic-bezier(0.83, 0, 0.17, 1)</code> / ディレイなし</li>
+</ul>
+<pre class="codehilite"><code class="language-tsx">&lt;&gt;
+  &lt;motion.div className=&quot;fixed inset-x-0 top-0 h-1/2 bg-neutral-900&quot;
+    initial={{ y: 0 }} animate={{ y: &quot;-100%&quot; }} transition={{ duration: 0.9, ease: [0.83, 0, 0.17, 1] }} /&gt;
+  &lt;motion.div className=&quot;fixed inset-x-0 bottom-0 h-1/2 bg-neutral-900&quot;
+    initial={{ y: 0 }} animate={{ y: &quot;100%&quot; }} transition={{ duration: 0.9, ease: [0.83, 0, 0.17, 1] }} /&gt;
+&lt;/&gt;
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: reduced-motion では一瞬のフェードアウトに置換</li>
+</ul>
+<h3 id="15-drawer-push">1.5 ドロワー・プッシュ (<code>drawer-push</code>)</h3>
+<ul>
+<li><strong>演出</strong>: メニューが出る際、本体コンテンツを押し出す</li>
+<li><strong>活用例</strong>: スマホ用グローバルメニュー、設定パネル</li>
+<li><strong>言語化</strong>: メニューが重なるのではなく、既存画面を横にスライドさせる</li>
+<li><strong>推奨実装</strong>: ルートラッパーに <code>transform: translateX(-80vw)</code> を適用、ドロワーは <code>right: -80vw</code></li>
+<li><strong>パラメータ目安</strong>: duration 0.35s / easing <code>ease-out</code> / ドロワー幅 80vw（PC時 360px）</li>
+</ul>
+<pre class="codehilite"><code class="language-tsx">&lt;motion.main animate={{ x: isOpen ? -320 : 0 }} transition={{ duration: 0.35, ease: &quot;easeOut&quot; }}&gt;
+  {children}
+&lt;/motion.main&gt;
+&lt;motion.aside animate={{ x: isOpen ? 0 : 320 }} transition={{ duration: 0.35, ease: &quot;easeOut&quot; }} /&gt;
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: ドロワー開閉時に <code>aria-expanded</code> を同期、reduced-motion では transform なしで display 切替</li>
+</ul>
+<h3 id="16-stack-card">1.6 スタック・カード (<code>stack-card</code>)</h3>
+<ul>
+<li><strong>演出</strong>: ページがトランプのように重なったカード状に捲れる</li>
+<li><strong>活用例</strong>: ストーリー仕立てのサービス紹介、ケーススタディ</li>
+<li><strong>言語化</strong>: 下の階層が上に重なっていく、奥行きのあるレイヤー遷移</li>
+<li><strong>推奨実装</strong>: 各セクションを <code>position: sticky; top: 0</code> で積層、<code>transform: scale(0.95) translateY(-20px)</code> を段階適用</li>
+<li><strong>パラメータ目安</strong>: duration scroll連動 / easing <code>linear</code> / カード間 scale 差 0.04</li>
+</ul>
+<pre class="codehilite"><code class="language-tsx">// Frameworkless (CSS only)
+// section { position: sticky; top: 0; height: 100vh; }
+// section:nth-child(n) { transform: scale(calc(1 - 0.04 * var(--depth))); }
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: reduced-motion では sticky を解除し通常の縦並びに変更</li>
+</ul>
+<h2 id="2">2. テキスト・タイポグラフィ系</h2>
+<h3 id="21-typing-effect">2.1 タイピング・エフェクト (<code>typing-effect</code>)</h3>
+<ul>
+<li><strong>演出</strong>: 1文字ずつコードのように打たれる</li>
+<li><strong>活用例</strong>: メインコピー、AIチャット風UI、ターミナル風ヒーロー</li>
+<li><strong>言語化</strong>: カーソル点滅を伴い、入力中のようなリズムで表示</li>
+<li><strong>推奨実装</strong>: <code>typewriter-effect</code> ライブラリ or 自作 <code>setInterval</code> / framer-motion + <code>useEffect</code></li>
+<li><strong>パラメータ目安</strong>: 1文字 40-80ms / カーソル点滅 1Hz</li>
+</ul>
+<pre class="codehilite"><code class="language-tsx">// 自作
+const [shown, setShown] = useState(&quot;&quot;);
+useEffect(() =&gt; {
+  let i = 0;
+  const t = setInterval(() =&gt; setShown(text.slice(0, ++i)), 60);
+  return () =&gt; clearInterval(t);
+}, [text]);
+return &lt;span&gt;{shown}&lt;span className=&quot;animate-pulse&quot;&gt;|&lt;/span&gt;&lt;/span&gt;;
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: スクリーンリーダー用に完成形を <code>aria-label</code> に持たせ、reduced-motion では即時全文表示</li>
+</ul>
+<h3 id="22-masking-reveal">2.2 マスキング・リビール (<code>masking-reveal</code>)</h3>
+<ul>
+<li><strong>演出</strong>: 見えない枠の中から文字が浮き出る</li>
+<li><strong>活用例</strong>: 各セクションの見出し、章タイトル</li>
+<li><strong>言語化</strong>: テキストを一行ずつ、下から上へスライドして露出させる</li>
+<li><strong>推奨実装</strong>: 親要素 <code>overflow: hidden</code>、子要素 <code>translateY(100%)</code> → <code>translateY(0)</code></li>
+<li><strong>パラメータ目安</strong>: duration 0.7s / easing <code>cubic-bezier(0.33, 1, 0.68, 1)</code> / stagger 0.08s</li>
+</ul>
+<pre class="codehilite"><code class="language-tsx">&lt;span className=&quot;inline-block overflow-hidden&quot;&gt;
+  &lt;motion.span
+    className=&quot;inline-block&quot;
+    initial={{ y: &quot;100%&quot; }}
+    whileInView={{ y: 0 }}
+    transition={{ duration: 0.7, ease: [0.33, 1, 0.68, 1] }}
+  &gt;
+    {text}
+  &lt;/motion.span&gt;
+&lt;/span&gt;
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: reduced-motion ではマスクなしで即時表示</li>
+</ul>
+<h3 id="23-kinetic-flow">2.3 キネティック・フロー (<code>kinetic-flow</code>)</h3>
+<ul>
+<li><strong>演出</strong>: 巨大な文字がスクロールで横流れる</li>
+<li><strong>活用例</strong>: 背景の装飾テキスト、セクションの区切り</li>
+<li><strong>言語化</strong>: スクロール量に同期して、文字を高速で水平移動させる</li>
+<li><strong>推奨実装</strong>: GSAP ScrollTrigger + <code>xPercent</code>、または framer-motion <code>useScroll</code> + <code>useTransform</code></li>
+<li><strong>パラメータ目安</strong>: スクロール 100vh で -50% 移動 / フォントサイズ 12-20vw</li>
+</ul>
+<pre class="codehilite"><code class="language-tsx">const { scrollYProgress } = useScroll();
+const x = useTransform(scrollYProgress, [0, 1], [&quot;0%&quot;, &quot;-50%&quot;]);
+return &lt;motion.div style={{ x }} className=&quot;whitespace-nowrap text-[20vw]&quot;&gt;{marqueeText}&lt;/motion.div&gt;;
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: 文字情報として重要でない装飾用途に限定。reduced-motion では静止</li>
+</ul>
+<h3 id="24-letter-scatter-fade">2.4 文字バラバラ・フェード (<code>letter-scatter-fade</code>)</h3>
+<ul>
+<li><strong>演出</strong>: 1文字単位でランダムに表示される</li>
+<li><strong>活用例</strong>: 印象的なキャッチコピー、ヒーローの見出し</li>
+<li><strong>言語化</strong>: 文字ごとにディレイをかけ、バラバラと浮かび上がらせる</li>
+<li><strong>推奨実装</strong>: 文字を <code>&lt;span&gt;</code> 分割し、各 span に <code>opacity</code> + <code>y</code> のアニメーションをランダム delay で適用</li>
+<li><strong>パラメータ目安</strong>: duration 0.6s / delay 0〜0.4s ランダム / y 20px → 0</li>
+</ul>
+<pre class="codehilite"><code class="language-tsx">{text.split(&quot;&quot;).map((ch, i) =&gt; (
+  &lt;motion.span
+    key={i}
+    initial={{ opacity: 0, y: 20 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.6, delay: Math.random() * 0.4 }}
+  &gt;
+    {ch}
+  &lt;/motion.span&gt;
+))}
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: 元テキストを <code>aria-label</code> に保持。reduced-motion では全文即時表示</li>
+</ul>
+<h3 id="25-text-scramble">2.5 テキスト・スクランブル (<code>text-scramble</code>)</h3>
+<ul>
+<li><strong>演出</strong>: 文字がランダムに変化して正解になる</li>
+<li><strong>活用例</strong>: 近未来的なタイトル、プロダクト名のイントロ</li>
+<li><strong>言語化</strong>: デジタルノイズのように文字が入れ替わり、最後に静止する</li>
+<li><strong>推奨実装</strong>: <code>requestAnimationFrame</code> で一定フレームごとに文字をランダム置換しつつ、固定位置から確定させる</li>
+<li><strong>パラメータ目安</strong>: 全体 duration 1.2s / 1文字確定タイミング 0〜1秒</li>
+</ul>
+<pre class="codehilite"><code class="language-ts">function scramble(target: string, onUpdate: (s: string) =&gt; void) {
+  const chars = &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789&quot;;
+  let frame = 0;
+  const duration = 72; // frames
+  const id = setInterval(() =&gt; {
+    frame++;
+    onUpdate(target.split(&quot;&quot;).map((c, i) =&gt;
+      frame / duration &gt; i / target.length ? c : chars[Math.floor(Math.random() * chars.length)]
+    ).join(&quot;&quot;));
+    if (frame &gt;= duration) clearInterval(id);
+  }, 1000 / 60);
+}
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: <code>aria-label</code> に最終文字列。reduced-motion では即時確定</li>
+</ul>
+<h3 id="26-stroke-drawing">2.6 ストローク・ドローイング (<code>stroke-drawing</code>)</h3>
+<ul>
+<li><strong>演出</strong>: 文字の外形線が描かれてから塗り潰される</li>
+<li><strong>活用例</strong>: ロゴアニメーション、ブランドイントロ</li>
+<li><strong>言語化</strong>: SVG のパスをなぞるように線を描画し、最後に色を満たす</li>
+<li><strong>推奨実装</strong>: SVG <code>stroke-dasharray</code> + <code>stroke-dashoffset</code> で線を描画、完了後 <code>fill-opacity</code> をアニメート</li>
+<li><strong>パラメータ目安</strong>: 線描画 1.5s / 塗り 0.6s / easing <code>ease-in-out</code></li>
+</ul>
+<pre class="codehilite"><code class="language-tsx">&lt;motion.path
+  d={pathData}
+  fill=&quot;transparent&quot;
+  stroke=&quot;currentColor&quot;
+  strokeWidth={2}
+  initial={{ pathLength: 0, fillOpacity: 0 }}
+  animate={{ pathLength: 1, fillOpacity: 1 }}
+  transition={{ pathLength: { duration: 1.5 }, fillOpacity: { delay: 1.5, duration: 0.6 } }}
+/&gt;
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: SVG に <code>&lt;title&gt;</code> / <code>aria-label</code> を付与。reduced-motion では最終形を即時表示</li>
+</ul>
+<h2 id="3">3. インタラクション（ホバー・クリック）系</h2>
+<h3 id="31-magnetic-mouse">3.1 マグネティック・マウス (<code>magnetic-mouse</code>)</h3>
+<ul>
+<li><strong>演出</strong>: ボタンがカーソルに吸い寄せられる</li>
+<li><strong>活用例</strong>: 重要な CTA ボタン、プライマリナビゲーション</li>
+<li><strong>言語化</strong>: 磁石のように、カーソルの近接に合わせて要素を微動させる</li>
+<li><strong>推奨実装</strong>: <code>mousemove</code> で要素中心との距離を測り、<code>translate</code> を係数付きで適用</li>
+<li><strong>パラメータ目安</strong>: 反応範囲 100px / 最大変位 12px / easing <code>ease-out</code> 0.2s</li>
+</ul>
+<pre class="codehilite"><code class="language-tsx">function Magnetic({ children }) {
+  const ref = useRef&lt;HTMLButtonElement&gt;(null);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+  return (
+    &lt;motion.button
+      ref={ref}
+      onMouseMove={e =&gt; {
+        const r = ref.current!.getBoundingClientRect();
+        setPos({ x: (e.clientX - (r.left + r.width / 2)) * 0.3, y: (e.clientY - (r.top + r.height / 2)) * 0.3 });
+      }}
+      onMouseLeave={() =&gt; setPos({ x: 0, y: 0 })}
+      animate={pos}
+      transition={{ type: &quot;spring&quot;, stiffness: 150, damping: 15 }}
+    &gt;{children}&lt;/motion.button&gt;
+  );
+}
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: キーボードフォーカス時は発火しない。reduced-motion では完全無効化</li>
+</ul>
+<h3 id="32-glitch-hover">3.2 グリッチ・ホバー (<code>glitch-hover</code>)</h3>
+<ul>
+<li><strong>演出</strong>: 一瞬だけ画像や文字がブレる</li>
+<li><strong>活用例</strong>: ロゴ、エンジニア採用枠のヒーロー</li>
+<li><strong>言語化</strong>: デジタルなノイズと色収差を一瞬だけ発生させる</li>
+<li><strong>推奨実装</strong>: CSS <code>::before</code> <code>::after</code> で RGB 色収差の複製を配置、keyframes で瞬間的に translate</li>
+<li><strong>パラメータ目安</strong>: duration 0.4s / ズレ量 2-4px / 色 R / G / B 分解</li>
+</ul>
+<pre class="codehilite"><code class="language-css">.glitch:hover::before { transform: translate(-2px, 0); color: #f0f; mix-blend-mode: screen; }
+.glitch:hover::after  { transform: translate(2px, 0);  color: #0ff; mix-blend-mode: screen; }
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: 光感受性への配慮として連続発火を抑制。reduced-motion では無効化</li>
+</ul>
+<h3 id="33-liquid-hover">3.3 リキッド・ホバー (<code>liquid-hover</code>)</h3>
+<ul>
+<li><strong>演出</strong>: 触れた場所が水面のように揺らぐ</li>
+<li><strong>活用例</strong>: チームメンバーの写真、作品ギャラリー</li>
+<li><strong>言語化</strong>: マウスの位置に応じて、画像に液体のような歪みを加える</li>
+<li><strong>推奨実装</strong>: WebGL シェーダ（Three.js / OGL）で画像に波紋ディスプレイスメントマップ</li>
+<li><strong>パラメータ目安</strong>: 波紋半径 180px / 強度 0.05 / 減衰 0.95</li>
+</ul>
+<pre class="codehilite"><code class="language-ts">// 概略: fragment shader にて mouse.xy と uv の距離からディスプレイスメントを計算
+uniform vec2 uMouse;
+uniform float uStrength;
+vec2 disp = (uv - uMouse) * uStrength * exp(-distance(uv, uMouse) * 5.0);
+gl_FragColor = texture2D(uTexture, uv + disp);
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: タッチデバイスでは静止画像にフォールバック。reduced-motion で無効化</li>
+</ul>
+<h3 id="34-burst-effect">3.4 バースト・エフェクト (<code>burst-effect</code>)</h3>
+<ul>
+<li><strong>演出</strong>: クリックした場所から粒子が弾ける</li>
+<li><strong>活用例</strong>: 「応募する」「送信する」ボタン、いいねボタン</li>
+<li><strong>言語化</strong>: 押下した座標から、小さな図形を放射状に散らす</li>
+<li><strong>推奨実装</strong>: Canvas 2D で粒子生成、または <code>mo.js</code> / <code>tsParticles</code> 利用</li>
+<li><strong>パラメータ目安</strong>: 粒子数 12-20 / 初速 100-200px/s / lifetime 0.5s</li>
+</ul>
+<pre class="codehilite"><code class="language-tsx">function burst(x: number, y: number) {
+  const particles = Array.from({ length: 16 }, (_, i) =&gt; {
+    const el = document.createElement(&quot;span&quot;);
+    el.className = &quot;fixed pointer-events-none w-1 h-1 rounded-full bg-primary&quot;;
+    el.style.left = `${x}px`; el.style.top = `${y}px`;
+    document.body.appendChild(el);
+    el.animate([
+      { transform: &quot;translate(0,0)&quot;, opacity: 1 },
+      { transform: `translate(${Math.cos(i) * 80}px, ${Math.sin(i) * 80}px)`, opacity: 0 }
+    ], { duration: 500, easing: &quot;ease-out&quot; }).onfinish = () =&gt; el.remove();
+  });
+}
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: 装飾用途のみ（成功状態の唯一の通知手段にしない）。reduced-motion で無効化</li>
+</ul>
+<h3 id="35-underline-draw">3.5 アンダーライン・ドロー (<code>underline-draw</code>)</h3>
+<ul>
+<li><strong>演出</strong>: 下線が左から右へスッと引かれる</li>
+<li><strong>活用例</strong>: テキストリンク、ナビゲーションメニュー</li>
+<li><strong>言語化</strong>: ホバー時に中心または左から、線が伸びるように表示する</li>
+<li><strong>推奨実装</strong>: <code>::after</code> を <code>width: 0</code> → <code>100%</code> にトランジション、または <code>scaleX(0)</code> → <code>scaleX(1)</code> + <code>transform-origin: left</code></li>
+<li><strong>パラメータ目安</strong>: duration 0.3s / easing <code>ease-out</code></li>
+</ul>
+<pre class="codehilite"><code class="language-css">.link { position: relative; }
+.link::after {
+  content: &quot;&quot;; position: absolute; left: 0; bottom: -2px;
+  width: 100%; height: 1px; background: currentColor;
+  transform: scaleX(0); transform-origin: left; transition: transform 0.3s ease-out;
+}
+.link:hover::after { transform: scaleX(1); }
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: reduced-motion では即時表示。線だけでなく <code>text-decoration</code> のフォールバックも残す</li>
+</ul>
+<h3 id="36-floating-float">3.6 フローティング・フロート (<code>floating-float</code>)</h3>
+<ul>
+<li><strong>演出</strong>: 浮いているように常に微振動する</li>
+<li><strong>活用例</strong>: 浮遊アイコン、サービスロゴ、3Dオブジェクト</li>
+<li><strong>言語化</strong>: 上下に数ピクセル、ゆったりとしたイージングでループさせる</li>
+<li><strong>推奨実装</strong>: CSS <code>@keyframes</code> でループ、または framer-motion <code>animate={{ y: [0, -6, 0] }}</code> + <code>repeat: Infinity</code></li>
+<li><strong>パラメータ目安</strong>: 振幅 4-8px / 周期 3-4s / easing <code>ease-in-out</code></li>
+</ul>
+<pre class="codehilite"><code class="language-css">@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+.float { animation: float 3.5s ease-in-out infinite; }
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: reduced-motion で <code>animation: none</code> に上書き。ページ内に複数使う場合は位相をずらす</li>
+</ul>
+<h2 id="4">4. スクロール・背景系</h2>
+<h3 id="41-parallax-depth">4.1 パララックス・デプス (<code>parallax-depth</code>)</h3>
+<ul>
+<li><strong>演出</strong>: 背景と前景の速度を変えて動かす</li>
+<li><strong>活用例</strong>: メインビジュアル、ストーリーテリング型LP</li>
+<li><strong>言語化</strong>: 視差効果を利用して、画面に立体感と奥行きを与える</li>
+<li><strong>推奨実装</strong>: framer-motion <code>useScroll</code> + <code>useTransform</code> でレイヤーごとに y 変換、またはGSAP ScrollTrigger</li>
+<li><strong>パラメータ目安</strong>: 背景 speed 0.3 / 中景 0.6 / 前景 1.0</li>
+</ul>
+<pre class="codehilite"><code class="language-tsx">const { scrollY } = useScroll();
+const bgY = useTransform(scrollY, v =&gt; v * 0.3);
+const fgY = useTransform(scrollY, v =&gt; v * 0.8);
+return (&lt;&gt;
+  &lt;motion.img style={{ y: bgY }} className=&quot;absolute inset-0&quot; src=&quot;/bg.webp&quot; /&gt;
+  &lt;motion.img style={{ y: fgY }} className=&quot;absolute inset-0&quot; src=&quot;/fg.webp&quot; /&gt;
+&lt;/&gt;);
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: モバイルでは無効化または強度を下げる。reduced-motion で完全無効化</li>
+</ul>
+<h3 id="42-particle-connect">4.2 パーティクル・コネクト (<code>particle-connect</code>)</h3>
+<ul>
+<li><strong>演出</strong>: 点と点が線で結ばれながら動く</li>
+<li><strong>活用例</strong>: AI / IT / テック系のヒーロー背景</li>
+<li><strong>言語化</strong>: 粒子が浮遊し、距離が近いもの同士をラインで繋ぐ</li>
+<li><strong>推奨実装</strong>: <code>tsParticles</code> (<code>@tsparticles/react</code>) or Canvas 2D 自作</li>
+<li><strong>パラメータ目安</strong>: 粒子数 60-100 / リンク距離 150px / 移動速度 0.5-1</li>
+</ul>
+<pre class="codehilite"><code class="language-tsx">import Particles from &quot;@tsparticles/react&quot;;
+&lt;Particles options={{
+  particles: {
+    number: { value: 80 },
+    links: { enable: true, distance: 150, opacity: 0.3 },
+    move: { enable: true, speed: 0.8 },
+  },
+}} /&gt;
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: 装飾のみの用途。reduced-motion では静止画像にフォールバック</li>
+</ul>
+<h3 id="43-progressive-sharp">4.3 プログレッシブ・シャープ (<code>progressive-sharp</code>)</h3>
+<ul>
+<li><strong>演出</strong>: ぼかし状態からピントが合う</li>
+<li><strong>活用例</strong>: 実績紹介の画像、フォト主体のセクション</li>
+<li><strong>言語化</strong>: 強いブラーから、徐々に鮮明な画像へ変化させる</li>
+<li><strong>推奨実装</strong>: <code>filter: blur(20px)</code> → <code>blur(0)</code> を Intersection Observer で発火</li>
+<li><strong>パラメータ目安</strong>: duration 1.0s / easing <code>ease-out</code> / blur 20px → 0</li>
+</ul>
+<pre class="codehilite"><code class="language-tsx">&lt;motion.img
+  initial={{ filter: &quot;blur(20px)&quot;, opacity: 0 }}
+  whileInView={{ filter: &quot;blur(0px)&quot;, opacity: 1 }}
+  viewport={{ once: true, margin: &quot;-10%&quot; }}
+  transition={{ duration: 1 }}
+/&gt;
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: reduced-motion では blur なしで即時表示</li>
+</ul>
+<h3 id="44-section-snap">4.4 セクション・スナップ (<code>section-snap</code>)</h3>
+<ul>
+<li><strong>演出</strong>: スクロールすると次の階層へ吸着</li>
+<li><strong>活用例</strong>: 縦長 LP、1枚完結サイト、ストーリー型サイト</li>
+<li><strong>言語化</strong>: 中途半端な位置で止めず、セクションの頭に自動で合わせる</li>
+<li><strong>推奨実装</strong>: CSS <code>scroll-snap-type: y mandatory</code> + 各セクションに <code>scroll-snap-align: start</code></li>
+<li><strong>パラメータ目安</strong>: <code>scroll-snap-type: y mandatory</code>（強制）または <code>y proximity</code>（近接時のみ）</li>
+</ul>
+<pre class="codehilite"><code class="language-css">html { scroll-snap-type: y proximity; scroll-behavior: smooth; }
+section { scroll-snap-align: start; min-height: 100vh; }
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: キーボードスクロールを阻害しないよう <code>proximity</code> を推奨。reduced-motion では <code>scroll-behavior: auto</code></li>
+</ul>
+<h3 id="45-path-animation">4.5 パス・アニメーション (<code>path-animation</code>)</h3>
+<ul>
+<li><strong>演出</strong>: 線に沿ってスクロールが進む</li>
+<li><strong>活用例</strong>: 沿革、サービスの流れ、プロセスフロー</li>
+<li><strong>言語化</strong>: 1本の繋がった線が、スクロールに合わせて伸びていく</li>
+<li><strong>推奨実装</strong>: SVG <code>&lt;path&gt;</code> + <code>stroke-dasharray</code> / <code>stroke-dashoffset</code> を scroll progress で変化</li>
+<li><strong>パラメータ目安</strong>: <code>pathLength</code> 0 → 1 をスクロール量に完全同期</li>
+</ul>
+<pre class="codehilite"><code class="language-tsx">const { scrollYProgress } = useScroll({ target: ref, offset: [&quot;start end&quot;, &quot;end start&quot;] });
+&lt;svg ref={ref}&gt;
+  &lt;motion.path d=&quot;M ...&quot; stroke=&quot;black&quot; strokeWidth={2} fill=&quot;none&quot;
+    style={{ pathLength: scrollYProgress }} /&gt;
+&lt;/svg&gt;
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: 情報伝達手段として線のみに依存せず、各ノードにテキストラベルを併記</li>
+</ul>
+<h3 id="46-inbound-slide">4.6 インバウンド・スライド (<code>inbound-slide</code>)</h3>
+<ul>
+<li><strong>演出</strong>: 左右交互に要素が飛び込んでくる</li>
+<li><strong>活用例</strong>: 特徴紹介セクション、機能一覧</li>
+<li><strong>言語化</strong>: 画面外からバネのような動き（Back Out）で要素を挿入する</li>
+<li><strong>推奨実装</strong>: Intersection Observer + CSS transition、または framer-motion <code>whileInView</code></li>
+<li><strong>パラメータ目安</strong>: 変位 80px / duration 0.8s / easing <code>back.out(1.7)</code> (GSAP) or <code>[0.34, 1.56, 0.64, 1]</code></li>
+</ul>
+<pre class="codehilite"><code class="language-tsx">&lt;motion.div
+  initial={{ x: fromLeft ? -80 : 80, opacity: 0 }}
+  whileInView={{ x: 0, opacity: 1 }}
+  viewport={{ once: true, margin: &quot;-10%&quot; }}
+  transition={{ duration: 0.8, ease: [0.34, 1.56, 0.64, 1] }}
+/&gt;
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: reduced-motion ではフェードインのみ。横スクロールを発生させない（overflow-x: hidden を親に）</li>
+</ul>
+<h2 id="5">5. ベンチャー・先進性特化系</h2>
+<h3 id="51-slot-counter">5.1 スロット・カウンター (<code>slot-counter</code>)</h3>
+<ul>
+<li><strong>演出</strong>: 数字が回転しながら止まる</li>
+<li><strong>活用例</strong>: 導入実績、社員数、KPI 表示</li>
+<li><strong>言語化</strong>: 目的の数値まで、ドラムロールのように数字を回す</li>
+<li><strong>推奨実装</strong>: framer-motion <code>useMotionValue</code> + <code>animate()</code>、または <code>react-countup</code></li>
+<li><strong>パラメータ目安</strong>: duration 1.5-2.0s / easing <code>ease-out</code> / 桁ごとに回転表示</li>
+</ul>
+<pre class="codehilite"><code class="language-tsx">const count = useMotionValue(0);
+const rounded = useTransform(count, Math.round);
+useEffect(() =&gt; {
+  const anim = animate(count, target, { duration: 2, ease: &quot;easeOut&quot; });
+  return () =&gt; anim.stop();
+}, [target]);
+return &lt;motion.span&gt;{rounded}&lt;/motion.span&gt;;
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: <code>aria-live="polite"</code> + 最終値を <code>aria-label</code> に固定値で記述。reduced-motion で即時表示</li>
+</ul>
+<h3 id="52-neon-pulse">5.2 ネオン・パルス (<code>neon-pulse</code>)</h3>
+<ul>
+<li><strong>演出</strong>: 枠線が脈打つように光る</li>
+<li><strong>活用例</strong>: 「急募」タグ、限定情報、警告バッジ</li>
+<li><strong>言語化</strong>: 輝度を周期的に変化させ、エネルギーが通っている質感を出す</li>
+<li><strong>推奨実装</strong>: <code>box-shadow</code> + <code>filter: drop-shadow</code> を keyframes で周期変化</li>
+<li><strong>パラメータ目安</strong>: 周期 1.5-2s / easing <code>ease-in-out</code> / 輝度差 40-60%</li>
+</ul>
+<pre class="codehilite"><code class="language-css">@keyframes neon-pulse {
+  0%, 100% { box-shadow: 0 0 8px var(--accent), 0 0 16px var(--accent); }
+  50%      { box-shadow: 0 0 16px var(--accent), 0 0 32px var(--accent); }
+}
+.neon { animation: neon-pulse 1.8s ease-in-out infinite; }
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: 光感受性配慮で点滅は 3Hz 未満。reduced-motion で停止</li>
+</ul>
+<h3 id="53-card-tilt">5.3 カード・チルト (<code>card-tilt</code>)</h3>
+<ul>
+<li><strong>演出</strong>: マウスに合わせてカードが傾く</li>
+<li><strong>活用例</strong>: サービス紹介パネル、プロダクトカード</li>
+<li><strong>言語化</strong>: カーソルの位置に応じて、3D 的に要素の角度を傾ける</li>
+<li><strong>推奨実装</strong>: <code>vanilla-tilt.js</code> もしくは mousemove から <code>rotateX</code> / <code>rotateY</code> を算出</li>
+<li><strong>パラメータ目安</strong>: 最大角 10deg / perspective 1000px / easing <code>ease-out</code> 0.2s</li>
+</ul>
+<pre class="codehilite"><code class="language-tsx">function Tilt({ children }) {
+  const ref = useRef&lt;HTMLDivElement&gt;(null);
+  return &lt;div
+    ref={ref}
+    style={{ perspective: 1000 }}
+    onMouseMove={e =&gt; {
+      const r = ref.current!.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      ref.current!.style.transform = `rotateY(${x * 10}deg) rotateX(${-y * 10}deg)`;
+    }}
+    onMouseLeave={() =&gt; { ref.current!.style.transform = &quot;none&quot;; }}
+  &gt;{children}&lt;/div&gt;;
+}
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: タッチデバイス・キーボード操作では無効。reduced-motion で無効化</li>
+</ul>
+<h3 id="54-skeleton-loading">5.4 スケルトン・ローディング (<code>skeleton-loading</code>)</h3>
+<ul>
+<li><strong>演出</strong>: 読み込み中に中身の形だけ光る</li>
+<li><strong>活用例</strong>: データフェッチ中の一覧、ダッシュボードカード</li>
+<li><strong>言語化</strong>: グレーの枠内で、光が左から右へ流れるような予感を与える</li>
+<li><strong>推奨実装</strong>: グラデーション背景を <code>background-position</code> でアニメート</li>
+<li><strong>パラメータ目安</strong>: 周期 1.5s / easing <code>linear</code> / グラデーション 3色（base / highlight / base）</li>
+</ul>
+<pre class="codehilite"><code class="language-css">.skeleton {
+  background: linear-gradient(90deg, #eee 0%, #f8f8f8 50%, #eee 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: <code>aria-busy="true"</code> + スクリーンリーダー用に "読み込み中" を伝える。reduced-motion で静止グレーに</li>
+</ul>
+<h3 id="55-dynamic-cursor">5.5 ダイナミック・カーソル (<code>dynamic-cursor</code>)</h3>
+<ul>
+<li><strong>演出</strong>: マウスの形自体が状況で変化する</li>
+<li><strong>活用例</strong>: サイト全体の一貫した演出、クリエイティブサイト</li>
+<li><strong>言語化</strong>: クリックできる場所でカーソルが巨大化・反転する演出</li>
+<li><strong>推奨実装</strong>: OS カーソルを <code>cursor: none</code> で隠し、<code>position: fixed</code> の独自 div を mousemove で追従</li>
+<li><strong>パラメータ目安</strong>: 通常 12px / ホバー時 48px / transition 0.2s ease-out / <code>mix-blend-mode: difference</code></li>
+</ul>
+<pre class="codehilite"><code class="language-tsx">const [pos, setPos] = useState({ x: 0, y: 0 });
+const [hover, setHover] = useState(false);
+useEffect(() =&gt; {
+  const on = (e: MouseEvent) =&gt; setPos({ x: e.clientX, y: e.clientY });
+  window.addEventListener(&quot;mousemove&quot;, on);
+  return () =&gt; window.removeEventListener(&quot;mousemove&quot;, on);
+}, []);
+return &lt;motion.div
+  className=&quot;fixed pointer-events-none rounded-full mix-blend-difference bg-white&quot;
+  animate={{ x: pos.x - (hover ? 24 : 6), y: pos.y - (hover ? 24 : 6), width: hover ? 48 : 12, height: hover ? 48 : 12 }}
+  transition={{ type: &quot;spring&quot;, mass: 0.3, stiffness: 300, damping: 25 }}
+/&gt;;
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: タッチデバイスでは無効。OS カーソルを完全に隠す場合はフォーカスリングを必ず残す。reduced-motion で無効化</li>
+</ul>
+<h3 id="56-overlay-texture">5.6 オーバーレイ・テクスチャ (<code>overlay-texture</code>)</h3>
+<ul>
+<li><strong>演出</strong>: 常に砂嵐のようなノイズが乗る</li>
+<li><strong>活用例</strong>: サイト全体の質感向上、フィルム風ブランディング</li>
+<li><strong>言語化</strong>: 非常に薄いフィルムノイズを全体に重ね、生きてる感を出す</li>
+<li><strong>推奨実装</strong>: 固定配置の SVG ノイズ or PNG テクスチャを <code>position: fixed; inset: 0; pointer-events: none; mix-blend-mode: overlay;</code></li>
+<li><strong>パラメータ目安</strong>: opacity 0.04-0.08 / 周期アニメーション 0.2s（ランダム translate）/ <code>pointer-events: none</code> 必須</li>
+</ul>
+<pre class="codehilite"><code class="language-tsx">&lt;div className=&quot;fixed inset-0 pointer-events-none z-50 opacity-[0.05] mix-blend-overlay&quot;
+  style={{ backgroundImage: &quot;url('/noise.png')&quot;, backgroundSize: &quot;200px&quot; }}&gt;
+&lt;/div&gt;
+</code></pre>
+
+<p>SVG版（JSバンドル増なし）:</p>
+<pre class="codehilite"><code class="language-html">&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; style=&quot;position:fixed;inset:0;pointer-events:none;opacity:0.05;mix-blend-mode:overlay;&quot;&gt;
+  &lt;filter id=&quot;n&quot;&gt;&lt;feTurbulence baseFrequency=&quot;0.9&quot; /&gt;&lt;/filter&gt;
+  &lt;rect width=&quot;100%&quot; height=&quot;100%&quot; filter=&quot;url(#n)&quot; /&gt;
+&lt;/svg&gt;
+</code></pre>
+
+<ul>
+<li><strong>アクセシビリティ</strong>: 文字背景のコントラスト比を検証（ノイズで WCAG 基準を下回らないこと）。reduced-motion では静止のみ許容</li>
+</ul>
+<hr />
+<h2 id="_4">改訂履歴</h2>
+<table>
+<thead>
+<tr>
+<th>日付</th>
+<th>改訂内容</th>
+<th>担当</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026-04-24</td>
+<td>初版作成（30モーション収録）</td>
+<td>Claude Code</td>
+</tr>
+</tbody>
+</table>
+</main>
+</body>
+</html>

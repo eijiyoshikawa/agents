@@ -1,17 +1,26 @@
 import type { ExtractResponse, JobPosting } from "./types";
 
+<<<<<<< HEAD
 /** /api/extract を呼び出し、URL統合で求人票を取得する。 */
+=======
+/** /api/extract を呼び出し、統合求人票を取得する。 */
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
 export async function requestExtract(urls: string[]): Promise<ExtractResponse> {
   const res = await fetch("/api/extract", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+<<<<<<< HEAD
     body: JSON.stringify({ mode: "url", urls }),
+=======
+    body: JSON.stringify({ urls }),
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data?.error || "抽出に失敗しました。");
   return data as ExtractResponse;
 }
 
+<<<<<<< HEAD
 /** /api/extract を呼び出し、テキスト素案を整理して求人票を取得する。 */
 export async function requestFromText(text: string): Promise<ExtractResponse> {
   const res = await fetch("/api/extract", {
@@ -24,6 +33,8 @@ export async function requestFromText(text: string): Promise<ExtractResponse> {
   return data as ExtractResponse;
 }
 
+=======
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
 /** /api/pdf を呼び出し、PDFをダウンロードさせる。 */
 export async function downloadPdf(job: JobPosting): Promise<void> {
   const res = await fetch("/api/pdf", {
@@ -46,6 +57,7 @@ export async function downloadPdf(job: JobPosting): Promise<void> {
   URL.revokeObjectURL(url);
 }
 
+<<<<<<< HEAD
 /**
  * 複数求人票をまとめた印刷ドキュメントを新規ウィンドウで開き、印刷（PDF保存）する。
  * 送信先で「PDFに保存」を選ぶと、全件が改ページで1つのPDFになる。
@@ -67,6 +79,8 @@ export function printCombined(html: string): void {
   };
 }
 
+=======
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
 /** 改行区切りテキストをURL配列へ整形する。 */
 export function parseUrlLines(text: string): string[] {
   return text

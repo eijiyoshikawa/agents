@@ -1,6 +1,10 @@
 "use client";
 
+<<<<<<< HEAD
 import { useMemo, useRef, useImperativeHandle, forwardRef } from "react";
+=======
+import { useMemo } from "react";
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9
 import type { CompanyProfile, JobPosting } from "@/lib/types";
 import { buildJobPostingHtml } from "@/lib/template";
 
@@ -9,6 +13,7 @@ interface Props {
   company: CompanyProfile;
 }
 
+<<<<<<< HEAD
 export interface JobPreviewHandle {
   print: () => void;
 }
@@ -47,3 +52,23 @@ export const JobPreview = forwardRef<JobPreviewHandle, Props>(
     );
   },
 );
+=======
+/**
+ * PDFと同一の自己完結HTMLをiframeで表示する。
+ * これによりWebプレビューとPDF出力の見た目が常に一致する。
+ */
+export function JobPreview({ job, company }: Props) {
+  const html = useMemo(() => buildJobPostingHtml(job, company), [job, company]);
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-border-soft bg-white shadow-sm">
+      <iframe
+        title="求人票プレビュー"
+        srcDoc={html}
+        className="h-[840px] w-full"
+        sandbox=""
+      />
+    </div>
+  );
+}
+>>>>>>> claude/evaluation-finance-dashboard-50w8t9

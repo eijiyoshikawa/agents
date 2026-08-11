@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Resend</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-resend">Design System: Resend</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Resend's website is a dark, cinematic canvas that treats email infrastructure like a luxury product. The entire page is draped in pure black (<code>#000000</code>) with text that glows in near-white (<code>#f0f0f0</code>), creating a theater-like experience where content performs on a void stage. This isn't the typical developer-tool darkness — it's the controlled darkness of a photography gallery, where every element is lit with intention and nothing competes for attention.</p>
+<p>The typography system is the star of the show. Three carefully chosen typefaces create a hierarchy that feels both editorial and technical: Domaine Display (a Klim Type Foundry serif) appears at massive 96px for hero headlines with barely-there line-height (1.00) and negative tracking (-0.96px), creating display text that feels like a magazine cover. ABC Favorit (by Dinamo) handles section headings with an even more aggressive letter-spacing (-2.8px at 56px), giving a compressed, engineered quality to mid-tier text. Inter takes over for body and UI, providing the clean readability that lets the display fonts shine. Commit Mono rounds out the family for code blocks.</p>
+<p>What makes Resend distinctive is its icy, blue-tinted border system. Instead of neutral gray borders, Resend uses <code>rgba(214, 235, 253, 0.19)</code> — a frosty, slightly blue-tinted line at 19% opacity that gives every container and divider a cold, crystalline quality against the black background. Combined with pill-shaped buttons (9999px radius), multi-color accent system (orange, green, blue, yellow, red — each with its own CSS variable scale), and OpenType stylistic sets (<code>"ss01"</code>, <code>"ss03"</code>, <code>"ss04"</code>, <code>"ss11"</code>), the result is a design system that feels premium, precise, and quietly confident.</p>
+<p><strong>Key Characteristics:</strong>
+- Pure black background with near-white (<code>#f0f0f0</code>) text — theatrical, gallery-like darkness
+- Three-font hierarchy: Domaine Display (serif hero), ABC Favorit (geometric sections), Inter (body/UI)
+- Icy blue-tinted borders: <code>rgba(214, 235, 253, 0.19)</code> — every border has a cold, crystalline shimmer
+- Multi-color accent system: orange, green, blue, yellow, red — each with numbered CSS variable scales
+- Pill-shaped buttons and tags (9999px radius) with transparent backgrounds
+- OpenType stylistic sets (<code>"ss01"</code>, <code>"ss03"</code>, <code>"ss04"</code>, <code>"ss11"</code>) on display fonts
+- Commit Mono for code — monospace as a design element, not an afterthought
+- Whisper-level shadows using blue-tinted ring: <code>rgba(176, 199, 217, 0.145) 0px 0px 0px 1px</code></p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>Void Black</strong> (<code>#000000</code>): Page background, the defining canvas color (95% opacity via <code>--color-black-12</code>)</li>
+<li><strong>Near White</strong> (<code>#f0f0f0</code>): Primary text, button text, high-contrast elements</li>
+<li><strong>Pure White</strong> (<code>#ffffff</code>): <code>--color-white</code>, maximum emphasis text, link highlights</li>
+</ul>
+<h3 id="accent-scale-orange">Accent Scale — Orange</h3>
+<ul>
+<li><strong>Orange 4</strong> (<code>#ff5900</code>): <code>--color-orange-4</code>, at 22% opacity — subtle warm glow</li>
+<li><strong>Orange 10</strong> (<code>#ff801f</code>): <code>--color-orange-10</code>, primary orange accent — warm, energetic</li>
+<li><strong>Orange 11</strong> (<code>#ffa057</code>): <code>--color-orange-11</code>, lighter orange for secondary use</li>
+</ul>
+<h3 id="accent-scale-green">Accent Scale — Green</h3>
+<ul>
+<li><strong>Green 3</strong> (<code>#22ff99</code>): <code>--color-green-3</code>, at 12% opacity — faint emerald wash</li>
+<li><strong>Green 4</strong> (<code>#11ff99</code>): <code>--color-green-4</code>, at 18% opacity — success indicator glow</li>
+</ul>
+<h3 id="accent-scale-blue">Accent Scale — Blue</h3>
+<ul>
+<li><strong>Blue 4</strong> (<code>#0075ff</code>): <code>--color-blue-4</code>, at 34% opacity — medium blue accent</li>
+<li><strong>Blue 5</strong> (<code>#0081fd</code>): <code>--color-blue-5</code>, at 42% opacity — stronger blue</li>
+<li><strong>Blue 10</strong> (<code>#3b9eff</code>): <code>--color-blue-10</code>, bright blue — links, interactive elements</li>
+</ul>
+<h3 id="accent-scale-other">Accent Scale — Other</h3>
+<ul>
+<li><strong>Yellow 9</strong> (<code>#ffc53d</code>): <code>--color-yellow-9</code>, warm gold for warnings or highlights</li>
+<li><strong>Red 5</strong> (<code>#ff2047</code>): <code>--color-red-5</code>, at 34% opacity — error states, destructive actions</li>
+</ul>
+<h3 id="neutral-scale">Neutral Scale</h3>
+<ul>
+<li><strong>Silver</strong> (<code>#a1a4a5</code>): Secondary text, muted links, descriptions</li>
+<li><strong>Dark Gray</strong> (<code>#464a4d</code>): Tertiary text, de-emphasized content</li>
+<li><strong>Mid Gray</strong> (<code>#5c5c5c</code>): Hover states, subtle emphasis</li>
+<li><strong>Medium Gray</strong> (<code>#494949</code>): Quaternary text</li>
+<li><strong>Light Gray</strong> (<code>#f8f8f8</code>): Light mode surface (if applicable)</li>
+<li><strong>Border Gray</strong> (<code>#eaeaea</code>): Light context borders</li>
+<li><strong>Edge Gray</strong> (<code>#ececec</code>): Subtle borders on light surfaces</li>
+<li><strong>Mist Gray</strong> (<code>#dedfdf</code>): Light dividers</li>
+<li><strong>Soft Gray</strong> (<code>#e5e6e6</code>): Alternate light border</li>
+</ul>
+<h3 id="surface-overlay">Surface &amp; Overlay</h3>
+<ul>
+<li><strong>Frost Primary</strong> (<code>#fcfdff</code>): Primary color token (slight blue tint, 94% opacity)</li>
+<li><strong>White Hover</strong> (<code>rgba(255, 255, 255, 0.28)</code>): Button hover state on dark</li>
+<li><strong>White 60%</strong> (<code>oklab(0.999994 ... / 0.577)</code>): Semi-transparent white for muted text</li>
+<li><strong>White 64%</strong> (<code>oklab(0.999994 ... / 0.642)</code>): Slightly brighter semi-transparent white</li>
+</ul>
+<h3 id="borders-shadows">Borders &amp; Shadows</h3>
+<ul>
+<li><strong>Frost Border</strong> (<code>rgba(214, 235, 253, 0.19)</code>): The signature — icy blue-tinted borders at 19% opacity</li>
+<li><strong>Frost Border Alt</strong> (<code>rgba(217, 237, 254, 0.145)</code>): Slightly lighter variant for list items</li>
+<li><strong>Ring Shadow</strong> (<code>rgba(176, 199, 217, 0.145) 0px 0px 0px 1px</code>): Blue-tinted shadow-as-border</li>
+<li><strong>Focus Ring</strong> (<code>rgb(0, 0, 0) 0px 0px 0px 8px</code>): Heavy black focus ring</li>
+<li><strong>Subtle Shadow</strong> (<code>rgba(0, 0, 0, 0.1) 0px 1px 3px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px</code>): Minimal card elevation</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-families">Font Families</h3>
+<ul>
+<li><strong>Display Serif</strong>: <code>domaine</code> (Domaine Display by Klim Type Foundry) — hero headlines</li>
+<li><strong>Display Sans</strong>: <code>aBCFavorit</code> (ABC Favorit by Dinamo), fallbacks: <code>ui-sans-serif, system-ui</code> — section headings</li>
+<li><strong>Body / UI</strong>: <code>inter</code>, fallbacks: <code>ui-sans-serif, system-ui</code> — body text, buttons, navigation</li>
+<li><strong>Monospace</strong>: <code>commitMono</code>, fallbacks: <code>ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas</code></li>
+<li><strong>Secondary</strong>: <code>Helvetica</code> — fallback for specific UI contexts</li>
+<li><strong>System</strong>: <code>-apple-system, system-ui, Segoe UI, Roboto</code> — embedded content</li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display Hero</td>
+<td>domaine</td>
+<td>96px (6.00rem)</td>
+<td>400</td>
+<td>1.00 (tight)</td>
+<td>-0.96px</td>
+<td><code>"ss01", "ss04", "ss11"</code></td>
+</tr>
+<tr>
+<td>Display Hero Mobile</td>
+<td>domaine</td>
+<td>76.8px (4.80rem)</td>
+<td>400</td>
+<td>1.00 (tight)</td>
+<td>-0.768px</td>
+<td>Scaled for mobile</td>
+</tr>
+<tr>
+<td>Section Heading</td>
+<td>aBCFavorit</td>
+<td>56px (3.50rem)</td>
+<td>400</td>
+<td>1.20 (tight)</td>
+<td>-2.8px</td>
+<td><code>"ss01", "ss04", "ss11"</code></td>
+</tr>
+<tr>
+<td>Sub-heading</td>
+<td>aBCFavorit</td>
+<td>20px (1.25rem)</td>
+<td>400</td>
+<td>1.30 (tight)</td>
+<td>normal</td>
+<td><code>"ss01", "ss04", "ss11"</code></td>
+</tr>
+<tr>
+<td>Sub-heading Compact</td>
+<td>aBCFavorit</td>
+<td>16px (1.00rem)</td>
+<td>400</td>
+<td>1.50</td>
+<td>-0.8px</td>
+<td><code>"ss01", "ss04", "ss11"</code></td>
+</tr>
+<tr>
+<td>Feature Title</td>
+<td>inter</td>
+<td>24px (1.50rem)</td>
+<td>500</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Section sub-headings</td>
+</tr>
+<tr>
+<td>Body Large</td>
+<td>inter</td>
+<td>18px (1.13rem)</td>
+<td>400</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Introductions</td>
+</tr>
+<tr>
+<td>Body</td>
+<td>inter</td>
+<td>16px (1.00rem)</td>
+<td>400</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Standard body text</td>
+</tr>
+<tr>
+<td>Body Semibold</td>
+<td>inter</td>
+<td>16px (1.00rem)</td>
+<td>600</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Emphasis, active states</td>
+</tr>
+<tr>
+<td>Nav Link</td>
+<td>aBCFavorit</td>
+<td>14px (0.88rem)</td>
+<td>500</td>
+<td>1.43</td>
+<td>0.35px</td>
+<td><code>"ss01", "ss03", "ss04"</code> — positive tracking</td>
+</tr>
+<tr>
+<td>Button / Link</td>
+<td>inter</td>
+<td>14px (0.88rem)</td>
+<td>500–600</td>
+<td>1.43</td>
+<td>normal</td>
+<td>Buttons, nav, CTAs</td>
+</tr>
+<tr>
+<td>Caption</td>
+<td>inter</td>
+<td>14px (0.88rem)</td>
+<td>400</td>
+<td>1.60 (relaxed)</td>
+<td>normal</td>
+<td>Descriptions</td>
+</tr>
+<tr>
+<td>Helvetica Caption</td>
+<td>Helvetica</td>
+<td>14px (0.88rem)</td>
+<td>400–600</td>
+<td>1.00–1.71</td>
+<td>normal</td>
+<td>UI elements</td>
+</tr>
+<tr>
+<td>Small</td>
+<td>inter</td>
+<td>12px (0.75rem)</td>
+<td>400–500</td>
+<td>1.33</td>
+<td>normal</td>
+<td>Tags, meta, fine print</td>
+</tr>
+<tr>
+<td>Small Uppercase</td>
+<td>inter</td>
+<td>12px (0.75rem)</td>
+<td>500</td>
+<td>1.33</td>
+<td>normal</td>
+<td><code>text-transform: uppercase</code></td>
+</tr>
+<tr>
+<td>Small Capitalize</td>
+<td>inter</td>
+<td>12px (0.75rem)</td>
+<td>500</td>
+<td>1.33</td>
+<td>normal</td>
+<td><code>text-transform: capitalize</code></td>
+</tr>
+<tr>
+<td>Code Body</td>
+<td>commitMono</td>
+<td>16px (1.00rem)</td>
+<td>400</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Code blocks</td>
+</tr>
+<tr>
+<td>Code Small</td>
+<td>commitMono</td>
+<td>14px (0.88rem)</td>
+<td>400</td>
+<td>1.43</td>
+<td>normal</td>
+<td>Inline code</td>
+</tr>
+<tr>
+<td>Code Tiny</td>
+<td>commitMono</td>
+<td>12px (0.75rem)</td>
+<td>400</td>
+<td>1.33</td>
+<td>normal</td>
+<td>Small code labels</td>
+</tr>
+<tr>
+<td>Heading (Helvetica)</td>
+<td>Helvetica</td>
+<td>24px (1.50rem)</td>
+<td>400</td>
+<td>1.40</td>
+<td>normal</td>
+<td>Alternate heading context</td>
+</tr>
+</tbody>
+</table>
+<h3 id="principles">Principles</h3>
+<ul>
+<li><strong>Three-font editorial hierarchy</strong>: Domaine Display (serif, hero), ABC Favorit (geometric sans, sections), Inter (readable body). Each font has a strict role — they never cross lanes.</li>
+<li><strong>Aggressive negative tracking on display</strong>: Domaine at -0.96px, ABC Favorit at -2.8px. The display type feels compressed, urgent, and designed — like a magazine masthead.</li>
+<li><strong>Positive tracking on nav</strong>: ABC Favorit nav links use +0.35px letter-spacing — the only positive tracking in the system. This creates airy, spaced-out navigation text that contrasts with the compressed headings.</li>
+<li><strong>OpenType as identity</strong>: The <code>"ss01"</code>, <code>"ss03"</code>, <code>"ss04"</code>, <code>"ss11"</code> stylistic sets are enabled on all ABC Favorit and Domaine text, activating alternate glyphs that give Resend's typography its unique character.</li>
+<li><strong>Commit Mono as design element</strong>: The monospace font isn't hidden in code blocks — it's used prominently for code examples and technical content, treated as a first-class visual element.</li>
+</ul>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<p><strong>Primary Transparent Pill</strong>
+- Background: transparent
+- Text: <code>#f0f0f0</code>
+- Padding: 5px 12px
+- Radius: 9999px (full pill)
+- Border: <code>1px solid rgba(214, 235, 253, 0.19)</code> (frost border)
+- Hover: background <code>rgba(255, 255, 255, 0.28)</code> (white glass)
+- Use: Primary CTA on dark backgrounds</p>
+<p><strong>White Solid Pill</strong>
+- Background: <code>#ffffff</code>
+- Text: <code>#000000</code>
+- Padding: 5px 12px
+- Radius: 9999px
+- Use: High-contrast CTA ("Get started")</p>
+<p><strong>Ghost Button</strong>
+- Background: transparent
+- Text: <code>#f0f0f0</code>
+- Radius: 4px
+- No border
+- Hover: subtle background tint
+- Use: Secondary actions, tab items</p>
+<h3 id="cards-containers">Cards &amp; Containers</h3>
+<ul>
+<li>Background: transparent or very subtle dark tint</li>
+<li>Border: <code>1px solid rgba(214, 235, 253, 0.19)</code> (frost border)</li>
+<li>Radius: 16px (standard cards), 24px (large sections/panels)</li>
+<li>Shadow: <code>rgba(176, 199, 217, 0.145) 0px 0px 0px 1px</code> (ring shadow)</li>
+<li>Dark product screenshots and code demos as card content</li>
+<li>No traditional box-shadow elevation</li>
+</ul>
+<h3 id="inputs-forms">Inputs &amp; Forms</h3>
+<ul>
+<li>Text: <code>#f0f0f0</code> on dark, <code>#000000</code> on light</li>
+<li>Radius: 4px</li>
+<li>Focus: shadow-based ring</li>
+<li>Minimal styling — inherits dark theme</li>
+</ul>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li>Sticky dark header with frost border bottom: <code>1px solid rgba(214, 235, 253, 0.19)</code></li>
+<li>"Resend" wordmark left-aligned</li>
+<li>ABC Favorit 14px weight 500 with +0.35px tracking for nav links</li>
+<li>Pill CTAs right-aligned</li>
+<li>Mobile: hamburger collapse</li>
+</ul>
+<h3 id="image-treatment">Image Treatment</h3>
+<ul>
+<li>Product screenshots and code demos dominate content sections</li>
+<li>Dark-themed screenshots on dark background — seamless integration</li>
+<li>Rounded corners: 12px–16px on images</li>
+<li>Full-width sections with subtle gradient overlays</li>
+</ul>
+<h3 id="distinctive-components">Distinctive Components</h3>
+<p><strong>Tab Navigation</strong>
+- Horizontal tabs with subtle selection indicator
+- Tab items: 8px radius
+- Active state with subtle background differentiation</p>
+<p><strong>Code Preview Panels</strong>
+- Dark code blocks using Commit Mono
+- Frost borders (<code>rgba(214, 235, 253, 0.19)</code>)
+- Syntax-highlighted with multi-color accent tokens (orange, blue, green, yellow)</p>
+<p><strong>Multi-color Accent Badges</strong>
+- Each product feature has its own accent color from the CSS variable scale
+- Badges use the accent color at low opacity (12–42%) for background, full opacity for text</p>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-system">Spacing System</h3>
+<ul>
+<li>Base unit: 8px</li>
+<li>Scale: 1px, 2px, 4px, 5px, 6px, 7px, 8px, 10px, 12px, 16px, 20px, 24px, 30px, 32px, 40px</li>
+</ul>
+<h3 id="grid-container">Grid &amp; Container</h3>
+<ul>
+<li>Centered content with generous max-width</li>
+<li>Full-width black sections with contained inner content</li>
+<li>Single-column hero, expanding to feature grids below</li>
+<li>Code preview panels as full-width or contained showcases</li>
+</ul>
+<h3 id="whitespace-philosophy">Whitespace Philosophy</h3>
+<ul>
+<li><strong>Cinematic black space</strong>: The black background IS the whitespace. Generous vertical spacing (80px–120px+) between sections creates a scroll-through-darkness experience where each section emerges like a scene.</li>
+<li><strong>Tight content, vast surrounds</strong>: Text blocks and cards are compact internally, but float in vast dark space — creating isolated "islands" of content.</li>
+<li><strong>Typography-led rhythm</strong>: The massive display fonts (96px) create their own vertical rhythm — each headline is a visual event that anchors the surrounding space.</li>
+</ul>
+<h3 id="border-radius-scale">Border Radius Scale</h3>
+<ul>
+<li>Sharp (4px): Buttons (ghost), inputs, small interactive elements</li>
+<li>Subtle (6px): Menu panels, navigation items</li>
+<li>Standard (8px): Tabs, content blocks</li>
+<li>Comfortable (10px): Accent elements</li>
+<li>Card (12px): Clipboard buttons, medium containers</li>
+<li>Large (16px): Feature cards, images, main buttons</li>
+<li>Section (24px): Large panels, section containers</li>
+<li>Pill (9999px): Primary CTAs, tags, badges</li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Treatment</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flat (Level 0)</td>
+<td>No shadow, transparent background</td>
+<td>Default — most elements on dark void</td>
+</tr>
+<tr>
+<td>Ring (Level 1)</td>
+<td><code>rgba(176, 199, 217, 0.145) 0px 0px 0px 1px</code></td>
+<td>Shadow-as-border for cards, containers</td>
+</tr>
+<tr>
+<td>Frost Border (Level 1b)</td>
+<td><code>1px solid rgba(214, 235, 253, 0.19)</code></td>
+<td>Explicit borders — buttons, dividers, tabs</td>
+</tr>
+<tr>
+<td>Subtle (Level 2)</td>
+<td><code>rgba(0, 0, 0, 0.1) 0px 1px 3px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px</code></td>
+<td>Light card elevation</td>
+</tr>
+<tr>
+<td>Focus (Level 3)</td>
+<td><code>rgb(0, 0, 0) 0px 0px 0px 8px</code></td>
+<td>Heavy black focus ring — accessibility</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Shadow Philosophy</strong>: Resend barely uses shadows at all. On a pure black background, traditional shadows are invisible — you can't cast a shadow into the void. Instead, Resend creates depth through its signature frost borders (<code>rgba(214, 235, 253, 0.19)</code>) — thin, icy blue-tinted lines that catch light against the darkness. This creates a "glass panel floating in space" aesthetic where borders are the primary depth mechanism.</p>
+<h3 id="decorative-depth">Decorative Depth</h3>
+<ul>
+<li>Subtle warm gradient glows behind hero content (orange/amber tints)</li>
+<li>Product screenshots create visual depth through their own internal UI</li>
+<li>No gradient backgrounds — depth comes from border luminance and content contrast</li>
+</ul>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use pure black (<code>#000000</code>) as the page background — the void is the canvas</li>
+<li>Apply frost borders (<code>rgba(214, 235, 253, 0.19)</code>) for all structural lines — they're the blue-tinted signature</li>
+<li>Use Domaine Display ONLY for hero headings (96px), ABC Favorit for section headings, Inter for everything else</li>
+<li>Enable OpenType <code>"ss01"</code>, <code>"ss04"</code>, <code>"ss11"</code> on Domaine and ABC Favorit text</li>
+<li>Apply pill radius (9999px) to primary CTAs and tags</li>
+<li>Use the multi-color accent scale (orange/green/blue/yellow/red) with opacity variants for context-specific highlighting</li>
+<li>Keep shadows at ring level (<code>0px 0px 0px 1px</code>) — on black, traditional shadows don't work</li>
+<li>Use +0.35px letter-spacing on ABC Favorit nav links — the only positive tracking</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Don't lighten the background above <code>#000000</code> — the pure black void is non-negotiable</li>
+<li>Don't use neutral gray borders — all borders must have the frost blue tint</li>
+<li>Don't apply Domaine Display to body text — it's a display-only serif</li>
+<li>Don't mix accent colors in the same component — each feature gets one accent color</li>
+<li>Don't use box-shadow for elevation on the dark background — use frost borders instead</li>
+<li>Don't skip the OpenType stylistic sets — they define the typographic character</li>
+<li>Don't use negative letter-spacing on nav links — ABC Favorit nav uses positive +0.35px</li>
+<li>Don't make buttons opaque on dark — transparency with frost border is the pattern</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<h3 id="breakpoints">Breakpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Width</th>
+<th>Key Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mobile Small</td>
+<td>&lt;480px</td>
+<td>Single column, tight padding, 76.8px hero</td>
+</tr>
+<tr>
+<td>Mobile</td>
+<td>480–600px</td>
+<td>Standard mobile, stacked layout</td>
+</tr>
+<tr>
+<td>Desktop</td>
+<td>&gt;600px</td>
+<td>Full layout, 96px hero, expanded sections</td>
+</tr>
+</tbody>
+</table>
+<p><em>Note: Resend uses a minimal breakpoint system — only 480px and 600px detected. The design is desktop-first with a clean mobile collapse.</em></p>
+<h3 id="touch-targets">Touch Targets</h3>
+<ul>
+<li>Pill buttons: adequate padding (5px 12px minimum)</li>
+<li>Tab items: 8px radius with comfortable hit areas</li>
+<li>Navigation links spaced with 0.35px tracking for visual separation</li>
+</ul>
+<h3 id="collapsing-strategy">Collapsing Strategy</h3>
+<ul>
+<li>Hero: Domaine 96px → 76.8px on mobile</li>
+<li>Navigation: horizontal → hamburger</li>
+<li>Feature sections: side-by-side → stacked</li>
+<li>Code panels: maintain width, horizontal scroll if needed</li>
+<li>Spacing compresses proportionally</li>
+</ul>
+<h3 id="image-behavior">Image Behavior</h3>
+<ul>
+<li>Product screenshots maintain aspect ratio</li>
+<li>Dark screenshots blend seamlessly with dark background at all sizes</li>
+<li>Rounded corners (12px–16px) maintained across breakpoints</li>
+</ul>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Background: Void Black (<code>#000000</code>)</li>
+<li>Primary text: Near White (<code>#f0f0f0</code>)</li>
+<li>Secondary text: Silver (<code>#a1a4a5</code>)</li>
+<li>Border: Frost Border (<code>rgba(214, 235, 253, 0.19)</code>)</li>
+<li>Orange accent: <code>#ff801f</code></li>
+<li>Green accent: <code>#11ff99</code> (at 18% opacity)</li>
+<li>Blue accent: <code>#3b9eff</code></li>
+<li>Focus ring: <code>rgb(0, 0, 0) 0px 0px 0px 8px</code></li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create a hero section on pure black (#000000) background. Headline at 96px Domaine Display weight 400, line-height 1.00, letter-spacing -0.96px, near-white (#f0f0f0) text, OpenType 'ss01 ss04 ss11'. Subtitle at 20px ABC Favorit weight 400, line-height 1.30. Two pill buttons: white solid (#ffffff, 9999px radius) and transparent with frost border (rgba(214,235,253,0.19))."</li>
+<li>"Design a navigation bar: dark background with frost border bottom (1px solid rgba(214,235,253,0.19)). Nav links at 14px ABC Favorit weight 500, letter-spacing +0.35px, OpenType 'ss01 ss03 ss04'. White pill CTA right-aligned."</li>
+<li>"Build a feature card: transparent background, frost border (rgba(214,235,253,0.19)), 16px radius. Title at 56px ABC Favorit weight 400, letter-spacing -2.8px. Body at 16px Inter weight 400, #a1a4a5 text."</li>
+<li>"Create a code block using Commit Mono 16px on dark background. Frost border container (24px radius). Syntax colors: orange (#ff801f), blue (#3b9eff), green (#11ff99), yellow (#ffc53d)."</li>
+<li>"Design an accent badge: background #ff5900 at 22% opacity, text #ffa057, 9999px radius, 12px Inter weight 500."</li>
+</ul>
+<h3 id="iteration-guide">Iteration Guide</h3>
+<ol>
+<li>Start with pure black — everything floats in the void</li>
+<li>Frost borders (<code>rgba(214, 235, 253, 0.19)</code>) are the universal structural element — not gray, not neutral</li>
+<li>Three fonts, three roles: Domaine (hero), ABC Favorit (sections), Inter (body) — never cross</li>
+<li>OpenType stylistic sets are mandatory on display fonts — they define the character</li>
+<li>Multi-color accents at low opacity (12–42%) for backgrounds, full opacity for text</li>
+<li>Pill shape (9999px) for CTAs and badges, standard radius (4px–16px) for containers</li>
+<li>No shadows — use frost borders for depth against the void</li>
+</ol>
+</main>
+</body>
+</html>

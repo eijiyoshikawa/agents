@@ -1,0 +1,333 @@
+{
+  "channel_name_candidates": [
+    "建設テック最前線",
+    "建設DXラボ",
+    "建設ビジネスNEXT"
+  ],
+  "posting_frequency": {
+    "phase_1_launch": {
+      "period": "1-3ヶ月目",
+      "long_form": "週2本",
+      "shorts": "なし",
+      "note": "ストック型コンテンツを先行蓄積、SEO基盤構築"
+    },
+    "phase_2_growth": {
+      "period": "4-6ヶ月目",
+      "long_form": "週2本",
+      "shorts": "週1本",
+      "note": "Shortsで新規流入を獲得、長尺への誘導"
+    },
+    "phase_3_scale": {
+      "period": "7ヶ月目以降",
+      "long_form": "週2本",
+      "shorts": "週2本",
+      "note": "Shorts経由の登録者増加を加速"
+    }
+  },
+  "categories": [
+    {
+      "name": "建設DX/AI活用",
+      "ratio": "30%",
+      "purpose": "専門性・権威性の確立。「このチャンネル=建設テック」の想起を獲得",
+      "video_length": "10-15分",
+      "thumbnail_pattern": "テクノロジー感のあるビジュアル + 数字入りキャッチ"
+    },
+    {
+      "name": "業界分析/ビジネス解説",
+      "ratio": "25%",
+      "purpose": "検索流入・知的好奇心の刺激。業界の構造的問題を可視化",
+      "video_length": "12-18分",
+      "thumbnail_pattern": "衝撃的な数字 + 問題提起型タイトル"
+    },
+    {
+      "name": "採用/人材戦略",
+      "ratio": "20%",
+      "purpose": "リード獲得に直結。最も購買行動に近い視聴者層",
+      "video_length": "8-12分",
+      "thumbnail_pattern": "ビフォーアフター事例 + 具体的な成果数字"
+    },
+    {
+      "name": "建設×不動産の裏側",
+      "ratio": "15%",
+      "purpose": "バズ・新規流入。業界横断の視点で好奇心を刺激",
+      "video_length": "10-15分",
+      "thumbnail_pattern": "お金・利益構造の図解 + 暴露系ワード"
+    },
+    {
+      "name": "ゲスト対談/事例",
+      "ratio": "10%",
+      "purpose": "権威性・ネットワーク構築。業界キーパーソンとの共演で信頼獲得",
+      "video_length": "15-25分",
+      "thumbnail_pattern": "ゲスト写真 + 実績数字"
+    }
+  ],
+  "initial_30_videos": [
+    {
+      "number": 1,
+      "title": "建設業のAI導入率9.4%の衝撃 — なぜ建設だけ取り残されるのか",
+      "category": "建設DX/AI活用",
+      "target_keyword": "建設業 AI導入",
+      "estimated_appeal": "high",
+      "production_notes": "データビジュアライゼーション重視。他業種との比較グラフで衝撃を演出"
+    },
+    {
+      "number": 2,
+      "title": "建設業の倒産が急増している本当の理由【2024年問題の真実】",
+      "category": "業界分析/ビジネス解説",
+      "target_keyword": "建設業 倒産 2024年問題",
+      "estimated_appeal": "high",
+      "production_notes": "最新の倒産データを引用。問題の構造を図解で分かりやすく"
+    },
+    {
+      "number": 3,
+      "title": "建設会社がTikTokで新卒6人採用した方法【実例公開】",
+      "category": "採用/人材戦略",
+      "target_keyword": "建設会社 TikTok 採用",
+      "estimated_appeal": "high",
+      "production_notes": "あいホーム等の事例を参考に。具体的なアカウント運用手順を解説"
+    },
+    {
+      "number": 4,
+      "title": "ChatGPTで施工管理の書類作成を半自動化した建設会社の話",
+      "category": "建設DX/AI活用",
+      "target_keyword": "施工管理 ChatGPT 効率化",
+      "estimated_appeal": "high",
+      "production_notes": "画面収録でChatGPTの実際の使い方をデモ。テンプレートも紹介"
+    },
+    {
+      "number": 5,
+      "title": "不動産デベロッパーと建設会社の力関係 — 誰が儲けているのか",
+      "category": "建設×不動産の裏側",
+      "target_keyword": "不動産 建設 利益構造",
+      "estimated_appeal": "high",
+      "production_notes": "お金の流れを図解。業界構造の闇に切り込むが、特定企業名は出さない"
+    },
+    {
+      "number": 6,
+      "title": "建設業のDX補助金 完全攻略ガイド 2026年版",
+      "category": "建設DX/AI活用",
+      "target_keyword": "建設業 DX補助金 2026",
+      "estimated_appeal": "medium",
+      "production_notes": "申請手順をステップバイステップで解説。実質負担額のシミュレーション"
+    },
+    {
+      "number": 7,
+      "title": "ゼネコン・サブコン・工務店 — 利益構造を完全解説",
+      "category": "業界分析/ビジネス解説",
+      "target_keyword": "ゼネコン サブコン 利益",
+      "estimated_appeal": "high",
+      "production_notes": "各業態のPL構造を図解。就活生にもバズる可能性あり"
+    },
+    {
+      "number": 8,
+      "title": "求人票の書き方で応募数が3倍変わる — 建設業特化版",
+      "category": "採用/人材戦略",
+      "target_keyword": "建設業 求人票 書き方",
+      "estimated_appeal": "medium",
+      "production_notes": "NG例とOK例のビフォーアフター。具体的な文言テンプレートを提供"
+    },
+    {
+      "number": 9,
+      "title": "ドローン測量 vs 従来測量 — コスト・精度・時間を徹底比較",
+      "category": "建設DX/AI活用",
+      "target_keyword": "ドローン測量 コスト 比較",
+      "estimated_appeal": "medium",
+      "production_notes": "数値データで客観的に比較。導入のハードルと解決策も提示"
+    },
+    {
+      "number": 10,
+      "title": "建設業の就業者 55歳以上が35%。10年後何が起きるか",
+      "category": "業界分析/ビジネス解説",
+      "target_keyword": "建設業 高齢化 人手不足",
+      "estimated_appeal": "high",
+      "production_notes": "人口ピラミッドの推移をアニメーションで表現。危機感を共有"
+    },
+    {
+      "number": 11,
+      "title": "BIM/CIMを導入した中小建設会社のリアルな費用対効果",
+      "category": "建設DX/AI活用",
+      "target_keyword": "BIM CIM 中小 費用",
+      "estimated_appeal": "medium",
+      "production_notes": "導入事例のインタビュー形式。投資額・回収期間を具体的に"
+    },
+    {
+      "number": 12,
+      "title": "リフォーム業界の闇 — 見積もりの裏側を全部見せます",
+      "category": "建設×不動産の裏側",
+      "target_keyword": "リフォーム 見積もり 裏側",
+      "estimated_appeal": "high",
+      "production_notes": "一般消費者にもリーチする内容。原価率の実態を公開"
+    },
+    {
+      "number": 13,
+      "title": "建設業の離職率を半分にした会社がやったこと",
+      "category": "採用/人材戦略",
+      "target_keyword": "建設業 離職率 改善",
+      "estimated_appeal": "medium",
+      "production_notes": "具体的な制度設計（メンター制度、評価基準、研修プログラム）を紹介"
+    },
+    {
+      "number": 14,
+      "title": "建設現場のAI安全管理 — 事故率30%削減の実例",
+      "category": "建設DX/AI活用",
+      "target_keyword": "建設 AI 安全管理",
+      "estimated_appeal": "medium",
+      "production_notes": "AI画像認識による危険行動検知の事例。映像素材があると理想的"
+    },
+    {
+      "number": 15,
+      "title": "建設投資額は増えているのに、なぜ儲からないのか",
+      "category": "業界分析/ビジネス解説",
+      "target_keyword": "建設業 利益率 低い 理由",
+      "estimated_appeal": "high",
+      "production_notes": "マクロ経済データと個社PLの両面から分析。構造的な問題を指摘"
+    },
+    {
+      "number": 16,
+      "title": "Z世代が建設業に来ない本当の理由と処方箋",
+      "category": "採用/人材戦略",
+      "target_keyword": "建設業 Z世代 採用",
+      "estimated_appeal": "high",
+      "production_notes": "Z世代のアンケートデータを引用。SNS活用の具体策を提示"
+    },
+    {
+      "number": 17,
+      "title": "一人親方の闇 — インボイス制度で何が変わったか",
+      "category": "業界分析/ビジネス解説",
+      "target_keyword": "一人親方 インボイス",
+      "estimated_appeal": "high",
+      "production_notes": "税制の影響を具体的な金額シミュレーションで解説"
+    },
+    {
+      "number": 18,
+      "title": "建設業の請求書・見積書をAIで自動化する方法",
+      "category": "建設DX/AI活用",
+      "target_keyword": "建設業 請求書 AI 自動化",
+      "estimated_appeal": "medium",
+      "production_notes": "ツール比較＋実際のセットアップ手順をデモ"
+    },
+    {
+      "number": 19,
+      "title": "DXで年商2倍にした建設会社社長に聞く",
+      "category": "ゲスト対談/事例",
+      "target_keyword": "建設会社 DX 成功事例",
+      "estimated_appeal": "high",
+      "production_notes": "対談形式。導入前後の具体的な数字変化を引き出す"
+    },
+    {
+      "number": 20,
+      "title": "建売住宅の原価構造 — 土地・建物・利益の内訳",
+      "category": "建設×不動産の裏側",
+      "target_keyword": "建売住宅 原価 利益",
+      "estimated_appeal": "high",
+      "production_notes": "一般消費者とプロ両方にリーチ。数字を使った構造図解"
+    },
+    {
+      "number": 21,
+      "title": "建設業の原価管理 — 赤字工事をゼロにする仕組み",
+      "category": "業界分析/ビジネス解説",
+      "target_keyword": "建設業 原価管理 赤字",
+      "estimated_appeal": "medium",
+      "production_notes": "原価管理ツールの紹介と、Excel管理からの移行手順"
+    },
+    {
+      "number": 22,
+      "title": "i-Constructionは中小でもできるのか？ 現実を解説",
+      "category": "建設DX/AI活用",
+      "target_keyword": "i-Construction 中小 導入",
+      "estimated_appeal": "medium",
+      "production_notes": "国交省の方針を噛み砕いて解説。中小向けの現実的なステップ"
+    },
+    {
+      "number": 23,
+      "title": "建設会社の採用コスト比較 — 媒体・SNS・紹介のROI",
+      "category": "採用/人材戦略",
+      "target_keyword": "建設会社 採用コスト 比較",
+      "estimated_appeal": "medium",
+      "production_notes": "各チャネルのCPA・LTVを比較表で提示。データに基づく提案"
+    },
+    {
+      "number": 24,
+      "title": "2026年 建設テックカオスマップ完全解説",
+      "category": "建設DX/AI活用",
+      "target_keyword": "建設テック カオスマップ 2026",
+      "estimated_appeal": "medium",
+      "production_notes": "自作カオスマップを作成し解説。保存・シェアされやすいコンテンツ"
+    },
+    {
+      "number": 25,
+      "title": "不動産テックと建設テック — 2つの業界DXの決定的な違い",
+      "category": "建設×不動産の裏側",
+      "target_keyword": "不動産テック 建設テック 比較",
+      "estimated_appeal": "medium",
+      "production_notes": "両業界のDX進捗度を比較。不動産業界の事例を建設に活かす視点"
+    },
+    {
+      "number": 26,
+      "title": "建設業許可の種類と取得戦略 — 事業拡大のロードマップ",
+      "category": "業界分析/ビジネス解説",
+      "target_keyword": "建設業許可 種類 取得",
+      "estimated_appeal": "medium",
+      "production_notes": "フローチャート形式で許可区分を解説。経営戦略と絡めた解説"
+    },
+    {
+      "number": 27,
+      "title": "外国人技能実習生に頼らない採用戦略は可能か",
+      "category": "採用/人材戦略",
+      "target_keyword": "建設業 外国人実習生 代替",
+      "estimated_appeal": "medium",
+      "production_notes": "制度の問題点と代替策（AI活用・省人化・SNS採用）を提示"
+    },
+    {
+      "number": 28,
+      "title": "2026年の建設業界 5つの大予測",
+      "category": "業界分析/ビジネス解説",
+      "target_keyword": "建設業界 2026 予測",
+      "estimated_appeal": "high",
+      "production_notes": "年初・年度替わりに投稿。各予測に根拠データを添付"
+    },
+    {
+      "number": 29,
+      "title": "元ゼネコンマンが語る — 大手と中小の決定的な差",
+      "category": "ゲスト対談/事例",
+      "target_keyword": "ゼネコン 中小 違い",
+      "estimated_appeal": "high",
+      "production_notes": "転職経験者をゲストに。リアルな待遇差・やりがいの違いを語る"
+    },
+    {
+      "number": 30,
+      "title": "建設業からIT企業に転職した人が語るリアル",
+      "category": "ゲスト対談/事例",
+      "target_keyword": "建設業 転職 IT",
+      "estimated_appeal": "medium",
+      "production_notes": "異業種転職のリアル。建設業の強みが活きるIT領域も紹介"
+    }
+  ],
+  "seo_strategy": {
+    "primary_keywords": [
+      "建設DX",
+      "建設業 AI",
+      "建設テック",
+      "建設業 人手不足",
+      "建設業 採用",
+      "施工管理 効率化",
+      "建設業 2024年問題"
+    ],
+    "content_pillars": [
+      "建設DX（テクノロジーで変える）",
+      "業界構造分析（データで読み解く）",
+      "採用革命（SNSで人を集める）"
+    ],
+    "long_tail_strategy": "「建設業 x 具体的テーマ」の組み合わせで検索ボリュームは小さいが競合も少ないキーワードを狙う"
+  },
+  "thumbnail_guidelines": {
+    "style": "ダーク背景 + 太字テキスト + アクセントカラー（オレンジ or 青）",
+    "rules": [
+      "文字数は最大15文字以内",
+      "数字を必ず入れる（具体的なデータ or パーセンテージ）",
+      "顔出しの場合は表情大きめ（驚き or 真剣）",
+      "テック感を出す場合はグラフ・チャート・アイコンを活用",
+      "スマホで見ても読める文字サイズ"
+    ]
+  }
+}

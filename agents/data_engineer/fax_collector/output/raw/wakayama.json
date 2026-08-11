@@ -1,0 +1,22 @@
+{
+  "prefecture": "和歌山県",
+  "collected_at": "2026-04-15",
+  "sources_used": [
+    {"source_name": "企業公式サイト WebSearch結果", "url": "N/A", "records_collected": 8}
+  ],
+  "companies": [
+    {"company_name": "三友工業株式会社", "prefecture": "和歌山県", "city": "和歌山市", "address": "和歌山県和歌山市", "phone": "073-455-3116", "fax": "073-455-0779", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.sanyukogyo.co.jp/"},
+    {"company_name": "株式会社小池組", "prefecture": "和歌山県", "city": "和歌山市", "address": "和歌山県和歌山市", "phone": "073-422-2165", "fax": "073-422-5670", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://koikegumi.net/"},
+    {"company_name": "紀州国土建設株式会社", "prefecture": "和歌山県", "city": "和歌山市", "address": "和歌山県和歌山市手平4丁目6番70号", "phone": "073-426-5669", "fax": "073-426-5670", "business_category": "建築", "source": "企業公式サイト", "source_url": "https://www.kokudo-kensetsu.co.jp/company/outline"},
+    {"company_name": "三洋建設株式会社", "prefecture": "和歌山県", "city": "有田郡有田川町", "address": "和歌山県有田郡有田川町", "phone": "0737-52-6088", "fax": "0737-52-6368", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "http://www.sanyo-kensetsu.com/"},
+    {"company_name": "木下建設株式会社", "prefecture": "和歌山県", "city": "有田市", "address": "和歌山県有田市港町221番地", "phone": "0737-83-0011", "fax": "0737-83-0015", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "http://www.kinosita-kensetu.co.jp/about/index.html"},
+    {"company_name": "株式会社岡本建設", "prefecture": "和歌山県", "city": "田辺市", "address": "和歌山県田辺市", "phone": "0739-20-5158", "fax": "0739-20-5159", "business_category": "設備", "source": "企業公式サイト", "source_url": "http://www.okmt-kensetsu.com/"},
+    {"company_name": "奈和建設株式会社", "prefecture": "和歌山県", "city": "橋本市", "address": "和歌山県橋本市賢堂1114-1", "phone": "0736-32-3733", "fax": "0736-33-3217", "business_category": "総合建設", "source": "企業公式サイト", "source_url": "https://www.nawakensetsu.com"}
+  ],
+  "collection_stats": {
+    "total_companies": 7,
+    "companies_with_fax": 7,
+    "companies_without_fax": 0,
+    "fax_coverage_rate": "100%"
+  }
+}

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Airtable</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-airtable">Design System: Airtable</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Airtable's website is a clean, enterprise-friendly platform that communicates "sophisticated simplicity" through a white canvas with deep navy text (<code>#181d26</code>) and Airtable Blue (<code>#1b61c9</code>) as the primary interactive accent. The Haas font family (display + text variants) creates a Swiss-precision typography system with positive letter-spacing throughout.</p>
+<p><strong>Key Characteristics:</strong>
+- White canvas with deep navy text (<code>#181d26</code>)
+- Airtable Blue (<code>#1b61c9</code>) as primary CTA and link color
+- Haas + Haas Groot Disp dual font system
+- Positive letter-spacing on body text (0.08px–0.28px)
+- 12px radius buttons, 16px–32px for cards
+- Multi-layer blue-tinted shadow: <code>rgba(45,127,249,0.28) 0px 1px 3px</code>
+- Semantic theme tokens: <code>--theme_*</code> CSS variable naming</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>Deep Navy</strong> (<code>#181d26</code>): Primary text</li>
+<li><strong>Airtable Blue</strong> (<code>#1b61c9</code>): CTA buttons, links</li>
+<li><strong>White</strong> (<code>#ffffff</code>): Primary surface</li>
+<li><strong>Spotlight</strong> (<code>rgba(249,252,255,0.97)</code>): <code>--theme_button-text-spotlight</code></li>
+</ul>
+<h3 id="semantic">Semantic</h3>
+<ul>
+<li><strong>Success Green</strong> (<code>#006400</code>): <code>--theme_success-text</code></li>
+<li><strong>Weak Text</strong> (<code>rgba(4,14,32,0.69)</code>): <code>--theme_text-weak</code></li>
+<li><strong>Secondary Active</strong> (<code>rgba(7,12,20,0.82)</code>): <code>--theme_button-text-secondary-active</code></li>
+</ul>
+<h3 id="neutral">Neutral</h3>
+<ul>
+<li><strong>Dark Gray</strong> (<code>#333333</code>): Secondary text</li>
+<li><strong>Mid Blue</strong> (<code>#254fad</code>): Link/accent blue variant</li>
+<li><strong>Border</strong> (<code>#e0e2e6</code>): Card borders</li>
+<li><strong>Light Surface</strong> (<code>#f8fafc</code>): Subtle surface</li>
+</ul>
+<h3 id="shadows">Shadows</h3>
+<ul>
+<li><strong>Blue-tinted</strong> (<code>rgba(0,0,0,0.32) 0px 0px 1px, rgba(0,0,0,0.08) 0px 0px 2px, rgba(45,127,249,0.28) 0px 1px 3px, rgba(0,0,0,0.06) 0px 0px 0px 0.5px inset</code>)</li>
+<li><strong>Soft</strong> (<code>rgba(15,48,106,0.05) 0px 0px 20px</code>)</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-families">Font Families</h3>
+<ul>
+<li><strong>Primary</strong>: <code>Haas</code>, fallbacks: <code>-apple-system, system-ui, Segoe UI, Roboto</code></li>
+<li><strong>Display</strong>: <code>Haas Groot Disp</code>, fallback: <code>Haas</code></li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display Hero</td>
+<td>Haas</td>
+<td>48px</td>
+<td>400</td>
+<td>1.15</td>
+<td>normal</td>
+</tr>
+<tr>
+<td>Display Bold</td>
+<td>Haas Groot Disp</td>
+<td>48px</td>
+<td>900</td>
+<td>1.50</td>
+<td>normal</td>
+</tr>
+<tr>
+<td>Section Heading</td>
+<td>Haas</td>
+<td>40px</td>
+<td>400</td>
+<td>1.25</td>
+<td>normal</td>
+</tr>
+<tr>
+<td>Sub-heading</td>
+<td>Haas</td>
+<td>32px</td>
+<td>400–500</td>
+<td>1.15–1.25</td>
+<td>normal</td>
+</tr>
+<tr>
+<td>Card Title</td>
+<td>Haas</td>
+<td>24px</td>
+<td>400</td>
+<td>1.20–1.30</td>
+<td>0.12px</td>
+</tr>
+<tr>
+<td>Feature</td>
+<td>Haas</td>
+<td>20px</td>
+<td>400</td>
+<td>1.25–1.50</td>
+<td>0.1px</td>
+</tr>
+<tr>
+<td>Body</td>
+<td>Haas</td>
+<td>18px</td>
+<td>400</td>
+<td>1.35</td>
+<td>0.18px</td>
+</tr>
+<tr>
+<td>Body Medium</td>
+<td>Haas</td>
+<td>16px</td>
+<td>500</td>
+<td>1.30</td>
+<td>0.08–0.16px</td>
+</tr>
+<tr>
+<td>Button</td>
+<td>Haas</td>
+<td>16px</td>
+<td>500</td>
+<td>1.25–1.30</td>
+<td>0.08px</td>
+</tr>
+<tr>
+<td>Caption</td>
+<td>Haas</td>
+<td>14px</td>
+<td>400–500</td>
+<td>1.25–1.35</td>
+<td>0.07–0.28px</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<ul>
+<li><strong>Primary Blue</strong>: <code>#1b61c9</code>, white text, 16px 24px padding, 12px radius</li>
+<li><strong>White</strong>: white bg, <code>#181d26</code> text, 12px radius, 1px border white</li>
+<li><strong>Cookie Consent</strong>: <code>#1b61c9</code> bg, 2px radius (sharp)</li>
+</ul>
+<h3 id="cards-1px-solid-e0e2e6-16px24px-radius">Cards: <code>1px solid #e0e2e6</code>, 16px–24px radius</h3>
+<h3 id="inputs-standard-haas-styling">Inputs: Standard Haas styling</h3>
+<h2 id="5-layout">5. Layout</h2>
+<ul>
+<li>Spacing: 1–48px (8px base)</li>
+<li>Radius: 2px (small), 12px (buttons), 16px (cards), 24px (sections), 32px (large), 50% (circles)</li>
+</ul>
+<h2 id="6-depth">6. Depth</h2>
+<ul>
+<li>Blue-tinted multi-layer shadow system</li>
+<li>Soft ambient: <code>rgba(15,48,106,0.05) 0px 0px 20px</code></li>
+</ul>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do-use-airtable-blue-for-ctas-haas-with-positive-tracking-12px-radius-buttons">Do: Use Airtable Blue for CTAs, Haas with positive tracking, 12px radius buttons</h3>
+<h3 id="dont-skip-positive-letter-spacing-use-heavy-shadows">Don't: Skip positive letter-spacing, use heavy shadows</h3>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<p>Breakpoints: 425–1664px (23 breakpoints)</p>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<ul>
+<li>Text: Deep Navy (<code>#181d26</code>)</li>
+<li>CTA: Airtable Blue (<code>#1b61c9</code>)</li>
+<li>Background: White (<code>#ffffff</code>)</li>
+<li>Border: <code>#e0e2e6</code></li>
+</ul>
+</main>
+</body>
+</html>

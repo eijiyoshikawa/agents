@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Linear</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-linear">Design System: Linear</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Linear's website is a masterclass in dark-mode-first product design — a near-black canvas (<code>#08090a</code>) where content emerges from darkness like starlight. The overall impression is one of extreme precision engineering: every element exists in a carefully calibrated hierarchy of luminance, from barely-visible borders (<code>rgba(255,255,255,0.05)</code>) to soft, luminous text (<code>#f7f8f8</code>). This is not a dark theme applied to a light design — it is darkness as the native medium, where information density is managed through subtle gradations of white opacity rather than color variation.</p>
+<p>The typography system is built entirely on Inter Variable with OpenType features <code>"cv01"</code> and <code>"ss03"</code> enabled globally, giving the typeface a cleaner, more geometric character. Inter is used at a remarkable range of weights — from 300 (light body) through 510 (medium, Linear's signature weight) to 590 (semibold emphasis). The 510 weight is particularly distinctive: it sits between regular and medium, creating a subtle emphasis that doesn't shout. At display sizes (72px, 64px, 48px), Inter uses aggressive negative letter-spacing (-1.584px to -1.056px), creating compressed, authoritative headlines that feel engineered rather than designed. Berkeley Mono serves as the monospace companion for code and technical labels, with fallbacks to ui-monospace, SF Mono, and Menlo.</p>
+<p>The color system is almost entirely achromatic — dark backgrounds with white/gray text — punctuated by a single brand accent: Linear's signature indigo-violet (<code>#5e6ad2</code> for backgrounds, <code>#7170ff</code> for interactive accents). This accent color is used sparingly and intentionally, appearing only on CTAs, active states, and brand elements. The border system uses ultra-thin, semi-transparent white borders (<code>rgba(255,255,255,0.05)</code> to <code>rgba(255,255,255,0.08)</code>) that create structure without visual noise, like wireframes drawn in moonlight.</p>
+<p><strong>Key Characteristics:</strong>
+- Dark-mode-native: <code>#08090a</code> marketing background, <code>#0f1011</code> panel background, <code>#191a1b</code> elevated surfaces
+- Inter Variable with <code>"cv01", "ss03"</code> globally — geometric alternates for a cleaner aesthetic
+- Signature weight 510 (between regular and medium) for most UI text
+- Aggressive negative letter-spacing at display sizes (-1.584px at 72px, -1.056px at 48px)
+- Brand indigo-violet: <code>#5e6ad2</code> (bg) / <code>#7170ff</code> (accent) / <code>#828fff</code> (hover) — the only chromatic color in the system
+- Semi-transparent white borders throughout: <code>rgba(255,255,255,0.05)</code> to <code>rgba(255,255,255,0.08)</code>
+- Button backgrounds at near-zero opacity: <code>rgba(255,255,255,0.02)</code> to <code>rgba(255,255,255,0.05)</code>
+- Multi-layered shadows with inset variants for depth on dark surfaces
+- Radix UI primitives as the component foundation (6 detected primitives)
+- Success green (<code>#27a644</code>, <code>#10b981</code>) used only for status indicators</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="background-surfaces">Background Surfaces</h3>
+<ul>
+<li><strong>Marketing Black</strong> (<code>#010102</code> / <code>#08090a</code>): The deepest background — the canvas for hero sections and marketing pages. Near-pure black with an imperceptible blue-cool undertone.</li>
+<li><strong>Panel Dark</strong> (<code>#0f1011</code>): Sidebar and panel backgrounds. One step up from the marketing black.</li>
+<li><strong>Level 3 Surface</strong> (<code>#191a1b</code>): Elevated surface areas, card backgrounds, dropdowns.</li>
+<li><strong>Secondary Surface</strong> (<code>#28282c</code>): The lightest dark surface — used for hover states and slightly elevated components.</li>
+</ul>
+<h3 id="text-content">Text &amp; Content</h3>
+<ul>
+<li><strong>Primary Text</strong> (<code>#f7f8f8</code>): Near-white with a barely-warm cast. The default text color — not pure white, preventing eye strain on dark backgrounds.</li>
+<li><strong>Secondary Text</strong> (<code>#d0d6e0</code>): Cool silver-gray for body text, descriptions, and secondary content.</li>
+<li><strong>Tertiary Text</strong> (<code>#8a8f98</code>): Muted gray for placeholders, metadata, and de-emphasized content.</li>
+<li><strong>Quaternary Text</strong> (<code>#62666d</code>): The most subdued text — timestamps, disabled states, subtle labels.</li>
+</ul>
+<h3 id="brand-accent">Brand &amp; Accent</h3>
+<ul>
+<li><strong>Brand Indigo</strong> (<code>#5e6ad2</code>): Primary brand color — used for CTA button backgrounds, brand marks, and key interactive surfaces.</li>
+<li><strong>Accent Violet</strong> (<code>#7170ff</code>): Brighter variant for interactive elements — links, active states, selected items.</li>
+<li><strong>Accent Hover</strong> (<code>#828fff</code>): Lighter, more saturated variant for hover states on accent elements.</li>
+<li><strong>Security Lavender</strong> (<code>#7a7fad</code>): Muted indigo used specifically for security-related UI elements.</li>
+</ul>
+<h3 id="status-colors">Status Colors</h3>
+<ul>
+<li><strong>Green</strong> (<code>#27a644</code>): Primary success/active status. Used for "in progress" indicators.</li>
+<li><strong>Emerald</strong> (<code>#10b981</code>): Secondary success — pill badges, completion states.</li>
+</ul>
+<h3 id="border-divider">Border &amp; Divider</h3>
+<ul>
+<li><strong>Border Primary</strong> (<code>#23252a</code>): Solid dark border for prominent separations.</li>
+<li><strong>Border Secondary</strong> (<code>#34343a</code>): Slightly lighter solid border.</li>
+<li><strong>Border Tertiary</strong> (<code>#3e3e44</code>): Lightest solid border variant.</li>
+<li><strong>Border Subtle</strong> (<code>rgba(255,255,255,0.05)</code>): Ultra-subtle semi-transparent border — the default.</li>
+<li><strong>Border Standard</strong> (<code>rgba(255,255,255,0.08)</code>): Standard semi-transparent border for cards, inputs, code blocks.</li>
+<li><strong>Line Tint</strong> (<code>#141516</code>): Nearly invisible line for the subtlest divisions.</li>
+<li><strong>Line Tertiary</strong> (<code>#18191a</code>): Slightly more visible divider line.</li>
+</ul>
+<h3 id="light-mode-neutrals-for-light-theme-contexts">Light Mode Neutrals (for light theme contexts)</h3>
+<ul>
+<li><strong>Light Background</strong> (<code>#f7f8f8</code>): Page background in light mode.</li>
+<li><strong>Light Surface</strong> (<code>#f3f4f5</code> / <code>#f5f6f7</code>): Subtle surface tinting.</li>
+<li><strong>Light Border</strong> (<code>#d0d6e0</code>): Visible border in light contexts.</li>
+<li><strong>Light Border Alt</strong> (<code>#e6e6e6</code>): Alternative lighter border.</li>
+<li><strong>Pure White</strong> (<code>#ffffff</code>): Card surfaces, highlights.</li>
+</ul>
+<h3 id="overlay">Overlay</h3>
+<ul>
+<li><strong>Overlay Primary</strong> (<code>rgba(0,0,0,0.85)</code>): Modal/dialog backdrop — extremely dark for focus isolation.</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-family">Font Family</h3>
+<ul>
+<li><strong>Primary</strong>: <code>Inter Variable</code>, with fallbacks: <code>SF Pro Display, -apple-system, system-ui, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Open Sans, Helvetica Neue</code></li>
+<li><strong>Monospace</strong>: <code>Berkeley Mono</code>, with fallbacks: <code>ui-monospace, SF Mono, Menlo</code></li>
+<li><strong>OpenType Features</strong>: <code>"cv01", "ss03"</code> enabled globally — cv01 provides an alternate lowercase 'a' (single-story), ss03 adjusts specific letterforms for a cleaner geometric appearance.</li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display XL</td>
+<td>Inter Variable</td>
+<td>72px (4.50rem)</td>
+<td>510</td>
+<td>1.00 (tight)</td>
+<td>-1.584px</td>
+<td>Hero headlines, maximum impact</td>
+</tr>
+<tr>
+<td>Display Large</td>
+<td>Inter Variable</td>
+<td>64px (4.00rem)</td>
+<td>510</td>
+<td>1.00 (tight)</td>
+<td>-1.408px</td>
+<td>Secondary hero text</td>
+</tr>
+<tr>
+<td>Display</td>
+<td>Inter Variable</td>
+<td>48px (3.00rem)</td>
+<td>510</td>
+<td>1.00 (tight)</td>
+<td>-1.056px</td>
+<td>Section headlines</td>
+</tr>
+<tr>
+<td>Heading 1</td>
+<td>Inter Variable</td>
+<td>32px (2.00rem)</td>
+<td>400</td>
+<td>1.13 (tight)</td>
+<td>-0.704px</td>
+<td>Major section titles</td>
+</tr>
+<tr>
+<td>Heading 2</td>
+<td>Inter Variable</td>
+<td>24px (1.50rem)</td>
+<td>400</td>
+<td>1.33</td>
+<td>-0.288px</td>
+<td>Sub-section headings</td>
+</tr>
+<tr>
+<td>Heading 3</td>
+<td>Inter Variable</td>
+<td>20px (1.25rem)</td>
+<td>590</td>
+<td>1.33</td>
+<td>-0.24px</td>
+<td>Feature titles, card headers</td>
+</tr>
+<tr>
+<td>Body Large</td>
+<td>Inter Variable</td>
+<td>18px (1.13rem)</td>
+<td>400</td>
+<td>1.60 (relaxed)</td>
+<td>-0.165px</td>
+<td>Introduction text, feature descriptions</td>
+</tr>
+<tr>
+<td>Body Emphasis</td>
+<td>Inter Variable</td>
+<td>17px (1.06rem)</td>
+<td>590</td>
+<td>1.60 (relaxed)</td>
+<td>normal</td>
+<td>Emphasized body, sub-headings in content</td>
+</tr>
+<tr>
+<td>Body</td>
+<td>Inter Variable</td>
+<td>16px (1.00rem)</td>
+<td>400</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Standard reading text</td>
+</tr>
+<tr>
+<td>Body Medium</td>
+<td>Inter Variable</td>
+<td>16px (1.00rem)</td>
+<td>510</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Navigation, labels</td>
+</tr>
+<tr>
+<td>Body Semibold</td>
+<td>Inter Variable</td>
+<td>16px (1.00rem)</td>
+<td>590</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Strong emphasis</td>
+</tr>
+<tr>
+<td>Small</td>
+<td>Inter Variable</td>
+<td>15px (0.94rem)</td>
+<td>400</td>
+<td>1.60 (relaxed)</td>
+<td>-0.165px</td>
+<td>Secondary body text</td>
+</tr>
+<tr>
+<td>Small Medium</td>
+<td>Inter Variable</td>
+<td>15px (0.94rem)</td>
+<td>510</td>
+<td>1.60 (relaxed)</td>
+<td>-0.165px</td>
+<td>Emphasized small text</td>
+</tr>
+<tr>
+<td>Small Semibold</td>
+<td>Inter Variable</td>
+<td>15px (0.94rem)</td>
+<td>590</td>
+<td>1.60 (relaxed)</td>
+<td>-0.165px</td>
+<td>Strong small text</td>
+</tr>
+<tr>
+<td>Small Light</td>
+<td>Inter Variable</td>
+<td>15px (0.94rem)</td>
+<td>300</td>
+<td>1.47</td>
+<td>-0.165px</td>
+<td>De-emphasized body</td>
+</tr>
+<tr>
+<td>Caption Large</td>
+<td>Inter Variable</td>
+<td>14px (0.88rem)</td>
+<td>510–590</td>
+<td>1.50</td>
+<td>-0.182px</td>
+<td>Sub-labels, category headers</td>
+</tr>
+<tr>
+<td>Caption</td>
+<td>Inter Variable</td>
+<td>13px (0.81rem)</td>
+<td>400–510</td>
+<td>1.50</td>
+<td>-0.13px</td>
+<td>Metadata, timestamps</td>
+</tr>
+<tr>
+<td>Label</td>
+<td>Inter Variable</td>
+<td>12px (0.75rem)</td>
+<td>400–590</td>
+<td>1.40</td>
+<td>normal</td>
+<td>Button text, small labels</td>
+</tr>
+<tr>
+<td>Micro</td>
+<td>Inter Variable</td>
+<td>11px (0.69rem)</td>
+<td>510</td>
+<td>1.40</td>
+<td>normal</td>
+<td>Tiny labels</td>
+</tr>
+<tr>
+<td>Tiny</td>
+<td>Inter Variable</td>
+<td>10px (0.63rem)</td>
+<td>400–510</td>
+<td>1.50</td>
+<td>-0.15px</td>
+<td>Overline text, sometimes uppercase</td>
+</tr>
+<tr>
+<td>Link Large</td>
+<td>Inter Variable</td>
+<td>16px (1.00rem)</td>
+<td>400</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Standard links</td>
+</tr>
+<tr>
+<td>Link Medium</td>
+<td>Inter Variable</td>
+<td>15px (0.94rem)</td>
+<td>510</td>
+<td>2.67</td>
+<td>normal</td>
+<td>Spaced navigation links</td>
+</tr>
+<tr>
+<td>Link Small</td>
+<td>Inter Variable</td>
+<td>14px (0.88rem)</td>
+<td>510</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Compact links</td>
+</tr>
+<tr>
+<td>Link Caption</td>
+<td>Inter Variable</td>
+<td>13px (0.81rem)</td>
+<td>400–510</td>
+<td>1.50</td>
+<td>-0.13px</td>
+<td>Footer, metadata links</td>
+</tr>
+<tr>
+<td>Mono Body</td>
+<td>Berkeley Mono</td>
+<td>14px (0.88rem)</td>
+<td>400</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Code blocks</td>
+</tr>
+<tr>
+<td>Mono Caption</td>
+<td>Berkeley Mono</td>
+<td>13px (0.81rem)</td>
+<td>400</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Code labels</td>
+</tr>
+<tr>
+<td>Mono Label</td>
+<td>Berkeley Mono</td>
+<td>12px (0.75rem)</td>
+<td>400</td>
+<td>1.40</td>
+<td>normal</td>
+<td>Code metadata, sometimes uppercase</td>
+</tr>
+</tbody>
+</table>
+<h3 id="principles">Principles</h3>
+<ul>
+<li><strong>510 is the signature weight</strong>: Linear uses Inter Variable's 510 weight (between regular 400 and medium 500) as its default emphasis weight. This creates a subtly bolded feel without the heaviness of traditional medium or semibold.</li>
+<li><strong>Compression at scale</strong>: Display sizes use progressively tighter letter-spacing — -1.584px at 72px, -1.408px at 64px, -1.056px at 48px, -0.704px at 32px. Below 24px, spacing relaxes toward normal.</li>
+<li><strong>OpenType as identity</strong>: <code>"cv01", "ss03"</code> aren't decorative — they transform Inter into Linear's distinctive typeface, giving it a more geometric, purposeful character.</li>
+<li><strong>Three-tier weight system</strong>: 400 (reading), 510 (emphasis/UI), 590 (strong emphasis). The 300 weight appears only in deliberately de-emphasized contexts.</li>
+</ul>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<p><strong>Ghost Button (Default)</strong>
+- Background: <code>rgba(255,255,255,0.02)</code>
+- Text: <code>#e2e4e7</code> (near-white)
+- Padding: comfortable
+- Radius: 6px
+- Border: <code>1px solid rgb(36, 40, 44)</code>
+- Outline: none
+- Focus shadow: <code>rgba(0,0,0,0.1) 0px 4px 12px</code>
+- Use: Standard actions, secondary CTAs</p>
+<p><strong>Subtle Button</strong>
+- Background: <code>rgba(255,255,255,0.04)</code>
+- Text: <code>#d0d6e0</code> (silver-gray)
+- Padding: 0px 6px
+- Radius: 6px
+- Use: Toolbar actions, contextual buttons</p>
+<p><strong>Primary Brand Button (Inferred)</strong>
+- Background: <code>#5e6ad2</code> (brand indigo)
+- Text: <code>#ffffff</code>
+- Padding: 8px 16px
+- Radius: 6px
+- Hover: <code>#828fff</code> shift
+- Use: Primary CTAs ("Start building", "Sign up")</p>
+<p><strong>Icon Button (Circle)</strong>
+- Background: <code>rgba(255,255,255,0.03)</code> or <code>rgba(255,255,255,0.05)</code>
+- Text: <code>#f7f8f8</code> or <code>#ffffff</code>
+- Radius: 50%
+- Border: <code>1px solid rgba(255,255,255,0.08)</code>
+- Use: Close, menu toggle, icon-only actions</p>
+<p><strong>Pill Button</strong>
+- Background: transparent
+- Text: <code>#d0d6e0</code>
+- Padding: 0px 10px 0px 5px
+- Radius: 9999px
+- Border: <code>1px solid rgb(35, 37, 42)</code>
+- Use: Filter chips, tags, status indicators</p>
+<p><strong>Small Toolbar Button</strong>
+- Background: <code>rgba(255,255,255,0.05)</code>
+- Text: <code>#62666d</code> (muted)
+- Radius: 2px
+- Border: <code>1px solid rgba(255,255,255,0.05)</code>
+- Shadow: <code>rgba(0,0,0,0.03) 0px 1.2px 0px 0px</code>
+- Font: 12px weight 510
+- Use: Toolbar actions, quick-access controls</p>
+<h3 id="cards-containers">Cards &amp; Containers</h3>
+<ul>
+<li>Background: <code>rgba(255,255,255,0.02)</code> to <code>rgba(255,255,255,0.05)</code> (never solid — always translucent)</li>
+<li>Border: <code>1px solid rgba(255,255,255,0.08)</code> (standard) or <code>1px solid rgba(255,255,255,0.05)</code> (subtle)</li>
+<li>Radius: 8px (standard), 12px (featured), 22px (large panels)</li>
+<li>Shadow: <code>rgba(0,0,0,0.2) 0px 0px 0px 1px</code> or layered multi-shadow stacks</li>
+<li>Hover: subtle background opacity increase</li>
+</ul>
+<h3 id="inputs-forms">Inputs &amp; Forms</h3>
+<p><strong>Text Area</strong>
+- Background: <code>rgba(255,255,255,0.02)</code>
+- Text: <code>#d0d6e0</code>
+- Border: <code>1px solid rgba(255,255,255,0.08)</code>
+- Padding: 12px 14px
+- Radius: 6px</p>
+<p><strong>Search Input</strong>
+- Background: transparent
+- Text: <code>#f7f8f8</code>
+- Padding: 1px 32px (icon-aware)</p>
+<p><strong>Button-style Input</strong>
+- Text: <code>#8a8f98</code>
+- Padding: 1px 6px
+- Radius: 5px
+- Focus shadow: multi-layer stack</p>
+<h3 id="badges-pills">Badges &amp; Pills</h3>
+<p><strong>Success Pill</strong>
+- Background: <code>#10b981</code>
+- Text: <code>#f7f8f8</code>
+- Radius: 50% (circular)
+- Font: 10px weight 510
+- Use: Status dots, completion indicators</p>
+<p><strong>Neutral Pill</strong>
+- Background: transparent
+- Text: <code>#d0d6e0</code>
+- Padding: 0px 10px 0px 5px
+- Radius: 9999px
+- Border: <code>1px solid rgb(35, 37, 42)</code>
+- Font: 12px weight 510
+- Use: Tags, filter chips, category labels</p>
+<p><strong>Subtle Badge</strong>
+- Background: <code>rgba(255,255,255,0.05)</code>
+- Text: <code>#f7f8f8</code>
+- Padding: 0px 8px 0px 2px
+- Radius: 2px
+- Border: <code>1px solid rgba(255,255,255,0.05)</code>
+- Font: 10px weight 510
+- Use: Inline labels, version tags</p>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li>Dark sticky header on near-black background</li>
+<li>Linear logomark left-aligned (SVG icon)</li>
+<li>Links: Inter Variable 13–14px weight 510, <code>#d0d6e0</code> text</li>
+<li>Active/hover: text lightens to <code>#f7f8f8</code></li>
+<li>CTA: Brand indigo button or ghost button</li>
+<li>Mobile: hamburger collapse</li>
+<li>Search: command palette trigger (<code>/</code> or <code>Cmd+K</code>)</li>
+</ul>
+<h3 id="image-treatment">Image Treatment</h3>
+<ul>
+<li>Product screenshots on dark backgrounds with subtle border (<code>rgba(255,255,255,0.08)</code>)</li>
+<li>Top-rounded images: <code>12px 12px 0px 0px</code> radius</li>
+<li>Dashboard/issue previews dominate feature sections</li>
+<li>Subtle shadow beneath screenshots: <code>rgba(0,0,0,0.4) 0px 2px 4px</code></li>
+</ul>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-system">Spacing System</h3>
+<ul>
+<li>Base unit: 8px</li>
+<li>Scale: 1px, 4px, 7px, 8px, 11px, 12px, 16px, 19px, 20px, 22px, 24px, 28px, 32px, 35px</li>
+<li>The 7px and 11px values suggest micro-adjustments for optical alignment</li>
+<li>Primary rhythm: 8px, 16px, 24px, 32px (standard 8px grid)</li>
+</ul>
+<h3 id="grid-container">Grid &amp; Container</h3>
+<ul>
+<li>Max content width: approximately 1200px</li>
+<li>Hero: centered single-column with generous vertical padding</li>
+<li>Feature sections: 2–3 column grids for feature cards</li>
+<li>Full-width dark sections with internal max-width constraints</li>
+<li>Changelog: single-column timeline layout</li>
+</ul>
+<h3 id="whitespace-philosophy">Whitespace Philosophy</h3>
+<ul>
+<li><strong>Darkness as space</strong>: On Linear's dark canvas, empty space isn't white — it's absence. The near-black background IS the whitespace, and content emerges from it.</li>
+<li><strong>Compressed headlines, expanded surroundings</strong>: Display text at 72px with -1.584px tracking is dense and compressed, but sits within vast dark padding. The contrast between typographic density and spatial generosity creates tension.</li>
+<li><strong>Section isolation</strong>: Each feature section is separated by generous vertical padding (80px+) with no visible dividers — the dark background provides natural separation.</li>
+</ul>
+<h3 id="border-radius-scale">Border Radius Scale</h3>
+<ul>
+<li>Micro (2px): Inline badges, toolbar buttons, subtle tags</li>
+<li>Standard (4px): Small containers, list items</li>
+<li>Comfortable (6px): Buttons, inputs, functional elements</li>
+<li>Card (8px): Cards, dropdowns, popovers</li>
+<li>Panel (12px): Panels, featured cards, section containers</li>
+<li>Large (22px): Large panel elements</li>
+<li>Full Pill (9999px): Chips, filter pills, status tags</li>
+<li>Circle (50%): Icon buttons, avatars, status dots</li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Treatment</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flat (Level 0)</td>
+<td>No shadow, <code>#010102</code> bg</td>
+<td>Page background, deepest canvas</td>
+</tr>
+<tr>
+<td>Subtle (Level 1)</td>
+<td><code>rgba(0,0,0,0.03) 0px 1.2px 0px</code></td>
+<td>Toolbar buttons, micro-elevation</td>
+</tr>
+<tr>
+<td>Surface (Level 2)</td>
+<td><code>rgba(255,255,255,0.05)</code> bg + <code>1px solid rgba(255,255,255,0.08)</code> border</td>
+<td>Cards, input fields, containers</td>
+</tr>
+<tr>
+<td>Inset (Level 2b)</td>
+<td><code>rgba(0,0,0,0.2) 0px 0px 12px 0px inset</code></td>
+<td>Recessed panels, inner shadows</td>
+</tr>
+<tr>
+<td>Ring (Level 3)</td>
+<td><code>rgba(0,0,0,0.2) 0px 0px 0px 1px</code></td>
+<td>Border-as-shadow technique</td>
+</tr>
+<tr>
+<td>Elevated (Level 4)</td>
+<td><code>rgba(0,0,0,0.4) 0px 2px 4px</code></td>
+<td>Floating elements, dropdowns</td>
+</tr>
+<tr>
+<td>Dialog (Level 5)</td>
+<td>Multi-layer stack: <code>rgba(0,0,0,0) 0px 8px 2px, rgba(0,0,0,0.01) 0px 5px 2px, rgba(0,0,0,0.04) 0px 3px 2px, rgba(0,0,0,0.07) 0px 1px 1px, rgba(0,0,0,0.08) 0px 0px 1px</code></td>
+<td>Popovers, command palette, modals</td>
+</tr>
+<tr>
+<td>Focus</td>
+<td><code>rgba(0,0,0,0.1) 0px 4px 12px</code> + additional layers</td>
+<td>Keyboard focus on interactive elements</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Shadow Philosophy</strong>: On dark surfaces, traditional shadows (dark on dark) are nearly invisible. Linear solves this by using semi-transparent white borders as the primary depth indicator. Elevation isn't communicated through shadow darkness but through background luminance steps — each level slightly increases the white opacity of the surface background (<code>0.02</code> → <code>0.04</code> → <code>0.05</code>), creating a subtle stacking effect. The inset shadow technique (<code>rgba(0,0,0,0.2) 0px 0px 12px 0px inset</code>) creates a unique "sunken" effect for recessed panels, adding dimensional depth that traditional dark themes lack.</p>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use Inter Variable with <code>"cv01", "ss03"</code> on ALL text — these features are fundamental to Linear's typeface identity</li>
+<li>Use weight 510 as your default emphasis weight — it's Linear's signature between-weight</li>
+<li>Apply aggressive negative letter-spacing at display sizes (-1.584px at 72px, -1.056px at 48px)</li>
+<li>Build on near-black backgrounds: <code>#08090a</code> for marketing, <code>#0f1011</code> for panels, <code>#191a1b</code> for elevated surfaces</li>
+<li>Use semi-transparent white borders (<code>rgba(255,255,255,0.05)</code> to <code>rgba(255,255,255,0.08)</code>) instead of solid dark borders</li>
+<li>Keep button backgrounds nearly transparent: <code>rgba(255,255,255,0.02)</code> to <code>rgba(255,255,255,0.05)</code></li>
+<li>Reserve brand indigo (<code>#5e6ad2</code> / <code>#7170ff</code>) for primary CTAs and interactive accents only</li>
+<li>Use <code>#f7f8f8</code> for primary text — not pure <code>#ffffff</code>, which would be too harsh</li>
+<li>Apply the luminance stacking model: deeper = darker bg, elevated = slightly lighter bg</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Don't use pure white (<code>#ffffff</code>) as primary text — <code>#f7f8f8</code> prevents eye strain</li>
+<li>Don't use solid colored backgrounds for buttons — transparency is the system (rgba white at 0.02–0.05)</li>
+<li>Don't apply the brand indigo decoratively — it's reserved for interactive/CTA elements only</li>
+<li>Don't use positive letter-spacing on display text — Inter at large sizes always runs negative</li>
+<li>Don't use visible/opaque borders on dark backgrounds — borders should be whisper-thin semi-transparent white</li>
+<li>Don't skip the OpenType features (<code>"cv01", "ss03"</code>) — without them, it's generic Inter, not Linear's Inter</li>
+<li>Don't use weight 700 (bold) — Linear's maximum weight is 590, with 510 as the workhorse</li>
+<li>Don't introduce warm colors into the UI chrome — the palette is cool gray with blue-violet accent only</li>
+<li>Don't use drop shadows for elevation on dark surfaces — use background luminance stepping instead</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<h3 id="breakpoints">Breakpoints</h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Width</th>
+<th>Key Changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mobile Small</td>
+<td>&lt;600px</td>
+<td>Single column, compact padding</td>
+</tr>
+<tr>
+<td>Mobile</td>
+<td>600–640px</td>
+<td>Standard mobile layout</td>
+</tr>
+<tr>
+<td>Tablet</td>
+<td>640–768px</td>
+<td>Two-column grids begin</td>
+</tr>
+<tr>
+<td>Desktop Small</td>
+<td>768–1024px</td>
+<td>Full card grids, expanded padding</td>
+</tr>
+<tr>
+<td>Desktop</td>
+<td>1024–1280px</td>
+<td>Standard desktop, full navigation</td>
+</tr>
+<tr>
+<td>Large Desktop</td>
+<td>&gt;1280px</td>
+<td>Full layout, generous margins</td>
+</tr>
+</tbody>
+</table>
+<h3 id="touch-targets">Touch Targets</h3>
+<ul>
+<li>Buttons use comfortable padding with 6px radius minimum</li>
+<li>Navigation links at 13–14px with adequate spacing</li>
+<li>Pill tags have 10px horizontal padding for touch accessibility</li>
+<li>Icon buttons at 50% radius ensure circular, easy-to-tap targets</li>
+<li>Search trigger is prominently placed with generous hit area</li>
+</ul>
+<h3 id="collapsing-strategy">Collapsing Strategy</h3>
+<ul>
+<li>Hero: 72px → 48px → 32px display text, tracking adjusts proportionally</li>
+<li>Navigation: horizontal links + CTAs → hamburger menu at 768px</li>
+<li>Feature cards: 3-column → 2-column → single column stacked</li>
+<li>Product screenshots: maintain aspect ratio, may reduce padding</li>
+<li>Changelog: timeline maintains single-column through all sizes</li>
+<li>Footer: multi-column → stacked single column</li>
+<li>Section spacing: 80px+ → 48px on mobile</li>
+</ul>
+<h3 id="image-behavior">Image Behavior</h3>
+<ul>
+<li>Dashboard screenshots maintain border treatment at all sizes</li>
+<li>Hero visuals simplify on mobile (fewer floating UI elements)</li>
+<li>Product screenshots use responsive sizing with consistent radius</li>
+<li>Dark background ensures screenshots blend naturally at any viewport</li>
+</ul>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Primary CTA: Brand Indigo (<code>#5e6ad2</code>)</li>
+<li>Page Background: Marketing Black (<code>#08090a</code>)</li>
+<li>Panel Background: Panel Dark (<code>#0f1011</code>)</li>
+<li>Surface: Level 3 (<code>#191a1b</code>)</li>
+<li>Heading text: Primary White (<code>#f7f8f8</code>)</li>
+<li>Body text: Silver Gray (<code>#d0d6e0</code>)</li>
+<li>Muted text: Tertiary Gray (<code>#8a8f98</code>)</li>
+<li>Subtle text: Quaternary Gray (<code>#62666d</code>)</li>
+<li>Accent: Violet (<code>#7170ff</code>)</li>
+<li>Accent Hover: Light Violet (<code>#828fff</code>)</li>
+<li>Border (default): <code>rgba(255,255,255,0.08)</code></li>
+<li>Border (subtle): <code>rgba(255,255,255,0.05)</code></li>
+<li>Focus ring: Multi-layer shadow stack</li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create a hero section on <code>#08090a</code> background. Headline at 48px Inter Variable weight 510, line-height 1.00, letter-spacing -1.056px, color <code>#f7f8f8</code>, font-feature-settings <code>'cv01', 'ss03'</code>. Subtitle at 18px weight 400, line-height 1.60, color <code>#8a8f98</code>. Brand CTA button (<code>#5e6ad2</code>, 6px radius, 8px 16px padding) and ghost button (<code>rgba(255,255,255,0.02)</code> bg, <code>1px solid rgba(255,255,255,0.08)</code> border, 6px radius)."</li>
+<li>"Design a card on dark background: <code>rgba(255,255,255,0.02)</code> background, <code>1px solid rgba(255,255,255,0.08)</code> border, 8px radius. Title at 20px Inter Variable weight 590, letter-spacing -0.24px, color <code>#f7f8f8</code>. Body at 15px weight 400, color <code>#8a8f98</code>, letter-spacing -0.165px."</li>
+<li>"Build a pill badge: transparent background, <code>#d0d6e0</code> text, 9999px radius, 0px 10px padding, <code>1px solid #23252a</code> border, 12px Inter Variable weight 510."</li>
+<li>"Create navigation: dark sticky header on <code>#0f1011</code>. Inter Variable 13px weight 510 for links, <code>#d0d6e0</code> text. Brand indigo CTA <code>#5e6ad2</code> right-aligned with 6px radius. Bottom border: <code>1px solid rgba(255,255,255,0.05)</code>."</li>
+<li>"Design a command palette: <code>#191a1b</code> background, <code>1px solid rgba(255,255,255,0.08)</code> border, 12px radius, multi-layer shadow stack. Input at 16px Inter Variable weight 400, <code>#f7f8f8</code> text. Results list with 13px weight 510 labels in <code>#d0d6e0</code> and 12px metadata in <code>#62666d</code>."</li>
+</ul>
+<h3 id="iteration-guide">Iteration Guide</h3>
+<ol>
+<li>Always set font-feature-settings <code>"cv01", "ss03"</code> on all Inter text — this is non-negotiable for Linear's look</li>
+<li>Letter-spacing scales with font size: -1.584px at 72px, -1.056px at 48px, -0.704px at 32px, normal below 16px</li>
+<li>Three weights: 400 (read), 510 (emphasize/navigate), 590 (announce)</li>
+<li>Surface elevation via background opacity: <code>rgba(255,255,255, 0.02 → 0.04 → 0.05)</code> — never solid backgrounds on dark</li>
+<li>Brand indigo (<code>#5e6ad2</code> / <code>#7170ff</code>) is the only chromatic color — everything else is grayscale</li>
+<li>Borders are always semi-transparent white, never solid dark colors on dark backgrounds</li>
+<li>Berkeley Mono for any code or technical content, Inter Variable for everything else</li>
+</ol>
+</main>
+</body>
+</html>

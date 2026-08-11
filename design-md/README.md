@@ -16,7 +16,7 @@
 <div align="center">
 
 [![Awesome](https://awesome.re/badge.svg)](https://awesome.re)
-![DESIGN.md Count](https://img.shields.io/badge/DESIGN.md%20count-55-10b981?style=classic)
+![DESIGN.md Count](https://img.shields.io/badge/DESIGN.md%20count-56-10b981?style=classic)
 [![Last Update](https://img.shields.io/github/last-commit/VoltAgent/awesome-design-md?label=Last%20update&style=classic)](https://github.com/VoltAgent/awesome-design-md)
 [![Discord](https://img.shields.io/discord/1361559153780195478.svg?label=&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2)](https://s.voltagent.dev/discord)
 
@@ -141,6 +141,10 @@ Each site includes:
 - [**Kraken**](https://github.com/VoltAgent/awesome-design-md/tree/main/design-md/kraken/) - Crypto trading platform. Purple-accented dark UI, data-dense dashboards
 - [**Revolut**](https://github.com/VoltAgent/awesome-design-md/tree/main/design-md/revolut/) - Digital banking. Sleek dark interface, gradient cards, fintech precision
 - [**Wise**](https://github.com/VoltAgent/awesome-design-md/tree/main/design-md/wise/) - International money transfer. Bright green accent, friendly and clear
+
+### Japanese B2B / Corporate（社内デフォルト）
+
+- [**feer**](./feer/DESIGN.md) — **和文B2B/コーポレートサイトのデフォルト基準**。クリーム × 墨 × ブランドオレンジ、エディトリアル + ネオブルータリズム、`grow-from-bottom` 主体の上品なモーション。日本語コーポレート / 採用 / サービスサイト案件で **最初に参照する**
 
 ### Enterprise & Consumer
 

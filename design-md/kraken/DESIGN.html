@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Kraken</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-kraken">Design System: Kraken</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Kraken's website is a clean, trustworthy crypto exchange that uses purple as its commanding brand color. The design operates on white backgrounds with Kraken Purple (<code>#7132f5</code>, <code>#5741d8</code>, <code>#5b1ecf</code>) creating a distinctive, professional crypto identity. The proprietary Kraken-Brand font handles display headings with bold (700) weight and negative tracking, while Kraken-Product (with IBM Plex Sans fallback) serves as the UI workhorse.</p>
+<p><strong>Key Characteristics:</strong>
+- Kraken Purple (<code>#7132f5</code>) as primary brand with darker variants (<code>#5741d8</code>, <code>#5b1ecf</code>)
+- Kraken-Brand (display) + Kraken-Product (UI) dual font system
+- Near-black (<code>#101114</code>) text with cool blue-gray neutral scale
+- 12px radius buttons (rounded but not pill)
+- Subtle shadows (<code>rgba(0,0,0,0.03) 0px 4px 24px</code>) — whisper-level
+- Green accent (<code>#149e61</code>) for positive/success states</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>Kraken Purple</strong> (<code>#7132f5</code>): Primary CTA, brand accent, links</li>
+<li><strong>Purple Dark</strong> (<code>#5741d8</code>): Button borders, outlined variants</li>
+<li><strong>Purple Deep</strong> (<code>#5b1ecf</code>): Deepest purple</li>
+<li><strong>Purple Subtle</strong> (<code>rgba(133,91,251,0.16)</code>): Purple at 16% — subtle button backgrounds</li>
+<li><strong>Near Black</strong> (<code>#101114</code>): Primary text</li>
+</ul>
+<h3 id="neutral">Neutral</h3>
+<ul>
+<li><strong>Cool Gray</strong> (<code>#686b82</code>): Primary neutral, borders at 24% opacity</li>
+<li><strong>Silver Blue</strong> (<code>#9497a9</code>): Secondary text, muted elements</li>
+<li><strong>White</strong> (<code>#ffffff</code>): Primary surface</li>
+<li><strong>Border Gray</strong> (<code>#dedee5</code>): Divider borders</li>
+</ul>
+<h3 id="semantic">Semantic</h3>
+<ul>
+<li><strong>Green</strong> (<code>#149e61</code>): Success/positive at 16% opacity for badges</li>
+<li><strong>Green Dark</strong> (<code>#026b3f</code>): Badge text</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-families">Font Families</h3>
+<ul>
+<li><strong>Display</strong>: <code>Kraken-Brand</code>, fallbacks: <code>IBM Plex Sans, Helvetica, Arial</code></li>
+<li><strong>UI / Body</strong>: <code>Kraken-Product</code>, fallbacks: <code>Helvetica Neue, Helvetica, Arial</code></li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display Hero</td>
+<td>Kraken-Brand</td>
+<td>48px</td>
+<td>700</td>
+<td>1.17</td>
+<td>-1px</td>
+</tr>
+<tr>
+<td>Section Heading</td>
+<td>Kraken-Brand</td>
+<td>36px</td>
+<td>700</td>
+<td>1.22</td>
+<td>-0.5px</td>
+</tr>
+<tr>
+<td>Sub-heading</td>
+<td>Kraken-Brand</td>
+<td>28px</td>
+<td>700</td>
+<td>1.29</td>
+<td>-0.5px</td>
+</tr>
+<tr>
+<td>Feature Title</td>
+<td>Kraken-Product</td>
+<td>22px</td>
+<td>600</td>
+<td>1.20</td>
+<td>normal</td>
+</tr>
+<tr>
+<td>Body</td>
+<td>Kraken-Product</td>
+<td>16px</td>
+<td>400</td>
+<td>1.38</td>
+<td>normal</td>
+</tr>
+<tr>
+<td>Body Medium</td>
+<td>Kraken-Product</td>
+<td>16px</td>
+<td>500</td>
+<td>1.38</td>
+<td>normal</td>
+</tr>
+<tr>
+<td>Button</td>
+<td>Kraken-Product</td>
+<td>16px</td>
+<td>500–600</td>
+<td>1.38</td>
+<td>normal</td>
+</tr>
+<tr>
+<td>Caption</td>
+<td>Kraken-Product</td>
+<td>14px</td>
+<td>400–700</td>
+<td>1.43–1.71</td>
+<td>normal</td>
+</tr>
+<tr>
+<td>Small</td>
+<td>Kraken-Product</td>
+<td>12px</td>
+<td>400–500</td>
+<td>1.33</td>
+<td>normal</td>
+</tr>
+<tr>
+<td>Micro</td>
+<td>Kraken-Product</td>
+<td>7px</td>
+<td>500</td>
+<td>1.00</td>
+<td>uppercase</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<p><strong>Primary Purple</strong>
+- Background: <code>#7132f5</code>
+- Text: <code>#ffffff</code>
+- Padding: 13px 16px
+- Radius: 12px</p>
+<p><strong>Purple Outlined</strong>
+- Background: <code>#ffffff</code>
+- Text: <code>#5741d8</code>
+- Border: <code>1px solid #5741d8</code>
+- Radius: 12px</p>
+<p><strong>Purple Subtle</strong>
+- Background: <code>rgba(133,91,251,0.16)</code>
+- Text: <code>#7132f5</code>
+- Padding: 8px
+- Radius: 12px</p>
+<p><strong>White Button</strong>
+- Background: <code>#ffffff</code>
+- Text: <code>#101114</code>
+- Radius: 10px
+- Shadow: <code>rgba(0,0,0,0.03) 0px 4px 24px</code></p>
+<p><strong>Secondary Gray</strong>
+- Background: <code>rgba(148,151,169,0.08)</code>
+- Text: <code>#101114</code>
+- Radius: 12px</p>
+<h3 id="badges">Badges</h3>
+<ul>
+<li>Success: <code>rgba(20,158,97,0.16)</code> bg, <code>#026b3f</code> text, 6px radius</li>
+<li>Neutral: <code>rgba(104,107,130,0.12)</code> bg, <code>#484b5e</code> text, 8px radius</li>
+</ul>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-1px-2px-3px-4px-5px-6px-8px-10px-12px-13px-15px-16px-20px-24px-25px">Spacing: 1px, 2px, 3px, 4px, 5px, 6px, 8px, 10px, 12px, 13px, 15px, 16px, 20px, 24px, 25px</h3>
+<h3 id="border-radius-3px-6px-8px-10px-12px-16px-9999px-50">Border Radius: 3px, 6px, 8px, 10px, 12px, 16px, 9999px, 50%</h3>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<ul>
+<li>Subtle: <code>rgba(0,0,0,0.03) 0px 4px 24px</code></li>
+<li>Micro: <code>rgba(16,24,40,0.04) 0px 1px 4px</code></li>
+</ul>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use Kraken Purple (#7132f5) for CTAs and links</li>
+<li>Apply 12px radius on all buttons</li>
+<li>Use Kraken-Brand for headings, Kraken-Product for body</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Don't use pill buttons — 12px is the max radius for buttons</li>
+<li>Don't use other purples outside the defined scale</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<p>Breakpoints: 375px, 425px, 640px, 768px, 1024px, 1280px, 1536px</p>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Brand: Kraken Purple (<code>#7132f5</code>)</li>
+<li>Dark variant: <code>#5741d8</code></li>
+<li>Text: Near Black (<code>#101114</code>)</li>
+<li>Secondary text: <code>#9497a9</code></li>
+<li>Background: White (<code>#ffffff</code>)</li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create hero: white background. Kraken-Brand 48px weight 700, letter-spacing -1px. Purple CTA (#7132f5, 12px radius, 13px 16px padding)."</li>
+</ul>
+</main>
+</body>
+</html>

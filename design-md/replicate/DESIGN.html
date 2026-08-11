@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System: Replicate</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="design-system-replicate">Design System: Replicate</h1>
+<h2 id="1-visual-theme-atmosphere">1. Visual Theme &amp; Atmosphere</h2>
+<p>Replicate's interface is a developer playground crackling with creative energy — a bold, high-contrast design that feels more like a music festival poster than a typical API platform. The hero section explodes with a vibrant orange-red-magenta gradient that immediately signals "this is where AI models come alive," while the body of the page grounds itself in a clean white canvas where code snippets and model galleries take center stage.</p>
+<p>The design personality is defined by two extreme choices: <strong>massive display typography</strong> (up to 128px) using the custom rb-freigeist-neue face, and <strong>exclusively pill-shaped geometry</strong> (9999px radius on everything). The display font is thick, bold, and confident — its heavy weight at enormous sizes creates text that feels like it's shouting with joy rather than whispering authority. Combined with basier-square for body text (a clean geometric sans) and JetBrains Mono for code, the system serves developers who want power and playfulness in equal measure.</p>
+<p>What makes Replicate distinctive is its community-powered energy. The model gallery with AI-generated images, the dotted-underline links, the green status badges, and the "Imagine what you can build" closing manifesto all create a space that feels alive and participatory — not a corporate product page but a launchpad for creative developers.</p>
+<p><strong>Key Characteristics:</strong>
+- Explosive orange-red-magenta gradient hero (#ea2804 brand anchor)
+- Massive display typography (128px) in heavy rb-freigeist-neue
+- Exclusively pill-shaped geometry: 9999px radius on EVERYTHING
+- High-contrast black (#202020) and white palette with red brand accent
+- Developer-community energy: model galleries, code examples, dotted-underline links
+- Green status badges (#2b9a66) for live/operational indicators
+- Bold/heavy font weights (600-700) creating maximum typographic impact
+- Playful closing manifesto: "Imagine what you can build."</p>
+<h2 id="2-color-palette-roles">2. Color Palette &amp; Roles</h2>
+<h3 id="primary">Primary</h3>
+<ul>
+<li><strong>Replicate Dark</strong> (<code>#202020</code>): The primary text color and dark surface — a near-black that's the anchor of all text and borders. Slightly warmer than pure #000.</li>
+<li><strong>Replicate Red</strong> (<code>#ea2804</code>): The core brand color — a vivid, saturated orange-red used in the hero gradient, accent borders, and high-signal moments.</li>
+<li><strong>Secondary Red</strong> (<code>#dd4425</code>): A slightly warmer variant for button borders and link hover states.</li>
+</ul>
+<h3 id="secondary-accent">Secondary &amp; Accent</h3>
+<ul>
+<li><strong>Status Green</strong> (<code>#2b9a66</code>): Badge/pill background for "running" or operational status indicators.</li>
+<li><strong>GitHub Dark</strong> (<code>#24292e</code>): A blue-tinted dark used for code block backgrounds and developer contexts.</li>
+</ul>
+<h3 id="surface-background">Surface &amp; Background</h3>
+<ul>
+<li><strong>Pure White</strong> (<code>#ffffff</code>): The primary page body background.</li>
+<li><strong>Near White</strong> (<code>#fcfcfc</code>): Button text on dark surfaces and the lightest content.</li>
+<li><strong>Hero Gradient</strong>: A dramatic orange → red → magenta → pink gradient for the hero section. Transitions from warm (#ea2804 family) through hot pink.</li>
+</ul>
+<h3 id="neutrals-text">Neutrals &amp; Text</h3>
+<ul>
+<li><strong>Medium Gray</strong> (<code>#646464</code>): Secondary body text and de-emphasized content.</li>
+<li><strong>Warm Gray</strong> (<code>#4e4e4e</code>): Emphasized secondary text.</li>
+<li><strong>Mid Silver</strong> (<code>#8d8d8d</code>): Tertiary text, footnotes.</li>
+<li><strong>Light Silver</strong> (<code>#bbbbbb</code>): Dotted-underline link decoration color, muted metadata.</li>
+<li><strong>Pure Black</strong> (<code>#000000</code>): Maximum-emphasis borders and occasional text.</li>
+</ul>
+<h3 id="gradient-system">Gradient System</h3>
+<ul>
+<li><strong>Hero Blaze</strong>: A dramatic multi-stop gradient flowing through orange (<code>#ea2804</code>) → red → magenta → hot pink. This gradient occupies the full hero section and is the most visually dominant element on the page.</li>
+<li><strong>Dark Sections</strong>: Deep dark (#202020) sections with white/near-white text provide contrast against the white body.</li>
+</ul>
+<h2 id="3-typography-rules">3. Typography Rules</h2>
+<h3 id="font-family">Font Family</h3>
+<ul>
+<li><strong>Display</strong>: <code>rb-freigeist-neue</code>, with fallbacks: <code>ui-sans-serif, system-ui</code></li>
+<li><strong>Body / UI</strong>: <code>basier-square</code>, with fallbacks: <code>ui-sans-serif, system-ui</code></li>
+<li><strong>Code</strong>: <code>jetbrains-mono</code>, with fallbacks: <code>ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New</code></li>
+</ul>
+<h3 id="hierarchy">Hierarchy</h3>
+<table>
+<thead>
+<tr>
+<th>Role</th>
+<th>Font</th>
+<th>Size</th>
+<th>Weight</th>
+<th>Line Height</th>
+<th>Letter Spacing</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Display Mega</td>
+<td>rb-freigeist-neue</td>
+<td>128px (8rem)</td>
+<td>700</td>
+<td>1.00 (tight)</td>
+<td>normal</td>
+<td>The maximum: closing manifesto</td>
+</tr>
+<tr>
+<td>Display / Hero</td>
+<td>rb-freigeist-neue</td>
+<td>72px (4.5rem)</td>
+<td>700</td>
+<td>1.00 (tight)</td>
+<td>-1.8px</td>
+<td>Hero section headline</td>
+</tr>
+<tr>
+<td>Section Heading</td>
+<td>rb-freigeist-neue</td>
+<td>48px (3rem)</td>
+<td>400–700</td>
+<td>1.00 (tight)</td>
+<td>normal</td>
+<td>Feature section titles</td>
+</tr>
+<tr>
+<td>Sub-heading</td>
+<td>rb-freigeist-neue</td>
+<td>30px (1.88rem)</td>
+<td>600</td>
+<td>1.20 (tight)</td>
+<td>normal</td>
+<td>Card headings</td>
+</tr>
+<tr>
+<td>Sub-heading Sans</td>
+<td>basier-square</td>
+<td>38.4px (2.4rem)</td>
+<td>400</td>
+<td>0.83 (ultra-tight)</td>
+<td>normal</td>
+<td>Large body headings</td>
+</tr>
+<tr>
+<td>Feature Title</td>
+<td>basier-square / rb-freigeist-neue</td>
+<td>18px (1.13rem)</td>
+<td>600</td>
+<td>1.56</td>
+<td>normal</td>
+<td>Small section titles, labels</td>
+</tr>
+<tr>
+<td>Body Large</td>
+<td>basier-square</td>
+<td>20px (1.25rem)</td>
+<td>400</td>
+<td>1.40</td>
+<td>normal</td>
+<td>Intro paragraphs</td>
+</tr>
+<tr>
+<td>Body / Button</td>
+<td>basier-square</td>
+<td>16–18px (1–1.13rem)</td>
+<td>400–600</td>
+<td>1.50–1.56</td>
+<td>normal</td>
+<td>Standard text, buttons</td>
+</tr>
+<tr>
+<td>Caption</td>
+<td>basier-square</td>
+<td>14px (0.88rem)</td>
+<td>400–600</td>
+<td>1.43</td>
+<td>-0.35px to normal</td>
+<td>Metadata, descriptions</td>
+</tr>
+<tr>
+<td>Small / Tag</td>
+<td>basier-square</td>
+<td>12px (0.75rem)</td>
+<td>400</td>
+<td>1.33</td>
+<td>normal</td>
+<td>Tags (lowercase transform)</td>
+</tr>
+<tr>
+<td>Code</td>
+<td>jetbrains-mono</td>
+<td>14px (0.88rem)</td>
+<td>400</td>
+<td>1.43</td>
+<td>normal</td>
+<td>Code snippets, API examples</td>
+</tr>
+<tr>
+<td>Code Small</td>
+<td>jetbrains-mono</td>
+<td>11px (0.69rem)</td>
+<td>400</td>
+<td>1.50</td>
+<td>normal</td>
+<td>Tiny code references</td>
+</tr>
+</tbody>
+</table>
+<h3 id="principles">Principles</h3>
+<ul>
+<li><strong>Heavy display, light body</strong>: rb-freigeist-neue at 700 weight creates thundering headlines, while basier-square at 400 handles body text with quiet efficiency. The contrast is extreme and intentional.</li>
+<li><strong>128px is a real size</strong>: The closing manifesto "Imagine what you can build." uses 128px — bigger than most mobile screens. This is the design equivalent of shouting from a rooftop.</li>
+<li><strong>Negative tracking on hero</strong>: -1.8px letter-spacing at 72px creates dense, impactful hero text.</li>
+<li><strong>Lowercase tags</strong>: 12px basier-square uses <code>text-transform: lowercase</code> — an unusual choice that creates a casual, developer-friendly vibe.</li>
+<li><strong>Weight 600 as emphasis</strong>: When basier-square needs emphasis, it uses 600 (semibold) — never bold (700), which is reserved for rb-freigeist-neue display text.</li>
+</ul>
+<h2 id="4-component-stylings">4. Component Stylings</h2>
+<h3 id="buttons">Buttons</h3>
+<p><strong>Dark Solid</strong>
+- Background: Replicate Dark (<code>#202020</code>)
+- Text: Near White (<code>#fcfcfc</code>)
+- Padding: 0px 4px (extremely compact)
+- Outline: Replicate Dark 4px solid
+- Radius: pill-shaped (implied by system)
+- Maximum emphasis — dark pill on light surface</p>
+<p><strong>White Outlined</strong>
+- Background: Pure White (<code>#ffffff</code>)
+- Text: Replicate Dark (<code>#202020</code>)
+- Border: <code>1px solid #202020</code>
+- Radius: pill-shaped
+- Clean outlined pill for secondary actions</p>
+<p><strong>Transparent Glass</strong>
+- Background: <code>rgba(255, 255, 255, 0.1)</code> (frosted glass)
+- Text: Replicate Dark (<code>#202020</code>)
+- Padding: 6px 56px 6px 28px (asymmetric — icon/search layout)
+- Border: transparent
+- Outline: Light Silver (<code>#bbbbbb</code>) 1px solid
+- Used for search/input-like buttons</p>
+<h3 id="cards-containers">Cards &amp; Containers</h3>
+<ul>
+<li>Background: Pure White or subtle gray</li>
+<li>Border: <code>1px solid #202020</code> for prominent containment</li>
+<li>Radius: pill-shaped (9999px) for badges, labels, images</li>
+<li>Shadow: minimal standard shadows</li>
+<li>Model gallery: grid of AI-generated image thumbnails</li>
+<li>Accent border: <code>1px solid #ea2804</code> for highlighted/featured items</li>
+</ul>
+<h3 id="inputs-forms">Inputs &amp; Forms</h3>
+<ul>
+<li>Background: <code>rgba(255, 255, 255, 0.1)</code> (frosted glass)</li>
+<li>Text: Replicate Dark (<code>#202020</code>)</li>
+<li>Border: transparent with outline</li>
+<li>Padding: 6px 56px 6px 28px (search-bar style)</li>
+</ul>
+<h3 id="navigation">Navigation</h3>
+<ul>
+<li>Clean horizontal nav on white</li>
+<li>Logo: Replicate wordmark in dark</li>
+<li>Links: dark text with dotted underline on hover</li>
+<li>CTA: Dark pill button</li>
+<li>GitHub link and sign-in</li>
+</ul>
+<h3 id="image-treatment">Image Treatment</h3>
+<ul>
+<li>AI-generated model output images in a gallery grid</li>
+<li>Pill-shaped image containers (9999px)</li>
+<li>Full-width gradient hero section</li>
+<li>Product screenshots with dark backgrounds</li>
+</ul>
+<h3 id="distinctive-components">Distinctive Components</h3>
+<p><strong>Model Gallery Grid</strong>
+- Horizontal scrolling or grid of AI-generated images
+- Each image in a pill-shaped container
+- Model names and run counts displayed
+- The visual heart of the community platform</p>
+<p><strong>Dotted Underline Links</strong>
+- Links use <code>text-decoration: underline dotted #bbbbbb</code>
+- A distinctive, developer-notebook aesthetic
+- Lighter and more casual than solid underlines</p>
+<p><strong>Status Badges</strong>
+- Status Green (<code>#2b9a66</code>) background with white text
+- Pill-shaped (9999px)
+- 14px font size
+- Indicates model availability/operational status</p>
+<p><strong>Manifesto Section</strong>
+- "Imagine what you can build." at 128px
+- Dark background with white text
+- Images embedded between words
+- The emotional climax of the page</p>
+<h2 id="5-layout-principles">5. Layout Principles</h2>
+<h3 id="spacing-system">Spacing System</h3>
+<ul>
+<li>Base unit: 8px</li>
+<li>Scale: 1px, 2px, 4px, 6px, 8px, 10px, 12px, 16px, 24px, 32px, 48px, 64px, 96px, 160px, 192px</li>
+<li>Button padding: varies widely (0px 4px to 6px 56px)</li>
+<li>Section vertical spacing: very generous (96–192px)</li>
+</ul>
+<h3 id="grid-container">Grid &amp; Container</h3>
+<ul>
+<li>Fluid width with responsive constraints</li>
+<li>Hero: full-width gradient with centered content</li>
+<li>Model gallery: multi-column responsive grid</li>
+<li>Feature sections: mixed layouts</li>
+<li>Code examples: contained dark blocks</li>
+</ul>
+<h3 id="whitespace-philosophy">Whitespace Philosophy</h3>
+<ul>
+<li><strong>Bold and generous</strong>: Massive spacing between sections (up to 192px) creates distinct zones.</li>
+<li><strong>Dense within galleries</strong>: Model images are tightly packed in the grid for browsable density.</li>
+<li><strong>The gradient IS the whitespace</strong>: The hero gradient section occupies significant vertical space as a colored void.</li>
+</ul>
+<h3 id="border-radius-scale">Border Radius Scale</h3>
+<ul>
+<li><strong>Pill (9999px)</strong>: The ONLY radius in the system. Everything interactive, every image, every badge, every label, every container uses 9999px. This is the most extreme pill-radius commitment in any major tech brand.</li>
+</ul>
+<h2 id="6-depth-elevation">6. Depth &amp; Elevation</h2>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Treatment</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flat (Level 0)</td>
+<td>No shadow</td>
+<td>White body, text blocks</td>
+</tr>
+<tr>
+<td>Bordered (Level 1)</td>
+<td><code>1px solid #202020</code></td>
+<td>Cards, buttons, containers</td>
+</tr>
+<tr>
+<td>Accent Border (Level 2)</td>
+<td><code>1px solid #ea2804</code></td>
+<td>Featured/highlighted items</td>
+</tr>
+<tr>
+<td>Gradient Hero (Level 3)</td>
+<td>Full-width blaze gradient</td>
+<td>Hero section, maximum visual impact</td>
+</tr>
+<tr>
+<td>Dark Section (Level 4)</td>
+<td>Dark bg (#202020) with light text</td>
+<td>Manifesto, footer, feature sections</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Shadow Philosophy</strong>: Replicate relies on <strong>borders and background color</strong> for depth rather than shadows. The <code>1px solid #202020</code> border is the primary containment mechanism. The dramatic gradient hero and dark/light section alternation provide all the depth the design needs.</p>
+<h2 id="7-dos-and-donts">7. Do's and Don'ts</h2>
+<h3 id="do">Do</h3>
+<ul>
+<li>Use pill-shaped (9999px) radius on EVERYTHING — buttons, images, badges, containers</li>
+<li>Use rb-freigeist-neue at weight 700 for display text — go big (72px+) or go home</li>
+<li>Use the orange-red brand gradient for hero sections</li>
+<li>Use Replicate Dark (#202020) as the primary dark — not pure black</li>
+<li>Apply dotted underline decoration on text links (#bbbbbb)</li>
+<li>Use Status Green (#2b9a66) for operational/success badges</li>
+<li>Keep body text in basier-square at 400–600 weight</li>
+<li>Use JetBrains Mono for all code content</li>
+<li>Create a "manifesto" section with 128px type for emotional impact</li>
+</ul>
+<h3 id="dont">Don't</h3>
+<ul>
+<li>Don't use any border-radius other than 9999px — the pill system is absolute</li>
+<li>Don't use the brand red (#ea2804) as a surface/background color — it's for gradients and accent borders</li>
+<li>Don't reduce display text below 48px on desktop — the heavy display font needs size to breathe</li>
+<li>Don't use light/thin font weights on rb-freigeist-neue — 600–700 is the range</li>
+<li>Don't use solid underlines on links — dotted is the signature</li>
+<li>Don't add drop shadows — depth comes from borders and background color</li>
+<li>Don't use warm neutrals — the gray scale is purely neutral (#202020 → #bbbbbb)</li>
+<li>Don't skip the code examples — they're primary content, not decoration</li>
+<li>Don't make the hero gradient subtle — it should be BOLD and vibrant</li>
+</ul>
+<h2 id="8-responsive-behavior">8. Responsive Behavior</h2>
+<h3 id="breakpoints">Breakpoints</h3>
+<p><em>No explicit breakpoints detected — likely using fluid/container-query responsive system.</em></p>
+<h3 id="touch-targets">Touch Targets</h3>
+<ul>
+<li>Pill buttons with generous padding</li>
+<li>Gallery images as large touch targets</li>
+<li>Navigation adequately spaced</li>
+</ul>
+<h3 id="collapsing-strategy">Collapsing Strategy</h3>
+<ul>
+<li><strong>Hero text</strong>: 128px → 72px → 48px progressive scaling</li>
+<li><strong>Model gallery</strong>: Grid reduces columns</li>
+<li><strong>Navigation</strong>: Collapses to hamburger</li>
+<li><strong>Manifesto</strong>: Scales down but maintains impact</li>
+</ul>
+<h3 id="image-behavior">Image Behavior</h3>
+<ul>
+<li>AI-generated images scale within pill containers</li>
+<li>Gallery reflows to fewer columns on narrow screens</li>
+<li>Hero gradient maintained at all sizes</li>
+</ul>
+<h2 id="9-agent-prompt-guide">9. Agent Prompt Guide</h2>
+<h3 id="quick-color-reference">Quick Color Reference</h3>
+<ul>
+<li>Primary Text: "Replicate Dark (#202020)"</li>
+<li>Page Background: "Pure White (#ffffff)"</li>
+<li>Brand Accent: "Replicate Red (#ea2804)"</li>
+<li>Secondary Text: "Medium Gray (#646464)"</li>
+<li>Muted/Decoration: "Light Silver (#bbbbbb)"</li>
+<li>Status: "Status Green (#2b9a66)"</li>
+<li>Dark Surface: "Replicate Dark (#202020)"</li>
+</ul>
+<h3 id="example-component-prompts">Example Component Prompts</h3>
+<ul>
+<li>"Create a hero section with a vibrant orange-red-magenta gradient background. Headline at 72px rb-freigeist-neue weight 700, white text, -1.8px letter-spacing. Include a dark pill CTA button and a white outlined pill button."</li>
+<li>"Design a model card with pill-shaped (9999px) image container, model name at 16px basier-square weight 600, run count at 14px in Medium Gray. Border: 1px solid #202020."</li>
+<li>"Build a status badge: pill-shaped (9999px), Status Green (#2b9a66) background, white text at 14px basier-square."</li>
+<li>"Create a manifesto section on Replicate Dark (#202020) with 'Imagine what you can build.' at 128px rb-freigeist-neue weight 700, white text. Embed small AI-generated images between the words."</li>
+<li>"Design a code block: dark background (#24292e), JetBrains Mono at 14px, white text. Pill-shaped container."</li>
+</ul>
+<h3 id="iteration-guide">Iteration Guide</h3>
+<ol>
+<li>Everything is pill-shaped — never specify any other border-radius</li>
+<li>Display text is HEAVY — weight 700, sizes 48px+</li>
+<li>Links use dotted underline (#bbbbbb) — never solid</li>
+<li>The gradient hero is the visual anchor — make it bold</li>
+<li>Use basier-square for body, rb-freigeist-neue for display, JetBrains Mono for code</li>
+</ol>
+</main>
+</body>
+</html>

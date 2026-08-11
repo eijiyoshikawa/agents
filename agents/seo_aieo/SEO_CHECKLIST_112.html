@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEO チェックリスト 112項目</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="seo-112">SEO チェックリスト 112項目</h1>
+<blockquote>
+<p>SEO/AIEO Agent が全ての SEO 関連アウトプット（記事最適化・サイト設計・テクニカル監査・施策提案）で必ず参照する社内標準チェックリスト。
+本リストの項目を満たさないアウトプットは QA Reviewer の差し戻し対象とする。</p>
+<p>参照: 全112項目を6カテゴリに再編。元の連番（1〜112）は <code>id</code> として保持。</p>
+</blockquote>
+<hr />
+<h2 id="1-url111">カテゴリ1: ドメイン・URL・サイト基盤（1〜11）</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>項目</th>
+<th>必須</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>独自ドメインを使う</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>2</td>
+<td>ドメイン名の長さは、あまり長くならないようにする</td>
+<td>○</td>
+</tr>
+<tr>
+<td>3</td>
+<td>将来的に多言語展開がある場合、<code>.jp</code> は使わない</td>
+<td>○</td>
+</tr>
+<tr>
+<td>4</td>
+<td>サブドメインの利用は非推奨</td>
+<td>○</td>
+</tr>
+<tr>
+<td>5</td>
+<td>URL（スラッグ）は、簡潔でわかりやすいアルファベット表記</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>6</td>
+<td>URL は不変で、変わらないものにする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>7</td>
+<td>URL は静的なもので、パラメータにより区別されるものは極力避ける</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>8</td>
+<td>文字コードは UTF-8</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>9</td>
+<td>同一 URL で、PC/スマホ両対応のレスポンシブサイト</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>10</td>
+<td>SSL（https）対応</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Google ビジネスプロフィールに登録する</td>
+<td>○</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="2-1228">カテゴリ2: キーワード戦略・サイト設計（12〜28）</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>項目</th>
+<th>必須</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>12</td>
+<td>対象キーワードの検索ボリュームは、十分多いものを使う</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>13</td>
+<td>同じようなキーワード（検索意図が同じ、検索結果がほぼ同じ）はグループ化して、一つとして扱う</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>14</td>
+<td>キーワードの種類（購入・行動につながるクエリと情報収集のクエリ）を考慮して、ページに割り当てる</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>15</td>
+<td>全国対象ではない場合は、地名を追加して確認</td>
+<td>○</td>
+</tr>
+<tr>
+<td>16</td>
+<td>メインで狙うキーワードを一番最初に決める（社内相談必須）</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>17</td>
+<td>競合調査は、メインで狙うキーワードで検索した上位の類似サイトを調べる</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>18</td>
+<td>競合とは違う軸で勝てる要素をコンセプトにする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>19</td>
+<td>主要なすべてのページにキーワードを割り当てる</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>20</td>
+<td>サイト全体を親子孫の上下階層がある構成にする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>21</td>
+<td>トップページはサイト全体の目次として設計</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>22</td>
+<td>グローバルナビを設置し、重要なページへの導線を確保する</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>23</td>
+<td>フッターナビを設置し、主要なページへの導線を確保する</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>24</td>
+<td>すべてのページがオリジナルの内容にする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>25</td>
+<td>類似ページ、重複ページが多数になるような設計をしない</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>26</td>
+<td>狙うキーワードを極力、上部（ファーストビュー内が理想）に設置</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>27</td>
+<td>コンテンツの下部、サイドバー、フッターなどから関連ページへのリンクを設置</td>
+<td>○</td>
+</tr>
+<tr>
+<td>28</td>
+<td>子供のページへのリンクは、コンテンツとして配置する</td>
+<td>○</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="3-2956">カテゴリ3: コンテンツ品質・キーワード密度（29〜56）</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>項目</th>
+<th>必須</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>29</td>
+<td>長いページは最初に目次などを設置して内部リンクを設置</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>30</td>
+<td>200文字など極端に文字数の少ないページが出来ないようにする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>31</td>
+<td>タイトルとリンクのみのページは、極力作らない</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>32</td>
+<td>できれば、カテゴリページ、一覧ページにも、リンク以外でオリジナリティを確保する</td>
+<td>○</td>
+</tr>
+<tr>
+<td>33</td>
+<td>1ページ=1テーマにする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>34</td>
+<td>狙うキーワードをコンテンツに含める</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>35</td>
+<td>狙うキーワードが複合キーワードある場合は、できる限り近接させる</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>36</td>
+<td>狙うキーワードの表記ゆれがある場合は、すべてのパターンを自然に入れ込む</td>
+<td>○</td>
+</tr>
+<tr>
+<td>37</td>
+<td>狙うキーワードを乱用しない</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>38</td>
+<td>キーワードの出現率を計算しない</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>39</td>
+<td>関連キーワード、メインキーワードを意識して入れる</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>40</td>
+<td>狙うキーワードに対してユーザーのニーズを満たす内容を入れる</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>41</td>
+<td>h1&gt;h2&gt;h3 の構造を想定してライティングする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>42</td>
+<td>できれば h2、h3 などは、それぞれの親に対して3つ以上存在するようにする</td>
+<td>○</td>
+</tr>
+<tr>
+<td>43</td>
+<td>h1 と title タグは、ほぼ同じ内容にする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>44</td>
+<td>h1 と title タグには、狙うキーワードを前方に配置</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>45</td>
+<td>h1 と title タグの文字数は、長くしすぎない</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>46</td>
+<td>h1 と title タグは、ページ内容を適切に表すもの</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>47</td>
+<td>h1 はページに1回を基本</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>48</td>
+<td>h2〜h4 を利用して構造化する</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>49</td>
+<td>メインコンテンツ以外に、h タグを使わない</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>50</td>
+<td>HTML5 を極力取り入れる</td>
+<td>○</td>
+</tr>
+<tr>
+<td>51</td>
+<td><code>&lt;strong&gt;</code> を乱用しない</td>
+<td>○</td>
+</tr>
+<tr>
+<td>52</td>
+<td><code>&lt;em&gt;</code> は基本使わない</td>
+<td>○</td>
+</tr>
+<tr>
+<td>53</td>
+<td>表は <code>&lt;table&gt;</code></td>
+<td>○</td>
+</tr>
+<tr>
+<td>54</td>
+<td>リストは <code>&lt;ul&gt;</code>、<code>&lt;ol&gt;</code></td>
+<td>○</td>
+</tr>
+<tr>
+<td>55</td>
+<td>引用は <code>&lt;blockquote&gt;</code></td>
+<td>○</td>
+</tr>
+<tr>
+<td>56</td>
+<td>インラインフレームは使わない</td>
+<td>○</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-ux5784">カテゴリ4: マークアップ・メタ情報・UX（57〜84）</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>項目</th>
+<th>必須</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>57</td>
+<td>description を適切に記述する</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>58</td>
+<td><code>rel="prev"</code>、<code>rel="next"</code> は不要</td>
+<td>○</td>
+</tr>
+<tr>
+<td>59</td>
+<td>メインビジュアルも含めて、テキストを画像にしない</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>60</td>
+<td>画像の alt は、内容を表すものにする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>61</td>
+<td>説明の画像などは、caption をつけるか figure 構成にする</td>
+<td>○</td>
+</tr>
+<tr>
+<td>62</td>
+<td>レスポンシブイメージにする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>63</td>
+<td>ブログなどの場合、遅延読み込みにする</td>
+<td>○</td>
+</tr>
+<tr>
+<td>64</td>
+<td>アンカーテキストは、可能な限りリンク先の内容を表す内容にする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>65</td>
+<td>可能なら、アンカーテキストに狙うキーワードをいれる</td>
+<td>○</td>
+</tr>
+<tr>
+<td>66</td>
+<td>画像でリンクする場合は、img の alt を表す内容がリンク先になるようにする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>67</td>
+<td>リンクは静的リンク（<code>a href=""</code>）、javascript、動的生成にしない</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>68</td>
+<td>広告、対価（お金以外も含む）を貰って掲載するリンクは、<code>rel="sponsored"</code></td>
+<td>◎</td>
+</tr>
+<tr>
+<td>69</td>
+<td>意味がないリンクは設置しない</td>
+<td>○</td>
+</tr>
+<tr>
+<td>70</td>
+<td>HTML で記載の内容は、初期状態ですべて見れるようにする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>71</td>
+<td>派手な動作をつけない</td>
+<td>○</td>
+</tr>
+<tr>
+<td>72</td>
+<td>スマートフォン対応（toC は、モバイルファーストデザインを基本）</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>73</td>
+<td>PC とスマホで、表示内容を同じにする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>74</td>
+<td>h タグ構造と文字の大きさは比例させる</td>
+<td>○</td>
+</tr>
+<tr>
+<td>75</td>
+<td>h タグ構造と目立ちやすさは比例させる</td>
+<td>○</td>
+</tr>
+<tr>
+<td>76</td>
+<td>デザインや配置のために、<code>&lt;table&gt;</code> を使わない</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>77</td>
+<td>リンクはリンクとわかるデザインにする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>78</td>
+<td>ボタンはボタンとわかるデザインにする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>79</td>
+<td>画面範囲外に要素を飛ばさない</td>
+<td>○</td>
+</tr>
+<tr>
+<td>80</td>
+<td>隠しテキストになるような記述をしない</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>81</td>
+<td>インースティシャル（インタースティシャル広告）は禁止</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>82</td>
+<td>sitemap.xml を生成する</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>83</td>
+<td>パンくずリストを設置する</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>84</td>
+<td>構造化データを設置する</td>
+<td>◎</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-85103">カテゴリ5: テクニカル・クロール制御（85〜103）</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>項目</th>
+<th>必須</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>85</td>
+<td>無限スクロールを利用する場合は、ページネーションでもアクセス可能にする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>86</td>
+<td>コメントを開放する場合、承認制にする</td>
+<td>○</td>
+</tr>
+<tr>
+<td>87</td>
+<td>1ページの出力ソース、CSS など関連ソースのサイズを抑える</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>88</td>
+<td>ページ速度の最適化、ページエクスペリエンスで良好になるようにする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>89</td>
+<td>http、https、www あり/なし、の統合をする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>90</td>
+<td>index.html、index.htm、index.php などの統合をする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>91</td>
+<td>リニューアル時、過去のサイトの全 URL にアクセス可能にする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>92</td>
+<td>クロールが不要なページは生成しない</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>93</td>
+<td>類似ページは、生成されないようにする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>94</td>
+<td>【通常サイト】検索結果ページは、noindex</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>95</td>
+<td>robots.txt は必要な場合のみ生成</td>
+<td>○</td>
+</tr>
+<tr>
+<td>96</td>
+<td>robots.txt の記述は矛盾しないようにする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>97</td>
+<td><code>rel="canonical"</code> は、基本は、自分自身の初期状態 URL</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>98</td>
+<td>一覧ページの1ページ目に canonical を戻さない</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>99</td>
+<td>言語が違う場合は、canonical ではなく、<code>rel="alternate"</code></td>
+<td>◎</td>
+</tr>
+<tr>
+<td>100</td>
+<td>リダイレクトコードは適切に利用する</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>101</td>
+<td>【EC/DB サイト】検索結果をインデックスさせるかどうかを厳密に設計する</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>102</td>
+<td>【EC/DB サイト】検索結果0件、在庫なし、販売終了の扱いを厳密に設計する</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>103</td>
+<td>HTTP コードを適切に返す</td>
+<td>◎</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>注: 元スライドでは項番「97」が <code>rel="canonical"</code> 行で「79」と表記されているが、正規連番として 97 に補正。</p>
+</blockquote>
+<hr />
+<h2 id="6-104112">カテゴリ6: 運用・モニタリング・リンク管理（104〜112）</h2>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>項目</th>
+<th>必須</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>104</td>
+<td>ユーザー向けと GoogleBot 向けに違う内容を返さない（クローキング禁止）</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>105</td>
+<td>キャッシュの設定は適切にする</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>106</td>
+<td>javascript による動的生成コンテンツ（ajax）は極力使わない</td>
+<td>○</td>
+</tr>
+<tr>
+<td>107</td>
+<td>リンク切れをチェックして、修正する</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>108</td>
+<td>古くなったコンテンツは最新情報へ更新する</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>109</td>
+<td>Search Console を確認、エラー（赤字）があれば対応する</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>110</td>
+<td>リンクを購入しない、お金を払ってリンクをしてもらわない</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>111</td>
+<td>外部サイトへ掲載した内容と同じものを自社サイトに乗せる場合は、<code>no index</code> をしてもらう</td>
+<td>◎</td>
+</tr>
+<tr>
+<td>112</td>
+<td>ウイルス感染、スパム汚染などを定期的に確認（Search Console、サーバーのメールチェック）</td>
+<td>◎</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="_1">凡例</h2>
+<ul>
+<li><strong>◎ 必須</strong>: 違反した場合 SEO に直接的な悪影響。アウトプット前に必ず満たすこと。</li>
+<li><strong>○ 推奨</strong>: 違反でも致命的ではないが、満たさない場合は output.json の <code>seo_checklist.skipped</code> に理由を明記する。</li>
+</ul>
+<h2 id="_2">運用ルール</h2>
+<h3 id="_3">アウトプット前チェック</h3>
+<p>SEO/AIEO Agent は以下のアウトプットを行う前に、本チェックリストの該当項目を確認し、<code>output.json</code> に検証結果を記録する:</p>
+<ul>
+<li>新規記事のメタデータ生成</li>
+<li>既存記事の SEO 監査</li>
+<li>サイト設計レビュー（IA/URL構造/内部リンク設計）</li>
+<li>テクニカル SEO 監査（クロール/インデックス/速度）</li>
+<li>競合分析レポート</li>
+</ul>
+<h3 id="outputjson">output.json への記録フォーマット</h3>
+<pre class="codehilite"><code class="language-json">{
+  &quot;seo_checklist_verification&quot;: {
+    &quot;checklist_version&quot;: &quot;v1.0 (112 items)&quot;,
+    &quot;verified_ids&quot;: [1, 5, 10, 24, 26, 33, 41, 43, 47, 57, 60, 82, 83, 84, 88, 97, 109],
+    &quot;passed&quot;: [...],
+    &quot;failed&quot;: [
+      { &quot;id&quot;: 26, &quot;reason&quot;: &quot;ファーストビュー内にキーワードなし&quot;, &quot;fix&quot;: &quot;h1直後の冒頭120文字に挿入提案&quot; }
+    ],
+    &quot;n_a&quot;: [
+      { &quot;id&quot;: 11, &quot;reason&quot;: &quot;ECサイトのため Googleビジネスプロフィール対象外&quot; }
+    ],
+    &quot;skipped_optional&quot;: [
+      { &quot;id&quot;: 63, &quot;reason&quot;: &quot;記事数が少ないため遅延読み込み未実装&quot; }
+    ]
+  }
+}
+</code></pre>
+
+<h3 id="qa-reviewer">QA Reviewer 連携</h3>
+<p>QA Reviewer は SEO/AIEO Agent の出力に <code>seo_checklist_verification</code> フィールドが含まれない、または必須項目（◎）の <code>failed</code> が空でない場合、自動的に差し戻す。</p>
+<h3 id="_4">更新・改訂</h3>
+<ul>
+<li>改訂時は本ファイル冒頭の <code>checklist_version</code> をインクリメント</li>
+<li>追加項目は連番継続（113, 114, ...）</li>
+<li>廃止項目は削除せず「廃止: 理由」を追記して履歴を保持</li>
+</ul>
+</main>
+</body>
+</html>

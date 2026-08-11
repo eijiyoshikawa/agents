@@ -1,0 +1,170 @@
+{
+  "revenue_philosophy": "YouTube広告収入を主目的にしない。チャンネルは『建設業界向けマーケティング・DXコンサルティング』のリード獲得装置として位置づける。月5件のリードが発生すれば、SNS運用代行（月35万円）の受注1件で年間420万円の売上。YouTube広告収入の10倍以上の価値。",
+  "phases": [
+    {
+      "phase": 0,
+      "name": "準備フェーズ",
+      "period": "開始前1ヶ月",
+      "objectives": [
+        "チャンネルコンセプト確定・ブランディング設計",
+        "機材調達・撮影環境構築",
+        "初期10本の企画・構成作成",
+        "先行撮影5本完了"
+      ],
+      "subscriber_target": null,
+      "revenue_sources": [],
+      "monthly_revenue_estimate_yen": 0,
+      "key_milestones": [
+        "チャンネルアート・ロゴ完成",
+        "撮影フロー確立",
+        "編集パートナー契約"
+      ]
+    },
+    {
+      "phase": 1,
+      "name": "蓄積フェーズ",
+      "period": "1-3ヶ月目",
+      "objectives": [
+        "30本の動画を公開しコンテンツ基盤を構築",
+        "YouTube SEOの基盤確立",
+        "視聴者のフィードバック収集・コンテンツ方向性の微調整",
+        "SNS（X/Instagram）での同時発信開始"
+      ],
+      "subscriber_target": 1000,
+      "revenue_sources": [],
+      "monthly_revenue_estimate_yen": 0,
+      "key_milestones": [
+        "登録者500人達成",
+        "再生回数1万回/月突破",
+        "最初のバズ動画（1万再生以上）の出現"
+      ]
+    },
+    {
+      "phase": 2,
+      "name": "収益化開始フェーズ",
+      "period": "4-6ヶ月目",
+      "objectives": [
+        "YouTube収益化条件達成（登録者1000人+年間4000時間視聴）",
+        "自社サービスへのリード獲得開始",
+        "Shorts投稿開始による新規流入拡大",
+        "メルマガ/LINE登録の動線構築"
+      ],
+      "subscriber_target": 3000,
+      "revenue_sources": [
+        {
+          "source": "YouTube広告",
+          "monthly_estimate_yen": "10000-30000",
+          "note": "建設業界のCPMは比較的高い（ビジネス系）"
+        },
+        {
+          "source": "自社リード（SNS運用代行・AI導入支援）",
+          "monthly_leads": "2-3件",
+          "conversion_rate": "20-30%",
+          "note": "動画概要欄・エンドカードから問い合わせフォームへ誘導"
+        }
+      ],
+      "monthly_revenue_estimate_yen": "10000-30000（YouTube広告のみ。リード経由の受注は別計上）",
+      "key_milestones": [
+        "収益化審査通過",
+        "初の問い合わせリード獲得",
+        "月間再生10万回突破"
+      ]
+    },
+    {
+      "phase": 3,
+      "name": "事業連携フェーズ",
+      "period": "7-12ヶ月目",
+      "objectives": [
+        "チャンネルを自社事業の集客エンジンとして確立",
+        "タイアップ・スポンサード動画の受注開始",
+        "セミナー/ウェビナーの集客チャネルとして活用",
+        "建設業界内での認知・ブランド確立"
+      ],
+      "subscriber_target": 10000,
+      "revenue_sources": [
+        {
+          "source": "YouTube広告",
+          "monthly_estimate_yen": "50000-100000"
+        },
+        {
+          "source": "自社リード",
+          "monthly_leads": "5件",
+          "conversion_rate": "25-30%",
+          "annual_revenue_per_client_yen": 4200000,
+          "note": "SNS運用代行 月35万円 x 12ヶ月 = 420万円/件"
+        },
+        {
+          "source": "タイアップ/スポンサード",
+          "monthly_deals": "1件",
+          "per_deal_yen": "100000-300000",
+          "note": "建設テック企業、SaaS企業との提携"
+        },
+        {
+          "source": "セミナー集客",
+          "note": "オンラインセミナーの集客チャネルとして活用。セミナー経由のリードは成約率が高い"
+        }
+      ],
+      "monthly_revenue_estimate_yen": "150000-400000（YouTube直接収入）+ リード経由受注（月100万円以上）",
+      "key_milestones": [
+        "登録者1万人達成",
+        "月間再生30万回",
+        "リード経由の年間受注額1000万円突破",
+        "初のタイアップ案件成約"
+      ]
+    },
+    {
+      "phase": 4,
+      "name": "スケールフェーズ",
+      "period": "13ヶ月目以降",
+      "objectives": [
+        "建設テック領域のNo.1チャンネルとしてポジション確立",
+        "オンラインコミュニティ/有料メンバーシップの検討",
+        "書籍出版・メディア出演への展開",
+        "第2チャンネル（Shorts特化）の検討"
+      ],
+      "subscriber_target": 30000,
+      "revenue_sources": [
+        {
+          "source": "YouTube広告",
+          "monthly_estimate_yen": "150000-300000"
+        },
+        {
+          "source": "自社リード",
+          "monthly_leads": "10件以上"
+        },
+        {
+          "source": "タイアップ/スポンサード",
+          "monthly_estimate_yen": "300000-500000"
+        },
+        {
+          "source": "メンバーシップ/コミュニティ",
+          "note": "月額制コミュニティ（月3,000円 x 100人 = 30万円/月）"
+        }
+      ],
+      "monthly_revenue_estimate_yen": "直接収入50-100万円/月 + リード経由受注200万円以上/月",
+      "key_milestones": [
+        "登録者3万人",
+        "建設業界メディアへの露出",
+        "自社事業の主要集客チャネルとして確立"
+      ]
+    }
+  ],
+  "roi_analysis": {
+    "initial_investment_yen": 450000,
+    "monthly_running_cost_yen": 200000,
+    "break_even_scenario": {
+      "description": "リード経由でSNS運用代行を1件受注すれば月35万円の売上。月額ランニングコスト20万円を上回る。",
+      "expected_month": "4-6ヶ月目（Phase 2）",
+      "condition": "リード経由の初受注1件"
+    },
+    "12_month_projection": {
+      "total_investment_yen": 2850000,
+      "youtube_ad_revenue_yen": 400000,
+      "lead_revenue_yen": 8400000,
+      "tieup_revenue_yen": 1200000,
+      "total_revenue_yen": 10000000,
+      "roi_percentage": 251,
+      "note": "リード経由受注2件（年間420万円 x 2）+ YouTube広告 + タイアップの保守的見積もり"
+    }
+  }
+}

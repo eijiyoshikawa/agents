@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>パイプライン実行手順書</title>
+<style>
+:root {
+  --fg: #1f2328;
+  --muted: #656d76;
+  --bg: #ffffff;
+  --border: #d0d7de;
+  --code-bg: #f6f8fa;
+  --link: #0969da;
+}
+* { box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+               "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
+  color: var(--fg);
+  background: var(--bg);
+  line-height: 1.6;
+  margin: 0;
+  padding: 2rem 1rem;
+}
+main {
+  max-width: 920px;
+  margin: 0 auto;
+}
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 1.8em;
+  margin-bottom: 0.6em;
+  line-height: 1.25;
+  font-weight: 600;
+}
+h1 { font-size: 2em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+p, ul, ol, blockquote, table, pre { margin: 0 0 1em; }
+a { color: var(--link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background: var(--code-bg);
+  padding: 0.2em 0.4em;
+  border-radius: 6px;
+  font-size: 0.9em;
+}
+pre {
+  background: var(--code-bg);
+  padding: 1em;
+  border-radius: 6px;
+  overflow: auto;
+  font-size: 0.9em;
+}
+pre code { background: transparent; padding: 0; }
+blockquote {
+  margin: 0 0 1em;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  display: block;
+  overflow: auto;
+}
+table th, table td {
+  border: 1px solid var(--border);
+  padding: 0.5em 0.9em;
+}
+table th { background: var(--code-bg); }
+img { max-width: 100%; height: auto; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 2em 0; }
+ul, ol { padding-left: 2em; }
+li + li { margin-top: 0.2em; }
+</style>
+</head>
+<body>
+<main>
+<h1 id="_1">パイプライン実行手順書</h1>
+<h2 id="_2">概要</h2>
+<p>会議の議事録から戦略提案資料を自動生成する6段階パイプライン。
+Claude Code 上で順番に実行する。</p>
+<h2 id="_3">前提条件</h2>
+<ul>
+<li>Claude Code（Max プラン）で実行</li>
+<li>以下の MCP サーバーが接続済みであること:</li>
+<li><strong>Notion</strong> — 議事録の取得に使用</li>
+<li><strong>Google Slides（Google Drive MCP）</strong> — 過去資料の検索・スライド作成に使用</li>
+</ul>
+<h2 id="_4">パイプライン全体像</h2>
+<pre class="codehilite"><code>[Notion 議事録]
+      │
+      ▼
+┌─────────────┐
+│ 1. Retriever │  ← Notion MCP で議事録を取得・構造化
+└─────┬───────┘
+      ▼
+┌──────────────────┐
+│ 2. Issue Structurer │  ← ビジネス課題を言語化・検索クエリ生成
+└─────┬────────────┘
+      ├──────────────────┐
+      ▼                  ▼
+┌──────────────┐  ┌───────────────┐
+│ 3. Market    │  │ 4. Analogy    │  ← 並列実行
+│   Researcher │  │    Finder     │
+└──────┬───────┘  └───────┬───────┘
+       └────────┬─────────┘
+                ▼
+┌─────────────────┐
+│ 5. Strategist   │  ← 戦略構築 + Devil's Advocate
+└─────┬───────────┘
+      ▼
+┌─────────────────┐
+│ 6. Report Builder│  ← スライド構成を生成
+└─────────────────┘
+      │
+      ▼
+[Google Slides 提案資料]
+</code></pre>
+
+<h2 id="_5">実行手順</h2>
+<h3 id="step-0">Step 0: 準備</h3>
+<p>会議名（Notion の議事録ページ名）を確認する。
+以下の手順では <code>{{会議名}}</code> を実際の会議名に置き換えること。</p>
+<hr />
+<h3 id="step-1-retriever">Step 1: Retriever（議事録取得・構造化）</h3>
+<p><strong>プロンプト:</strong> <code>/agents/retriever/prompt.md</code>
+<strong>出力:</strong> <code>/agents/retriever/output.json</code></p>
+<ol>
+<li><code>notion-search</code> で <code>{{会議名}}</code> を検索</li>
+<li>該当ページを <code>notion-fetch</code> で取得</li>
+<li>議事録を構造化し <code>output.json</code> に保存</li>
+</ol>
+<p><strong>完了条件:</strong> <code>retriever/output.json</code> に <code>title</code>, <code>key_points</code>, <code>raw_text</code> が含まれている</p>
+<hr />
+<h3 id="step-2-issue-structurer">Step 2: Issue Structurer（課題の言語化）</h3>
+<p><strong>プロンプト:</strong> <code>/agents/issue_structurer/prompt.md</code>
+<strong>入力:</strong> <code>/agents/retriever/output.json</code>
+<strong>出力:</strong> <code>/agents/issue_structurer/output.json</code></p>
+<ol>
+<li><code>retriever/output.json</code> を読み込む</li>
+<li>ビジネス課題を構造化</li>
+<li>リサーチクエリを 5-10 個生成</li>
+<li><code>output.json</code> に保存</li>
+</ol>
+<p><strong>完了条件:</strong> <code>core_question</code> と <code>research_queries</code> が含まれている</p>
+<hr />
+<h3 id="step-3-4-market-researcher-analogy-finder">Step 3 &amp; 4: Market Researcher + Analogy Finder（並列実行）</h3>
+<p><strong>並列で 2 つのエージェントを同時実行する。</strong></p>
+<h4 id="3-market-researcher">3. Market Researcher</h4>
+<p><strong>プロンプト:</strong> <code>/agents/market_researcher/prompt.md</code>
+<strong>入力:</strong> <code>/agents/issue_structurer/output.json</code>
+<strong>出力:</strong> <code>/agents/market_researcher/output.json</code></p>
+<ul>
+<li><code>research_queries</code> を使って WebSearch を実行</li>
+<li>市場・競合・ベンチマーク・顧客情報を収集</li>
+</ul>
+<h4 id="4-analogy-finder">4. Analogy Finder</h4>
+<p><strong>プロンプト:</strong> <code>/agents/analogy_finder/prompt.md</code>
+<strong>入力:</strong> <code>/agents/issue_structurer/output.json</code>
+<strong>出力:</strong> <code>/agents/analogy_finder/output.json</code></p>
+<ul>
+<li>異業種のアナロジー事例を 5-8 件収集</li>
+<li>転用可能なインサイトを抽出</li>
+</ul>
+<p><strong>完了条件:</strong> 両方の <code>output.json</code> が保存されている</p>
+<hr />
+<h3 id="step-5-strategist">Step 5: Strategist（戦略構築 + 批判的検証）</h3>
+<p><strong>プロンプト:</strong> <code>/agents/strategist/prompt.md</code>
+<strong>入力:</strong> <code>issue_structurer</code>, <code>market_researcher</code>, <code>analogy_finder</code> の output.json
+<strong>出力:</strong> <code>/agents/strategist/output.json</code></p>
+<ol>
+<li>全リサーチ結果を統合</li>
+<li>戦略オプションを 3-5 個構築</li>
+<li>Devil's Advocate で批判的検証</li>
+<li>最終推奨戦略を選定</li>
+</ol>
+<p><strong>完了条件:</strong> <code>recommended_strategy</code> と <code>critical_reviews</code> が含まれている</p>
+<hr />
+<h3 id="step-6-report-builder">Step 6: Report Builder（提案資料の構成作成）</h3>
+<p><strong>プロンプト:</strong> <code>/agents/report_builder/prompt.md</code>
+<strong>入力:</strong> <code>issue_structurer</code>, <code>market_researcher</code>, <code>analogy_finder</code>, <code>strategist</code> の output.json
+<strong>出力:</strong> <code>/agents/report_builder/output.json</code></p>
+<ol>
+<li>10-15 枚のスライド構成を設計</li>
+<li>各スライドのタイトル・箇条書き・スピーカーノートを作成</li>
+<li><code>output.json</code> に保存</li>
+</ol>
+<p><strong>完了条件:</strong> <code>slides</code> 配列にスライドデータが含まれている</p>
+<hr />
+<h3 id="step-7-google-slides">Step 7: Google Slides への反映（オプション）</h3>
+<p><code>report_builder/output.json</code> の内容を Google Slides MCP で実際のプレゼンテーションに変換する。</p>
+<ol>
+<li><code>createGoogleSlides</code> で新しいプレゼンテーションを作成</li>
+<li>各スライドを <code>createGoogleSlidesTextBox</code> で追加</li>
+<li>スピーカーノートを <code>updateGoogleSlidesSpeakerNotes</code> で設定</li>
+</ol>
+<hr />
+<h2 id="_6">エラー時の対応</h2>
+<table>
+<thead>
+<tr>
+<th>問題</th>
+<th>対応</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Notion で議事録が見つからない</td>
+<td>ページ名を確認し再検索。部分一致でも試す</td>
+</tr>
+<tr>
+<td>WebSearch の結果が不十分</td>
+<td>クエリを変更して再実行</td>
+</tr>
+<tr>
+<td>output.json のフォーマット不正</td>
+<td>prompt.md の出力フォーマットに従って修正</td>
+</tr>
+<tr>
+<td>MCP サーバー未接続</td>
+<td>Claude Code の MCP 設定を確認</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_7">共有・再利用</h2>
+<p>このパイプラインを他の人が使う場合:</p>
+<ol>
+<li>このリポジトリを <code>git clone</code> する</li>
+<li>Claude Code（Max プラン）を開く</li>
+<li>MCP サーバー（Notion, Google Drive）を設定する</li>
+<li>下記のコマンドで実行:</li>
+</ol>
+<pre class="codehilite"><code>/agents/orchestrator/PIPELINE.md の手順に従って、
+Notion の議事録ページ「会議名」からパイプラインを実行してください。
+</code></pre>
+
+<p>または、<code>/agents/orchestrator/run.md</code> のプロンプトを使って一括実行できる。</p>
+</main>
+</body>
+</html>
