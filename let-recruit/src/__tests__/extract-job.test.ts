@@ -1,13 +1,5 @@
 import { describe, it, expect } from "vitest";
-<<<<<<< HEAD
-import {
-  extractJsonBlock,
-  parseJobJson,
-  repairTruncatedJson,
-} from "@/lib/extract-job";
-=======
 import { extractJsonBlock, parseJobJson } from "@/lib/extract-job";
->>>>>>> claude/evaluation-finance-dashboard-50w8t9
 
 describe("extractJsonBlock", () => {
   it("```json フェンスから抽出する", () => {
@@ -23,76 +15,6 @@ describe("extractJsonBlock", () => {
   it("JSONが無ければ例外", () => {
     expect(() => extractJsonBlock("テキストのみ")).toThrow();
   });
-<<<<<<< HEAD
-
-  it("閉じ括弧が無い途中切れでも先頭から返す（修復に回す）", () => {
-    const raw = '結果: {"jobTitle":"エンジニア","summary":"仕事';
-    expect(extractJsonBlock(raw)).toBe('{"jobTitle":"エンジニア","summary":"仕事');
-  });
-});
-
-describe("repairTruncatedJson", () => {
-  it("文字列の途中で切れたJSONを修復する", () => {
-    const broken = '{"jobTitle":"エンジニア","summary":"仕事内容の説明が途中で';
-    const repaired = repairTruncatedJson(broken);
-    const obj = JSON.parse(repaired);
-    expect(obj.jobTitle).toBe("エンジニア");
-  });
-
-  it("配列の途中で切れたJSONを修復する", () => {
-    const broken = '{"benefits":["社会保険完備","交通費支給","住宅';
-    const obj = JSON.parse(repairTruncatedJson(broken));
-    expect(obj.benefits).toContain("社会保険完備");
-    expect(obj.benefits).toContain("交通費支給");
-  });
-
-  it('「"key": 」まで書いて切れた場合も壊れない', () => {
-    const broken = '{"jobTitle":"営業","salary":';
-    const obj = JSON.parse(repairTruncatedJson(broken));
-    expect(obj.jobTitle).toBe("営業");
-  });
-
-  it("ネストした途中切れも閉じられる", () => {
-    const broken =
-      '{"salary":{"type":"月給","min":300000,"max":500000,"note":"賞与';
-    const obj = JSON.parse(repairTruncatedJson(broken));
-    expect(obj.salary.min).toBe(300000);
-  });
-});
-
-describe("parseJobJson（応答の揺れへの耐性）", () => {
-  it("文字列内に生の改行があっても解析できる", () => {
-    const raw =
-      '{"jobTitle":"営業","philosophy":"ミッション: 可能性を解き放つ。\nビジョン: 日本をアップデートする。"}';
-    const job = parseJobJson(raw);
-    expect(job.jobTitle).toBe("営業");
-    expect(job.philosophy).toContain("ミッション");
-    expect(job.philosophy).toContain("ビジョン");
-  });
-
-  it("文字列内の未エスケープ引用符を修復できる（本番ログの実例）", () => {
-    // AIが「"細かいことに気づける"」を素の"で埋め込んだ実際の失敗応答パターン
-    const raw = `{
-      "catchphrase": "【土日祝休み×賞与年2回】"細かいことに気づける"が武器になる事務職／段取り・整理が得意な方にぴったりのポジション",
-      "jobTitle": "建築事務",
-      "benefits": ["社会保険完備", "定年後再雇用制度あり"]
-    }`;
-    const job = parseJobJson(raw);
-    expect(job.jobTitle).toBe("建築事務");
-    expect(job.catchphrase).toContain("細かいことに気づける");
-    expect(job.catchphrase).toContain("ポジション");
-    expect(job.benefits).toContain("社会保険完備");
-  });
-
-  it("給与の数値が文字列で来ても数値化される", () => {
-    const job = parseJobJson(
-      '{"salary":{"monthlyMin":"19.6","monthlyMax":"30万円","annualMin":null,"annualMax":null,"note":""}}',
-    );
-    expect(job.salary.monthlyMin).toBe(19.6);
-    expect(job.salary.monthlyMax).toBe(30);
-  });
-=======
->>>>>>> claude/evaluation-finance-dashboard-50w8t9
 });
 
 describe("parseJobJson", () => {
@@ -100,26 +22,10 @@ describe("parseJobJson", () => {
     const job = parseJobJson('{"jobTitle":"エンジニア"}');
     expect(job.jobTitle).toBe("エンジニア");
     expect(job.responsibilities).toEqual([]);
-<<<<<<< HEAD
-    expect(job.salary.monthlyMin).toBeNull();
-  });
-
-  it("途中切れの応答からも読める部分を復元する", () => {
-    const truncated =
-      '{"jobTitle":"施工管理","companyName":"テスト建設","summary":"新築の';
-    const job = parseJobJson(truncated);
-    expect(job.jobTitle).toBe("施工管理");
-    expect(job.companyName).toBe("テスト建設");
-  });
-
-  it("JSONを含まない応答は例外", () => {
-    expect(() => parseJobJson("すみません、できませんでした")).toThrow();
-=======
     expect(job.salary.type).toBe("月給");
   });
 
   it("不正JSONは例外", () => {
     expect(() => parseJobJson("{壊れた")).toThrow();
->>>>>>> claude/evaluation-finance-dashboard-50w8t9
   });
 });

@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
   "trailingSlash": false,
@@ -22,12 +21,5 @@
     { "source": "/demo/sales", "destination": "/demo/sales.html" },
     { "source": "/demo/marketing", "destination": "/demo/marketing.html" },
     { "source": "/demo/bpo", "destination": "/demo/bpo.html" }
-=======
-  "buildCommand": null,
-  "outputDirectory": "public",
-  "framework": null,
-  "rewrites": [
-    { "source": "/", "destination": "/dance-class-strategy.html" }
->>>>>>> claude/evaluation-finance-dashboard-50w8t9
   ]
 }

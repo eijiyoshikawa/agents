@@ -15,10 +15,6 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.69.0",
     "@sparticuz/chromium": "^140.0.0",
-<<<<<<< HEAD
-    "@vercel/postgres": "^0.10.0",
-=======
->>>>>>> claude/evaluation-finance-dashboard-50w8t9
     "lucide-react": "^1.8.0",
     "next": "16.2.3",
     "puppeteer-core": "^24.27.0",
