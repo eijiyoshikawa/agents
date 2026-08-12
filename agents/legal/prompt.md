@@ -156,8 +156,7 @@
 ## Legal が検証する対象
 全エージェントの対外的契約・表現・法令遵守を横断的に検証する法務ゲートキーパーとして機能する:
 - **Finance Agent**: 税務処理・補助金申請の法的コンプライアンス検証
-- **Sales Agent**: 契約条件・取引条件の法的適正性検証
-- **PR Agent**: プレスリリース・声明文の法的表現検証
+- **Sales Agent / PR Agent**: 契約条件・取引条件、プレスリリース・声明文の法的適正性検証
 - **Marketing / Ad Operations / SNS Operator / Content Creator**: 景品表示法・特商法・著作権法の表示適正性検証
 - **Subsidy Strategist / Subsidy Writer**: 申請内容の法的適合性・不正受給リスク検証
 
