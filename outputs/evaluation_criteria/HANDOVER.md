@@ -37,11 +37,27 @@
 デプロイブランチ: let-hyoka（ここへのpushで let-hyoka.vercel.app が更新される）
 ```
 
+### 【2026-08-13〜】デプロイはCLI経由に変更（重要）
+
+VercelのGitHub連携が停止中（自動デプロイが全プロジェクトで発火しない・原因調査中）のため、
+**本番反映は Vercel CLI（`npx vercel --prod`）で行う**。あわせて `let-hyoka.vercel.app` の
+ドメイン割り当てを「let-hyokaブランチ」→「Production」に変更済み（CLIデプロイが直接載る）。
+
+```bash
+cd ~/work/agents
+cat .vercel/project.json   # ← "agents" にリンクされていることを毎回確認（重要・下記事故参照）
+npx vercel --prod          # これが本番反映ボタン。let-hyoka.vercel.app に載る
+```
+
+⚠️ **2026-08-13の事故**: `vercel link` でプロジェクトを「slack-let」と誤選択して `--prod` を実行し、
+財務ダッシュボード本番が評価サイトの中身に置き換わった（slack_let側から `npx vercel --prod` で復旧済み）。
+リンク先の確認を必ず行うこと。GitHub連携が復旧したら従来のlet-hyokaブランチpush方式に戻せる。
+
 ### Vercelプロジェクトは2つある（混同注意！）
 
 | プロジェクト | 配信内容 | Root Directory | 触ってよいか |
 |------------|---------|---------------|------------|
-| **agents** | 評価制度ページ（let-hyoka.vercel.app は let-hyokaブランチのbranchドメイン）| `outputs/evaluation_criteria` / Framework=Other / 各Override OFF | 本プロジェクトの対象 |
+| **agents** | 評価制度ページ（let-hyoka.vercel.app = Production割り当て 2026-08-13〜）| `outputs/evaluation_criteria` / Framework=Other / 各Override OFF | 本プロジェクトの対象 |
 | **let-hyoka** | let-recruit（求人票Next.jsアプリ・別件）| `let-recruit` / Next.js | **触らない** |
 
 - agentsプロジェクトの main ブランチには `outputs/evaluation_criteria` が存在しないため、**mainブランチのデプロイは常に失敗する（仕様・無害）**。Redeployはlet-hyokaブランチの行のみ行うこと
@@ -70,9 +86,22 @@ cp outputs/evaluation_criteria/marketing/v2.html outputs/evaluation_criteria/pub
 cp -r outputs/evaluation_criteria/public/* ./public/
 git add -A && git commit -m "feat(deploy): ミラー同期" && git push origin let-hyoka
 git checkout claude/evaluation-finance-dashboard-50w8t9
+
+# 3. 【GitHub連携停止中の追加ステップ】CLIで本番反映（pushだけではデプロイされない）
+npx vercel --prod   # 実行前に cat .vercel/project.json で "agents" を確認
 ```
 
 ※ 実際に配信されているのは `outputs/evaluation_criteria/` 直下（Root Directory）。ルート/publicミラーは事故時の保険。
+
+### 実績データの更新（週次目安・2026-08-13 初回反映済み）
+
+```bash
+cd ~/work/agents   # 作業ブランチで
+CRON_SECRET=<slack-letのトークン> node outputs/evaluation_criteria/scripts/bake-eval-data.mjs
+git add outputs/evaluation_criteria/data outputs/evaluation_criteria/public/data
+git commit -m "chore(eval): 実績データ反映" && git push origin claude/evaluation-finance-dashboard-50w8t9
+npx vercel --prod   # let-hyokaブランチへのマージは記録用（デプロイには不要）
+```
 
 ## 4. 各部門の制度バージョン現状
 
