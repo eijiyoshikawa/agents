@@ -18,11 +18,11 @@
   const DEPT = root.dataset.dept || "";
 
   const css = `
-  #eval-live{margin:48px auto 24px;max-width:1080px;padding:0 16px;font-feature-settings:"tnum"}
-  #eval-live .ev-head{border-top:3px solid #1a1a2e;padding-top:20px;margin-bottom:4px;font-size:1.4rem;font-weight:700}
+  #eval-live{margin:48px auto 24px;max-width:1080px;padding:0 16px;font-feature-settings:"tnum";color:#1a1a1a}
+  #eval-live .ev-head{border-top:3px solid #1a1a2e;padding-top:20px;margin-bottom:4px;font-size:1.4rem;font-weight:700;color:#1a1a1a}
   #eval-live .ev-sub{color:#777;font-size:.78rem;margin-bottom:18px}
   #eval-live .ev-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
-  #eval-live .ev-card{border:1px solid #e2e2e8;border-radius:12px;padding:18px 20px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  #eval-live .ev-card{border:1px solid #e2e2e8;border-radius:12px;padding:18px 20px;background:#fff;color:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,.04)}
   #eval-live .ev-name{font-weight:700;font-size:1.05rem;display:flex;justify-content:space-between;align-items:baseline}
   #eval-live .ev-dept{font-size:.7rem;background:#eef0ff;color:#4550b5;padding:2px 8px;border-radius:99px}
   #eval-live .ev-kpis{display:flex;gap:20px;margin:12px 0}
@@ -38,15 +38,12 @@
   #eval-live details{margin-top:8px;font-size:.78rem}
   #eval-live details summary{cursor:pointer;color:#4550b5}
   #eval-live .ev-box{border:1px dashed #ccc;border-radius:12px;padding:20px;text-align:center;color:#777;font-size:.85rem}
-  #eval-live .ev-common{border:1px solid #e2e2e8;border-radius:12px;padding:14px 20px;margin-top:16px;font-size:.82rem}
+  #eval-live .ev-common{border:1px solid #e2e2e8;border-radius:12px;padding:14px 20px;margin-top:16px;font-size:.82rem;background:#fff;color:#1a1a1a}
   #eval-live .ev-warn{background:#fff8e6;border:1px solid #f0d890;border-radius:10px;padding:10px 14px;font-size:.76rem;color:#8a6d1a;margin-bottom:14px}
-  #eval-live input.ev-pw{padding:8px 12px;border:1px solid #ccc;border-radius:8px;font-size:.9rem}
+  #eval-live input.ev-pw{padding:8px 12px;border:1px solid #ccc;border-radius:8px;font-size:.9rem;background:#fff;color:#1a1a1a}
   #eval-live button.ev-btn{padding:8px 16px;border:0;border-radius:8px;background:#1a1a2e;color:#fff;font-size:.85rem;cursor:pointer;margin-left:8px}
-  @media(prefers-color-scheme:dark){
-    #eval-live .ev-card,#eval-live .ev-common{background:#1c1c28;border-color:#33334a}
-    #eval-live .ev-head{border-color:#e8e8f0}
-    #eval-live table.ev-cost td{border-color:#2a2a3c}
-  }`;
+  /* ページ本体は常にライトデザインのため、OSダークモードでも配色を固定する
+     (以前は dark 時にカード背景だけ暗転し文字色が黒のまま→読めない問題があった) */`;
   const style = document.createElement("style");
   style.textContent = css;
   document.head.appendChild(style);
