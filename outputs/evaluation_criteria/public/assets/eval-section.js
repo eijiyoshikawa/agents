@@ -25,10 +25,10 @@
   #eval-live .ev-card{border:1px solid #e2e2e8;border-radius:12px;padding:18px 20px;background:#fff;color:#1a1a1a;box-shadow:0 1px 3px rgba(0,0,0,.04)}
   #eval-live .ev-name{font-weight:700;font-size:1.05rem;display:flex;justify-content:space-between;align-items:baseline}
   #eval-live .ev-dept{font-size:.7rem;background:#eef0ff;color:#4550b5;padding:2px 8px;border-radius:99px}
-  #eval-live .ev-kpis{display:flex;gap:20px;margin:12px 0}
+  #eval-live .ev-kpis{display:flex;flex-wrap:wrap;gap:14px 20px;margin:12px 0}
   #eval-live .ev-kpis b{display:block;font-size:1.25rem}
   #eval-live .ev-kpis span{font-size:.7rem;color:#888}
-  #eval-live .ev-pos{color:#0a7d4f}#eval-live .ev-neg{color:#c0392b}
+  #eval-live .ev-pos{color:#0a7d4f}#eval-live .ev-neg{color:#c0392b}#eval-live .ev-warn-txt{color:#b8860b}
   #eval-live table.ev-cost{width:100%;border-collapse:collapse;font-size:.82rem;margin:6px 0}
   #eval-live table.ev-cost td{padding:4px 2px;border-bottom:1px solid #f0f0f3}
   #eval-live table.ev-cost td:last-child{text-align:right;white-space:nowrap}
@@ -112,11 +112,15 @@
       costRows.push(["外注費（担当クライアント）", m.outsource_cost, null]);
     }
     const gp = m.gross_profit;
+    // 原価率 = 原価合計 ÷ 売上 (売上ゼロ時は表示しない)
+    const costRatio = m.total_cost != null && m.sales > 0 ? m.total_cost / m.sales : null;
+    const costRatioColor = costRatio == null ? "" : costRatio >= 1 ? "ev-neg" : costRatio >= 0.8 ? "ev-warn-txt" : "";
     return `<div class="ev-card">
       <div class="ev-name">${esc(m.name)}<span class="ev-dept">${esc(m.dept)}</span></div>
       <div class="ev-kpis">
         <div><span>当期売上</span><b>${yen(m.sales)}</b></div>
         <div><span>当期粗利</span><b class="${gp == null ? "" : gp >= 0 ? "ev-pos" : "ev-neg"}">${yen(gp)}</b></div>
+        <div><span>原価率</span><b class="${costRatioColor}">${costRatio != null ? pct(costRatio) : "—"}</b></div>
         <div><span>粗利率 / 月平均</span><b style="font-size:.95rem">${pct(m.gross_margin)} / ${yen(m.monthly_avg_profit)}</b></div>
       </div>
       <table class="ev-cost">${costRows
