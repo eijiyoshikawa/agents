@@ -13,7 +13,9 @@
 (function () {
   const root = document.getElementById("eval-live");
   if (!root) return;
-  const SRC = root.dataset.src;
+  // 主データ (部門別ファイル) と副データ (経営陣ファイル)。
+  // 部門パスワードなら主が、経営陣パスワードなら副が復号できる。
+  const SRCS = [root.dataset.src, root.dataset.srcAlt].filter(Boolean);
   const KEY = root.dataset.key + "_pw";
   const DEPT = root.dataset.dept || "";
 
@@ -157,7 +159,17 @@
     `;
   }
 
-  function askPassword(payload, message) {
+  /** パスワードを全候補データに順に試し、最初に復号できたものを返す */
+  async function tryDecrypt(payloads, password) {
+    for (const payload of payloads) {
+      try {
+        return await decrypt(payload, password);
+      } catch (e) { /* 次の候補へ */ }
+    }
+    return null;
+  }
+
+  function askPassword(payloads, message) {
     root.innerHTML = `
       <div class="ev-head">📊 リアルタイム実績</div>
       <div class="ev-box">
@@ -167,12 +179,12 @@
       </div>`;
     const input = root.querySelector("input");
     const tryUnlock = async () => {
-      try {
-        const data = await decrypt(payload, input.value);
+      const data = await tryDecrypt(payloads, input.value);
+      if (data) {
         sessionStorage.setItem(KEY, input.value);
         render(data);
-      } catch (e) {
-        askPassword(payload, "パスワードが違います。もう一度入力してください");
+      } else {
+        askPassword(payloads, "パスワードが違います。もう一度入力してください");
       }
     };
     root.querySelector("button").addEventListener("click", tryUnlock);
@@ -180,24 +192,29 @@
   }
 
   async function main() {
-    let payload;
-    try {
-      const res = await fetch(SRC, { cache: "no-store" });
-      if (!res.ok) throw new Error("not baked");
-      payload = await res.json();
-    } catch (e) {
+    const payloads = [];
+    for (const src of SRCS) {
+      try {
+        const res = await fetch(src, { cache: "no-store" });
+        if (res.ok) payloads.push(await res.json());
+      } catch (e) { /* 未焼き付けのファイルはスキップ */ }
+    }
+    if (!payloads.length) {
       root.innerHTML = `<div class="ev-head">📊 リアルタイム実績</div>
         <div class="ev-box">実績データはまだ反映されていません。<br>ターミナルで <code>node scripts/bake-eval-data.mjs</code> を実行してデプロイすると表示されます。</div>`;
       return;
     }
-    const saved = sessionStorage.getItem(KEY);
-    if (saved) {
-      try {
-        render(await decrypt(payload, saved));
+    // 認証ゲートで保持したパスワード (部門用 or 経営陣用) を先に試す
+    for (const k of [KEY, "let_auth_exec_pw"]) {
+      const saved = sessionStorage.getItem(k);
+      if (!saved) continue;
+      const data = await tryDecrypt(payloads, saved);
+      if (data) {
+        render(data);
         return;
-      } catch (e) { /* パスワード変更などで復号失敗 → 入力を求める */ }
+      }
     }
-    askPassword(payload);
+    askPassword(payloads);
   }
 
   main();

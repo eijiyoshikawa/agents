@@ -425,6 +425,7 @@ h1 {
     const errEl = document.getElementById('auth-error');
     if (hash === PASS_HASH) {
       sessionStorage.setItem(STORAGE_KEY, '1');
+      sessionStorage.setItem(STORAGE_KEY + '_pw', input);
       show();
     } else {
       errEl.classList.add('show');

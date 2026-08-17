@@ -35,6 +35,7 @@ const TARGETS = [
   { out: "eval-exec.enc.json", password: "letyakuin2026", depts: null }, // 経営陣: 全部門
   { out: "eval-sales.enc.json", password: "saleslet1117", depts: ["営業"] },
   { out: "eval-marketing.enc.json", password: "makematsu2026", depts: ["マーケティング"] },
+  { out: "eval-bpo.enc.json", password: "bpolet2026", depts: ["BPO"] },
 ];
 
 function fyArg() {
