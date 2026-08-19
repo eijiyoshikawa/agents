@@ -20,38 +20,16 @@
 
 ### Step 2: デザイントークンの体系的抽出
 
-**カラーセマンティクス（意味ベースの分類）:**
-1. **Brand**: プライマリ、セカンダリ、アクセント（CTA・強調に使用）
-2. **Neutral**: 背景（main/alt/dark）、テキスト（primary/secondary/muted）、ボーダー
-3. **Semantic**: success/warning/error/info（存在する場合）
-4. **Surface**: カード背景、モーダル背景、オーバーレイ色
+**カラーセマンティクス:** Brand（primary/secondary/accent）、Neutral（background/text/border）、Semantic（success/warning/error/info）、Surface（card/modal/overlay）の4層で分類。色は HEX（`#RRGGBB`）で統一。
 
-色は HEX コード（`#RRGGBB`）で統一して記録する。
+**スペーシングスケール:** 使用余白値を収集しベーススケールを推定（4px/8px ベース等）。セクション間・コンポーネント間・要素間の3階層で整理し、Tailwind spacing scale との対応を記録。
 
-**スペーシングスケール:**
-- 使用されている余白値を収集し、ベーススケールを推定（4px/8px ベース等）
-- セクション間、コンポーネント間、要素間の3階層で整理
-- Tailwind の spacing scale との対応を記録
+**タイポグラフィスケール:** フォントファミリー（日本語/欧文、Google Fonts URL）、見出し（h1〜h4）のsize/weight/line-height/letter-spacing（デスクトップ/モバイル）、本文（日本語はline-height 1.8〜2.0）、小テキスト（caption/label/overline）。modular scale 比率を推定。
 
-**タイポグラフィスケール:**
-- フォントファミリー（日本語/欧文、Google Fonts URL）
-- 見出し（h1〜h4）: size, weight, line-height, letter-spacing（デスクトップ/モバイル）
-- 本文: size, weight, line-height（日本語は 1.8〜2.0 が多い）
-- 小テキスト: caption, label, overline
-- フォントサイズの比率（modular scale）を推定
-
-**エレベーションシステム（影の階層）:**
-- shadow-sm / shadow / shadow-md / shadow-lg / shadow-xl 相当の値を抽出
-- 使用箇所ごとのエレベーション対応（カード、モーダル、ドロップダウン等）
+**エレベーションシステム:** shadow-sm〜xl 相当の値を抽出し、使用箇所（カード/モーダル/ドロップダウン等）との対応を記録。
 
 ### Step 3: ブランドアイデンティティ分析
-サイト全体のビジュアル言語を言語化する:
-
-- **トーン**: corporate / modern-clean / playful / luxury / minimal / editorial
-- **ムード**: 信頼感 / 革新性 / 親しみ / 高級感 / 力強さ
-- **パーソナリティ**: 形容詞3〜5語で表現（例: 洗練された、温かい、プロフェッショナル）
-- **ビジュアル言語の特徴**: 直線的/有機的、余白重視/密度重視、写真主体/イラスト主体
-- **競合との差別化ポイント**: デザイン面での独自性
+サイト全体のビジュアル言語を言語化する: トーン（corporate/modern-clean/playful/luxury/minimal/editorial）、ムード（信頼感/革新性/親しみ/高級感/力強さ）、パーソナリティ（形容詞3〜5語）、ビジュアル言語の特徴（直線的/有機的、余白重視/密度重視、写真主体/イラスト主体）、競合との差別化ポイント。
 
 ### Step 4: UIコンポーネントのスタイル
 よく使われるUIパーツのスタイルを記録する:
