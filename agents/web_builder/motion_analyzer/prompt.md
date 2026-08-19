@@ -41,43 +41,20 @@ CSSファイルとインラインスタイルから以下を検出する:
 - 画像: ズーム、オーバーレイ表示
 
 ### Step 5: ページ遷移パターンの検出
-- **SPA遷移**: fade / slide / crossfade / shared-layout-animation
-- **View Transitions API**: `::view-transition-*` 擬似要素の使用
-- **ルーティングライブラリ連携**: Next.js App Router / Framer Motion AnimatePresence
-- **遷移前後の要素対応**: 共有要素遷移（shared element transition）の有無
+SPA遷移（fade/slide/crossfade/shared-layout）、View Transitions API（`::view-transition-*`）、ルーティング連携（Next.js App Router / AnimatePresence）、共有要素遷移の有無を検出。
 
 ### Step 6: ローディング・フィードバックアニメーション
-
-**ローディング状態:**
-- 初回ページロード: プログレスバー / スピナー / ロゴアニメーション / スケルトン
-- コンテンツ遅延読み込み: プレースホルダー / shimmer エフェクト / blur-up
-- ページ遷移中: トップバープログレス / フェードオーバーレイ
-
-**マイクロフィードバック:**
-- フォーム送信: ボタン内スピナー / 成功チェックマーク / エラーシェイク
-- コピー完了: ツールチップ変化 / アイコン変化
-- いいね/お気に入り: ハートアニメーション / カウントアップ
-- トースト通知: スライドイン方向、自動消去タイミング
+**ローディング:** 初回ロード（progress-bar/spinner/skeleton）、遅延読み込み（shimmer/blur-up）、遷移中（top-bar-progress/fade-overlay）。
+**マイクロフィードバック:** フォーム送信（spinner→check/error-shake）、コピー完了（icon-swap+tooltip）、いいね（heart animation）、トースト通知（slide方向・自動消去）。
 
 ### Step 7: テキスト・数値アニメーション
-- テキスト表示: タイピング / 文字ごとのフェードイン / マスクリビール / スプリットテキスト
-- 数値: カウントアップ / スロットカウンター / 桁ごとのロール
-- スクロールバー連動プログレスバー
-- マーキー（横スクロールテキスト）
+テキスト（タイピング/文字フェードイン/マスクリビール/スプリットテキスト）、数値（カウントアップ/スロットカウンター）、プログレスバー、マーキー。
 
 ### Step 8: パフォーマンス影響の評価
 検出した各アニメーションのレンダリングコストを分類する:
 
-**レイヤー分類（安価→高価）:**
-- **Composite のみ**: `transform`(translate/scale/rotate), `opacity` → GPU処理、高パフォーマンス
-- **Paint 発生**: `background-color`, `box-shadow`, `border-radius` 変化 → 中程度のコスト
-- **Layout 発生**: `width`, `height`, `margin`, `padding`, `top/left` 変化 → 高コスト、要最適化
-
-**評価項目:**
-- `will-change` / `transform: translateZ(0)` によるレイヤー昇格の有無
-- 同時アニメーション数の推定（過剰な同時実行は jank の原因）
-- 大きな要素（ヒーロー画像等）のアニメーションコスト
-- `contain` プロパティによるレイアウト封じ込めの有無
+**レイヤー分類:** Composite（transform/opacity→GPU、高パフォーマンス）、Paint（background-color/box-shadow→中コスト）、Layout（width/height/margin→高コスト、要最適化）。
+**評価項目:** `will-change` によるレイヤー昇格、同時アニメーション数、大要素のコスト、`contain` による封じ込め。
 
 ### Step 9: アクセシビリティ対応（Reduced Motion）の検出
 - `@media (prefers-reduced-motion: reduce)` の有無
