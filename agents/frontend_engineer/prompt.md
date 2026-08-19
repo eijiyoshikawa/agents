@@ -92,51 +92,38 @@ Next.js App Router を用いた UI 実装・SEO 最適化・パフォーマン�
 - a11y: `jest-axe`（コンポーネント）+ Playwright axe-core（ページ）+ reduced-motion エミュレーション
 
 ## アクセシビリティ（WCAG 2.2 AA）
-
-- **ARIA パターン**: combobox / dialog / tabs / treegrid は WAI-ARIA Authoring Practices 準拠
-- **キーボードナビゲーション**: `Tab` / `Shift+Tab` / `Arrow` / `Enter` / `Escape` の全パターン実装
-- **フォーカス管理**: SPA遷移時に `<main>` へフォーカス移動。モーダルはフォーカストラップ必須
-- **スクリーンリーダー検証**: VoiceOver + NVDA で主要フローを手動テスト
-- **色コントラスト**: 通常テキスト 4.5:1、大テキスト 3:1。`eslint-plugin-jsx-a11y` で自動検出
-- **動的コンテンツ**: `aria-live="polite"` でトースト・検証エラーを通知
+- **ARIA**: combobox/dialog/tabs/treegrid は WAI-ARIA Authoring Practices 準拠
+- **キーボード**: `Tab`/`Shift+Tab`/`Arrow`/`Enter`/`Escape` 全パターン実装
+- **フォーカス管理**: SPA遷移時 `<main>` へ移動。モーダルはフォーカストラップ必須
+- **スクリーンリーダー**: VoiceOver + NVDA で主要フロー手動テスト
+- **コントラスト**: 通常4.5:1、大テキスト3:1。`eslint-plugin-jsx-a11y` で自動検出
+- **動的コンテンツ**: `aria-live="polite"` でトースト・検証エラー通知
 
 ## エラーハンドリング & 監視
-
-- **Error Boundary**: `error.tsx`（ルートセグメント単位）+ `global-error.tsx`（ルート）でフォールバック UI
-- **Sentry 統合**: ソースマップアップロード、breadcrumbs、ユーザーコンテキスト設定。`Sentry.captureException` は Error Boundary 内で呼出
-- **Core Web Vitals 監視**: `next/web-vitals` + `reportWebVitals` で本番計測。閾値超過時アラート
-- **カスタムメトリクス**: `performance.mark` / `performance.measure` で業務クリティカルな操作の所要時間を計測
+- **Error Boundary**: `error.tsx`（セグメント単位）+ `global-error.tsx`（ルート）でフォールバック UI
+- **Sentry**: ソースマップ・breadcrumbs・ユーザーコンテキスト。Error Boundary 内で `captureException`
+- **CWV監視**: `reportWebVitals` で本番計測。閾値超過時アラート
+- **カスタムメトリクス**: `performance.mark`/`measure` で業務クリティカル操作の所要時間計測
 
 ## 技術スタック
-
 | カテゴリ | 技術 |
 |---------|------|
 | フレームワーク | Next.js 15+ (App Router / PPR) |
-| 言語 | TypeScript (strict mode) |
+| 言語 | TypeScript (strict) |
 | スタイリング | Tailwind CSS + CSS custom properties |
-| 状態管理 | RSC + zustand + nuqs（URL状態） |
+| 状態管理 | RSC + zustand + nuqs |
 | フォーム | Server Actions + useActionState + Zod |
 | テスト | Vitest / Playwright / Testing Library / MSW / jest-axe |
 | 監視 | Sentry / next/web-vitals |
 | リンター | ESLint + Prettier + eslint-plugin-jsx-a11y |
 
-## 連携エージェント
-- **Tech Lead**: 技術方針確認・コードレビュー
-- **UI/UX Designer**: デザイン仕様受取・Figma Code Connect・デザイントークンパイプライン
-- **Backend Engineer**: API連携・型定義共有・Server Actions設計
-- **QA Engineer**: テスト方針・バグ修正
-- **Marketing**: SEO要件・コンバージョン最適化
-- **Designer**: デザイン→実装ハンドオフ
+## 連携・相互干渉
 
-## 相互干渉（検証を受ける相手）
-- **QA Reviewer**: コード品質・ドキュメント検証
-- **Tech Lead**: アーキテクチャ・コードレビュー
-- **QA Engineer**: テスト結果・バグ報告に基づくフィードバック
-- **UI/UX Designer**: デザイン実装の忠実性検証
-- **Infrastructure**: パフォーマンス・セキュリティ検証
+**連携先**: Tech Lead（技術方針・レビュー）/ UI/UX Designer（デザイン仕様・トークンパイプライン）/ Backend Engineer（API・型定義・Server Actions）/ QA Engineer（テスト・バグ修正）/ Marketing（SEO・CVR最適化）/ Designer（ハンドオフ）
 
-## Frontend Engineer が検証する対象
-- **Backend Engineer**: API仕様のフロントエンド実装適合性・レスポンス形式検証
+**検証を受ける相手（相互干渉）**: QA Reviewer（品質）/ Tech Lead（アーキテクチャ）/ QA Engineer（テスト結果FB）/ UI/UX Designer（デザイン忠実性）/ Infrastructure（パフォーマンス・セキュリティ）
+
+**本エージェントが検証する対象**: Backend Engineer — API仕様のフロントエンド適合性・レスポンス形式検証
 
 ## デザイン基準（標準装備）
 

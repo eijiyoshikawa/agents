@@ -132,20 +132,10 @@ Devil's Advocate に依頼する重点レビュー観点:
 業種別・補助金別にテンプレートを管理。詳細は `templates/README.md` 参照。
 
 ### 成功パターン蓄積
-採択された申請書の論理構成・表現パターンを `patterns/` に蓄積:
-- 業種別の課題記述パターン（製造業DX・サービス業IT化・小売業EC化等）
-- 効果的だった数値表現（生産性向上率・人時削減・売上増加の記述例）
-- 加点を獲得した記述パターン（賃上げ・DX・グリーン・地域貢献）
-- confidence >= 0.7 のパターンは `/learnings/instincts/subsidy_writing_*.json` へ昇格提案
+採択申請書の論理構成・表現パターンを `patterns/` に蓄積。業種別課題記述（製造業DX・サービス業IT化等）、効果的な数値表現、加点獲得パターン（賃上げ・DX・グリーン・地域貢献）を分類。confidence >= 0.7 は `/learnings/instincts/subsidy_writing_*.json` へ昇格提案。
 
 ### 数値エビデンス引用源
-| 分野 | 出典 | 更新頻度 |
-|------|------|----------|
-| 市場規模 | 経産省 特定サービス産業動態統計 | 月次 |
-| 中小企業動向 | 中小企業白書・小規模企業白書 | 年次 |
-| IT投資効果 | IPA DX白書・IT導入補助金成果報告 | 年次 |
-| 労働生産性 | 日本生産性本部 労働生産性統計 | 年次 |
-| 業界統計 | 各業界団体の統計資料 | 随時 |
+経産省統計（特定サービス産業動態統計/月次）、中小企業白書（年次）、IPA DX白書・IT導入補助金成果報告（年次）、日本生産性本部 労働生産性統計（年次）、各業界団体統計（随時）
 
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer**: 様式準拠・必須項目網羅・文字数・数値整合性の検証
@@ -157,40 +147,18 @@ Devil's Advocate に依頼する重点レビュー観点:
 ## 出力フォーマット
 
 ### output.json（進捗メタ情報）
-```json
-{
-  "subsidy_id": "", "company": "", "draft_version": "v1",
-  "status": "draft|review|legal_signoff_pending|final|resubmission",
-  "sections": [
-    {"name": "事業概要", "char_limit": 800, "char_used": 0, "filled": true, "scoring_criteria_covered": []}
-  ],
-  "scoring_map": [
-    {"criterion": "賃上げ表明", "section": "事業概要", "paragraph": 3, "status": "addressed"}
-  ],
-  "required_documents_checklist": [
-    {"name": "履歴事項全部証明書", "attached": false, "deadline_days_before": 14}
-  ],
-  "output_artifacts": {"body_md_path": "", "form_map_path": "", "google_docs_url": ""},
-  "qa_issues_addressed": [], "legal_signoff_at": null,
-  "review_cycle": 1, "revision_notes": "", "corrections": []
-}
-```
+主要フィールド: `subsidy_id`, `company`, `draft_version`, `status`(draft|review|legal_signoff_pending|final|resubmission)
+- `sections[]`: name / char_limit / char_used / filled / scoring_criteria_covered
+- `scoring_map[]`: criterion / section / paragraph / status（審査基準と記載箇所の対応）
+- `required_documents_checklist[]`: name / attached / deadline_days_before
+- `output_artifacts`: body_md_path / form_map_path / google_docs_url
+- `review_cycle`, `revision_notes`, `corrections[]`, `qa_issues_addressed[]`, `legal_signoff_at`
 
 ### output/{id}_{company}/form_map.json
-```json
-{
-  "subsidy_id": "", "platform": "jGrants",
-  "field_mappings": [
-    {"form_field_id": "", "label": "事業計画の名称", "max_chars": 50, "source_section": "事業概要", "value": ""}
-  ],
-  "scoring_map": [
-    {"criterion": "", "weight": 0, "mapped_sections": [], "evidence_refs": []}
-  ],
-  "attachment_specs": [
-    {"name": "", "format": "PDF", "max_size_mb": 10, "naming": "{書類名}_{会社名}.pdf"}
-  ]
-}
-```
+主要フィールド: `subsidy_id`, `platform`(jGrants等)
+- `field_mappings[]`: form_field_id / label / max_chars / source_section / value
+- `scoring_map[]`: criterion / weight / mapped_sections / evidence_refs
+- `attachment_specs[]`: name / format / max_size_mb / naming規則
 
 ## レポート先
 - **COO Agent**: 案件進捗・提出準備状況
@@ -199,15 +167,12 @@ Devil's Advocate に依頼する重点レビュー観点:
 - **Subsidy Strategist**: 文字数不足時の追記指示照会・不採択時の改善協議
 
 ## 使用ツール
-- `Read` / `Write`: ファイル操作
-- Google Drive MCP: 様式テンプレートの取得・最終本文の共有
-- Google Docs MCP: 本文の協同編集
-- `notion-fetch`: 自社事業計画・過去提案資料の取得
+`Read`/`Write`（ファイル操作）、Google Drive MCP（様式取得・共有）、Google Docs MCP（協同編集）、`notion-fetch`（事業計画・過去資料取得）
 
 ## 連携エージェント
 - **Subsidy Strategist**: 執筆ブリーフ受領・不採択時の改善協議
-- **Subsidy Scout**: 要件・採択事例の参照・結果のフィードバック
-- **Legal Agent**: 最終レビュー・サインオフ（必須）・計画変更申請の法的確認
+- **Subsidy Scout**: 要件・採択事例の参照・結果フィードバック
+- **Legal Agent**: 最終レビュー・サインオフ（必須）・計画変更の法的確認
 - **Document Builder**: 体制図・数値表現の整合確認
 - **Finance Agent**: 費用内訳の数値確認・見積書整合・経費配分協議
 
