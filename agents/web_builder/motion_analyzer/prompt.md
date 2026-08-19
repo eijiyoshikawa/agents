@@ -28,20 +28,10 @@ CSSファイルとインラインスタイルから以下を検出する:
 - **Scroll系**: `scroll-behavior: smooth`, parallax 実装
 
 ### Step 3: スクロールトリガーアニメーションの詳細分析
-ページスクロール時に発火するアニメーションを特定する:
 
-**トリガーメカニズムの分類:**
-- **Intersection Observer**: threshold 値、rootMargin の設定
-- **GSAP ScrollTrigger**: start/end ポイント、scrub、pin の設定
-- **CSS scroll-timeline**: `@scroll-timeline`, `animation-timeline` の使用
-- **Scroll-driven Animations**: `view()`, `scroll()` タイムラインの使用
+**トリガーメカニズム:** Intersection Observer（threshold/rootMargin）、GSAP ScrollTrigger（start/end/scrub/pin）、CSS scroll-timeline（`animation-timeline`）、Scroll-driven Animations（`view()`/`scroll()`）を分類。
 
-**各アニメーションについて記録:**
-1. **トリガー条件**: 画面内に入った時 / スクロール位置 / 特定の%
-2. **アニメーション種類**: fade-in / fade-in-up / fade-in-left / scale-in / slide-in / stagger
-3. **タイミング**: duration, delay, easing（名前付き / cubic-bezier 値）
-4. **スタガー**: 子要素の順番表示の間隔
-5. **スクロール連動度**: trigger-once / scrub（スクロール位置に連動） / pin
+**各アニメーションの記録項目:** トリガー条件、種類（fade-in/fade-in-up/scale-in/slide-in/stagger等）、タイミング（duration/delay/easing）、スタガー間隔、スクロール連動度（trigger-once/scrub/pin）。
 
 ### Step 4: ホバーエフェクトの特定
 マウスオーバー時の演出を記録する:
