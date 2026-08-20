@@ -11,12 +11,10 @@ name: Deploy sales-cockpit to Vercel
 #
 # ORG_ID / PROJECT_ID は不要（このワークフローがプロジェクトを自動作成・リンクする）。
 
+# 2026-08-20: Vercel の GitHub 連携（Git Integration）を有効化したため、
+# push による自動デプロイはVercel側が行う。このワークフローの push トリガーは
+# 二重デプロイ防止のため無効化し、手動実行（workflow_dispatch）のみ残す。
 on:
-  push:
-    branches: [claude/jolly-dirac-j1jm1i, main]
-    paths:
-      - "sales-cockpit/**"
-      - ".github/workflows/deploy-sales-cockpit.yml"
   workflow_dispatch:
 
 concurrency:

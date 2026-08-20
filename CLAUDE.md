@@ -333,6 +333,18 @@ hotfix/<短い説明>    — 緊急修正
 4. QA Reviewer / Tech Lead のレビュー
 5. CI通過後にマージ
 
+### デプロイ再トリガーの禁止事項（恒久ルール・厳守）
+背景: 空コミットの定期自動pushによるVercelデプロイ再トリガーがGitHubの不正検知（abuse detection）に抵触し、アカウントがフラグされた実績がある（2026年8月）。
+
+1. **空コミット禁止** — `git commit --allow-empty`、内容のないダミーコミット、コメントだけ変えた再トリガー用コミットは絶対にしない
+2. **自動コミット生成の禁止** — cron・スクリプト・ループ等でコミットやpushを定期的・自動的に生成する仕組みを作らない
+3. **コミットは実変更があるときのみ** — 実際のコード・ドキュメント変更があるときだけコミットする
+4. **デプロイ再実行は必ず以下のいずれかで行う**（GitHubを経由しない）:
+   - Vercel Deploy Hook（Settings → Git → Deploy Hooks で発行したURLに `curl -X POST`）
+   - Vercelダッシュボードの Redeploy ボタン
+   - Vercel CLI（`vercel --prod`）
+5. 通常のデプロイは Vercel の GitHub 連携（mainマージ → 自動デプロイ）を使う
+
 ## セキュリティ基準（Security Standards）
 
 ### コミット前の必須チェック
