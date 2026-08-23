@@ -119,6 +119,10 @@
       costRows.push(["広告宣伝費（担当クライアント）", m.ad_cost, null]);
       costRows.push(["外注費（担当クライアント）", m.outsource_cost, null]);
     }
+    // 従業員向け表示調整 (サーバ側 eval_employee_adjustments で設定された分)
+    if (m.adjustment_cost) {
+      costRows.push(["調整額", m.adjustment_cost, `月額 ${yen(m.adjustment_monthly)} × ${m.months_elapsed}ヶ月`]);
+    }
     const gp = m.gross_profit;
     // 原価率 = 原価合計 ÷ 売上 (売上ゼロ時は表示しない)
     const costRatio = m.total_cost != null && m.sales > 0 ? m.total_cost / m.sales : null;
