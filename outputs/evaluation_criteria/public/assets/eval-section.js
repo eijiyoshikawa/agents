@@ -13,9 +13,15 @@
 (function () {
   const root = document.getElementById("eval-live");
   if (!root) return;
-  // 主データ (部門別ファイル) と副データ (経営陣ファイル)。
-  // 部門パスワードなら主が、経営陣パスワードなら副が復号できる。
-  const SRCS = [root.dataset.src, root.dataset.srcAlt].filter(Boolean);
+  // データ候補 (先頭から順に取得を試す):
+  //   data-srcs="url1 url2 ..." 空白区切り。通常は
+  //   [動的配信(部門), 動的配信(経営陣), 静的焼き付け(部門), 静的焼き付け(経営陣)]
+  //   の順で、slack-let の動的配信が最新・静的ファイルは障害時フォールバック。
+  // 旧形式 data-src / data-src-alt も引き続きサポート。
+  const SRCS = (root.dataset.srcs
+    ? root.dataset.srcs.split(/\s+/)
+    : [root.dataset.src, root.dataset.srcAlt]
+  ).filter(Boolean);
   const KEY = root.dataset.key + "_pw";
   const DEPT = root.dataset.dept || "";
 

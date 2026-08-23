@@ -247,3 +247,12 @@ npx vercel --prod   # let-hyokaブランチへのマージは記録用（デプ�
 - 実績データも部門別ファイル (eval-sales/marketing/bpo.enc.json) を部門パスワードで復号。
   他部門の人件費・粗利は部門パスワードでは復号できない
 - パスワード変更手順: ①bake-eval-data.mjs の TARGETS のpassword ②該当ページのDEPT_HASH (sha256) を変更 → bake → デプロイ
+
+## 実績データの動的配信化 — 2026-08-24
+- 実績セクションは slack-let の `/api/eval/encrypted?target=<sales|marketing|bpo|exec>` から
+  暗号化データを直接取得するようになった（30分キャッシュ・実質リアルタイム）
+- **手動bake→コミット→デプロイの定期作業は不要になった**。
+  `scripts/bake-eval-data.mjs` と `data/*.enc.json` は slack-let 障害時のフォールバック
+  （各ページの data-srcs の後段に静的ファイルを残してある）
+- 配信パスワードは Notion「MF連携設定」の `eval_page_password_*`。
+  ページのパスワード変更時は「ページ側ハッシュ」と「このNotionキー」の両方を更新すること
