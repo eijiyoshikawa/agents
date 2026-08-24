@@ -1,6 +1,6 @@
 # 引き継ぎ文書 — LET評価制度プロジェクト（let-hyoka）
 
-最終更新: 2026-08-24 ／ 現行作業ブランチ: claude/evaluation-finance-dashboard-d0u7iz（50w8t9 は PR #22 でmainへマージ済み）
+最終更新: 2026-08-24 ／ 現行作業ブランチ: claude/evaluation-finance-dashboard-d0u7iz（50w8t9 の全作業を取り込み済み。PR #22 まではmainへマージ済み）
 
 ---
 
@@ -33,7 +33,7 @@
 
 ```
 リポジトリ: eijiyoshikawa/agents
-作業ブランチ: claude/evaluation-finance-dashboard-50w8t9（開発コミット先 ※旧 claude/evaluation-criteria-framework-mkp6W をマージ済み）
+作業ブランチ: claude/evaluation-finance-dashboard-d0u7iz（開発コミット先 ※50w8t9 の全作業をマージ済み）
 デプロイブランチ: let-hyoka（ここへのpushで let-hyoka.vercel.app が更新される）
 ```
 
@@ -67,13 +67,13 @@ npx vercel --prod          # これが本番反映ボタン。let-hyoka.vercel.a
 
 ```bash
 # 1. 作業ブランチで outputs/evaluation_criteria/ 配下を編集・コミット・push
-git checkout claude/evaluation-finance-dashboard-50w8t9
+git checkout claude/evaluation-finance-dashboard-d0u7iz
 # （編集）
-git add outputs/evaluation_criteria/ && git commit -m "..." && git push origin claude/evaluation-finance-dashboard-50w8t9
+git add outputs/evaluation_criteria/ && git commit -m "..." && git push origin claude/evaluation-finance-dashboard-d0u7iz
 
 # 2. let-hyokaにマージ + ミラー同期 + push（これでVercelが自動デプロイ）
 git checkout let-hyoka
-git merge claude/evaluation-finance-dashboard-50w8t9 --no-ff -m "merge: ..."
+git merge claude/evaluation-finance-dashboard-d0u7iz --no-ff -m "merge: ..."
 # ルートミラー（let-hyokaブランチのみ存在）
 cp outputs/evaluation_criteria/*.html ./ 2>/dev/null
 cp outputs/evaluation_criteria/demo/*.html ./demo/
@@ -85,7 +85,7 @@ cp outputs/evaluation_criteria/demo/*.html outputs/evaluation_criteria/public/de
 cp outputs/evaluation_criteria/marketing/v2.html outputs/evaluation_criteria/public/marketing/
 cp -r outputs/evaluation_criteria/public/* ./public/
 git add -A && git commit -m "feat(deploy): ミラー同期" && git push origin let-hyoka
-git checkout claude/evaluation-finance-dashboard-50w8t9
+git checkout claude/evaluation-finance-dashboard-d0u7iz
 
 # 3. 【GitHub連携停止中の追加ステップ】CLIで本番反映（pushだけではデプロイされない）
 npx vercel --prod   # 実行前に cat .vercel/project.json で "agents" を確認
@@ -99,7 +99,7 @@ npx vercel --prod   # 実行前に cat .vercel/project.json で "agents" を確�
 cd ~/work/agents   # 作業ブランチで
 CRON_SECRET=<slack-letのトークン> node outputs/evaluation_criteria/scripts/bake-eval-data.mjs
 git add outputs/evaluation_criteria/data outputs/evaluation_criteria/public/data
-git commit -m "chore(eval): 実績データ反映" && git push origin claude/evaluation-finance-dashboard-50w8t9
+git commit -m "chore(eval): 実績データ反映" && git push origin claude/evaluation-finance-dashboard-d0u7iz
 npx vercel --prod   # let-hyokaブランチへのマージは記録用（デプロイには不要）
 ```
 
