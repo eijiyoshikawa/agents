@@ -663,9 +663,9 @@ h1 em { font-style: normal; color: var(--accent); }
 <body>
 <div id="auth-gate">
   <div class="auth-card">
-    <div class="auth-eyebrow">LET / 経営陣ページ</div>
+    <div class="auth-eyebrow">LET / マーケティング部ページ</div>
     <div class="auth-title">パスワードを入力</div>
-    <div class="auth-desc">この資料は社外秘です。<br>経営陣専用のパスワードを入力してください（1回のログインで全部門ページが開きます）。</div>
+    <div class="auth-desc">この資料は社外秘です。<br>マーケティング部用のパスワードを入力してください。</div>
     <form id="auth-form" class="auth-form" autocomplete="off">
       <input type="password" id="auth-input" class="auth-input" placeholder="パスワード" autofocus required />
       <button type="submit" class="auth-button">ログイン</button>
@@ -1325,12 +1325,18 @@ h1 em { font-style: normal; color: var(--accent); }
 </div>
 </div>
 
+<!-- eval-live:start -->
+<section id="eval-live" data-srcs="https://slack-let.vercel.app/api/eval/encrypted?target=marketing https://slack-let.vercel.app/api/eval/encrypted?target=exec /data/eval-marketing.enc.json /data/eval-exec.enc.json" data-key="let_auth_marketing" data-dept="マーケティング"></section>
+<script src="/assets/eval-section.js" defer></script>
+<!-- eval-live:end -->
 </div>
 
 <script>
 (function() {
-  const PASS_HASH = "1e980b5384f2ce83258b28faa11cba9393191c5c95720fc1ca3b7fc464708ea4";
-  const STORAGE_KEY = "let_auth_exec";
+  // 部門用パスワード / 経営陣パスワードのどちらでも開ける
+  const DEPT_HASH = "06d54e2513a16422a07ef460dd6b5c4c4b42d770b78527653e654ea10774572e";
+  const EXEC_HASH = "1e980b5384f2ce83258b28faa11cba9393191c5c95720fc1ca3b7fc464708ea4";
+  const STORAGE_KEY = "let_auth_marketing";
   async function sha256(text) {
     const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
@@ -1339,14 +1345,20 @@ h1 em { font-style: normal; color: var(--accent); }
     document.getElementById('auth-gate').style.display = 'none';
     document.getElementById('main-content').style.display = '';
   }
-  if (sessionStorage.getItem(STORAGE_KEY) === '1') { show(); }
+  if (sessionStorage.getItem(STORAGE_KEY) === '1' || sessionStorage.getItem('let_auth_exec') === '1') { show(); }
   document.getElementById('auth-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     const input = document.getElementById('auth-input').value;
     const hash = await sha256(input);
     const errEl = document.getElementById('auth-error');
-    if (hash === PASS_HASH) {
+    if (hash === DEPT_HASH || hash === EXEC_HASH) {
       sessionStorage.setItem(STORAGE_KEY, '1');
+      // 実績データ復号用にパスワードをタブ内保持 (sessionStorage)
+      sessionStorage.setItem(STORAGE_KEY + '_pw', input);
+      if (hash === EXEC_HASH) {
+        sessionStorage.setItem('let_auth_exec', '1');
+        sessionStorage.setItem('let_auth_exec_pw', input);
+      }
       show();
     } else {
       errEl.classList.add('show');

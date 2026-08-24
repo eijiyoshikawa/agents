@@ -513,3 +513,15 @@ ECC の Continuous Learning v2 を参考にした、セッション間のパタ�
 
 ### 採用済み（2026-04-17）
 - Subsidy Scout / Subsidy Strategist / Subsidy Writer — 日本国内の補助金・助成金申請を一気通貫で担当
+
+## 【恒久ルール・厳守】デプロイ再トリガーに関する禁止事項（2026-08-18 制定）
+
+背景: 空コミットを数時間おきに自動pushしてVercelのデプロイを再トリガーしたことが、GitHubの不正検知（abuse detection）に抵触し、アカウントがフラグされた実績がある（2026年8月）。
+
+1. **空コミット（`git commit --allow-empty`）や、内容のないダミーコミット・コメントだけ変えた再トリガー用コミットによるデプロイ再実行は絶対にしない**
+2. **cron・スクリプト・ループ等で、コミットやpushを定期的・自動的に生成する仕組みを作らない**
+3. コミットは実際のコード・ドキュメント変更があるときのみ行う
+4. デプロイの再実行が必要な場合は、必ず次のいずれかを使う（GitHubを経由しない）:
+   - Vercel Deploy Hook（Settings → Git → Deploy Hooks で発行したURLに `curl -X POST`）
+   - Vercelダッシュボードの Redeploy ボタン
+   - Vercel CLI: `npx vercel --prod`（評価サイト let-hyoka は `~/work/agents` から。プロジェクトが `agents` であることを確認）

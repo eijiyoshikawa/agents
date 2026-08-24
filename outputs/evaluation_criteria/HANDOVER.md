@@ -1,6 +1,6 @@
 # 引き継ぎ文書 — LET評価制度プロジェクト（let-hyoka）
 
-最終更新: 2026-08-05 ／ 現行作業ブランチ: claude/evaluation-finance-dashboard-50w8t9（旧 claude/evaluation-criteria-framework-mkp6W をマージ済み）
+最終更新: 2026-08-24 ／ 現行作業ブランチ: claude/evaluation-finance-dashboard-d0u7iz（50w8t9 の全作業を取り込み済み。PR #22 まではmainへマージ済み）
 
 ---
 
@@ -33,15 +33,31 @@
 
 ```
 リポジトリ: eijiyoshikawa/agents
-作業ブランチ: claude/evaluation-finance-dashboard-50w8t9（開発コミット先 ※旧 claude/evaluation-criteria-framework-mkp6W をマージ済み）
+作業ブランチ: claude/evaluation-finance-dashboard-d0u7iz（開発コミット先 ※50w8t9 の全作業をマージ済み）
 デプロイブランチ: let-hyoka（ここへのpushで let-hyoka.vercel.app が更新される）
 ```
+
+### 【2026-08-13〜】デプロイはCLI経由に変更（重要）
+
+VercelのGitHub連携が停止中（自動デプロイが全プロジェクトで発火しない・原因調査中）のため、
+**本番反映は Vercel CLI（`npx vercel --prod`）で行う**。あわせて `let-hyoka.vercel.app` の
+ドメイン割り当てを「let-hyokaブランチ」→「Production」に変更済み（CLIデプロイが直接載る）。
+
+```bash
+cd ~/work/agents
+cat .vercel/project.json   # ← "agents" にリンクされていることを毎回確認（重要・下記事故参照）
+npx vercel --prod          # これが本番反映ボタン。let-hyoka.vercel.app に載る
+```
+
+⚠️ **2026-08-13の事故**: `vercel link` でプロジェクトを「slack-let」と誤選択して `--prod` を実行し、
+財務ダッシュボード本番が評価サイトの中身に置き換わった（slack_let側から `npx vercel --prod` で復旧済み）。
+リンク先の確認を必ず行うこと。GitHub連携が復旧したら従来のlet-hyokaブランチpush方式に戻せる。
 
 ### Vercelプロジェクトは2つある（混同注意！）
 
 | プロジェクト | 配信内容 | Root Directory | 触ってよいか |
 |------------|---------|---------------|------------|
-| **agents** | 評価制度ページ（let-hyoka.vercel.app は let-hyokaブランチのbranchドメイン）| `outputs/evaluation_criteria` / Framework=Other / 各Override OFF | 本プロジェクトの対象 |
+| **agents** | 評価制度ページ（let-hyoka.vercel.app = Production割り当て 2026-08-13〜）| `outputs/evaluation_criteria` / Framework=Other / 各Override OFF | 本プロジェクトの対象 |
 | **let-hyoka** | let-recruit（求人票Next.jsアプリ・別件）| `let-recruit` / Next.js | **触らない** |
 
 - agentsプロジェクトの main ブランチには `outputs/evaluation_criteria` が存在しないため、**mainブランチのデプロイは常に失敗する（仕様・無害）**。Redeployはlet-hyokaブランチの行のみ行うこと
@@ -51,13 +67,13 @@
 
 ```bash
 # 1. 作業ブランチで outputs/evaluation_criteria/ 配下を編集・コミット・push
-git checkout claude/evaluation-finance-dashboard-50w8t9
+git checkout claude/evaluation-finance-dashboard-d0u7iz
 # （編集）
-git add outputs/evaluation_criteria/ && git commit -m "..." && git push origin claude/evaluation-finance-dashboard-50w8t9
+git add outputs/evaluation_criteria/ && git commit -m "..." && git push origin claude/evaluation-finance-dashboard-d0u7iz
 
 # 2. let-hyokaにマージ + ミラー同期 + push（これでVercelが自動デプロイ）
 git checkout let-hyoka
-git merge claude/evaluation-finance-dashboard-50w8t9 --no-ff -m "merge: ..."
+git merge claude/evaluation-finance-dashboard-d0u7iz --no-ff -m "merge: ..."
 # ルートミラー（let-hyokaブランチのみ存在）
 cp outputs/evaluation_criteria/*.html ./ 2>/dev/null
 cp outputs/evaluation_criteria/demo/*.html ./demo/
@@ -69,10 +85,23 @@ cp outputs/evaluation_criteria/demo/*.html outputs/evaluation_criteria/public/de
 cp outputs/evaluation_criteria/marketing/v2.html outputs/evaluation_criteria/public/marketing/
 cp -r outputs/evaluation_criteria/public/* ./public/
 git add -A && git commit -m "feat(deploy): ミラー同期" && git push origin let-hyoka
-git checkout claude/evaluation-finance-dashboard-50w8t9
+git checkout claude/evaluation-finance-dashboard-d0u7iz
+
+# 3. 【GitHub連携停止中の追加ステップ】CLIで本番反映（pushだけではデプロイされない）
+npx vercel --prod   # 実行前に cat .vercel/project.json で "agents" を確認
 ```
 
 ※ 実際に配信されているのは `outputs/evaluation_criteria/` 直下（Root Directory）。ルート/publicミラーは事故時の保険。
+
+### 実績データの更新（週次目安・2026-08-13 初回反映済み）
+
+```bash
+cd ~/work/agents   # 作業ブランチで
+CRON_SECRET=<slack-letのトークン> node outputs/evaluation_criteria/scripts/bake-eval-data.mjs
+git add outputs/evaluation_criteria/data outputs/evaluation_criteria/public/data
+git commit -m "chore(eval): 実績データ反映" && git push origin claude/evaluation-finance-dashboard-d0u7iz
+npx vercel --prod   # let-hyokaブランチへのマージは記録用（デプロイには不要）
+```
 
 ## 4. 各部門の制度バージョン現状
 
@@ -97,6 +126,27 @@ git checkout claude/evaluation-finance-dashboard-50w8t9
   - Section 10.2のボーナス額再計算（新定着率係数なら▲58.5万）
   - 決定された条文（クローバック・最低母数・除外規定等）を追記
 
+### 【2026-08-10 実装完了】リアルタイム実績セクション（MF実仕訳 × 評価制度）
+
+経営陣用 `sales.html` / `marketing.html` と従業員用 `demo/sales.html` / `demo/marketing.html` の末尾に
+「📊 リアルタイム実績」セクションを追加。slack-let の担当者別集計をページ別パスワードで
+**AES-GCM暗号化**して静的焼き付けする方式（平文はリポジトリにもHTMLにも残らない）。
+
+- 計算ルール（2026-08-10 役員決定）: 売上=MF実仕訳／人件費=実額表示／営業原価=江原の人件費+精算後PL科目（取引先=江原）／マーケ原価=人件費+広告宣伝費+外注費（自社SNS外注は部門共通費）。詳細は slack_let リポジトリ `docs/eval-contribution.md`
+- 構成: `assets/eval-section.js`（復号+描画）／`scripts/bake-eval-data.mjs`（データ焼き付け）／`scripts/inject-eval-section.js`（ページ注入・冪等）
+- 認証ゲートは通過時にパスワードを `sessionStorage(<key>_pw)` へ保持し、それが復号鍵になる（ゲート改修済み）
+- **データ反映手順（ターミナルから・週次目安）**:
+  ```bash
+  cd outputs/evaluation_criteria
+  CRON_SECRET=xxxx node scripts/bake-eval-data.mjs   # data/ と public/data/ に暗号化JSONを生成
+  git add data public/data && git commit -m "chore(eval): 実績データ反映" && git push
+  # → let-hyoka ブランチへマージ+push（§3の定型フロー）で本番反映
+  ```
+- **前提となる残作業（数字が出るまで）**:
+  1. Notion「メンバーマスタ」の **月額人件費（法定福利込み実額）** と **月次粗利目標** を役員が記入（未記入は「要設定」表示）
+  2. 担当マッピングDBの **MF取引先名の名寄せ**完了（未名寄せ分は「共通・未名寄せ」に集約される）
+  3. 記帳ルールの経理共有（広告費・外注費・経費精算に取引先/補助科目を必ず付ける）
+
 ### その他の未完タスク
 - 就業規則改定3項目（降格規定・査定給減額・賞与変動条項）の労務TODO反映 → 2026-08-03に `marketing/v2.html` Section 12（未確定・運用開始までのTODO）に追記済み
 - 営業部制度とv2.1受注基準の整合改定（未着手・v2.1確定後に着手予定）
@@ -113,7 +163,7 @@ git checkout claude/evaluation-finance-dashboard-50w8t9
 
 ### 【2026-08-05 完了】マーケ実績データ 不明項目のNotion表作成
 
-**Notionデータベース作成済み** — 松本・松岡本人の記入待ち。
+**Notionデータベース作成済み** — **2026-08-24 時点で記入済み 19/23・未記入 4・確認完了 0**（回収結果の全転記と分析は `MARKETING_DATA_AUDIT.md` §3.5）。
 
 | 項目 | 内容 |
 |------|------|
@@ -132,7 +182,11 @@ git checkout claude/evaluation-finance-dashboard-50w8t9
 
 **運用**: 本人に**都度記入**してもらい、完了報告を受けてから反映する流れ。ステータスが「確認完了」になった社から順に反映可能（全23社の回収待ちは不要）。ただし社名酷似（ビッグ測量設計／ビック測量）の法人重複は担当者別集計の前提に影響するため、個別社の反映より先に解消する。
 
-**次アクション**: 松本・松岡へ記入依頼を連絡 → 記入完了後、`marketing.html`（Step 8）/`marketing/v2.html`（Section 13）/`demo/marketing.html`（Step 7）の実績表へ反映。あわせて営業担当（吉田氏）への管理シート整備依頼、Financeとの入金実績突合も実施。
+**次アクション（2026-08-24 更新）**:
+1. 未記入4件の回収督促（タキオンワタナベ・セントラルフルーツ・弘陽電設＝「利益」のみ／清一建設＝ステータス未記入・部分回答あり）
+2. **法人重複（ビッグ測量設計/ビック測量）の最終確認** — 回答「担当変更」から同一法人・松本→松岡移管の可能性が高いが明答なし。反映前に確定させる
+3. 記入済み19件を「確認完了」へ昇格（本人 or 役員確認）→ 確認完了になった社から `marketing.html`（Step 8）/`marketing/v2.html`（Section 13）/`demo/marketing.html`（Step 7）の実績表へ反映
+4. 営業担当（吉田氏）への管理シート整備依頼、Financeとの入金実績突合（未着手）
 
 > 📋 **監査記録の詳細は [`MARKETING_DATA_AUDIT.md`](./MARKETING_DATA_AUDIT.md) を参照**（23社の不明項目一覧・データ品質上の5つの問題・反映手順）
 
@@ -189,3 +243,20 @@ git checkout claude/evaluation-finance-dashboard-50w8t9
 - マーケv1.4は新規/継続の配分逆転を撤廃し「実質粗利=売上−実費」に統一
 - 従業員ページの demo/ は経営側P&L非表示、ボーナス注記は「固定残業代を引いた金額×1ヶ月」表記
 - 有料職業紹介の許可は**取得済み**（v2.1の他社紹介モデルの前提）
+
+## 従業員配信 (部門別パスワード) — 2026-08-17 開始
+- 各部門ページは「部門用パスワード」または「経営陣パスワード」で開ける
+  - /sales = `saleslet1117` (営業: 江原) / /marketing = `makematsu2026` (マーケ: 松本・松岡) / /bpo = `bpolet2026` (BPO: 澤口)
+  - トップ (/) は経営陣パスワードのみ。経営陣パスワードは全ページ共通で通る
+- 実績データも部門別ファイル (eval-sales/marketing/bpo.enc.json) を部門パスワードで復号。
+  他部門の人件費・粗利は部門パスワードでは復号できない
+- パスワード変更手順: ①bake-eval-data.mjs の TARGETS のpassword ②該当ページのDEPT_HASH (sha256) を変更 → bake → デプロイ
+
+## 実績データの動的配信化 — 2026-08-24
+- 実績セクションは slack-let の `/api/eval/encrypted?target=<sales|marketing|bpo|exec>` から
+  暗号化データを直接取得するようになった（30分キャッシュ・実質リアルタイム）
+- **手動bake→コミット→デプロイの定期作業は不要になった**。
+  `scripts/bake-eval-data.mjs` と `data/*.enc.json` は slack-let 障害時のフォールバック
+  （各ページの data-srcs の後段に静的ファイルを残してある）
+- 配信パスワードは Notion「MF連携設定」の `eval_page_password_*`。
+  ページのパスワード変更時は「ページ側ハッシュ」と「このNotionキー」の両方を更新すること
