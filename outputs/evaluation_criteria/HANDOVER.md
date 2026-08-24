@@ -1,6 +1,6 @@
 # 引き継ぎ文書 — LET評価制度プロジェクト（let-hyoka）
 
-最終更新: 2026-08-05 ／ 現行作業ブランチ: claude/evaluation-finance-dashboard-50w8t9（旧 claude/evaluation-criteria-framework-mkp6W をマージ済み）
+最終更新: 2026-08-24 ／ 現行作業ブランチ: claude/evaluation-finance-dashboard-d0u7iz（50w8t9 は PR #22 でmainへマージ済み）
 
 ---
 
@@ -113,7 +113,7 @@ git checkout claude/evaluation-finance-dashboard-50w8t9
 
 ### 【2026-08-05 完了】マーケ実績データ 不明項目のNotion表作成
 
-**Notionデータベース作成済み** — 松本・松岡本人の記入待ち。
+**Notionデータベース作成済み** — **2026-08-24 時点で記入済み 19/23・未記入 4・確認完了 0**（回収結果の全転記と分析は `MARKETING_DATA_AUDIT.md` §3.5）。
 
 | 項目 | 内容 |
 |------|------|
@@ -132,7 +132,11 @@ git checkout claude/evaluation-finance-dashboard-50w8t9
 
 **運用**: 本人に**都度記入**してもらい、完了報告を受けてから反映する流れ。ステータスが「確認完了」になった社から順に反映可能（全23社の回収待ちは不要）。ただし社名酷似（ビッグ測量設計／ビック測量）の法人重複は担当者別集計の前提に影響するため、個別社の反映より先に解消する。
 
-**次アクション**: 松本・松岡へ記入依頼を連絡 → 記入完了後、`marketing.html`（Step 8）/`marketing/v2.html`（Section 13）/`demo/marketing.html`（Step 7）の実績表へ反映。あわせて営業担当（吉田氏）への管理シート整備依頼、Financeとの入金実績突合も実施。
+**次アクション（2026-08-24 更新）**:
+1. 未記入4件の回収督促（タキオンワタナベ・セントラルフルーツ・弘陽電設＝「利益」のみ／清一建設＝ステータス未記入・部分回答あり）
+2. **法人重複（ビッグ測量設計/ビック測量）の最終確認** — 回答「担当変更」から同一法人・松本→松岡移管の可能性が高いが明答なし。反映前に確定させる
+3. 記入済み19件を「確認完了」へ昇格（本人 or 役員確認）→ 確認完了になった社から `marketing.html`（Step 8）/`marketing/v2.html`（Section 13）/`demo/marketing.html`（Step 7）の実績表へ反映
+4. 営業担当（吉田氏）への管理シート整備依頼、Financeとの入金実績突合（未着手）
 
 > 📋 **監査記録の詳細は [`MARKETING_DATA_AUDIT.md`](./MARKETING_DATA_AUDIT.md) を参照**（23社の不明項目一覧・データ品質上の5つの問題・反映手順）
 
