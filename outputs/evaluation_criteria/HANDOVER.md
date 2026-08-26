@@ -135,6 +135,7 @@ npx vercel --prod   # let-hyokaブランチへのマージは記録用（デプ�
 - 計算ルール（2026-08-10 役員決定）: 売上=MF実仕訳／人件費=実額表示／営業原価=江原の人件費+精算後PL科目（取引先=江原）／マーケ原価=人件費+広告宣伝費+外注費（自社SNS外注は部門共通費）。詳細は slack_let リポジトリ `docs/eval-contribution.md`
 - 構成: `assets/eval-section.js`（復号+描画）／`scripts/bake-eval-data.mjs`（データ焼き付け）／`scripts/inject-eval-section.js`（ページ注入・冪等）
 - 認証ゲートは通過時にパスワードを `sessionStorage(<key>_pw)` へ保持し、それが復号鍵になる（ゲート改修済み）
+- **【仕様・2026-08-25 役員指示】従業員向けページ（`/demo/*`）には通信費・家賃の按分を表示しない**。按分表記（家賃按分・通信費按分）は経営陣ページの経営側P&Lのみ。`assets/eval-section.js` は `data-audience="employee"`（または `/demo/` 配下）のページで、原価行のうち 按分/家賃/地代/通信費 に該当するラベルを「その他共通費（内訳非公開）」へ集約するマスクを実装済み（合計金額は変えない）
 - **データ反映手順（ターミナルから・週次目安）**:
   ```bash
   cd outputs/evaluation_criteria

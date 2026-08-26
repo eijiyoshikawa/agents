@@ -24,6 +24,29 @@
   ).filter(Boolean);
   const KEY = root.dataset.key + "_pw";
   const DEPT = root.dataset.dept || "";
+  // 従業員向けページ (data-audience="employee" または /demo/ 配下) では、
+  // 通信費・家賃などの按分項目を個別表示しない (役員指示 2026-08-25)。
+  // 該当ラベルの原価行は「その他共通費（内訳非公開）」へ集約する。
+  const EMPLOYEE =
+    root.dataset.audience === "employee" || /\/demo\//.test(location.pathname);
+  const HIDDEN_COST_RE = /按分|家賃|地代|通信費/;
+
+  function maskRowsForEmployee(rows) {
+    if (!EMPLOYEE) return rows;
+    const visible = [];
+    let hiddenTotal = 0;
+    let hasHidden = false;
+    for (const r of rows) {
+      if (HIDDEN_COST_RE.test(String(r[0]))) {
+        hasHidden = true;
+        hiddenTotal += Number(r[1]) || 0;
+      } else {
+        visible.push(r);
+      }
+    }
+    if (hasHidden) visible.push(["その他共通費（内訳非公開）", hiddenTotal, null]);
+    return visible;
+  }
 
   const css = `
   #eval-live{margin:48px auto 24px;max-width:1080px;padding:0 16px;font-feature-settings:"tnum";color:#1a1a1a}
@@ -135,7 +158,7 @@
         <div><span>原価率</span><b class="${costRatioColor}">${costRatio != null ? pct(costRatio) : "—"}</b></div>
         <div><span>粗利率 / 月平均</span><b style="font-size:.95rem">${pct(m.gross_margin)} / ${yen(m.monthly_avg_profit)}</b></div>
       </div>
-      <table class="ev-cost">${costRows
+      <table class="ev-cost">${maskRowsForEmployee(costRows)
         .map(([l, v, sub]) => `<tr><td>${esc(l)}${sub ? `<div class="ev-note">${esc(sub)}</div>` : ""}</td><td>${yen(v)}</td></tr>`)
         .join("")}
         <tr><td><b>原価合計</b></td><td><b>${yen(m.total_cost)}</b></td></tr></table>
@@ -160,10 +183,12 @@
       <div class="ev-grid">${members.map(card).join("") || '<div class="ev-box">対象メンバーのデータがありません</div>'}</div>
       ${showCommon ? `<div class="ev-common"><b>個人に配賦していない金額（共通・未名寄せ）</b>
         <table class="ev-cost">
-          <tr><td>自社SNS外注（マーケ部門共通原価）</td><td>${yen(c.own_sns_outsourcing)}</td></tr>
-          <tr><td>共通広告宣伝費（クライアント不明）</td><td>${yen(c.common_ads)}</td></tr>
-          <tr><td>共通外注費（クライアント不明）</td><td>${yen(c.common_outsourcing)}</td></tr>
-          <tr><td>未名寄せ売上（どの担当にも紐付かない）</td><td>${yen(c.unmatched_sales)}</td></tr>
+          ${maskRowsForEmployee([
+            ["自社SNS外注（マーケ部門共通原価）", c.own_sns_outsourcing],
+            ["共通広告宣伝費（クライアント不明）", c.common_ads],
+            ["共通外注費（クライアント不明）", c.common_outsourcing],
+            ["未名寄せ売上（どの担当にも紐付かない）", c.unmatched_sales],
+          ]).map(([l, v]) => `<tr><td>${esc(l)}</td><td>${yen(v)}</td></tr>`).join("")}
         </table>
         <div class="ev-note">名寄せ（担当マッピングのMF取引先名記入）が進むと各担当へ自動で振り分かります</div></div>` : ""}
     `;
