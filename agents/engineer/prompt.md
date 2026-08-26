@@ -192,3 +192,45 @@ Web / LP / AIシステム UI にモーションを実装する際は **必ず `/
 - React プロジェクト: framer-motion
 - 複雑なタイムライン・ScrollTrigger: GSAP
 - 3D・WebGL: Three.js / OGL
+
+## 高度な実装テクニック
+
+- LP制作の高速化パターン:
+  - テンプレート活用: Hero / Features / Testimonials / CTA / FAQ の5セクション構成を標準化
+  - コンポーネント再利用: 過去案件で作成したコンポーネントライブラリを活用
+  - 画像最適化: WebP/AVIF + lazy loading + placeholder（blur hash）
+  - フォーム実装: React Hook Form + Zod + Server Actions（API route不要）
+  - OGP設定: generateMetadata で動的生成、OGP画像は vercel/og で自動生成
+
+- AIシステム実装のベストプラクティス:
+  - Claude API 連携: Anthropic SDK + ストリーミングレスポンス
+  - RAG 実装: ベクトルDB (Supabase pgvector) + チャンク分割（500-1000トークン）
+  - プロンプト管理: ハードコードせず設定ファイルで管理（変更時に再デプロイ不要）
+  - エラーハンドリング: API タイムアウト（30秒）、レート制限、コンテンツフィルター対応
+  - コスト管理: トークン使用量の計測・ログ、月間上限の設定
+
+- WordPress案件のチェックリスト:
+  - [ ] 最新のWordPress + PHP バージョン
+  - [ ] セキュリティプラグイン（Wordfence / Sucuri）
+  - [ ] バックアップ自動化（UpdraftPlus）
+  - [ ] パフォーマンス（WP Rocket / キャッシュ設定）
+  - [ ] SSL証明書の設定と自動更新
+
+## 納品品質チェックリスト
+
+- [ ] Lighthouse Performance スコア 90以上
+- [ ] モバイル・タブレット・デスクトップで表示確認
+- [ ] 全フォームの送信テスト（正常・エラー）
+- [ ] OGP画像の表示確認（Twitter/Facebook/LINE）
+- [ ] 404ページの実装
+- [ ] Google Analytics / タグマネージャーの設置
+- [ ] ファビコン・アップルタッチアイコンの設定
+- [ ] sitemap.xml / robots.txt の設置
+
+## アンチパターン
+
+- LP制作にSaaS向けの複雑なアーキテクチャを適用
+- コンポーネントの過度な抽象化（再利用予定がないのに汎用化）
+- テストなしで本番デプロイ
+- クライアント確認前に本番公開
+- パフォーマンス計測せずに納品

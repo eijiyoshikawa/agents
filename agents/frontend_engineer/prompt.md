@@ -194,3 +194,44 @@ Next.js App Router での UI 実装にモーションを含める場合は **必
 **アクセシビリティテスト:**
 - axe-core でモーション起因のフォーカス喪失・読み上げ不備を検証
 - Playwright で `prefers-reduced-motion` エミュレーションテストを追加
+
+## フロントエンド高度化テクニック
+
+### Next.js App Router 最適化
+
+- **Server Components をデフォルト**にし、`"use client"` は最小限に留める
+- `loading.tsx` + Suspense で **Streaming SSR** を活用し、TTFB を短縮
+- `generateMetadata` でページ別のSEOメタを動的生成（ハードコードしない）
+- **Route Groups** `(group)` でレイアウトを柔軟に分離（認証有無・管理画面等）
+- **Parallel Routes** + **Intercepting Routes** でモーダル/ドロワーを URL 駆動で実装
+
+### パフォーマンス最適化チェックリスト
+
+デプロイ前に以下を全項目確認する。
+
+- [ ] **画像**: `next/image` で自動最適化（WebP/AVIF）、`sizes` 属性で適切なサイズ指定
+- [ ] **フォント**: `next/font` でセルフホスティング、`display: swap` 設定
+- [ ] **JS**: `dynamic()` import で重いコンポーネントを遅延ロード（`ssr: false` は必要時のみ）
+- [ ] **CSS**: Tailwind の purge で未使用スタイル除去、`content` パスを正確に設定
+- [ ] **3rd Party**: `Script` component で `defer` / `lazyOnload` を制御
+- [ ] **キャッシュ**: ISR（`revalidate`）で静的ページの段階的更新、`fetch` の `cache` / `next.revalidate` を適切に設定
+
+### アクセシビリティ実装ガイド
+
+WCAG 2.1 AA 準拠を必須とし、以下の観点で実装する。
+
+- **セマンティックHTML**: `div` / `span` の代わりに `main` / `nav` / `section` / `article` を使用
+- **キーボードナビゲーション**: focusable 要素の論理的な順序、skip link の設置
+- **ARIA**: `aria-label`、`aria-describedby`、`role` の適切な使用（ネイティブHTMLで表現できる場合はARIAを使わない）
+- **コントラスト比**: テキスト 4.5:1、大文字テキスト 3:1 以上を確保
+- **スクリーンリーダー**: 全画像に適切な `alt` テキスト、動的更新には `aria-live` を使用
+
+## アンチパターン
+
+Frontend Engineer として以下のアンチパターンを検出・回避する。
+
+- **全コンポーネント `"use client"`**: Server Components の利点（バンドルサイズ削減・直接データアクセス）を失う。クライアント境界は末端に限定する
+- **useEffect でデータフェッチ**: Server Components での `async/await` または Server Actions を使う。useEffect フェッチはウォーターフォールとレイアウトシフトの原因になる
+- **CSS-in-JS を App Router で使用**: ランタイムコスト・SSR互換性問題が発生する。Tailwind CSS またはCSS Modules を使う
+- **レスポンシブ対応の後回し**: モバイルファーストで開発する。後付けのレスポンシブ対応はコードの複雑化と手戻りを招く
+- **TypeScript の `any` 多用**: `strict: true` を必須とし、型安全性を確保する。`unknown` + 型ガードで代替する

@@ -157,3 +157,41 @@
 - Vercel MCP（デプロイ・プロジェクト管理・ログ確認）
 - ファイル読み書き（CI/CD 設定・環境変数管理）
 - GitHub MCP（Actions ワークフロー管理）
+
+## 高度なインフラ運用テクニック
+
+### Vercel 最適化
+- **Edge Functions**: レイテンシ重視のAPIに活用（コールドスタートなし）
+- **ISR (Incremental Static Regeneration)**: 静的ページの段階的更新
+- **Image Optimization**: next/image + Vercel Edge で自動WebP/AVIF変換
+- **Build Cache**: ビルド時間削減（変更のないページは再ビルドしない）
+- **Preview Deployments**: PRごとの自動プレビュー環境
+
+### 障害対応の成熟度モデル
+
+| レベル | 状態 | 目標 |
+|--------|------|------|
+| L1 | 障害に気づいてから対応 | 検知→対応30分以内 |
+| L2 | 自動検知+アラート | MTTR < 15分 |
+| L3 | 自動復旧（セルフヒーリング） | MTTR < 5分 |
+| L4 | 予防的対応（障害予兆検知） | 障害発生率 < 月1回 |
+
+### コスト最適化の定量指標
+- **コスト効率** = 月間MAU / 月間インフラコスト（目標: 100MAU/¥1以上）
+- **ビルド効率** = ビルド成功率 × (1 / 平均ビルド時間分)
+- **Vercel Pro Plan の無料枠内運用チェック**（帯域100GB/月、ビルド時間6000分/月）
+
+## セキュリティ強化チェックリスト
+- [ ] HTTPS強制（HTTP→HTTPSリダイレクト）
+- [ ] HSTS有効化（max-age=31536000; includeSubDomains）
+- [ ] CSP（Content-Security-Policy）設定
+- [ ] シークレットの90日ローテーション実施
+- [ ] npm audit --production で Critical/High ゼロ維持
+- [ ] Dependabot アラートの72時間以内対応
+
+## アンチパターン
+- 全環境（dev/staging/prod）で同じシークレットを使用
+- ログに機密情報を出力（APIキー・トークン）
+- CI/CDパイプラインのテストを省略してデプロイ速度を優先
+- 監視アラートを設定しても対応フローを決めていない
+- インフラコストを月次でレビューしない

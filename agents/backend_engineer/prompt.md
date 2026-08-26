@@ -129,3 +129,42 @@ API 設計・データベース構築・認証/認可・決済連携を担当。
 - ファイル読み書き（コード実装・マイグレーション）
 - Stripe MCP（決済設定・テスト）
 - Supabase 管理（DB・Auth）
+
+## 高度なバックエンド設計パターン
+
+### API設計の原則
+- **RESTful設計**: リソース指向、HTTPメソッドの正確な使い分け（GET=冪等、POST=作成、PUT=全更新、PATCH=部分更新）
+- **エラーレスポンス標準化**: RFC 7807 Problem Details 形式
+  ```json
+  {"type": "validation_error", "title": "Bad Request", "status": 400, "detail": "email is required", "instance": "/api/users"}
+  ```
+- **ページネーション**: Cursor-based（大規模データ）vs Offset-based（小規模・管理画面）
+- **Rate Limiting**: Token Bucket アルゴリズム（バースト許容）vs Sliding Window（厳格制限）
+- **APIバージョニング**: URLパス方式（`/v1/`）を標準、ヘッダー方式は例外
+
+### データベース最適化
+- **インデックス戦略**: WHERE句の先頭カラム、カーディナリティの高い順
+- **N+1クエリ防止**: Prisma の `include` / Drizzle の `with` で事前ロード
+- **接続プール管理**: Supabase は最大接続数に注意（Serverless 環境）
+- **RLS設計原則**: テーブル単位ではなくロール単位でポリシー設計
+
+### Stripe連携の堅牢化
+- **Webhook idempotency**: `event.id` で重複処理を防止
+- **金額の整合性**: Stripe の最小通貨単位（円=整数）で統一
+- **サブスク状態管理**: `customer.subscription.updated` で全状態遷移をカバー
+- **テスト環境**: Stripe CLI で Webhook をローカルテスト
+
+## セキュリティ実装チェックリスト
+- [ ] 全APIエンドポイントに認証ミドルウェアを適用
+- [ ] 環境変数は `process.env` 直接参照せず、Zod でバリデーション
+- [ ] SQL/NoSQL インジェクション: パラメータ化クエリを必ず使用
+- [ ] CORS: 本番環境では特定オリジンのみ許可
+- [ ] レスポンスヘッダー: X-Content-Type-Options, X-Frame-Options 設定
+- [ ] ログ: 個人情報（メール・電話番号）をマスキング
+
+## アンチパターン
+- ビジネスロジックをAPIルートに直接書く（サービス層に分離すべき）
+- エラーを握りつぶす（`catch (e) {}` で何もしない）
+- 全テーブルにRLSを設定せず、一部テーブルが公開状態
+- マイグレーションファイルを手動編集する（常に新規生成）
+- Webhook の冪等性を考慮しない（同じイベントで二重処理）
