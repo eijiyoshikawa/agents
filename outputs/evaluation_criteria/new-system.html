@@ -167,6 +167,46 @@ body {
 .tl .td { font-size: 11.5px; color: var(--sub); }
 .tl .arrow { color: var(--line); font-size: 20px; }
 
+/* live gauges */
+.live-note { text-align: center; font-size: 12.5px; color: var(--sub); margin: -14px 0 20px; }
+.team-block {
+  background: var(--card); border: 1px solid var(--line); border-radius: 20px;
+  padding: 26px 26px 18px; margin-bottom: 18px;
+}
+.team-head { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.team-name { font-size: 17px; font-weight: 900; }
+.team-name small { font-weight: 400; color: var(--sub); font-size: 11.5px; margin-left: 8px; }
+.bonus-badge {
+  font-size: 12.5px; font-weight: 900; border-radius: 999px; padding: 5px 14px;
+  background: var(--green-bg); color: var(--green);
+}
+.bonus-badge.off { background: #F1F0EC; color: var(--sub); font-weight: 700; }
+.gauge { margin: 6px 0 4px; }
+.gauge-top { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; color: var(--sub); }
+.gauge-top .pct { font-size: 20px; font-weight: 900; color: var(--ink); }
+.gauge-bar { position: relative; height: 14px; border-radius: 999px; background: #EFEDE8; overflow: visible; margin-top: 6px; }
+.gauge-fill { height: 100%; border-radius: 999px; transition: width .6s ease; }
+.gauge-fill.team { background: var(--green); }
+.gauge-fill.team.miss { background: #C9C6BF; }
+.gauge-fill.p-up { background: var(--blue); }
+.gauge-fill.p-keep { background: #8A8781; }
+.gauge-fill.p-down { background: var(--red); }
+.gauge-mark { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); opacity: .35; }
+.gauge-mark span {
+  position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+  font-size: 9.5px; color: var(--sub); white-space: nowrap;
+}
+.member-row { border-top: 1px solid var(--line); padding: 16px 0 6px; margin-top: 12px; }
+.member-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px; }
+.member-name { font-weight: 900; font-size: 14.5px; }
+.rank-chip { font-size: 10.5px; font-weight: 700; background: #F1F0EC; color: var(--sub); border-radius: 999px; padding: 2px 9px; margin-left: 8px; }
+.outlook { font-size: 12px; font-weight: 900; }
+.outlook.up { color: var(--blue); }
+.outlook.keep { color: var(--sub); }
+.outlook.down { color: var(--red); }
+.member-nums { font-size: 12px; color: var(--sub); margin-top: 4px; }
+.live-status { text-align: center; color: var(--sub); font-size: 13px; padding: 26px 0; }
+
 .footer {
   margin-top: 70px; text-align: center;
   font-size: 10.5px; letter-spacing: 2px; color: #C0BDB5;
@@ -216,7 +256,7 @@ body {
   <p>半年ごとの査定 ／ 会計データと自動連動 ／ 自分のページでいつでも確認</p>
 </div>
 
-<div class="note">スタートまでは現在の評価制度がそのまま適用されます。内容は正式決定までに一部変わる可能性があります。</div>
+<div class="note">スタートまでは現在の評価制度がそのまま適用されます。</div>
 
 <!-- 01: two numbers -->
 <div class="sec">
@@ -278,25 +318,29 @@ body {
 <div class="sec">
   <div class="sec-label">03</div>
   <h2>ボーナス（チームの達成率）</h2>
-  <div class="ladder">
+  <div class="ladder" style="grid-template-columns:1fr 1fr 1fr 1fr 1.2fr;">
     <div class="step">
       <div class="bar" style="height:60px;"><div class="m">0<small>なし</small></div></div>
       <div class="cond">〜99%</div>
     </div>
     <div class="step on">
-      <div class="bar" style="height:100px;"><div class="m">1.0<small>ヶ月分</small></div></div>
+      <div class="bar" style="height:95px;"><div class="m">1.0<small>ヶ月分</small></div></div>
       <div class="cond">100%〜</div>
     </div>
     <div class="step on">
-      <div class="bar" style="height:130px;"><div class="m">1.5<small>ヶ月分</small></div></div>
+      <div class="bar" style="height:120px;"><div class="m">1.5<small>ヶ月分</small></div></div>
       <div class="cond">120%〜</div>
     </div>
     <div class="step on">
-      <div class="bar" style="height:160px;"><div class="m">2.0<small>ヶ月分</small></div></div>
+      <div class="bar" style="height:145px;"><div class="m">2.0<small>ヶ月分</small></div></div>
       <div class="cond">150%〜</div>
     </div>
+    <div class="step on">
+      <div class="bar" style="height:180px;background:linear-gradient(to top,var(--green),#6EE7A0);"><div class="m">2.5〜<small>上限なし</small></div></div>
+      <div class="cond">180%〜<small>以降+30%ごとに +0.5ヶ月</small></div>
+    </div>
   </div>
-  <div class="ladder-note">半年ごとに支給（年2回・最大4ヶ月分）。仲間を助けてチームの数字を上げることが、そのまま自分のボーナスになります。</div>
+  <div class="ladder-note">半年ごとに支給（年2回）。<b>上限はありません</b> — チームが伸びた分だけ、どこまでも増えます。仲間を助けてチームの数字を上げることが、そのまま自分のボーナスになります。</div>
 </div>
 
 <!-- 04: roles -->
@@ -358,17 +402,12 @@ body {
   </div>
 </div>
 
-<!-- 07: timeline -->
-<div class="sec">
+<!-- 07: live gauges -->
+<div class="sec" id="live-sec">
   <div class="sec-label">07</div>
-  <h2>これからの流れ</h2>
-  <div class="tl">
-    <div class="t now"><div class="dot"></div><div class="tt">いま</div><div class="td">現行制度で運用中</div></div>
-    <div class="arrow">→</div>
-    <div class="t"><div class="dot"></div><div class="tt">〜9月</div><div class="td">規程の整備・最終確定</div></div>
-    <div class="arrow">→</div>
-    <div class="t go"><div class="dot"></div><div class="tt">10月1日</div><div class="td">新制度スタート（全員R2）</div></div>
-  </div>
+  <h2>いまの数字（リアルタイム）</h2>
+  <div class="live-note" id="live-period"></div>
+  <div id="live-root"><div class="live-status">実績データを読み込んでいます…</div></div>
 </div>
 
 <div class="footer">CONFIDENTIAL — 株式会社LET</div>
@@ -377,36 +416,167 @@ body {
 </div>
 <script>
 (function() {
-  // 経営陣 / 営業 / マーケ / BPO いずれのパスワードでも閲覧可
-  const PASS_HASHES = [
-    "1e980b5384f2ce83258b28faa11cba9393191c5c95720fc1ca3b7fc464708ea4",
-    "4eec5bf9b65f5a32b6d1396822173162960a0e999e1633289d92493130511ea0",
-    "06d54e2513a16422a07ef460dd6b5c4c4b42d770b78527653e654ea10774572e",
-    "ca8266858a2df9fd49181dbb7f3568fb53ec1764eafd1ddc55dc992688f0889a"
+  // 経営陣 / 営業 / マーケ / BPO いずれのパスワードでも閲覧可。
+  // どの種別のパスワードかをハッシュで判定し、リアルタイム実績の取得先を切り替える
+  const HASH_TO_KIND = {
+    "1e980b5384f2ce83258b28faa11cba9393191c5c95720fc1ca3b7fc464708ea4": "exec",
+    "4eec5bf9b65f5a32b6d1396822173162960a0e999e1633289d92493130511ea0": "sales",
+    "06d54e2513a16422a07ef460dd6b5c4c4b42d770b78527653e654ea10774572e": "marketing",
+    "ca8266858a2df9fd49181dbb7f3568fb53ec1764eafd1ddc55dc992688f0889a": "bpo"
+  };
+  const SESSION_KINDS = [
+    ["let_auth_exec", "exec"],
+    ["let_auth_sales", "sales"],
+    ["let_auth_marketing", "marketing"],
+    ["let_auth_bpo", "bpo"]
   ];
-  const SESSION_KEYS = ["let_auth_exec", "let_auth_sales", "let_auth_marketing", "let_auth_bpo", "let_auth_newsystem"];
+  const API_BASE = "https://slack-let.vercel.app/api/eval/new-system";
+
   async function sha256(text) {
     const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
     return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
   }
+  function b64ToBuf(b64) {
+    const bin = atob(b64);
+    const buf = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+    return buf;
+  }
+  async function decrypt(payload, password) {
+    const enc = new TextEncoder();
+    const baseKey = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveKey"]);
+    const key = await crypto.subtle.deriveKey(
+      { name: "PBKDF2", salt: b64ToBuf(payload.salt), iterations: payload.iter, hash: "SHA-256" },
+      baseKey,
+      { name: "AES-GCM", length: 256 },
+      false,
+      ["decrypt"]
+    );
+    const plain = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv: b64ToBuf(payload.iv) },
+      key,
+      b64ToBuf(payload.ct)
+    );
+    return JSON.parse(new TextDecoder().decode(plain));
+  }
+
+  function credentials() {
+    const pw = sessionStorage.getItem('let_auth_newsystem_pw');
+    const kind = sessionStorage.getItem('let_auth_newsystem_kind');
+    if (pw && kind) return { pw, kind };
+    for (const [key, k] of SESSION_KINDS) {
+      const p = sessionStorage.getItem(key + '_pw');
+      if (sessionStorage.getItem(key) === '1' && p) return { pw: p, kind: k };
+    }
+    return null;
+  }
+
   function show() {
     document.getElementById('auth-gate').style.display = 'none';
     document.getElementById('main-content').style.display = '';
+    loadLive();
   }
-  if (SESSION_KEYS.some(k => sessionStorage.getItem(k) === '1')) { show(); }
+
+  const authed = sessionStorage.getItem('let_auth_newsystem') === '1' || credentials();
+  if (authed) { show(); }
   document.getElementById('auth-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     const input = document.getElementById('auth-input').value;
     const hash = await sha256(input);
     const errEl = document.getElementById('auth-error');
-    if (PASS_HASHES.includes(hash)) {
+    const kind = HASH_TO_KIND[hash];
+    if (kind) {
       sessionStorage.setItem('let_auth_newsystem', '1');
+      sessionStorage.setItem('let_auth_newsystem_pw', input);
+      sessionStorage.setItem('let_auth_newsystem_kind', kind);
       show();
     } else {
       errEl.classList.add('show');
       document.getElementById('auth-input').value = '';
     }
   });
+
+  // ---- リアルタイム実績 (個人=昇降格 / チーム=ボーナス の2本ゲージ) ----
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  const man = (v) => (v == null ? "—" : (v / 10000).toLocaleString("ja-JP", { maximumFractionDigits: 1 }) + "万円");
+  const pct = (r) => (r == null ? "—" : (r * 100).toFixed(1) + "%");
+  const CAP = 1.6; // ゲージの右端 = 160%
+
+  function gauge(rate, cls, marks) {
+    const w = rate == null ? 0 : Math.max(0, Math.min(rate, CAP)) / CAP * 100;
+    const markHtml = marks.map(([v, label]) =>
+      `<div class="gauge-mark" style="left:${(v / CAP * 100).toFixed(1)}%"><span>${label}</span></div>`).join("");
+    return `<div class="gauge">
+      <div class="gauge-top"><span></span><span class="pct">${pct(rate)}</span></div>
+      <div class="gauge-bar">${markHtml}<div class="gauge-fill ${cls}" style="width:${w.toFixed(1)}%"></div></div>
+    </div>`;
+  }
+
+  const OUTLOOK = {
+    up: ['up', '↑ 昇格ペース（110%以上）'],
+    keep: ['keep', '→ 維持圏内（70〜109%）'],
+    down: ['down', '↓ 降格ライン（70%未満）']
+  };
+  const DEPT_LABEL = { '営業': '営業チーム', 'マーケティング': 'マーケチーム', 'CA': 'CAチーム', 'BPO': '不動産/BPO' };
+
+  function render(data) {
+    const period = document.getElementById('live-period');
+    period.innerHTML = esc(data.period.label) + '（' + data.period.months_elapsed + 'ヶ月経過）' +
+      (data.period.is_preview
+        ? ' — <b>試運転表示</b>: 制度スタート（2026年10月1日）前のプレビューで、現在の評価には影響しません'
+        : '');
+    const root = document.getElementById('live-root');
+    if (!data.teams || !data.teams.length) {
+      root.innerHTML = '<div class="live-status">表示できるチームがありません。</div>';
+      return;
+    }
+    root.innerHTML = data.teams.map((t) => {
+      const bonus = t.bonus_months
+        ? `<span class="bonus-badge">現時点: ボーナス ${t.bonus_months}ヶ月ペース</span>`
+        : `<span class="bonus-badge off">チーム100%でボーナス発生</span>`;
+      const memberHtml = (t.members || []).map((m) => {
+        const [ocls, olabel] = OUTLOOK[m.outlook] || ['keep', '—'];
+        return `<div class="member-row">
+          <div class="member-head">
+            <span class="member-name">${esc(m.name)}<span class="rank-chip">${esc(m.rank)}</span></span>
+            <span class="outlook ${ocls}">${olabel}</span>
+          </div>
+          ${gauge(m.personal_rate, 'p-' + ocls, [[0.7, '70%'], [1.1, '110%']])}
+          <div class="member-nums">粗利 ${man(m.gross_profit)} ／ この期の基準 ${man(m.denom)}（月あたり ${man(m.monthly_required)}）</div>
+        </div>`;
+      }).join('');
+      return `<div class="team-block">
+        <div class="team-head">
+          <span class="team-name">${esc(DEPT_LABEL[t.dept] || t.dept)}<small>${t.member_count}名 × 倍率${t.multiplier}</small></span>
+          ${bonus}
+        </div>
+        ${gauge(t.team_rate, 'team' + (t.team_rate >= 1 ? '' : ' miss'), [[1.0, '100%'], [1.2, '120%'], [1.5, '150%']])}
+        <div class="member-nums">チーム粗利 ${man(t.gross_profit)} ／ チーム基準 ${man(t.denom)}</div>
+        ${memberHtml}
+      </div>`;
+    }).join('');
+  }
+
+  async function loadLive() {
+    const root = document.getElementById('live-root');
+    if (!root || root.dataset.loaded) return;
+    root.dataset.loaded = '1';
+    const cred = credentials();
+    if (!cred) {
+      root.innerHTML = '<div class="live-status">実績の表示にはこのページで再ログインしてください（部門パスワード）。</div>';
+      return;
+    }
+    try {
+      const res = await fetch(API_BASE + '?target=' + cred.kind);
+      if (!res.ok) throw new Error('http ' + res.status);
+      const payload = await res.json();
+      const data = await decrypt(payload, cred.pw);
+      render(data);
+    } catch (e) {
+      root.innerHTML = '<div class="live-status">実績データは準備中です（接続できませんでした）。制度の内容は上記のとおりです。</div>';
+    }
+  }
 })();
 </script>
 </body>
