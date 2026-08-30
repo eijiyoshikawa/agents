@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LET 新評価制度</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+
+:root {
+  --ink: #1A1A1A;
+  --sub: #767470;
+  --bg: #FAFAF7;
+  --card: #FFFFFF;
+  --line: #ECEAE4;
+  --blue: #2563EB;
+  --blue-bg: #EFF4FE;
+  --green: #16A34A;
+  --green-bg: #EEFAF1;
+  --amber: #B45309;
+  --amber-bg: #FEF7EC;
+  --red: #DC2626;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--bg); color: var(--ink);
+  font-size: 15px; line-height: 1.8;
+  padding: 48px 20px 90px;
+}
+.wrap { max-width: 760px; margin: 0 auto; }
+
+/* hero */
+.hero { text-align: center; margin-bottom: 44px; }
+.hero .badge {
+  display: inline-block; background: var(--ink); color: #fff;
+  font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  padding: 6px 18px; border-radius: 999px; margin-bottom: 18px;
+}
+.hero h1 { font-size: 36px; font-weight: 900; letter-spacing: -1px; line-height: 1.25; }
+.hero p { color: var(--sub); margin-top: 12px; font-size: 14px; }
+
+.note {
+  background: var(--amber-bg); color: var(--amber);
+  border-radius: 12px; padding: 14px 20px;
+  font-size: 13px; margin-bottom: 56px; text-align: center;
+}
+
+/* section */
+.sec { margin-bottom: 64px; }
+.sec-label {
+  text-align: center; font-size: 12px; font-weight: 700;
+  color: var(--sub); letter-spacing: 3px; margin-bottom: 8px;
+}
+.sec h2 { text-align: center; font-size: 24px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 28px; }
+
+/* two tracks */
+.tracks { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 620px) { .tracks { grid-template-columns: 1fr; } }
+.track {
+  background: var(--card); border-radius: 20px; padding: 28px 26px;
+  border: 1px solid var(--line);
+}
+.track .icon { font-size: 30px; margin-bottom: 10px; }
+.track .kind { font-size: 12px; font-weight: 700; letter-spacing: 2px; margin-bottom: 4px; }
+.track.rank .kind { color: var(--blue); }
+.track.bonus .kind { color: var(--green); }
+.track h3 { font-size: 20px; font-weight: 900; margin-bottom: 14px; }
+.track .big {
+  border-radius: 14px; padding: 16px 18px; font-weight: 700;
+  font-size: 14.5px; line-height: 1.7; margin-bottom: 14px;
+}
+.track.rank .big { background: var(--blue-bg); }
+.track.bonus .big { background: var(--green-bg); }
+.track ul { list-style: none; }
+.track li { font-size: 13px; color: var(--sub); padding-left: 1.2em; position: relative; margin-bottom: 6px; }
+.track li::before { content: "・"; position: absolute; left: 0; }
+
+.one-line {
+  text-align: center; margin-top: 22px; font-size: 15px; font-weight: 700;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 999px; padding: 12px 24px;
+}
+
+/* formula strip */
+.f {
+  background: var(--ink); color: #fff; border-radius: 14px;
+  padding: 18px 22px; text-align: center; font-weight: 700;
+  font-size: 15px; line-height: 1.9;
+}
+.f small { display: block; font-weight: 400; font-size: 12px; color: #BDBDB8; margin-top: 6px; }
+.f b { color: #7FD1A0; }
+
+/* rank judge visual */
+.judge { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 18px; }
+@media (max-width: 620px) { .judge { grid-template-columns: 1fr; } }
+.judge .j {
+  border-radius: 16px; padding: 20px 14px; text-align: center;
+  background: var(--card); border: 1px solid var(--line);
+}
+.judge .pct { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; }
+.judge .what { font-size: 14px; font-weight: 700; margin-top: 2px; }
+.judge .down .pct, .judge .down .what { color: var(--red); }
+.judge .keep .pct, .judge .keep .what { color: var(--sub); }
+.judge .up .pct, .judge .up .what { color: var(--blue); }
+.judge .hint { font-size: 11.5px; color: var(--sub); margin-top: 6px; }
+
+/* bonus ladder */
+.ladder { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; align-items: end; }
+@media (max-width: 620px) { .ladder { grid-template-columns: repeat(4, 1fr); gap: 8px; } }
+.step { text-align: center; }
+.step .bar {
+  border-radius: 12px 12px 0 0; background: var(--line);
+  display: flex; flex-direction: column; justify-content: flex-end;
+  align-items: center; padding-bottom: 10px; color: var(--sub); font-weight: 900;
+}
+.step.on .bar { background: var(--green); color: #fff; }
+.step .m { font-size: 18px; line-height: 1.2; }
+.step .m small { font-size: 11px; font-weight: 700; display: block; }
+.step .cond { font-size: 12px; font-weight: 700; margin-top: 8px; }
+.step .cond small { display: block; font-weight: 400; color: var(--sub); font-size: 11px; }
+.ladder-note { text-align: center; font-size: 12.5px; color: var(--sub); margin-top: 16px; }
+
+/* role cards */
+.roles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 620px) { .roles { grid-template-columns: 1fr; } }
+.role {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 18px; padding: 22px 22px 18px;
+}
+.role .name { font-weight: 900; font-size: 16px; }
+.role .meta { font-size: 12px; color: var(--sub); margin-bottom: 12px; }
+.role .target { font-size: 26px; font-weight: 900; letter-spacing: -0.5px; line-height: 1.2; }
+.role .target small { font-size: 12px; font-weight: 700; color: var(--sub); margin-left: 4px; }
+.role .per { font-size: 12.5px; color: var(--sub); margin-top: 2px; }
+
+/* rank steps */
+.rankbar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+@media (max-width: 620px) { .rankbar { gap: 6px; } }
+.r {
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  text-align: center; padding: 14px 6px 12px;
+}
+.r .rn { font-weight: 900; font-size: 15px; }
+.r.start { border: 2px solid var(--ink); }
+.r.start .tagS { display: inline-block; font-size: 10px; font-weight: 700; background: var(--ink); color: #fff; border-radius: 999px; padding: 1px 8px; margin-bottom: 4px; }
+.r .sal { font-size: 11.5px; color: var(--sub); line-height: 1.6; margin-top: 6px; }
+.rank-note { text-align: center; font-size: 12.5px; color: var(--sub); margin-top: 16px; }
+
+/* simple rules */
+.rules { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 10px 26px; }
+.rule { display: flex; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.rule:last-child { border-bottom: none; }
+.rule .ri { font-size: 20px; flex-shrink: 0; }
+.rule .rt { font-size: 13.5px; }
+.rule .rt b { display: block; font-size: 14px; }
+.rule .rt span { color: var(--sub); font-size: 12.5px; }
+
+/* timeline */
+.tl { display: flex; align-items: center; justify-content: center; gap: 0; }
+.tl .t { text-align: center; padding: 0 18px; }
+.tl .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--line); margin: 0 auto 8px; }
+.tl .t.now .dot { background: var(--ink); }
+.tl .t.go .dot { background: var(--green); }
+.tl .tt { font-size: 13px; font-weight: 900; }
+.tl .td { font-size: 11.5px; color: var(--sub); }
+.tl .arrow { color: var(--line); font-size: 20px; }
+
+/* live gauges */
+.live-note { text-align: center; font-size: 12.5px; color: var(--sub); margin: -14px 0 20px; }
+.team-block {
+  background: var(--card); border: 1px solid var(--line); border-radius: 20px;
+  padding: 26px 26px 18px; margin-bottom: 18px;
+}
+.team-head { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.team-name { font-size: 17px; font-weight: 900; }
+.team-name small { font-weight: 400; color: var(--sub); font-size: 11.5px; margin-left: 8px; }
+.bonus-badge {
+  font-size: 12.5px; font-weight: 900; border-radius: 999px; padding: 5px 14px;
+  background: var(--green-bg); color: var(--green);
+}
+.bonus-badge.off { background: #F1F0EC; color: var(--sub); font-weight: 700; }
+.gauge { margin: 6px 0 4px; }
+.gauge-top { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; color: var(--sub); }
+.gauge-top .pct { font-size: 20px; font-weight: 900; color: var(--ink); }
+.gauge-bar { position: relative; height: 14px; border-radius: 999px; background: #EFEDE8; overflow: visible; margin-top: 6px; }
+.gauge-fill { height: 100%; border-radius: 999px; transition: width .6s ease; }
+.gauge-fill.team { background: var(--green); }
+.gauge-fill.team.miss { background: #C9C6BF; }
+.gauge-fill.p-up { background: var(--blue); }
+.gauge-fill.p-keep { background: #8A8781; }
+.gauge-fill.p-down { background: var(--red); }
+.gauge-mark { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); opacity: .35; }
+.gauge-mark span {
+  position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
+  font-size: 9.5px; color: var(--sub); white-space: nowrap;
+}
+.member-row { border-top: 1px solid var(--line); padding: 16px 0 6px; margin-top: 12px; }
+.member-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px; }
+.member-name { font-weight: 900; font-size: 14.5px; }
+.rank-chip { font-size: 10.5px; font-weight: 700; background: #F1F0EC; color: var(--sub); border-radius: 999px; padding: 2px 9px; margin-left: 8px; }
+.outlook { font-size: 12px; font-weight: 900; }
+.outlook.up { color: var(--blue); }
+.outlook.keep { color: var(--sub); }
+.outlook.down { color: var(--red); }
+.member-nums { font-size: 12px; color: var(--sub); margin-top: 4px; }
+.live-status { text-align: center; color: var(--sub); font-size: 13px; padding: 26px 0; }
+
+.footer {
+  margin-top: 70px; text-align: center;
+  font-size: 10.5px; letter-spacing: 2px; color: #C0BDB5;
+}
+
+/* auth */
+#auth-gate { position: fixed; inset: 0; background: var(--bg);
+  display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
+.auth-card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 40px 36px;
+  max-width: 380px; width: 100%; text-align: center; }
+.auth-eyebrow { font-size: 10px; letter-spacing: 2px; color: #a8a49a; margin-bottom: 14px; font-weight: 700; }
+.auth-title { font-size: 22px; font-weight: 900; margin-bottom: 8px; }
+.auth-desc { font-size: 12.5px; color: #55524a; margin-bottom: 24px; line-height: 1.6; }
+.auth-form { display: flex; flex-direction: column; gap: 12px; }
+.auth-input { width: 100%; padding: 12px 14px; border: 1.5px solid var(--line);
+  border-radius: 8px; font-size: 14px; font-family: inherit; outline: none; }
+.auth-input:focus { border-color: var(--ink); }
+.auth-button { padding: 12px 14px; border: none; border-radius: 8px; background: var(--ink); color: #fff;
+  font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; }
+.auth-button:active { transform: scale(0.98); }
+.auth-error { font-size: 12px; color: var(--red); margin-top: 6px; display: none; }
+.auth-error.show { display: block; }
+.auth-footer { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line);
+  font-size: 9px; letter-spacing: 1.5px; color: #c5c1b8; }
+</style>
+</head>
+<body>
+<div id="auth-gate">
+  <div class="auth-card">
+    <div class="auth-eyebrow">LET / 新評価制度</div>
+    <div class="auth-title">パスワードを入力</div>
+    <div class="auth-desc">この資料は社外秘です。<br>お使いの評価ページのパスワード（各部門用 または 経営陣用）を入力してください。</div>
+    <form id="auth-form" class="auth-form" autocomplete="off">
+      <input type="password" id="auth-input" class="auth-input" placeholder="パスワード" autofocus required />
+      <button type="submit" class="auth-button">ログイン</button>
+      <div id="auth-error" class="auth-error">パスワードが違います</div>
+    </form>
+    <div class="auth-footer">CONFIDENTIAL — 株式会社LET</div>
+  </div>
+</div>
+<div id="main-content" style="display:none;">
+<div class="wrap">
+
+<div class="hero">
+  <div class="badge">2026年10月1日 スタート予定</div>
+  <h1>新しい評価のしくみ</h1>
+  <p>半年ごとの査定 ／ 会計データと自動連動 ／ 自分のページでいつでも確認</p>
+</div>
+
+<div class="note">スタートまでは現在の評価制度がそのまま適用されます。</div>
+
+<!-- 01: two numbers -->
+<div class="sec">
+  <div class="sec-label">01</div>
+  <h2>見るのは、2つの数字だけ</h2>
+  <div class="tracks">
+    <div class="track rank">
+      <div class="icon">🧗</div>
+      <div class="kind">昇格・降格</div>
+      <h3>自分の達成率</h3>
+      <div class="big">自分の粗利が、自分の人件費の<br>3倍（営業は3.5倍）に届いているか</div>
+      <ul>
+        <li>ランクと月給が決まる、キャリアの数字</li>
+        <li>チームの成績は影響しない</li>
+      </ul>
+    </div>
+    <div class="track bonus">
+      <div class="icon">🤝</div>
+      <div class="kind">ボーナス</div>
+      <h3>チームの達成率</h3>
+      <div class="big">チーム全体の粗利が、チーム全体の<br>人件費の3倍（営業は3.5倍）に届いているか</div>
+      <ul>
+        <li>チームが達成すれば、全員に支給</li>
+        <li>チーム＝職種単位（1人の職種は自分の数字がそのまま）</li>
+      </ul>
+    </div>
+  </div>
+  <div style="text-align:center;"><div class="one-line">自分の数字で<span style="color:var(--blue);">キャリア</span>、チームの数字で<span style="color:var(--green);">ボーナス</span></div></div>
+</div>
+
+<!-- 02: rank judge -->
+<div class="sec">
+  <div class="sec-label">02</div>
+  <h2>昇格・降格（自分の達成率）</h2>
+  <div class="f">自分の達成率 ＝ 自分の粗利 ÷（月給 × 1.15 × 経過月数 × 倍率）
+    <small>1.15 = 法定福利費15%分 ／ 倍率 = 営業3.5・その他3.0</small>
+  </div>
+  <div class="judge">
+    <div class="j down">
+      <div class="pct">〜69%</div>
+      <div class="what">↓ 降格</div>
+      <div class="hint">その期の結果で翌期から1ランクダウン</div>
+    </div>
+    <div class="j keep">
+      <div class="pct">70〜109%</div>
+      <div class="what">→ 現状維持</div>
+      <div class="hint">ランク・月給は変わらない</div>
+    </div>
+    <div class="j up">
+      <div class="pct">110%〜</div>
+      <div class="what">↑ 昇格</div>
+      <div class="hint">翌期から1ランクアップ（飛び級なし）</div>
+    </div>
+  </div>
+  <div class="rank-note">半年ごとに、その期の数字だけで判定。過去の持ち越しはありません。</div>
+</div>
+
+<!-- 03: bonus ladder -->
+<div class="sec">
+  <div class="sec-label">03</div>
+  <h2>ボーナス（チームの達成率）</h2>
+  <div class="ladder" style="grid-template-columns:1fr 1fr 1fr 1fr 1.2fr;">
+    <div class="step">
+      <div class="bar" style="height:60px;"><div class="m">0<small>なし</small></div></div>
+      <div class="cond">〜99%</div>
+    </div>
+    <div class="step on">
+      <div class="bar" style="height:95px;"><div class="m">1.0<small>ヶ月分</small></div></div>
+      <div class="cond">100%〜</div>
+    </div>
+    <div class="step on">
+      <div class="bar" style="height:120px;"><div class="m">1.5<small>ヶ月分</small></div></div>
+      <div class="cond">120%〜</div>
+    </div>
+    <div class="step on">
+      <div class="bar" style="height:145px;"><div class="m">2.0<small>ヶ月分</small></div></div>
+      <div class="cond">150%〜</div>
+    </div>
+    <div class="step on">
+      <div class="bar" style="height:180px;background:linear-gradient(to top,var(--green),#6EE7A0);"><div class="m">2.5〜<small>上限なし</small></div></div>
+      <div class="cond">180%〜<small>以降+30%ごとに +0.5ヶ月</small></div>
+    </div>
+  </div>
+  <div class="ladder-note">半年ごとに支給（年2回）。<b>上限はありません</b> — チームが伸びた分だけ、どこまでも増えます。仲間を助けてチームの数字を上げることが、そのまま自分のボーナスになります。</div>
+</div>
+
+<!-- 04: roles -->
+<div class="sec">
+  <div class="sec-label">04</div>
+  <h2>職種ごとの目標ライン（スタート時）</h2>
+  <div class="roles">
+    <div class="role">
+      <div class="name">法人営業</div>
+      <div class="meta">月給30万 × 3.5倍</div>
+      <div class="target">724.5万<small>／半年</small></div>
+      <div class="per">月あたり 120.75万の粗利</div>
+    </div>
+    <div class="role">
+      <div class="name">マーケティング</div>
+      <div class="meta">月給25万 × 3倍</div>
+      <div class="target">517.5万<small>／半年</small></div>
+      <div class="per">月あたり 86.25万の粗利</div>
+    </div>
+    <div class="role">
+      <div class="name">人材紹介CA</div>
+      <div class="meta">月給25万 × 3倍</div>
+      <div class="target">517.5万<small>／半年</small></div>
+      <div class="per">月あたり 86.25万の粗利</div>
+    </div>
+    <div class="role">
+      <div class="name">不動産 / BPO統括</div>
+      <div class="meta">月給22万 × 3倍（売上−外注費で判定）</div>
+      <div class="target">455.4万<small>／半年</small></div>
+      <div class="per">月あたり 75.9万の粗利</div>
+    </div>
+  </div>
+  <div class="rank-note">月給が上がると目標も一緒に上がります（昇給1万円 → 必要粗利 月+3.45万）。</div>
+</div>
+
+<!-- 05: ranks -->
+<div class="sec">
+  <div class="sec-label">05</div>
+  <h2>ランクは5段階・全員R2スタート</h2>
+  <div class="rankbar">
+    <div class="r"><div class="rn">R1</div><div class="sal">28万<br>23万<br>20万</div></div>
+    <div class="r start"><div class="tagS">START</div><div class="rn">R2</div><div class="sal">30万<br>25万<br>22万</div></div>
+    <div class="r"><div class="rn">R3</div><div class="sal">33万<br>28万<br>25万</div></div>
+    <div class="r"><div class="rn">R4</div><div class="sal">37万<br>32万<br>29万</div></div>
+    <div class="r"><div class="rn">R5</div><div class="sal">42万<br>37万<br>34万</div></div>
+  </div>
+  <div class="rank-note">各枠の月給は上から 営業／マーケ・CA／BPO統括。R1は降格したときの枠です。</div>
+</div>
+
+<!-- 06: counting rules -->
+<div class="sec">
+  <div class="sec-label">06</div>
+  <h2>数字のカウント方法</h2>
+  <div class="rules">
+    <div class="rule"><div class="ri">📅</div><div class="rt"><b>毎月の実績で積み上げ</b><span>受注した瞬間にドンではなく、実際に請求が立った月ごとにカウント。会計データ（MF）と完全に一致し、手集計はありません。</span></div></div>
+    <div class="rule"><div class="ri">👥</div><div class="rt"><b>営業とマーケの両方にカウント</b><span>同じ案件でも、営業には「受注の貢献」、マーケには「運用の貢献」として両方に数字が付きます（役割ごとの物差しで、会社の売上とは別物です）。</span></div></div>
+    <div class="rule"><div class="ri">↩️</div><div class="rt"><b>返金・キャンセルはその時にマイナス</b><span>発生した期の粗利から引きます。過去にもらったボーナスをさかのぼって返す、はありません。</span></div></div>
+    <div class="rule"><div class="ri">📱</div><div class="rt"><b>自分のページでいつでも見られる</b><span>「自分の達成率」「チームの達成率」の2本のゲージをリアルタイム表示予定です。</span></div></div>
+  </div>
+</div>
+
+<!-- 07: live gauges -->
+<div class="sec" id="live-sec">
+  <div class="sec-label">07</div>
+  <h2>いまの数字（リアルタイム）</h2>
+  <div class="live-note" id="live-period"></div>
+  <div id="live-root"><div class="live-status">実績データを読み込んでいます…</div></div>
+</div>
+
+<div class="footer">CONFIDENTIAL — 株式会社LET</div>
+
+</div>
+</div>
+<script>
+(function() {
+  // 経営陣 / 営業 / マーケ / BPO いずれのパスワードでも閲覧可。
+  // どの種別のパスワードかをハッシュで判定し、リアルタイム実績の取得先を切り替える
+  const HASH_TO_KIND = {
+    "1e980b5384f2ce83258b28faa11cba9393191c5c95720fc1ca3b7fc464708ea4": "exec",
+    "4eec5bf9b65f5a32b6d1396822173162960a0e999e1633289d92493130511ea0": "sales",
+    "06d54e2513a16422a07ef460dd6b5c4c4b42d770b78527653e654ea10774572e": "marketing",
+    "ca8266858a2df9fd49181dbb7f3568fb53ec1764eafd1ddc55dc992688f0889a": "bpo",
+    "4e3fa4d283d4adc937fd52b1944c489e24eea35e4c302e8c95ae22bd68e19e2a": "bpo"
+  };
+  const SESSION_KINDS = [
+    ["let_auth_exec", "exec"],
+    ["let_auth_sales", "sales"],
+    ["let_auth_marketing", "marketing"],
+    ["let_auth_bpo", "bpo"]
+  ];
+  const API_BASE = "https://slack-let.vercel.app/api/eval/new-system";
+
+  async function sha256(text) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+  function b64ToBuf(b64) {
+    const bin = atob(b64);
+    const buf = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+    return buf;
+  }
+  async function decrypt(payload, password) {
+    const enc = new TextEncoder();
+    const baseKey = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveKey"]);
+    const key = await crypto.subtle.deriveKey(
+      { name: "PBKDF2", salt: b64ToBuf(payload.salt), iterations: payload.iter, hash: "SHA-256" },
+      baseKey,
+      { name: "AES-GCM", length: 256 },
+      false,
+      ["decrypt"]
+    );
+    const plain = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv: b64ToBuf(payload.iv) },
+      key,
+      b64ToBuf(payload.ct)
+    );
+    return JSON.parse(new TextDecoder().decode(plain));
+  }
+
+  function credentials() {
+    const pw = sessionStorage.getItem('let_auth_newsystem_pw');
+    const kind = sessionStorage.getItem('let_auth_newsystem_kind');
+    if (pw && kind) return { pw, kind };
+    for (const [key, k] of SESSION_KINDS) {
+      const p = sessionStorage.getItem(key + '_pw');
+      if (sessionStorage.getItem(key) === '1' && p) return { pw: p, kind: k };
+    }
+    return null;
+  }
+
+  function show() {
+    document.getElementById('auth-gate').style.display = 'none';
+    document.getElementById('main-content').style.display = '';
+    loadLive();
+  }
+
+  const authed = sessionStorage.getItem('let_auth_newsystem') === '1' || credentials();
+  if (authed) { show(); }
+  document.getElementById('auth-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const input = document.getElementById('auth-input').value;
+    const hash = await sha256(input);
+    const errEl = document.getElementById('auth-error');
+    const kind = HASH_TO_KIND[hash];
+    if (kind) {
+      sessionStorage.setItem('let_auth_newsystem', '1');
+      sessionStorage.setItem('let_auth_newsystem_pw', input);
+      sessionStorage.setItem('let_auth_newsystem_kind', kind);
+      show();
+    } else {
+      errEl.classList.add('show');
+      document.getElementById('auth-input').value = '';
+    }
+  });
+
+  // ---- リアルタイム実績 (個人=昇降格 / チーム=ボーナス の2本ゲージ) ----
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  const man = (v) => (v == null ? "—" : (v / 10000).toLocaleString("ja-JP", { maximumFractionDigits: 1 }) + "万円");
+  const pct = (r) => (r == null ? "—" : (r * 100).toFixed(1) + "%");
+  const CAP = 1.6; // ゲージの右端 = 160%
+
+  function gauge(rate, cls, marks) {
+    const w = rate == null ? 0 : Math.max(0, Math.min(rate, CAP)) / CAP * 100;
+    const markHtml = marks.map(([v, label]) =>
+      `<div class="gauge-mark" style="left:${(v / CAP * 100).toFixed(1)}%"><span>${label}</span></div>`).join("");
+    return `<div class="gauge">
+      <div class="gauge-top"><span></span><span class="pct">${pct(rate)}</span></div>
+      <div class="gauge-bar">${markHtml}<div class="gauge-fill ${cls}" style="width:${w.toFixed(1)}%"></div></div>
+    </div>`;
+  }
+
+  const OUTLOOK = {
+    up: ['up', '↑ 昇格ペース（110%以上）'],
+    keep: ['keep', '→ 維持圏内（70〜109%）'],
+    down: ['down', '↓ 降格ライン（70%未満）']
+  };
+  const DEPT_LABEL = { '営業': '営業チーム', 'マーケティング': 'マーケチーム', 'CA': 'CAチーム', 'BPO': '不動産/BPO' };
+
+  function render(data) {
+    const period = document.getElementById('live-period');
+    period.innerHTML = esc(data.period.label) + '（' + data.period.months_elapsed + 'ヶ月経過）' +
+      (data.period.is_preview
+        ? ' — <b>試運転表示</b>: 制度スタート（2026年10月1日）前のプレビューで、現在の評価には影響しません'
+        : '');
+    const root = document.getElementById('live-root');
+    if (!data.teams || !data.teams.length) {
+      root.innerHTML = '<div class="live-status">表示できるチームがありません。</div>';
+      return;
+    }
+    root.innerHTML = data.teams.map((t) => {
+      const bonus = t.bonus_months
+        ? `<span class="bonus-badge">現時点: ボーナス ${t.bonus_months}ヶ月ペース</span>`
+        : `<span class="bonus-badge off">チーム100%でボーナス発生</span>`;
+      const memberHtml = (t.members || []).map((m) => {
+        const [ocls, olabel] = OUTLOOK[m.outlook] || ['keep', '—'];
+        return `<div class="member-row">
+          <div class="member-head">
+            <span class="member-name">${esc(m.name)}<span class="rank-chip">${esc(m.rank)}</span></span>
+            <span class="outlook ${ocls}">${olabel}</span>
+          </div>
+          ${gauge(m.personal_rate, 'p-' + ocls, [[0.7, '70%'], [1.1, '110%']])}
+          <div class="member-nums">粗利 ${man(m.gross_profit)} ／ この期の基準 ${man(m.denom)}（月あたり ${man(m.monthly_required)}）</div>
+        </div>`;
+      }).join('');
+      return `<div class="team-block">
+        <div class="team-head">
+          <span class="team-name">${esc(DEPT_LABEL[t.dept] || t.dept)}<small>${t.member_count}名 × 倍率${t.multiplier}</small></span>
+          ${bonus}
+        </div>
+        ${gauge(t.team_rate, 'team' + (t.team_rate >= 1 ? '' : ' miss'), [[1.0, '100%'], [1.2, '120%'], [1.5, '150%']])}
+        <div class="member-nums">チーム粗利 ${man(t.gross_profit)} ／ チーム基準 ${man(t.denom)}</div>
+        ${memberHtml}
+      </div>`;
+    }).join('');
+  }
+
+  async function loadLive() {
+    const root = document.getElementById('live-root');
+    if (!root || root.dataset.loaded) return;
+    root.dataset.loaded = '1';
+    const cred = credentials();
+    if (!cred) {
+      root.innerHTML = '<div class="live-status">実績の表示にはこのページで再ログインしてください（部門パスワード）。</div>';
+      return;
+    }
+    try {
+      const res = await fetch(API_BASE + '?target=' + cred.kind);
+      if (!res.ok) throw new Error('http ' + res.status);
+      const payload = await res.json();
+      const data = await decrypt(payload, cred.pw);
+      render(data);
+    } catch (e) {
+      root.innerHTML = '<div class="live-status">実績データは準備中です（接続できませんでした）。制度の内容は上記のとおりです。</div>';
+    }
+  }
+})();
+</script>
+</body>
+</html>
