@@ -5,232 +5,291 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LET 新評価制度</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
 :root {
-  --ink: #1A1A1A;
-  --sub: #767470;
-  --bg: #FAFAF7;
-  --card: #FFFFFF;
-  --line: #ECEAE4;
-  --blue: #2563EB;
-  --blue-bg: #EFF4FE;
-  --green: #16A34A;
-  --green-bg: #EEFAF1;
-  --amber: #B45309;
-  --amber-bg: #FEF7EC;
+  --ink: #0D0D0D;
+  --ink-2: #3D3D3D;
+  --ink-3: #888;
+  --rule: #E0E0E0;
+  --page: #F7F6F3;
+  --white: #FFFFFF;
+  --blue: #1A5FA8;
+  --blue-light: #EAF1FB;
+  --green: #1A7A4A;
+  --green-light: #EAF7F0;
   --red: #DC2626;
+  --red-light: #FDECEC;
+  --amber: #B45309;
+  --amber-light: #FEF5EA;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
 body {
   font-family: 'Noto Sans JP', sans-serif;
-  background: var(--bg); color: var(--ink);
-  font-size: 15px; line-height: 1.8;
-  padding: 48px 20px 90px;
+  background: var(--page);
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.65;
 }
-.wrap { max-width: 760px; margin: 0 auto; }
+.mono { font-family: 'IBM Plex Mono', monospace; }
+.page { max-width: 1080px; margin: 0 auto; padding: 52px 32px 80px; }
 
-/* hero */
-.hero { text-align: center; margin-bottom: 44px; }
-.hero .badge {
-  display: inline-block; background: var(--ink); color: #fff;
-  font-size: 12px; font-weight: 700; letter-spacing: 1px;
-  padding: 6px 18px; border-radius: 999px; margin-bottom: 18px;
+.nav-back {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-3);
+  text-decoration: none; margin-bottom: 20px; padding: 6px 12px;
+  border: 1px solid var(--rule); border-radius: 4px; background: var(--white);
 }
-.hero h1 { font-size: 36px; font-weight: 900; letter-spacing: -1px; line-height: 1.25; }
-.hero p { color: var(--sub); margin-top: 12px; font-size: 14px; }
+.nav-back:hover { color: var(--ink); border-color: var(--ink); }
 
-.note {
-  background: var(--amber-bg); color: var(--amber);
-  border-radius: 12px; padding: 14px 20px;
-  font-size: 13px; margin-bottom: 56px; text-align: center;
+header { margin-bottom: 40px; }
+.header-top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding-bottom: 20px; border-bottom: 2.5px solid var(--ink); gap: 24px;
+}
+.doc-eyebrow {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px;
+}
+h1 { font-size: 28px; font-weight: 900; letter-spacing: -0.8px; line-height: 1.15; }
+h1 em { font-style: normal; color: var(--blue); }
+.doc-meta {
+  text-align: right; font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px; color: var(--ink-3); line-height: 2; flex-shrink: 0;
+}
+.philosophy {
+  margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: var(--rule); border: 1px solid var(--rule);
+  border-radius: 8px; overflow: hidden;
+}
+.phil-item { background: var(--white); padding: 14px 18px; }
+.phil-label {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--ink-3); margin-bottom: 5px;
+}
+.phil-val { font-size: 13px; font-weight: 700; }
+
+.notice {
+  margin-top: 14px; background: #FFFBEB; border: 1px solid #FCD34D;
+  border-radius: 6px; padding: 10px 14px; font-size: 12px; color: var(--ink-2);
 }
 
-/* section */
-.sec { margin-bottom: 64px; }
-.sec-label {
-  text-align: center; font-size: 12px; font-weight: 700;
-  color: var(--sub); letter-spacing: 3px; margin-bottom: 8px;
+.sec-title {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--ink-3); margin: 48px 0 14px;
+  display: flex; align-items: center; gap: 10px;
 }
-.sec h2 { text-align: center; font-size: 24px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 28px; }
+.sec-title::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
 
 /* two tracks */
-.tracks { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media (max-width: 620px) { .tracks { grid-template-columns: 1fr; } }
-.track {
-  background: var(--card); border-radius: 20px; padding: 28px 26px;
-  border: 1px solid var(--line);
+.tracks { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 680px) { .tracks { grid-template-columns: 1fr; } }
+.track { background: var(--white); border: 1.5px solid; border-radius: 8px; overflow: hidden; }
+.track.rank { border-color: var(--blue); }
+.track.bonus { border-color: var(--green); }
+.track-head { padding: 10px 16px 8px; border-bottom: 1px solid var(--rule); display: flex; align-items: center; gap: 10px; }
+.track-tag {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600;
+  letter-spacing: 1px; text-transform: uppercase; color: #fff; padding: 2px 8px; border-radius: 3px;
 }
-.track .icon { font-size: 30px; margin-bottom: 10px; }
-.track .kind { font-size: 12px; font-weight: 700; letter-spacing: 2px; margin-bottom: 4px; }
-.track.rank .kind { color: var(--blue); }
-.track.bonus .kind { color: var(--green); }
-.track h3 { font-size: 20px; font-weight: 900; margin-bottom: 14px; }
-.track .big {
-  border-radius: 14px; padding: 16px 18px; font-weight: 700;
-  font-size: 14.5px; line-height: 1.7; margin-bottom: 14px;
+.track.rank .track-tag { background: var(--blue); }
+.track.bonus .track-tag { background: var(--green); }
+.track-title { font-size: 14px; font-weight: 900; }
+.track-body { padding: 14px 16px; }
+.track-big {
+  border-radius: 6px; padding: 12px 14px; font-weight: 700;
+  font-size: 13px; line-height: 1.7; margin-bottom: 10px;
 }
-.track.rank .big { background: var(--blue-bg); }
-.track.bonus .big { background: var(--green-bg); }
-.track ul { list-style: none; }
-.track li { font-size: 13px; color: var(--sub); padding-left: 1.2em; position: relative; margin-bottom: 6px; }
-.track li::before { content: "・"; position: absolute; left: 0; }
-
+.track.rank .track-big { background: var(--blue-light); }
+.track.bonus .track-big { background: var(--green-light); }
+.track-body ul { list-style: none; }
+.track-body li { font-size: 12px; color: var(--ink-2); padding-left: 1.1em; position: relative; margin-bottom: 4px; }
+.track-body li::before { content: '・'; position: absolute; left: 0; color: var(--ink-3); }
 .one-line {
-  text-align: center; margin-top: 22px; font-size: 15px; font-weight: 700;
-  background: var(--card); border: 1px solid var(--line);
-  border-radius: 999px; padding: 12px 24px;
+  margin-top: 12px; text-align: center; font-size: 13.5px; font-weight: 700;
+  background: var(--white); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 18px;
 }
 
-/* formula strip */
-.f {
-  background: var(--ink); color: #fff; border-radius: 14px;
-  padding: 18px 22px; text-align: center; font-weight: 700;
-  font-size: 15px; line-height: 1.9;
+/* formula */
+.formula {
+  background: var(--ink); color: #fff; border-radius: 8px;
+  padding: 16px 22px; font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px; line-height: 2; margin-bottom: 14px; overflow-x: auto;
 }
-.f small { display: block; font-weight: 400; font-size: 12px; color: #BDBDB8; margin-top: 6px; }
-.f b { color: #7FD1A0; }
+.formula .comment { color: #6B7280; font-size: 11px; }
+.formula .highlight { color: #FCD34D; }
 
-/* rank judge visual */
-.judge { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 18px; }
-@media (max-width: 620px) { .judge { grid-template-columns: 1fr; } }
-.judge .j {
-  border-radius: 16px; padding: 20px 14px; text-align: center;
-  background: var(--card); border: 1px solid var(--line);
-}
-.judge .pct { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; }
-.judge .what { font-size: 14px; font-weight: 700; margin-top: 2px; }
+/* judge grid */
+.judge { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+@media (max-width: 680px) { .judge { grid-template-columns: 1fr; } }
+.judge .j { background: var(--white); border: 1.5px solid var(--rule); border-radius: 8px; padding: 16px 14px; text-align: center; }
+.judge .j.down { border-color: var(--red); }
+.judge .j.up { border-color: var(--blue); }
+.judge .pct { font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 600; }
+.judge .what { font-size: 13px; font-weight: 900; margin-top: 2px; }
 .judge .down .pct, .judge .down .what { color: var(--red); }
-.judge .keep .pct, .judge .keep .what { color: var(--sub); }
+.judge .keep .pct, .judge .keep .what { color: var(--ink-3); }
 .judge .up .pct, .judge .up .what { color: var(--blue); }
-.judge .hint { font-size: 11.5px; color: var(--sub); margin-top: 6px; }
+.judge .hint { font-size: 11px; color: var(--ink-3); margin-top: 5px; line-height: 1.5; }
+.sec-note { font-size: 11.5px; color: var(--ink-3); margin-top: 10px; }
 
 /* bonus ladder */
-.ladder { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; align-items: end; }
-@media (max-width: 620px) { .ladder { grid-template-columns: repeat(4, 1fr); gap: 8px; } }
+.ladder-wrap { background: var(--white); border: 1px solid var(--rule); border-radius: 8px; padding: 20px 20px 16px; }
+.ladder { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1.2fr; gap: 10px; align-items: end; }
 .step { text-align: center; }
 .step .bar {
-  border-radius: 12px 12px 0 0; background: var(--line);
+  border-radius: 4px 4px 0 0; background: #ECEAE4;
   display: flex; flex-direction: column; justify-content: flex-end;
-  align-items: center; padding-bottom: 10px; color: var(--sub); font-weight: 900;
+  align-items: center; padding-bottom: 8px; color: var(--ink-3); font-weight: 600;
+  font-family: 'IBM Plex Mono', monospace;
 }
 .step.on .bar { background: var(--green); color: #fff; }
-.step .m { font-size: 18px; line-height: 1.2; }
-.step .m small { font-size: 11px; font-weight: 700; display: block; }
-.step .cond { font-size: 12px; font-weight: 700; margin-top: 8px; }
-.step .cond small { display: block; font-weight: 400; color: var(--sub); font-size: 11px; }
-.ladder-note { text-align: center; font-size: 12.5px; color: var(--sub); margin-top: 16px; }
+.step .m { font-size: 16px; line-height: 1.2; }
+.step .m small { font-size: 10px; display: block; font-family: 'Noto Sans JP', sans-serif; font-weight: 700; }
+.step .cond { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; margin-top: 6px; }
+.step .cond small { display: block; font-family: 'Noto Sans JP', sans-serif; font-weight: 400; color: var(--ink-3); font-size: 10px; }
 
-/* role cards */
-.roles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-@media (max-width: 620px) { .roles { grid-template-columns: 1fr; } }
-.role {
-  background: var(--card); border: 1px solid var(--line);
-  border-radius: 18px; padding: 22px 22px 18px;
+/* role table */
+.kpi-table-wrap { background: var(--white); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
+table.kpi-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.kpi-table th {
+  padding: 10px 14px; text-align: left; font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-3);
+  background: var(--page); border-bottom: 1px solid var(--rule); font-weight: 500;
 }
-.role .name { font-weight: 900; font-size: 16px; }
-.role .meta { font-size: 12px; color: var(--sub); margin-bottom: 12px; }
-.role .target { font-size: 26px; font-weight: 900; letter-spacing: -0.5px; line-height: 1.2; }
-.role .target small { font-size: 12px; font-weight: 700; color: var(--sub); margin-left: 4px; }
-.role .per { font-size: 12.5px; color: var(--sub); margin-top: 2px; }
+.kpi-table td { padding: 12px 14px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+.kpi-table tr:last-child td { border-bottom: none; }
+.kpi-table td.num, .kpi-table th.num { text-align: right; font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.big-num { font-family: 'IBM Plex Mono', monospace; font-size: 17px; font-weight: 600; }
+.big-num-sub { font-size: 10.5px; color: var(--ink-3); font-family: 'IBM Plex Mono', monospace; }
+tr.hl td { background: #FBF7EA; }
 
-/* rank steps */
-.rankbar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
-@media (max-width: 620px) { .rankbar { gap: 6px; } }
-.r {
-  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
-  text-align: center; padding: 14px 6px 12px;
-}
-.r .rn { font-weight: 900; font-size: 15px; }
-.r.start { border: 2px solid var(--ink); }
-.r.start .tagS { display: inline-block; font-size: 10px; font-weight: 700; background: var(--ink); color: #fff; border-radius: 999px; padding: 1px 8px; margin-bottom: 4px; }
-.r .sal { font-size: 11.5px; color: var(--sub); line-height: 1.6; margin-top: 6px; }
-.rank-note { text-align: center; font-size: 12.5px; color: var(--sub); margin-top: 16px; }
-
-/* simple rules */
-.rules { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 10px 26px; }
-.rule { display: flex; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+/* rules list */
+.rules { background: var(--white); border: 1px solid var(--rule); border-radius: 8px; padding: 4px 20px; }
+.rule { display: flex; gap: 14px; padding: 13px 0; border-bottom: 1px dashed var(--rule); }
 .rule:last-child { border-bottom: none; }
-.rule .ri { font-size: 20px; flex-shrink: 0; }
-.rule .rt { font-size: 13.5px; }
-.rule .rt b { display: block; font-size: 14px; }
-.rule .rt span { color: var(--sub); font-size: 12.5px; }
+.rule .ri { font-size: 18px; flex-shrink: 0; }
+.rule .rt b { display: block; font-size: 13px; }
+.rule .rt span { color: var(--ink-3); font-size: 12px; }
 
-/* timeline */
-.tl { display: flex; align-items: center; justify-content: center; gap: 0; }
-.tl .t { text-align: center; padding: 0 18px; }
-.tl .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--line); margin: 0 auto 8px; }
-.tl .t.now .dot { background: var(--ink); }
-.tl .t.go .dot { background: var(--green); }
-.tl .tt { font-size: 13px; font-weight: 900; }
-.tl .td { font-size: 11.5px; color: var(--sub); }
-.tl .arrow { color: var(--line); font-size: 20px; }
-
-/* live gauges */
-.live-note { text-align: center; font-size: 12.5px; color: var(--sub); margin: -14px 0 20px; }
-.team-block {
-  background: var(--card); border: 1px solid var(--line); border-radius: 20px;
-  padding: 26px 26px 18px; margin-bottom: 18px;
+/* ===== live gauges ===== */
+.live-period { font-size: 11.5px; color: var(--ink-3); margin-bottom: 14px; font-family: 'IBM Plex Mono', monospace; }
+.team-block { background: var(--white); border: 1.5px solid var(--ink); border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+.team-head {
+  padding: 12px 18px; background: var(--ink); color: #fff;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
 }
-.team-head { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
-.team-name { font-size: 17px; font-weight: 900; }
-.team-name small { font-weight: 400; color: var(--sub); font-size: 11.5px; margin-left: 8px; }
+.team-name { font-size: 14px; font-weight: 900; }
+.team-name small { font-family: 'IBM Plex Mono', monospace; font-weight: 400; color: #BBB; font-size: 10.5px; margin-left: 10px; }
 .bonus-badge {
-  font-size: 12.5px; font-weight: 900; border-radius: 999px; padding: 5px 14px;
-  background: var(--green-bg); color: var(--green);
+  font-size: 12px; font-weight: 900; border-radius: 4px; padding: 4px 12px;
+  background: var(--green); color: #fff;
 }
-.bonus-badge.off { background: #F1F0EC; color: var(--sub); font-weight: 700; }
-.gauge { margin: 6px 0 4px; }
-.gauge-top { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; color: var(--sub); }
-.gauge-top .pct { font-size: 20px; font-weight: 900; color: var(--ink); }
-.gauge-bar { position: relative; height: 14px; border-radius: 999px; background: #EFEDE8; overflow: visible; margin-top: 6px; }
-.gauge-fill { height: 100%; border-radius: 999px; transition: width .6s ease; }
+.bonus-badge.off { background: #3D3D3D; color: #BBB; font-weight: 700; }
+.team-body { padding: 16px 20px 6px; }
+.gauge { margin: 4px 0 4px; }
+.gauge-top { display: flex; justify-content: space-between; align-items: baseline; }
+.gauge-top .glabel { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-3); }
+.gauge-top .pct { font-family: 'IBM Plex Mono', monospace; font-size: 19px; font-weight: 600; }
+.gauge-bar { position: relative; height: 12px; border-radius: 3px; background: #ECEAE4; margin-top: 16px; }
+.gauge-fill { height: 100%; border-radius: 3px; transition: width .6s ease; }
 .gauge-fill.team { background: var(--green); }
-.gauge-fill.team.miss { background: #C9C6BF; }
+.gauge-fill.team.miss { background: #B9B6AE; }
 .gauge-fill.p-up { background: var(--blue); }
 .gauge-fill.p-keep { background: #8A8781; }
 .gauge-fill.p-down { background: var(--red); }
-.gauge-mark { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink); opacity: .35; }
+.gauge-mark { position: absolute; top: -4px; bottom: -4px; width: 1.5px; background: var(--ink); opacity: .4; }
 .gauge-mark span {
-  position: absolute; top: -16px; left: 50%; transform: translateX(-50%);
-  font-size: 9.5px; color: var(--sub); white-space: nowrap;
+  position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+  font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--ink-3); white-space: nowrap;
 }
-.member-row { border-top: 1px solid var(--line); padding: 16px 0 6px; margin-top: 12px; }
+.team-nums { font-size: 11.5px; color: var(--ink-3); margin-top: 6px; font-family: 'IBM Plex Mono', monospace; }
+
+.member-row { border-top: 1px solid var(--rule); padding: 16px 0 14px; margin-top: 14px; }
 .member-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px; }
 .member-name { font-weight: 900; font-size: 14.5px; }
-.rank-chip { font-size: 10.5px; font-weight: 700; background: #F1F0EC; color: var(--sub); border-radius: 999px; padding: 2px 9px; margin-left: 8px; }
+.rank-chip {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600;
+  background: var(--page); border: 1px solid var(--rule); color: var(--ink-2);
+  border-radius: 3px; padding: 2px 8px; margin-left: 8px;
+}
 .outlook { font-size: 12px; font-weight: 900; }
 .outlook.up { color: var(--blue); }
-.outlook.keep { color: var(--sub); }
+.outlook.keep { color: var(--ink-3); }
 .outlook.down { color: var(--red); }
-.member-nums { font-size: 12px; color: var(--sub); margin-top: 4px; }
-.live-status { text-align: center; color: var(--sub); font-size: 13px; padding: 26px 0; }
+.member-nums { font-size: 11.5px; color: var(--ink-3); margin-top: 6px; }
+.mkpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 12px 0 0; }
+@media (max-width: 680px) { .mkpis { grid-template-columns: repeat(2, 1fr); } }
+.mkpi { background: var(--page); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 12px; }
+.mkpi .kv { font-family: 'IBM Plex Mono', monospace; font-size: 14.5px; font-weight: 600; letter-spacing: -0.3px; }
+.mkpi .kl { font-size: 10px; color: var(--ink-3); }
+.mkpi.good .kv { color: var(--green); }
+.mbonus {
+  font-size: 12px; margin: 10px 0 0; padding: 9px 14px; border-radius: 6px;
+  background: var(--green-light); border: 1px solid var(--green); color: var(--green); font-weight: 700;
+}
+.mbonus.off { background: var(--page); border-color: var(--rule); color: var(--ink-3); font-weight: 400; }
+.mbars-title {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--ink-3); margin-top: 16px;
+}
+.mbars { display: flex; gap: 8px; align-items: flex-end; height: 96px; margin: 8px 2px 2px; }
+.mbar { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; }
+.mbar .v { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--ink-3); margin-bottom: 3px; white-space: nowrap; }
+.mbar .b { width: 100%; max-width: 48px; border-radius: 4px 4px 0 0; background: var(--blue); }
+.mbar .b.neg { background: var(--red); }
+.mbar .ml { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--ink-3); margin-top: 4px; }
+.mclients { margin-top: 12px; }
+.mclients summary { cursor: pointer; color: var(--blue); font-weight: 700; font-size: 12px; }
+.mclients table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
+.mclients th {
+  text-align: left; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px;
+  letter-spacing: 1px; text-transform: uppercase; color: var(--ink-3); font-weight: 500;
+  padding: 5px 6px; border-bottom: 1.5px solid var(--ink);
+}
+.mclients td { padding: 5px 6px; border-bottom: 1px solid var(--rule); }
+.mclients td.num, .mclients th.num { text-align: right; font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mclients tr.total td { font-weight: 900; border-bottom: none; }
+.live-status { text-align: center; color: var(--ink-3); font-size: 12.5px; padding: 26px 0; background: var(--white); border: 1px dashed var(--rule); border-radius: 8px; }
 
-.footer {
-  margin-top: 70px; text-align: center;
-  font-size: 10.5px; letter-spacing: 2px; color: #C0BDB5;
+.doc-footer {
+  margin-top: 60px; padding-top: 16px; border-top: 1px solid var(--rule);
+  display: flex; justify-content: space-between;
+  font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--ink-3);
+}
+
+@media (max-width: 768px) {
+  .page { padding: 32px 16px 60px; }
+  h1 { font-size: 22px; }
+  .header-top { flex-direction: column; }
+  .doc-meta { text-align: left; }
+  .philosophy { grid-template-columns: 1fr; }
+  .ladder { gap: 6px; }
+  .kpi-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .kpi-table { min-width: 560px; }
+  .doc-footer { flex-direction: column; gap: 4px; }
 }
 
 /* auth */
-#auth-gate { position: fixed; inset: 0; background: var(--bg);
-  display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-.auth-card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 40px 36px;
-  max-width: 380px; width: 100%; text-align: center; }
-.auth-eyebrow { font-size: 10px; letter-spacing: 2px; color: #a8a49a; margin-bottom: 14px; font-weight: 700; }
-.auth-title { font-size: 22px; font-weight: 900; margin-bottom: 8px; }
+#auth-gate { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #f7f6f2;
+  display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 1000; }
+.auth-card { background: #fff; border: 1px solid #e3e1da; border-radius: 12px; padding: 40px 36px;
+  max-width: 420px; width: 100%; box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+.auth-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px;
+  text-transform: uppercase; color: #8a877e; margin-bottom: 14px; }
+.auth-title { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 8px; line-height: 1.3; }
 .auth-desc { font-size: 12.5px; color: #55524a; margin-bottom: 24px; line-height: 1.6; }
 .auth-form { display: flex; flex-direction: column; gap: 12px; }
-.auth-input { width: 100%; padding: 12px 14px; border: 1.5px solid var(--line);
-  border-radius: 8px; font-size: 14px; font-family: inherit; outline: none; }
-.auth-input:focus { border-color: var(--ink); }
-.auth-button { padding: 12px 14px; border: none; border-radius: 8px; background: var(--ink); color: #fff;
-  font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; }
+.auth-input { width: 100%; padding: 12px 14px; border: 1.5px solid #e3e1da;
+  border-radius: 6px; font-size: 14px; font-family: 'IBM Plex Mono', monospace; outline: none; }
+.auth-input:focus { border-color: #1a1a1a; }
+.auth-button { padding: 12px 14px; border: none; border-radius: 6px; background: #1a1a1a; color: #fff;
+  font-size: 13px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; }
 .auth-button:active { transform: scale(0.98); }
-.auth-error { font-size: 12px; color: var(--red); margin-top: 6px; display: none; }
+.auth-error { font-size: 12px; color: #c0392b; margin-top: 6px; display: none; }
 .auth-error.show { display: block; }
-.auth-footer { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line);
-  font-size: 9px; letter-spacing: 1.5px; color: #c5c1b8; }
+.auth-footer { margin-top: 20px; padding-top: 16px; border-top: 1px solid #e3e1da;
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #8a877e; text-align: center; letter-spacing: 1px; }
 </style>
 </head>
 <body>
@@ -248,173 +307,162 @@ body {
   </div>
 </div>
 <div id="main-content" style="display:none;">
-<div class="wrap">
+<div class="page">
 
-<a class="back" id="back-link" href="/" hidden>← 現行の評価シートへ戻る</a>
+<a class="nav-back" id="back-link" href="/" hidden>← 現行の評価シートに戻る</a>
 
-<div class="hero">
-  <div class="badge">2026年10月1日 スタート予定</div>
-  <h1>新しい評価のしくみ</h1>
-  <p>半年ごとの査定 ／ 会計データと自動連動 ／ 自分のページでいつでも確認</p>
-</div>
+<header>
+  <div class="header-top">
+    <div>
+      <div class="doc-eyebrow">株式会社LET — 社外秘 / 全職種共通 / 新評価制度</div>
+      <h1>粗利ベース × <em>2トラック</em>評価制度</h1>
+    </div>
+    <div class="doc-meta">
+      Ver. 1.0<br>
+      2026-10-01 施行予定<br>
+      対象：全職種
+    </div>
+  </div>
+  <div class="philosophy">
+    <div class="phil-item">
+      <div class="phil-label">昇格・降格</div>
+      <div class="phil-val">自分の達成率だけで判定。チーム成績は影響しない</div>
+    </div>
+    <div class="phil-item">
+      <div class="phil-label">ボーナス</div>
+      <div class="phil-val">チームの達成率で判定・達成なら全員に支給（上限なし）</div>
+    </div>
+    <div class="phil-item">
+      <div class="phil-label">データ</div>
+      <div class="phil-val">MF会計の実仕訳と完全連動・本ページでリアルタイム表示</div>
+    </div>
+  </div>
+  <div class="notice">✦ 本制度は <strong>2026年10月1日（新会計年度）から施行予定</strong>。スタートまでは現在の評価制度がそのまま適用されます。</div>
+</header>
 
-<div class="note">スタートまでは現在の評価制度がそのまま適用されます。</div>
-
-<!-- 01: two numbers -->
-<div class="sec">
-  <div class="sec-label">01</div>
-  <h2>見るのは、2つの数字だけ</h2>
-  <div class="tracks">
-    <div class="track rank">
-      <div class="icon">🧗</div>
-      <div class="kind">昇格・降格</div>
-      <h3>自分の達成率</h3>
-      <div class="big">自分の粗利が、自分の人件費の<br>3倍（営業は3.5倍）に届いているか</div>
+<div class="sec-title">Step 1 — 見るのは、2つの数字だけ</div>
+<div class="tracks">
+  <div class="track rank">
+    <div class="track-head"><span class="track-tag">Rank</span><span class="track-title">自分の達成率 → 昇格・降格</span></div>
+    <div class="track-body">
+      <div class="track-big">自分の粗利が、自分の人件費の3倍（営業は3.5倍）に届いているか</div>
       <ul>
         <li>ランクと月給が決まる、キャリアの数字</li>
         <li>チームの成績は影響しない</li>
       </ul>
     </div>
-    <div class="track bonus">
-      <div class="icon">🤝</div>
-      <div class="kind">ボーナス</div>
-      <h3>チームの達成率</h3>
-      <div class="big">チーム全体の粗利が、チーム全体の<br>人件費の3倍（営業は3.5倍）に届いているか</div>
+  </div>
+  <div class="track bonus">
+    <div class="track-head"><span class="track-tag">Bonus</span><span class="track-title">チームの達成率 → ボーナス</span></div>
+    <div class="track-body">
+      <div class="track-big">チーム全体の粗利が、チーム全体の人件費の3倍（営業は3.5倍）に届いているか</div>
       <ul>
         <li>チームが達成すれば、全員に支給</li>
         <li>チーム＝職種単位（1人の職種は自分の数字がそのまま）</li>
       </ul>
     </div>
   </div>
-  <div style="text-align:center;"><div class="one-line">自分の数字で<span style="color:var(--blue);">キャリア</span>、チームの数字で<span style="color:var(--green);">ボーナス</span></div></div>
+</div>
+<div class="one-line">自分の数字で<span style="color:var(--blue);">キャリア</span>、チームの数字で<span style="color:var(--green);">ボーナス</span></div>
+
+<div class="sec-title">Step 2 — 昇格・降格（自分の達成率）</div>
+<div class="formula">
+  <span class="comment">// 半年ごとに、その期の数字だけで判定（過去の持ち越しなし）</span><br>
+  自分の達成率 = 自分の粗利 ÷（<span class="highlight">月給 × 1.15 × 経過月数 × 倍率</span>）<br>
+  <span class="comment">// 1.15 = 法定福利費15%分 ／ 倍率 = 営業3.5・その他3.0</span>
+</div>
+<div class="judge">
+  <div class="j down">
+    <div class="pct">〜69%</div>
+    <div class="what">↓ 降格</div>
+    <div class="hint">その期の結果で翌期から1ランクダウン</div>
+  </div>
+  <div class="j keep">
+    <div class="pct">70〜109%</div>
+    <div class="what">→ 現状維持</div>
+    <div class="hint">ランク・月給は変わらない</div>
+  </div>
+  <div class="j up">
+    <div class="pct">110%〜</div>
+    <div class="what">↑ 昇格</div>
+    <div class="hint">翌期から1ランクアップ（飛び級なし）</div>
+  </div>
 </div>
 
-<!-- 02: rank judge -->
-<div class="sec">
-  <div class="sec-label">02</div>
-  <h2>昇格・降格（自分の達成率）</h2>
-  <div class="f">自分の達成率 ＝ 自分の粗利 ÷（月給 × 1.15 × 経過月数 × 倍率）
-    <small>1.15 = 法定福利費15%分 ／ 倍率 = 営業3.5・その他3.0</small>
-  </div>
-  <div class="judge">
-    <div class="j down">
-      <div class="pct">〜69%</div>
-      <div class="what">↓ 降格</div>
-      <div class="hint">その期の結果で翌期から1ランクダウン</div>
-    </div>
-    <div class="j keep">
-      <div class="pct">70〜109%</div>
-      <div class="what">→ 現状維持</div>
-      <div class="hint">ランク・月給は変わらない</div>
-    </div>
-    <div class="j up">
-      <div class="pct">110%〜</div>
-      <div class="what">↑ 昇格</div>
-      <div class="hint">翌期から1ランクアップ（飛び級なし）</div>
-    </div>
-  </div>
-  <div class="rank-note">半年ごとに、その期の数字だけで判定。過去の持ち越しはありません。</div>
-</div>
-
-<!-- 03: bonus ladder -->
-<div class="sec">
-  <div class="sec-label">03</div>
-  <h2>ボーナス（チームの達成率）</h2>
-  <div class="ladder" style="grid-template-columns:1fr 1fr 1fr 1fr 1.2fr;">
+<div class="sec-title">Step 3 — ボーナス（チームの達成率・上限なし）</div>
+<div class="ladder-wrap">
+  <div class="ladder">
     <div class="step">
-      <div class="bar" style="height:60px;"><div class="m">0<small>なし</small></div></div>
+      <div class="bar" style="height:56px;"><div class="m">0<small>なし</small></div></div>
       <div class="cond">〜99%</div>
     </div>
     <div class="step on">
-      <div class="bar" style="height:95px;"><div class="m">1.0<small>ヶ月分</small></div></div>
+      <div class="bar" style="height:88px;"><div class="m">1.0<small>ヶ月分</small></div></div>
       <div class="cond">100%〜</div>
     </div>
     <div class="step on">
-      <div class="bar" style="height:120px;"><div class="m">1.5<small>ヶ月分</small></div></div>
+      <div class="bar" style="height:112px;"><div class="m">1.5<small>ヶ月分</small></div></div>
       <div class="cond">120%〜</div>
     </div>
     <div class="step on">
-      <div class="bar" style="height:145px;"><div class="m">2.0<small>ヶ月分</small></div></div>
+      <div class="bar" style="height:136px;"><div class="m">2.0<small>ヶ月分</small></div></div>
       <div class="cond">150%〜</div>
     </div>
     <div class="step on">
-      <div class="bar" style="height:180px;background:linear-gradient(to top,var(--green),#6EE7A0);"><div class="m">2.5〜<small>上限なし</small></div></div>
+      <div class="bar" style="height:170px;background:linear-gradient(to top,var(--green),#4CAF7D);"><div class="m">2.5〜<small>上限なし</small></div></div>
       <div class="cond">180%〜<small>以降+30%ごとに +0.5ヶ月</small></div>
     </div>
   </div>
-  <div class="ladder-note">半年ごとに支給（年2回）。<b>上限はありません</b> — チームが伸びた分だけ、どこまでも増えます。仲間を助けてチームの数字を上げることが、そのまま自分のボーナスになります。</div>
+  <div class="sec-note">半年ごとに支給（年2回）。<b>上限はありません</b> — チームが伸びた分だけ、どこまでも増えます。仲間を助けてチームの数字を上げることが、そのまま自分のボーナスになります。</div>
 </div>
 
-<!-- 04: roles -->
-<div class="sec">
-  <div class="sec-label">04</div>
-  <h2>職種ごとの目標ライン（スタート時）</h2>
-  <div class="roles">
-    <div class="role">
-      <div class="name">法人営業</div>
-      <div class="meta">月給30万 × 3.5倍</div>
-      <div class="target">724.5万<small>／半年</small></div>
-      <div class="per">月あたり 120.75万の粗利</div>
-    </div>
-    <div class="role">
-      <div class="name">マーケティング</div>
-      <div class="meta">月給25万 × 3倍</div>
-      <div class="target">517.5万<small>／半年</small></div>
-      <div class="per">月あたり 86.25万の粗利</div>
-    </div>
-    <div class="role">
-      <div class="name">人材紹介CA</div>
-      <div class="meta">月給25万 × 3倍</div>
-      <div class="target">517.5万<small>／半年</small></div>
-      <div class="per">月あたり 86.25万の粗利</div>
-    </div>
-    <div class="role">
-      <div class="name">不動産 / BPO統括</div>
-      <div class="meta">月給22万 × 3倍（売上−外注費で判定）</div>
-      <div class="target">455.4万<small>／半年</small></div>
-      <div class="per">月あたり 75.9万の粗利</div>
-    </div>
-  </div>
-  <div class="rank-note">月給が上がると目標も一緒に上がります（昇給1万円 → 必要粗利 月+3.45万）。</div>
+<div class="sec-title">Step 4 — 職種ごとの目標ライン（スタート時）</div>
+<div class="kpi-table-wrap">
+  <table class="kpi-table">
+    <thead>
+      <tr><th>職種</th><th class="num">月給</th><th class="num">倍率</th><th class="num">半期の目標粗利</th><th class="num">月あたり</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><b>法人営業</b></td><td class="num">30万</td><td class="num">3.5</td><td class="num"><span class="big-num" style="color:var(--blue)">724.5万</span></td><td class="num">120.75万</td></tr>
+      <tr><td><b>マーケティング</b></td><td class="num">25万</td><td class="num">3.0</td><td class="num"><span class="big-num" style="color:var(--blue)">517.5万</span></td><td class="num">86.25万</td></tr>
+      <tr><td><b>人材紹介CA</b></td><td class="num">25万</td><td class="num">3.0</td><td class="num"><span class="big-num" style="color:var(--blue)">517.5万</span></td><td class="num">86.25万</td></tr>
+      <tr><td><b>不動産 / BPO統括</b><div style="font-size:10.5px;color:var(--ink-3)">売上−外注費で判定</div></td><td class="num">22万</td><td class="num">3.0</td><td class="num"><span class="big-num" style="color:var(--blue)">455.4万</span></td><td class="num">75.9万</td></tr>
+    </tbody>
+  </table>
+</div>
+<div class="sec-note">月給が上がると目標も一緒に上がります（昇給1万円 → 必要粗利 月+3.45万）。</div>
+
+<div class="sec-title">Step 5 — ランクは5段階・全員R2スタート</div>
+<div class="kpi-table-wrap">
+  <table class="kpi-table">
+    <thead>
+      <tr><th>ランク</th><th class="num">営業</th><th class="num">マーケ / CA</th><th class="num">BPO統括</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>R1（降格枠）</td><td class="num">28万</td><td class="num">23万</td><td class="num">20万</td></tr>
+      <tr class="hl"><td><b>R2（スタート）</b></td><td class="num"><b>30万</b></td><td class="num"><b>25万</b></td><td class="num"><b>22万</b></td></tr>
+      <tr><td>R3</td><td class="num">33万</td><td class="num">28万</td><td class="num">25万</td></tr>
+      <tr><td>R4</td><td class="num">37万</td><td class="num">32万</td><td class="num">29万</td></tr>
+      <tr><td>R5</td><td class="num">42万</td><td class="num">37万</td><td class="num">34万</td></tr>
+    </tbody>
+  </table>
 </div>
 
-<!-- 05: ranks -->
-<div class="sec">
-  <div class="sec-label">05</div>
-  <h2>ランクは5段階・全員R2スタート</h2>
-  <div class="rankbar">
-    <div class="r"><div class="rn">R1</div><div class="sal">28万<br>23万<br>20万</div></div>
-    <div class="r start"><div class="tagS">START</div><div class="rn">R2</div><div class="sal">30万<br>25万<br>22万</div></div>
-    <div class="r"><div class="rn">R3</div><div class="sal">33万<br>28万<br>25万</div></div>
-    <div class="r"><div class="rn">R4</div><div class="sal">37万<br>32万<br>29万</div></div>
-    <div class="r"><div class="rn">R5</div><div class="sal">42万<br>37万<br>34万</div></div>
-  </div>
-  <div class="rank-note">各枠の月給は上から 営業／マーケ・CA／BPO統括。R1は降格したときの枠です。</div>
+<div class="sec-title">Step 6 — 数字のカウント方法</div>
+<div class="rules">
+  <div class="rule"><div class="ri">📅</div><div class="rt"><b>毎月の実績で積み上げ</b><span>受注した瞬間にドンではなく、実際に請求が立った月ごとにカウント。会計データ（MF）と完全に一致し、手集計はありません。</span></div></div>
+  <div class="rule"><div class="ri">👥</div><div class="rt"><b>営業とマーケの両方にカウント</b><span>同じ案件でも、営業には「受注の貢献」、マーケには「運用の貢献」として両方に数字が付きます（役割ごとの物差しで、会社の売上とは別物です）。</span></div></div>
+  <div class="rule"><div class="ri">↩️</div><div class="rt"><b>返金・キャンセルはその時にマイナス</b><span>発生した期の粗利から引きます。過去にもらったボーナスをさかのぼって返す、はありません。</span></div></div>
 </div>
 
-<!-- 06: counting rules -->
-<div class="sec">
-  <div class="sec-label">06</div>
-  <h2>数字のカウント方法</h2>
-  <div class="rules">
-    <div class="rule"><div class="ri">📅</div><div class="rt"><b>毎月の実績で積み上げ</b><span>受注した瞬間にドンではなく、実際に請求が立った月ごとにカウント。会計データ（MF）と完全に一致し、手集計はありません。</span></div></div>
-    <div class="rule"><div class="ri">👥</div><div class="rt"><b>営業とマーケの両方にカウント</b><span>同じ案件でも、営業には「受注の貢献」、マーケには「運用の貢献」として両方に数字が付きます（役割ごとの物差しで、会社の売上とは別物です）。</span></div></div>
-    <div class="rule"><div class="ri">↩️</div><div class="rt"><b>返金・キャンセルはその時にマイナス</b><span>発生した期の粗利から引きます。過去にもらったボーナスをさかのぼって返す、はありません。</span></div></div>
-    <div class="rule"><div class="ri">📱</div><div class="rt"><b>自分のページでいつでも見られる</b><span>「自分の達成率」「チームの達成率」の2本のゲージをリアルタイム表示予定です。</span></div></div>
-  </div>
+<div class="sec-title">Step 7 — いまの数字（リアルタイム）</div>
+<div class="live-period" id="live-period"></div>
+<div id="live-root"><div class="live-status">実績データを読み込んでいます…</div></div>
+
+<div class="doc-footer">
+  <span>株式会社LET ／ 新評価制度</span>
+  <span>CONFIDENTIAL — 社内限定資料 ／ EFFECTIVE 2026-10-01 (PLANNED)</span>
 </div>
-
-<!-- 07: live gauges -->
-<div class="sec" id="live-sec">
-  <div class="sec-label">07</div>
-  <h2>いまの数字（リアルタイム）</h2>
-  <div class="live-note" id="live-period"></div>
-  <div id="live-root"><div class="live-status">実績データを読み込んでいます…</div></div>
-</div>
-
-<div style="text-align:center;margin-top:40px;"><a class="back" id="back-link-bottom" href="/" hidden>← 現行の評価シートへ戻る</a></div>
-
-<div class="footer">CONFIDENTIAL — 株式会社LET</div>
 
 </div>
 </div>
@@ -491,10 +539,8 @@ body {
   function showBackLinks() {
     const kind = sessionStorage.getItem('let_auth_newsystem_kind') || (credentials() || {}).kind;
     const href = sessionStorage.getItem('let_ns_back') || KIND_HOME[kind] || '/';
-    for (const id of ['back-link', 'back-link-bottom']) {
-      const a = document.getElementById(id);
-      if (a) { a.href = href; a.hidden = false; }
-    }
+    const a = document.getElementById('back-link');
+    if (a) { a.href = href; a.hidden = false; }
   }
 
   function show() {
@@ -523,19 +569,20 @@ body {
     }
   });
 
-  // ---- リアルタイム実績 (個人=昇降格 / チーム=ボーナス の2本ゲージ) ----
+  // ---- リアルタイム実績 (個人=昇降格 / チーム=ボーナス) ----
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
     ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   const man = (v) => (v == null ? "—" : (v / 10000).toLocaleString("ja-JP", { maximumFractionDigits: 1 }) + "万円");
+  const manS = (v) => (v == null ? "—" : (v < 0 ? "▲" : "") + Math.round(Math.abs(v) / 10000).toLocaleString("ja-JP") + "万");
   const pct = (r) => (r == null ? "—" : (r * 100).toFixed(1) + "%");
-  const CAP = 1.6; // ゲージの右端 = 160%
+  const CAP = 1.8; // ゲージの右端 = 180%
 
-  function gauge(rate, cls, marks) {
+  function gauge(rate, cls, marks, label) {
     const w = rate == null ? 0 : Math.max(0, Math.min(rate, CAP)) / CAP * 100;
-    const markHtml = marks.map(([v, label]) =>
-      `<div class="gauge-mark" style="left:${(v / CAP * 100).toFixed(1)}%"><span>${label}</span></div>`).join("");
+    const markHtml = marks.map(([v, l]) =>
+      `<div class="gauge-mark" style="left:${(v / CAP * 100).toFixed(1)}%"><span>${l}</span></div>`).join("");
     return `<div class="gauge">
-      <div class="gauge-top"><span></span><span class="pct">${pct(rate)}</span></div>
+      <div class="gauge-top"><span class="glabel">${label}</span><span class="pct">${pct(rate)}</span></div>
       <div class="gauge-bar">${markHtml}<div class="gauge-fill ${cls}" style="width:${w.toFixed(1)}%"></div></div>
     </div>`;
   }
@@ -545,13 +592,73 @@ body {
     keep: ['keep', '→ 維持圏内（70〜109%）'],
     down: ['down', '↓ 降格ライン（70%未満）']
   };
-  const DEPT_LABEL = { '営業': '営業チーム', 'マーケティング': 'マーケチーム', 'CA': 'CAチーム', 'BPO': '不動産/BPO' };
+  const DEPT_LABEL = { '営業': '営業チーム', 'マーケティング': 'マーケチーム', 'CA': 'CAチーム', 'BPO': '不動産 / BPO' };
+
+  function memberCard(m, t) {
+    const [ocls, olabel] = OUTLOOK[m.outlook] || ['keep', '—'];
+
+    // KPIタイル: 売上 / 直課費用 / 粗利 / 昇格ラインまで
+    const rem110 = m.denom * 1.1 - m.gross_profit;
+    const kpi4 = rem110 <= 0
+      ? { l: '昇格ライン(110%)', v: '突破 +' + manS(-rem110), good: true }
+      : { l: '昇格ライン(110%)まで', v: manS(rem110) };
+    const kpis = [
+      { l: '売上（役割ベース）', v: manS(m.sales) },
+      { l: '直課費用（広告・外注）', v: manS(m.direct_cost) },
+      { l: '粗利', v: manS(m.gross_profit) },
+      kpi4
+    ].map(k => `<div class="mkpi${k.good ? ' good' : ''}"><div class="kv">${k.v}</div><div class="kl">${k.l}</div></div>`).join('');
+
+    // ボーナス見込み (チーム達成率ベース・本人の月給で換算)
+    const bonus = t.bonus_months
+      ? `<div class="mbonus">🎁 チーム現ペースのボーナス見込み: ${t.bonus_months}ヶ月分 ＝ ${man(m.monthly_salary * t.bonus_months)}</div>`
+      : `<div class="mbonus off">チームが100%に届くと ボーナス1ヶ月分（${man(m.monthly_salary)}）が発生します</div>`;
+
+    // 月ごとの粗利バー
+    const months = m.monthly || [];
+    const maxAbs = Math.max(1, ...months.map(x => Math.abs(x.profit || 0)));
+    const bars = months.map(x => {
+      const p = x.profit || 0;
+      const h = Math.max(2, Math.round(Math.abs(p) / maxAbs * 60));
+      const mo = Number(x.month.slice(5, 7)) + '月';
+      return `<div class="mbar" title="${mo}: 売上${manS(x.sales)} − 費用${manS(x.direct_cost)} = 粗利${manS(p)}">
+        <span class="v">${p ? manS(p) : '0'}</span>
+        <div class="b${p < 0 ? ' neg' : ''}" style="height:${h}px"></div>
+        <span class="ml">${mo}</span>
+      </div>`;
+    }).join('');
+
+    // クライアント別の内訳
+    const rows = m.by_client || [];
+    const clientsHtml = rows.length ? `<details class="mclients">
+      <summary>クライアント別の内訳（${rows.length}件）</summary>
+      <table>
+        <tr><th>クライアント</th><th class="num">売上</th><th class="num">費用</th><th class="num">粗利</th></tr>
+        ${rows.map(r => `<tr><td>${esc(r.client)}</td><td class="num">${manS(r.sales)}</td><td class="num">${manS(r.direct_cost)}</td><td class="num">${manS(r.profit)}</td></tr>`).join('')}
+        <tr class="total"><td>合計</td><td class="num">${manS(m.sales)}</td><td class="num">${manS(m.direct_cost)}</td><td class="num">${manS(m.gross_profit)}</td></tr>
+      </table>
+    </details>` : '';
+
+    return `<div class="member-row">
+      <div class="member-head">
+        <span class="member-name">${esc(m.name)}<span class="rank-chip">${esc(m.rank)} ／ 月給${Math.round(m.monthly_salary / 10000)}万</span></span>
+        <span class="outlook ${ocls}">${olabel}</span>
+      </div>
+      ${gauge(m.personal_rate, 'p-' + ocls, [[0.7, '70%'], [1.1, '110%'], [1.5, '150%']], '自分の達成率')}
+      <div class="member-nums">この期の基準 ${man(m.denom)}（月あたり ${man(m.monthly_required)}）に対する進捗</div>
+      <div class="mkpis">${kpis}</div>
+      ${bonus}
+      <div class="mbars-title">月ごとの粗利（MF仕訳・月次発生ベース）</div>
+      <div class="mbars">${bars}</div>
+      ${clientsHtml}
+    </div>`;
+  }
 
   function render(data) {
     const period = document.getElementById('live-period');
     period.innerHTML = esc(data.period.label) + '（' + data.period.months_elapsed + 'ヶ月経過）' +
       (data.period.is_preview
-        ? ' — <b>試運転表示</b>: 制度スタート（2026年10月1日）前のプレビューで、現在の評価には影響しません'
+        ? ' — <b>試運転表示</b>: 制度スタート（2026-10-01）前のプレビューで、現在の評価には影響しません'
         : '');
     const root = document.getElementById('live-root');
     if (!data.teams || !data.teams.length) {
@@ -562,25 +669,17 @@ body {
       const bonus = t.bonus_months
         ? `<span class="bonus-badge">現時点: ボーナス ${t.bonus_months}ヶ月ペース</span>`
         : `<span class="bonus-badge off">チーム100%でボーナス発生</span>`;
-      const memberHtml = (t.members || []).map((m) => {
-        const [ocls, olabel] = OUTLOOK[m.outlook] || ['keep', '—'];
-        return `<div class="member-row">
-          <div class="member-head">
-            <span class="member-name">${esc(m.name)}<span class="rank-chip">${esc(m.rank)}</span></span>
-            <span class="outlook ${ocls}">${olabel}</span>
-          </div>
-          ${gauge(m.personal_rate, 'p-' + ocls, [[0.7, '70%'], [1.1, '110%']])}
-          <div class="member-nums">粗利 ${man(m.gross_profit)} ／ この期の基準 ${man(m.denom)}（月あたり ${man(m.monthly_required)}）</div>
-        </div>`;
-      }).join('');
+      const memberHtml = (t.members || []).map((m) => memberCard(m, t)).join('');
       return `<div class="team-block">
         <div class="team-head">
           <span class="team-name">${esc(DEPT_LABEL[t.dept] || t.dept)}<small>${t.member_count}名 × 倍率${t.multiplier}</small></span>
           ${bonus}
         </div>
-        ${gauge(t.team_rate, 'team' + (t.team_rate >= 1 ? '' : ' miss'), [[1.0, '100%'], [1.2, '120%'], [1.5, '150%']])}
-        <div class="member-nums">チーム粗利 ${man(t.gross_profit)} ／ チーム基準 ${man(t.denom)}</div>
-        ${memberHtml}
+        <div class="team-body">
+          ${gauge(t.team_rate, 'team' + (t.team_rate >= 1 ? '' : ' miss'), [[1.0, '100%'], [1.2, '120%'], [1.5, '150%']], 'チームの達成率（ボーナス判定）')}
+          <div class="team-nums">チーム粗利 ${man(t.gross_profit)} ／ チーム基準 ${man(t.denom)}</div>
+          ${memberHtml}
+        </div>
       </div>`;
     }).join('');
   }
