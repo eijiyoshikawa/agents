@@ -173,7 +173,15 @@ tr.hl td { background: #FBF7EA; }
 .rule .rt span { color: var(--ink-3); font-size: 12px; }
 
 /* ===== live gauges ===== */
-.live-period { font-size: 11.5px; color: var(--ink-3); margin-bottom: 14px; font-family: 'IBM Plex Mono', monospace; }
+.live-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.live-period { font-size: 11.5px; color: var(--ink-3); font-family: 'IBM Plex Mono', monospace; }
+.refresh-btn {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-2);
+  background: var(--white); border: 1px solid var(--rule); border-radius: 4px;
+  padding: 6px 12px; cursor: pointer;
+}
+.refresh-btn:hover { border-color: var(--ink); color: var(--ink); }
+.refresh-btn:disabled { opacity: .5; cursor: default; }
 .team-block { background: var(--white); border: 1.5px solid var(--ink); border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
 .team-head {
   padding: 12px 18px; background: var(--ink); color: #fff;
@@ -416,47 +424,22 @@ tr.hl td { background: #FBF7EA; }
   <div class="sec-note">半年ごとに支給（年2回）。<b>上限はありません</b> — チームが伸びた分だけ、どこまでも増えます。仲間を助けてチームの数字を上げることが、そのまま自分のボーナスになります。</div>
 </div>
 
-<div class="sec-title">Step 4 — 職種ごとの目標ライン（スタート時）</div>
-<div class="kpi-table-wrap">
-  <table class="kpi-table">
-    <thead>
-      <tr><th>職種</th><th class="num">月給</th><th class="num">倍率</th><th class="num">半期の目標粗利</th><th class="num">月あたり</th></tr>
-    </thead>
-    <tbody>
-      <tr><td><b>法人営業</b></td><td class="num">30万</td><td class="num">3.5</td><td class="num"><span class="big-num" style="color:var(--blue)">724.5万</span></td><td class="num">120.75万</td></tr>
-      <tr><td><b>マーケティング</b></td><td class="num">25万</td><td class="num">3.0</td><td class="num"><span class="big-num" style="color:var(--blue)">517.5万</span></td><td class="num">86.25万</td></tr>
-      <tr><td><b>人材紹介CA</b></td><td class="num">25万</td><td class="num">3.0</td><td class="num"><span class="big-num" style="color:var(--blue)">517.5万</span></td><td class="num">86.25万</td></tr>
-      <tr><td><b>不動産 / BPO統括</b><div style="font-size:10.5px;color:var(--ink-3)">売上−外注費で判定</div></td><td class="num">22万</td><td class="num">3.0</td><td class="num"><span class="big-num" style="color:var(--blue)">455.4万</span></td><td class="num">75.9万</td></tr>
-    </tbody>
-  </table>
-</div>
-<div class="sec-note">月給が上がると目標も一緒に上がります（昇給1万円 → 必要粗利 月+3.45万）。</div>
+<div class="sec-title">Step 4 — 目標ラインと月給テーブル（あなたの職種）</div>
+<div id="tables-root"><div class="live-status">🔒 目標ライン・月給テーブルは、ログインした職種の分だけ表示されます（読み込み中…）</div></div>
+<div class="sec-note">ランクはR1〜R5の5段階・全員R2スタート。昇格すると月給と目標が同時に上がります。他職種の月給テーブルは表示されません。</div>
 
-<div class="sec-title">Step 5 — ランクは5段階・全員R2スタート</div>
-<div class="kpi-table-wrap">
-  <table class="kpi-table">
-    <thead>
-      <tr><th>ランク</th><th class="num">営業</th><th class="num">マーケ / CA</th><th class="num">BPO統括</th></tr>
-    </thead>
-    <tbody>
-      <tr><td>R1（降格枠）</td><td class="num">28万</td><td class="num">23万</td><td class="num">20万</td></tr>
-      <tr class="hl"><td><b>R2（スタート）</b></td><td class="num"><b>30万</b></td><td class="num"><b>25万</b></td><td class="num"><b>22万</b></td></tr>
-      <tr><td>R3</td><td class="num">33万</td><td class="num">28万</td><td class="num">25万</td></tr>
-      <tr><td>R4</td><td class="num">37万</td><td class="num">32万</td><td class="num">29万</td></tr>
-      <tr><td>R5</td><td class="num">42万</td><td class="num">37万</td><td class="num">34万</td></tr>
-    </tbody>
-  </table>
-</div>
-
-<div class="sec-title">Step 6 — 数字のカウント方法</div>
+<div class="sec-title">Step 5 — 数字のカウント方法</div>
 <div class="rules">
   <div class="rule"><div class="ri">📅</div><div class="rt"><b>毎月の実績で積み上げ</b><span>受注した瞬間にドンではなく、実際に請求が立った月ごとにカウント。会計データ（MF）と完全に一致し、手集計はありません。</span></div></div>
   <div class="rule"><div class="ri">👥</div><div class="rt"><b>営業とマーケの両方にカウント</b><span>同じ案件でも、営業には「受注の貢献」、マーケには「運用の貢献」として両方に数字が付きます（役割ごとの物差しで、会社の売上とは別物です）。</span></div></div>
   <div class="rule"><div class="ri">↩️</div><div class="rt"><b>返金・キャンセルはその時にマイナス</b><span>発生した期の粗利から引きます。過去にもらったボーナスをさかのぼって返す、はありません。</span></div></div>
 </div>
 
-<div class="sec-title">Step 7 — いまの数字（リアルタイム）</div>
-<div class="live-period" id="live-period"></div>
+<div class="sec-title">Step 6 — いまの数字（リアルタイム）</div>
+<div class="live-head">
+  <div class="live-period" id="live-period"></div>
+  <button class="refresh-btn" id="refresh-btn" type="button" hidden>🔄 データ更新</button>
+</div>
 <div id="live-root"><div class="live-status">実績データを読み込んでいます…</div></div>
 
 <div class="doc-footer">
@@ -654,7 +637,43 @@ tr.hl td { background: #FBF7EA; }
     </div>`;
   }
 
+  const DEPT_SHORT = { '営業': '法人営業', 'マーケティング': 'マーケティング', 'CA': '人材紹介CA', 'BPO': '不動産 / BPO統括' };
+
+  function renderTables(data) {
+    const root = document.getElementById('tables-root');
+    if (!root) return;
+    const tables = data.tables || [];
+    if (!tables.length) {
+      root.innerHTML = '<div class="live-status">基準表を取得できませんでした。</div>';
+      return;
+    }
+    root.innerHTML = tables.map((tb) => {
+      const rows = ['R1', 'R2', 'R3', 'R4', 'R5'].map((r) => {
+        const sal = tb.rank_salaries[r];
+        const req = sal * 1.15 * tb.multiplier;
+        const name = r === 'R2' ? '<b>R2（スタート）</b>' : r === 'R1' ? 'R1（降格枠）' : r;
+        const fmt = (v) => (v / 10000).toLocaleString('ja-JP', { maximumFractionDigits: 2 });
+        return `<tr${r === 'R2' ? ' class="hl"' : ''}><td>${name}</td><td class="num">${r === 'R2' ? '<b>' : ''}${Math.round(sal / 10000)}万${r === 'R2' ? '</b>' : ''}</td><td class="num">${fmt(req)}万</td></tr>`;
+      }).join('');
+      const half = (tb.half_target / 10000).toLocaleString('ja-JP', { maximumFractionDigits: 2 });
+      const monthly = (tb.monthly_target / 10000).toLocaleString('ja-JP', { maximumFractionDigits: 2 });
+      const bpoNote = tb.dept === 'BPO' ? '<div style="font-size:10.5px;color:var(--ink-3)">売上 − 外注費で判定</div>' : '';
+      return `<div class="kpi-table-wrap" style="margin-bottom:12px;">
+        <table class="kpi-table">
+          <thead>
+            <tr><th>${esc(DEPT_SHORT[tb.dept] || tb.dept)} ｜ 倍率 ${tb.multiplier}</th><th class="num">月給</th><th class="num">必要粗利 / 月</th></tr>
+          </thead>
+          <tbody>
+            <tr><td style="color:var(--ink-3);font-size:11px">半期の目標粗利（R2スタート時）${bpoNote}</td><td class="num" colspan="2"><span class="big-num" style="color:var(--blue)">${half}万円</span> <span class="big-num-sub">／ 月あたり ${monthly}万円</span></td></tr>
+            ${rows}
+          </tbody>
+        </table>
+      </div>`;
+    }).join('');
+  }
+
   function render(data) {
+    renderTables(data);
     const period = document.getElementById('live-period');
     period.innerHTML = esc(data.period.label) + '（' + data.period.months_elapsed + 'ヶ月経過）' +
       (data.period.is_preview
@@ -684,9 +703,10 @@ tr.hl td { background: #FBF7EA; }
     }).join('');
   }
 
-  async function loadLive() {
+  async function loadLive(refresh) {
     const root = document.getElementById('live-root');
-    if (!root || root.dataset.loaded) return;
+    if (!root) return;
+    if (!refresh && root.dataset.loaded) return;
     root.dataset.loaded = '1';
     const cred = credentials();
     if (!cred) {
@@ -694,15 +714,34 @@ tr.hl td { background: #FBF7EA; }
       return;
     }
     try {
-      const res = await fetch(API_BASE + '?target=' + cred.kind);
+      let url = API_BASE + '?target=' + cred.kind;
+      if (refresh) {
+        // Notion更新の即時反映: パスワードのハッシュを鍵に集計キャッシュを破棄して再計算
+        url += '&refresh=1&k=' + await sha256(cred.pw) + '&_=' + Date.now();
+      }
+      const res = await fetch(url);
       if (!res.ok) throw new Error('http ' + res.status);
       const payload = await res.json();
       const data = await decrypt(payload, cred.pw);
       render(data);
+      const btn = document.getElementById('refresh-btn');
+      if (btn) btn.hidden = false;
     } catch (e) {
       root.innerHTML = '<div class="live-status">実績データは準備中です（接続できませんでした）。制度の内容は上記のとおりです。</div>';
+      const tr = document.getElementById('tables-root');
+      if (tr) tr.innerHTML = '<div class="live-status">🔒 目標ライン・月給テーブルは接続回復後に表示されます。</div>';
     }
   }
+
+  const refreshBtn = document.getElementById('refresh-btn');
+  if (refreshBtn) refreshBtn.addEventListener('click', async function() {
+    refreshBtn.disabled = true;
+    refreshBtn.textContent = '🔄 更新中…（最大30秒）';
+    try { await loadLive(true); } finally {
+      refreshBtn.disabled = false;
+      refreshBtn.textContent = '🔄 データ更新';
+    }
+  });
 })();
 </script>
 </body>
