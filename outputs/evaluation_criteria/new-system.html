@@ -3,119 +3,194 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LET 新評価制度（2026-10-01 施行予定）</title>
+<title>LET 新評価制度</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap');
 
 :root {
-  --ink: #0D0D0D;
-  --ink-2: #3D3D3D;
-  --ink-3: #888;
-  --rule: #E0E0E0;
-  --page: #F7F6F3;
-  --white: #FFFFFF;
-  --sales: #1A5FA8;
-  --sales-light: #EAF1FB;
-  --mkt: #5B21B6;
-  --mkt-light: #F3F0FD;
-  --bpo: #B85C00;
-  --bpo-light: #FEF5EA;
-  --green: #1B7A3D;
-  --green-light: #EAF7EE;
-  --red: #C0392B;
+  --ink: #1A1A1A;
+  --sub: #767470;
+  --bg: #FAFAF7;
+  --card: #FFFFFF;
+  --line: #ECEAE4;
+  --blue: #2563EB;
+  --blue-bg: #EFF4FE;
+  --green: #16A34A;
+  --green-bg: #EEFAF1;
+  --amber: #B45309;
+  --amber-bg: #FEF7EC;
+  --red: #DC2626;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 body {
   font-family: 'Noto Sans JP', sans-serif;
-  background: var(--page);
-  color: var(--ink);
-  font-size: 14px;
-  line-height: 1.7;
-  padding: 40px 20px 80px;
+  background: var(--bg); color: var(--ink);
+  font-size: 15px; line-height: 1.8;
+  padding: 48px 20px 90px;
 }
-.container { max-width: 880px; margin: 0 auto; }
-.eyebrow {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
-  color: var(--ink-3); margin-bottom: 14px; text-align: center;
+.wrap { max-width: 760px; margin: 0 auto; }
+
+/* hero */
+.hero { text-align: center; margin-bottom: 44px; }
+.hero .badge {
+  display: inline-block; background: var(--ink); color: #fff;
+  font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  padding: 6px 18px; border-radius: 999px; margin-bottom: 18px;
 }
-h1 { font-size: 34px; font-weight: 900; letter-spacing: -1px; text-align: center; line-height: 1.3; }
-.hero-badge {
-  display: inline-block; margin-top: 14px;
-  font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600;
-  background: var(--ink); color: #fff; padding: 6px 16px; border-radius: 999px;
+.hero h1 { font-size: 36px; font-weight: 900; letter-spacing: -1px; line-height: 1.25; }
+.hero p { color: var(--sub); margin-top: 12px; font-size: 14px; }
+
+.note {
+  background: var(--amber-bg); color: var(--amber);
+  border-radius: 12px; padding: 14px 20px;
+  font-size: 13px; margin-bottom: 56px; text-align: center;
 }
-.hero { text-align: center; margin-bottom: 20px; }
-.hero-lead { color: var(--ink-2); font-size: 13.5px; margin-top: 16px; }
-.notice {
-  background: #FFF8E6; border: 1px solid #E8D9A0; border-radius: 10px;
-  padding: 14px 18px; font-size: 12.5px; color: #6B5A1E; margin: 26px 0 40px;
+
+/* section */
+.sec { margin-bottom: 64px; }
+.sec-label {
+  text-align: center; font-size: 12px; font-weight: 700;
+  color: var(--sub); letter-spacing: 3px; margin-bottom: 8px;
 }
-h2 {
-  font-size: 20px; font-weight: 900; letter-spacing: -0.3px;
-  margin: 48px 0 6px; padding-top: 24px; border-top: 2px solid var(--ink);
+.sec h2 { text-align: center; font-size: 24px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 28px; }
+
+/* two tracks */
+.tracks { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 620px) { .tracks { grid-template-columns: 1fr; } }
+.track {
+  background: var(--card); border-radius: 20px; padding: 28px 26px;
+  border: 1px solid var(--line);
 }
-h2 .num { font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--ink-3); margin-right: 10px; }
-.sub { color: var(--ink-3); font-size: 12.5px; margin-bottom: 18px; }
-.card {
-  background: var(--white); border: 1px solid var(--rule); border-radius: 12px;
-  padding: 22px 24px; margin-bottom: 14px;
+.track .icon { font-size: 30px; margin-bottom: 10px; }
+.track .kind { font-size: 12px; font-weight: 700; letter-spacing: 2px; margin-bottom: 4px; }
+.track.rank .kind { color: var(--blue); }
+.track.bonus .kind { color: var(--green); }
+.track h3 { font-size: 20px; font-weight: 900; margin-bottom: 14px; }
+.track .big {
+  border-radius: 14px; padding: 16px 18px; font-weight: 700;
+  font-size: 14.5px; line-height: 1.7; margin-bottom: 14px;
 }
-.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-@media (max-width: 640px) { .two-col { grid-template-columns: 1fr; } }
-.track-title { font-size: 15px; font-weight: 900; margin-bottom: 4px; }
-.track-tag {
-  display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 10px;
-  letter-spacing: 1.5px; padding: 3px 10px; border-radius: 999px; margin-bottom: 12px;
+.track.rank .big { background: var(--blue-bg); }
+.track.bonus .big { background: var(--green-bg); }
+.track ul { list-style: none; }
+.track li { font-size: 13px; color: var(--sub); padding-left: 1.2em; position: relative; margin-bottom: 6px; }
+.track li::before { content: "・"; position: absolute; left: 0; }
+
+.one-line {
+  text-align: center; margin-top: 22px; font-size: 15px; font-weight: 700;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 999px; padding: 12px 24px;
 }
-.tag-rank { background: var(--sales-light); color: var(--sales); }
-.tag-bonus { background: var(--green-light); color: var(--green); }
-.formula {
-  font-family: 'IBM Plex Mono', monospace; font-size: 12.5px;
-  background: #111; color: #E8E8E8; border-radius: 8px;
-  padding: 14px 16px; margin: 10px 0; overflow-x: auto; white-space: nowrap;
+
+/* formula strip */
+.f {
+  background: var(--ink); color: #fff; border-radius: 14px;
+  padding: 18px 22px; text-align: center; font-weight: 700;
+  font-size: 15px; line-height: 1.9;
 }
-.formula b { color: #7FD1A0; font-weight: 600; }
-table { width: 100%; border-collapse: collapse; background: var(--white); font-size: 13px; }
-.table-wrap { overflow-x: auto; border: 1px solid var(--rule); border-radius: 10px; margin: 8px 0 6px; }
-th {
-  font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; letter-spacing: 1px;
-  text-transform: uppercase; color: var(--ink-3); font-weight: 600;
-  text-align: left; padding: 10px 14px; border-bottom: 2px solid var(--ink); white-space: nowrap;
+.f small { display: block; font-weight: 400; font-size: 12px; color: #BDBDB8; margin-top: 6px; }
+.f b { color: #7FD1A0; }
+
+/* rank judge visual */
+.judge { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 18px; }
+@media (max-width: 620px) { .judge { grid-template-columns: 1fr; } }
+.judge .j {
+  border-radius: 16px; padding: 20px 14px; text-align: center;
+  background: var(--card); border: 1px solid var(--line);
 }
-td { padding: 10px 14px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
-tr:last-child td { border-bottom: none; }
-td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
-.hl { background: #FBF7EA; font-weight: 700; }
-.fine { font-size: 11.5px; color: var(--ink-3); margin-top: 6px; }
-.list { padding-left: 1.3em; margin: 8px 0; }
-.list li { margin-bottom: 6px; }
+.judge .pct { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; }
+.judge .what { font-size: 14px; font-weight: 700; margin-top: 2px; }
+.judge .down .pct, .judge .down .what { color: var(--red); }
+.judge .keep .pct, .judge .keep .what { color: var(--sub); }
+.judge .up .pct, .judge .up .what { color: var(--blue); }
+.judge .hint { font-size: 11.5px; color: var(--sub); margin-top: 6px; }
+
+/* bonus ladder */
+.ladder { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 12px; align-items: end; }
+@media (max-width: 620px) { .ladder { grid-template-columns: repeat(4, 1fr); gap: 8px; } }
+.step { text-align: center; }
+.step .bar {
+  border-radius: 12px 12px 0 0; background: var(--line);
+  display: flex; flex-direction: column; justify-content: flex-end;
+  align-items: center; padding-bottom: 10px; color: var(--sub); font-weight: 900;
+}
+.step.on .bar { background: var(--green); color: #fff; }
+.step .m { font-size: 18px; line-height: 1.2; }
+.step .m small { font-size: 11px; font-weight: 700; display: block; }
+.step .cond { font-size: 12px; font-weight: 700; margin-top: 8px; }
+.step .cond small { display: block; font-weight: 400; color: var(--sub); font-size: 11px; }
+.ladder-note { text-align: center; font-size: 12.5px; color: var(--sub); margin-top: 16px; }
+
+/* role cards */
+.roles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width: 620px) { .roles { grid-template-columns: 1fr; } }
+.role {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 18px; padding: 22px 22px 18px;
+}
+.role .name { font-weight: 900; font-size: 16px; }
+.role .meta { font-size: 12px; color: var(--sub); margin-bottom: 12px; }
+.role .target { font-size: 26px; font-weight: 900; letter-spacing: -0.5px; line-height: 1.2; }
+.role .target small { font-size: 12px; font-weight: 700; color: var(--sub); margin-left: 4px; }
+.role .per { font-size: 12.5px; color: var(--sub); margin-top: 2px; }
+
+/* rank steps */
+.rankbar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+@media (max-width: 620px) { .rankbar { gap: 6px; } }
+.r {
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  text-align: center; padding: 14px 6px 12px;
+}
+.r .rn { font-weight: 900; font-size: 15px; }
+.r.start { border: 2px solid var(--ink); }
+.r.start .tagS { display: inline-block; font-size: 10px; font-weight: 700; background: var(--ink); color: #fff; border-radius: 999px; padding: 1px 8px; margin-bottom: 4px; }
+.r .sal { font-size: 11.5px; color: var(--sub); line-height: 1.6; margin-top: 6px; }
+.rank-note { text-align: center; font-size: 12.5px; color: var(--sub); margin-top: 16px; }
+
+/* simple rules */
+.rules { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 10px 26px; }
+.rule { display: flex; gap: 14px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.rule:last-child { border-bottom: none; }
+.rule .ri { font-size: 20px; flex-shrink: 0; }
+.rule .rt { font-size: 13.5px; }
+.rule .rt b { display: block; font-size: 14px; }
+.rule .rt span { color: var(--sub); font-size: 12.5px; }
+
+/* timeline */
+.tl { display: flex; align-items: center; justify-content: center; gap: 0; }
+.tl .t { text-align: center; padding: 0 18px; }
+.tl .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--line); margin: 0 auto 8px; }
+.tl .t.now .dot { background: var(--ink); }
+.tl .t.go .dot { background: var(--green); }
+.tl .tt { font-size: 13px; font-weight: 900; }
+.tl .td { font-size: 11.5px; color: var(--sub); }
+.tl .arrow { color: var(--line); font-size: 20px; }
+
 .footer {
-  margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--rule);
-  text-align: center; font-family: 'IBM Plex Mono', monospace;
-  font-size: 10px; letter-spacing: 2px; color: var(--ink-3);
+  margin-top: 70px; text-align: center;
+  font-size: 10.5px; letter-spacing: 2px; color: #C0BDB5;
 }
-.back { display: inline-block; margin-bottom: 24px; font-size: 12px; color: var(--ink-3); text-decoration: none; }
-.back:hover { color: var(--ink); }
-#auth-gate { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #f7f6f2;
+
+/* auth */
+#auth-gate { position: fixed; inset: 0; background: var(--bg);
   display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
-.auth-card { background: #fff; border: 1px solid #e3e1da; border-radius: 12px; padding: 40px 36px;
+.auth-card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 40px 36px;
   max-width: 380px; width: 100%; text-align: center; }
-.auth-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px;
-  text-transform: uppercase; color: #a8a49a; margin-bottom: 14px; }
-.auth-title { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 8px; line-height: 1.3; }
+.auth-eyebrow { font-size: 10px; letter-spacing: 2px; color: #a8a49a; margin-bottom: 14px; font-weight: 700; }
+.auth-title { font-size: 22px; font-weight: 900; margin-bottom: 8px; }
 .auth-desc { font-size: 12.5px; color: #55524a; margin-bottom: 24px; line-height: 1.6; }
 .auth-form { display: flex; flex-direction: column; gap: 12px; }
-.auth-input { width: 100%; box-sizing: border-box; padding: 12px 14px; border: 1.5px solid #e3e1da;
-  border-radius: 6px; font-size: 14px; font-family: inherit; outline: none; }
-.auth-input:focus { border-color: #1a1a1a; }
-.auth-button { padding: 12px 14px; border: none; border-radius: 6px; background: #1a1a1a; color: #fff;
+.auth-input { width: 100%; padding: 12px 14px; border: 1.5px solid var(--line);
+  border-radius: 8px; font-size: 14px; font-family: inherit; outline: none; }
+.auth-input:focus { border-color: var(--ink); }
+.auth-button { padding: 12px 14px; border: none; border-radius: 8px; background: var(--ink); color: #fff;
   font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; }
 .auth-button:active { transform: scale(0.98); }
-.auth-error { font-size: 12px; color: #c0392b; margin-top: 6px; display: none; }
+.auth-error { font-size: 12px; color: var(--red); margin-top: 6px; display: none; }
 .auth-error.show { display: block; }
-.auth-footer { margin-top: 20px; padding-top: 16px; border-top: 1px solid #e3e1da;
-  font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 1.5px; color: #c5c1b8; }
+.auth-footer { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line);
+  font-size: 9px; letter-spacing: 1.5px; color: #c5c1b8; }
 </style>
 </head>
 <body>
@@ -133,111 +208,170 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   </div>
 </div>
 <div id="main-content" style="display:none;">
-<div class="container">
+<div class="wrap">
 
 <div class="hero">
-  <div class="eyebrow">LET / New Evaluation System</div>
-  <h1>新評価制度</h1>
-  <div class="hero-badge">2026-10-01 施行予定</div>
-  <div class="hero-lead">半年査定 ／ 会計データ（MF実仕訳）と完全連動 ／ 個人ページでリアルタイムに確認</div>
+  <div class="badge">2026年10月1日 スタート予定</div>
+  <h1>新しい評価のしくみ</h1>
+  <p>半年ごとの査定 ／ 会計データと自動連動 ／ 自分のページでいつでも確認</p>
 </div>
 
-<div class="notice">
-  ⚠️ 本制度は <b>2026年10月1日（新会計年度）から施行予定</b>です。施行までは現行の評価制度が適用されます。
-  正式施行は就業規則・賃金規程の改定を経て確定します。内容は施行前に一部調整される可能性があります。
-</div>
+<div class="note">スタートまでは現在の評価制度がそのまま適用されます。内容は正式決定までに一部変わる可能性があります。</div>
 
-<h2><span class="num">01</span>コアの考え方</h2>
-<div class="sub">評価はただ1つの基準から出発します</div>
-<div class="card">
-  <div class="formula">担当粗利 ≥ 自分の人件費 × <b>3倍</b>（法人営業職のみ <b>3.5倍</b>）</div>
-  <ul class="list">
-    <li>人件費 = 月給 × <b>1.15</b>（法定福利費15%・制度上の固定値）× 経過月数</li>
-    <li>自分の人件費の3倍を稼げば、会社が回り、本人にも還元できる — 従来から伝えてきた基準をそのまま制度化</li>
-    <li>営業職の3.5倍は「営業の役割売上は全案件を取り込む最も広い物差し」のため。営業が達成していれば事業が黒字になる水準に設定</li>
-  </ul>
-</div>
-
-<h2><span class="num">02</span>2つの数字だけ見ればいい</h2>
-<div class="sub">個人の数字はキャリアに、チームの数字はボーナスに効きます</div>
-<div class="two-col">
-  <div class="card">
-    <div class="track-tag tag-rank">RANK — 昇格・降格</div>
-    <div class="track-title">個人達成率</div>
-    <div class="formula">個人粗利 ÷（月給 × 1.15<br>× 経過月数 × 職種倍率）</div>
-    <ul class="list">
-      <li><b>110%以上</b>の期 → 翌期に<b>1ランク昇格</b>（飛び級なし）</li>
-      <li><b>70%未満</b>の期 → 翌期に<b>1ランク降格</b></li>
-      <li>70〜109% → 現状維持</li>
-      <li>チーム成績は昇降格に影響しません</li>
-    </ul>
+<!-- 01: two numbers -->
+<div class="sec">
+  <div class="sec-label">01</div>
+  <h2>見るのは、2つの数字だけ</h2>
+  <div class="tracks">
+    <div class="track rank">
+      <div class="icon">🧗</div>
+      <div class="kind">昇格・降格</div>
+      <h3>自分の達成率</h3>
+      <div class="big">自分の粗利が、自分の人件費の<br>3倍（営業は3.5倍）に届いているか</div>
+      <ul>
+        <li>ランクと月給が決まる、キャリアの数字</li>
+        <li>チームの成績は影響しない</li>
+      </ul>
+    </div>
+    <div class="track bonus">
+      <div class="icon">🤝</div>
+      <div class="kind">ボーナス</div>
+      <h3>チームの達成率</h3>
+      <div class="big">チーム全体の粗利が、チーム全体の<br>人件費の3倍（営業は3.5倍）に届いているか</div>
+      <ul>
+        <li>チームが達成すれば、全員に支給</li>
+        <li>チーム＝職種単位（1人の職種は自分の数字がそのまま）</li>
+      </ul>
+    </div>
   </div>
-  <div class="card">
-    <div class="track-tag tag-bonus">BONUS — 賞与</div>
-    <div class="track-title">チーム達成率</div>
-    <div class="formula">チーム合計粗利 ÷（チーム合計<br>人件費 × 職種倍率）</div>
-    <ul class="list">
-      <li>チームが達成すれば<b>メンバー全員に支給</b></li>
-      <li>チームは職種単位（営業／マーケ／CA。BPOは単独）</li>
-      <li>1名チームは チーム達成率＝個人達成率</li>
-      <li>支給は半期査定ごと（年2回）</li>
-    </ul>
+  <div style="text-align:center;"><div class="one-line">自分の数字で<span style="color:var(--blue);">キャリア</span>、チームの数字で<span style="color:var(--green);">ボーナス</span></div></div>
+</div>
+
+<!-- 02: rank judge -->
+<div class="sec">
+  <div class="sec-label">02</div>
+  <h2>昇格・降格（自分の達成率）</h2>
+  <div class="f">自分の達成率 ＝ 自分の粗利 ÷（月給 × 1.15 × 経過月数 × 倍率）
+    <small>1.15 = 法定福利費15%分 ／ 倍率 = 営業3.5・その他3.0</small>
+  </div>
+  <div class="judge">
+    <div class="j down">
+      <div class="pct">〜69%</div>
+      <div class="what">↓ 降格</div>
+      <div class="hint">その期の結果で翌期から1ランクダウン</div>
+    </div>
+    <div class="j keep">
+      <div class="pct">70〜109%</div>
+      <div class="what">→ 現状維持</div>
+      <div class="hint">ランク・月給は変わらない</div>
+    </div>
+    <div class="j up">
+      <div class="pct">110%〜</div>
+      <div class="what">↑ 昇格</div>
+      <div class="hint">翌期から1ランクアップ（飛び級なし）</div>
+    </div>
+  </div>
+  <div class="rank-note">半年ごとに、その期の数字だけで判定。過去の持ち越しはありません。</div>
+</div>
+
+<!-- 03: bonus ladder -->
+<div class="sec">
+  <div class="sec-label">03</div>
+  <h2>ボーナス（チームの達成率）</h2>
+  <div class="ladder">
+    <div class="step">
+      <div class="bar" style="height:60px;"><div class="m">0<small>なし</small></div></div>
+      <div class="cond">〜99%</div>
+    </div>
+    <div class="step on">
+      <div class="bar" style="height:100px;"><div class="m">1.0<small>ヶ月分</small></div></div>
+      <div class="cond">100%〜</div>
+    </div>
+    <div class="step on">
+      <div class="bar" style="height:130px;"><div class="m">1.5<small>ヶ月分</small></div></div>
+      <div class="cond">120%〜</div>
+    </div>
+    <div class="step on">
+      <div class="bar" style="height:160px;"><div class="m">2.0<small>ヶ月分</small></div></div>
+      <div class="cond">150%〜</div>
+    </div>
+  </div>
+  <div class="ladder-note">半年ごとに支給（年2回・最大4ヶ月分）。仲間を助けてチームの数字を上げることが、そのまま自分のボーナスになります。</div>
+</div>
+
+<!-- 04: roles -->
+<div class="sec">
+  <div class="sec-label">04</div>
+  <h2>職種ごとの目標ライン（スタート時）</h2>
+  <div class="roles">
+    <div class="role">
+      <div class="name">法人営業</div>
+      <div class="meta">月給30万 × 3.5倍</div>
+      <div class="target">724.5万<small>／半年</small></div>
+      <div class="per">月あたり 120.75万の粗利</div>
+    </div>
+    <div class="role">
+      <div class="name">マーケティング</div>
+      <div class="meta">月給25万 × 3倍</div>
+      <div class="target">517.5万<small>／半年</small></div>
+      <div class="per">月あたり 86.25万の粗利</div>
+    </div>
+    <div class="role">
+      <div class="name">人材紹介CA</div>
+      <div class="meta">月給25万 × 3倍</div>
+      <div class="target">517.5万<small>／半年</small></div>
+      <div class="per">月あたり 86.25万の粗利</div>
+    </div>
+    <div class="role">
+      <div class="name">不動産 / BPO統括</div>
+      <div class="meta">月給22万 × 3倍（売上−外注費で判定）</div>
+      <div class="target">455.4万<small>／半年</small></div>
+      <div class="per">月あたり 75.9万の粗利</div>
+    </div>
+  </div>
+  <div class="rank-note">月給が上がると目標も一緒に上がります（昇給1万円 → 必要粗利 月+3.45万）。</div>
+</div>
+
+<!-- 05: ranks -->
+<div class="sec">
+  <div class="sec-label">05</div>
+  <h2>ランクは5段階・全員R2スタート</h2>
+  <div class="rankbar">
+    <div class="r"><div class="rn">R1</div><div class="sal">28万<br>23万<br>20万</div></div>
+    <div class="r start"><div class="tagS">START</div><div class="rn">R2</div><div class="sal">30万<br>25万<br>22万</div></div>
+    <div class="r"><div class="rn">R3</div><div class="sal">33万<br>28万<br>25万</div></div>
+    <div class="r"><div class="rn">R4</div><div class="sal">37万<br>32万<br>29万</div></div>
+    <div class="r"><div class="rn">R5</div><div class="sal">42万<br>37万<br>34万</div></div>
+  </div>
+  <div class="rank-note">各枠の月給は上から 営業／マーケ・CA／BPO統括。R1は降格したときの枠です。</div>
+</div>
+
+<!-- 06: counting rules -->
+<div class="sec">
+  <div class="sec-label">06</div>
+  <h2>数字のカウント方法</h2>
+  <div class="rules">
+    <div class="rule"><div class="ri">📅</div><div class="rt"><b>毎月の実績で積み上げ</b><span>受注した瞬間にドンではなく、実際に請求が立った月ごとにカウント。会計データ（MF）と完全に一致し、手集計はありません。</span></div></div>
+    <div class="rule"><div class="ri">👥</div><div class="rt"><b>営業とマーケの両方にカウント</b><span>同じ案件でも、営業には「受注の貢献」、マーケには「運用の貢献」として両方に数字が付きます（役割ごとの物差しで、会社の売上とは別物です）。</span></div></div>
+    <div class="rule"><div class="ri">↩️</div><div class="rt"><b>返金・キャンセルはその時にマイナス</b><span>発生した期の粗利から引きます。過去にもらったボーナスをさかのぼって返す、はありません。</span></div></div>
+    <div class="rule"><div class="ri">📱</div><div class="rt"><b>自分のページでいつでも見られる</b><span>「自分の達成率」「チームの達成率」の2本のゲージをリアルタイム表示予定です。</span></div></div>
   </div>
 </div>
 
-<h2><span class="num">03</span>ボーナス（チーム達成率で判定）</h2>
-<div class="table-wrap"><table>
-  <tr><th>チーム達成率</th><th class="num">ボーナス</th></tr>
-  <tr><td>100%以上 120%未満</td><td class="num">月給 <b>1ヶ月分</b></td></tr>
-  <tr><td>120%以上 150%未満</td><td class="num">月給 <b>1.5ヶ月分</b></td></tr>
-  <tr><td>150%以上</td><td class="num">月給 <b>2ヶ月分</b></td></tr>
-  <tr><td>100%未満</td><td class="num">なし</td></tr>
-</table></div>
-<div class="fine">半期ごとに判定・支給（年最大4ヶ月分）。仲間を助けてチームの数字を上げることが、そのまま自分の賞与につながります。</div>
-
-<h2><span class="num">04</span>職種別の基準値（スタート時点）</h2>
-<div class="table-wrap"><table>
-  <tr><th>職種</th><th class="num">月給</th><th class="num">倍率</th><th class="num">半期基準粗利</th><th class="num">月あたり</th></tr>
-  <tr><td>法人営業</td><td class="num">30万</td><td class="num">3.5倍</td><td class="num">724.5万</td><td class="num">120.75万</td></tr>
-  <tr><td>マーケティング</td><td class="num">25万</td><td class="num">3倍</td><td class="num">517.5万</td><td class="num">86.25万</td></tr>
-  <tr><td>人材紹介CA</td><td class="num">25万</td><td class="num">3倍</td><td class="num">517.5万</td><td class="num">86.25万</td></tr>
-  <tr><td>不動産/BPO統括</td><td class="num">22万</td><td class="num">3倍</td><td class="num">455.4万</td><td class="num">75.9万</td></tr>
-</table></div>
-<div class="fine">不動産/BPO統括は単独のため「売上 − 外注費 ≥ 人件費×3」のシンプル判定。月給が上がると基準も自動で上がります（昇給1万円 → 必要粗利 月+3.45万）。</div>
-
-<h2><span class="num">05</span>ランクと月給テーブル</h2>
-<div class="sub">R1〜R5の5段階。全員R2からスタート。半年査定ごとに個人達成率で判定</div>
-<div class="table-wrap"><table>
-  <tr><th>ランク</th><th class="num">営業</th><th class="num">マーケ / CA</th><th class="num">BPO統括</th></tr>
-  <tr><td>R1（降格枠）</td><td class="num">28万</td><td class="num">23万</td><td class="num">20万</td></tr>
-  <tr class="hl"><td>R2（スタート）</td><td class="num">30万</td><td class="num">25万</td><td class="num">22万</td></tr>
-  <tr><td>R3</td><td class="num">33万</td><td class="num">28万</td><td class="num">25万</td></tr>
-  <tr><td>R4</td><td class="num">37万</td><td class="num">32万</td><td class="num">29万</td></tr>
-  <tr><td>R5</td><td class="num">42万</td><td class="num">37万</td><td class="num">34万</td></tr>
-</table></div>
-<div class="fine">昇格・降格とも「その半期の個人達成率」だけで判定が完結します（期をまたぐ条件はありません）。昇格すると月給と基準が同時に上がります。</div>
-
-<h2><span class="num">06</span>売上・粗利のカウント方法</h2>
-<div class="card">
-  <ul class="list">
-    <li><b>月次発生ベース</b> — 受注時の契約総額一括ではなく、実際に請求が立った月に計上（MF会計の実仕訳と一致。手集計や恣意性はゼロ）</li>
-    <li><b>役割売上の両建て</b> — 同じ案件が営業（受注貢献）とマーケ（運用貢献）の双方にカウントされます。これは職種別の物差しであり、<b>会社の実売上とは異なります</b></li>
-    <li><b>人材紹介コミット型</b>は契約時（前受25%入金）に計上、<b>一般型</b>は請求時（内定＋入社確認）に計上</li>
-    <li><b>返金・戻入・貸倒れ</b>は発生した期の粗利からマイナス計上（過去の査定・支給済み賞与は遡及しません）</li>
-    <li>クロスセルは実働した役割に計上（AI GROWTH案件は評価対象外）</li>
-  </ul>
+<!-- 07: timeline -->
+<div class="sec">
+  <div class="sec-label">07</div>
+  <h2>これからの流れ</h2>
+  <div class="tl">
+    <div class="t now"><div class="dot"></div><div class="tt">いま</div><div class="td">現行制度で運用中</div></div>
+    <div class="arrow">→</div>
+    <div class="t"><div class="dot"></div><div class="tt">〜9月</div><div class="td">規程の整備・最終確定</div></div>
+    <div class="arrow">→</div>
+    <div class="t go"><div class="dot"></div><div class="tt">10月1日</div><div class="td">新制度スタート（全員R2）</div></div>
+  </div>
 </div>
 
-<h2><span class="num">07</span>いつから・どう見えるようになるか</h2>
-<div class="card">
-  <ul class="list">
-    <li><b>2026-10-01（新会計年度）施行予定</b>。施行日時点の在籍者は全員R2に格付け</li>
-    <li>個人ページに「個人達成率（昇降格用）」「チーム達成率（ボーナス用）」の2本のゲージをリアルタイム表示予定（財務ダッシュボードと同じMF実仕訳データに連動）</li>
-    <li>現在の評価ページ（本サイトの各部門ページ）は施行まで現行制度のまま運用します</li>
-  </ul>
-</div>
-
-<div class="footer">CONFIDENTIAL — 株式会社LET ／ NEW EVALUATION SYSTEM ／ EFFECTIVE 2026-10-01 (PLANNED)</div>
+<div class="footer">CONFIDENTIAL — 株式会社LET</div>
 
 </div>
 </div>
