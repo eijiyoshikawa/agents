@@ -250,6 +250,8 @@ body {
 <div id="main-content" style="display:none;">
 <div class="wrap">
 
+<a class="back" id="back-link" href="/" hidden>← 現行の評価シートへ戻る</a>
+
 <div class="hero">
   <div class="badge">2026年10月1日 スタート予定</div>
   <h1>新しい評価のしくみ</h1>
@@ -410,6 +412,8 @@ body {
   <div id="live-root"><div class="live-status">実績データを読み込んでいます…</div></div>
 </div>
 
+<div style="text-align:center;margin-top:40px;"><a class="back" id="back-link-bottom" href="/" hidden>← 現行の評価シートへ戻る</a></div>
+
 <div class="footer">CONFIDENTIAL — 株式会社LET</div>
 
 </div>
@@ -472,9 +476,31 @@ body {
     return null;
   }
 
+  // 旧ページへ戻るリンク: 来訪元 (バナー経由の同一サイトページ) を記憶し、
+  // 直接アクセス時はログイン種別に応じたページへ戻す
+  try {
+    if (document.referrer) {
+      const u = new URL(document.referrer);
+      if (u.origin === location.origin && u.pathname !== location.pathname) {
+        sessionStorage.setItem('let_ns_back', u.pathname);
+      }
+    }
+  } catch (e) {}
+  const KIND_HOME = { exec: '/', sales: '/sales', marketing: '/marketing', bpo: '/bpo' };
+
+  function showBackLinks() {
+    const kind = sessionStorage.getItem('let_auth_newsystem_kind') || (credentials() || {}).kind;
+    const href = sessionStorage.getItem('let_ns_back') || KIND_HOME[kind] || '/';
+    for (const id of ['back-link', 'back-link-bottom']) {
+      const a = document.getElementById(id);
+      if (a) { a.href = href; a.hidden = false; }
+    }
+  }
+
   function show() {
     document.getElementById('auth-gate').style.display = 'none';
     document.getElementById('main-content').style.display = '';
+    showBackLinks();
     loadLive();
   }
 
