@@ -65,6 +65,79 @@ API 設計・データベース構築・認証/認可・決済連携を担当。
 出力: 連携設定・APIキー管理ドキュメント
 ```
 
+## API設計原則
+
+### RESTful成熟度モデル（Richardson Maturity Model）
+本組織はLevel 2（HTTPメソッド+ステータスコード）を標準とする:
+- `GET`=取得 / `POST`=作成 / `PUT`=全置換 / `PATCH`=部分更新 / `DELETE`=削除
+- 適切なHTTPステータスコード（200/201/204/400/401/403/404/409/422/429/500）
+
+### エラーレスポンス標準形式
+```json
+{
+  "error": { "code": "VALIDATION_ERROR", "message": "人間向け説明", "details": [] }
+}
+```
+- 内部エラー詳細（スタックトレース等）は本番環境で絶対に露出しない
+- エラーコードは機械処理可能な定数（`VALIDATION_ERROR` / `NOT_FOUND` / `RATE_LIMITED`）
+
+### ページネーション戦略
+| 方式 | 用途 | 実装 |
+|------|------|------|
+| **Cursor-based（推奨）** | 大量データ・リアルタイム | `?cursor=xxx&limit=20` |
+| **Offset-based** | 管理画面・小規模データ | `?page=1&per_page=20` |
+
+## データベース設計パターン
+
+| 原則 | 基準 |
+|------|------|
+| 正規化 | 第3正規形を基本。読取性能が必要な箇所のみ意図的に非正規化（理由をADR記録） |
+| インデックス | WHERE/JOIN/ORDER BY 対象カラムに付与。複合インデックスはカーディナリティ高→低順 |
+| マイグレーション | 全変更をマイグレーションファイルで管理。**破壊的変更は2段階デプロイ**（追加→移行→削除） |
+| RLS | Supabase RLSは全テーブルで有効化。ポリシーなし＝アクセス拒否を原則とする |
+| 命名 | テーブル: snake_case複数形 / カラム: snake_case / FK: `{参照先}_id` |
+
+## 認証・認可パターン
+
+| パターン | 選定基準 |
+|---------|---------|
+| **JWT（Supabase Auth標準）** | SPAとの相性良・ステートレス。有効期限短め（15min）+ Refresh Token |
+| **Session** | SSR主体・セキュリティ最重視。サーバー側で無効化可能 |
+| **RBAC（推奨）** | 役割ベース（admin/editor/viewer）。シンプルな権限体系に適用 |
+| **ABAC** | 属性ベース。複雑な条件（所属組織×リソース所有者×時間帯）が必要な場合 |
+
+OAuth 2.0/OIDC: Google/GitHub等のソーシャルログインはSupabase Auth Provider経由で統一。
+
+## セキュリティ実装基準
+
+```
+□ Rate Limiting — 公開API: 100req/min、認証済み: 1000req/min。Vercel Edge Middleware推奨
+□ Input Validation — Zodスキーマで全入力をバリデーション。型安全性をAPI境界で担保
+□ SQL Injection — Prisma/Drizzle のパラメータ化クエリを徹底。生SQLは原則禁止
+□ CSRF — Server Actionsは自動対応。カスタムAPIはOriginヘッダー検証
+□ Secrets — 環境変数のみ。コード内ハードコード絶対禁止。起動時に存在チェック
+```
+
+## Stripe連携ベストプラクティス
+
+| 原則 | 実装 |
+|------|------|
+| **Webhook冪等性** | `event.id` を記録し重複処理を防止。DB内で処理済みイベントを管理 |
+| **署名検証** | `stripe.webhooks.constructEvent()` で全Webhookの署名を必ず検証 |
+| **失敗リカバリー** | Webhook失敗時はStripeが自動リトライ。処理はトランザクション内で完結させる |
+| **テスト** | Stripe CLIの `stripe listen --forward-to` でローカルWebhookテスト |
+| **サブスク状態同期** | `customer.subscription.*` イベントでDB状態を同期。ポーリングに頼らない |
+
+## キャッシュ戦略
+
+| レイヤー | 手法 | 用途 |
+|---------|------|------|
+| **HTTP Cache** | `Cache-Control` / `stale-while-revalidate` | 静的API・公開データ |
+| **CDN（Vercel Edge）** | ISR / `revalidate` | ページ単位キャッシュ |
+| **Application** | `unstable_cache` / React `cache()` | リクエスト内・ビルド時データ |
+
+キャッシュ無効化は明示的に設計する（`revalidatePath` / `revalidateTag`）。暗黙的な期限切れに頼らない。
+
 ## 技術スタック
 
 | カテゴリ | 技術 |

@@ -88,6 +88,66 @@
   P3（低）  : 軽微な問題   → 次スプリント
 ```
 
+## Vercel最適化ガイド
+
+| 機能 | 活用方針 |
+|------|---------|
+| **Edge Functions** | 地理的に近いエッジでの認証チェック・リダイレクト・A/Bテスト。コールドスタートなし |
+| **ISR（Incremental Static Regeneration）** | 更新頻度の低い公開ページ。`revalidate` 秒数は内容の鮮度要件で決定 |
+| **Middleware** | 認証ガード・地域別リダイレクト・Bot検出・セキュリティヘッダー注入 |
+| **Image Optimization** | `next/image` 経由で自動WebP/AVIF変換。外部画像は `remotePatterns` で許可 |
+| **Skew Protection** | デプロイ中の旧バージョンリクエストを保護。本番で有効化必須 |
+
+## SLI / SLO / SLA 設計
+
+| 指標（SLI） | SLO（目標） | SLA（契約） | 計測方法 |
+|------------|-----------|-----------|---------|
+| 可用性 | 99.95% | 99.9% | Synthetic monitoring（5分間隔） |
+| レスポンスタイム（p95） | ≤ 500ms | ≤ 1000ms | Vercel Analytics |
+| エラー率（5xx） | ≤ 0.1% | ≤ 0.5% | Sentry + Vercel Logs |
+| デプロイ成功率 | ≥ 98% | — | GitHub Actions結果 |
+
+### アラート疲れ防止ルール
+- **即時通知**: P0（全停止）/ P1（主要機能停止）のみ
+- **日次サマリー**: P2以下はバッチ通知。閾値超過の連続時間で重要度昇格
+- **自動復旧**: 一時的スパイク（<5分）は自動クローズ。手動対応不要
+
+## セキュリティヘッダー標準構成
+
+`next.config.js` の `headers()` で以下を全ページに適用:
+```
+Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://*.supabase.co https://*.stripe.com
+X-Frame-Options: DENY
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+```
+
+CORS: 許可オリジンを環境変数で管理。ワイルドカード `*` は本番環境で禁止。
+
+## コスト最適化戦略
+
+| 対象 | 最適化手法 |
+|------|-----------|
+| **Vercel帯域** | 画像最適化・CDNキャッシュ活用・不要なCSR→SSR/SSG移行 |
+| **Serverless実行時間** | 関数タイムアウト設定・不要なログ削減・コールドスタート最小化 |
+| **Supabase** | 不要なリアルタイムSubscription停止・接続プーリング・クエリ最適化 |
+| **外部API** | レスポンスキャッシュ・バッチリクエスト・不要なポーリング排除 |
+
+月次コストレポートで前月比10%以上増加時は原因分析を実施。
+
+## CI/CDパイプライン最適化
+
+| 施策 | 効果 |
+|------|------|
+| **依存キャッシュ** | `actions/cache` でnode_modules/`.next/cache` をキャッシュ |
+| **テスト並列化** | Playwright `--shard` / Jest `--maxWorkers` で並列実行 |
+| **差分ビルド** | `turbo` / `nx` でモノレポ時の影響範囲のみビルド |
+| **不要ステップ省略** | パス条件 (`paths-filter`) でドキュメントのみの変更時はビルドスキップ |
+
+ビルド目標: **3分以内**。超過時は原因分析→最適化を実施。
+
 ## インフラ構成
 
 | コンポーネント | サービス | 用途 |

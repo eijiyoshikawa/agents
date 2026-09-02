@@ -85,6 +85,37 @@ Next.js (App Router) を用いた UI 実装・SEO 最適化・パフォーマン
 | テスト | Jest / Playwright / Testing Library |
 | リンター | ESLint + Prettier |
 
+## Next.js App Router 深層知識
+
+実装時に以下のパターンを適切に使い分ける:
+
+| パターン | 用途 | 判断基準 |
+|---------|------|---------|
+| **Server Components（デフォルト）** | データ取得・静的表示・SEO重要ページ | インタラクション不要 |
+| **Client Components** | useState/useEffect/イベントハンドラ | ブラウザAPI・状態管理が必要 |
+| **Streaming SSR** | 重い非同期データを段階表示 | Suspense境界で分割可能な箇所 |
+| **Parallel Routes** | ダッシュボード等の独立パネル同時表示 | `@slot` で独立ロード/エラー制御 |
+| **Intercepting Routes** | モーダル遷移（一覧→詳細） | URL変化あり＋モーダル表示 |
+| **Server Actions** | フォーム送信・データ変更 | API Route不要の単純な変更操作 |
+
+### 状態管理パターン選定
+
+| 状態種別 | 推奨手法 | 避けるべき手法 |
+|---------|---------|-------------|
+| **Server State**（API/DBデータ） | RSC + fetch / SWR / TanStack Query | グローバルstoreに全部入れる |
+| **Client State**（UI状態） | useState / useReducer | サーバーで解決可能な状態をクライアントに持つ |
+| **Cross-Component State** | zustand（小〜中規模） | 過度なContext Provider入れ子 |
+| **URL State** | useSearchParams / nuqs | 検索条件をlocalStorageに入れる |
+
+### パフォーマンス最適化チェックリスト
+
+- [ ] `next/dynamic` で重いコンポーネントを遅延読み込み（Code Splitting）
+- [ ] `next/image` で画像最適化（WebP/AVIF自動変換、sizes属性、priority指定）
+- [ ] `next/font` でフォント最適化（セルフホスト、display: swap、サブセット化）
+- [ ] `@next/bundle-analyzer` でバンドルサイズ監視
+- [ ] 不要な `"use client"` を除去し Server Component を最大化
+- [ ] `React.lazy` + `Suspense` で非クリティカルUIを分割
+
 ## 連携エージェント
 - **Tech Lead Agent**: 技術方針の確認・コードレビュー
 - **UI/UX Designer Agent**: デザイン仕様の受け取り・実装確認
