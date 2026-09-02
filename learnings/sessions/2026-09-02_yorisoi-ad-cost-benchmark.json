@@ -1,0 +1,23 @@
+{
+  "session_date": "2026-09-02",
+  "topic": "株式会社YORISOI「2026年版 人材紹介業界の広告費用相場」プレスリリースの学習・ナレッジ登録",
+  "agents_involved": ["ad_operations", "marketing", "sales", "kpi_dashboard", "coo"],
+  "decisions_made": [
+    {
+      "decision": "プレスリリースの数値を learnings/patterns/market_benchmarks.json（MKB-001）としてカタログ登録し、Ad Operations 向けインスティンクト ADO-001（confidence 0.3）を新設した",
+      "context": "ユーザーから https://prtimes.jp/main/html/rd/p/000000031.000175265.html の学習指示。人材紹介・採用系はLETの事業領域（SNS採用支援）に隣接し、媒体別CPA相場は広告運用提案・見積・KPI設計に横断的に使えるため",
+      "outcome": "good",
+      "lesson": "業界相場データはインスティンクト（行動パターン）ではなくパターンカタログ（参照データ）として保存し、インスティンクト側からは参照だけさせると更新・出典管理がしやすい"
+    },
+    {
+      "decision": "リモート実行環境から prtimes.jp を直接取得できなかったため、ユーザーに本文の貼り付けを依頼して取得した",
+      "context": "クラウド実行環境のネットワークポリシーで外部サイトへのegressがブロックされている（許可はパッケージレジストリ等のみ）。Web検索・Notion・Gmailからも該当リリースは特定できなかった",
+      "outcome": "neutral",
+      "lesson": "リモートセッションで外部URLの学習指示を受けた場合、prtimes.jp等はegressブロックされる。恒久対応は環境のネットワーク設定への許可ドメイン追加、暫定対応は本文貼り付け依頼"
+    }
+  ],
+  "new_instincts": ["ADO-001"],
+  "reinforced_instincts": [],
+  "corrected_instincts": [],
+  "notes": "発行元YORISOI（採用くん/送客くん、渋谷区）はLETの隣接領域プレイヤーのため、Notionの競合情報DBへの登録を別途検討する価値あり"
+}

@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0",
+  "description": "Ad Operations Agent 固有の学習済みパターン（インスティンクト）",
+  "updated_at": "2026-09-02",
+  "instincts": [
+    {
+      "id": "ADO-001",
+      "trigger": "人材紹介・採用系クライアントの広告運用提案・予算設計・CPA目標設定を行う",
+      "action": "learnings/patterns/market_benchmarks.json の MKB-001（2026年版 人材紹介業界の広告費用相場）を参照し、媒体別の登録CPA・面談CPAレンジを初期仮説にする。応募CPA単体ではなく、有効応募CPA→面談設定CPA→面談CPA→成約CPA→広告ROIのファネル指標で設計し、応募後の初期連絡・日程調整・リマインドの運用体制まで提案に含める",
+      "confidence": 0.3,
+      "evidence": {
+        "count": 1,
+        "examples": [
+          "2026-09-02: 株式会社YORISOIのプレスリリース（PR TIMES, 2026-08-27）から業界ベンチマークを登録。広告費は売上の15〜25%、登録CPA 3,000〜5,000円、面談CPA 8,000〜15,000円が目安"
+        ]
+      },
+      "scope": "agent",
+      "domain": "marketing",
+      "created_at": "2026-09-02",
+      "updated_at": "2026-09-02"
+    }
+  ]
+}

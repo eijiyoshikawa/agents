@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "category": "market_benchmarks",
+  "description": "市場ベンチマーク・相場データのカタログ。広告運用提案・見積・KPI設計時の参照値。数値は公開情報ベースの参考値であり成果を保証しない。",
+  "updated_at": "2026-09-02",
+  "entries": [
+    {
+      "id": "MKB-001",
+      "title": "2026年版 人材紹介業界の広告費用相場（登録CPA・面談CPA）",
+      "source": {
+        "publisher": "株式会社YORISOI（東京都渋谷区、代表取締役: 竹原甲斐斗）",
+        "url": "https://prtimes.jp/main/html/rd/p/000000031.000175265.html",
+        "published_at": "2026-08-27T21:01+09:00",
+        "type": "press_release",
+        "secondary_reference": "L reach「人材紹介の広告費はいくら？媒体別CPA相場早見表【2026年版】」",
+        "reliability_note": "事業者（YORISOI）による公開情報の整理。一次統計ではなく参考値。広告成果の保証なし"
+      },
+      "industry": "人材紹介（求職者集客）",
+      "headline_benchmarks": {
+        "広告費の売上比率": "15〜25%",
+        "登録CPA": "3,000〜5,000円",
+        "面談CPA": "8,000〜15,000円",
+        "変動要因": ["職種", "年齢", "地域", "求人条件", "媒体", "応募後の対応体制"]
+      },
+      "media_benchmarks": [
+        { "media": "Google検索広告", "monthly_budget": "10〜100万円", "registration_cpa": "900〜2,000円", "interview_cpa": "5,000〜15,000円" },
+        { "media": "Meta広告", "monthly_budget": "10〜50万円", "registration_cpa": "500〜900円", "interview_cpa": "3,000〜8,000円" },
+        { "media": "YouTube広告", "monthly_budget": "20〜100万円", "registration_cpa": "1,500〜3,500円", "interview_cpa": "7,000〜15,000円" },
+        { "media": "Yahoo!検索広告", "monthly_budget": "5〜50万円", "registration_cpa": "800〜1,800円", "interview_cpa": "4,500〜13,000円" },
+        { "media": "TikTok広告", "monthly_budget": "10〜50万円", "registration_cpa": "400〜800円", "interview_cpa": "3,500〜9,000円" },
+        { "media": "X広告", "monthly_budget": "5〜30万円", "registration_cpa": "700〜1,500円", "interview_cpa": "4,000〜10,000円" },
+        { "media": "スカウト媒体", "monthly_budget": "30〜100万円", "registration_cpa": "3,000〜8,000円", "interview_cpa": "15,000〜25,000円" },
+        { "media": "Indeed", "monthly_budget": "5〜30万円", "registration_cpa": "400〜800円", "interview_cpa": "2,000〜6,000円" },
+        { "media": "送客サービス", "monthly_budget": "成果報酬型", "registration_cpa": null, "interview_cpa": "15,000〜35,000円" }
+      ],
+      "market_context": {
+        "国内総広告費_2025": "8兆623億円（4年連続過去最高、出典: 電通「2025年 日本の広告費」）",
+        "インターネット広告費_2025": "4兆459億円（総広告費の50.2%）",
+        "人材紹介市場_ホワイトカラー_2024年度": "4,490億円（前年度比+12.0%、出典: 矢野経済研究所）"
+      },
+      "kpi_design_principles": [
+        "応募CPAだけでなく、有効応募CPA / 面談設定CPA / 面談CPA / 成約CPA / 広告ROI をファネル全体で追う",
+        "応募単価が低くても、条件不一致応募や面談キャンセルが多ければ最終的な費用対効果は低下する",
+        "応募後の初期連絡・面談日程調整・リマインドまでを運用設計に含めて、広告費を面談・成約につなげる"
+      ],
+      "competitive_intel": {
+        "note": "発行元YORISOIは人材紹介会社向け集客支援の事業者。LETのSNS採用支援と隣接領域のため競合情報DBへの登録候補",
+        "services": [
+          { "name": "採用くん", "description": "求人媒体を活用した集客体制の構築" },
+          { "name": "送客くん", "description": "面談機会を成果報酬型で提供（送客型）" }
+        ],
+        "positioning": "「渋谷を代表するHRカンパニー」を標榜。広告費の適正化＋面談着座率・成約率向上の支援を強化する方針"
+      },
+      "usage": [
+        "Ad Operations: 人材紹介・採用系クライアントの媒体選定と予算配分の初期仮説、CPA目標のレンジ設定",
+        "Sales / Finance: 広告運用受託の見積時に予算目安（売上の15〜25%）と媒体別月額レンジを提示根拠に使う",
+        "Marketing / Strategist: 提案資料での市場規模引用（電通・矢野経済研究所の数値、原典要確認）",
+        "KPI Dashboard: 人材系案件のCPA異常検知の閾値レンジ"
+      ],
+      "registered_at": "2026-09-02"
+    }
+  ]
+}
