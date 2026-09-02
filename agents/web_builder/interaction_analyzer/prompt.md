@@ -71,7 +71,44 @@
 - **ヘッダー変化**: スクロール時のヘッダー縮小 / 背景色変化
 - **スクロールトップボタン**: 表示条件、位置、アニメーション
 
-### Step 6: その他のインタラクティブ要素
+### Step 6: UIパターン分類体系
+
+検出した各インタラクティブ要素を以下の体系で分類し、実装の再現粒度を統一する:
+
+| カテゴリ | パターン | 検出キー |
+|---------|---------|---------|
+| 表示切替 | モーダル / ドロワー / ポップオーバー / ツールチップ | `dialog`, `[role="dialog"]`, `data-*` |
+| 折畳 | アコーディオン / コラプシブル / `<details>` | `aria-expanded`, `<details>` |
+| 選択 | タブ / セグメント / ピル / ラジオグループ | `[role="tablist"]`, `aria-selected` |
+| 入力 | フォーム / 検索 / オートコンプリート / 日付選択 | `<form>`, `<input>`, `[role="combobox"]` |
+| 回遊 | カルーセル / ギャラリー / ページネーション | Swiper, `[role="listbox"]` |
+| 通知 | トースト / スナックバー / Cookie同意 / バナー | `[role="alert"]`, `[role="status"]` |
+
+### Step 7: フォームバリデーション検出
+
+各フォームのバリデーション実装を詳細に分析する:
+
+- **HTML5ネイティブ**: `required`, `pattern`, `type="email"`, `minlength`/`maxlength`
+- **カスタムJS**: `addEventListener('submit')`, ライブラリ（Zod/Yup/React Hook Form）
+- **リアルタイム検証**: `input`/`blur` イベントでの即時フィードバック有無
+- **エラー表示**: インライン / サマリー / ツールチップ形式
+- **送信状態**: ローディング表示、二重送信防止、成功/失敗メッセージ
+
+### Step 8: キーボードアクセシビリティ評価
+
+各インタラクティブ要素のキーボード操作対応を評価する:
+
+| 要素 | 必須キー操作 | 確認ポイント |
+|------|------------|------------|
+| モーダル | Escape で閉じる、Tab トラップ | `focus-trap` 実装の有無 |
+| タブ | 矢印キーで切替 | `[role="tab"]` + `aria-selected` |
+| アコーディオン | Enter/Space で開閉 | `aria-expanded` の切替 |
+| ドロップダウン | 矢印キーで移動、Escape で閉じる | `[role="menu"]` + `aria-activedescendant` |
+| スライダー | 矢印キーで前後 | フォーカス可能なナビゲーション |
+
+**ARIA属性チェック**: `role`, `aria-label`, `aria-expanded`, `aria-hidden`, `tabindex` の使用状況を記録し、`a11y_score`（A/B/C）を付与する。
+
+### Step 9: その他のインタラクティブ要素
 - **ツールチップ**: ホバー時の説明表示
 - **ドロップダウン**: 選択メニュー
 - **コピーボタン**: テキスト/URLのコピー
@@ -180,7 +217,24 @@
       "dismissable": true,
       "buttons": ["すべて許可", "設定"]
     }
-  ]
+  ],
+  "form_validation_details": [
+    {
+      "form_id": "contact-form",
+      "validation_type": "html5+custom",
+      "realtime_feedback": true,
+      "error_display": "inline",
+      "double_submit_prevention": true,
+      "library_detected": "react-hook-form"
+    }
+  ],
+  "keyboard_accessibility": {
+    "a11y_score": "B",
+    "findings": [
+      {"element": "mobile-menu", "issue": "focus-trap未実装", "severity": "high"},
+      {"element": "faq-accordion", "issue": "aria-expanded正常", "severity": "none"}
+    ]
+  }
 }
 ```
 

@@ -148,7 +148,7 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 | エージェント | 自律実行 | Claude API + Tool Use |
 | 構造化出力 | データ抽出・分類 | Claude API + JSON mode |
 
-**API連携ルール**: APIキーは環境変数管理、レート制限対応（exponential backoff）、トークン数事前チェック必須。ストリーミング応答はUX改善に有効。
+**ルール**: APIキーは環境変数、レート制限対応（exponential backoff）、トークン数事前チェック必須。
 
 ## 工数見積基準
 
@@ -163,7 +163,6 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 初回見積はバッファ込み。実績乖離20%以上で基準値を更新する。
 
 ## 納品前チェックリスト
-
 - [ ] **ブラウザ**: Chrome / Safari / Firefox / Edge 表示確認
 - [ ] **レスポンシブ**: 375px / 768px / 1280px / 1920px 確認
 - [ ] **SEO**: title / description / OGP / 構造化データ / sitemap / robots.txt

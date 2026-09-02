@@ -61,12 +61,53 @@ JS ソースから以下のパターンを検出する:
 - テキストアニメーション（タイピング、文字ごとのフェードイン等）
 - スクロールバー連動のプログレスバー
 
-### Step 6: 実装推奨の決定
+### Step 6: CSS/JSアニメーション技術分類
+
+検出したアニメーションを技術レイヤーで分類する:
+
+| 分類 | 検出パターン | 再現コスト |
+|------|------------|----------|
+| CSS Transition | `transition` プロパティ | 低 |
+| CSS Animation | `@keyframes` + `animation` | 低〜中 |
+| CSS Scroll-driven | `animation-timeline: scroll()` / `view()` | 中 |
+| Web Animations API | `element.animate()` | 中 |
+| JS requestAnimationFrame | `requestAnimationFrame` ループ | 中〜高 |
+| ライブラリ依存 | GSAP/Framer Motion/Lottie 等 | 高 |
+
+### Step 7: パフォーマンス影響評価
+
+各アニメーションのレンダリング負荷を評価する:
+
+**GPU活用判定:**
+- `transform` / `opacity` のみ → **Compositor層で処理（軽量）**
+- `width`/`height`/`top`/`left` → **Layout再計算発生（重い）**
+- `box-shadow`/`border-radius` アニメーション → **Paint発生（中程度）**
+
+**最適化チェック:**
+- [ ] `will-change` の適切な使用（過剰指定は逆効果）
+- [ ] `transform: translateZ(0)` によるGPUレイヤー昇格の有無
+- [ ] 同時アニメーション数（10以上は `perf_warning` を出力）
+- [ ] `contain: layout` / `content-visibility` の活用
+
+出力に `performance_rating`（light/moderate/heavy）を付与する。
+
+### Step 8: 実装推奨の決定
 検出したアニメーションの複雑さに応じて、最適な実装方法を推奨する:
 
 - **CSS only**: シンプルなhover、transition、基本的なkeyframes
 - **framer-motion**: React向けスクロールアニメーション、ページ遷移
 - **GSAP**: 複雑なタイムライン、ScrollTrigger連動、パフォーマンス重視
+
+### Step 9: アクセシビリティ対応（必須）
+
+全アニメーションに `prefers-reduced-motion` 対応を設計する:
+
+**判定基準:**
+- `prefers-reduced-motion: reduce` 時に**完全停止すべき**: 自動再生、パララックス、背景アニメーション、テキスト連続アニメーション
+- `prefers-reduced-motion: reduce` 時に**簡素化すべき**: フェードイン（即時表示に変更）、スライド（opacity のみに変更）
+- **停止不要**: フォーカスインジケータ、必須のUI状態遷移
+
+出力の各アニメーションに `reduced_motion_strategy`（`remove` / `simplify` / `keep`）を付与する。Builder は必ずこの指定に従い `@media (prefers-reduced-motion: reduce)` を実装すること。
 
 ## 出力フォーマット
 
@@ -150,6 +191,19 @@ JS ソースから以下のパターンを検出する:
     "has_loader": false,
     "type": "none",
     "description": ""
+  },
+  "performance_assessment": {
+    "gpu_accelerated_count": 8,
+    "layout_triggering_count": 1,
+    "paint_triggering_count": 2,
+    "performance_rating": "light",
+    "perf_warnings": []
+  },
+  "accessibility": {
+    "reduced_motion_mappings": [
+      {"section_id": "hero", "type": "parallax", "strategy": "remove"},
+      {"section_id": "features", "type": "fade-in-up", "strategy": "simplify"}
+    ]
   },
   "recommended_library": "framer-motion",
   "recommended_library_reason": "React/Next.js環境で最も統合しやすく、スクロールアニメーション・ページ遷移・ホバーエフェクトを統一的に扱える",

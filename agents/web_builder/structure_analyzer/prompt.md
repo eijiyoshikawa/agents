@@ -20,6 +20,21 @@
 - `<section>` や `<div>` によるセクション分割
 - セクションの出現順序と数
 
+### Step 1.5: HTML5セマンティクス判定
+
+各要素のセマンティクス適切性を評価する:
+
+| 要素 | 適正使用 | 誤用パターン |
+|------|---------|------------|
+| `<nav>` | 主要ナビゲーション | `<div class="nav">` で代用 |
+| `<article>` | 自己完結コンテンツ | 単なるカード要素に濫用 |
+| `<aside>` | 補足コンテンツ | サイドバー以外への誤用 |
+| `<figure>/<figcaption>` | キャプション付きメディア | `<div>+<p>` で代用 |
+| `<time>` | 日時情報 | プレーンテキストで表記 |
+| `<address>` | 連絡先情報 | 住所テキストに不使用 |
+
+**判定結果**: セクションごとに `semantic_score`（A/B/C）を付与し、Builderへの改善提案を `semantic_suggestions` に記録する。
+
 ### Step 2: セクション単位の詳細解析
 各セクションについて以下を記録する:
 
@@ -32,7 +47,16 @@
    - `grid-3col`: 3カラムグリッド
    - `grid-4col`: 4カラムグリッド
    - `alternating`: 左右交互レイアウト
-4. **配置方法**: Flexbox / CSS Grid / 絶対配置
+   - `masonry`: ピンタレスト型（高さ不揃いグリッド）
+   - `sidebar-main`: サイドバー+メインコンテンツ
+   - `sticky-sidebar`: スクロール追従サイドバー
+4. **配置方法の分類**（CSSから正確に判定）:
+   - `grid`: CSS Grid（`display: grid`, `grid-template-*` 検出）
+   - `flex`: Flexbox（`display: flex`, `flex-direction` 検出）
+   - `float`: Float（`float: left/right`, clearfix 検出）— レガシー判定
+   - `absolute`: 絶対配置（`position: absolute/fixed`）
+   - `table`: テーブルレイアウト（`display: table` — レガシー判定）
+   レガシー手法が検出された場合、`legacy_layout_warning` を出力に含める。
 5. **子要素の構成**: 見出し + テキスト + ボタン、カード x 3、画像 + テキスト 等
 6. **推定高さ**: 100vh / auto / 特定px値
 
@@ -53,9 +77,21 @@
 全ページを通じた共通パターンを抽出する:
 - コンテンツの最大幅（max-width）
 - セクション間のスペーシング
-- レスポンシブブレークポイント（768px, 1024px, 1280px 等）
 - ヘッダー高さ
 - 共通パディング
+
+**レスポンシブブレイクポイント精密検出:**
+CSSメディアクエリを全て抽出し、実際に使用されているブレイクポイントを特定する。
+
+| 検出手法 | 対象 |
+|---------|------|
+| `@media` クエリ抽出 | `min-width`/`max-width` の全値を列挙 |
+| コンテナクエリ | `@container` の使用有無を確認 |
+| Tailwind推定 | クラス名から `sm:/md:/lg:/xl:/2xl:` を検出 |
+| Bootstrap推定 | `col-sm-*/col-md-*` 等のクラスを検出 |
+
+デフォルト参照値: `640px(sm)`, `768px(md)`, `1024px(lg)`, `1280px(xl)`, `1536px(2xl)`
+実測値がデフォルトと異なる場合 `custom_breakpoints` として明記する。
 
 ### Step 6: ページ間の共通/固有要素の整理
 - 共通コンポーネント: Header, Footer, CTA Section 等

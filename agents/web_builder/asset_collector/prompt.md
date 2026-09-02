@@ -16,14 +16,20 @@
 ## 実行手順
 
 ### Step 1: 画像アセットの収集
-HTMLから全 `<img>` タグと CSS `background-image` を抽出する:
+HTMLから全 `<img>` タグ、CSS `background-image`、`<picture>`/`<source>` を抽出する:
 
 各画像について:
 1. **元URL**: src 属性の値
 2. **使用箇所**: どのセクションのどの位置で使われているか
 3. **alt テキスト**: 画像の説明
 4. **サイズ/アスペクト比**: width, height 属性または CSS
-5. **種類分類**:
+5. **フォーマット検出と最適化判定**:
+   - 現行フォーマット（JPEG/PNG/GIF/SVG/WebP/AVIF）を記録
+   - `<picture>` 要素によるフォーマット分岐の有無
+   - **最適化推奨**: 写真→WebP（フォールバックJPEG）、イラスト/アイコン→SVG、透過画像→WebP/PNG
+   - AVIF対応: サイズ大の写真素材に `format_recommendation: "avif"` を付与
+   - `loading="lazy"` / `fetchpriority="high"` の使用状況を記録
+6. **種類分類**:
    - `hero-image`: ヒーローセクション背景
    - `content-image`: コンテンツ内画像
    - `icon-image`: アイコン的な画像
@@ -35,7 +41,7 @@ HTMLから全 `<img>` タグと CSS `background-image` を抽出する:
    - SVG プレースホルダーで代用する場合のサイズ・色
    - ダミーテキストとアスペクト比だけ合わせる
 
-### Step 2: フォントの収集
+### Step 2: フォントの収集とライセンス確認
 `design_analyzer/output.json` の typography 情報を基に:
 
 1. **Google Fonts**: インポートURL と必要なウェイト
@@ -43,6 +49,14 @@ HTMLから全 `<img>` タグと CSS `background-image` を抽出する:
 2. **Adobe Fonts**: フォント名と代替フォントの提案
 3. **カスタムフォント**: woff2 ファイルのURL（取得可能な場合）
 4. **フォールバック**: 各フォントに対する適切なフォールバック指定
+
+**フォントライセンス確認チェックリスト（必須）:**
+- [ ] Google Fonts → OFL（再配布可）確認
+- [ ] Adobe Fonts → Creative Cloud サブスクリプション要否
+- [ ] カスタムフォント → ライセンス種別（商用利用可否）確認
+- [ ] 日本語フォント → 再配布制限の有無（Noto系=OFL、游ゴシック=OS同梱のみ）
+- [ ] Webフォントサービス利用料の有無
+ライセンス不明のフォントは `license_status: "unverified"` とし、代替フォントを `safe_alternative` に記載する。
 
 ### Step 3: アイコンの収集
 ページ内で使われているアイコンを分類する:
@@ -60,7 +74,7 @@ HTMLから全 `<img>` タグと CSS `background-image` を抽出する:
 - ファビコン: 形状・色の説明とプレースホルダー生成方針
 - OGP画像: サイズ・デザインの説明
 
-### Step 5: ローカルファイルパス設計
+### Step 5: ローカルファイルパス設計とアセット命名規則
 Next.js の `/public` ディレクトリ構成を設計する:
 
 ```
@@ -74,6 +88,13 @@ Next.js の `/public` ディレクトリ構成を設計する:
 ├── fonts/        (カスタムフォントがある場合)
 └── favicon.ico
 ```
+
+**アセット命名規則（厳守）:**
+- `{セクション}-{役割}-{連番}.{拡張子}` 例: `hero-bg-01.webp`, `about-team-01.jpg`
+- 英数字・ハイフンのみ（スペース・日本語・アンダースコア禁止）
+- 全て小文字
+- レスポンシブ画像: `{名前}-{幅}w.{拡張子}` 例: `hero-bg-1920w.webp`, `hero-bg-768w.webp`
+- アイコン: `icon-{名前}.svg` 例: `icon-arrow-right.svg`
 
 ## 出力フォーマット
 
