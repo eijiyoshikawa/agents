@@ -99,47 +99,13 @@
 出力: AIEO最適化レポート + 適用コード
 ```
 
-### 4. WordPress への適用
-```
-入力: 分析結果 + 最適化データ
-処理:
-  1. REST API経由でのメタデータ更新
-     - title / excerpt / meta_description
-     - tags / categories
-  2. Yoast SEO / All in One SEO / Rank Math 対応
-     - プラグイン固有のメタフィールド更新
-  3. カスタムフィールドへの構造化データ挿入
-  4. 記事本文への AIEO ブロック挿入
-     - Direct Answer Block（冒頭）
-     - FAQ セクション（末尾）
-出力: 適用結果レポート
-```
+### 4. プラットフォーム別適用
+- **WordPress**: REST API / Yoast SEO / Rank Math 経由でメタデータ更新 + AIEO ブロック挿入
+- **Next.js**: `metadata` / `generateMetadata` 更新 + JSON-LD コンポーネント生成 + sitemap.ts / robots.ts 最適化
 
-### 5. Next.js への適用
-```
-入力: 分析結果 + 最適化データ
-処理:
-  1. metadata / generateMetadata の生成・更新
-     - title / description / openGraph / twitter
-  2. JSON-LD 構造化データコンポーネントの生成
-     - <script type="application/ld+json">
-  3. MDX frontmatter の更新（MDXベースの場合）
-     - title / description / tags / keywords / author
-  4. sitemap.ts / robots.ts の最適化
-  5. 記事コンポーネントへの AIEO ブロック挿入
-出力: 適用済みコード + diffレポート
-```
-
-### 6. 効果測定・改善提案
-```
-処理:
-  1. 適用前後の変化追跡
-     - Google検索順位の変動
-     - AI検索での引用頻度
-  2. 改善レポートの生成
-  3. 次回最適化のための推奨事項
-出力: /agents/seo_aieo/reports/{article_id}_report.json
-```
+### 5. 効果測定・改善提案
+- 適用前後の Google 検索順位変動・AI 検索引用頻度を追跡
+- 改善レポート → 次回最適化推奨事項を `/agents/seo_aieo/reports/{article_id}_report.json` に出力
 
 ---
 
@@ -195,60 +161,20 @@
   "url": "記事URL",
   "platform": "wordpress|nextjs",
   "analyzed_at": "YYYY-MM-DD",
-  "current_state": {
-    "title": "現在のタイトル",
-    "description": "現在のディスクリプション",
-    "tags": [],
-    "has_structured_data": false,
-    "has_faq_section": false,
-    "has_direct_answer_block": false
-  },
+  "current_state": { "title": "", "description": "", "tags": [], "has_structured_data": false, "has_faq_section": false },
   "optimized": {
     "title": "最適化後タイトル",
     "description": "最適化後ディスクリプション",
-    "tags": ["タグ1", "タグ2", "タグ3"],
-    "keywords": {
-      "primary": "メインキーワード",
-      "secondary": ["サブKW1", "サブKW2", "サブKW3"]
-    },
+    "tags": [], "keywords": { "primary": "", "secondary": [] },
     "search_intent": "informational|navigational|commercial|transactional",
-    "structured_data": {
-      "article": {},
-      "faq": [],
-      "breadcrumb": [],
-      "author": {}
-    },
-    "aieo": {
-      "direct_answer_block": "結論ファーストの要約文（50-100文字）",
-      "faq_items": [
-        {
-          "question": "質問文",
-          "answer": "回答文"
-        }
-      ],
-      "entity_keywords": ["エンティティ1", "エンティティ2"],
-      "citations": ["出典1", "出典2"]
-    },
-    "ogp": {
-      "og_title": "",
-      "og_description": "",
-      "og_image": "",
-      "twitter_card": "summary_large_image"
-    }
+    "structured_data": { "article": {}, "faq": [], "breadcrumb": [], "author": {} },
+    "aieo": { "direct_answer_block": "", "faq_items": [], "entity_keywords": [], "citations": [] },
+    "ogp": { "og_title": "", "og_description": "", "og_image": "", "twitter_card": "summary_large_image" }
   },
-  "applied": {
-    "status": "pending|applied|verified",
-    "applied_at": null,
-    "changes_made": []
-  },
+  "applied": { "status": "pending|applied|verified", "applied_at": null, "changes_made": [] },
   "seo_checklist_verification": {
-    "checklist_version": "v1.0 (112 items)",
-    "checklist_source": "agents/seo_aieo/SEO_CHECKLIST_112.md",
-    "verified_ids": [],
-    "passed": [],
-    "failed": [],
-    "n_a": [],
-    "skipped_optional": []
+    "checklist_version": "v1.0 (112 items)", "checklist_source": "agents/seo_aieo/SEO_CHECKLIST_112.md",
+    "verified_ids": [], "passed": [], "failed": [], "n_a": [], "skipped_optional": []
   },
   "recommendations": []
 }
@@ -294,19 +220,8 @@
 - 引用トラフィック（リファラー分析）の追跡
 
 ## 構造化データ実装ガイド
-
-### 必須スキーマ（全記事）
-```json
-// Article + BreadcrumbList + Author は全記事に必須
-// FAQ は Q&A セクションがある記事に必須
-// HowTo は手順記事に必須
-```
-
-### 実装検証手順
-1. Google Rich Results Test で構造化データの有効性を確認
-2. Schema.org Validator で文法エラーをチェック
-3. GSC の「拡張」レポートでエラー・警告を監視
-4. 実装後7日以内にリッチリザルトの表示状況を確認
+- **必須スキーマ**: Article + BreadcrumbList + Author（全記事）、FAQ（Q&Aあり）、HowTo（手順記事）
+- **検証**: Rich Results Test → Schema.org Validator → GSC「拡張」レポート → 7日以内にリッチリザルト確認
 
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer**: SEO/AIEO 品質チェック・チェックリスト網羅性
