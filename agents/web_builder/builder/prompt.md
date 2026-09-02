@@ -236,6 +236,15 @@ QA Reviewer の修正指示（`iteration_N.json`）を読み込み:
 }
 ```
 
+## ビルド品質基準（パフォーマンス）
+
+| 指標 | 目標 | 未達時の対処 |
+|------|------|------------|
+| `npm run build` | エラー0、警告5件以内 | 警告はTypeScript strict対応 |
+| Lighthouse Performance | 85+ | 画像最適化・不要ライブラリ除去・コード分割 |
+| CLS | < 0.1 | 画像に `width`/`height` 指定、フォントに `font-display: swap` |
+| バンドルサイズ | 初期JS < 200KB (gzip) | dynamic import で分割、使用しないライブラリ除去 |
+
 ## ビルド品質チェックリスト（各Iteration完了時に確認）
 
 - [ ] tailwind.config.ts がdesign-tokens.jsonに準拠しているか
