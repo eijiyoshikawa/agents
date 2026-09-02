@@ -45,13 +45,29 @@ CSV/Excelのダウンロードリンクが特定されている場合:
 
 県ごとに `/agents/data_engineer/fax_collector/output/raw/{prefecture}.json` に保存する。
 
-### 収集時の遵守事項
+### スクレイピング倫理基準（厳守）
 
-1. **robots.txt 遵守**: source_scanner が `robots_allowed: false` と記録したソースは使用しない
-2. **リクエスト間隔**: WebFetch の連続実行は避け、1ソースの処理完了後に次のソースに進む
+1. **robots.txt 遵守**: source_scanner が `robots_allowed: false` と記録したソースは絶対に使用しない
+2. **リクエストレート制限**: source_scanner の `recommended_interval_sec` に従う。未指定時は最低5秒間隔
 3. **利用規約**: 明確に「転載禁止」と記載されているソースからはデータを収集しない
 4. **個人情報**: 代表者の個人名は収集しない（法人名のみ）
 5. **データ出典**: 各レコードに収集元のURLを記録する
+6. **User-Agent**: 明確なbot識別子を使用（偽装禁止）
+7. **セッション/ログイン回避**: 認証が必要なコンテンツは収集対象外
+8. **サーバー負荷配慮**: 503/429応答時は即座に停止し、`collection_errors` に記録
+
+### エラーハンドリング（タイムアウト・リトライ戦略）
+
+| エラー種別 | 対応 | リトライ |
+|-----------|------|---------|
+| タイムアウト（30秒超） | `timeout_errors` に記録 | 最大2回、間隔を倍増（30秒→60秒） |
+| HTTP 429 (Too Many Requests) | 即停止、`rate_limit_hits` に記録 | 300秒後に1回のみ再試行 |
+| HTTP 503 (Service Unavailable) | `server_errors` に記録 | 60秒後に1回のみ再試行 |
+| HTTP 403/404 | `access_errors` に記録 | リトライしない |
+| ネットワークエラー | `network_errors` に記録 | 最大2回、30秒間隔 |
+| データ解析失敗 | `parse_errors` に記録、生HTMLを保存 | リトライしない |
+
+全エラーは `collection_errors` 配列に `{type, url, status, timestamp, retried}` 形式で記録する。
 
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer**: 収集データの品質・網羅性検証
@@ -93,9 +109,29 @@ CSV/Excelのダウンロードリンクが特定されている場合:
     "companies_with_fax": 0,
     "companies_without_fax": 0,
     "fax_coverage_rate": "0%"
-  }
+  },
+  "data_quality_verification": {
+    "sample_size": 10,
+    "verified_correct": 0,
+    "accuracy_rate": "0%",
+    "verification_method": "元ページとの突合確認"
+  },
+  "collection_errors": [],
+  "rate_limit_hits": 0,
+  "total_requests": 0,
+  "avg_response_time_ms": 0
 }
 ```
+
+### データ抽出精度検証
+
+収集完了後、各ソースから抽出したデータの精度をサンプル検証する:
+
+1. **サンプル抽出**: 各ソースから最大10件をランダム抽出
+2. **元ページ突合**: `WebFetch` で元ページを再取得し、抽出データと照合
+3. **検証項目**: 会社名の正確性、FAX番号の一致、住所の完全性
+4. **精度基準**: 正確率90%未満の場合、当該ソースの抽出ロジックを再検討し `extraction_quality_warning` を出力
+5. **結果記録**: `data_quality_verification` に検証結果を出力
 
 ## 使用ツール
 - `Read`: source_scanner/output.json の読み込み

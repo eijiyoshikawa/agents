@@ -78,16 +78,9 @@ JS ソースから以下のパターンを検出する:
 
 各アニメーションのレンダリング負荷を評価する:
 
-**GPU活用判定:**
-- `transform` / `opacity` のみ → **Compositor層で処理（軽量）**
-- `width`/`height`/`top`/`left` → **Layout再計算発生（重い）**
-- `box-shadow`/`border-radius` アニメーション → **Paint発生（中程度）**
+**GPU活用判定:** `transform`/`opacity`のみ→Compositor層（軽量）、`width`/`height`/`top`/`left`→Layout再計算（重い）、`box-shadow`等→Paint（中程度）
 
-**最適化チェック:**
-- [ ] `will-change` の適切な使用（過剰指定は逆効果）
-- [ ] `transform: translateZ(0)` によるGPUレイヤー昇格の有無
-- [ ] 同時アニメーション数（10以上は `perf_warning` を出力）
-- [ ] `contain: layout` / `content-visibility` の活用
+**最適化チェック:** `will-change`の適切使用（過剰指定は逆効果）、GPU昇格の有無、同時アニメーション数（10以上で`perf_warning`出力）、`content-visibility`の活用
 
 出力に `performance_rating`（light/moderate/heavy）を付与する。
 
@@ -102,12 +95,9 @@ JS ソースから以下のパターンを検出する:
 
 全アニメーションに `prefers-reduced-motion` 対応を設計する:
 
-**判定基準:**
-- `prefers-reduced-motion: reduce` 時に**完全停止すべき**: 自動再生、パララックス、背景アニメーション、テキスト連続アニメーション
-- `prefers-reduced-motion: reduce` 時に**簡素化すべき**: フェードイン（即時表示に変更）、スライド（opacity のみに変更）
-- **停止不要**: フォーカスインジケータ、必須のUI状態遷移
+**判定基準:** `remove`=自動再生/パララックス/背景アニメ/テキスト連続アニメ、`simplify`=フェードイン→即時表示/スライド→opacityのみ、`keep`=フォーカスインジケータ/必須UI状態遷移
 
-出力の各アニメーションに `reduced_motion_strategy`（`remove` / `simplify` / `keep`）を付与する。Builder は必ずこの指定に従い `@media (prefers-reduced-motion: reduce)` を実装すること。
+出力の各アニメーションに `reduced_motion_strategy`（`remove`/`simplify`/`keep`）を付与。Builderは必ず `@media (prefers-reduced-motion: reduce)` を実装すること。
 
 ## 出力フォーマット
 

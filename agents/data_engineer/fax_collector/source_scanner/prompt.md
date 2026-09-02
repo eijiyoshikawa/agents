@@ -45,6 +45,44 @@
 | アクセス方法 | HTML直接取得 / 検索必要 / ダウンロード |
 | 信頼度 | high（政府・公式）/ medium（業界団体）/ low（第三者） |
 | robots.txt | クローリング許可されているか |
+| 利用規約 | 転載禁止条項の有無 |
+| 更新頻度 | データの鮮度（最終更新日を確認） |
+
+### Step 2.5: ソース信頼性評価基準
+
+各データソースに信頼性スコアを付与する:
+
+| ランク | 条件 | 例 |
+|--------|------|-----|
+| S（最高） | 政府機関の公式データ | 国交省建設業許可データ、data.go.jp |
+| A（高） | 自治体・公的機関の公開データ | 都道府県庁の許可業者一覧 |
+| B（中） | 業界団体の公式会員名簿 | 建設業協会、専門工事業団体 |
+| C（低） | 商用ディレクトリサービス | iタウンページ、建通新聞 |
+| D（要注意） | 出典不明の転載サイト | 個人ブログ、まとめサイト |
+
+D ランクのソースは原則使用禁止。やむを得ず使用する場合は `source_risk: "high"` を付与。
+
+### Step 2.6: robots.txt遵守確認（必須）
+
+各ソースURLに対し、`WebFetch` で `{ドメイン}/robots.txt` を取得し確認する:
+
+- `Disallow` に該当するパスが含まれる → `robots_allowed: false`（収集禁止）
+- `Crawl-delay` 指定がある → `crawl_delay_seconds` に記録（Web Collector に伝達）
+- `Sitemap` がある場合 → サイトマップからデータページを効率的に発見
+- robots.txt が存在しない → `robots_allowed: true`（ただし利用規約を別途確認）
+
+### Step 2.7: リクエストレート制限管理
+
+各ソースへの推奨アクセス頻度を設定する:
+
+| ソース種別 | 推奨間隔 | 最大同時リクエスト |
+|-----------|---------|-----------------|
+| 政府系サイト | 3秒以上 | 1 |
+| 業界団体サイト | 5秒以上 | 1 |
+| 商用サイト | 5秒以上 | 1 |
+| `Crawl-delay` 指定あり | 指定値に従う | 1 |
+
+出力の各ソースに `recommended_interval_sec` を付与し、Web Collector が遵守する。
 
 ### Step 3: データソースマッピングの作成
 
@@ -72,7 +110,12 @@
         "estimated_companies": 500,
         "access_method": "html_fetch",
         "reliability": "medium",
+        "reliability_rank": "B",
         "robots_allowed": true,
+        "crawl_delay_seconds": null,
+        "recommended_interval_sec": 5,
+        "terms_of_service": "転載禁止条項なし",
+        "last_updated": "YYYY-MM-DD",
         "priority": 1,
         "notes": "FAX番号は会員詳細ページに掲載"
       }
