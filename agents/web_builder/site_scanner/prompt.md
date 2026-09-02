@@ -105,6 +105,21 @@ HTMLソースと読み込まれたリソースから技術を検出する:
 }
 ```
 
+## 技術検出の精度基準
+
+### 検出信頼度レベル
+| レベル | 基準 | 例 |
+|--------|------|-----|
+| **確定** | 固有のグローバル変数・パスパターンが存在 | `__NEXT_DATA__` → Next.js 確定 |
+| **高確度** | 複数のクラス名パターンが一致 | Tailwindユーティリティクラスが10個以上 → 高確度 |
+| **推定** | 間接的な証拠のみ | minified CSSからの推測 |
+
+output.json の `tech_stack` 各項目に `confidence: "confirmed" | "high" | "estimated"` を付与する。Builderは `estimated` の技術は代替を検討する。
+
+### 検出漏れ防止
+- SPA/SSRサイトは JavaScript 実行後のDOMが必要な場合がある。WebFetch で取得できない動的コンテンツは `dynamic_content_warning: true` を出力に記録する
+- CDN経由のライブラリはURLパスから特定（例: `cdn.jsdelivr.net/npm/gsap` → GSAP）
+
 ## 使用するツール
 - `WebFetch`: トップページおよびサブページのHTML取得
 - `WebSearch`: 技術スタックの追加調査（必要に応じて）
