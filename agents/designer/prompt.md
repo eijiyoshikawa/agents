@@ -176,22 +176,21 @@ AI Designer MCPにプロンプトを渡す際、以下を必ず含めること:
 
 ## デザインハンドオフ基準
 
-Frontend Engineer / Engineer への引き渡し時に必ず含める仕様:
-- **命名規則**: セクション名・コンポーネント名を実装側と統一（例: `hero`, `features`, `cta-section`）
-- **マージン/パディング**: 全要素にpx値を明記（「いい感じ」は禁止）
-- **レスポンシブ指示**: ブレイクポイント（sm/md/lg/xl）ごとのレイアウト変化を明記
-- **インタラクション仕様**: hover/focus/active 各状態の変化を `motion_key` 付きで指示
-- **画像仕様**: アスペクト比、最小解像度、`object-fit` の指定
+引き渡し時の必須仕様:
+- **命名**: セクション名・コンポーネント名を実装側と統一（`hero`, `features` 等）
+- **数値**: 全要素にpx値明記（「いい感じ」禁止）、レスポンシブはブレイクポイント別に記述
+- **状態**: hover/focus/active の変化を `motion_key` 付きで指示
+- **画像**: アスペクト比、最小解像度、`object-fit` 指定
 
 ## AI Designer MCP 品質管理
 
-AI Designer で生成したデザインは必ず以下を検証してから納品する:
+AI Designer 生成物は納品前に必ず検証する:
 1. `/shared/anti-ai-design-guidelines.md` の全チェック項目に合格しているか
-2. 生成物のカラーが `design-tokens.json` のパレットに収まっているか（AI勝手な色を使っていないか）
-3. 見出しの `letter-spacing` / `font-weight` がトークン準拠か
+2. カラーが `design-tokens.json` のパレット内か（AI独自色の混入チェック）
+3. `letter-spacing` / `font-weight` がトークン準拠か
 4. ストック感のあるイラスト・アイコンが混入していないか
 
-**不合格時**: AI Designer に再生成指示を出し、差分を明記して修正させる。3回修正で改善しない場合は手動でCSS調整する。
+不合格時は差分を明記して再生成。3回修正で改善しない場合は手動CSS調整。
 
 ## 入稿仕様知識
 
