@@ -326,7 +326,7 @@ tr.hl td { background: #FBF7EA; }
       <h1>粗利ベース × <em>2トラック</em>評価制度</h1>
     </div>
     <div class="doc-meta">
-      Ver. 1.0<br>
+      Ver. 2.0（ボーナス=プール方式）<br>
       2026-10-01 施行予定<br>
       対象：全職種
     </div>
@@ -334,11 +334,11 @@ tr.hl td { background: #FBF7EA; }
   <div class="philosophy">
     <div class="phil-item">
       <div class="phil-label">昇格・降格</div>
-      <div class="phil-val">自分の達成率だけで判定。チーム成績は影響しない</div>
+      <div class="phil-val">案件ごとの役割分担で自分の数字を計算。目標達成＋行動で判定</div>
     </div>
     <div class="phil-item">
       <div class="phil-label">ボーナス</div>
-      <div class="phil-val">チームの達成率で判定・達成なら全員に支給（上限なし）</div>
+      <div class="phil-val">チーム粗利の15%が原資。ランクに応じて全員で分配（上限なし）</div>
     </div>
     <div class="phil-item">
       <div class="phil-label">データ</div>
@@ -351,78 +351,117 @@ tr.hl td { background: #FBF7EA; }
 <div class="sec-title">Step 1 — 見るのは、2つの数字だけ</div>
 <div class="tracks">
   <div class="track rank">
-    <div class="track-head"><span class="track-tag">Rank</span><span class="track-title">自分の達成率 → 昇格・降格</span></div>
+    <div class="track-head"><span class="track-tag">Rank</span><span class="track-title">自分の評価粗利 → 昇格・降格</span></div>
     <div class="track-body">
-      <div class="track-big">自分の粗利が、自分の人件費の3倍（営業は3.5倍）に届いているか</div>
+      <div class="track-big">案件ごとに役割で分け合った「自分の粗利」が、期首に決めた目標に届いているか</div>
       <ul>
         <li>ランクと月給が決まる、キャリアの数字</li>
-        <li>チームの成績は影響しない</li>
+        <li>チーム賞与の成績は混ぜない</li>
       </ul>
     </div>
   </div>
   <div class="track bonus">
-    <div class="track-head"><span class="track-tag">Bonus</span><span class="track-title">チームの達成率 → ボーナス</span></div>
+    <div class="track-head"><span class="track-tag">Bonus</span><span class="track-title">チームの粗利 → ボーナス</span></div>
     <div class="track-body">
-      <div class="track-big">チーム全体の粗利が、チーム全体の人件費の3倍（営業は3.5倍）に届いているか</div>
+      <div class="track-big">営業・マーケみんなで作ったチーム粗利の15%が、そのままボーナスの原資になる</div>
       <ul>
-        <li>チームが達成すれば、全員に支給</li>
-        <li>チーム＝職種単位（1人の職種は自分の数字がそのまま）</li>
+        <li>原資はランクに応じて全員で分配</li>
+        <li>粗利が増えるほど原資も増える（上限なし）</li>
       </ul>
     </div>
   </div>
 </div>
 <div class="one-line">自分の数字で<span style="color:var(--blue);">キャリア</span>、チームの数字で<span style="color:var(--green);">ボーナス</span></div>
 
-<div class="sec-title">Step 2 — 昇格・降格（自分の達成率）</div>
+<div class="sec-title">Step 2 — 昇格・降格（自分の数字＝案件ごとの役割分担で決まる）</div>
 <div class="formula">
   <span class="comment">// 半年ごとに、その期の数字だけで判定（過去の持ち越しなし）</span><br>
-  自分の達成率 = 自分の粗利 ÷（<span class="highlight">月給 × 1.15 × 経過月数 × 倍率</span>）<br>
-  <span class="comment">// 1.15 = 法定福利費15%分 ／ 倍率 = 営業3.5・その他3.0</span>
+  自分の評価粗利 = 案件の粗利 ×（<span class="highlight">役割の取り分</span>）×（自分の担当割合）<br>
+  <span class="comment">// 同じ案件を、関わった役割で分け合ってカウントします（合計はちょうど100%）</span>
+</div>
+<div style="overflow-x:auto; margin:12px 0;">
+<table style="width:100%; border-collapse:collapse; font-size:13px;">
+  <tr style="border-bottom:2px solid var(--ink,#222);">
+    <th style="text-align:left; padding:6px 8px;">案件の種類</th>
+    <th style="text-align:left; padding:6px 8px;">役割の取り分</th>
+  </tr>
+  <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">SNS運用（初回契約の期間）</td><td style="padding:6px 8px;"><b>営業 50%・マーケ 50%</b></td></tr>
+  <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">SNS運用（更新後）</td><td style="padding:6px 8px;"><b>営業 10%・マーケ 90%</b></td></tr>
+  <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">クロスセル単発（HP等）</td><td style="padding:6px 8px;">販売担当 50%・制作納品担当 50%（1人で完結すればその人100%）</td></tr>
+  <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">人材紹介 コミット型</td><td style="padding:6px 8px;">営業 20%・マーケ 50%・CA 30%</td></tr>
+  <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">人材紹介 一般型</td><td style="padding:6px 8px;">RA 50%・CA 50%</td></tr>
+  <tr><td style="padding:6px 8px;">不動産/BPO</td><td style="padding:6px 8px;">BPO担当 100%（別集計）</td></tr>
+</table>
 </div>
 <div class="judge">
-  <div class="j down">
-    <div class="pct">〜69%</div>
-    <div class="what">↓ 降格</div>
-    <div class="hint">その期の結果で翌期から1ランクダウン</div>
+  <div class="j up">
+    <div class="pct">目標の110%〜</div>
+    <div class="what">↑ 昇格</div>
+    <div class="hint">期首に決める自分の目標（G）の110%、または次のランクの目標（N）の高い方に到達</div>
   </div>
   <div class="j keep">
-    <div class="pct">70〜109%</div>
-    <div class="what">→ 現状維持</div>
-    <div class="hint">ランク・月給は変わらない</div>
+    <div class="pct">＋行動評価</div>
+    <div class="what">定性・役割実証</div>
+    <div class="hint">MVVに沿った行動・チームへの貢献・次のランクの役割を3ヶ月以上実証できていること</div>
   </div>
-  <div class="j up">
-    <div class="pct">110%〜</div>
-    <div class="what">↑ 昇格</div>
-    <div class="hint">翌期から1ランクアップ（飛び級なし）</div>
+  <div class="j down">
+    <div class="pct">降格は別判定</div>
+    <div class="what">↓ 昇格できない≠降格</div>
+    <div class="hint">昇格不成立を理由に降格はしない。降格の基準は期首に確定して周知</div>
   </div>
 </div>
+<div class="sec-note">目標は期首に一人ひとり合意して決めます（期末に後付けで引き上げない・達成機会のない目標は設定しない）。役員が担う分は社員の数字に付かず、返金は発生した期にマイナスします。数字はすべてMF会計の実仕訳ベースです。</div>
 
-<div class="sec-title">Step 3 — ボーナス（チームの達成率・上限なし）</div>
+<div class="sec-title">Step 3 — ボーナス（チーム粗利の15%を、ランクに応じて分配）</div>
+<div class="formula">
+  <span class="comment">// 営業・マーケ合同。半年ごとに計算（年2回支給）</span><br>
+  ボーナス原資 = 半期のチーム粗利（売上 − 広告費 − 外注費）× <span class="highlight">15%</span><br>
+  あなたの取り分 = 原資 × <span class="highlight">あなたのランクのウェイト</span> ÷ 全員のウェイト合計
+</div>
 <div class="ladder-wrap">
   <div class="ladder">
     <div class="step">
-      <div class="bar" style="height:56px;"><div class="m">0<small>なし</small></div></div>
-      <div class="cond">〜99%</div>
+      <div class="bar" style="height:80px;"><div class="m">0.8<small>ウェイト</small></div></div>
+      <div class="cond">R1</div>
     </div>
     <div class="step on">
-      <div class="bar" style="height:88px;"><div class="m">1.0<small>ヶ月分</small></div></div>
-      <div class="cond">100%〜</div>
+      <div class="bar" style="height:100px;"><div class="m">1.0<small>ウェイト</small></div></div>
+      <div class="cond">R2<small>スタート</small></div>
     </div>
     <div class="step on">
-      <div class="bar" style="height:112px;"><div class="m">1.5<small>ヶ月分</small></div></div>
-      <div class="cond">120%〜</div>
+      <div class="bar" style="height:120px;"><div class="m">1.2<small>ウェイト</small></div></div>
+      <div class="cond">R3</div>
     </div>
     <div class="step on">
-      <div class="bar" style="height:136px;"><div class="m">2.0<small>ヶ月分</small></div></div>
-      <div class="cond">150%〜</div>
+      <div class="bar" style="height:140px;"><div class="m">1.4<small>ウェイト</small></div></div>
+      <div class="cond">R4</div>
     </div>
     <div class="step on">
-      <div class="bar" style="height:170px;background:linear-gradient(to top,var(--green),#4CAF7D);"><div class="m">2.5〜<small>上限なし</small></div></div>
-      <div class="cond">180%〜<small>以降+30%ごとに +0.5ヶ月</small></div>
+      <div class="bar" style="height:170px;background:linear-gradient(to top,var(--green),#4CAF7D);"><div class="m">1.6<small>ウェイト</small></div></div>
+      <div class="cond">R5</div>
     </div>
   </div>
-  <div class="sec-note">半年ごとに支給（年2回）。<b>上限はありません</b> — チームが伸びた分だけ、どこまでも増えます。仲間を助けてチームの数字を上げることが、そのまま自分のボーナスになります。</div>
-  <div class="sec-note">※ <b>不動産/BPO職のボーナスだけは判定方法が異なります</b>: 半期の<b>原価率（原価 ÷ 売上）が40%以下</b>であれば月給1ヶ月分を支給します（上の段階制は適用されません）。昇格・降格の判定は他職種と同じ「個人の達成率」です。</div>
+  <div class="sec-note">チームの粗利が伸びるほど原資も増えます — <b>上限はありません</b>。同じ案件を営業とマーケで協力して伸ばすことが、そのまま全員のボーナスになります。原資の粗利は会社の実額で数えます（営業とマーケの二重カウントはしません）。</div>
+  <div class="sec-note">分配は<b>ランクのウェイト</b>で決まります。全員が同じランクの間は均等割。昇格（Step 2）するとウェイトが上がり、同じ原資でも取り分が増えます。期の途中で入社・退社した場合は在籍月数で按分します。確定額は半期末に会社から通知します（このページの表示は現在ペースの見込みです）。</div>
+  <div style="margin:14px 0 4px; font-weight:600;">早見表 — チームでいくら稼ぐと、いくらになるか（現4名・全員R2で均等割の場合）</div>
+  <div style="overflow-x:auto;">
+  <table style="width:100%; border-collapse:collapse; font-size:13px;">
+    <tr style="border-bottom:2px solid var(--ink,#222);">
+      <th style="text-align:left; padding:6px 8px;">半期のチーム粗利</th>
+      <th style="text-align:right; padding:6px 8px;">（月あたり）</th>
+      <th style="text-align:right; padding:6px 8px;">ボーナス原資（15%）</th>
+      <th style="text-align:right; padding:6px 8px;">1人あたり</th>
+    </tr>
+    <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">600万円</td><td style="text-align:right; padding:6px 8px;">100万円</td><td style="text-align:right; padding:6px 8px;">90万円</td><td style="text-align:right; padding:6px 8px;">22.5万円</td></tr>
+    <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">900万円</td><td style="text-align:right; padding:6px 8px;">150万円</td><td style="text-align:right; padding:6px 8px;">135万円</td><td style="text-align:right; padding:6px 8px;">33.8万円</td></tr>
+    <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">1,200万円</td><td style="text-align:right; padding:6px 8px;">200万円</td><td style="text-align:right; padding:6px 8px;">180万円</td><td style="text-align:right; padding:6px 8px;">45万円</td></tr>
+    <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">1,600万円</td><td style="text-align:right; padding:6px 8px;">267万円</td><td style="text-align:right; padding:6px 8px;">240万円</td><td style="text-align:right; padding:6px 8px;">60万円</td></tr>
+    <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">2,000万円</td><td style="text-align:right; padding:6px 8px;">333万円</td><td style="text-align:right; padding:6px 8px;">300万円</td><td style="text-align:right; padding:6px 8px;">75万円</td></tr>
+    <tr><td style="padding:6px 8px;">2,400万円</td><td style="text-align:right; padding:6px 8px;">400万円</td><td style="text-align:right; padding:6px 8px;">360万円</td><td style="text-align:right; padding:6px 8px;">90万円</td></tr>
+  </table>
+  </div>
+  <div class="sec-note" style="margin-top:6px;">目安: 月額30万円のSNS運用1件 ＝ 粗利約24万円/月 ＝ 半期約144万円。1件増えるだけで原資は半期+21.6万円増えます。人数が増えたときやランクに差がついたときは、上の分配式に従って1人あたりの額が変わります。</div>
+  <div class="sec-note">※ <b>不動産/BPO職のボーナスだけは判定方法が異なります</b>: 半期の<b>原価率（原価 ÷ 売上）が40%以下</b>であれば月給1ヶ月分を支給します（プール分配の対象外です）。昇格・降格の判定は他職種と同じ「個人の達成率」です。</div>
 </div>
 
 <div class="sec-title">Step 4 — 目標ラインと月給テーブル（あなたの職種）</div>
@@ -432,7 +471,7 @@ tr.hl td { background: #FBF7EA; }
 <div class="sec-title">Step 5 — 数字のカウント方法</div>
 <div class="rules">
   <div class="rule"><div class="ri">📅</div><div class="rt"><b>毎月の実績で積み上げ</b><span>受注した瞬間にドンではなく、実際に請求が立った月ごとにカウント。会計データ（MF）と完全に一致し、手集計はありません。</span></div></div>
-  <div class="rule"><div class="ri">👥</div><div class="rt"><b>営業とマーケの両方にカウント</b><span>同じ案件でも、営業には「受注の貢献」、マーケには「運用の貢献」として両方に数字が付きます（役割ごとの物差しで、会社の売上とは別物です）。</span></div></div>
+  <div class="rule"><div class="ri">👥</div><div class="rt"><b>1つの案件を、役割で分け合う</b><span>同じ案件の粗利を、関わった役割の取り分（Step 2の表）で分けてカウントします。合計はちょうど100%で、二重カウントはありません。役員が担った分は誰にも付きません。</span></div></div>
   <div class="rule"><div class="ri">↩️</div><div class="rt"><b>返金・キャンセルはその時にマイナス</b><span>発生した期の粗利から引きます。過去にもらったボーナスをさかのぼって返す、はありません。</span></div></div>
 </div>
 
@@ -577,7 +616,7 @@ tr.hl td { background: #FBF7EA; }
   };
   const DEPT_LABEL = { '営業': '営業チーム', 'マーケティング': 'マーケチーム', 'CA': 'CAチーム', 'BPO': '不動産 / BPO' };
 
-  function memberCard(m, t) {
+  function memberCard(m, t, poolShare) {
     const [ocls, olabel] = OUTLOOK[m.outlook] || ['keep', '—'];
 
     // KPIタイル: 売上 / 直課費用 / 粗利 / 昇格ラインまで
@@ -592,12 +631,18 @@ tr.hl td { background: #FBF7EA; }
       kpi4
     ].map(k => `<div class="mkpi${k.good ? ' good' : ''}"><div class="kv">${k.v}</div><div class="kl">${k.l}</div></div>`).join('');
 
-    // ボーナス見込み (チーム達成率ベース・本人の月給で換算)
-    const bonus = t.bonus_months
-      ? `<div class="mbonus">🎁 チーム現ペースのボーナス見込み: ${t.bonus_months}ヶ月分 ＝ ${man(m.monthly_salary * t.bonus_months)}</div>`
-      : (t.bonus_rule === 'cost_rate'
-        ? `<div class="mbonus off">半期の原価率が40%以下になると ボーナス1ヶ月分（${man(m.monthly_salary)}）が発生します</div>`
-        : `<div class="mbonus off">チームが100%に届くと ボーナス1ヶ月分（${man(m.monthly_salary)}）が発生します</div>`);
+    // ボーナス見込み (営業・マーケ=合同プールの取り分 / BPO=原価率判定)
+    const ps = poolShare && poolShare[m.name];
+    let bonus = '';
+    if (ps) {
+      bonus = ps.share > 0
+        ? `<div class="mbonus">🎁 ボーナス取り分（現ペースの見込み）: ${man(ps.share)}　— ランク${esc(ps.rank)}・ウェイト${ps.weight}。チーム粗利+100万円ごとに 約+${man(ps.marginal100)}</div>`
+        : `<div class="mbonus off">チーム粗利がプラスになると分配が始まります（チーム粗利+100万円ごとに あなたの取り分 約+${man(ps.marginal100)}）</div>`;
+    } else if (t.bonus_rule === 'cost_rate') {
+      bonus = t.bonus_months
+        ? `<div class="mbonus">🎁 原価率クリア中: ボーナス${t.bonus_months}ヶ月分 ＝ ${man(m.monthly_salary * t.bonus_months)}</div>`
+        : `<div class="mbonus off">半期の原価率が40%以下になると ボーナス1ヶ月分（${man(m.monthly_salary)}）が発生します</div>`;
+    }
 
     // 月ごとの粗利バー
     const months = m.monthly || [];
@@ -629,8 +674,8 @@ tr.hl td { background: #FBF7EA; }
         <span class="member-name">${esc(m.name)}<span class="rank-chip">${esc(m.rank)} ／ 月給${Math.round(m.monthly_salary / 10000)}万</span></span>
         <span class="outlook ${ocls}">${olabel}</span>
       </div>
-      ${gauge(m.personal_rate, 'p-' + ocls, [[0.7, '70%'], [1.1, '110%'], [1.5, '150%']], '自分の達成率')}
-      <div class="member-nums">この期の基準 ${man(m.denom)}（月あたり ${man(m.monthly_required)}）に対する進捗</div>
+      ${gauge(m.personal_rate, 'p-' + ocls, [[0.7, '70%'], [1.1, '110%'], [1.5, '150%']], '参考: 旧基準の達成率（配分前）')}
+      <div class="member-nums">※ 昇降格の正式判定は「役割の取り分で分けた評価粗利 × 期首に決める個人目標」で行います（目標設定が済むまで、このゲージは旧基準〔粗利 ÷ 月給×1.15×倍率〕の参考表示です）。参考基準 ${man(m.denom)}（月あたり ${man(m.monthly_required)}）</div>
       <div class="mkpis">${kpis}</div>
       ${bonus}
       <div class="mbars-title">月ごとの粗利（MF仕訳・月次発生ベース）</div>
@@ -686,22 +731,53 @@ tr.hl td { background: #FBF7EA; }
       root.innerHTML = '<div class="live-status">表示できるチームがありません。</div>';
       return;
     }
-    root.innerHTML = data.teams.map((t) => {
+    // 営業・マーケ合同ボーナスプール (チーム粗利×15%・ランクウェイト分配)
+    const poolShare = {};
+    let poolHtml = '';
+    if (data.pool) {
+      const totalW = data.pool.members.reduce((s, pm) => s + pm.weight, 0) || 1;
+      for (const pm of data.pool.members) {
+        pm.marginal100 = (1000000 * 0.15 * pm.weight) / totalW; // チーム粗利+100万円あたりの取り分増
+        poolShare[pm.name] = pm;
+      }
+      const shares = data.pool.members
+        .map((pm) => `${esc(pm.name)}（${esc(pm.rank)}・ウェイト${pm.weight}）→ <b>${man(pm.share)}</b>`)
+        .join('　／　');
+      poolHtml = `<div class="team-block">
+        <div class="team-head">
+          <span class="team-name">💰 ボーナス原資（営業・マーケ合同）<small>チーム粗利 × 15%</small></span>
+          <span class="bonus-badge${data.pool.amount > 0 ? '' : ' off'}">現ペースの原資 ${man(data.pool.amount)}</span>
+        </div>
+        <div class="team-body">
+          <div class="team-nums">チーム粗利 <b>${man(data.pool.gross_profit)}</b>（売上 ${man(data.pool.sales)} − 広告費・外注費 ${man(data.pool.direct_cost)}）× 15% ＝ 原資 <b>${man(data.pool.amount)}</b></div>
+          <div class="team-nums">取り分（ランクウェイト分配）: ${shares}</div>
+          <div class="team-nums">📈 チーム粗利が100万円増えるごとに原資 +15万円（SNS運用1件 ≒ 粗利24万円/月 ＝ 半期+144万円 → 原資+21.6万円）</div>
+          <div class="team-nums" style="opacity:.65;">※ 表示は現在ペースの見込みです。確定額は半期末に会社から通知します。</div>
+        </div>
+      </div>`;
+    }
+
+    root.innerHTML = poolHtml + data.teams.map((t) => {
       const isCostRule = t.bonus_rule === 'cost_rate';
-      const bonus = t.bonus_months
-        ? `<span class="bonus-badge">現時点: ボーナス ${t.bonus_months}ヶ月ペース</span>`
-        : `<span class="bonus-badge off">${isCostRule ? '原価率40%以下でボーナス1ヶ月' : 'チーム100%でボーナス発生'}</span>`;
-      const bonusGauge = isCostRule
+      const isPool = t.bonus_rule === 'pool';
+      const bonus = isPool
+        ? `<span class="bonus-badge">ボーナスは上の合同プールで算定</span>`
+        : isCostRule
+          ? (t.bonus_months
+            ? `<span class="bonus-badge">現時点: ボーナス ${t.bonus_months}ヶ月ペース</span>`
+            : `<span class="bonus-badge off">原価率40%以下でボーナス1ヶ月</span>`)
+          : '';
+      const bonusLine = isCostRule
         ? `<div class="team-nums" style="margin-bottom:6px;">ボーナス判定（BPOは原価率方式）: 原価率 <b>${t.cost_rate != null ? (t.cost_rate * 100).toFixed(1) + '%' : '—（売上なし）'}</b>（基準: 40%以下で月給1ヶ月分）｜ 売上 ${man(t.sales)} ／ 原価 ${man(t.direct_cost)}</div>`
-        : gauge(t.team_rate, 'team' + (t.team_rate >= 1 ? '' : ' miss'), [[1.0, '100%'], [1.2, '120%'], [1.5, '150%']], 'チームの達成率（ボーナス判定）');
-      const memberHtml = (t.members || []).map((m) => memberCard(m, t)).join('');
+        : '';
+      const memberHtml = (t.members || []).map((m) => memberCard(m, t, poolShare)).join('');
       return `<div class="team-block">
         <div class="team-head">
           <span class="team-name">${esc(DEPT_LABEL[t.dept] || t.dept)}<small>${t.member_count}名 × 倍率${t.multiplier}</small></span>
           ${bonus}
         </div>
         <div class="team-body">
-          ${bonusGauge}
+          ${bonusLine}
           <div class="team-nums">チーム粗利 ${man(t.gross_profit)} ／ チーム基準 ${man(t.denom)}</div>
           ${memberHtml}
         </div>
