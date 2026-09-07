@@ -64,6 +64,9 @@
   #eval-live table.ev-cost td{padding:4px 2px;border-bottom:1px solid #f0f0f3}
   #eval-live table.ev-cost td:last-child{text-align:right;white-space:nowrap}
   #eval-live .ev-note{font-size:.72rem;color:#999;margin-top:6px}
+  #eval-live .ev-refresh{float:right;font-size:.72rem;font-weight:600;color:#4550b5;background:#fff;border:1px solid #d5d5de;border-radius:6px;padding:5px 12px;cursor:pointer}
+  #eval-live .ev-refresh:hover{border-color:#4550b5}
+  #eval-live .ev-refresh:disabled{opacity:.5;cursor:default}
   #eval-live .ev-bar{height:8px;border-radius:99px;background:#ececf1;overflow:hidden;margin-top:4px}
   #eval-live .ev-bar i{display:block;height:100%}
   #eval-live details{margin-top:8px;font-size:.78rem}
@@ -170,14 +173,40 @@
     </div>`;
   }
 
+  // 復号に成功したパスワードと取得元URL (「🔄 データ更新」= マネフォ最新データでの再集計に使う)
+  let activePw = null;
+  let activeSrc = null;
+
+  async function sha256hex(text) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  async function refreshNow() {
+    const btn = root.querySelector(".ev-refresh");
+    if (!activePw || !activeSrc || !/^https?:/.test(activeSrc)) return;
+    if (btn) { btn.disabled = true; btn.textContent = "🔄 更新中…（最大30秒）"; }
+    try {
+      const sep = activeSrc.includes("?") ? "&" : "?";
+      const url = activeSrc + sep + "refresh=1&k=" + (await sha256hex(activePw)) + "&_=" + Date.now();
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) throw new Error("http " + res.status);
+      const data = await decrypt(await res.json(), activePw);
+      render(data);
+    } catch (e) {
+      if (btn) { btn.disabled = false; btn.textContent = "🔄 更新に失敗（もう一度）"; }
+    }
+  }
+
   function render(data) {
     const members = DEPT ? data.members.filter((m) => m.dept === DEPT) : data.members;
     const missing = (data.data_quality && data.data_quality.members_without_labor_cost) || [];
     const missingHere = missing.filter((n) => members.some((m) => m.name === n));
     const c = data.common || {};
     const showCommon = !DEPT || DEPT === "マーケティング";
+    const canRefresh = activePw && activeSrc && /^https?:/.test(activeSrc);
     root.innerHTML = `
-      <div class="ev-head">📊 リアルタイム実績（${esc(data.fy_label)}）</div>
+      <div class="ev-head">${canRefresh ? '<button class="ev-refresh" type="button">🔄 データ更新</button>' : ""}📊 リアルタイム実績（${esc(data.fy_label)}）</div>
       <div class="ev-sub">MF会計の実仕訳ベース / 集計期間 ${esc(data.period.from)} 〜 ${esc(data.period.to)} / データ更新 ${esc((data.generated_at || "").slice(0, 10))}。当会計年度のみ表示（通算表記なし）</div>
       ${missingHere.length ? `<div class="ev-warn">⚠️ 月額人件費が未登録のため粗利を計算できません: ${esc(missingHere.join("・"))}（Notion「メンバーマスタ」に記入後、再反映で表示されます）</div>` : ""}
       <div class="ev-grid">${members.map(card).join("") || '<div class="ev-box">対象メンバーのデータがありません</div>'}</div>
@@ -192,19 +221,24 @@
         </table>
         <div class="ev-note">名寄せ（担当マッピングのMF取引先名記入）が進むと各担当へ自動で振り分かります</div></div>` : ""}
     `;
+    const btn = root.querySelector(".ev-refresh");
+    if (btn) btn.addEventListener("click", refreshNow);
   }
 
-  /** パスワードを全候補データに順に試し、最初に復号できたものを返す */
-  async function tryDecrypt(payloads, password) {
-    for (const payload of payloads) {
+  /** パスワードを全候補データに順に試し、最初に復号できたものを返す (取得元も記録) */
+  async function tryDecrypt(sources, password) {
+    for (const s of sources) {
       try {
-        return await decrypt(payload, password);
+        const data = await decrypt(s.payload, password);
+        activePw = password;
+        activeSrc = s.src;
+        return data;
       } catch (e) { /* 次の候補へ */ }
     }
     return null;
   }
 
-  function askPassword(payloads, message) {
+  function askPassword(sources, message) {
     root.innerHTML = `
       <div class="ev-head">📊 リアルタイム実績</div>
       <div class="ev-box">
@@ -214,12 +248,12 @@
       </div>`;
     const input = root.querySelector("input");
     const tryUnlock = async () => {
-      const data = await tryDecrypt(payloads, input.value);
+      const data = await tryDecrypt(sources, input.value);
       if (data) {
         sessionStorage.setItem(KEY, input.value);
         render(data);
       } else {
-        askPassword(payloads, "パスワードが違います。もう一度入力してください");
+        askPassword(sources, "パスワードが違います。もう一度入力してください");
       }
     };
     root.querySelector("button").addEventListener("click", tryUnlock);
@@ -227,14 +261,14 @@
   }
 
   async function main() {
-    const payloads = [];
+    const sources = [];
     for (const src of SRCS) {
       try {
         const res = await fetch(src, { cache: "no-store" });
-        if (res.ok) payloads.push(await res.json());
+        if (res.ok) sources.push({ src, payload: await res.json() });
       } catch (e) { /* 未焼き付けのファイルはスキップ */ }
     }
-    if (!payloads.length) {
+    if (!sources.length) {
       root.innerHTML = `<div class="ev-head">📊 リアルタイム実績</div>
         <div class="ev-box">実績データはまだ反映されていません。<br>ターミナルで <code>node scripts/bake-eval-data.mjs</code> を実行してデプロイすると表示されます。</div>`;
       return;
@@ -243,13 +277,13 @@
     for (const k of [KEY, "let_auth_exec_pw"]) {
       const saved = sessionStorage.getItem(k);
       if (!saved) continue;
-      const data = await tryDecrypt(payloads, saved);
+      const data = await tryDecrypt(sources, saved);
       if (data) {
         render(data);
         return;
       }
     }
-    askPassword(payloads);
+    askPassword(sources);
   }
 
   main();
