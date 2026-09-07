@@ -305,7 +305,7 @@ tr.hl td { background: #FBF7EA; }
   <div class="auth-card">
     <div class="auth-eyebrow">LET / 新評価制度</div>
     <div class="auth-title">パスワードを入力</div>
-    <div class="auth-desc">この資料は社外秘です。<br>お使いの評価ページのパスワード（各部門用 または 経営陣用）を入力してください。</div>
+    <div class="auth-desc">この資料は社外秘です。<br>あなた専用のパスワード（個別にお渡ししたもの）を入力してください。<br>ご自身の実績・ボーナス取り分だけが表示されます。</div>
     <form id="auth-form" class="auth-form" autocomplete="off">
       <input type="password" id="auth-input" class="auth-input" placeholder="パスワード" autofocus required />
       <button type="submit" class="auth-button">ログイン</button>
@@ -491,20 +491,20 @@ tr.hl td { background: #FBF7EA; }
 </div>
 <script>
 (function() {
-  // 経営陣 / 営業 / マーケ / BPO いずれのパスワードでも閲覧可。
-  // どの種別のパスワードかをハッシュで判定し、リアルタイム実績の取得先を切り替える
+  // 2026-09-07: 個人パスワード制。本人の実績・取り分だけが表示される
+  // (同じ職種でも同僚の数字は見えない)。経営陣パスワードのみ全員分を表示。
+  // 旧・職種パスワード (saleslet1117等) ではこのページは開かない。
   const HASH_TO_KIND = {
     "1e980b5384f2ce83258b28faa11cba9393191c5c95720fc1ca3b7fc464708ea4": "exec",
-    "4eec5bf9b65f5a32b6d1396822173162960a0e999e1633289d92493130511ea0": "sales",
-    "06d54e2513a16422a07ef460dd6b5c4c4b42d770b78527653e654ea10774572e": "marketing",
-    "4e3fa4d283d4adc937fd52b1944c489e24eea35e4c302e8c95ae22bd68e19e2a": "bpo"
+    "3d4a61017b7e31d2bb3435ec8544e284143893fb4e0a0e0c79630a14c04ecaa0": "ehara",
+    "c94aac49f0a10df4b591509fc3374d5be1bd0e2e9efafb66697f2fc4948783b5": "hamasaki",
+    "8883e364906a1a3259e43c6ed57569b18d165d2f47cf2390a1b060c827d2269a": "matsumoto",
+    "5493f023b604435e59f9a6970e0d27114087fea082dcf412afae7602282603cb": "matsuoka",
+    "2d695a070fdbd434974cd2f6b91f60b0e262110cd87de1a9066f520f7d6c70bb": "sawaguchi"
   };
   const SESSION_KINDS = [
     ["let_auth_exec", "exec"],
-    ["let_auth_sales", "sales"],
-    ["let_auth_marketing", "marketing"],
-    ["let_auth_bpo", "bpo"]
-  ];
+  ]; // 職種セッション (sales/marketing/bpo) の引き継ぎは2026-09-07に廃止 (個人パスワード制)
   const API_BASE = "https://slack-let.vercel.app/api/eval/new-system";
 
   async function sha256(text) {
@@ -556,7 +556,12 @@ tr.hl td { background: #FBF7EA; }
       }
     }
   } catch (e) {}
-  const KIND_HOME = { exec: '/', sales: '/sales', marketing: '/marketing', bpo: '/bpo' };
+  const KIND_HOME = {
+    exec: '/',
+    ehara: '/demo/sales',
+    hamasaki: '/demo/marketing', matsumoto: '/demo/marketing', matsuoka: '/demo/marketing',
+    sawaguchi: '/demo/bpo'
+  };
 
   function showBackLinks() {
     const kind = sessionStorage.getItem('let_auth_newsystem_kind') || (credentials() || {}).kind;
@@ -735,7 +740,7 @@ tr.hl td { background: #FBF7EA; }
     const poolShare = {};
     let poolHtml = '';
     if (data.pool) {
-      const totalW = data.pool.members.reduce((s, pm) => s + pm.weight, 0) || 1;
+      const totalW = data.pool.total_weight || data.pool.members.reduce((s, pm) => s + pm.weight, 0) || 1;
       for (const pm of data.pool.members) {
         pm.marginal100 = (1000000 * 0.15 * pm.weight) / totalW; // チーム粗利+100万円あたりの取り分増
         poolShare[pm.name] = pm;
@@ -792,7 +797,7 @@ tr.hl td { background: #FBF7EA; }
     root.dataset.loaded = '1';
     const cred = credentials();
     if (!cred) {
-      root.innerHTML = '<div class="live-status">実績の表示にはこのページで再ログインしてください（部門パスワード）。</div>';
+      root.innerHTML = '<div class="live-status">実績の表示にはこのページで再ログインしてください（あなた専用のパスワード）。</div>';
       return;
     }
     try {
