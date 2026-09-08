@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LET 新評価制度</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --ink: #0D0D0D;
+  --ink-2: #3D3D3D;
+  --ink-3: #888;
+  --rule: #E0E0E0;
+  --page: #F7F6F3;
+  --white: #FFFFFF;
+  --blue: #1A5FA8;
+  --blue-light: #EAF1FB;
+  --green: #1A7A4A;
+  --green-light: #EAF7F0;
+  --red: #DC2626;
+  --red-light: #FDECEC;
+  --amber: #B45309;
+  --amber-light: #FEF5EA;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Noto Sans JP', sans-serif;
+  background: var(--page);
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.65;
+}
+.mono { font-family: 'IBM Plex Mono', monospace; }
+.page { max-width: 1080px; margin: 0 auto; padding: 52px 32px 80px; }
+
+.nav-back {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-3);
+  text-decoration: none; margin-bottom: 20px; padding: 6px 12px;
+  border: 1px solid var(--rule); border-radius: 4px; background: var(--white);
+}
+.nav-back:hover { color: var(--ink); border-color: var(--ink); }
+
+header { margin-bottom: 40px; }
+.header-top {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  padding-bottom: 20px; border-bottom: 2.5px solid var(--ink); gap: 24px;
+}
+.doc-eyebrow {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--ink-3); margin-bottom: 8px;
+}
+h1 { font-size: 28px; font-weight: 900; letter-spacing: -0.8px; line-height: 1.15; }
+h1 em { font-style: normal; color: var(--blue); }
+.doc-meta {
+  text-align: right; font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px; color: var(--ink-3); line-height: 2; flex-shrink: 0;
+}
+.philosophy {
+  margin-top: 20px; display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: var(--rule); border: 1px solid var(--rule);
+  border-radius: 8px; overflow: hidden;
+}
+.phil-item { background: var(--white); padding: 14px 18px; }
+.phil-label {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--ink-3); margin-bottom: 5px;
+}
+.phil-val { font-size: 13px; font-weight: 700; }
+
+.notice {
+  margin-top: 14px; background: #FFFBEB; border: 1px solid #FCD34D;
+  border-radius: 6px; padding: 10px 14px; font-size: 12px; color: var(--ink-2);
+}
+
+.sec-title {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--ink-3); margin: 48px 0 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.sec-title::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
+
+/* two tracks */
+.tracks { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 680px) { .tracks { grid-template-columns: 1fr; } }
+.track { background: var(--white); border: 1.5px solid; border-radius: 8px; overflow: hidden; }
+.track.rank { border-color: var(--blue); }
+.track.bonus { border-color: var(--green); }
+.track-head { padding: 10px 16px 8px; border-bottom: 1px solid var(--rule); display: flex; align-items: center; gap: 10px; }
+.track-tag {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600;
+  letter-spacing: 1px; text-transform: uppercase; color: #fff; padding: 2px 8px; border-radius: 3px;
+}
+.track.rank .track-tag { background: var(--blue); }
+.track.bonus .track-tag { background: var(--green); }
+.track-title { font-size: 14px; font-weight: 900; }
+.track-body { padding: 14px 16px; }
+.track-big {
+  border-radius: 6px; padding: 12px 14px; font-weight: 700;
+  font-size: 13px; line-height: 1.7; margin-bottom: 10px;
+}
+.track.rank .track-big { background: var(--blue-light); }
+.track.bonus .track-big { background: var(--green-light); }
+.track-body ul { list-style: none; }
+.track-body li { font-size: 12px; color: var(--ink-2); padding-left: 1.1em; position: relative; margin-bottom: 4px; }
+.track-body li::before { content: '・'; position: absolute; left: 0; color: var(--ink-3); }
+.one-line {
+  margin-top: 12px; text-align: center; font-size: 13.5px; font-weight: 700;
+  background: var(--white); border: 1px solid var(--rule); border-radius: 8px; padding: 12px 18px;
+}
+
+/* formula */
+.formula {
+  background: var(--ink); color: #fff; border-radius: 8px;
+  padding: 16px 22px; font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px; line-height: 2; margin-bottom: 14px; overflow-x: auto;
+}
+.formula .comment { color: #6B7280; font-size: 11px; }
+.formula .highlight { color: #FCD34D; }
+
+/* judge grid */
+.judge { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+@media (max-width: 680px) { .judge { grid-template-columns: 1fr; } }
+.judge .j { background: var(--white); border: 1.5px solid var(--rule); border-radius: 8px; padding: 16px 14px; text-align: center; }
+.judge .j.down { border-color: var(--red); }
+.judge .j.up { border-color: var(--blue); }
+.judge .pct { font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 600; }
+.judge .what { font-size: 13px; font-weight: 900; margin-top: 2px; }
+.judge .down .pct, .judge .down .what { color: var(--red); }
+.judge .keep .pct, .judge .keep .what { color: var(--ink-3); }
+.judge .up .pct, .judge .up .what { color: var(--blue); }
+.judge .hint { font-size: 11px; color: var(--ink-3); margin-top: 5px; line-height: 1.5; }
+.sec-note { font-size: 11.5px; color: var(--ink-3); margin-top: 10px; }
+
+/* bonus ladder */
+.ladder-wrap { background: var(--white); border: 1px solid var(--rule); border-radius: 8px; padding: 20px 20px 16px; }
+.ladder { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1.2fr; gap: 10px; align-items: end; }
+.step { text-align: center; }
+.step .bar {
+  border-radius: 4px 4px 0 0; background: #ECEAE4;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  align-items: center; padding-bottom: 8px; color: var(--ink-3); font-weight: 600;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.step.on .bar { background: var(--green); color: #fff; }
+.step .m { font-size: 16px; line-height: 1.2; }
+.step .m small { font-size: 10px; display: block; font-family: 'Noto Sans JP', sans-serif; font-weight: 700; }
+.step .cond { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; margin-top: 6px; }
+.step .cond small { display: block; font-family: 'Noto Sans JP', sans-serif; font-weight: 400; color: var(--ink-3); font-size: 10px; }
+
+/* role table */
+.kpi-table-wrap { background: var(--white); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; }
+table.kpi-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.kpi-table th {
+  padding: 10px 14px; text-align: left; font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-3);
+  background: var(--page); border-bottom: 1px solid var(--rule); font-weight: 500;
+}
+.kpi-table td { padding: 12px 14px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+.kpi-table tr:last-child td { border-bottom: none; }
+.kpi-table td.num, .kpi-table th.num { text-align: right; font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.big-num { font-family: 'IBM Plex Mono', monospace; font-size: 17px; font-weight: 600; }
+.big-num-sub { font-size: 10.5px; color: var(--ink-3); font-family: 'IBM Plex Mono', monospace; }
+tr.hl td { background: #FBF7EA; }
+
+/* rules list */
+.rules { background: var(--white); border: 1px solid var(--rule); border-radius: 8px; padding: 4px 20px; }
+.rule { display: flex; gap: 14px; padding: 13px 0; border-bottom: 1px dashed var(--rule); }
+.rule:last-child { border-bottom: none; }
+.rule .ri { font-size: 18px; flex-shrink: 0; }
+.rule .rt b { display: block; font-size: 13px; }
+.rule .rt span { color: var(--ink-3); font-size: 12px; }
+
+/* ===== live gauges ===== */
+.live-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
+.live-period { font-size: 11.5px; color: var(--ink-3); font-family: 'IBM Plex Mono', monospace; }
+.refresh-btn {
+  font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-2);
+  background: var(--white); border: 1px solid var(--rule); border-radius: 4px;
+  padding: 6px 12px; cursor: pointer;
+}
+.refresh-btn:hover { border-color: var(--ink); color: var(--ink); }
+.refresh-btn:disabled { opacity: .5; cursor: default; }
+.team-block { background: var(--white); border: 1.5px solid var(--ink); border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+.team-head {
+  padding: 12px 18px; background: var(--ink); color: #fff;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+}
+.team-name { font-size: 14px; font-weight: 900; }
+.team-name small { font-family: 'IBM Plex Mono', monospace; font-weight: 400; color: #BBB; font-size: 10.5px; margin-left: 10px; }
+.bonus-badge {
+  font-size: 12px; font-weight: 900; border-radius: 4px; padding: 4px 12px;
+  background: var(--green); color: #fff;
+}
+.bonus-badge.off { background: #3D3D3D; color: #BBB; font-weight: 700; }
+.team-body { padding: 16px 20px 6px; }
+.gauge { margin: 4px 0 4px; }
+.gauge-top { display: flex; justify-content: space-between; align-items: baseline; }
+.gauge-top .glabel { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--ink-3); }
+.gauge-top .pct { font-family: 'IBM Plex Mono', monospace; font-size: 19px; font-weight: 600; }
+.gauge-bar { position: relative; height: 12px; border-radius: 3px; background: #ECEAE4; margin-top: 16px; }
+.gauge-fill { height: 100%; border-radius: 3px; transition: width .6s ease; }
+.gauge-fill.team { background: var(--green); }
+.gauge-fill.team.miss { background: #B9B6AE; }
+.gauge-fill.p-up { background: var(--blue); }
+.gauge-fill.p-keep { background: #8A8781; }
+.gauge-fill.p-down { background: var(--red); }
+.gauge-mark { position: absolute; top: -4px; bottom: -4px; width: 1.5px; background: var(--ink); opacity: .4; }
+.gauge-mark span {
+  position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+  font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--ink-3); white-space: nowrap;
+}
+.team-nums { font-size: 11.5px; color: var(--ink-3); margin-top: 6px; font-family: 'IBM Plex Mono', monospace; }
+
+.member-row { border-top: 1px solid var(--rule); padding: 16px 0 14px; margin-top: 14px; }
+.member-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px; }
+.member-name { font-weight: 900; font-size: 14.5px; }
+.rank-chip {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600;
+  background: var(--page); border: 1px solid var(--rule); color: var(--ink-2);
+  border-radius: 3px; padding: 2px 8px; margin-left: 8px;
+}
+.outlook { font-size: 12px; font-weight: 900; }
+.outlook.up { color: var(--blue); }
+.outlook.keep { color: var(--ink-3); }
+.outlook.down { color: var(--red); }
+.member-nums { font-size: 11.5px; color: var(--ink-3); margin-top: 6px; }
+.mkpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 12px 0 0; }
+@media (max-width: 680px) { .mkpis { grid-template-columns: repeat(2, 1fr); } }
+.mkpi { background: var(--page); border: 1px solid var(--rule); border-radius: 6px; padding: 8px 12px; }
+.mkpi .kv { font-family: 'IBM Plex Mono', monospace; font-size: 14.5px; font-weight: 600; letter-spacing: -0.3px; }
+.mkpi .kl { font-size: 10px; color: var(--ink-3); }
+.mkpi.good .kv { color: var(--green); }
+.mbonus {
+  font-size: 12px; margin: 10px 0 0; padding: 9px 14px; border-radius: 6px;
+  background: var(--green-light); border: 1px solid var(--green); color: var(--green); font-weight: 700;
+}
+.mbonus.off { background: var(--page); border-color: var(--rule); color: var(--ink-3); font-weight: 400; }
+.mbars-title {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--ink-3); margin-top: 16px;
+}
+.mbars { display: flex; gap: 8px; align-items: flex-end; height: 96px; margin: 8px 2px 2px; }
+.mbar { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; }
+.mbar .v { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--ink-3); margin-bottom: 3px; white-space: nowrap; }
+.mbar .b { width: 100%; max-width: 48px; border-radius: 4px 4px 0 0; background: var(--blue); }
+.mbar .b.neg { background: var(--red); }
+.mbar .ml { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--ink-3); margin-top: 4px; }
+.mclients { margin-top: 12px; }
+.mclients summary { cursor: pointer; color: var(--blue); font-weight: 700; font-size: 12px; }
+.mclients table { width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 12px; }
+.mclients th {
+  text-align: left; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px;
+  letter-spacing: 1px; text-transform: uppercase; color: var(--ink-3); font-weight: 500;
+  padding: 5px 6px; border-bottom: 1.5px solid var(--ink);
+}
+.mclients td { padding: 5px 6px; border-bottom: 1px solid var(--rule); }
+.mclients td.num, .mclients th.num { text-align: right; font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mclients tr.total td { font-weight: 900; border-bottom: none; }
+.live-status { text-align: center; color: var(--ink-3); font-size: 12.5px; padding: 26px 0; background: var(--white); border: 1px dashed var(--rule); border-radius: 8px; }
+
+.doc-footer {
+  margin-top: 60px; padding-top: 16px; border-top: 1px solid var(--rule);
+  display: flex; justify-content: space-between;
+  font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: var(--ink-3);
+}
+
+@media (max-width: 768px) {
+  .page { padding: 32px 16px 60px; }
+  h1 { font-size: 22px; }
+  .header-top { flex-direction: column; }
+  .doc-meta { text-align: left; }
+  .philosophy { grid-template-columns: 1fr; }
+  .ladder { gap: 6px; }
+  .kpi-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .kpi-table { min-width: 560px; }
+  .doc-footer { flex-direction: column; gap: 4px; }
+}
+
+/* auth */
+#auth-gate { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: #f7f6f2;
+  display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 1000; }
+.auth-card { background: #fff; border: 1px solid #e3e1da; border-radius: 12px; padding: 40px 36px;
+  max-width: 420px; width: 100%; box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+.auth-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 2px;
+  text-transform: uppercase; color: #8a877e; margin-bottom: 14px; }
+.auth-title { font-size: 22px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 8px; line-height: 1.3; }
+.auth-desc { font-size: 12.5px; color: #55524a; margin-bottom: 24px; line-height: 1.6; }
+.auth-form { display: flex; flex-direction: column; gap: 12px; }
+.auth-input { width: 100%; padding: 12px 14px; border: 1.5px solid #e3e1da;
+  border-radius: 6px; font-size: 14px; font-family: 'IBM Plex Mono', monospace; outline: none; }
+.auth-input:focus { border-color: #1a1a1a; }
+.auth-button { padding: 12px 14px; border: none; border-radius: 6px; background: #1a1a1a; color: #fff;
+  font-size: 13px; font-weight: 700; font-family: 'Noto Sans JP', sans-serif; cursor: pointer; }
+.auth-button:active { transform: scale(0.98); }
+.auth-error { font-size: 12px; color: #c0392b; margin-top: 6px; display: none; }
+.auth-error.show { display: block; }
+.auth-footer { margin-top: 20px; padding-top: 16px; border-top: 1px solid #e3e1da;
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #8a877e; text-align: center; letter-spacing: 1px; }
+</style>
+</head>
+<body>
+<div id="auth-gate">
+  <div class="auth-card">
+    <div class="auth-eyebrow">LET / 新評価制度</div>
+    <div class="auth-title">パスワードを入力</div>
+    <div class="auth-desc">この資料は社外秘です。<br>あなた専用のパスワード（個別にお渡ししたもの）を入力してください。<br>ご自身の実績・ボーナス取り分だけが表示されます。</div>
+    <form id="auth-form" class="auth-form" autocomplete="off">
+      <input type="password" id="auth-input" class="auth-input" placeholder="パスワード" autofocus required />
+      <button type="submit" class="auth-button">ログイン</button>
+      <div id="auth-error" class="auth-error">パスワードが違います</div>
+    </form>
+    <div class="auth-footer">CONFIDENTIAL — 株式会社LET</div>
+  </div>
+</div>
+<div id="main-content" style="display:none;">
+<div class="page">
+
+<a class="nav-back" id="back-link" href="/" hidden>← 現行の評価シートに戻る</a>
+
+<header>
+  <div class="header-top">
+    <div>
+      <div class="doc-eyebrow">株式会社LET — 社外秘 / 全職種共通 / 新評価制度</div>
+      <h1>粗利ベース × <em>2トラック</em>評価制度</h1>
+    </div>
+    <div class="doc-meta">
+      Ver. 2.0（ボーナス=プール方式）<br>
+      2026-10-01 施行予定<br>
+      対象：全職種
+    </div>
+  </div>
+  <div class="philosophy">
+    <div class="phil-item">
+      <div class="phil-label">昇格・降格</div>
+      <div class="phil-val">案件ごとの役割分担で自分の数字を計算。目標達成＋行動で判定</div>
+    </div>
+    <div class="phil-item">
+      <div class="phil-label">ボーナス</div>
+      <div class="phil-val">チーム粗利の15%が原資。ランクに応じて全員で分配（上限なし）</div>
+    </div>
+    <div class="phil-item">
+      <div class="phil-label">データ</div>
+      <div class="phil-val">MF会計の実仕訳と完全連動・本ページでリアルタイム表示</div>
+    </div>
+  </div>
+  <div class="notice">✦ 本制度は <strong>2026年10月1日（新会計年度）から施行予定</strong>。スタートまでは現在の評価制度がそのまま適用されます。</div>
+</header>
+
+<div class="sec-title">Step 1 — 見るのは、2つの数字だけ</div>
+<div class="tracks">
+  <div class="track rank">
+    <div class="track-head"><span class="track-tag">Rank</span><span class="track-title">自分の評価粗利 → 昇格・降格</span></div>
+    <div class="track-body">
+      <div class="track-big">案件ごとに役割で分け合った「自分の粗利」が、期首に決めた目標に届いているか</div>
+      <ul>
+        <li>ランクと月給が決まる、キャリアの数字</li>
+        <li>チーム賞与の成績は混ぜない</li>
+      </ul>
+    </div>
+  </div>
+  <div class="track bonus">
+    <div class="track-head"><span class="track-tag">Bonus</span><span class="track-title">チームの粗利 → ボーナス</span></div>
+    <div class="track-body">
+      <div class="track-big">営業・マーケみんなで作ったチーム粗利の15%が、そのままボーナスの原資になる</div>
+      <ul>
+        <li>原資はランクに応じて全員で分配</li>
+        <li>粗利が増えるほど原資も増える（上限なし）</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<div class="one-line">自分の数字で<span style="color:var(--blue);">キャリア</span>、チームの数字で<span style="color:var(--green);">ボーナス</span></div>
+
+<div class="sec-title">Step 2 — 昇格・降格（自分の数字＝案件ごとの役割分担で決まる）</div>
+<div class="formula">
+  <span class="comment">// 半年ごとに、その期の数字だけで判定（過去の持ち越しなし）</span><br>
+  自分の評価粗利 = 案件の粗利 ×（<span class="highlight">役割の取り分</span>）×（自分の担当割合）<br>
+  <span class="comment">// 同じ案件を、関わった役割で分け合ってカウントします（合計はちょうど100%）</span>
+</div>
+<div style="overflow-x:auto; margin:12px 0;">
+<table style="width:100%; border-collapse:collapse; font-size:13px;">
+  <tr style="border-bottom:2px solid var(--ink,#222);">
+    <th style="text-align:left; padding:6px 8px;">案件の種類</th>
+    <th style="text-align:left; padding:6px 8px;">役割の取り分</th>
+  </tr>
+  <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">SNS運用（初回契約の期間）</td><td style="padding:6px 8px;"><b>営業 50%・マーケ 50%</b></td></tr>
+  <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">SNS運用（更新後）</td><td style="padding:6px 8px;"><b>営業 10%・マーケ 90%</b></td></tr>
+  <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">クロスセル単発（HP等）</td><td style="padding:6px 8px;">販売担当 50%・制作納品担当 50%（1人で完結すればその人100%）</td></tr>
+  <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">人材紹介 コミット型</td><td style="padding:6px 8px;">営業 20%・マーケ 50%・CA 30%</td></tr>
+  <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">人材紹介 一般型</td><td style="padding:6px 8px;">RA 50%・CA 50%</td></tr>
+  <tr><td style="padding:6px 8px;">不動産/BPO</td><td style="padding:6px 8px;">BPO担当 100%（別集計）</td></tr>
+</table>
+</div>
+<div class="judge">
+  <div class="j up">
+    <div class="pct">目標の110%〜</div>
+    <div class="what">↑ 昇格</div>
+    <div class="hint">期首に決める自分の目標（G）の110%、または次のランクの目標（N）の高い方に到達</div>
+  </div>
+  <div class="j keep">
+    <div class="pct">＋行動評価</div>
+    <div class="what">定性・役割実証</div>
+    <div class="hint">MVVに沿った行動・チームへの貢献・次のランクの役割を3ヶ月以上実証できていること</div>
+  </div>
+  <div class="j down">
+    <div class="pct">降格は別判定</div>
+    <div class="what">↓ 昇格できない≠降格</div>
+    <div class="hint">昇格不成立を理由に降格はしない。降格の基準は期首に確定して周知</div>
+  </div>
+</div>
+<div class="sec-note">目標は期首に一人ひとり合意して決めます（期末に後付けで引き上げない・達成機会のない目標は設定しない）。役員が担う分は社員の数字に付かず、返金は発生した期にマイナスします。数字はすべてMF会計の実仕訳ベースです。</div>
+
+<div class="sec-title">Step 3 — ボーナス（チーム粗利の15%を、ランクに応じて分配）</div>
+<div class="formula">
+  <span class="comment">// 営業・マーケ合同。半年ごとに計算（年2回支給）</span><br>
+  ボーナス原資 = 半期のチーム粗利（売上 − 広告費 − 外注費）× <span class="highlight">15%</span><br>
+  あなたの取り分 = 原資 × <span class="highlight">あなたのランクのウェイト</span> ÷ 全員のウェイト合計
+</div>
+<div class="ladder-wrap">
+  <div class="ladder">
+    <div class="step">
+      <div class="bar" style="height:80px;"><div class="m">0.8<small>ウェイト</small></div></div>
+      <div class="cond">R1</div>
+    </div>
+    <div class="step on">
+      <div class="bar" style="height:100px;"><div class="m">1.0<small>ウェイト</small></div></div>
+      <div class="cond">R2<small>スタート</small></div>
+    </div>
+    <div class="step on">
+      <div class="bar" style="height:120px;"><div class="m">1.2<small>ウェイト</small></div></div>
+      <div class="cond">R3</div>
+    </div>
+    <div class="step on">
+      <div class="bar" style="height:140px;"><div class="m">1.4<small>ウェイト</small></div></div>
+      <div class="cond">R4</div>
+    </div>
+    <div class="step on">
+      <div class="bar" style="height:170px;background:linear-gradient(to top,var(--green),#4CAF7D);"><div class="m">1.6<small>ウェイト</small></div></div>
+      <div class="cond">R5</div>
+    </div>
+  </div>
+  <div class="sec-note">チームの粗利が伸びるほど原資も増えます — <b>上限はありません</b>。同じ案件を営業とマーケで協力して伸ばすことが、そのまま全員のボーナスになります。原資の粗利は会社の実額で数えます（営業とマーケの二重カウントはしません）。</div>
+  <div class="sec-note">分配は<b>ランクのウェイト</b>で決まります。全員が同じランクの間は均等割。昇格（Step 2）するとウェイトが上がり、同じ原資でも取り分が増えます。期の途中で入社・退社した場合は在籍月数で按分します。確定額は半期末に会社から通知します（このページの表示は現在ペースの見込みです）。</div>
+  <div style="margin:14px 0 4px; font-weight:600;">早見表 — チームでいくら稼ぐと、いくらになるか（現4名・全員R2で均等割の場合）</div>
+  <div style="overflow-x:auto;">
+  <table style="width:100%; border-collapse:collapse; font-size:13px;">
+    <tr style="border-bottom:2px solid var(--ink,#222);">
+      <th style="text-align:left; padding:6px 8px;">半期のチーム粗利</th>
+      <th style="text-align:right; padding:6px 8px;">（月あたり）</th>
+      <th style="text-align:right; padding:6px 8px;">ボーナス原資（15%）</th>
+      <th style="text-align:right; padding:6px 8px;">1人あたり</th>
+    </tr>
+    <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">600万円</td><td style="text-align:right; padding:6px 8px;">100万円</td><td style="text-align:right; padding:6px 8px;">90万円</td><td style="text-align:right; padding:6px 8px;">22.5万円</td></tr>
+    <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">900万円</td><td style="text-align:right; padding:6px 8px;">150万円</td><td style="text-align:right; padding:6px 8px;">135万円</td><td style="text-align:right; padding:6px 8px;">33.8万円</td></tr>
+    <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">1,200万円</td><td style="text-align:right; padding:6px 8px;">200万円</td><td style="text-align:right; padding:6px 8px;">180万円</td><td style="text-align:right; padding:6px 8px;">45万円</td></tr>
+    <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">1,600万円</td><td style="text-align:right; padding:6px 8px;">267万円</td><td style="text-align:right; padding:6px 8px;">240万円</td><td style="text-align:right; padding:6px 8px;">60万円</td></tr>
+    <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">2,000万円</td><td style="text-align:right; padding:6px 8px;">333万円</td><td style="text-align:right; padding:6px 8px;">300万円</td><td style="text-align:right; padding:6px 8px;">75万円</td></tr>
+    <tr><td style="padding:6px 8px;">2,400万円</td><td style="text-align:right; padding:6px 8px;">400万円</td><td style="text-align:right; padding:6px 8px;">360万円</td><td style="text-align:right; padding:6px 8px;">90万円</td></tr>
+  </table>
+  </div>
+  <div class="sec-note" style="margin-top:6px;">目安: 月額30万円のSNS運用1件 ＝ 粗利約24万円/月 ＝ 半期約144万円。1件増えるだけで原資は半期+21.6万円増えます。人数が増えたときやランクに差がついたときは、上の分配式に従って1人あたりの額が変わります。</div>
+  <div class="sec-note">※ <b>不動産/BPO職のボーナスだけは判定方法が異なります</b>: 半期の<b>原価率（原価 ÷ 売上）が40%以下</b>であれば月給1ヶ月分を支給します（プール分配の対象外です）。昇格・降格の判定は他職種と同じ「個人の達成率」です。</div>
+</div>
+
+<div class="sec-title">Step 4 — 目標ラインと月給テーブル（あなたの職種）</div>
+<div id="tables-root"><div class="live-status">🔒 目標ライン・月給テーブルは、ログインした職種の分だけ表示されます（読み込み中…）</div></div>
+<div class="sec-note">ランクはR1〜R5の5段階・全員R2スタート。昇格すると月給と目標が同時に上がります。他職種の月給テーブルは表示されません。</div>
+
+<div class="sec-title">Step 5 — 数字のカウント方法</div>
+<div class="rules">
+  <div class="rule"><div class="ri">📅</div><div class="rt"><b>毎月の実績で積み上げ</b><span>受注した瞬間にドンではなく、実際に請求が立った月ごとにカウント。会計データ（MF）と完全に一致し、手集計はありません。</span></div></div>
+  <div class="rule"><div class="ri">👥</div><div class="rt"><b>1つの案件を、役割で分け合う</b><span>同じ案件の粗利を、関わった役割の取り分（Step 2の表）で分けてカウントします。合計はちょうど100%で、二重カウントはありません。役員が担った分は誰にも付きません。</span></div></div>
+  <div class="rule"><div class="ri">↩️</div><div class="rt"><b>返金・キャンセルはその時にマイナス</b><span>発生した期の粗利から引きます。過去にもらったボーナスをさかのぼって返す、はありません。</span></div></div>
+</div>
+
+<div class="sec-title">Step 6 — いまの数字（リアルタイム）</div>
+<div class="live-head">
+  <div class="live-period" id="live-period"></div>
+  <button class="refresh-btn" id="refresh-btn" type="button" hidden>🔄 データ更新</button>
+</div>
+<div id="live-root"><div class="live-status">実績データを読み込んでいます…</div></div>
+
+<div class="doc-footer">
+  <span>株式会社LET ／ 新評価制度</span>
+  <span>CONFIDENTIAL — 社内限定資料 ／ EFFECTIVE 2026-10-01 (PLANNED)</span>
+</div>
+
+</div>
+</div>
+<script>
+(function() {
+  // 2026-09-07: 個人パスワード制。本人の実績・取り分だけが表示される
+  // (同じ職種でも同僚の数字は見えない)。経営陣パスワードのみ全員分を表示。
+  // 旧・職種パスワード (saleslet1117等) ではこのページは開かない。
+  const HASH_TO_KIND = {
+    "1e980b5384f2ce83258b28faa11cba9393191c5c95720fc1ca3b7fc464708ea4": "exec",
+    "3d4a61017b7e31d2bb3435ec8544e284143893fb4e0a0e0c79630a14c04ecaa0": "ehara",
+    "c94aac49f0a10df4b591509fc3374d5be1bd0e2e9efafb66697f2fc4948783b5": "hamasaki",
+    "8883e364906a1a3259e43c6ed57569b18d165d2f47cf2390a1b060c827d2269a": "matsumoto",
+    "5493f023b604435e59f9a6970e0d27114087fea082dcf412afae7602282603cb": "matsuoka",
+    "2d695a070fdbd434974cd2f6b91f60b0e262110cd87de1a9066f520f7d6c70bb": "sawaguchi"
+  };
+  const SESSION_KINDS = [
+    ["let_auth_exec", "exec"],
+  ]; // 職種セッション (sales/marketing/bpo) の引き継ぎは2026-09-07に廃止 (個人パスワード制)
+  // 2026-09-08: 1名ずつのURL分離。/my/<slug> は本人のパスワード (+役員) のみ、
+  // /new-system は役員パスワードのみ受け付ける。
+  const PATH_SLUG = (location.pathname.match(/^\/my\/([a-z]+)/) || [])[1] || null;
+  const kindAllowed = (k) => k === 'exec' || (PATH_SLUG != null && k === PATH_SLUG);
+  const API_BASE = "https://slack-let.vercel.app/api/eval/new-system";
+
+  async function sha256(text) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+  function b64ToBuf(b64) {
+    const bin = atob(b64);
+    const buf = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+    return buf;
+  }
+  async function decrypt(payload, password) {
+    const enc = new TextEncoder();
+    const baseKey = await crypto.subtle.importKey("raw", enc.encode(password), "PBKDF2", false, ["deriveKey"]);
+    const key = await crypto.subtle.deriveKey(
+      { name: "PBKDF2", salt: b64ToBuf(payload.salt), iterations: payload.iter, hash: "SHA-256" },
+      baseKey,
+      { name: "AES-GCM", length: 256 },
+      false,
+      ["decrypt"]
+    );
+    const plain = await crypto.subtle.decrypt(
+      { name: "AES-GCM", iv: b64ToBuf(payload.iv) },
+      key,
+      b64ToBuf(payload.ct)
+    );
+    return JSON.parse(new TextDecoder().decode(plain));
+  }
+
+  function credentials() {
+    const pw = sessionStorage.getItem('let_auth_newsystem_pw');
+    const kind = sessionStorage.getItem('let_auth_newsystem_kind');
+    if (pw && kind) return { pw, kind };
+    for (const [key, k] of SESSION_KINDS) {
+      const p = sessionStorage.getItem(key + '_pw');
+      if (sessionStorage.getItem(key) === '1' && p) return { pw: p, kind: k };
+    }
+    return null;
+  }
+
+  // 旧ページへ戻るリンク: 来訪元 (バナー経由の同一サイトページ) を記憶し、
+  // 直接アクセス時はログイン種別に応じたページへ戻す
+  try {
+    if (document.referrer) {
+      const u = new URL(document.referrer);
+      if (u.origin === location.origin && u.pathname !== location.pathname) {
+        sessionStorage.setItem('let_ns_back', u.pathname);
+      }
+    }
+  } catch (e) {}
+  const KIND_HOME = {
+    exec: '/',
+    ehara: '/demo/sales',
+    hamasaki: '/demo/marketing', matsumoto: '/demo/marketing', matsuoka: '/demo/marketing',
+    sawaguchi: '/demo/bpo'
+  };
+
+  function showBackLinks() {
+    const kind = sessionStorage.getItem('let_auth_newsystem_kind') || (credentials() || {}).kind;
+    const href = sessionStorage.getItem('let_ns_back') || KIND_HOME[kind] || '/';
+    const a = document.getElementById('back-link');
+    if (a) { a.href = href; a.hidden = false; }
+  }
+
+  function show() {
+    document.getElementById('auth-gate').style.display = 'none';
+    document.getElementById('main-content').style.display = '';
+    showBackLinks();
+    loadLive();
+  }
+
+  const cred0 = credentials();
+  if (cred0 && kindAllowed(cred0.kind)) { show(); }
+  document.getElementById('auth-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const input = document.getElementById('auth-input').value;
+    const hash = await sha256(input);
+    const errEl = document.getElementById('auth-error');
+    const kind = HASH_TO_KIND[hash];
+    if (kind && !kindAllowed(kind)) {
+      errEl.textContent = 'このパスワードはこのURLでは使えません。ご案内したあなた専用のURLからアクセスしてください。';
+      errEl.classList.add('show');
+      document.getElementById('auth-input').value = '';
+      return;
+    }
+    if (kind) {
+      sessionStorage.setItem('let_auth_newsystem', '1');
+      sessionStorage.setItem('let_auth_newsystem_pw', input);
+      sessionStorage.setItem('let_auth_newsystem_kind', kind);
+      show();
+    } else {
+      errEl.textContent = 'パスワードが違います';
+      errEl.classList.add('show');
+      document.getElementById('auth-input').value = '';
+    }
+  });
+
+  // ---- リアルタイム実績 (個人=昇降格 / チーム=ボーナス) ----
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  const man = (v) => (v == null ? "—" : (v / 10000).toLocaleString("ja-JP", { maximumFractionDigits: 1 }) + "万円");
+  const manS = (v) => (v == null ? "—" : (v < 0 ? "▲" : "") + Math.round(Math.abs(v) / 10000).toLocaleString("ja-JP") + "万");
+  const pct = (r) => (r == null ? "—" : (r * 100).toFixed(1) + "%");
+  const CAP = 1.8; // ゲージの右端 = 180%
+
+  function gauge(rate, cls, marks, label) {
+    const w = rate == null ? 0 : Math.max(0, Math.min(rate, CAP)) / CAP * 100;
+    const markHtml = marks.map(([v, l]) =>
+      `<div class="gauge-mark" style="left:${(v / CAP * 100).toFixed(1)}%"><span>${l}</span></div>`).join("");
+    return `<div class="gauge">
+      <div class="gauge-top"><span class="glabel">${label}</span><span class="pct">${pct(rate)}</span></div>
+      <div class="gauge-bar">${markHtml}<div class="gauge-fill ${cls}" style="width:${w.toFixed(1)}%"></div></div>
+    </div>`;
+  }
+
+  const OUTLOOK = {
+    up: ['up', '↑ 昇格ペース（110%以上）'],
+    keep: ['keep', '→ 維持圏内（70〜109%）'],
+    down: ['down', '↓ 降格ライン（70%未満）']
+  };
+  const DEPT_LABEL = { '営業': '営業チーム', 'マーケティング': 'マーケチーム', 'CA': 'CAチーム', 'BPO': '不動産 / BPO' };
+
+  function memberCard(m, t, poolShare) {
+    const [ocls, olabel] = OUTLOOK[m.outlook] || ['keep', '—'];
+
+    // KPIタイル: 売上 / 直課費用 / 粗利 / 昇格ラインまで
+    const rem110 = m.denom * 1.1 - m.gross_profit;
+    const kpi4 = rem110 <= 0
+      ? { l: '昇格ライン(110%)', v: '突破 +' + manS(-rem110), good: true }
+      : { l: '昇格ライン(110%)まで', v: manS(rem110) };
+    const kpis = [
+      { l: '売上（役割ベース）', v: manS(m.sales) },
+      { l: '直課費用（広告・外注）', v: manS(m.direct_cost) },
+      { l: '粗利', v: manS(m.gross_profit) },
+      kpi4
+    ].map(k => `<div class="mkpi${k.good ? ' good' : ''}"><div class="kv">${k.v}</div><div class="kl">${k.l}</div></div>`).join('');
+
+    // ボーナス見込み (営業・マーケ=合同プールの取り分 / BPO=原価率判定)
+    const ps = poolShare && poolShare[m.name];
+    let bonus = '';
+    if (ps) {
+      bonus = ps.share > 0
+        ? `<div class="mbonus">🎁 ボーナス取り分（現ペースの見込み）: ${man(ps.share)}　— ランク${esc(ps.rank)}・ウェイト${ps.weight}。チーム粗利+100万円ごとに 約+${man(ps.marginal100)}</div>`
+        : `<div class="mbonus off">チーム粗利がプラスになると分配が始まります（チーム粗利+100万円ごとに あなたの取り分 約+${man(ps.marginal100)}）</div>`;
+    } else if (t.bonus_rule === 'cost_rate') {
+      bonus = t.bonus_months
+        ? `<div class="mbonus">🎁 原価率クリア中: ボーナス${t.bonus_months}ヶ月分 ＝ ${man(m.monthly_salary * t.bonus_months)}</div>`
+        : `<div class="mbonus off">半期の原価率が40%以下になると ボーナス1ヶ月分（${man(m.monthly_salary)}）が発生します</div>`;
+    }
+
+    // 月ごとの粗利バー
+    const months = m.monthly || [];
+    const maxAbs = Math.max(1, ...months.map(x => Math.abs(x.profit || 0)));
+    const bars = months.map(x => {
+      const p = x.profit || 0;
+      const h = Math.max(2, Math.round(Math.abs(p) / maxAbs * 60));
+      const mo = Number(x.month.slice(5, 7)) + '月';
+      return `<div class="mbar" title="${mo}: 売上${manS(x.sales)} − 費用${manS(x.direct_cost)} = 粗利${manS(p)}">
+        <span class="v">${p ? manS(p) : '0'}</span>
+        <div class="b${p < 0 ? ' neg' : ''}" style="height:${h}px"></div>
+        <span class="ml">${mo}</span>
+      </div>`;
+    }).join('');
+
+    // クライアント別の内訳
+    const rows = m.by_client || [];
+    const clientsHtml = rows.length ? `<details class="mclients">
+      <summary>クライアント別の内訳（${rows.length}件）</summary>
+      <table>
+        <tr><th>クライアント</th><th class="num">売上</th><th class="num">費用</th><th class="num">粗利</th></tr>
+        ${rows.map(r => `<tr><td>${esc(r.client)}</td><td class="num">${manS(r.sales)}</td><td class="num">${manS(r.direct_cost)}</td><td class="num">${manS(r.profit)}</td></tr>`).join('')}
+        <tr class="total"><td>合計</td><td class="num">${manS(m.sales)}</td><td class="num">${manS(m.direct_cost)}</td><td class="num">${manS(m.gross_profit)}</td></tr>
+      </table>
+    </details>` : '';
+
+    return `<div class="member-row">
+      <div class="member-head">
+        <span class="member-name">${esc(m.name)}<span class="rank-chip">${esc(m.rank)} ／ 月給${Math.round(m.monthly_salary / 10000)}万</span></span>
+        <span class="outlook ${ocls}">${olabel}</span>
+      </div>
+      ${gauge(m.personal_rate, 'p-' + ocls, [[0.7, '70%'], [1.1, '110%'], [1.5, '150%']], '参考: 旧基準の達成率（配分前）')}
+      <div class="member-nums">※ 昇降格の正式判定は「役割の取り分で分けた評価粗利 × 期首に決める個人目標」で行います（目標設定が済むまで、このゲージは旧基準〔粗利 ÷ 月給×1.15×倍率〕の参考表示です）。参考基準 ${man(m.denom)}（月あたり ${man(m.monthly_required)}）</div>
+      <div class="mkpis">${kpis}</div>
+      ${bonus}
+      <div class="mbars-title">月ごとの粗利（MF仕訳・月次発生ベース）</div>
+      <div class="mbars">${bars}</div>
+      ${clientsHtml}
+    </div>`;
+  }
+
+  const DEPT_SHORT = { '営業': '法人営業', 'マーケティング': 'マーケティング', 'CA': '人材紹介CA', 'BPO': '不動産 / BPO統括' };
+
+  function renderTables(data) {
+    const root = document.getElementById('tables-root');
+    if (!root) return;
+    const tables = data.tables || [];
+    if (!tables.length) {
+      root.innerHTML = '<div class="live-status">基準表を取得できませんでした。</div>';
+      return;
+    }
+    root.innerHTML = tables.map((tb) => {
+      const rows = ['R1', 'R2', 'R3', 'R4', 'R5'].map((r) => {
+        const sal = tb.rank_salaries[r];
+        const req = sal * 1.15 * tb.multiplier;
+        const name = r === 'R2' ? '<b>R2（スタート）</b>' : r === 'R1' ? 'R1（降格枠）' : r;
+        const fmt = (v) => (v / 10000).toLocaleString('ja-JP', { maximumFractionDigits: 2 });
+        return `<tr${r === 'R2' ? ' class="hl"' : ''}><td>${name}</td><td class="num">${r === 'R2' ? '<b>' : ''}${Math.round(sal / 10000)}万${r === 'R2' ? '</b>' : ''}</td><td class="num">${fmt(req)}万</td></tr>`;
+      }).join('');
+      const half = (tb.half_target / 10000).toLocaleString('ja-JP', { maximumFractionDigits: 2 });
+      const monthly = (tb.monthly_target / 10000).toLocaleString('ja-JP', { maximumFractionDigits: 2 });
+      const bpoNote = tb.dept === 'BPO' ? '<div style="font-size:10.5px;color:var(--ink-3)">売上 − 外注費で判定</div>' : '';
+      return `<div class="kpi-table-wrap" style="margin-bottom:12px;">
+        <table class="kpi-table">
+          <thead>
+            <tr><th>${esc(DEPT_SHORT[tb.dept] || tb.dept)} ｜ 倍率 ${tb.multiplier}</th><th class="num">月給</th><th class="num">必要粗利 / 月</th></tr>
+          </thead>
+          <tbody>
+            <tr><td style="color:var(--ink-3);font-size:11px">半期の目標粗利（R2スタート時）${bpoNote}</td><td class="num" colspan="2"><span class="big-num" style="color:var(--blue)">${half}万円</span> <span class="big-num-sub">／ 月あたり ${monthly}万円</span></td></tr>
+            ${rows}
+          </tbody>
+        </table>
+      </div>`;
+    }).join('');
+  }
+
+  function render(data) {
+    renderTables(data);
+    const period = document.getElementById('live-period');
+    period.innerHTML = esc(data.period.label) + '（' + data.period.months_elapsed + 'ヶ月経過）' +
+      (data.period.is_preview
+        ? ' — <b>試運転表示</b>: 制度スタート（2026-10-01）前のプレビューで、現在の評価には影響しません'
+        : '');
+    const root = document.getElementById('live-root');
+    if (!data.teams || !data.teams.length) {
+      root.innerHTML = '<div class="live-status">表示できるチームがありません。</div>';
+      return;
+    }
+    // 営業・マーケ合同ボーナスプール (チーム粗利×15%・ランクウェイト分配)
+    const poolShare = {};
+    let poolHtml = '';
+    if (data.pool) {
+      const totalW = data.pool.total_weight || data.pool.members.reduce((s, pm) => s + pm.weight, 0) || 1;
+      for (const pm of data.pool.members) {
+        pm.marginal100 = (1000000 * 0.15 * pm.weight) / totalW; // チーム粗利+100万円あたりの取り分増
+        poolShare[pm.name] = pm;
+      }
+      const shares = data.pool.members
+        .map((pm) => `${esc(pm.name)}（${esc(pm.rank)}・ウェイト${pm.weight}）→ <b>${man(pm.share)}</b>`)
+        .join('　／　');
+      poolHtml = `<div class="team-block">
+        <div class="team-head">
+          <span class="team-name">💰 ボーナス原資（営業・マーケ合同）<small>チーム粗利 × 15%</small></span>
+          <span class="bonus-badge${data.pool.amount > 0 ? '' : ' off'}">現ペースの原資 ${man(data.pool.amount)}</span>
+        </div>
+        <div class="team-body">
+          <div class="team-nums">チーム粗利 <b>${man(data.pool.gross_profit)}</b>（売上 ${man(data.pool.sales)} − 広告費・外注費 ${man(data.pool.direct_cost)}）× 15% ＝ 原資 <b>${man(data.pool.amount)}</b></div>
+          <div class="team-nums">取り分（ランクウェイト分配）: ${shares}</div>
+          <div class="team-nums">📈 チーム粗利が100万円増えるごとに原資 +15万円（SNS運用1件 ≒ 粗利24万円/月 ＝ 半期+144万円 → 原資+21.6万円）</div>
+          <div class="team-nums" style="opacity:.65;">※ 表示は現在ペースの見込みです。確定額は半期末に会社から通知します。</div>
+        </div>
+      </div>`;
+    }
+
+    root.innerHTML = poolHtml + data.teams.map((t) => {
+      const isCostRule = t.bonus_rule === 'cost_rate';
+      const isPool = t.bonus_rule === 'pool';
+      const bonus = isPool
+        ? `<span class="bonus-badge">ボーナスは上の合同プールで算定</span>`
+        : isCostRule
+          ? (t.bonus_months
+            ? `<span class="bonus-badge">現時点: ボーナス ${t.bonus_months}ヶ月ペース</span>`
+            : `<span class="bonus-badge off">原価率40%以下でボーナス1ヶ月</span>`)
+          : '';
+      const bonusLine = isCostRule
+        ? `<div class="team-nums" style="margin-bottom:6px;">ボーナス判定（BPOは原価率方式）: 原価率 <b>${t.cost_rate != null ? (t.cost_rate * 100).toFixed(1) + '%' : '—（売上なし）'}</b>（基準: 40%以下で月給1ヶ月分）｜ 売上 ${man(t.sales)} ／ 原価 ${man(t.direct_cost)}</div>`
+        : '';
+      const memberHtml = (t.members || []).map((m) => memberCard(m, t, poolShare)).join('');
+      return `<div class="team-block">
+        <div class="team-head">
+          <span class="team-name">${esc(DEPT_LABEL[t.dept] || t.dept)}<small>${t.member_count}名 × 倍率${t.multiplier}</small></span>
+          ${bonus}
+        </div>
+        <div class="team-body">
+          ${bonusLine}
+          <div class="team-nums">チーム粗利 ${man(t.gross_profit)} ／ チーム基準 ${man(t.denom)}</div>
+          ${memberHtml}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  async function loadLive(refresh) {
+    const root = document.getElementById('live-root');
+    if (!root) return;
+    if (!refresh && root.dataset.loaded) return;
+    root.dataset.loaded = '1';
+    const cred = credentials();
+    if (!cred) {
+      root.innerHTML = '<div class="live-status">実績の表示にはこのページで再ログインしてください（あなた専用のパスワード）。</div>';
+      return;
+    }
+    try {
+      let url = API_BASE + '?target=' + cred.kind;
+      if (refresh) {
+        // Notion更新の即時反映: パスワードのハッシュを鍵に集計キャッシュを破棄して再計算
+        url += '&refresh=1&k=' + await sha256(cred.pw) + '&_=' + Date.now();
+      }
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('http ' + res.status);
+      const payload = await res.json();
+      const data = await decrypt(payload, cred.pw);
+      render(data);
+      const btn = document.getElementById('refresh-btn');
+      if (btn) btn.hidden = false;
+    } catch (e) {
+      root.innerHTML = '<div class="live-status">実績データは準備中です（接続できませんでした）。制度の内容は上記のとおりです。</div>';
+      const tr = document.getElementById('tables-root');
+      if (tr) tr.innerHTML = '<div class="live-status">🔒 目標ライン・月給テーブルは接続回復後に表示されます。</div>';
+    }
+  }
+
+  const refreshBtn = document.getElementById('refresh-btn');
+  if (refreshBtn) refreshBtn.addEventListener('click', async function() {
+    refreshBtn.disabled = true;
+    refreshBtn.textContent = '🔄 更新中…（最大30秒）';
+    try { await loadLive(true); } finally {
+      refreshBtn.disabled = false;
+      refreshBtn.textContent = '🔄 データ更新';
+    }
+  });
+})();
+</script>
+</body>
+</html>
