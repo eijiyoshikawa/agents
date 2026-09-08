@@ -505,6 +505,10 @@ tr.hl td { background: #FBF7EA; }
   const SESSION_KINDS = [
     ["let_auth_exec", "exec"],
   ]; // 職種セッション (sales/marketing/bpo) の引き継ぎは2026-09-07に廃止 (個人パスワード制)
+  // 2026-09-08: 1名ずつのURL分離。/my/<slug> は本人のパスワード (+役員) のみ、
+  // /new-system は役員パスワードのみ受け付ける。
+  const PATH_SLUG = (location.pathname.match(/^\/my\/([a-z]+)/) || [])[1] || null;
+  const kindAllowed = (k) => k === 'exec' || (PATH_SLUG != null && k === PATH_SLUG);
   const API_BASE = "https://slack-let.vercel.app/api/eval/new-system";
 
   async function sha256(text) {
@@ -577,20 +581,27 @@ tr.hl td { background: #FBF7EA; }
     loadLive();
   }
 
-  const authed = sessionStorage.getItem('let_auth_newsystem') === '1' || credentials();
-  if (authed) { show(); }
+  const cred0 = credentials();
+  if (cred0 && kindAllowed(cred0.kind)) { show(); }
   document.getElementById('auth-form').addEventListener('submit', async function(e) {
     e.preventDefault();
     const input = document.getElementById('auth-input').value;
     const hash = await sha256(input);
     const errEl = document.getElementById('auth-error');
     const kind = HASH_TO_KIND[hash];
+    if (kind && !kindAllowed(kind)) {
+      errEl.textContent = 'このパスワードはこのURLでは使えません。ご案内したあなた専用のURLからアクセスしてください。';
+      errEl.classList.add('show');
+      document.getElementById('auth-input').value = '';
+      return;
+    }
     if (kind) {
       sessionStorage.setItem('let_auth_newsystem', '1');
       sessionStorage.setItem('let_auth_newsystem_pw', input);
       sessionStorage.setItem('let_auth_newsystem_kind', kind);
       show();
     } else {
+      errEl.textContent = 'パスワードが違います';
       errEl.classList.add('show');
       document.getElementById('auth-input').value = '';
     }

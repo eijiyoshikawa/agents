@@ -15,6 +15,11 @@
   ],
   "rewrites": [
     { "source": "/new-system", "destination": "/new-system.html" },
+    { "source": "/my/ehara", "destination": "/new-system.html" },
+    { "source": "/my/hamasaki", "destination": "/new-system.html" },
+    { "source": "/my/matsumoto", "destination": "/new-system.html" },
+    { "source": "/my/matsuoka", "destination": "/new-system.html" },
+    { "source": "/my/sawaguchi", "destination": "/new-system.html" },
     { "source": "/sales", "destination": "/sales.html" },
     { "source": "/marketing", "destination": "/marketing.html" },
     { "source": "/marketing/v2", "destination": "/marketing/v2.html" },
