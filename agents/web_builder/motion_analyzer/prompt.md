@@ -61,7 +61,19 @@ JS ソースから以下のパターンを検出する:
 - テキストアニメーション（タイピング、文字ごとのフェードイン等）
 - スクロールバー連動のプログレスバー
 
-### Step 6: 実装推奨の決定
+### Step 6: パフォーマンス影響評価
+各アニメーションのパフォーマンスコストを分類する:
+- **GPU推奨（コンポジットレイヤー）**: transform / opacity のみ → 低コスト
+- **CPU負荷（レイアウト再計算）**: width / height / margin 変更 → 高コスト。代替を提案
+- **同時発火制限**: 1ビューポート内で同時に動くアニメーションは2件以内を推奨
+
+### Step 7: reduced-motion 代替の設計
+全アニメーションに `prefers-reduced-motion: reduce` 時の代替を定義:
+- フェード系 → 即時表示（duration: 0）
+- スクロール連動 → 静的表示
+- 自動再生 → 手動操作のみ
+
+### Step 8: 実装推奨の決定
 検出したアニメーションの複雑さに応じて、最適な実装方法を推奨する:
 
 - **CSS only**: シンプルなhover、transition、基本的なkeyframes
@@ -154,7 +166,13 @@ JS ソースから以下のパターンを検出する:
   "recommended_library": "framer-motion",
   "recommended_library_reason": "React/Next.js環境で最も統合しやすく、スクロールアニメーション・ページ遷移・ホバーエフェクトを統一的に扱える",
   "complexity_level": "medium",
-  "total_animation_count": 12
+  "total_animation_count": 12,
+  "performance_classification": {
+    "gpu_only": 10,
+    "cpu_involved": 2,
+    "simultaneous_max": 2
+  },
+  "reduced_motion_alternatives": "全アニメーションに代替定義済み"
 }
 ```
 

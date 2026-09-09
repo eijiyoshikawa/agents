@@ -16,9 +16,11 @@
 `WebFetch` でHTMLを取得する。
 
 各ページについて以下を把握する:
-- `<header>`, `<main>`, `<footer>` の基本構造
+- `<header>`, `<main>`, `<footer>`, `<nav>`, `<aside>`, `<article>` の基本構造
+- セマンティックHTML評価: 適切なランドマーク要素・見出し階層（h1→h2→h3の順序）
 - `<section>` や `<div>` によるセクション分割
 - セクションの出現順序と数
+- ARIA ランドマーク・role 属性の使用状況
 
 ### Step 2: セクション単位の詳細解析
 各セクションについて以下を記録する:
@@ -53,9 +55,10 @@
 全ページを通じた共通パターンを抽出する:
 - コンテンツの最大幅（max-width）
 - セクション間のスペーシング
-- レスポンシブブレークポイント（768px, 1024px, 1280px 等）
+- レスポンシブブレークポイント（640px, 768px, 1024px, 1280px 等）
 - ヘッダー高さ
 - 共通パディング
+- コンポーネント階層マッピング: 共通コンポーネントの親子関係と再利用パターン
 
 ### Step 6: ページ間の共通/固有要素の整理
 - 共通コンポーネント: Header, Footer, CTA Section 等
@@ -131,7 +134,19 @@
     "Footer（全ページ共通）",
     "CTA Section（複数ページで使用）",
     "Section Heading（共通見出しパターン）"
-  ]
+  ],
+  "semantic_assessment": {
+    "heading_hierarchy_valid": true,
+    "landmark_elements_used": true,
+    "aria_roles_present": false,
+    "navigation_pattern": "fixed-top with hamburger mobile",
+    "notes": "h1は各ページに1つ。nav要素適切に使用"
+  },
+  "accessibility_tree": {
+    "skip_link": false,
+    "tab_order_logical": true,
+    "focus_visible": true
+  }
 }
 ```
 

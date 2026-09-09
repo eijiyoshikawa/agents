@@ -32,7 +32,12 @@
 CSS変数、インラインスタイル、クラス名から色情報を抽出する。
 色は HEX コード（`#RRGGBB`）で統一して記録する。
 
-### Step 3: タイポグラフィの抽出
+**WCAGコントラスト検証（必須）:**
+- テキスト色と背景色の組み合わせごとにコントラスト比を算出
+- 通常テキスト: 4.5:1以上（AA基準） / 大テキスト: 3:1以上
+- 不合格の組み合わせは `contrast_issues` に記録し Builder に警告
+
+### Step 3: タイポグラフィの抽出（タイプスケール検出）
 フォント関連の情報を体系的に記録する:
 
 1. **フォントファミリー**:
@@ -40,17 +45,11 @@ CSS変数、インラインスタイル、クラス名から色情報を抽出�
    - 欧文フォント（Inter, Poppins, etc.）
    - Google Fonts のインポートURLを確認
 2. **見出しスタイル** (h1〜h4):
-   - font-size（px または rem）
-   - font-weight
-   - line-height
-   - letter-spacing
+   - font-size（px または rem）/ font-weight / line-height / letter-spacing
    - モバイル時のサイズ変化
-3. **本文スタイル**:
-   - font-size
-   - font-weight
-   - line-height（日本語は 1.8〜2.0 が多い）
-4. **その他**:
-   - キャプション、ラベル、ボタンテキスト等の小さいテキスト
+   - タイプスケール比率の検出（例: 1.25 Major Third / 1.333 Perfect Fourth）
+3. **本文スタイル**: font-size / font-weight / line-height（日本語は 1.8〜2.0 が多い）
+4. **その他**: キャプション、ラベル、ボタンテキスト等の小さいテキスト
 
 ### Step 4: スペーシングシステムの解析
 セクション間・要素間の余白パターンを記録する:
@@ -165,8 +164,11 @@ CSS変数、インラインスタイル、クラス名から色情報を抽出�
     "overall_tone": "modern-clean | corporate | playful | luxury | minimal",
     "border_radius_system": "small: 4px, medium: 8px, large: 12px, xl: 24px",
     "shadow_style": "subtle | medium | dramatic | none",
+    "whitespace_rhythm": "tight | balanced | generous",
+    "brand_consistency_score": 0.85,
     "decorative_elements": ["斜めセクション区切り", "ドットパターン背景", "グラデーションオーバーレイ"]
   },
+  "contrast_issues": [],
   "sections_design": [
     {
       "section_id": "hero",

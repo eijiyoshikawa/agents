@@ -82,6 +82,11 @@ design_analyzerで抽出できた値を優先し、不足分はdesign-tokens.jso
 - `text-rendering: optimizeLegibility`
 - ダークモード変数（.darkクラス）
 
+### コンポーネントアーキテクチャ原則
+- **プログレッシブエンハンスメント**: JS無効でもコンテンツが読める構造を維持。アニメーションは装飾層
+- **Atomic Design準拠**: Atoms（Button/Input）→ Molecules（Card/FormField）→ Organisms（Header/FAQ）
+- **Server Components優先**: インタラクションの無いコンポーネントはRSCで実装し、`"use client"` は最小限
+
 ### Step 4: 共通コンポーネントの実装
 `structure_analyzer/output.json` の `shared_components` を基に:
 
@@ -176,13 +181,22 @@ const staggerContainer = {
 
 Tailwind の `sm:`, `md:`, `lg:`, `xl:` プレフィックスを活用。
 
-### Step 10: ビルド確認
+### Step 10: ビルド・パフォーマンス確認
 ```bash
 cd /agents/web_builder/output
 npm run build
 ```
 
 ビルドエラーがあれば修正する。
+
+**パフォーマンス最適化チェック:**
+- [ ] `next/image` で全画像を最適化（width/height/priority指定）
+- [ ] フォント: `next/font` でセルフホスト（外部CDN読み込み回避）
+- [ ] Bundle: 動的import（`next/dynamic`）で初期ロード削減
+- [ ] Metadata: 全ページに適切な title / description / OGP 設定
+
+**クロスブラウザ確認:**
+対象: Chrome / Safari / Firefox / Edge（最新版）+ iOS Safari + Android Chrome
 
 ## Iteration 2+ の修正手順
 

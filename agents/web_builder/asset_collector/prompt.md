@@ -15,7 +15,7 @@
 
 ## 実行手順
 
-### Step 1: 画像アセットの収集
+### Step 1: 画像アセットの収集と最適化計画
 HTMLから全 `<img>` タグと CSS `background-image` を抽出する:
 
 各画像について:
@@ -23,17 +23,15 @@ HTMLから全 `<img>` タグと CSS `background-image` を抽出する:
 2. **使用箇所**: どのセクションのどの位置で使われているか
 3. **alt テキスト**: 画像の説明
 4. **サイズ/アスペクト比**: width, height 属性または CSS
-5. **種類分類**:
-   - `hero-image`: ヒーローセクション背景
-   - `content-image`: コンテンツ内画像
-   - `icon-image`: アイコン的な画像
-   - `logo`: ロゴ画像
-   - `avatar`: 人物写真
-   - `decorative`: 装飾画像
-6. **代替戦略**:
+5. **種類分類**: `hero-image` / `content-image` / `icon-image` / `logo` / `avatar` / `decorative`
+6. **最適化指針**:
+   - 推奨フォーマット: WebP（フォールバック JPEG/PNG）
+   - 推奨圧縮品質: hero=85 / content=80 / decorative=70
+   - `next/image` の sizes 属性推奨値
+7. **代替戦略**:
    - Unsplash で類似画像を検索するためのキーワード
    - SVG プレースホルダーで代用する場合のサイズ・色
-   - ダミーテキストとアスペクト比だけ合わせる
+8. **フォールバック**: 画像読み込み失敗時の代替表示（背景色 + alt テキスト）
 
 ### Step 2: フォントの収集
 `design_analyzer/output.json` の typography 情報を基に:
@@ -56,11 +54,26 @@ HTMLから全 `<img>` タグと CSS `background-image` を抽出する:
    - `react-icons`: 複数ライブラリを統合
    各アイコンに対して推奨ライブラリのアイコン名を対応付ける
 
-### Step 4: ファビコン・OGP画像
+### Step 4: ライセンス検証ワークフロー
+各アセットのライセンス状態を確認する:
+- **Google Fonts**: SIL Open Font License → 商用利用可
+- **アイコンライブラリ**: MIT / Apache 2.0 → ライセンス表記方法を記録
+- **Unsplash画像**: Unsplash License → 商用利用可・帰属不要
+- **不明なアセット**: `license: "unknown"` としてLegal Agentへ確認依頼
+
+### Step 5: ファビコン・OGP画像
 - ファビコン: 形状・色の説明とプレースホルダー生成方針
 - OGP画像: サイズ・デザインの説明
 
-### Step 5: ローカルファイルパス設計
+### Step 6: アセット命名規約
+```
+{section}-{role}-{index}.{ext}
+例: hero-bg-01.webp / about-team-01.jpg / feature-icon-03.svg
+```
+- 小文字ハイフン区切り（snake_case 禁止）
+- セクション名 + 役割 + 連番で一意性を保証
+
+### Step 7: ローカルファイルパス設計
 Next.js の `/public` ディレクトリ構成を設計する:
 
 ```

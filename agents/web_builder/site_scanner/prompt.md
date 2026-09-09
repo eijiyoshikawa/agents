@@ -42,6 +42,7 @@ HTMLソースと読み込まれたリソースから技術を検出する:
 - `data-reactroot` → React
 - `ng-version` → Angular
 - WordPress特有のクラス名・パス → WordPress
+- `astro-island` → Astro | `gatsby` → Gatsby
 
 **CSSフレームワーク検出:**
 - `tailwind` クラス名パターン → Tailwind CSS
@@ -56,11 +57,25 @@ HTMLソースと読み込まれたリソースから技術を検出する:
 - `three.js`, `WebGL` → Three.js
 - `jQuery` → jQuery
 
+**CDN・ホスティング検出:**
+- `cloudflare`, `cdn.cloudflare.com` → Cloudflare
+- `vercel`, `.vercel.app` → Vercel
+- `netlify` → Netlify
+- `amazonaws.com` → AWS CloudFront
+
 **アナリティクス・ツール:**
 - Google Analytics / GTM
-- Facebook Pixel 等
+- Facebook Pixel / TikTok Pixel 等
+- Hotjar / Microsoft Clarity（ヒートマップ系）
 
-### Step 4: サイトの特徴メモ
+### Step 4: パフォーマンス・SEO・セキュリティベースライン
+基本的な品質指標を記録する:
+- **パフォーマンス**: 画像最適化（WebP/AVIF対応）、lazy loading の有無、リソース数
+- **SEO**: canonical タグ、構造化データ（JSON-LD）、robots meta、sitemap.xml の存在
+- **セキュリティヘッダー**: CSP / X-Frame-Options / HSTS の有無
+- **モバイル対応**: viewport 設定、タッチターゲットサイズ、フォントサイズ
+
+### Step 5: サイトの特徴メモ
 サイト全体の印象・特徴を簡潔にメモする:
 - デザインの方向性（ミニマル/リッチ/コーポレート等）
 - 主なビジュアル要素（動画背景/パララックス/大きな写真等）
@@ -101,7 +116,22 @@ HTMLソースと読み込まれたリソースから技術を検出する:
   "total_pages": 5,
   "primary_language": "ja",
   "site_characteristics": "ミニマルデザイン。大きなヒーロー画像とスムーズスクロール。BtoB向けSaaS。",
-  "responsive": true
+  "responsive": true,
+  "performance_baseline": {
+    "image_optimization": "WebP対応",
+    "lazy_loading": true,
+    "total_resources": 45
+  },
+  "seo_baseline": {
+    "has_canonical": true,
+    "has_structured_data": true,
+    "has_sitemap": true
+  },
+  "security_headers": {
+    "csp": false,
+    "hsts": true,
+    "x_frame_options": true
+  }
 }
 ```
 

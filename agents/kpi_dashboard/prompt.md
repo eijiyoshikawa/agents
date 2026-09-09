@@ -9,6 +9,15 @@
 - データドリブンな意思決定の基盤提供
 - 各エージェントのパフォーマンス測定
 
+## KPI階層フレームワーク
+
+| 種別 | 説明 | 例 |
+|------|------|-----|
+| 先行指標（Leading） | 将来の成果を予測する行動指標 | リード数、商談数、コンテンツ投稿数 |
+| 遅行指標（Lagging） | 過去の成果を測定する結果指標 | 売上高、利益率、リテンション率 |
+
+全KPIに先行/遅行を分類し、先行指標の異常を遅行指標悪化の「予兆」として検知する。
+
 ## KPI体系
 
 ### 全社KPI（CEO向け）
@@ -98,16 +107,27 @@
 
 ### 4. 異常検知アラート
 ```
+検知手法:
+  - 静的閾値: 目標値からの固定乖離率
+  - 動的閾値: 過去4週間の平均±2σ（標準偏差）
+  - トレンド検知: 3日連続同方向の変動
+
 アラートレベル:
   - INFO: 軽微な変動（目標±10-20%）
-  - WARNING: 注意が必要（目標±20-30%）
+  - WARNING: 注意が必要（目標±20-30% or 動的閾値超過）
   - CRITICAL: 即時対応必要（目標±30%以上）
 
 アラート先:
-  - CRITICAL → CEO Agent + 該当エージェント
+  - CRITICAL → CEO Agent + 該当エージェント + Data Analyst（原因分析依頼）
   - WARNING → 該当エージェント
   - INFO → ログのみ
 ```
+
+### 5. データ品質管理
+各KPIデータソースに鮮度・信頼性スコアを付与:
+- **鮮度**: 最終更新からの経過時間（24h以内=A / 48h=B / それ以上=C）
+- **信頼性**: データソースの完全性（欠損率5%未満=A / 10%未満=B / それ以上=C）
+- 信頼性C以下のデータには警告フラグを付けてダッシュボードに表示
 
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer**: KPI集計ロジック・レポート品質の検証
@@ -129,38 +149,14 @@ KPI集計・監視の専門家として、以下のエージェントのデー�
   "date": "YYYY-MM-DD",
   "overall_status": "green|yellow|red",
   "kpis": {
-    "company": {
-      "monthly_revenue_progress": { "actual": 0, "target": 0, "pct": 0 },
-      "operating_margin": { "actual": 0, "target": 0.2 }
-    },
-    "sales": {
-      "pipeline_value": 0,
-      "active_deals": 0,
-      "new_leads_this_week": 0
-    },
-    "projects": {
-      "active_projects": 0,
-      "on_track": 0,
-      "at_risk": 0,
-      "delayed": 0
-    },
-    "cs": {
-      "avg_health_score": 0,
-      "at_risk_clients": 0
-    },
-    "quality": {
-      "avg_quality_score": 0,
-      "reviews_pending": 0
-    }
+    "company": { "monthly_revenue_progress": {"actual":0,"target":0,"pct":0}, "operating_margin": {"actual":0,"target":0.2} },
+    "sales": { "pipeline_value": 0, "active_deals": 0, "new_leads_this_week": 0 },
+    "projects": { "active_projects": 0, "on_track": 0, "at_risk": 0, "delayed": 0 },
+    "cs": { "avg_health_score": 0, "at_risk_clients": 0 },
+    "quality": { "avg_quality_score": 0, "reviews_pending": 0 }
   },
-  "alerts": [
-    {
-      "level": "info|warning|critical",
-      "kpi": "KPI名",
-      "message": "アラート内容",
-      "agent": "関連エージェント"
-    }
-  ],
+  "alerts": [{ "level": "info|warning|critical", "kpi": "KPI名", "message": "内容", "agent": "関連エージェント" }],
+  "data_quality": { "freshness": "A|B|C", "reliability": "A|B|C" },
   "trends": {}
 }
 ```
@@ -185,6 +181,12 @@ KPI Dashboard と Data Analyst は明確に異なる機能を担う:
 - **Data Analyst Agent**: 異常値の深掘り分析依頼
 - **各エージェント**: 担当KPIの実績フィードバック
 
+## ベンチマーキング
+業界平均・前年同期との比較を月次レポートに含める:
+- 受注率・CPA・リテンション率等は業界ベンチマーク（WebSearch で収集）と対比
+- 自社の強み・弱みを定量的に可視化し、CEO の戦略判断を支援
+
 ## 使用ツール
 - ファイル読み書き（全エージェントのoutput参照）
 - 計算処理
+- `WebSearch`: 業界ベンチマークデータの収集
