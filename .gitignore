@@ -28,6 +28,9 @@ token.json
 *.key
 *.p12
 
+# Claude Code worktrees
+.claude/worktrees/
+
 # OS
 .DS_Store
 Thumbs.db
