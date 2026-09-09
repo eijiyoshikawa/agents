@@ -20,16 +20,8 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 
 ### 1. 技術設計
 ```
-入力: Designer Agent のデザイン / PM Agent のプロジェクト要件
-処理:
-  1. 技術要件の整理
-     - フレームワーク選定
-     - アーキテクチャ設計
-     - API設計（必要な場合）
-     - インフラ構成
-  2. コンポーネント分解
-  3. 工数見積（→ Finance Agent / PM Agent）
-  4. 技術リスクの洗い出し
+入力: Designer のデザイン / PM の要件
+処理: 技術要件整理(FW選定/アーキテクチャ/API/インフラ) → コンポーネント分解 → 工数見積 → リスク洗い出し
 出力: /agents/engineer/tech_design/{project_name}.json
 ```
 
@@ -50,22 +42,63 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 ### 3. テスト・品質保証
 ```
 処理:
-  1. クロスブラウザテスト
-  2. レスポンシブ表示確認
-  3. パフォーマンス計測（Lighthouse）
-  4. アクセシビリティチェック
+  1. クロスブラウザテスト（Chrome / Safari / Firefox / Edge）
+  2. レスポンシブ表示確認（375px / 768px / 1024px / 1440px）
+  3. パフォーマンス計測（Lighthouse 全項目90以上を目標）
+  4. アクセシビリティチェック（axe-core 0 violations）
   5. セキュリティチェック（OWASP基準）
-  6. SEO基本対策の確認
+  6. SEO技術チェック
+     - メタタグ・OGP・構造化データ（JSON-LD）
+     - canonical URL・サイトマップ・robots.txt
+     - Core Web Vitals（LCP < 2.5s / INP < 200ms / CLS < 0.1）
 出力: /agents/engineer/test_report/{project_name}.json
+```
+
+### パフォーマンス最適化チェックリスト
+```
+□ 画像: next/image + WebP/AVIF、遅延読み込み（above-the-fold以外）
+□ フォント: next/font セルフホスト、display: swap + size-adjust
+□ JS: dynamic import で重いライブラリを遅延読み込み
+□ CSS: 未使用CSSの除去（Tailwindのpurge設定確認）
+□ キャッシュ: 静的アセットに Cache-Control 設定
+□ SSR/SSG: ページ特性に応じた最適なレンダリング戦略
+```
+
+### エラーハンドリング・ログ基準
+```
+原則:
+  - ユーザー向けエラー: 具体的なアクションを示す（「再度お試しください」等）
+  - 内部エラー: スタックトレース・内部情報を漏洩しない
+  - フォームバリデーション: リアルタイム + サブミット時の二重チェック
+  - API連携エラー: リトライ（最大3回、指数バックオフ）+ フォールバック表示
+  - ログ: 構造化JSON、機密データ（PII・トークン）はログ出力禁止
+```
+
+### 外部サービス連携パターン
+```
+CMS連携（microCMS / Notion API）:
+  - ISR（Incremental Static Regeneration）でキャッシュ + 自動更新
+  - Webhook でオンデマンド再生成（revalidateTag）
+フォーム（問い合わせ）:
+  - Server Actions + Zod バリデーション
+  - CSRF対策 + レート制限 + honeypot spam対策
+外部API:
+  - タイムアウト設定（デフォルト10秒）
+  - サーキットブレーカーパターン（連続5回失敗でフォールバック）
 ```
 
 ### 4. デプロイ・納品
 ```
 処理:
   1. ステージング環境へのデプロイ
-  2. クライアント確認・修正対応
-  3. 本番デプロイ
-  4. 監視設定・アラート設定
+  2. デプロイ検証チェックリスト
+     □ 全ページが正常表示（404/500エラーなし）
+     □ フォーム送信が本番メール先に到達
+     □ OGP画像がSNSプレビューで正しく表示
+     □ Analytics / Sentry が正常にイベント受信
+     □ 環境変数が本番用に設定済み
+  3. クライアント確認・修正対応
+  4. 本番デプロイ + スモークテスト
   5. PM Agent への納品報告
 出力: /agents/engineer/deployment/{project_name}.json
 ```
@@ -150,45 +183,14 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 
 ## デザイン基準（標準装備）
 
-Web/LP実装の起点となる基準DESIGN.mdは案件タイプで決まる。Designer から `design_baseline` が渡されない場合は以下の判断表で自分で確定する。
+Designer から `design_baseline` が渡されない場合は以下で確定:
+和文B2B → `/design-md/feer/DESIGN.md`（社内デフォルト）/ 海外SaaS → `linear.app` / `framer` / LP・B2C → feer ベースにトーン調整
 
-| 案件タイプ | デフォルト基準 |
-|-----------|--------------|
-| 和文 コーポレート / 採用 / サービスサイト（B2B） | **`/design-md/feer/DESIGN.md`** ← 社内デフォルト |
-| 海外SaaS / ダッシュボード | `linear.app` / `framer` / `notion` |
-| LP / キャンペーン（B2C） | feer を雛形にトーン調整 |
-
-**和文B2Bの Tailwind config 既定（feer §6 準拠）:**
-```ts
-theme: { extend: {
-  colors: { ink:"#1a1a1a", cream:"#FFF9EF", brand:{DEFAULT:"#ef6c02",dark:"#c14e00"}, surface:"#fcfbfa" },
-  transitionTimingFunction: { standard:"cubic-bezier(.4,0,.2,1)", grow:"cubic-bezier(.28,.84,.42,1)" },
-  keyframes: {
-    growFromBottom: { "0%":{opacity:"0",transform:"scale(.9) translateY(16px)"}, "100%":{opacity:"1",transform:"scale(1) translateY(0)"} },
-    blink: { "50%":{opacity:"0"} },
-    marquee: { from:{transform:"translateX(0)"}, to:{transform:"translateX(-50%)"} },
-  },
-  animation: {
-    "grow-from-bottom":"growFromBottom .4s cubic-bezier(.28,.84,.42,1) both",
-    blink:"blink 1s steps(1) infinite",
-    marquee:"marquee 30s linear infinite",
-  },
-}}
-```
+和文B2Bは feer §6 準拠: colors(ink/cream/brand/surface) / timing(standard/grow) / keyframes(growFromBottom/blink/marquee) を `tailwind.config.ts` に反映。
 
 ## モーション実装（必須参照）
 
-Web / LP / AIシステム UI にモーションを実装する際は **必ず `/design-md/motion-library/MOTION_30.md`** を参照し、対応する `motion_key` のサンプル実装・推奨ライブラリ・パラメータ目安に従う。
-和文B2B案件では §6 の `marquee-keywords` / `thinking-caret` / `scroll-progress-bar` と feer の motion tokens（duration 300 / easing standard / 登場 `grow-from-bottom`）を既定として実装する。
+モーション実装は **必ず `/design-md/motion-library/MOTION_30.md`** を参照。和文B2Bは §6 の3モーション + feer tokens を既定。
 
-**実装ルール:**
-- Designer / UI/UX Designer の指定 `motion_key` を変更しない（変更が必要な場合は協議）
-- MOTION_30.md にないモーションを実装する場合は、実装前にドキュメントへ追加する
-- すべてのモーションは `prefers-reduced-motion: reduce` 対応を実装する（MOTION_30.md 共通ルール参照）
-- 1画面で同時発火するモーションは2件以内に抑え、Lighthouse Performance スコア 90以上を維持
-
-**推奨ライブラリ（MOTION_30.md 準拠）:**
-- 基本: CSS transition / keyframes
-- React プロジェクト: framer-motion
-- 複雑なタイムライン・ScrollTrigger: GSAP
-- 3D・WebGL: Three.js / OGL
+**ルール:** `motion_key` 準拠（変更は協議）/ MOTION_30.md にない場合は追加してから実装 / `prefers-reduced-motion` 全実装必須 / 同時発火2件以内 / Lighthouse 90以上維持
+**ライブラリ:** CSS基本 / framer-motion(React) / GSAP(ScrollTrigger) / Three.js(3D)

@@ -86,15 +86,51 @@ test: add coverage for [feature]     — カバレッジ追加
 入力: セキュリティ要件 / パフォーマンス基準
 処理:
   1. セキュリティテスト
-     - OWASP Top 10 チェック
+     - OWASP Top 10 チェック（OWASP ZAP 自動スキャン推奨）
      - 認証バイパス・権限昇格テスト
      - XSS / CSRF / SQLインジェクション検証
+     - 依存パッケージ脆弱性スキャン（npm audit）
   2. パフォーマンステスト
-     - Core Web Vitals 計測
-     - API レスポンスタイム計測
-     - 負荷テスト（同時接続数）
+     - 負荷テスト: 想定ピーク2倍で応答劣化なし
+     - ストレステスト: 限界点特定と縮退運転検証
+     - 耐久テスト: 長時間稼働でのメモリリーク確認
+     - Core Web Vitals / API p95レスポンスタイム
   3. アクセシビリティテスト（axe-core）
 出力: セキュリティ・パフォーマンスレポート
+```
+
+### リスクベーステスト戦略
+| リスク | テスト密度 | 例 |
+|--------|-----------|-----|
+| 高（決済・認証・PII） | 網羅的（正常+異常+境界+セキュリティ） | Stripe Webhook, ログイン |
+| 中（主要業務機能） | 標準（正常+主要異常+境界値） | CRUD, 検索 |
+| 低（表示・UI補助） | 軽量（正常系+スモーク） | 静的ページ |
+
+### シフトレフトテスト
+```
+設計時    → テスト観点レビュー（要件からテストケース導出）
+実装時    → TDD + ユニットテスト同時作成
+PR時      → 自動テスト + 静的解析（ESLint / TypeScript strict）
+ステージング → E2E + ビジュアルリグレッション + パフォーマンス
+本番      → スモークテスト + 監視アラート
+原則: バグは発見が遅いほどコスト10倍。左で捕まえる。
+```
+
+### テストデータ管理
+```
+- 本番データ使用禁止（PII保護）
+- ファクトリパターンでテストごとに生成・破棄
+- シードデータ: 最小限の固定データセット（マスタ系）
+- E2E: テスト前にDB状態リセット（beforeEach）
+- 外部API: MSW（Mock Service Worker）でモック化
+```
+
+### ビジュアルリグレッション
+```
+ツール: Playwright Screenshots / 差分比較
+対象: 主要ページ x 3BP（mobile/tablet/desktop）
+閾値: ピクセル差分 0.1% 以上で失敗
+実行: PR作成時自動、ベースライン画像はリポジトリ管理
 ```
 
 ### 4. バグ管理・品質レポート
@@ -150,31 +186,9 @@ test: add coverage for [feature]     — カバレッジ追加
 {
   "project_name": "プロジェクト名",
   "updated_at": "YYYY-MM-DD",
-  "test_summary": {
-    "total_tests": 0,
-    "passed": 0,
-    "failed": 0,
-    "skipped": 0,
-    "coverage": "80%"
-  },
-  "test_suites": [
-    {
-      "type": "unit|integration|e2e|security|performance",
-      "total": 0,
-      "passed": 0,
-      "failed": 0,
-      "duration": "0s"
-    }
-  ],
-  "bugs": [
-    {
-      "id": "BUG-001",
-      "severity": "critical|high|medium|low",
-      "status": "open|in_progress|resolved|verified",
-      "description": "バグの説明",
-      "steps_to_reproduce": "再現手順"
-    }
-  ],
+  "test_summary": {"total":0,"passed":0,"failed":0,"skipped":0,"coverage":"80%"},
+  "test_suites": [{"type":"unit|integration|e2e","total":0,"passed":0,"failed":0}],
+  "bugs": [{"id":"BUG-001","severity":"critical|high|medium|low","status":"open|resolved","description":""}],
   "release_readiness": "go|no-go"
 }
 ```

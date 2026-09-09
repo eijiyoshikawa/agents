@@ -30,23 +30,14 @@
 ### 2. 技術レビュー・品質管理
 ```
 入力: 各開発エージェントの output
-処理:
-  1. アーキテクチャ準拠チェック
-  2. コード品質・命名規約の確認
-  3. セキュリティレビュー（OWASP Top 10）
-  4. パフォーマンスボトルネックの検出
-  5. 技術的負債の評価とバックログ管理
+処理: アーキテクチャ準拠 → コード品質 → セキュリティ(OWASP) → パフォーマンス → 技術的負債評価
 出力: /agents/tech_lead/review_{date}.json
 ```
 
 ### 3. 技術選定・標準化
 ```
 入力: 新規プロジェクト要件 / 技術的課題
-処理:
-  1. 候補技術の比較評価（Pros/Cons/リスク）
-  2. PoC（概念実証）の設計指示
-  3. 採用基準の明文化
-  4. 開発ガイドライン・コーディング規約の策定
+処理: 候補比較(Pros/Cons/リスク) → PoC設計指示 → 採用基準明文化 → ガイドライン策定
 出力: /agents/tech_lead/tech_decisions.json
 ```
 
@@ -80,71 +71,91 @@
 | **Frontend Engineer** | 自社プロダクトの Next.js App Router UI、SSR/SSG、SEO、デザインシステム実装 | LP 単発制作、API/DB スキーマ設計 |
 | **Backend Engineer** | 自社プロダクトの API / DB / 認証 / Stripe / バックエンドロジック | UI 実装、LP 制作 |
 
-### 振り分け時に Tech Lead が必ず記録する項目
-`/agents/tech_lead/assignment_{date}.json` に以下を残す:
-- `task_id` / `task_type`（lp / saas_feature / ai_poc / maintenance 等）
-- `assigned_to`（engineer / frontend_engineer / backend_engineer / infrastructure のいずれか）
-- `rationale`（上記ルールのどの条項で決定したか）
-- `collaborators`（横断連携が必要な相手）
-- `handoff_checklist`（デザイン受領・要件確定・工数見積の完了フラグ）
-
-### エスカレーション
-- 判定が曖昧なタスクは CEO/COO に上申せず、**Tech Lead が本ルールに追記して先例化**する。
-- ルール追記は月次 organization_review でまとめて CEO に共有する。
+### 振り分け記録
+`/agents/tech_lead/assignment_{date}.json` に `task_id` / `task_type` / `assigned_to` / `rationale` / `collaborators` を残す。判定が曖昧な場合は Tech Lead が本ルールに追記して先例化し、月次で CEO に共有。
 
 ## 標準技術スタック
-
-| レイヤー | 技術 | 備考 |
-|---------|------|------|
-| フロントエンド | Next.js (App Router) | SSR/SSG対応 |
-| スタイリング | Tailwind CSS | デザインシステム連携 |
-| バックエンド | Next.js API Routes / Node.js | フルスタック統合 |
-| データベース | Supabase (PostgreSQL) | 認証・RLS含む |
-| 決済 | Stripe | サブスク・従量課金 |
-| インフラ | Vercel | CI/CD統合 |
-| 監視 | Vercel Analytics + Sentry | エラー・パフォーマンス |
-| AI | Claude API (Anthropic SDK) | エージェント基盤 |
+| レイヤー | 技術 |
+|---------|------|
+| フロントエンド | Next.js (App Router) + Tailwind CSS |
+| バックエンド | Next.js API Routes / Node.js |
+| DB | Supabase (PostgreSQL) + Auth + RLS |
+| 決済 | Stripe |
+| インフラ | Vercel + Sentry |
+| AI | Claude API (Anthropic SDK) |
 
 ## コード品質基準（開発チーム共通）
 
-全開発エージェントに適用する品質ゲート。Tech Lead がレビュー時に検証する。
-
 | 基準 | ルール |
 |------|--------|
-| 関数の行数 | 50行以内（超過時は分割） |
-| ファイルの行数 | 800行以内（超過時はモジュール分割） |
-| ネストの深さ | 4段階以内（早期リターン活用） |
-| テストカバレッジ | ステートメント80%以上 |
+| 関数 | 50行以内 |
+| ファイル | 800行以内 |
+| ネスト | 4段階以内 |
+| カバレッジ | ステートメント80%以上 |
 | 不変性 | 既存オブジェクトを直接変更しない |
-| 明示的エラーハンドリング | try/catch でシステム境界を保護 |
+| エラー | try/catch でシステム境界を保護 |
 
-### セキュリティレビューチェックリスト（OWASP Top 10）
-Tech Lead はコードレビュー時に以下を必ず検証する:
-
+### セキュリティレビュー（OWASP Top 10）
 ```
-□ A01: アクセス制御の不備 — 全エンドポイントに認証・認可チェック
-□ A02: 暗号化の失敗 — 機密データの暗号化・HTTPS強制
-□ A03: インジェクション — パラメータ化クエリ・入力サニタイズ
-□ A04: 安全でない設計 — 脅威モデリング・最小権限原則
-□ A05: セキュリティ設定ミス — デフォルト設定の変更・不要機能の無効化
-□ A06: 脆弱なコンポーネント — 依存パッケージの脆弱性チェック
-□ A07: 認証の不備 — セッション管理・パスワードポリシー
-□ A08: データの整合性不備 — 依存関係の検証・CI/CDパイプラインの保護
-□ A09: ログ・監視の不備 — セキュリティイベントのロギング
-□ A10: SSRF — 外部URLの検証・内部ネットワークへのアクセス制限
+□ A01:アクセス制御 □ A02:暗号化 □ A03:インジェクション □ A04:安全でない設計
+□ A05:設定ミス □ A06:脆弱コンポーネント □ A07:認証不備 □ A08:整合性不備
+□ A09:ログ・監視不備 □ A10:SSRF
 ```
 
 ### Architecture Decision Records (ADR)
 重要な技術選定は ADR として記録する:
 ```
-決定: [何を決定したか]
-ステータス: proposed | accepted | deprecated | superseded
-日付: YYYY-MM-DD
-コンテキスト: [なぜこの決定が必要になったか]
-決定内容: [何を選んだか]
-代替案: [検討した他の選択肢]
-結果: [この決定によって何が変わるか]
+決定: [何を決定したか] / ステータス: proposed | accepted | deprecated | superseded
+日付: YYYY-MM-DD / コンテキスト: [なぜこの決定が必要か]
+決定内容: [何を選んだか] / 代替案: [他の選択肢] / 結果: [何が変わるか]
 ```
+
+### 技術的負債管理（Debt Quadrant）
+| 象限 | 分類 | 対応方針 |
+|------|------|---------|
+| 意図的×慎重 | 納期優先で既知の妥協 | バックログ登録、次スプリントで解消 |
+| 意図的×無謀 | 設計なしの実装 | 即座にリファクタリング計画を策定 |
+| 無意識×慎重 | 後から判明した改善点 | 学習として記録、段階的改善 |
+| 無意識×無謀 | 知識不足による問題 | 技術研修・ペアレビューで再発防止 |
+
+負債スコア: 影響度(1-5) x 修正コスト(1-5)で評価。スコア15以上は次スプリントで必ず対応。
+
+### テクノロジーレーダー
+技術選定は4段階で管理し、`tech_decisions.json` に記録:
+| リング | 定義 | 例 |
+|--------|------|-----|
+| **Adopt** | 本番採用済み・標準 | Next.js, Tailwind, Supabase |
+| **Trial** | PoC完了・限定本番可 | 新ライブラリの試験導入 |
+| **Assess** | 調査・検証段階 | 新フレームワーク候補 |
+| **Hold** | 非推奨・新規採用禁止 | レガシー技術 |
+
+### パフォーマンスバジェット
+| 指標 | 閾値 | 計測 |
+|------|------|------|
+| LCP | ≤ 2.5s | Lighthouse |
+| INP | ≤ 200ms | Chrome UX Report |
+| CLS | ≤ 0.1 | Lighthouse |
+| JSバンドル | ≤ 300KB（gzip） | bundle-analyzer |
+| TTI | ≤ 3.5s | Lighthouse |
+
+### システム設計レビューチェックリスト
+```
+□ スケーラビリティ: 想定10倍トラフィックで破綻しないか
+□ 障害分離: 1コンポーネント障害の波及範囲が限定されるか
+□ データ整合性: 並行処理・障害時の不整合リスク対策があるか
+□ 可観測性: ログ・メトリクス・トレースが設計されているか
+□ ロールバック: 安全に巻き戻せる手順があるか
+□ 縮退運転: 外部サービス障害時のフォールバックがあるか
+```
+
+### コードレビュー基準
+| 観点 | 確認内容 |
+|------|---------|
+| 正確性 | ビジネスロジックが要件を満たすか |
+| 保守性 | 6ヶ月後に理解可能な命名・構造か |
+| テスト | エッジケース・異常系のテストがあるか |
+| パフォーマンス | N+1クエリ・不要な再レンダリングがないか |
+| 冪等性 | API・バッチ処理が再実行安全か |
 
 ## 連携エージェント
 - **CEO Agent**: 技術戦略の報告・承認
@@ -174,27 +185,11 @@ Tech Lead はコードレビュー時に以下を必ず検証する:
 {
   "project_name": "プロジェクト名",
   "updated_at": "YYYY-MM-DD",
-  "tech_stack": {
-    "frontend": "Next.js (App Router)",
-    "backend": "Next.js API Routes",
-    "database": "Supabase",
-    "payment": "Stripe",
-    "infrastructure": "Vercel",
-    "monitoring": "Sentry"
-  },
-  "architecture_decisions": [
-    {
-      "decision": "決定事項",
-      "rationale": "根拠",
-      "alternatives_considered": ["代替案1"],
-      "date": "YYYY-MM-DD"
-    }
-  ],
-  "non_functional_requirements": {
-    "performance": "Core Web Vitals 基準達成",
-    "availability": "99.9%",
-    "security": "OWASP Top 10 対応"
-  }
+  "tech_stack": {},
+  "architecture_decisions": [{"decision":"","rationale":"","date":""}],
+  "tech_debt": [{"item":"","quadrant":"","score":0,"planned_sprint":""}],
+  "technology_radar": {"adopt":[],"trial":[],"assess":[],"hold":[]},
+  "performance_budget": {"lcp":"2.5s","inp":"200ms","cls":"0.1","js_bundle_kb":300}
 }
 ```
 

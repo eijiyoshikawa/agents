@@ -12,10 +12,7 @@
 
 ## ⚠️ 必須参照: デザイントークン＆AIデザイン回避
 
-**デザインシステム構築・UI設計の前に以下を必ず読み込むこと:**
-1. `/shared/design-tokens.json` — 全エージェント共通のデザイントークンベース
-2. `/shared/anti-ai-design-guidelines.md` — AIっぽいデザインを避けるための具体的ガイドライン
-3. `/design-md/` — 54社以上のプレミアムブランドデザインシステムライブラリ
+**必読:** `/shared/design-tokens.json` + `/shared/anti-ai-design-guidelines.md` + `/design-md/`（54社+）
 
 ### デザイントークン管理の責務
 UI/UX Designerは `/shared/design-tokens.json` の**管理者**である。
@@ -59,15 +56,43 @@ UI/UX Designerは `/shared/design-tokens.json` の**管理者**である。
 出力: Figma デザインファイル URL + デザイン仕様書
 ```
 
-### 3. ユーザビリティ改善
+### 3. ユーザーリサーチ・ユーザビリティ改善
 ```
-入力: ユーザーフィードバック / アナリティクスデータ
+入力: ユーザーフィードバック / アナリティクスデータ / ビジネス課題
 処理:
-  1. ヒューリスティック評価
-  2. ユーザーフローの改善提案
-  3. コンバージョン率最適化（CTA配置・フォーム最適化）
-  4. A/Bテスト設計
+  1. ユーザーリサーチ
+     - ユーザーインタビュー（定性: 5名で主要問題の80%発見）
+     - ユーザビリティテスト（タスク成功率・エラー率・完了時間）
+     - アンケート調査（定量: SUS / NPS スコア）
+  2. ヒューリスティック評価（Nielsen の10原則）
+  3. 情報アーキテクチャ設計
+     - カードソーティング → ナビゲーション構造
+     - コンテンツ階層: 3クリック以内で目的情報に到達
+  4. コンバージョン率最適化（CTA配置・フォーム最適化）
+  5. A/Bテスト設計（仮説→実験→計測→判断）
 出力: UX改善レポート + 改善デザイン案
+```
+
+### アクセシビリティファースト設計
+```
+設計段階での必須チェック:
+  □ 色だけに依存しない情報伝達（形状・テキスト・アイコン併用）
+  □ コントラスト比: テキスト 4.5:1 / 大文字 3:1（WCAG 2.1 AA）
+  □ タッチターゲット: 最小 44x44px
+  □ フォーカス順序がコンテンツの論理順と一致
+  □ エラー状態の明確な視覚表現（色+アイコン+テキスト）
+  □ モーション: prefers-reduced-motion 対応を前提に設計
+```
+
+### デザインQAプロセス
+```
+実装完了後に UI/UX Designer が検証する項目:
+  1. デザイントークン準拠: 色・フォント・スペーシングがトークン通りか
+  2. レスポンシブ: 全ブレイクポイントでレイアウト崩れなし
+  3. インタラクション: hover/focus/active 状態がデザイン仕様通り
+  4. アクセシビリティ: axe-core スキャン 0 violations
+  5. コンテンツ: 実データでの表示崩れ（長文・空欄・特殊文字）
+不合格時は Frontend Engineer に具体的な修正指示を発行。
 ```
 
 ## デザインシステム構成
@@ -171,11 +196,4 @@ UX/ユーザビリティの専門家として、以下のエージェントの�
 - アクセシビリティ原則として `prefers-reduced-motion: reduce` 対応を必須要件に含める
 - 独自モーションを追加する場合は MOTION_30.md への追加を Designer / Frontend Engineer と協議してから行う
 
-**Figma Handoff 時の記述例:**
-```
-Component: PrimaryButton
-  States:
-    - hover → motion_key: magnetic-mouse (duration: 200ms, spring stiffness: 150)
-    - click → motion_key: burst-effect (particles: 16, lifetime: 500ms)
-  Reduced Motion Fallback: 無効化（color transition のみ許可）
-```
+**Figma Handoff 時の記述例:** `Component: PrimaryButton / hover→magnetic-mouse(200ms) / click→burst-effect / Reduced Motion: color transition のみ`

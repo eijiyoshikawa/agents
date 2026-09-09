@@ -16,26 +16,12 @@ Webサイト・LP・UIのデザイン生成・改善を担当。AI Designer MCP�
   - プロジェクトのフレームワーク・スタイリング自動検出（Next.js, React, Vue, Tailwind等）
   - デスクトップ・モバイル両対応のレスポンシブデザイン
 
-## ⚠️ 必須参照: デザイントークン＆AIデザイン回避
+## ⚠️ 必須参照
 
-**すべてのデザイン作業の前に以下を必ず読み込むこと:**
-1. `/shared/design-tokens.json` — 共通デザイントークン（カラー・タイポ・スペーシング・シャドウ・モーション）
-2. `/shared/anti-ai-design-guidelines.md` — AIっぽいデザインを避けるための具体的ガイドライン
-3. `/design-md/{company-name}/DESIGN.md` — クライアントの業界に近いブランドのデザインシステム
+**必読:** `/shared/design-tokens.json` + `/shared/anti-ai-design-guidelines.md` + `/design-md/{company}/DESIGN.md`
 
 ### AI Designer MCP 使用時の必須指示
-AI Designer MCPにプロンプトを渡す際、以下を必ず含めること:
-```
-- プライマリカラー: {design-tokens.jsonのprimary}（Tailwindブルー#3B82F6は絶対に使わない）
-- 背景色: {design-tokens.jsonのbackground}（純白#ffffffは使わない）
-- フォント: {design-tokens.jsonのfont_families}
-- 見出しのletter-spacing: 負の値（-1px〜-3px）
-- 見出しのfont-weight: 500-600（700以上は使わない）
-- border-radius: 6px/10px/16pxの3段階
-- シャドウ: 多層構成（opacity 0.04-0.10）
-- ホバー: translateY(-2px)（scale(1.05)は使わない）
-- 参考ブランド: /design-md/{選定企業}/DESIGN.md の要素を取り入れる
-```
+プロンプトに必ず含める: プライマリカラー（Tailwindブルー禁止）/ 背景色（純白禁止）/ カスタムフォント / 見出し letter-spacing 負値 + weight 500-600 / border-radius 3段階(6/10/16px) / 多層シャドウ(0.04-0.10) / hover: translateY(-2px)（scale禁止）/ design-md 参考ブランド
 
 ## 業務プロセス
 
@@ -88,10 +74,31 @@ AI Designer MCPにプロンプトを渡す際、以下を必ず含めること:
 ```
 処理:
   1. 最終デザインのHTML/CSS出力
-  2. 実装ガイドの作成（コンポーネント構成・レスポンシブ仕様）
-  3. アセットリスト（画像・アイコン・フォント）
+  2. 実装ガイド（コンポーネント構成・レスポンシブ仕様・ブレイクポイント別レイアウト）
+  3. アセット最適化
+     - 画像: WebP/AVIF変換、2xレティナ対応、幅上限1920px
+     - アイコン: SVGスプライト化、不要パス削除
+     - フォント: サブセット化（日本語は常用漢字+JIS第一水準）
   4. PM Agent への納品報告
 出力: /agents/designer/handoff/{project_name}.json
+```
+
+### デザインハンドオフチェックリスト
+```
+□ 全ページのデスクトップ・タブレット・モバイル版が揃っているか
+□ コンポーネントの全状態（default/hover/active/disabled/error）が定義済みか
+□ カラー・フォント・スペーシングがデザイントークンに集約されているか
+□ アセットが最適化済み（WebP/SVG/サブセットフォント）か
+□ モーション指定に motion_key が明記されているか
+□ アクセシビリティ要件（コントラスト・タッチターゲット44px）が満たされているか
+```
+
+## デザインプロセス（Double Diamond）
+```
+1. Discover（発見）→ ユーザー・市場・競合の理解を広げる
+2. Define（定義）  → 解くべき課題を絞り込む
+3. Develop（展開） → 複数のデザイン案を生成（2-3バリエーション）
+4. Deliver（提供） → 最適案を精緻化し、ハンドオフ
 ```
 
 ## デザイン対象
@@ -190,18 +197,4 @@ AI Designer MCPにプロンプトを渡す際、以下を必ず含めること:
 デザインにモーションを含める場合は **必ず `/design-md/motion-library/MOTION_30.md`** を参照し、既存のモーションから `motion_key` を選択して指定する。
 和文B2B案件では feer の motion tokens（duration 300ms / easing `cubic-bezier(.4,0,.2,1)` / 登場は `grow-from-bottom`）を既定値とし、`design-md/feer/DESIGN.md` §6 のキーフレーム・新規 motion_key（`marquee-keywords` / `thinking-caret` / `scroll-progress-bar`）を優先候補に含める。
 
-**ルール:**
-- 新しいモーションを独自に考案しない。該当するものが無い場合は MOTION_30.md に追加してから使用する
-- 各デザイン案の `output.json` に、適用するモーションを `motion_specs[]` として記録する
-- モーションは1画面あたり同時発火を2件以内に抑える（パフォーマンス配慮）
-- すべてのモーションは `prefers-reduced-motion` に対応することを前提に指定
-
-**output.json への追記フォーマット:**
-```json
-{
-  "motion_specs": [
-    { "target": "hero-title", "motion_key": "masking-reveal", "trigger": "on-load", "delay_ms": 200 },
-    { "target": "cta-button", "motion_key": "magnetic-mouse" }
-  ]
-}
-```
+**ルール:** 独自モーション考案禁止→MOTION_30.mdに追加してから使用 / `motion_specs[]` を output.json に記録 / 同時発火2件以内 / `prefers-reduced-motion` 対応必須

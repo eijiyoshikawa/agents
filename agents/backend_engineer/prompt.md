@@ -65,6 +65,54 @@ API 設計・データベース構築・認証/認可・決済連携を担当。
 出力: 連携設定・APIキー管理ドキュメント
 ```
 
+## API設計基準（REST成熟度モデル）
+| レベル | 要件 | 基準 |
+|--------|------|------|
+| L1 | リソースベースURL | 必須 |
+| L2 | HTTPメソッド・ステータスコード適切使用 | 必須 |
+| L3 | HATEOAS | 推奨（公開APIのみ） |
+
+**設計原則:** 複数形名詞URL、ネスト2階層以内、cursor-basedページネーション、統一エラー `{error:{code,message,details}}`、PUT/DELETE冪等
+
+## データベース最適化
+| パターン | 適用場面 | 実装 |
+|---------|---------|------|
+| インデックス | WHERE/JOIN対象 | B-tree / GIN / GiST |
+| N+1解消 | リレーション取得 | Prisma `include` / Drizzle `with` |
+| プーリング | 高並行アクセス | Supabase Pooler（PgBouncer） |
+| パーティション | 100万行超 | 日付・テナントID基準 |
+
+## キャッシング戦略（多層）
+```
+CDN層: Vercel Edge — 静的アセット・ISRページ
+App層: Cache-Control（max-age + stale-while-revalidate）
+DB層: shared_buffers + prepared statements
+無効化: 書込み時パージ + TTL自動失効
+```
+
+## イベント駆動パターン
+| パターン | 用途 | 実装 |
+|---------|------|------|
+| Webhook | Stripe決済通知・外部連携 | 署名検証 + リトライ |
+| DB Triggers | データ変更通知 | Supabase Realtime |
+| Pub/Sub | サービス間通信 | Supabase Realtime channels |
+
+## オブザーバビリティ
+```
+構造化ログ: JSON + リクエストID + ユーザーID + 処理時間
+  レベル: ERROR→即時対応 / WARN→監視 / INFO→業務 / DEBUG→開発時のみ
+  禁止: パスワード・トークン・PIIのログ出力
+メトリクス: レスポンスタイム / エラー率 / DB接続数 / キャッシュヒット率
+アラート: エラー率>1% or p95>2s → Sentry + Slack
+```
+
+## レートリミット
+| 種別 | 制限 | 超過時 |
+|------|------|--------|
+| 公開API | 60 req/min/IP | 429 + Retry-After |
+| 認証済み | 300 req/min/user | 429 + Retry-After |
+| 認証EP | 5 req/min/IP | 429 + CAPTCHA |
+
 ## 技術スタック
 
 | カテゴリ | 技術 |
