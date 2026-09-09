@@ -263,7 +263,7 @@ export async function fetchCustomers(): Promise<Customer[]> {
 const LIST_FIELD_NAMES = [
   "顧客名", "電話番号", "ステータス", "見込み度合い", "業種", "企業フェーズ",
   "営業手法", "IS担当", "S担当", "都道府県", "架電回数", "最終架電日",
-  "アポイント取得日", "住所", "確認状況",
+  "アポイント取得日", "住所", "確認状況", "従業員数", "掲載元メディア",
 ];
 
 let _listPropIds: string[] | null = null;
@@ -304,6 +304,8 @@ function mapListCustomer(pg: any): ListCustomer {
     lastEdited: pg.last_edited_time ?? null,
     address: txt(pg, "住所"),
     confirm: sel(pg, "確認状況"),
+    employees: number(pg, "従業員数"),
+    media: multi(pg, "掲載元メディア"),
   };
 }
 

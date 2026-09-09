@@ -66,6 +66,8 @@ export type ListCustomer = {
   lastEdited: string | null; // 最終更新日時（活動日の代理指標）
   address: string | null;
   confirm: string | null;
+  employees: number | null; // 従業員数（優先スコア算出に使用）
+  media: string[]; // 掲載元メディア（リードソース。優先スコア算出に使用）
 };
 
 /** サーバー側検索の1行（重複/人材紹介フラグ付き） */

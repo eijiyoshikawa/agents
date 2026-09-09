@@ -22,6 +22,9 @@ import {
   dbGetPipelineSlim,
   dbGetAppointedSlim,
   dbGetActiveSince,
+  dbGetPriorityList,
+  type PriorityMode,
+  type PriorityRow,
 } from "./db";
 import { PIPELINE_STATUSES } from "./notion";
 import { EXCLUDED_REPS } from "./reps";
@@ -301,6 +304,24 @@ export async function getSummaryCustomers(sinceYmd: string): Promise<{ customers
     safe("アポ有り", cachedAppointed, [] as ListCustomer[], errors),
   ]);
   return { customers: dedupeById([...recent, ...appointed]), errors };
+}
+
+/**
+ * 優先アプローチリスト（実績分析ベースのスコア降順）。DB(Neon)必須。
+ * mode=new: 未架電の新規、mode=follow: 追客在庫（再コール・資料請求・担当者不在）
+ */
+export async function getPriorityList(
+  mode: PriorityMode,
+  page: number,
+): Promise<{ rows: PriorityRow[]; total: number; page: number; pageSize: number; scored: boolean; errors: string[] }> {
+  const empty = { rows: [] as PriorityRow[], total: 0, page: 1, pageSize: 50, scored: false };
+  if (!dbConfigured()) return { ...empty, errors: ["優先リストにはDB(Neon)接続が必要です。DATABASE_URL を設定してください。"] };
+  try {
+    return { ...(await dbGetPriorityList(mode, page, 50)), errors: [] };
+  } catch (e) {
+    console.error("[data] priority list failed:", (e as Error)?.message);
+    return { ...empty, errors: ["優先リストの取得に失敗しました（DB障害の可能性）。時間を置いて再読み込みしてください。"] };
+  }
 }
 
 /** パイプライン用（商談ステータスのみ・軽量） */

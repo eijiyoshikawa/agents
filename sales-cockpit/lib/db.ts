@@ -3,6 +3,7 @@
 import { neon } from "@neondatabase/serverless";
 import { fetchCustomersSlim, fetchContracts, NOTION_MAX_PAGES } from "./notion";
 import { normalizeCompanyName, normalizePhone, agencyReason } from "./leadflags";
+import { scoreLead } from "./priority";
 import type { ListCustomer, Contract, SearchParams, SearchResult, SearchRow, Breakdowns } from "./types";
 
 // 接続文字列を解決：標準名 → 無ければ postgres:// 形式の環境変数を自動検出（Custom Prefix対策）。
@@ -55,6 +56,11 @@ export async function ensureSchema(): Promise<void> {
   await sql`ALTER TABLE sc_customers ADD COLUMN IF NOT EXISTS is_dup boolean`;
   await sql`ALTER TABLE sc_customers ADD COLUMN IF NOT EXISTS agency_reason text`;
   await sql`CREATE INDEX IF NOT EXISTS idx_sc_customers_is_dup ON sc_customers(is_dup)`;
+  // 優先アプローチ用: 従業員数・掲載元メディア・優先スコア（同期時に scoreLead で計算）
+  await sql`ALTER TABLE sc_customers ADD COLUMN IF NOT EXISTS employees integer`;
+  await sql`ALTER TABLE sc_customers ADD COLUMN IF NOT EXISTS media text`;
+  await sql`ALTER TABLE sc_customers ADD COLUMN IF NOT EXISTS priority integer`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_sc_customers_priority ON sc_customers(priority)`;
   await sql`CREATE TABLE IF NOT EXISTS sc_contracts (
     id text PRIMARY KEY, name text, status text, monthly bigint, start_date text, end_date text,
     kinds text, churn_risk text, next_renewal text, s_rep text, cs_rep text, health text,
@@ -63,7 +69,7 @@ export async function ensureSchema(): Promise<void> {
   await sql`CREATE TABLE IF NOT EXISTS sc_sync_meta ( key text PRIMARY KEY, value text )`;
 }
 
-const CUST_COLS = 22;
+const CUST_COLS = 25;
 async function upsertCustomers(
   rows: ListCustomer[],
   stamp: string,
@@ -81,14 +87,15 @@ async function upsertCustomers(
         c.id, c.url, c.name, normalizeCompanyName(c.name), c.phone, normalizePhone(c.phone),
         c.status, c.rank, c.industry, c.phase, c.method, c.pref, c.isRep, c.sRep,
         c.callCount, c.lastCallDate, c.appointmentDate, c.lastEdited, c.address, c.confirm,
+        c.employees ?? null, JSON.stringify(c.media ?? []), scoreLead(c),
         agency.get(c.id) ?? null, stamp,
       );
       return `(${ph})`;
     });
     // is_dup はここでは書かず、upsert後に recomputeDupFlags() がSQLで全体整合を取る
     const text =
-      `INSERT INTO sc_customers (id,url,name,name_norm,phone,phone_norm,status,rank,industry,phase,method,pref,is_rep,s_rep,call_count,last_call_date,appointment_date,last_edited,address,confirm,agency_reason,synced_at) VALUES ${tuples.join(",")} ` +
-      `ON CONFLICT (id) DO UPDATE SET url=EXCLUDED.url,name=EXCLUDED.name,name_norm=EXCLUDED.name_norm,phone=EXCLUDED.phone,phone_norm=EXCLUDED.phone_norm,status=EXCLUDED.status,rank=EXCLUDED.rank,industry=EXCLUDED.industry,phase=EXCLUDED.phase,method=EXCLUDED.method,pref=EXCLUDED.pref,is_rep=EXCLUDED.is_rep,s_rep=EXCLUDED.s_rep,call_count=EXCLUDED.call_count,last_call_date=EXCLUDED.last_call_date,appointment_date=EXCLUDED.appointment_date,last_edited=EXCLUDED.last_edited,address=EXCLUDED.address,confirm=EXCLUDED.confirm,agency_reason=EXCLUDED.agency_reason,synced_at=EXCLUDED.synced_at`;
+      `INSERT INTO sc_customers (id,url,name,name_norm,phone,phone_norm,status,rank,industry,phase,method,pref,is_rep,s_rep,call_count,last_call_date,appointment_date,last_edited,address,confirm,employees,media,priority,agency_reason,synced_at) VALUES ${tuples.join(",")} ` +
+      `ON CONFLICT (id) DO UPDATE SET url=EXCLUDED.url,name=EXCLUDED.name,name_norm=EXCLUDED.name_norm,phone=EXCLUDED.phone,phone_norm=EXCLUDED.phone_norm,status=EXCLUDED.status,rank=EXCLUDED.rank,industry=EXCLUDED.industry,phase=EXCLUDED.phase,method=EXCLUDED.method,pref=EXCLUDED.pref,is_rep=EXCLUDED.is_rep,s_rep=EXCLUDED.s_rep,call_count=EXCLUDED.call_count,last_call_date=EXCLUDED.last_call_date,appointment_date=EXCLUDED.appointment_date,last_edited=EXCLUDED.last_edited,address=EXCLUDED.address,confirm=EXCLUDED.confirm,employees=EXCLUDED.employees,media=EXCLUDED.media,priority=EXCLUDED.priority,agency_reason=EXCLUDED.agency_reason,synced_at=EXCLUDED.synced_at`;
     await sql.query(text, values);
   }
 }
@@ -202,7 +209,17 @@ export async function syncAll(opts?: { mode?: "full" | "incremental" }): Promise
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const SLIM_COLS =
-  "id,url,name,phone,status,rank,industry,phase,method,pref,is_rep,s_rep,call_count,last_call_date,appointment_date,last_edited,address,confirm";
+  "id,url,name,phone,status,rank,industry,phase,method,pref,is_rep,s_rep,call_count,last_call_date,appointment_date,last_edited,address,confirm,employees,media";
+
+function parseMedia(v: unknown): string[] {
+  if (typeof v !== "string" || !v) return [];
+  try {
+    const a = JSON.parse(v);
+    return Array.isArray(a) ? a.filter((x) => typeof x === "string") : [];
+  } catch {
+    return [];
+  }
+}
 
 function mapSlimRow(r: any): ListCustomer {
   return {
@@ -210,6 +227,7 @@ function mapSlimRow(r: any): ListCustomer {
     industry: r.industry, phase: r.phase, method: r.method, pref: r.pref, isRep: r.is_rep, sRep: r.s_rep,
     callCount: r.call_count, lastCallDate: r.last_call_date, appointmentDate: r.appointment_date,
     lastEdited: r.last_edited, address: r.address, confirm: r.confirm,
+    employees: r.employees ?? null, media: parseMedia(r.media),
   };
 }
 
@@ -249,6 +267,46 @@ export async function dbGetActiveSince(sinceYmd: string): Promise<ListCustomer[]
     [sinceYmd],
   )) as any[];
   return rows.map(mapSlimRow);
+}
+
+export type PriorityMode = "new" | "follow";
+export type PriorityRow = ListCustomer & { priority: number | null };
+
+/**
+ * 優先アプローチリスト。実績分析ベースの priority スコア降順で1ページ分を返す。
+ * - new: 未架電（ステータス空 or アプローチ前・アポなし）＝新規架電の優先順
+ * - follow: 追客在庫（再コール・資料請求・担当者不在）＝掘り起こしの優先順
+ * @returns scored=false はスコア未計算行のみ（フル同期前）で並びが暫定であることを示す
+ */
+export async function dbGetPriorityList(
+  mode: PriorityMode,
+  page: number,
+  pageSize: number,
+): Promise<{ rows: PriorityRow[]; total: number; page: number; pageSize: number; scored: boolean }> {
+  const sql = db();
+  const whereSql =
+    mode === "new"
+      ? `WHERE (status IS NULL OR status = 'アプローチ前') AND (appointment_date IS NULL OR appointment_date = '')`
+      : `WHERE status IN ('再コール','資料請求','担当者不在')`;
+  const ps = Math.min(Math.max(pageSize, 1), 100);
+  const p = Math.max(page, 1);
+  const cnt = (await sql.query(
+    `SELECT COUNT(*)::int AS total, COUNT(priority)::int AS scored FROM sc_customers ${whereSql}`,
+    [],
+  )) as Array<{ total: number; scored: number }>;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  const rows = (await sql.query(
+    `SELECT ${SLIM_COLS}, priority FROM sc_customers ${whereSql} ` +
+      `ORDER BY priority DESC NULLS LAST, employees DESC NULLS LAST, id ASC LIMIT $1 OFFSET $2`,
+    [ps, (p - 1) * ps],
+  )) as any[];
+  return {
+    rows: rows.map((r) => ({ ...mapSlimRow(r), priority: r.priority ?? null })),
+    total: cnt[0]?.total ?? 0,
+    page: p,
+    pageSize: ps,
+    scored: (cnt[0]?.scored ?? 0) > 0,
+  };
 }
 
 /**
@@ -383,9 +441,7 @@ export async function dbSearchCustomers(p: SearchParams): Promise<SearchResult> 
 
   // 該当ページの行だけを取得（LIMIT/OFFSET）。id 二次ソートでページ安定化。
   const rowsText =
-    `SELECT id,url,name,phone,status,rank,industry,phase,method,pref,is_rep,s_rep,` +
-    `call_count,last_call_date,appointment_date,last_edited,address,confirm,` +
-    `COALESCE(is_dup,false) AS is_dup, agency_reason ` +
+    `SELECT ${SLIM_COLS}, COALESCE(is_dup,false) AS is_dup, agency_reason ` +
     `FROM sc_customers ${whereSql} ` +
     `ORDER BY ${sortCol} ${dir} ${nulls}, id ASC ` +
     `LIMIT ${add(pageSize)} OFFSET ${add(offset)}`;
@@ -393,11 +449,9 @@ export async function dbSearchCustomers(p: SearchParams): Promise<SearchResult> 
   const rows = (await sql.query(rowsText, vals)) as any[];
 
   const mapped: SearchRow[] = rows.map((r) => ({
-    id: r.id, url: r.url, name: r.name, phone: r.phone, status: r.status, rank: r.rank,
-    industry: r.industry, phase: r.phase, method: r.method, pref: r.pref, isRep: r.is_rep, sRep: r.s_rep,
-    callCount: r.call_count, lastCallDate: r.last_call_date, appointmentDate: r.appointment_date,
-    lastEdited: r.last_edited, address: r.address, confirm: r.confirm,
-    dup: !!r.is_dup, agency: r.agency_reason ?? null,
+    ...mapSlimRow(r),
+    dup: !!r.is_dup,
+    agency: r.agency_reason ?? null,
   }));
 
   return { rows: mapped, total: cnt.total ?? 0, totalDup: cnt.dup ?? 0, totalAgency: cnt.agency ?? 0, page, pageSize };
