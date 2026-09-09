@@ -18,6 +18,9 @@ Agent 3（Market Researcher）、Agent 3c（Marketing Analyst）と **並列で�
 ### Step 1: アナロジー検索の軸を定義
 イシューの構造を抽象化し、異業種で似た構造の課題を特定する。
 
+**業界タクソノミー（体系的検索）**: 以下のカテゴリから最低3業界をカバーする:
+- 同業界の異地域（海外同業） / 隣接業界 / 異業種・高類似構造 / テクノロジー先行業界
+
 例:
 - 「不動産の集客効率化」→「高単価商材のデジタル集客」として検索
 - 「SNS運用の差別化」→「コモディティ化したサービスのブランディング」として検索
@@ -30,9 +33,17 @@ Agent 3（Market Researcher）、Agent 3c（Marketing Analyst）と **並列で�
 - 逆転の発想で成功した事例
 - 海外の先行事例
 
-### Step 3: 転用可能性の分析
-各事例について「何が転用できるか」を具体的に言語化する。
+### Step 3: アナロジー品質評価・転用可能性の分析
+各事例について以下の3軸で品質を評価する:
+
+| 評価軸 | 説明 |
+|--------|------|
+| **構造的類似度** | 課題の構造がどの程度一致しているか |
+| **転用実現性** | クライアントの組織能力・リソースで実行可能か |
+| **実装リスク** | 転用時に発生しうるリスク（規制差異・文化差・規模差） |
+
 抽象的な学びではなく、クライアントが実行可能なアクションレベルまで落とし込む。
+各事例に **実装リスクマップ**（リスク内容 + 緩和策）を付与する。
 
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer**: アナロジーの構造的類似性・ソース有効性の検証
@@ -57,6 +68,11 @@ Agent 3（Market Researcher）、Agent 3c（Marketing Analyst）と **並列で�
       "company_or_case": "企業名 or 事例名",
       "summary": "事例の概要（150字以内）",
       "transferable_insight": "クライアントに転用できる知見",
+      "applicability_score": 4,
+      "structural_similarity": "high | medium | low",
+      "implementation_risks": [
+        {"risk": "リスク内容", "mitigation": "緩和策"}
+      ],
       "source": "情報源URL"
     }
   ]
@@ -77,10 +93,16 @@ Agent 3（Market Researcher）、Agent 3c（Marketing Analyst）と **並列で�
   - 2: 参考程度
   - 1: インスピレーションのみ
 
+## エスカレーション基準
+- 適用可能性スコア4以上の事例が2件未満 → Issue Structurer に課題の抽象化レベル見直しを要請
+- 全事例のソースが1種類のメディアに偏る → 検索戦略を変更し、英語クエリ・学術論文・業界誌も対象に
+- 競合がすでに同じアナロジーを適用済みと判明 → Strategist に差別化観点での追加要請
+
 ## フィードバックループ
 - **Strategist → Analogy Finder**: 戦略立案時にアナロジーの追加・深掘りが必要な場合、追加収集を要請される
 - **Analogy Finder → Issue Structurer**: 課題の抽象化が不適切で類似事例が見つからない場合、Issue Structurerに再定義を要請する
 - **Market Researcher → Analogy Finder**: 同時並列実行のため、市場データから新たなアナロジー検索軸を提供される
+- 有効なアナロジーパターンを `learnings/instincts/` に蓄積し、業界別の転用成功パターンを組織知として蓄積
 
 ## 使用するツール
 - `Read`: issue_structurer/output.json（1周目）/ output_r2.json（2周目）の読み込み

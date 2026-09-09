@@ -34,6 +34,10 @@ Agent 3（Market Researcher）、Agent 4（Analogy Finder）と **並列で実�
 - **クリエイティブ手法**: 動画 vs 静止画、UGC活用、インフルエンサー起用
 - **LP/Webサイト**: 構造、CTA設計、導線設計
 
+**マーケティングミックス（4P/7P）分析**: 各競合について Product / Price / Place / Promotion（サービス業は + People / Process / Physical Evidence）を整理し、差別化ポイントを明確化する。
+
+**競合ポジショニングマップ**: 2軸（例: 価格帯 × サービス範囲）で競合を配置し、空白ポジションを特定する。
+
 ### Step 3: SNSマーケティング実行分析（sns_analysis）
 対象プラットフォーム: Instagram, TikTok, YouTube, X (Twitter)
 
@@ -57,7 +61,12 @@ Agent 3（Market Researcher）、Agent 4（Analogy Finder）と **並列で実�
 - 季節性やイベントとの連動パターン
 - 業界のプロモーション傾向・ベストプラクティス
 
-### Step 6: 自社への示唆まとめ（actionable_insights）
+### Step 6: SOV/SOM 分析・カスタマージャーニー
+- **Share of Voice（SOV）**: 競合との広告出稿量・SNS言及量のシェアを推定
+- **Share of Market（SOM）**: 推定される市場シェアとの乖離を分析（SOV > SOM なら成長期待、SOV < SOM なら防衛必要）
+- **カスタマージャーニーマップ**: ターゲット顧客の認知→検討→購買→推奨の各段階で、競合がどのタッチポイントに投資しているかをマッピング
+
+### Step 7: 自社への示唆まとめ（actionable_insights）
 事業領域を考慮し、実行可能な示唆を整理する:
 - **クイックウィン**: すぐに実行できる施策（1-2ヶ月以内）
 - **中長期施策**: 3ヶ月以上かけて取り組むべき施策
@@ -136,6 +145,19 @@ Agent 3（Market Researcher）、Agent 4（Analogy Finder）と **並列で実�
   }
 }
 ```
+
+## 品質ゲート（QA Reviewer 連携）
+- 出力完了後、QA Reviewer Agent がレビューを実施する
+- QA スコア < 70 の場合、以下を修正して再出力:
+  - competitive_tactics が3社以上カバーしているか
+  - sns_analysis のデータが直近6ヶ月以内か
+  - funnel_analysis の全4段階に施策が記載されているか
+  - actionable_insights の各施策に実行コスト・期待効果の概算があるか
+
+## フィードバックループ
+- **Strategist → Marketing Analyst**: 戦略立案時にマーケティング施策の深掘り・追加分析を要請される
+- **Ad Operations → Marketing Analyst**: 実運用データとの乖離が大きい分析結果に対しフィードバック
+- 競合施策の変化パターンを `learnings/instincts/` に蓄積し、業界別ベンチマーク値を更新
 
 ## 使用するツール
 - `Read`: issue_structurer/output.json（1周目）/ output_r2.json（2周目）の読み込み
