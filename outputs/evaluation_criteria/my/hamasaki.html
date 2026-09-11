@@ -237,6 +237,14 @@ tr.hl td { background: #FBF7EA; }
   background: var(--green-light); border: 1px solid var(--green); color: var(--green); font-weight: 700;
 }
 .mbonus.off { background: var(--page); border-color: var(--rule); color: var(--ink-3); font-weight: 400; }
+.mformal { margin-top: 10px; padding: 10px 12px; border: 1px solid var(--rule); border-radius: 6px; background: var(--page); }
+.mformal .mf-title { font-size: 12px; font-weight: 900; margin-bottom: 4px; }
+.mformal .mf-title small { font-weight: 400; color: var(--ink-3); margin-left: 6px; }
+.mformal.pending { border-style: dashed; }
+.mformal ul { margin: 6px 0 0 18px; padding: 0; font-size: 11.5px; color: var(--ink-3); }
+.mformal ul li { margin: 2px 0; }
+.mref { margin-top: 10px; }
+.mref summary { cursor: pointer; font-size: 11.5px; color: var(--ink-3); }
 .mbars-title {
   font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 1.5px;
   text-transform: uppercase; color: var(--ink-3); margin-top: 16px;
@@ -632,8 +640,67 @@ tr.hl td { background: #FBF7EA; }
   };
   const DEPT_LABEL = { '営業': '営業チーム', 'マーケティング': 'マーケチーム', 'CA': 'CAチーム', 'BPO': '不動産 / BPO' };
 
+  const OUTLOOK_FORMAL = {
+    up: ['up', '↑ 昇格ライン到達'],
+    keep: ['keep', '→ 維持圏内'],
+    down: ['down', '↓ 降格ライン（G×70%）割れ']
+  };
+  const pctOf = (v) => (v == null ? '—' : Math.round(v * 100) + '%');
+
+  // 正式判定（役割配分方式・2026-09-07 決定）: 本人評価粗利 = 案件粗利 × 役割配分率 × 本人担当割合
+  function formalBlock(m) {
+    const pe = m.personal_eval;
+    if (!pe) return '';
+    const rows = pe.by_client || [];
+    const rowsHtml = rows.length ? `<details class="mclients">
+      <summary>本人評価粗利の内訳（${rows.length}件）</summary>
+      <table>
+        <tr><th>クライアント</th><th>フェーズ</th><th class="num">役割配分</th><th class="num">担当割合</th><th class="num">案件粗利</th><th class="num">本人評価粗利</th></tr>
+        ${rows.map(r => `<tr><td>${esc(r.client)}</td><td>${esc(r.phase || '—')}</td><td class="num">${pctOf(r.split)}</td><td class="num">${pctOf(r.share)}</td><td class="num">${manS(r.profit)}</td><td class="num">${manS(r.role_profit)}</td></tr>`).join('')}
+        <tr class="total"><td colspan="5">合計</td><td class="num">${manS(pe.role_profit)}</td></tr>
+      </table>
+    </details>` : '';
+
+    if (pe.status !== 'ready') {
+      const missing = (pe.missing || []).map(x => `<li>${esc(x.client)}: ${esc((x.reasons || []).join('・'))}（案件粗利 ${manS(x.profit)}）</li>`).join('');
+      const blockers = (pe.blockers || []).map(b => `<li>${esc(b)}</li>`).join('');
+      return `<div class="mformal pending">
+        <div class="mf-title">🧭 昇降格の正式判定（役割配分方式）<small>準備中</small></div>
+        <div class="member-nums">本人評価粗利 = 案件粗利 × 役割配分率（SNS初回 営業50/マーケ50・更新後 10/90・クロスセル 50/50・BPO 100% など） × 本人担当割合。昇格ライン = max(半期目標G×110%, 次等級目標N)。未入力の案件はゼロ扱いにも100%扱いにもせず、揃うまで判定を確定しません。</div>
+        <ul>${blockers}${missing}</ul>
+        ${rows.length ? `<div class="member-nums">入力済みの案件だけで集計した本人評価粗利（暫定）: <b>${man(pe.role_profit)}</b></div>` : ''}
+        ${rowsHtml}
+      </div>`;
+    }
+
+    const [fcls] = OUTLOOK_FORMAL[pe.outlook] || ['keep'];
+    const remain = pe.promotion_line - pe.role_profit;
+    const kpis = [
+      { l: '本人評価粗利（配分後）', v: manS(pe.role_profit) },
+      { l: '半期目標G', v: manS(pe.target_g) },
+      { l: pe.target_n ? '昇格ライン max(G×110%, N)' : '昇格ライン（G×110%）', v: manS(pe.promotion_line) },
+      remain <= 0
+        ? { l: '昇格ライン', v: '突破 +' + manS(-remain), good: true }
+        : { l: '昇格ラインまで', v: manS(remain) }
+    ].map(k => `<div class="mkpi${k.good ? ' good' : ''}"><div class="kv">${k.v}</div><div class="kl">${k.l}</div></div>`).join('');
+    const marks = [[0.7, '70%'], [1.1, '110%']];
+    if (pe.target_n && pe.target_g && pe.target_n / pe.target_g > 1.1) marks.push([pe.target_n / pe.target_g, 'N']);
+    return `<div class="mformal">
+      <div class="mf-title">🧭 昇降格の正式判定（役割配分方式）<small>本人評価粗利 ÷ 半期目標G</small></div>
+      ${gauge(pe.rate, 'p-' + fcls, marks, '達成率（本人評価粗利 ÷ G）')}
+      <div class="mkpis">${kpis}</div>
+      <div class="member-nums">※ 昇格は上記に加えて定性評価（MVV・チーム貢献）・次等級役割の3ヶ月実証・総合80点以上が必要です。降格は別手続き（暫定: G×70%未満で1ランク）。</div>
+      ${rowsHtml}
+    </div>`;
+  }
+
   function memberCard(m, t, poolShare) {
-    const [ocls, olabel] = OUTLOOK[m.outlook] || ['keep', '—'];
+    const pe = m.personal_eval || null;
+    const formalReady = !!(pe && pe.status === 'ready');
+    // 見出しの昇降格チップは正式判定（役割配分方式）が揃っているときだけ出す。未確定時は「判定準備中」
+    const [ocls, olabel] = formalReady
+      ? (OUTLOOK_FORMAL[pe.outlook] || ['keep', '—'])
+      : ['keep', '判定準備中（台帳・目標の入力待ち）'];
 
     // KPIタイル: 売上 / 直課費用 / 粗利 / 昇格ラインまで
     const rem110 = m.denom * 1.1 - m.gross_profit;
@@ -690,8 +757,12 @@ tr.hl td { background: #FBF7EA; }
         <span class="member-name">${esc(m.name)}<span class="rank-chip">${esc(m.rank)} ／ 月給${Math.round(m.monthly_salary / 10000)}万</span></span>
         <span class="outlook ${ocls}">${olabel}</span>
       </div>
-      ${gauge(m.personal_rate, 'p-' + ocls, [[0.7, '70%'], [1.1, '110%'], [1.5, '150%']], '参考: 旧基準の達成率（配分前）')}
-      <div class="member-nums">※ 昇降格の正式判定は「役割の取り分で分けた評価粗利 × 期首に決める個人目標」で行います（目標設定が済むまで、このゲージは旧基準〔粗利 ÷ 月給×1.15×倍率〕の参考表示です）。参考基準 ${man(m.denom)}（月あたり ${man(m.monthly_required)}）</div>
+      ${formalBlock(m)}
+      <details class="mref">
+        <summary>参考: 旧基準の達成率（配分前・粗利 ÷ 月給×1.15×倍率）— 正式判定には使いません</summary>
+        ${gauge(m.personal_rate, 'p-' + ocls, [[0.7, '70%'], [1.1, '110%'], [1.5, '150%']], '参考: 旧基準の達成率（配分前）')}
+        <div class="member-nums">参考基準 ${man(m.denom)}（月あたり ${man(m.monthly_required)}）</div>
+      </details>
       <div class="mkpis">${kpis}</div>
       ${bonus}
       <div class="mbars-title">月ごとの粗利（MF仕訳・月次発生ベース）</div>
