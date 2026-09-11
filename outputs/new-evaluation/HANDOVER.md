@@ -35,7 +35,7 @@
 ### 期限あり
 5. **Metaトークン再生成** — 60日発行の場合、**2026年11月上旬に期限切れ**。切れるとアラートセンターに「Invalid OAuth」エラーが出る。再生成→`npx vercel env rm/add META_ACCESS_TOKEN production`→`npx vercel --prod`
 6. ~~T-MF-003のクローズ~~ — **完了済み**（Notion上「完了」・本番デプロイ dpl_8vHmKUeuseTEsxjhjCnbJVHcwXW7 = main 534488c に確報cron入りを確認 2026-09-11）
-6b. **本セッション分のデプロイ** — slack-let（役割配分集計・列名修正）と評価サイト（正式判定ブロック）を §4 の手順で本番反映する。反映後 `/my/matsumoto` 等で「判定準備中」ブロックと旧基準の折りたたみが出ることを確認
+6b. **本セッション分のデプロイ（mainマージ済み・未デプロイ）** — slack-let（役割配分集計・列名修正）と評価サイト（正式判定ブロック）を §4 の手順で slack-let → agents の順に本番反映する。反映後 `/my/matsumoto` 等で「判定準備中」ブロックと旧基準の折りたたみが出ることを確認
 
 ### 制度の本実装（情報が揃い次第）
 7. **個人評価の正式判定のデータ入力** — 集計・表示は実装済み。残りは入力のみ: (a) 担当マッピングDBの稼働中案件に「フェーズ」「担当割合」を入力（2026-09-11時点 全行未入力。実績のある案件が未入力だとその人は「判定準備中」のまま）(b) MF連携設定に `neweval_targets` を登録（各人のG・N）。人材紹介コミット型 20/50/30 は初期値（期首に正式採用を確認）。「営業担当割合」列は必要になったら追加（役員紹介案件の営業内持分用）
@@ -70,4 +70,4 @@ cd ~/work/agents && git checkout main && git pull origin main && npx vercel --pr
 
 - GitHub→Vercel自動デプロイ停止中。mainマージ後にユーザーがCLIで実行する運用
 - 空コミット・自動コミット生成は絶対禁止（CLAUDE.md恒久ルール）
-- リモートセッションからのmain反映手順: branchへcommit/push → `git checkout -B main origin/main && git merge --no-ff origin/claude/beautiful-mayer-ad0uoj && git push origin main`（ユーザー承認済みの定型運用。**本セッションのcommitはmain未マージ** — ユーザー確認後にマージ）
+- リモートセッションからのmain反映手順: branchへcommit/push → `git checkout -B main origin/main && git merge --no-ff origin/claude/beautiful-mayer-ad0uoj && git push origin main`（ユーザー承認済みの定型運用。本セッション分は 2026-09-11 に両リポジトリとも main へマージ済み: slack_let 7539cbc / agents ade0dd5。**本番デプロイは未実施** — リモートセッションにはVercel CLIの認証がないため、ユーザーのターミナルから上記コマンドで反映する）
