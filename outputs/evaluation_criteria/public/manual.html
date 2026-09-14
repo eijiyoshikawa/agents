@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LET ランクアップマニュアル</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+:root { --ink:#0D0D0D; --ink-2:#3D3D3D; --ink-3:#888; --rule:#E0E0E0; --page:#F7F6F3; --white:#FFF;
+  --blue:#1A5FA8; --blue-light:#EAF1FB; --green:#1A7A4A; --green-light:#EAF7F0; --red:#DC2626; --red-light:#FDECEC; --amber:#B45309; --amber-light:#FEF5EA; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Noto Sans JP',sans-serif; background:var(--page); color:var(--ink); font-size:13px; line-height:1.7; }
+.page { max-width:960px; margin:0 auto; padding:44px 24px 80px; }
+.nav-back { display:inline-flex; align-items:center; gap:6px; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-3); text-decoration:none; margin-bottom:18px; padding:6px 12px; border:1px solid var(--rule); border-radius:4px; background:var(--white); }
+.nav-back:hover { color:var(--ink); border-color:var(--ink); }
+header { margin-bottom:28px; }
+.header-top { padding-bottom:16px; border-bottom:2.5px solid var(--ink); }
+.eyebrow { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-3); margin-bottom:8px; }
+h1 { font-size:26px; font-weight:900; letter-spacing:-.6px; line-height:1.2; }
+h1 em { font-style:normal; color:var(--blue); }
+.lead { margin-top:12px; font-size:13.5px; color:var(--ink-2); }
+.start-banner { margin-top:14px; display:flex; flex-wrap:wrap; gap:10px; }
+.start-card { flex:1 1 200px; background:var(--white); border:1.5px solid var(--blue); border-radius:8px; padding:12px 14px; }
+.start-card .k { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink-3); }
+.start-card .v { font-size:20px; font-weight:900; color:var(--blue); font-family:'IBM Plex Mono',monospace; }
+.start-card .s { font-size:11px; color:var(--ink-3); }
+.sec { font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-3); margin:40px 0 12px; display:flex; align-items:center; gap:10px; }
+.sec::after { content:''; flex:1; height:1px; background:var(--rule); }
+.card { background:var(--white); border:1px solid var(--rule); border-radius:8px; padding:16px 18px; margin-bottom:12px; }
+.card h3 { font-size:14px; font-weight:900; margin-bottom:6px; }
+.card p { color:var(--ink-2); font-size:12.5px; }
+.checks { list-style:none; }
+.checks li { display:flex; gap:12px; padding:11px 0; border-bottom:1px dashed var(--rule); }
+.checks li:last-child { border-bottom:none; }
+.checks .n { flex-shrink:0; width:26px; height:26px; border-radius:50%; background:var(--ink); color:#fff; font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:600; display:flex; align-items:center; justify-content:center; }
+.checks b { display:block; font-size:13px; }
+.checks span { color:var(--ink-3); font-size:12px; }
+.formula { background:var(--ink); color:#fff; border-radius:8px; padding:14px 18px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; line-height:1.9; overflow-x:auto; margin-bottom:12px; }
+.formula .c { color:#6B7280; font-size:11px; }
+.formula .h { color:#FCD34D; }
+table.t { width:100%; border-collapse:collapse; font-size:12.5px; background:var(--white); }
+.t th { text-align:left; padding:9px 12px; font-family:'IBM Plex Mono',monospace; font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--ink-3); background:var(--page); border-bottom:1px solid var(--rule); font-weight:500; }
+.t td { padding:10px 12px; border-bottom:1px solid var(--rule); vertical-align:top; }
+.t tr:last-child td { border-bottom:none; }
+.t td.num, .t th.num { text-align:right; font-family:'IBM Plex Mono',monospace; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.t tr.hl td { background:#FBF7EA; font-weight:700; }
+.t tr.dim td { color:var(--ink-3); }
+.twrap { border:1px solid var(--rule); border-radius:8px; overflow:hidden; margin-bottom:12px; }
+.wbar { display:flex; height:14px; border-radius:7px; overflow:hidden; border:1px solid var(--rule); margin:8px 0 4px; }
+.wbar i { display:block; height:100%; }
+.wbar .q { background:var(--blue); } .wbar .v { background:var(--green); }
+.wlab { display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-3); }
+.levels { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:10px 0; }
+@media (max-width:640px){ .levels{ grid-template-columns:1fr; } }
+.lv { border:1.5px solid var(--rule); border-radius:8px; padding:12px; text-align:center; background:var(--white); }
+.lv .p { font-family:'IBM Plex Mono',monospace; font-size:18px; font-weight:600; }
+.lv .w { font-weight:900; font-size:13px; }
+.lv .d { font-size:11px; color:var(--ink-3); margin-top:4px; }
+.lv.ok { border-color:var(--green); } .lv.ok .p,.lv.ok .w { color:var(--green); }
+.lv.mid { border-color:var(--blue); } .lv.mid .p,.lv.mid .w { color:var(--blue); }
+.lv.ng { border-color:var(--red); } .lv.ng .p,.lv.ng .w { color:var(--red); }
+.note { font-size:11.5px; color:var(--ink-3); margin-top:8px; }
+.tip { background:var(--blue-light); border:1px solid var(--blue); border-radius:6px; padding:10px 14px; font-size:12.5px; margin-top:10px; }
+.warn { background:var(--amber-light); border:1px solid #FCD34D; border-radius:6px; padding:10px 14px; font-size:12.5px; margin-top:10px; }
+.me { border:1.5px solid var(--ink); border-radius:10px; overflow:hidden; background:var(--white); margin-bottom:14px; }
+.me-head { background:var(--ink); color:#fff; padding:10px 16px; font-weight:900; font-size:14px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; }
+.me-head small { font-family:'IBM Plex Mono',monospace; font-weight:400; color:#BBB; font-size:10.5px; }
+.me-body { padding:14px 16px; }
+.kpis { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:10px 0; }
+@media (max-width:640px){ .kpis{ grid-template-columns:repeat(2,1fr);} }
+.kpi { background:var(--page); border:1px solid var(--rule); border-radius:6px; padding:8px 12px; }
+.kpi .kv { font-family:'IBM Plex Mono',monospace; font-size:15px; font-weight:600; }
+.kpi .kl { font-size:10px; color:var(--ink-3); }
+.kpi.good .kv { color:var(--green); }
+.cl { list-style:none; margin-top:8px; font-size:12.5px; }
+.cl li { padding:4px 0; color:var(--ink-3); }
+.cl li.ok { color:var(--green); } .cl li.ng { color:var(--red); }
+.cl b { font-weight:700; margin-right:6px; }
+.status { text-align:center; color:var(--ink-3); font-size:12.5px; padding:22px; background:var(--white); border:1px dashed var(--rule); border-radius:8px; }
+.footer { margin-top:56px; padding-top:14px; border-top:1px solid var(--rule); display:flex; justify-content:space-between; font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-3); }
+@media (max-width:768px){ .page{ padding:28px 16px 60px; } h1{ font-size:21px; } .twrap{ overflow-x:auto; } table.t{ min-width:520px; } .footer{ flex-direction:column; gap:4px; } }
+#auth-gate { position:fixed; inset:0; background:#f7f6f2; display:flex; align-items:center; justify-content:center; padding:20px; z-index:1000; }
+.auth-card { background:#fff; border:1px solid #e3e1da; border-radius:12px; padding:36px 32px; max-width:420px; width:100%; box-shadow:0 8px 24px rgba(0,0,0,.06); }
+.auth-title { font-size:20px; font-weight:900; margin-bottom:8px; }
+.auth-desc { font-size:12.5px; color:#55524a; margin-bottom:20px; line-height:1.6; }
+.auth-input { width:100%; padding:12px 14px; border:1.5px solid #e3e1da; border-radius:6px; font-size:14px; font-family:'IBM Plex Mono',monospace; outline:none; margin-bottom:10px; }
+.auth-input:focus { border-color:#1a1a1a; }
+.auth-button { width:100%; padding:12px; border:none; border-radius:6px; background:#1a1a1a; color:#fff; font-size:13px; font-weight:700; cursor:pointer; }
+.auth-error { font-size:12px; color:#c0392b; margin-top:8px; display:none; }
+.auth-error.show { display:block; }
+</style>
+</head>
+<body>
+<div id="auth-gate">
+  <div class="auth-card">
+    <div class="eyebrow">LET / ランクアップマニュアル</div>
+    <div class="auth-title">パスワードを入力</div>
+    <div class="auth-desc">この資料は社外秘です。<br>あなた専用のパスワード（個別にお渡ししたもの）を入力してください。</div>
+    <form id="auth-form" autocomplete="off">
+      <input type="password" id="auth-input" class="auth-input" placeholder="パスワード" autofocus required />
+      <button type="submit" class="auth-button">ログイン</button>
+      <div id="auth-error" class="auth-error">パスワードが違います</div>
+    </form>
+  </div>
+</div>
+
+<div id="main" style="display:none;">
+<div class="page">
+<a class="nav-back" id="back-link" href="/new-system">← 自分の評価ページに戻る</a>
+
+<header>
+  <div class="header-top">
+    <div class="eyebrow">株式会社LET — 社外秘 / <span id="dept-eyebrow"></span> / ランクアップマニュアル</div>
+    <h1><span id="dept-title"></span>：<em>ランクを上げる</em>には</h1>
+    <div class="lead">何をどれだけやれば次のランクに上がるのか、その計算と手順をすべて書いています。数字はあなたの評価ページとまったく同じ式で出ています。</div>
+  </div>
+  <div class="start-banner" id="start-banner"></div>
+</header>
+
+<div class="sec">Step 1 — 昇格の条件は5つ。全部そろって1ランク上がる</div>
+<div class="card">
+  <ul class="checks">
+    <li><span class="n">1</span><div><b>本人評価粗利が、半期目標Gの110%以上</b><span>次のランクの目標Nが決まっている場合は、G×110% と N の高い方が昇格ライン。期首にあなたと合意して決めます。</span></div></li>
+    <li><span class="n">2</span><div><b>総合評価が 100点満点で 80点以上</b><span>定量（粗利の達成率）＋定性（行動評価）の合計。配点は Step 2。</span></div></li>
+    <li><span class="n">3</span><div><b>定性の全項目が「期待どおり」以上</b><span>MVVに沿った行動、チームへの貢献。1つでも「要改善」があると昇格しません。基準は Step 3。</span></div></li>
+    <li><span class="n">4</span><div><b>次のランクの役割を、直近3ヶ月以上すでにやっている</b><span>「上がってからやる」ではなく「やっているから上がる」。何が証拠になるかは Step 4。</span></div></li>
+    <li><span class="n">5</span><div><b>原価・担当・対象期間に大きな未確定がない</b><span>台帳（案件のフェーズ・担当割合）や目標が未入力だと、判定は確定しません。</span></div></li>
+  </ul>
+  <div class="note">半期ごと（10〜3月／4〜9月）に、その期の数字だけで判定します。飛び級はありません。昇格できないことを理由に降格することもありません（降格は別の手続き。Step 6）。</div>
+</div>
+
+<div class="sec">Step 2 — 総合点の作り方（<span id="score-ratio"></span>）</div>
+<div class="card">
+  <div class="wbar" id="wbar"></div>
+  <div class="wlab"><span id="wlab-q"></span><span id="wlab-v"></span></div>
+  <div class="formula" style="margin-top:12px;">
+    <span class="c">// 定量：粗利の達成率をそのまま点数に。上限は配点まで</span><br>
+    定量得点 = <span id="f-q"></span>点 × <span class="h">（本人評価粗利 ÷ 半期目標G）</span>　<span class="c">0〜<span id="f-q2"></span>点</span><br>
+    <span class="c">// 定性：観察項目ごとに 期待以上100% / 期待どおり80% / 要改善40% を掛ける</span><br>
+    定性得点 = <span id="f-mvv"></span>点 × MVV行動の水準 ＋ <span id="f-team"></span>点 × チーム貢献の水準<br>
+    総合 = 定量 ＋ 定性　<span class="c">// 80点以上が昇格条件のひとつ</span>
+  </div>
+  <div class="twrap"><table class="t" id="score-examples"></table></div>
+  <div class="note">粗利の達成率が110%を超えても定量は配点が上限です。それ以上は「昇格ライン」の判定で効きます。</div>
+</div>
+
+<div class="sec">Step 3 — 定性はここを見る（5つの観察項目）</div>
+<div class="card">
+  <div class="twrap"><table class="t">
+    <tr><th>区分</th><th>観察項目</th><th>「期待どおり」の目安</th></tr>
+    <tr><td rowspan="3"><b>MVVに沿った行動</b><br><span style="color:var(--ink-3);font-size:11px">配点 <span id="w-mvv"></span>点</span></td><td>約束を守り、誠実に報告する</td><td>期限と内容を守る。遅れや問題は自分から先に報告している</td></tr>
+    <tr><td>顧客の成果に向き合う</td><td>クライアントの結果（採用・売上・反応）を見て自分から動いている</td></tr>
+    <tr><td>根拠のある改善</td><td>数字や事実をもとに変えて、結果を確認している</td></tr>
+    <tr><td rowspan="2"><b>チームへの貢献</b><br><span style="color:var(--ink-3);font-size:11px">配点 <span id="w-team"></span>点</span></td><td>情報・手順の共有</td><td>自分が持つ情報や手順を、他の人が使える形にしている</td></tr>
+    <tr><td>他者支援・引継ぎ・育成</td><td>頼まれなくても助け、引き継ぎで相手が困らない</td></tr>
+  </table></div>
+  <div class="levels">
+    <div class="lv ok"><div class="p">100%</div><div class="w">期待以上</div><div class="d">現ランクの期待を明確に超えた事実がある</div></div>
+    <div class="lv mid"><div class="p">80%</div><div class="w">期待どおり</div><div class="d">昇格に必要な最低ライン。全項目でここ以上</div></div>
+    <div class="lv ng"><div class="p">40%</div><div class="w">要改善</div><div class="d">1つでもあると、その期は昇格しない</div></div>
+  </div>
+  <div class="note">判定は「現ランクに期待される行動」を基準に、具体的な事実で行います。性格・好感度・残業時間・担当売上の大小は根拠にしません。流れは 本人の自己評価 → 上長 → 役員の基準確認 → 本人への説明 です。</div>
+</div>
+
+<div class="sec">Step 4 — 次のランクの役割を「先に」やる</div>
+<div class="card">
+  <div class="twrap"><table class="t">
+    <tr><th>いまのランク → 次</th><th>3ヶ月以上つづけて示す証拠</th></tr>
+    <tr><td><b>R1 → R2</b></td><td>標準の業務を、自分ひとりで期限・品質どおりに終えている</td></tr>
+    <tr><td><b>R2 → R3</b></td><td>担当の成果が安定し、他の人が引き継げる情報・手順を整えている</td></tr>
+    <tr><td><b>R3 → R4</b></td><td>支援・教育・改善によって、他の人の品質や生産性も上がっている</td></tr>
+    <tr><td><b>R4 → R5</b></td><td>複数人で使える仕組みが定着し、チームの成果・品質が改善している</td></tr>
+  </table></div>
+  <div class="warn">自分しか触れない顧客情報・アカウント・手順を抱えている状態は、上位ランクの「再現性」の要件を満たしません。手順書は「他の人が実際に使えて、効果があった」ところまでが証拠です。部下の人数や役職の空きは条件にしません。</div>
+</div>
+
+<div class="sec">Step 5 — 本人評価粗利を増やす（<span id="dept-title2"></span>の場合）</div>
+<div class="formula">
+  <span class="c">// あなたの数字はこう決まる</span><br>
+  本人評価粗利 = 案件の粗利（売上 − 広告費 − 外注費）× <span class="h">役割の取り分</span> × 自分の担当割合
+</div>
+<div class="card">
+  <h3>あなたに関係する「役割の取り分」</h3>
+  <div class="twrap"><table class="t" id="roles-table"></table></div>
+  <h3 style="margin-top:14px;">数字を上げる打ち手</h3>
+  <ul class="checks" id="levers"></ul>
+  <div class="tip" id="dept-tip"></div>
+</div>
+
+<div class="sec">Step 6 — ボーナス・降格・スケジュール</div>
+<div class="card" id="bonus-card"></div>
+<div class="card">
+  <h3>降格は昇格とは別の手続き</h3>
+  <p>暫定基準は「本人評価粗利が G×70% 未満の期が1回」で1ランク下がります（期首に正式確定）。昇格の条件を満たさなかっただけでは降格しません。</p>
+  <h3 style="margin-top:12px;">いつ何が決まるか</h3>
+  <div class="twrap"><table class="t">
+    <tr><th>タイミング</th><th>やること</th></tr>
+    <tr><td>期首（10月・4月）</td><td>半期目標G・N の合意、担当案件のフェーズ・担当割合の登録、閾値の周知</td></tr>
+    <tr><td>毎月</td><td>配分後粗利・定性の事実・役割実証の確認（評価ページで随時見られます）</td></tr>
+    <tr><td>3ヶ月目</td><td>中間面談</td></tr>
+    <tr><td>6ヶ月目</td><td>半期の確定。通知後 10営業日以内に異議申立てができ、役員は 20営業日以内に根拠つきで回答</td></tr>
+  </table></div>
+  <div class="note">目標は期末に後付けで引き上げません。休業・時短は稼働に応じて目標を調整します。</div>
+</div>
+
+<div class="sec">Step 7 — ランク別の月給と、月に必要な粗利（<span id="dept-title3"></span>）</div>
+<div id="salary-root"><div class="status">🔒 ログインした職種の分だけ表示されます（読み込み中…）</div></div>
+<div class="note">スタートは全員 R2。昇格すると月給と目標が同時に上がります。他の職種のテーブルは表示されません。</div>
+
+<div class="sec">Step 8 — あなたの現在地（リアルタイム）</div>
+<div id="me-root"><div class="status">実績データを読み込んでいます…</div></div>
+
+<div class="footer"><span>株式会社LET ／ ランクアップマニュアル</span><span>CONFIDENTIAL — 社内限定 ／ EFFECTIVE 2026-10-01 (PLANNED)</span></div>
+</div>
+</div>
+
+<script>
+(function(){
+  const HASH_TO_KIND = {
+    "1e980b5384f2ce83258b28faa11cba9393191c5c95720fc1ca3b7fc464708ea4": "exec",
+    "3d4a61017b7e31d2bb3435ec8544e284143893fb4e0a0e0c79630a14c04ecaa0": "ehara",
+    "c94aac49f0a10df4b591509fc3374d5be1bd0e2e9efafb66697f2fc4948783b5": "hamasaki",
+    "8883e364906a1a3259e43c6ed57569b18d165d2f47cf2390a1b060c827d2269a": "matsumoto",
+    "5493f023b604435e59f9a6970e0d27114087fea082dcf412afae7602282603cb": "matsuoka",
+    "2d695a070fdbd434974cd2f6b91f60b0e262110cd87de1a9066f520f7d6c70bb": "sawaguchi"
+  };
+  const KIND_MY = { ehara:'/my/ehara', hamasaki:'/my/hamasaki', matsumoto:'/my/matsumoto', matsuoka:'/my/matsuoka', sawaguchi:'/my/sawaguchi', exec:'/new-system' };
+  const API_BASE = "https://slack-let.vercel.app/api/eval/new-system";
+
+  // 職種別の内容。月給などの金額は静的に書かず、暗号化APIから取得して描画する
+  const DEPTS = {
+    sales: {
+      dept:'営業', title:'法人営業', allow:['ehara'], multiplier:3.5,
+      score:{ q:70, mvv:20, team:10 }, bonus:'pool',
+      roles:[
+        ['SNS運用（初回契約の期間）','<b>営業 50%</b>','受注した案件は、初回契約のあいだ粗利の半分があなたの数字'],
+        ['SNS運用（更新後）','<b>営業 10%</b>','更新を取ると1割が続く。更新アプローチも営業の役割'],
+        ['クロスセル単発（HP等）','<b>販売担当 50%</b>','納品まで自分で完結させれば 100%'],
+        ['人材紹介 コミット型','営業 20%','初期値。期首に正式確認'],
+        ['人材紹介 一般型','RA 50%','RAを営業が担う想定'],
+      ],
+      levers:[
+        ['新規受注を積み上げる','初回契約の期間は粗利の50%が自分に付く。ここが一番大きい'],
+        ['更新を取り続ける','更新後は10%に下がるが、件数が積み上がるほど効いてくる'],
+        ['クロスセルを自分で完結させる','HP等を販売から納品まで担えば取り分は100%。外注制作のみなら販売分50%'],
+        ['広告費・制作外注費を抑えた受注設計','粗利 = 売上 − 広告費 − 外注費。同じ売上でも費用が軽いほど数字になる'],
+        ['役員紹介の案件は、期首に営業内の担当割合を登録する','未登録の分は自動で自分には付かず、役員持分として残る'],
+      ],
+      tip:'営業の分母倍率は 3.5（他職種は 3.0）。そのぶん受注の粗利がそのまま自分の数字になります。受注後の売上は「請求が立った月」ごとにカウントされ、前受は売上になりません。',
+    },
+    marketing: {
+      dept:'マーケティング', title:'マーケティング', allow:['hamasaki','matsumoto','matsuoka'], multiplier:3.0,
+      score:{ q:60, mvv:25, team:15 }, bonus:'pool',
+      roles:[
+        ['SNS運用（初回契約の期間）','<b>マーケ 50%</b>','運用している案件は、初回契約のあいだ粗利の半分'],
+        ['SNS運用（更新後）','<b>マーケ 90%</b>','更新後はほぼ全部があなたの数字。継続が最大の武器'],
+        ['クロスセル単発（HP等）','<b>制作納品担当 50%</b>','社内で制作・納品を担った案件のみ。外注制作だけなら付かない'],
+        ['人材紹介 コミット型','マーケ 50%','初期値。期首に正式確認'],
+      ],
+      levers:[
+        ['担当案件を更新させる','更新後は取り分が 50% → 90% に上がる。1件の継続が新規1件分以上に効く'],
+        ['広告費と制作外注費を削る','粗利 = 売上 − 広告費 − 外注費。費用を1万円下げると粗利が1万円上がる'],
+        ['クロスセルの制作を社内で担う','HP等を自分で制作・納品すると50%が付く。要件整理・外注管理・修正・納品確認まで担えば外注時も対象'],
+        ['引き継げる手順を整える','R2→R3の証拠そのもの。他の人が実際に使えて効果が出たところまで'],
+        ['台帳の登録漏れをなくす','案件の「フェーズ」「担当割合」が未入力だと、実績があっても計上されない'],
+      ],
+      tip:'あなたの数字は「担当している案件の粗利 × 取り分」。担当社数を増やすより、1社あたりの粗利と継続率を上げる方が確実に効きます。',
+    },
+    bpo: {
+      dept:'BPO', title:'不動産 / BPO', allow:['sawaguchi'], multiplier:3.0,
+      score:{ q:60, mvv:25, team:15 }, bonus:'cost_rate',
+      roles:[
+        ['不動産 / BPO','<b>BPO担当 100%</b>','配分の目減りなし。担当案件の粗利がそのまま自分の数字'],
+        ['賃貸仲介の仲介手数料','BPO売上に含む','BPO収入と合算して判定'],
+      ],
+      levers:[
+        ['原価率を 40% 以下に保つ','原価 ÷ 売上 が 40% 以下なら賞与1ヶ月。これがBPOのボーナス条件そのもの'],
+        ['売上を伸ばす','部門共通の外注費（サクパスBPO）は売上に関係なく配賦されるので、売上が増えるほど原価率が下がる'],
+        ['外注比率を下げる','自分で処理できる範囲を広げれば原価が減り、粗利と原価率の両方が改善'],
+        ['引き継げる手順を整える','R2→R3の証拠。自分しか触れない顧客・アカウントを減らす'],
+        ['台帳の登録漏れをなくす','案件の「フェーズ」「担当割合」が未入力だと、実績があっても計上されない'],
+      ],
+      tip:'部門共通の外注費（サクパスBPO等）はBPOメンバーで均等に配賦されます。売上が大きいほどこの固定的な負担が薄まるので、原価率の改善は売上側からも効きます。',
+    },
+  };
+
+  const PATH_DEPT = (location.pathname.match(/^\/manual\/(sales|marketing|bpo)/) || [])[1] || 'marketing';
+  const D = DEPTS[PATH_DEPT];
+  const kindAllowed = (k) => k === 'exec' || D.allow.includes(k);
+
+  async function sha256(t){ const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t)); return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join(''); }
+  function b64(s){ const bin=atob(s); const u=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i); return u; }
+  async function decrypt(p,pw){
+    const enc=new TextEncoder();
+    const base=await crypto.subtle.importKey("raw",enc.encode(pw),"PBKDF2",false,["deriveKey"]);
+    const key=await crypto.subtle.deriveKey({name:"PBKDF2",salt:b64(p.salt),iterations:p.iter,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["decrypt"]);
+    const plain=await crypto.subtle.decrypt({name:"AES-GCM",iv:b64(p.iv)},key,b64(p.ct));
+    return JSON.parse(new TextDecoder().decode(plain));
+  }
+  function credentials(){
+    const pw=sessionStorage.getItem('let_auth_newsystem_pw'), kind=sessionStorage.getItem('let_auth_newsystem_kind');
+    if(pw&&kind) return {pw,kind};
+    const ep=sessionStorage.getItem('let_auth_exec_pw');
+    if(sessionStorage.getItem('let_auth_exec')==='1'&&ep) return {pw:ep,kind:'exec'};
+    return null;
+  }
+  const esc=(s)=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[c]);
+  const man=(v)=>v==null?"—":(v/10000).toLocaleString("ja-JP",{maximumFractionDigits:1})+"万円";
+  const manS=(v)=>v==null?"—":(v<0?"▲":"")+Math.round(Math.abs(v)/10000).toLocaleString("ja-JP")+"万";
+  const pct=(r)=>r==null?"—":Math.round(r*100)+"%";
+  const pt=(v)=>v==null?"—":(Math.round(v*10)/10).toLocaleString("ja-JP")+"点";
+
+  // ---- 静的部分の描画（職種別テキスト。金額は含めない）----
+  function renderStatic(){
+    const q=D.score.q, v=D.score.mvv+D.score.team;
+    document.title = 'LET ランクアップマニュアル｜'+D.title;
+    document.getElementById('dept-eyebrow').textContent=D.title;
+    for(const id of ['dept-title','dept-title2','dept-title3']) document.getElementById(id).textContent=D.title;
+    document.getElementById('score-ratio').textContent=`定量${q} : 定性${v}`;
+    document.getElementById('wbar').innerHTML=`<i class="q" style="width:${q}%"></i><i class="v" style="width:${v}%"></i>`;
+    document.getElementById('wlab-q').textContent=`定量（粗利の達成率） ${q}点`;
+    document.getElementById('wlab-v').textContent=`定性（MVV ${D.score.mvv} ＋ チーム貢献 ${D.score.team}） ${v}点`;
+    document.getElementById('f-q').textContent=q; document.getElementById('f-q2').textContent=q;
+    document.getElementById('f-mvv').textContent=D.score.mvv; document.getElementById('f-team').textContent=D.score.team;
+    document.getElementById('w-mvv').textContent=D.score.mvv; document.getElementById('w-team').textContent=D.score.team;
+
+    // 総合点の例（達成率 × 定性水準）
+    const ex=[[1.10,1.0,1.0,'昇格ラインの達成率で、定性が両方期待以上'],[1.10,0.8,0.8,'昇格ラインで、定性が両方期待どおり（最低ライン）'],[1.00,0.8,0.8,'目標ちょうどで、定性が期待どおり'],[0.90,1.0,0.8,'目標未達でも、定性が高い'],[1.20,0.4,1.0,'数字は超えたが、MVV行動が要改善']];
+    document.getElementById('score-examples').innerHTML =
+      `<tr><th>達成率</th><th>MVV</th><th>チーム</th><th class="num">定量</th><th class="num">定性</th><th class="num">総合</th><th>判定</th></tr>`+
+      ex.map(([r,m,t,label])=>{ const qs=Math.max(0,Math.min(q,q*r)); const vs=D.score.mvv*m+D.score.team*t; const tot=qs+vs;
+        const lv=(x)=>x>=1?'期待以上':x>=0.8?'期待どおり':'要改善';
+        const ok=tot>=80&&m>=0.8&&t>=0.8&&r>=1.1;
+        return `<tr class="${ok?'hl':''}"><td>${Math.round(r*100)}%</td><td>${lv(m)}</td><td>${lv(t)}</td><td class="num">${qs.toFixed(0)}</td><td class="num">${vs.toFixed(0)}</td><td class="num"><b>${tot.toFixed(0)}</b></td><td style="font-size:11.5px">${ok?'<span style="color:var(--green);font-weight:700">昇格条件OK</span>':(tot<80?'総合80点未満':(m<0.8||t<0.8)?'定性に要改善あり':'主指標110%未満')}<br><span style="color:var(--ink-3)">${label}</span></td></tr>`;}).join('');
+
+    document.getElementById('roles-table').innerHTML=`<tr><th>案件の種類</th><th>あなたの取り分</th><th>意味</th></tr>`+D.roles.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td><td style="color:var(--ink-3);font-size:11.5px">${r[2]}</td></tr>`).join('');
+    document.getElementById('levers').innerHTML=D.levers.map((l,i)=>`<li><span class="n">${i+1}</span><div><b>${esc(l[0])}</b><span>${esc(l[1])}</span></div></li>`).join('');
+    document.getElementById('dept-tip').textContent=D.tip;
+
+    const bc=document.getElementById('bonus-card');
+    if(D.bonus==='pool'){
+      bc.innerHTML=`<h3>ボーナス（営業・マーケ合同プール）</h3>
+        <div class="formula" style="margin:8px 0;">原資 = 半期のチーム粗利（売上 − 広告費 − 外注費）× <span class="h">15%</span><br>あなたの取り分 = 原資 × <span class="h">あなたのランクのウェイト</span> ÷ 全員のウェイト合計</div>
+        <div class="twrap"><table class="t"><tr><th>ランク</th><th class="num">ウェイト</th><th>意味</th></tr>
+        <tr class="dim"><td>R1</td><td class="num">0.8</td><td>降格枠</td></tr><tr class="hl"><td>R2（スタート）</td><td class="num">1.0</td><td>全員ここから</td></tr><tr><td>R3</td><td class="num">1.2</td><td rowspan="3" style="color:var(--ink-3);font-size:11.5px">昇格するとウェイトが上がり、同じ原資でも取り分が増える。ボーナスは昇格の判定には使わない</td></tr><tr><td>R4</td><td class="num">1.4</td></tr><tr><td>R5</td><td class="num">1.6</td></tr></table></div>
+        <div class="note">上限なし。期中入社・退社は在籍月数で按分。確定額は半期末に会社から通知します。</div>`;
+    } else {
+      bc.innerHTML=`<h3>ボーナス（BPOは原価率で判定）</h3>
+        <div class="formula" style="margin:8px 0;">半期の 原価率 = 原価（外注費など） ÷ 売上<br>原価率が <span class="h">40% 以下</span> なら、月給の <span class="h">1ヶ月分</span> を支給</div>
+        <div class="note">プール分配の対象外で、1ヶ月固定です。売上ゼロの期は原価率が定義できないため支給されません。昇格・降格は他職種と同じく本人評価粗利で判定します。</div>`;
+    }
+    const back=document.getElementById('back-link');
+    const cred=credentials();
+    back.href = (cred && KIND_MY[cred.kind]) || '/new-system';
+  }
+
+  // ---- 動的部分（暗号化APIから）----
+  function renderSalary(data){
+    const root=document.getElementById('salary-root');
+    const tb=(data.tables||[]).find(t=>t.dept===D.dept);
+    if(!tb){ root.innerHTML='<div class="status">この職種の基準表を取得できませんでした。</div>'; return; }
+    const start=tb.rank_salaries.R2;
+    document.getElementById('start-banner').innerHTML=`
+      <div class="start-card"><div class="k">スタート月給（R2）</div><div class="v">${Math.round(start/10000)}万円</div><div class="s">${esc(D.title)}は全員ここから</div></div>
+      <div class="start-card"><div class="k">半期の目標粗利（R2）</div><div class="v">${(tb.half_target/10000).toLocaleString('ja-JP',{maximumFractionDigits:1})}万円</div><div class="s">月あたり ${(tb.monthly_target/10000).toLocaleString('ja-JP',{maximumFractionDigits:2})}万円（月給×1.15×${tb.multiplier}）</div></div>
+      <div class="start-card"><div class="k">昇格ライン</div><div class="v">110%</div><div class="s">＋ 総合80点 ＋ 定性全項目OK ＋ 役割3ヶ月</div></div>`;
+    const rows=['R1','R2','R3','R4','R5'].map(r=>{ const sal=tb.rank_salaries[r]; const req=sal*1.15*tb.multiplier;
+      const name=r==='R2'?'<b>R2（スタート）</b>':r==='R1'?'R1（降格枠）':r;
+      return `<tr class="${r==='R2'?'hl':r==='R1'?'dim':''}"><td>${name}</td><td class="num">${Math.round(sal/10000)}万円</td><td class="num">${(req/10000).toLocaleString('ja-JP',{maximumFractionDigits:2})}万円</td><td class="num">${(req*6/10000).toLocaleString('ja-JP',{maximumFractionDigits:1})}万円</td></tr>`;}).join('');
+    root.innerHTML=`<div class="twrap"><table class="t"><tr><th>ランク</th><th class="num">月給</th><th class="num">必要粗利 / 月</th><th class="num">必要粗利 / 半期</th></tr>${rows}</table></div>
+      <div class="note">「必要粗利」は参考値（月給 × 1.15 × 倍率${tb.multiplier}）。正式な昇格ラインは期首に合意する半期目標G × 110%（または次ランク目標N）です。</div>`;
+  }
+  function renderMe(data){
+    const root=document.getElementById('me-root');
+    const members=(data.teams||[]).filter(t=>t.dept===D.dept).flatMap(t=>t.members||[]);
+    if(!members.length){ root.innerHTML='<div class="status">表示できる実績がありません。</div>'; return; }
+    root.innerHTML=members.map(m=>{
+      const pe=m.personal_eval||{}; const sc=pe.scoring||null;
+      const ready=pe.status==='ready';
+      const kpis=[
+        {l:'本人評価粗利（配分後）',v:manS(pe.role_profit)},
+        {l:'半期目標G',v:manS(pe.target_g)},
+        {l:'昇格ライン',v:manS(pe.promotion_line)},
+        ready?{l:'達成率',v:pct(pe.rate),good:pe.rate>=1.1}:{l:'判定',v:'準備中'}
+      ].map(k=>`<div class="kpi${k.good?' good':''}"><div class="kv">${k.v}</div><div class="kl">${k.l}</div></div>`).join('');
+      const checks=(pe.promotion_checklist||[]).map(c=>{ const cls=c.ok===true?'ok':c.ok===false?'ng':''; const mk=c.ok===true?'✓':c.ok===false?'✕':'□';
+        return `<li class="${cls}"><b>${mk}</b>${esc(c.label)}${c.manual?'<span style="opacity:.7"> — 面談で確認</span>':''}</li>`;}).join('');
+      const bl=[...(pe.blockers||[]),...((sc&&sc.blockers)||[])].filter((x,i,a)=>a.indexOf(x)===i);
+      const blHtml=bl.length?`<div class="warn">まだ確定できない理由：${bl.map(esc).join('／')}</div>`:'';
+      const total=sc&&sc.total_score!=null?`総合 <b>${pt(sc.total_score)}</b>（定量 ${pt(sc.quantitative_score)} ＋ 定性 ${pt(sc.qualitative_score)}）`:'総合点は定性の入力後に出ます';
+      return `<div class="me"><div class="me-head"><span>${esc(m.name)}<small style="margin-left:10px">${esc(m.rank)} ／ 月給${Math.round(m.monthly_salary/10000)}万</small></span><small>${esc(data.period.label)}・${data.period.months_elapsed}ヶ月経過${data.period.is_preview?'・試運転':''}</small></div>
+        <div class="me-body"><div class="kpis">${kpis}</div><div style="font-size:12.5px">${total}</div><ul class="cl">${checks}</ul>${blHtml}
+        <div class="note">同じ数字の内訳（クライアント別・月別）は <a href="${KIND_MY[(credentials()||{}).kind]||'/new-system'}">評価ページ</a> で確認できます。</div></div></div>`;
+    }).join('');
+  }
+  async function loadLive(){
+    const cred=credentials(); if(!cred) return;
+    try{
+      const res=await fetch(API_BASE+'?target='+cred.kind); if(!res.ok) throw new Error('http '+res.status);
+      const data=await decrypt(await res.json(),cred.pw);
+      renderSalary(data); renderMe(data);
+    }catch(e){
+      document.getElementById('salary-root').innerHTML='<div class="status">🔒 月給テーブルは接続回復後に表示されます。</div>';
+      document.getElementById('me-root').innerHTML='<div class="status">実績データは準備中です（接続できませんでした）。マニュアルの内容は上記のとおりです。</div>';
+    }
+  }
+  function show(){ document.getElementById('auth-gate').style.display='none'; document.getElementById('main').style.display=''; renderStatic(); loadLive(); }
+
+  const c0=credentials(); if(c0&&kindAllowed(c0.kind)) show();
+  document.getElementById('auth-form').addEventListener('submit',async function(e){
+    e.preventDefault();
+    const input=document.getElementById('auth-input').value; const hash=await sha256(input); const err=document.getElementById('auth-error'); const kind=HASH_TO_KIND[hash];
+    if(kind&&!kindAllowed(kind)){ err.textContent='このパスワードではこの職種のマニュアルは開けません。ご自身の評価ページからアクセスしてください。'; err.classList.add('show'); document.getElementById('auth-input').value=''; return; }
+    if(kind){ sessionStorage.setItem('let_auth_newsystem','1'); sessionStorage.setItem('let_auth_newsystem_pw',input); sessionStorage.setItem('let_auth_newsystem_kind',kind); show(); }
+    else { err.textContent='パスワードが違います'; err.classList.add('show'); document.getElementById('auth-input').value=''; }
+  });
+})();
+</script>
+</body>
+</html>

@@ -6,26 +6,89 @@
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
       ]
     }
   ],
   "rewrites": [
-    { "source": "/new-system", "destination": "/new-system.html" },
-    { "source": "/my/ehara", "destination": "/new-system.html" },
-    { "source": "/my/hamasaki", "destination": "/new-system.html" },
-    { "source": "/my/matsumoto", "destination": "/new-system.html" },
-    { "source": "/my/matsuoka", "destination": "/new-system.html" },
-    { "source": "/my/sawaguchi", "destination": "/new-system.html" },
-    { "source": "/sales", "destination": "/sales.html" },
-    { "source": "/marketing", "destination": "/marketing.html" },
-    { "source": "/marketing/v2", "destination": "/marketing/v2.html" },
-    { "source": "/bpo", "destination": "/bpo.html" },
-    { "source": "/demo/sales", "destination": "/demo/sales.html" },
-    { "source": "/demo/marketing", "destination": "/demo/marketing.html" },
-    { "source": "/demo/bpo", "destination": "/demo/bpo.html" }
+    {
+      "source": "/new-system",
+      "destination": "/new-system.html"
+    },
+    {
+      "source": "/my/ehara",
+      "destination": "/new-system.html"
+    },
+    {
+      "source": "/my/hamasaki",
+      "destination": "/new-system.html"
+    },
+    {
+      "source": "/my/matsumoto",
+      "destination": "/new-system.html"
+    },
+    {
+      "source": "/my/matsuoka",
+      "destination": "/new-system.html"
+    },
+    {
+      "source": "/my/sawaguchi",
+      "destination": "/new-system.html"
+    },
+    {
+      "source": "/manual/sales",
+      "destination": "/manual.html"
+    },
+    {
+      "source": "/manual/marketing",
+      "destination": "/manual.html"
+    },
+    {
+      "source": "/manual/bpo",
+      "destination": "/manual.html"
+    },
+    {
+      "source": "/sales",
+      "destination": "/sales.html"
+    },
+    {
+      "source": "/marketing",
+      "destination": "/marketing.html"
+    },
+    {
+      "source": "/marketing/v2",
+      "destination": "/marketing/v2.html"
+    },
+    {
+      "source": "/bpo",
+      "destination": "/bpo.html"
+    },
+    {
+      "source": "/demo/sales",
+      "destination": "/demo/sales.html"
+    },
+    {
+      "source": "/demo/marketing",
+      "destination": "/demo/marketing.html"
+    },
+    {
+      "source": "/demo/bpo",
+      "destination": "/demo/bpo.html"
+    }
   ]
 }
