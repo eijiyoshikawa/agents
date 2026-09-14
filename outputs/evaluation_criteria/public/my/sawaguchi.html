@@ -245,6 +245,25 @@ tr.hl td { background: #FBF7EA; }
 .mformal ul li { margin: 2px 0; }
 .mref { margin-top: 10px; }
 .mref summary { cursor: pointer; font-size: 11.5px; color: var(--ink-3); }
+.mscore { margin-top: 10px; padding: 10px 12px; border: 1px solid var(--rule); border-radius: 6px; }
+.mscore.pending { border-style: dashed; }
+.mscore .ms-title { font-size: 12px; font-weight: 900; margin-bottom: 6px; }
+.mscore .ms-title small { font-weight: 400; color: var(--ink-3); margin-left: 6px; }
+.ms-total { font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 700; letter-spacing: -0.5px; }
+.ms-total.ok { color: var(--green); }
+.ms-bar { display: flex; height: 10px; border-radius: 5px; overflow: hidden; background: var(--page); border: 1px solid var(--rule); margin: 6px 0; }
+.ms-bar i { display: block; height: 100%; }
+.ms-bar i.q { background: var(--blue); }
+.ms-bar i.v { background: var(--green); }
+.ms-rows { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-top: 4px; }
+.ms-rows td { padding: 3px 4px; border-bottom: 1px solid var(--rule); }
+.ms-rows td.num { text-align: right; font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ms-rows tr:last-child td { border-bottom: none; font-weight: 900; }
+.ms-check { margin: 8px 0 0; padding: 0; list-style: none; font-size: 11.5px; }
+.ms-check li { margin: 3px 0; color: var(--ink-3); }
+.ms-check li b { font-weight: 700; }
+.ms-check li.ok { color: var(--green); }
+.ms-check li.ng { color: var(--red); }
 .mbars-title {
   font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 1.5px;
   text-transform: uppercase; color: var(--ink-3); margin-top: 16px;
@@ -646,6 +665,55 @@ tr.hl td { background: #FBF7EA; }
     down: ['down', '↓ 降格ライン（G×70%）割れ']
   };
   const pctOf = (v) => (v == null ? '—' : Math.round(v * 100) + '%');
+  const pt = (v) => (v == null ? '—' : (Math.round(v * 10) / 10).toLocaleString('ja-JP') + '点');
+
+  // 総合評価（定量 + 定性・100点満点／2026-09-14 役員確定の配点）
+  function scoreBlock(pe) {
+    const sc = pe && pe.scoring;
+    if (!sc) return '';
+    const w = sc.weights;
+    const quantW = Math.round(w.quantitative), qualW = Math.round(w.qualitative);
+    const head = `<div class="ms-title">📊 総合評価<small>定量${quantW} : 定性${qualW}（100点満点）</small></div>`;
+
+    const qrows = (sc.qualitative_items || []).map(it =>
+      `<tr><td>${esc(it.label)}<span style="color:var(--ink-3)"> / ${it.weight}点</span></td><td class="num">${it.level ? esc(it.level) : '未入力'}</td><td class="num">${pt(it.score)}</td></tr>`
+    ).join('');
+
+    if (sc.status !== 'ready') {
+      const bl = (sc.blockers || []).map(b => `<li>${esc(b)}</li>`).join('');
+      return `<div class="mscore pending">
+        ${head}
+        <div class="ms-bar"><i class="q" style="width:${quantW}%"></i><i class="v" style="width:${qualW}%"></i></div>
+        <table class="ms-rows">
+          <tr><td>定量：本人評価粗利の達成率 / ${quantW}点</td><td class="num">${sc.quantitative_score == null ? '—' : pctOf(pe.rate)}</td><td class="num">${pt(sc.quantitative_score)}</td></tr>
+          ${qrows}
+          <tr><td>総合</td><td class="num"></td><td class="num">${pt(sc.total_score)}</td></tr>
+        </table>
+        <ul class="ms-check">${bl}</ul>
+        <div class="member-nums">定性は「期待以上100% ／ 期待どおり80% ／ 要改善40%」で、観察項目ごとに配点を掛けます。未入力は0点にせず保留します。</div>
+      </div>`;
+    }
+
+    const checks = (pe.promotion_checklist || []).map(c => {
+      const cls = c.ok === true ? 'ok' : c.ok === false ? 'ng' : '';
+      const mark = c.ok === true ? '✓' : c.ok === false ? '✕' : '□';
+      const note = c.manual ? '<span style="opacity:.7"> — 面談で確認</span>' : '';
+      return `<li class="${cls}"><b>${mark}</b> ${esc(c.label)}${note}</li>`;
+    }).join('');
+
+    return `<div class="mscore">
+      ${head}
+      <div><span class="ms-total${sc.total_ok ? ' ok' : ''}">${pt(sc.total_score)}</span> <span style="font-size:11.5px;color:var(--ink-3)">／ 昇格に必要な総合点 ${sc.promotion_total_score}点</span></div>
+      <div class="ms-bar"><i class="q" style="width:${quantW}%"></i><i class="v" style="width:${qualW}%"></i></div>
+      <table class="ms-rows">
+        <tr><td>定量：本人評価粗利の達成率 / ${quantW}点</td><td class="num">${pctOf(pe.rate)}</td><td class="num">${pt(sc.quantitative_score)}</td></tr>
+        ${qrows}
+        <tr><td>総合</td><td class="num"></td><td class="num">${pt(sc.total_score)}</td></tr>
+      </table>
+      <div class="mbars-title" style="margin-top:10px">昇格判定（全項目を満たしたとき1等級昇格・飛び級なし）</div>
+      <ul class="ms-check">${checks}</ul>
+    </div>`;
+  }
 
   // 正式判定（役割配分方式・2026-09-07 決定）: 本人評価粗利 = 案件粗利 × 役割配分率 × 本人担当割合
   function formalBlock(m) {
@@ -670,6 +738,7 @@ tr.hl td { background: #FBF7EA; }
         <ul>${blockers}${missing}</ul>
         ${rows.length ? `<div class="member-nums">入力済みの案件だけで集計した本人評価粗利（暫定）: <b>${man(pe.role_profit)}</b></div>` : ''}
         ${rowsHtml}
+        ${scoreBlock(pe)}
       </div>`;
     }
 
@@ -689,8 +758,9 @@ tr.hl td { background: #FBF7EA; }
       <div class="mf-title">🧭 昇降格の正式判定（役割配分方式）<small>本人評価粗利 ÷ 半期目標G</small></div>
       ${gauge(pe.rate, 'p-' + fcls, marks, '達成率（本人評価粗利 ÷ G）')}
       <div class="mkpis">${kpis}</div>
-      <div class="member-nums">※ 昇格は上記に加えて定性評価（MVV・チーム貢献）・次等級役割の3ヶ月実証・総合80点以上が必要です。降格は別手続き（暫定: G×70%未満で1ランク）。</div>
+      <div class="member-nums">※ 降格は昇格とは別手続きです（暫定: 本人評価粗利が G×70% 未満で1ランク）。</div>
       ${rowsHtml}
+      ${scoreBlock(pe)}
     </div>`;
   }
 
@@ -792,6 +862,8 @@ tr.hl td { background: #FBF7EA; }
       const half = (tb.half_target / 10000).toLocaleString('ja-JP', { maximumFractionDigits: 2 });
       const monthly = (tb.monthly_target / 10000).toLocaleString('ja-JP', { maximumFractionDigits: 2 });
       const bpoNote = tb.dept === 'BPO' ? '<div style="font-size:10.5px;color:var(--ink-3)">売上 − 外注費で判定</div>' : '';
+      const sw = tb.score_weights;
+      const swRow = sw ? `<tr><td style="color:var(--ink-3);font-size:11px">総合評価の配点</td><td class="num" colspan="2">定量 <b>${sw.quantitative}</b> ／ 定性 <b>${sw.qualitative}</b>（MVV ${sw.mvv}・チーム貢献 ${sw.team}）</td></tr>` : '';
       return `<div class="kpi-table-wrap" style="margin-bottom:12px;">
         <table class="kpi-table">
           <thead>
@@ -799,6 +871,7 @@ tr.hl td { background: #FBF7EA; }
           </thead>
           <tbody>
             <tr><td style="color:var(--ink-3);font-size:11px">半期の目標粗利（R2スタート時）${bpoNote}</td><td class="num" colspan="2"><span class="big-num" style="color:var(--blue)">${half}万円</span> <span class="big-num-sub">／ 月あたり ${monthly}万円</span></td></tr>
+            ${swRow}
             ${rows}
           </tbody>
         </table>
