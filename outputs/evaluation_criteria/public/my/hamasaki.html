@@ -41,6 +41,14 @@ body {
   border: 1px solid var(--rule); border-radius: 4px; background: var(--white);
 }
 .nav-back:hover { color: var(--ink); border-color: var(--ink); }
+.manual-links { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+.manual-link {
+  display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
+  background: var(--blue); color: #fff; font-weight: 900; font-size: 13px;
+  padding: 10px 16px; border-radius: 8px; border: 1.5px solid var(--blue);
+}
+.manual-link:hover { background: #154b86; border-color: #154b86; }
+.manual-link small { font-weight: 400; font-size: 11px; opacity: .85; }
 
 header { margin-bottom: 40px; }
 .header-top {
@@ -373,6 +381,7 @@ tr.hl td { background: #FBF7EA; }
     </div>
   </div>
   <div class="notice">✦ 本制度は <strong>2026年10月1日（新会計年度）から施行予定</strong>。スタートまでは現在の評価制度がそのまま適用されます。</div>
+  <div class="manual-links" id="manual-links" hidden></div>
 </header>
 
 <div class="sec-title">Step 1 — 見るのは、2つの数字だけ</div>
@@ -594,6 +603,23 @@ tr.hl td { background: #FBF7EA; }
     sawaguchi: '/demo/bpo'
   };
 
+  // 職種別「ランクを上げるには」マニュアルへのリンク（本人の職種のみ。役員は3職種すべて）
+  const KIND_MANUAL = {
+    ehara: [['sales', '法人営業']],
+    hamasaki: [['marketing', 'マーケティング']], matsumoto: [['marketing', 'マーケティング']], matsuoka: [['marketing', 'マーケティング']],
+    sawaguchi: [['bpo', '不動産 / BPO']],
+    exec: [['sales', '法人営業'], ['marketing', 'マーケティング'], ['bpo', '不動産 / BPO']]
+  };
+  function showManualLinks() {
+    const kind = sessionStorage.getItem('let_auth_newsystem_kind') || (credentials() || {}).kind;
+    const box = document.getElementById('manual-links');
+    const list = KIND_MANUAL[kind];
+    if (!box || !list) return;
+    box.innerHTML = list.map(([slug, label]) =>
+      `<a class="manual-link" href="/manual/${slug}">📘 ランクを上げるには <small>${label}向けマニュアル</small></a>`).join('');
+    box.hidden = false;
+  }
+
   function showBackLinks() {
     const kind = sessionStorage.getItem('let_auth_newsystem_kind') || (credentials() || {}).kind;
     const href = sessionStorage.getItem('let_ns_back') || KIND_HOME[kind] || '/';
@@ -605,6 +631,7 @@ tr.hl td { background: #FBF7EA; }
     document.getElementById('auth-gate').style.display = 'none';
     document.getElementById('main-content').style.display = '';
     showBackLinks();
+    showManualLinks();
     loadLive();
   }
 
