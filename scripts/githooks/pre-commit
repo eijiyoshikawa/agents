@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# 空コミット（ステージ差分ゼロ）を作らせないガード。CLAUDE.md 恒久ルールの強制装置。
+# マージコミットは対象外。意図的に迂回する場合のみ --no-verify（原則使用禁止）。
+if git rev-parse -q --verify MERGE_HEAD >/dev/null 2>&1; then exit 0; fi
+if git diff --cached --quiet 2>/dev/null; then
+  echo "【ブロック】ステージされた変更がありません（空コミット禁止・恒久ルール）。" >&2
+  echo "デプロイ再実行が目的なら: Vercel Deploy Hook / Redeploy / npx vercel --prod を使うこと。" >&2
+  exit 1
+fi
+exit 0

@@ -6,6 +6,16 @@
         "hooks": [
           {
             "type": "command",
+            "command": "bash scripts/hooks/deploy-retrigger-guard.sh"
+          }
+        ],
+        "description": "空コミット・自動コミット生成・空コミットpushをブロック（GitHubフラグ再発防止・恒久ルール）"
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
             "command": "bash scripts/hooks/secret-scan.sh"
           }
         ],

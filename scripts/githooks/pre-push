@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# push対象に「差分ゼロの空コミット」が含まれていないか検査するガード。
+# 背景: 空コミットの定期pushが GitHub abuse detection に抵触した実績(2026-08)。
+# stdin: <local_ref> <local_sha> <remote_ref> <remote_sha>
+ZERO=0000000000000000000000000000000000000000
+while read -r _lref lsha _rref rsha; do
+  [ -z "$lsha" ] && continue
+  [ "$lsha" = "$ZERO" ] && continue  # ブランチ削除は対象外
+  if [ "$rsha" = "$ZERO" ]; then
+    range="$lsha -n 20"              # 新規ブランチは直近20コミットのみ検査
+  else
+    range="$rsha..$lsha"
+  fi
+  for c in $(git rev-list --no-merges $range 2>/dev/null); do
+    if git diff --quiet "$c^" "$c" 2>/dev/null; then
+      echo "【ブロック】差分ゼロの空コミットが含まれています: $(git log -1 --format='%h %s' "$c")" >&2
+      echo "空コミットのpushは禁止（恒久ルール）。git rebase 等で該当コミットを除いてから push してください。" >&2
+      exit 1
+    fi
+  done
+done
+exit 0
