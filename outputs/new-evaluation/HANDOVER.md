@@ -101,6 +101,7 @@ cd ~/work/slack_let && git checkout main && git pull origin main && npx vercel -
 cd ~/work/agents && git checkout main && git pull origin main && npx vercel --prod    # 1行目 agents 確認
 ```
 
-- GitHub→Vercel自動デプロイ停止中。mainマージ後にユーザーがCLIで実行する運用
+- **2026-09-15 GitHub連携が復旧**: main への push／マージで自動デプロイされる（slack-let・agents とも）。リモートセッションからの main マージも即本番反映になるので要注意。手動デプロイは従来どおり可
+- 空コミット再発防止の3層（Vercel ignoreCommand／GitHub Actions guard-empty-commits／.githooks）を両リポジトリに導入。詳細は各 CLAUDE.md
 - 空コミット・自動コミット生成は絶対禁止（CLAUDE.md恒久ルール）
 - リモートセッションからのmain反映手順: branchへcommit/push → `git checkout -B main origin/main && git merge --no-ff origin/claude/beautiful-mayer-ad0uoj && git push origin main`（ユーザー承認済みの定型運用。本セッション分は 2026-09-11 に両リポジトリとも main へマージ済み: slack_let 7539cbc / agents ade0dd5。**本番デプロイは未実施** — リモートセッションにはVercel CLIの認証がないため、ユーザーのターミナルから上記コマンドで反映する）

@@ -1,0 +1,19 @@
+#!/bin/sh
+# CLAUDE.md 恒久ルール: 空コミットを含む push を拒否
+ZERO=0000000000000000000000000000000000000000
+while read local_ref local_sha remote_ref remote_sha; do
+  [ "$local_sha" = "$ZERO" ] && continue
+  if [ "$remote_sha" = "$ZERO" ]; then
+    commits=$(git rev-list --no-merges --max-count=50 "$local_sha")
+  else
+    commits=$(git rev-list --no-merges "$remote_sha..$local_sha")
+  fi
+  for c in $commits; do
+    if git diff --quiet "$c^" "$c" 2>/dev/null; then
+      echo "✖ 空コミット $c を含む push は禁止です（CLAUDE.md 恒久ルール）。" >&2
+      echo "  git reset --soft HEAD~1 等で取り消してから push してください。" >&2
+      exit 1
+    fi
+  done
+done
+exit 0
