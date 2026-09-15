@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { revalidateTag } from "next/cache";
-import { updateCustomerConfirm } from "@/lib/notion";
+import { updateCustomerConfirm, notionErrorMessage } from "@/lib/notion";
 import { verifySession, SESSION_COOKIE } from "@/lib/session";
 
 export const runtime = "nodejs";
@@ -17,6 +17,6 @@ export async function POST(req: Request) {
     revalidateTag("customers");
     return NextResponse.json({ ok: true });
   } catch (e: any) {
-    return NextResponse.json({ ok: false, error: e?.message ?? "更新失敗" }, { status: 500 });
+    return NextResponse.json({ ok: false, error: notionErrorMessage(e) }, { status: 500 });
   }
 }

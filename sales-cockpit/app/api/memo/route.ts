@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { revalidateTag } from "next/cache";
-import { updateCustomerMemo } from "@/lib/notion";
+import { updateCustomerMemo, notionErrorMessage } from "@/lib/notion";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -16,6 +16,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true });
   } catch (e: any) {
     // Notion更新権限が無い場合などはここで握る
-    return NextResponse.json({ ok: false, error: e?.message ?? "保存に失敗しました" }, { status: 500 });
+    return NextResponse.json({ ok: false, error: notionErrorMessage(e) }, { status: 500 });
   }
 }
