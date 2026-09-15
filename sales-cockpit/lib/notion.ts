@@ -28,8 +28,38 @@ export const DB = {
 };
 
 // Notion プロパティ組み立てヘルパー（書き込み用）
-const rt = (s: string) => ({ rich_text: [{ type: "text" as const, text: { content: s ?? "" } }] });
-const tt = (s: string) => ({ title: [{ type: "text" as const, text: { content: s ?? "" } }] });
+// Notion APIは rich_text/title の1要素あたり2,000文字・1プロパティ100要素が上限。
+// 長文は複数要素に分割し、上限(20万字)超は切り捨てて validation_error を防ぐ。
+// （空文字は空配列となり、プロパティのクリアとして扱われる）
+const RT_MAX = 2000;
+const RT_MAX_PARTS = 100;
+const textParts = (s: string) => {
+  const str = (s ?? "").slice(0, RT_MAX * RT_MAX_PARTS);
+  const parts: { type: "text"; text: { content: string } }[] = [];
+  for (let i = 0; i < str.length; i += RT_MAX) {
+    parts.push({ type: "text" as const, text: { content: str.slice(i, i + RT_MAX) } });
+  }
+  return parts;
+};
+const rt = (s: string) => ({ rich_text: textParts(s) });
+
+/** Notion APIエラーを利用者向けの日本語メッセージに変換する（APIルートのcatchで使用） */
+export function notionErrorMessage(e: unknown): string {
+  const err = e as { code?: string; status?: number; message?: string };
+  const msg = err?.message ?? "";
+  if (err?.status === 401 || err?.status === 403 || /unauthorized|restricted/i.test(msg))
+    return "Notionの更新権限がありません。インテグレーションの接続・権限を確認してください。";
+  if (err?.status === 404 || /could not find/i.test(msg))
+    return "対象のNotionページまたは項目が見つかりません（削除・名称変更された可能性があります）。";
+  if (err?.status === 429 || err?.code === "rate_limited")
+    return "Notionが混み合っています。少し時間を置いてもう一度お試しください。";
+  if (/length should be|too long/i.test(msg))
+    return "入力がNotionの文字数上限を超えています。内容を少し短くして保存してください。";
+  if (err?.code === "validation_error")
+    return `入力内容がNotionの制限に合いません（${msg.slice(0, 200)}）`;
+  return msg || "保存に失敗しました。時間を置いて再度お試しください。";
+}
+const tt = (s: string) => ({ title: textParts(s) }); // タイトルも1要素2,000文字上限のため分割
 
 export function notionConfigured(): boolean {
   return Boolean(TOKEN && DB.customers);
@@ -241,10 +271,10 @@ export async function updateCustomer(pageId: string, fields: Record<string, stri
     const v = (raw ?? "").toString().trim();
     if (t === "status") props[name] = { status: v ? { name: v } : null };
     else if (t === "select") props[name] = { select: v ? { name: v } : null };
-    else if (t === "text") props[name] = { rich_text: v ? [{ type: "text", text: { content: v } }] : [] };
-    else if (t === "phone") props[name] = { phone_number: v || null };
-    else if (t === "email") props[name] = { email: v || null };
-    else if (t === "url") props[name] = { url: v || null };
+    else if (t === "text") props[name] = rt(v); // 2,000文字超は自動分割（空文字はクリア）
+    else if (t === "phone") props[name] = { phone_number: v.slice(0, 200) || null }; // Notion上限200字
+    else if (t === "email") props[name] = { email: v.slice(0, 200) || null }; // Notion上限200字
+    else if (t === "url") props[name] = { url: v.slice(0, 2000) || null }; // Notion上限2,000字
     else if (t === "date") props[name] = { date: v ? { start: v } : null };
   }
   if (Object.keys(props).length > 0) {
@@ -399,7 +429,7 @@ export async function fetchWorkedCustomers(): Promise<Customer[]> {
 export async function updateCustomerMemo(pageId: string, memo: string): Promise<void> {
   await client().pages.update({
     page_id: pageId,
-    properties: { メモ: { rich_text: [{ type: "text", text: { content: memo } }] } },
+    properties: { メモ: rt(memo) }, // 2,000文字超は自動分割
   });
 }
 
