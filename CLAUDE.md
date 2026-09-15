@@ -525,3 +525,10 @@ ECC の Continuous Learning v2 を参考にした、セッション間のパタ�
    - Vercel Deploy Hook（Settings → Git → Deploy Hooks で発行したURLに `curl -X POST`）
    - Vercelダッシュボードの Redeploy ボタン
    - Vercel CLI: `npx vercel --prod`（評価サイト let-hyoka は `~/work/agents` から。プロジェクトが `agents` であることを確認）
+
+### 強制装置（2026-09-15 実装。ルールは仕組みで担保される）
+- **Claude Code フック**: `scripts/hooks/deploy-retrigger-guard.sh`（`.claude/settings.json` で全セッションに自動適用）
+  - 空コミットフラグ付き `git commit`／無限ループ・crontab・watch による commit/push 生成／差分ゼロコミットの push をブロック
+- **git 本体フック**: `scripts/githooks/pre-commit`（空ステージのコミット禁止）・`pre-push`（差分ゼロコミットを含む push 禁止）
+  - 各クローンで1回 `bash scripts/setup-githooks.sh` を実行して有効化（core.hooksPath 設定）
+- **定期実行ジョブ（Routine）を新設するときの必須事項**: プロンプトに「実質変更のないコミット・空コミット・再トリガー目的のコミット禁止。変更が無ければコミットせず終了」を必ず含める
