@@ -28,7 +28,17 @@ export const DB = {
 };
 
 // Notion プロパティ組み立てヘルパー（書き込み用）
-const rt = (s: string) => ({ rich_text: [{ type: "text" as const, text: { content: s ?? "" } }] });
+// Notion APIは rich_text の1要素あたり2,000文字が上限。長文メモ等は複数要素に分割して送る。
+// （空文字は rich_text: [] となり、プロパティのクリアとして扱われる）
+const RT_MAX = 2000;
+const rt = (s: string) => {
+  const str = s ?? "";
+  const parts: { type: "text"; text: { content: string } }[] = [];
+  for (let i = 0; i < str.length; i += RT_MAX) {
+    parts.push({ type: "text" as const, text: { content: str.slice(i, i + RT_MAX) } });
+  }
+  return { rich_text: parts };
+};
 const tt = (s: string) => ({ title: [{ type: "text" as const, text: { content: s ?? "" } }] });
 
 export function notionConfigured(): boolean {
@@ -241,7 +251,7 @@ export async function updateCustomer(pageId: string, fields: Record<string, stri
     const v = (raw ?? "").toString().trim();
     if (t === "status") props[name] = { status: v ? { name: v } : null };
     else if (t === "select") props[name] = { select: v ? { name: v } : null };
-    else if (t === "text") props[name] = { rich_text: v ? [{ type: "text", text: { content: v } }] : [] };
+    else if (t === "text") props[name] = rt(v); // 2,000文字超は自動分割（空文字はクリア）
     else if (t === "phone") props[name] = { phone_number: v || null };
     else if (t === "email") props[name] = { email: v || null };
     else if (t === "url") props[name] = { url: v || null };
@@ -399,7 +409,7 @@ export async function fetchWorkedCustomers(): Promise<Customer[]> {
 export async function updateCustomerMemo(pageId: string, memo: string): Promise<void> {
   await client().pages.update({
     page_id: pageId,
-    properties: { メモ: { rich_text: [{ type: "text", text: { content: memo } }] } },
+    properties: { メモ: rt(memo) }, // 2,000文字超は自動分割
   });
 }
 
