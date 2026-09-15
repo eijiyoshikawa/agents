@@ -1,0 +1,41 @@
+name: Guard - 空コミット禁止
+
+# CLAUDE.md 恒久ルール: 空コミット・ダミーコミットによるデプロイ再トリガーは禁止
+# （2026年8月に GitHub の abuse detection でアカウントがフラグされた再発防止）。
+# push に「ファイル変更のないコミット」が含まれていたら fail にして通知する。
+on:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 空コミット（ファイル変更なし）を検出
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: |
+          set -eu
+          ZERO=0000000000000000000000000000000000000000
+          if [ "$BEFORE" != "$ZERO" ] && git cat-file -e "$BEFORE" 2>/dev/null; then
+            COMMITS=$(git rev-list --no-merges "$BEFORE..$AFTER")
+          else
+            COMMITS=$(git rev-list --no-merges --max-count=20 "$AFTER")
+          fi
+          BAD=""
+          for c in $COMMITS; do
+            if git diff --quiet "$c^" "$c" 2>/dev/null; then BAD="$BAD $c"; fi
+          done
+          if [ -n "$BAD" ]; then
+            echo "::error::空コミット（ファイル変更のないコミット）が含まれています:$BAD"
+            echo "::error::CLAUDE.md 恒久ルール違反。デプロイ再実行は npx vercel --prod / Vercel Redeploy / Deploy Hook を使ってください。"
+            exit 1
+          fi
+          echo "OK: 空コミットなし（$(echo $COMMITS | wc -w) commits checked）"

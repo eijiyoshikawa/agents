@@ -345,6 +345,12 @@ hotfix/<短い説明>    — 緊急修正
    - Vercel CLI（`vercel --prod`）
 5. 通常のデプロイは Vercel の GitHub 連携（mainマージ → 自動デプロイ）を使う
 
+#### 再発防止の仕組み（2026-09-15 導入・3層）
+GitHub 連携は 2026-09-15 に復旧。**main への push（マージ含む）は評価サイト（Vercel `agents`）へ自動で本番反映される**ため、main には動作確認済みのものだけを入れる。
+1. **Vercel `ignoreCommand`**（`outputs/evaluation_criteria/vercel.json`）— 公開フォルダ配下に変更のないコミット（空コミット・ドキュメントだけの変更）は Git 連携経由のビルドをスキップ。空コミットではデプロイが走らないので再トリガーの動機を消す。CLI やダッシュボードの Redeploy には影響しない
+2. **GitHub Actions `guard-empty-commits`** — push に空コミットが含まれていたら fail にして push した本人へ通知
+3. **ローカル git hooks**（`.githooks/`）— `git commit --allow-empty` と空コミットを含む push を手元で拒否。clone ごとに1回 `bash scripts/setup-git-hooks.sh` で有効化
+
 ## セキュリティ基準（Security Standards）
 
 ### コミット前の必須チェック

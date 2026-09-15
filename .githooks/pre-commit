@@ -1,0 +1,8 @@
+#!/bin/sh
+# CLAUDE.md 恒久ルール: 空コミット禁止（--allow-empty でもここで止まる）
+if git diff --cached --quiet; then
+  echo "✖ 空コミットは禁止です（ステージされたファイル変更がありません）。" >&2
+  echo "  デプロイの再実行は npx vercel --prod / Vercel ダッシュボードの Redeploy / Deploy Hook を使ってください。" >&2
+  exit 1
+fi
+exit 0
