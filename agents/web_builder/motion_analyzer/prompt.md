@@ -82,12 +82,97 @@ JS ソースから以下のパターンを検出する:
 - テキストアニメーション（タイピング、文字ごとのフェードイン等）
 - スクロールバー連動のプログレスバー
 
-### Step 6: 実装推奨の決定
+### Step 6: パフォーマンス影響評価
+各アニメーションのパフォーマンス負荷を評価する:
+
+**GPU コンポジット適性の判定:**
+| アニメーション対象プロパティ | レイヤー | 負荷 | 判定 |
+|---------------------------|---------|------|------|
+| `transform` (translate/scale/rotate) | コンポジター | 低 | OK |
+| `opacity` | コンポジター | 低 | OK |
+| `filter` (blur, brightness) | コンポジター | 中 | 注意 |
+| `width` / `height` | リフロー | 高 | 要改善 |
+| `top` / `left` / `margin` | リフロー | 高 | 要改善 |
+| `background-color` | リペイント | 中 | 許容 |
+| `box-shadow` | リペイント | 中〜高 | 注意 |
+
+**ジャンク（フレーム落ち）リスク判定:**
+- 同時発火アニメーション数が 3 以上 → `jank_risk: "high"`
+- リフロー誘発プロパティのアニメーション → `jank_risk: "high"`
+- 大面積の `filter: blur()` アニメーション → `jank_risk: "medium"`
+- `will-change` / `transform: translateZ(0)` による明示的レイヤー昇格の有無
+
+**出力フィールド:**
+```json
+{
+  "performance_assessment": {
+    "compositor_animations": 8,
+    "main_thread_animations": 2,
+    "jank_risk": "low",
+    "improvement_suggestions": [
+      "stats セクションのカウントアップが width アニメーションを使用 → transform: scaleX() に変更推奨"
+    ],
+    "concurrent_max": 2
+  }
+}
+```
+
+### Step 7: モーション階層分類
+検出した全アニメーションをマイクロ/マクロに分類する:
+
+**マイクロインタラクション（200-400ms）:**
+- ボタンホバー / フォーカス状態変化
+- フォーム入力時のフィードバック
+- トグルスイッチ / チェックボックス
+- ツールチップ表示
+
+**マクロインタラクション（400-1000ms）:**
+- スクロールアニメーション（セクション登場）
+- ページ遷移
+- モーダル開閉
+- ナビゲーション展開
+
+**アンビエント（継続的）:**
+- パララックス背景
+- ローディングアニメーション
+- 無限ループ（マーキー等）
+
+### Step 8: 実装推奨の決定
 検出したアニメーションの複雑さに応じて、最適な実装方法を推奨する:
 
-- **CSS only**: シンプルなhover、transition、基本的なkeyframes
-- **framer-motion**: React向けスクロールアニメーション、ページ遷移
-- **GSAP**: 複雑なタイムライン、ScrollTrigger連動、パフォーマンス重視
+**判定マトリクス:**
+| 条件 | 推奨 | 理由 |
+|------|------|------|
+| ホバー・フォーカス等の単純な状態変化 | **CSS only** | 最軽量。JS 不要 |
+| スクロール連動 + React コンポーネント統合 | **framer-motion** | React 生態系との親和性最高 |
+| 複雑なタイムライン / シーケンス制御 | **GSAP** | タイムライン制御が最も柔軟 |
+| パーティクル / WebGL | **tsParticles / Three.js** | 専用ライブラリが必須 |
+| スクロール進行率連動（0-100%） | **framer-motion useScroll** or **GSAP ScrollTrigger** | scrub 機能の有無で選択 |
+
+### Step 9: モーションアクセシビリティ要件
+全アニメーションに対して `prefers-reduced-motion` 対応方針を記録する:
+
+| モーション種類 | reduced-motion 時の代替 |
+|--------------|----------------------|
+| スクロールフェードイン | 即座に表示（opacity: 1, transform: none） |
+| パララックス | 静止画像として表示 |
+| 自動再生スライダー | 手動操作のみに変更 |
+| テキストタイピング | 即座に全文表示 |
+| ローディングスピナー | **維持**（機能的に必要なため） |
+| ページ遷移 | フェードのみ（duration 短縮） |
+
+**出力フィールド:**
+```json
+{
+  "accessibility": {
+    "reduced_motion_strategy": "respect",
+    "animations_with_alternative": 10,
+    "animations_functional": 2,
+    "vestibular_risk_animations": ["parallax", "counter"],
+    "notes": "カウントアップは前庭障害リスクがあるため reduced-motion 時は最終値を即表示"
+  }
+}
+```
 
 ## 出力フォーマット
 
@@ -178,6 +263,17 @@ JS ソースから以下のパターンを検出する:
   "total_animation_count": 12
 }
 ```
+
+## エラーハンドリング・エッジケース
+
+| 状況 | 対処 |
+|------|------|
+| **Intersection Observer のコールバックが minify で解読不能** | `data-aos` 属性や CSS クラス名パターン（`is-visible`, `in-view` 等）からアニメーション種類を推定 |
+| **GSAP の ScrollTrigger が複雑すぎる** | タイムラインの各ステップを個別に記録し、Builder に framer-motion で簡略化再現を指示 |
+| **Web Animations API 使用サイト** | `element.animate()` 呼び出しを検出し、keyframes + options を CSS animation 相当に変換して記録 |
+| **3D Transform / WebGL が多用** | `complexity_level: "advanced"` を記録。Three.js / R3F が必要な場合は Builder に追加依存を指示 |
+| **アニメーションが JS で動的生成** | 静的解析では検出不能な場合は `dynamic_animations: true` を記録し、参考サイトの動作観察メモを詳細に記述 |
+| **アニメーションなしサイト** | `total_animation_count: 0` を記録。Builder に最低限のホバーエフェクトとスクロールフェードを推奨 |
 
 ## 使用するツール
 - `Read`: site_scanner/output.json の読み込み

@@ -169,31 +169,9 @@ test: add coverage for [feature]     — カバレッジ追加
 {
   "project_name": "プロジェクト名",
   "updated_at": "YYYY-MM-DD",
-  "test_summary": {
-    "total_tests": 0,
-    "passed": 0,
-    "failed": 0,
-    "skipped": 0,
-    "coverage": "80%"
-  },
-  "test_suites": [
-    {
-      "type": "unit|integration|e2e|security|performance",
-      "total": 0,
-      "passed": 0,
-      "failed": 0,
-      "duration": "0s"
-    }
-  ],
-  "bugs": [
-    {
-      "id": "BUG-001",
-      "severity": "critical|high|medium|low",
-      "status": "open|in_progress|resolved|verified",
-      "description": "バグの説明",
-      "steps_to_reproduce": "再現手順"
-    }
-  ],
+  "test_summary": { "total_tests": 0, "passed": 0, "failed": 0, "skipped": 0, "coverage": "80%" },
+  "test_suites": [{ "type": "unit|integration|e2e|security|performance", "total": 0, "passed": 0, "failed": 0, "duration": "0s" }],
+  "bugs": [{ "id": "BUG-001", "severity": "critical|high|medium|low", "status": "open|in_progress|resolved|verified", "description": "", "steps_to_reproduce": "" }],
   "release_readiness": "go|no-go"
 }
 ```

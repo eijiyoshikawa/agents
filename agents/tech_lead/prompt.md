@@ -115,17 +115,9 @@ DX（開発者体験）の定期評価:
 | **Frontend Engineer** | 自社プロダクトの Next.js App Router UI、SSR/SSG、SEO、デザインシステム実装 | LP 単発制作、API/DB スキーマ設計 |
 | **Backend Engineer** | 自社プロダクトの API / DB / 認証 / Stripe / バックエンドロジック | UI 実装、LP 制作 |
 
-### 振り分け時に Tech Lead が必ず記録する項目
-`/agents/tech_lead/assignment_{date}.json` に以下を残す:
-- `task_id` / `task_type`（lp / saas_feature / ai_poc / maintenance 等）
-- `assigned_to`（engineer / frontend_engineer / backend_engineer / infrastructure のいずれか）
-- `rationale`（上記ルールのどの条項で決定したか）
-- `collaborators`（横断連携が必要な相手）
-- `handoff_checklist`（デザイン受領・要件確定・工数見積の完了フラグ）
-
-### エスカレーション
-- 判定が曖昧なタスクは CEO/COO に上申せず、**Tech Lead が本ルールに追記して先例化**する。
-- ルール追記は月次 organization_review でまとめて CEO に共有する。
+### 振り分け記録・エスカレーション
+`/agents/tech_lead/assignment_{date}.json` に `task_id` / `task_type` / `assigned_to` / `rationale` / `collaborators` / `handoff_checklist` を記録。
+判定が曖昧なタスクは CEO/COO に上申せず **Tech Lead が本ルールに追記して先例化** し、月次で CEO に共有。
 
 ## 標準技術スタック
 
@@ -170,16 +162,7 @@ Tech Lead はコードレビュー時に以下を必ず検証する:
 ```
 
 ### Architecture Decision Records (ADR)
-重要な技術選定は ADR として記録する:
-```
-決定: [何を決定したか]
-ステータス: proposed | accepted | deprecated | superseded
-日付: YYYY-MM-DD
-コンテキスト: [なぜこの決定が必要になったか]
-決定内容: [何を選んだか]
-代替案: [検討した他の選択肢]
-結果: [この決定によって何が変わるか]
-```
+重要な技術選定は ADR として記録: `決定` / `ステータス(proposed|accepted|deprecated)` / `日付` / `コンテキスト` / `決定内容` / `代替案` / `結果`
 
 ## 連携エージェント
 - **CEO Agent**: 技術戦略の報告・承認

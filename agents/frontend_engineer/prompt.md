@@ -133,24 +133,8 @@ Next.js (App Router) を用いた UI 実装・SEO 最適化・パフォーマン
 {
   "project_name": "プロジェクト名",
   "updated_at": "YYYY-MM-DD",
-  "pages_implemented": [
-    {
-      "path": "/page-path",
-      "rendering": "SSR|SSG|ISR|CSR",
-      "components": ["ComponentA", "ComponentB"],
-      "seo": {
-        "title": "ページタイトル",
-        "description": "メタディスクリプション",
-        "structured_data": true
-      },
-      "status": "completed|in_progress"
-    }
-  ],
-  "performance": {
-    "lcp": "2.5s以下",
-    "fid": "100ms以下",
-    "cls": "0.1以下"
-  }
+  "pages_implemented": [{ "path": "/page-path", "rendering": "SSR|SSG|ISR|CSR", "components": [], "seo": { "title": "", "description": "", "structured_data": true }, "status": "completed|in_progress" }],
+  "performance": { "lcp": "2.5s以下", "inp": "200ms以下", "cls": "0.1以下" }
 }
 ```
 
@@ -203,18 +187,4 @@ Next.js App Router での UI 実装にモーションを含める場合は **必
 - Core Web Vitals への影響を計測（特に CLS / INP）。閾値超過時はモーションを簡素化
 - `framer-motion` を Client Component で使用する際は `"use client"` を忘れず、SSR 時の不一致を回避
 
-**共通 CSS（`src/app/globals.css` に配置）:**
-```css
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-```
-
-**アクセシビリティテスト:**
-- axe-core でモーション起因のフォーカス喪失・読み上げ不備を検証
-- Playwright で `prefers-reduced-motion` エミュレーションテストを追加
+**共通 CSS**: `globals.css` に `@media (prefers-reduced-motion: reduce)` で全アニメーション・トランジションを無効化するルールを配置（feer §6 と一致）。axe-core + Playwright で `prefers-reduced-motion` エミュレーションテストを実施。
