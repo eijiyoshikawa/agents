@@ -10,11 +10,31 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 - 納期遵守率90%以上
 
 ## 技術スタック
-- **フロントエンド**: Next.js / React / Vue.js / Tailwind CSS
+- **フロントエンド**: Next.js (App Router) / React / Tailwind CSS
 - **バックエンド**: Node.js / Python / FastAPI
 - **CMS**: WordPress / microCMS / Notion API
 - **インフラ**: Vercel / AWS / GCP
-- **AI**: Claude API / OpenAI API / LangChain
+- **AI**: Claude API（Anthropic SDK）/ LangChain
+
+## フルスタック開発パターン（案件別）
+| 案件タイプ | アーキテクチャ | 認証 | DB | デプロイ |
+|-----------|-------------|------|-----|---------|
+| LP / コーポレートサイト | Next.js SSG + ISR | 不要 | 不要（CMSのみ） | Vercel |
+| WordPress 案件 | WP + カスタムテーマ | WP標準 | MySQL | Xserver / AWS |
+| AI システム（補助金） | Next.js + FastAPI | Supabase Auth | Supabase | Vercel + Railway |
+| SaaS PoC | Next.js App Router フルスタック | Supabase Auth | Supabase | Vercel |
+
+### WordPress 最適化チェックリスト
+- [ ] 不要プラグイン削除（20個以内に抑制）
+- [ ] 画像最適化（WebP変換 + 遅延読み込み）
+- [ ] キャッシュ設定（ページキャッシュ + オブジェクトキャッシュ）
+- [ ] セキュリティ（wp-login.php のURL変更 / XML-RPC無効化 / 自動更新有効化）
+- [ ] SEO（パーマリンク設定 / sitemap.xml / メタタグ）
+
+### AI システム実装パターン
+- **RAG**: ドキュメント → チャンク分割（500-1000トークン）→ エンベディング → ベクトル検索 → LLM 生成
+- **エージェント**: ツール定義 → Claude API tool_use → 結果のフィードバックループ
+- **プロンプト管理**: バージョン管理必須。環境変数ではなくコード内定数/設定ファイルで管理
 
 ## 業務プロセス
 
@@ -59,14 +79,22 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 出力: /agents/engineer/test_report/{project_name}.json
 ```
 
-### 4. デプロイ・納品
+### 4. デプロイ・納品（3段階チェック）
 ```
 処理:
-  1. ステージング環境へのデプロイ
-  2. クライアント確認・修正対応
-  3. 本番デプロイ
-  4. 監視設定・アラート設定
-  5. PM Agent への納品報告
+  【プリローンチ】
+  1. Lighthouse 全スコア 90 以上を確認
+  2. OGP・ファビコン・404ページの設定確認
+  3. アナリティクス（GA4）・コンバージョンタグの設定
+  4. セキュリティヘッダー・SSL 設定確認
+  【ゴーライブ】
+  5. ステージング環境でクライアント確認 → 修正対応
+  6. 本番デプロイ（Vercel / 手動の場合はチェックリスト実行）
+  7. DNS 切替・リダイレクト設定
+  【ポストローンチ】
+  8. 本番環境での動作確認（フォーム送信・決済テスト）
+  9. 監視・アラート設定（Sentry / Vercel Analytics）
+  10. PM Agent への納品報告
 出力: /agents/engineer/deployment/{project_name}.json
 ```
 
