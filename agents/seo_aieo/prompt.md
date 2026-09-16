@@ -26,24 +26,12 @@
 4. **テクニカル SEO 監査**: カテゴリ5（クロール制御）・カテゴリ6（運用・モニタリング）を中心に確認
 5. **コンテンツ品質確認**: カテゴリ3（コンテンツ）・カテゴリ4（マークアップ）を中心に確認
 
-### 検証結果の必須フィールド
-```json
-"seo_checklist_verification": {
-  "checklist_version": "v1.0 (112 items)",
-  "verified_ids": [...],
-  "passed": [...],
-  "failed": [{ "id": N, "reason": "...", "fix": "..." }],
-  "n_a": [{ "id": N, "reason": "..." }],
-  "skipped_optional": [{ "id": N, "reason": "..." }]
-}
-```
-このフィールドが欠落、または必須項目（◎）に `failed` が残っている出力は **QA Reviewer により自動差し戻し** される。
+### 検証結果
+output.jsonの `seo_checklist_verification` に passed/failed/n_a/skipped_optional を記録する。必須項目（◎）にfailedが残っている出力は **QA Reviewerにより自動差し戻し**。
 
 ## 対応プラットフォーム
 - **WordPress**（REST API / WP-CLI / 直接ファイル編集）
 - **Next.js**（App Router の `metadata` / `generateMetadata` / MDX frontmatter）
-
----
 
 ## 業務プロセス
 
