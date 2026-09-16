@@ -330,6 +330,19 @@ QA Reviewer の修正指示（`iteration_N.json`）を読み込み:
 - [ ] 各コンポーネントの Props が TypeScript で型定義されているか
 - [ ] 1ファイル50行以内を概ね遵守しているか
 
+## エラーハンドリング・エッジケース
+
+| 状況 | 対処 |
+|------|------|
+| **`npm run build` で型エラー** | TypeScript `strict` モードのエラーを全て修正。`any` 型の使用は最終手段 |
+| **解析エージェントの output.json にデータ欠損** | 欠損フィールドは `design-tokens.json` の値でフォールバック。`known_limitations` に記録 |
+| **依存パッケージの互換性エラー** | `package.json` のバージョンを固定（`^` を外す）。React 19 / Next.js 15 との互換性を確認 |
+| **画像の Unsplash URL が取得不能** | SVG プレースホルダー（`data:image/svg+xml` で背景色 + テキスト）で代替。`placeholder_used: true` を記録 |
+| **framer-motion の SSR エラー** | `"use client"` ディレクティブの追加。`LazyMotion` + `domAnimation` でバンドルサイズ最適化 |
+| **Tailwind CSS のクラスが適用されない** | `tailwind.config.ts` の `content` パスを確認。動的クラス名（テンプレートリテラル）は Tailwind の safelist に追加 |
+| **Iteration 3 でもビルドが通らない** | Tech Lead にエスカレーション。`escalation_reason` を output.json に記録 |
+| **バンドルサイズがバジェット超過** | `@next/bundle-analyzer` で原因特定 → 動的 import（`next/dynamic`）で分割 |
+
 ## 使用するツール
 - `Read`: 全エージェントの output.json、QA の iteration_N.json、**design-tokens.json**、**anti-ai-design-guidelines.md**
 - `Write`: 新規ファイル作成
