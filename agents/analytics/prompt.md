@@ -174,16 +174,9 @@ GA4・Google Search Console・各種広告プラットフォームのデータ�
     "by_goal": []
   },
   "search_console": {
-    "total_clicks": 0,
-    "total_impressions": 0,
-    "avg_ctr": 0,
-    "avg_position": 0,
+    "total_clicks": 0, "total_impressions": 0, "avg_ctr": 0, "avg_position": 0,
     "top_queries": [],
-    "core_web_vitals": {
-      "lcp": null,
-      "fid": null,
-      "cls": null
-    }
+    "core_web_vitals": { "lcp": null, "fid": null, "cls": null }
   },
   "ads_performance": {
     "total_spend": 0,

@@ -98,6 +98,34 @@ HTMLから全 `<img>` タグと CSS `background-image` を抽出する:
 3. **カスタムフォント**: woff2 ファイルのURL（取得可能な場合）
 4. **フォールバック**: 各フォントに対する適切なフォールバック指定
 
+**フォントサブセット最適化（日本語フォント必須）:**
+日本語フォントはフルセットで 5-15MB に達するため、サブセット戦略を必ず策定する:
+
+| 方式 | サイズ削減 | 適用条件 |
+|------|----------|---------|
+| `next/font/google` の `subsets: ['latin']` | 自動最適化（Google Fonts が unicode-range で分割配信） | Google Fonts 使用時（推奨） |
+| `unicode-range` 指定 | 必要な文字種のみ読み込み | セルフホスト時 |
+| `font-display: swap` | CLS 防止（フォールバック表示後に差し替え） | 全フォントに必須 |
+| `preload` | LCP 改善 | ヒーロー見出しのフォントのみ |
+
+**`next/font/google` 推奨設定（日本語サイト）:**
+```typescript
+const notoSansJP = Noto_Sans_JP({
+  subsets: ['latin'],           // 日本語は自動で unicode-range 分割
+  weight: ['400', '500', '700'], // 使用するウェイトのみ
+  display: 'swap',              // CLS 防止
+  preload: true,                // LCP 最適化
+  adjustFontFallback: true,     // CLS 最小化
+});
+```
+
+**フォントライセンス確認:**
+| ソース | ライセンス | 再利用可否 |
+|--------|----------|----------|
+| Google Fonts | OFL (Open Font License) | 再利用可 |
+| Adobe Fonts | サブスクリプション | 契約必要（代替提案必須） |
+| カスタム（セルフホスト） | 個別確認 | `license: "unknown"` で記録 |
+
 ### Step 3: アイコンの収集
 ページ内で使われているアイコンを分類する:
 
@@ -112,7 +140,20 @@ HTMLから全 `<img>` タグと CSS `background-image` を抽出する:
 
 ### Step 4: ファビコン・OGP画像
 - ファビコン: 形状・色の説明とプレースホルダー生成方針
-- OGP画像: サイズ・デザインの説明
+- OGP画像: サイズ（1200x630px 推奨）・デザインの説明
+
+### Step 4.5: アセットライセンス検証プロトコル
+全アセットのライセンス状態を以下の基準で分類する:
+
+| 分類 | 説明 | Builder への指示 |
+|------|------|----------------|
+| **extractable** | SVGインラインコード、CSS生成パターン背景 | そのまま使用可（コードとして再現） |
+| **replaceable_free** | 写真・イラスト → Unsplash / Pexels / unDraw で代替可能 | 代替キーワードと推奨ソースを提示 |
+| **replaceable_paid** | 有料ストック写真 → iStock / Shutterstock 相当 | クライアントに購入を提案。暫定はプレースホルダー |
+| **brand_specific** | ロゴ・商標・固有キャラクター | 再現不可。プレースホルダーで代替し、クライアント提供を依頼 |
+| **font_commercial** | 有料フォント | Google Fonts の代替フォントを提案 |
+
+**注意**: `license: "unknown"` のアセットは一律 `replaceable_free` として処理し、Legal Agent に確認をエスカレーションする。
 
 ### Step 5: ローカルファイルパス設計
 Next.js の `/public` ディレクトリ構成を設計する:
@@ -206,9 +247,35 @@ Next.js の `/public` ディレクトリ構成を設計する:
   },
   "total_images": 12,
   "images_requiring_placeholder": 10,
-  "images_extractable": 2
+  "images_extractable": 2,
+  "optimization_summary": {
+    "estimated_total_asset_size_kb": 2400,
+    "estimated_optimized_size_kb": 800,
+    "savings_percent": 67,
+    "lcp_image": "hero-bg.jpg",
+    "lcp_strategy": "priority + preload + WebP + sizes 指定"
+  },
+  "cdn_strategy": {
+    "provider": "Vercel Edge Network（Next.js デフォルト）",
+    "image_optimization": "next/image で自動 WebP 変換 + リサイズ",
+    "cache_policy": "public, max-age=31536000, immutable（ハッシュ付きファイル名）",
+    "font_preload": ["Noto Sans JP 400", "Noto Sans JP 700"],
+    "critical_assets": ["hero-bg.jpg", "logo.svg"]
+  }
 }
 ```
+
+## エラーハンドリング・エッジケース
+
+| 状況 | 対処 |
+|------|------|
+| **画像が CDN 経由でクエリパラメータ付き URL** | ベース URL を正規化して重複排除。CDN パラメータ（`?w=`, `?h=`, `?q=`）から元サイズを推定 |
+| **WebP / AVIF のみ提供で元 JPEG/PNG がない** | `original_format: "webp"` を記録。Builder は `next/image` の自動変換に任せる |
+| **Lazy load で `src` が空（`data-src` に実URL）** | `data-src`, `data-lazy-src`, `noscript` 内の img から実 URL を抽出 |
+| **SVG スプライトシート使用** | スプライトシート全体を記録し、個別アイコンの `<use>` パターンをマッピング |
+| **画像が base64 エンコード** | 10KB 以下はインライン SVG として維持。それ以上は外部ファイル化を推奨 |
+| **フォントが woff のみ（woff2 なし）** | `font_format_warning: true` を記録。Google Fonts の同等フォントへの差し替えを推奨 |
+| **アイコンフォント（Font Awesome 等）が数千グリフ** | 実際に使用されているアイコンだけをリスト化し、Tree-shaking 可能なライブラリ（lucide-react）への移行を推奨 |
 
 ## 使用するツール
 - `Read`: site_scanner/output.json, design_analyzer/output.json の読み込み

@@ -150,18 +150,10 @@ Notion MCP ツールを使用して「収集データ」データベースに保
 ## 使用するツール
 
 ### Playwright MCP（ブラウザ自動操作）
-- `browser_navigate`: URL遷移
-- `browser_click`: 要素クリック
-- `browser_fill`: フォーム入力
-- `browser_snapshot`: ページ内容取得
-- `browser_take_screenshot`: スクリーンショット
-- `browser_wait`: 要素待機
+`browser_navigate` / `browser_click` / `browser_fill` / `browser_snapshot` / `browser_take_screenshot` / `browser_wait`
 
 ### Notion MCP（データ保存）
-- `notion-search`: データベース・ページ検索
-- `notion-create-pages`: 新規ページ作成
-- `notion-update-page`: ページ更新
-- `notion-create-database`: データベース作成（初回セットアップ時）
+`notion-search` / `notion-create-pages` / `notion-update-page` / `notion-create-database`
 
 ### その他
 - `Read`: サイト設定ファイルの読み込み

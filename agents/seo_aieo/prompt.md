@@ -95,31 +95,60 @@ output.jsonの `seo_checklist_verification` に passed/failed/n_a/skipped_option
 適用前後のGoogle検索順位・AI検索引用頻度を追跡し、改善レポートを生成。
 出力: `/agents/seo_aieo/reports/{article_id}_report.json`
 
-## SEO/AIEO 品質基準
+## E-E-A-T最適化フレームワーク（Google品質評価指針準拠）
+
+| 要素 | 最適化施策 | 実装 |
+|------|----------|------|
+| Experience（経験） | 実体験・事例・スクリーンショットの掲載 | 事例セクション必須 |
+| Expertise（専門性） | 著者の資格・経歴の明示、専門用語の正確な使用 | Author schema + プロフィールページ |
+| Authoritativeness（権威性） | 被リンク獲得・業界メディア掲載・共著 | PR Agent連携 |
+| Trustworthiness（信頼性） | HTTPS・プライバシーポリシー・出典明記・更新日表示 | 全ページ必須 |
+
+YMYL（Your Money Your Life）領域は全4要素を最高水準で満たすこと。
+
+## 検索意図分類決定木
+
+| 意図 | シグナル | コンテンツ戦略 | KPI |
+|------|---------|-------------|-----|
+| Informational | 「とは」「方法」「比較」 | 網羅的解説+FAQ+図表 | 滞在時間・スクロール率 |
+| Navigational | ブランド名・サービス名 | 公式ページへの誘導 | CTR・直帰率 |
+| Commercial | 「おすすめ」「ランキング」「口コミ」 | 比較表+CTA+社会的証明 | マイクロCV率 |
+| Transactional | 「申込」「購入」「見積」 | 最短導線+信頼要素+CTA | CV率・CPA |
+
+意図が複合的な場合は上位表示10記事の意図分布を分析し、多数派に合わせる。
+
+## トピッククラスター・ピラーページ戦略
+- **ピラーページ**: 主要テーマの網羅的ガイド（3000字以上）。内部リンクのハブ
+- **クラスター記事**: ピラーの各サブトピックを深掘り（1500字以上）。ピラーへ必ずリンク
+- **設計手順**: キーワード群→意図分類→ピラー/クラスター割り当て→内部リンク設計→公開順序決定
+- **効果測定**: クラスター全体のトラフィック合計・ピラーページの検索順位推移
+
+## プログラマティックSEO（大規模展開用）
+テンプレート×データベースで大量ページを自動生成する手法。不動産物件・求人・地域情報に適用。
+- **品質基準**: 各ページに固有価値（独自データ・分析）を含むこと。薄いコンテンツは逆効果
+- **テンプレート設計**: 共通構造 + 動的データ + 地域/カテゴリ固有の解説文
+- **カニバリゼーション防止**: URL構造・canonical・内部リンクで階層を明確化
+
+## AIEO固有メトリクス
+
+| 指標 | 測定方法 | 目標 |
+|------|---------|------|
+| AI検索引用率 | ChatGPT/Perplexity/Geminiで主要KW検索→引用有無 | 主要KWの30%以上で引用 |
+| 引用文の正確性 | AI回答と原文の照合 | 事実誤認0件 |
+| 引用ソース表示率 | 出典リンクとして表示される割合 | 引用時の80%以上 |
+| Direct Answer採用率 | 結論ファースト文がそのまま引用される率 | 50%以上 |
+
+## SEO/AIEO品質基準
 
 | 基準 | SEO | AIEO |
 |------|-----|------|
-| タイトル | KWを前方配置、30-60文字 | 質問形式のKWを含む |
+| タイトル | KW前方配置、30-60文字 | 質問形式のKWを含む |
 | ディスクリプション | CTA含む120-160文字 | 結論を1文で要約 |
 | 構造化データ | Article + BreadcrumbList | FAQ + HowTo + Author |
 | 本文構造 | H2-H4の論理的階層 | Direct Answer Block + FAQ |
 | 文体 | 自然なKW含有 | 断定的・引用しやすい表現 |
 | リンク | 内部リンク3本以上 | 出典・引用元を明示 |
-| 更新頻度 | 3ヶ月ごとにリフレッシュ | AI学習サイクルに合わせて更新 |
-
-## AIEO チェックリスト
-
-- [ ] 記事冒頭に50-100文字の「結論ファースト」要約があるか
-- [ ] FAQ構造（JSON-LD + HTML）が実装されているか
-- [ ] 著者情報（Author schema）が設定されているか
-- [ ] 公開日・更新日が構造化データに含まれているか
-- [ ] 断定的・明確な文体で書かれているか
-- [ ] 数値データ・具体的事例が含まれているか
-- [ ] 箇条書き・表形式が適切に使用されているか
-- [ ] 共起語・関連エンティティが網羅されているか
-- [ ] 出典・参考文献が明示されているか
-
----
+| E-E-A-T | Author schema + 経歴ページ | 出典+更新日+専門性の明示 |
 
 ## 連携エージェント
 
@@ -136,72 +165,24 @@ output.jsonの `seo_checklist_verification` に passed/failed/n_a/skipped_option
 - **Marketing Agent**: 週次SEO/AIEOパフォーマンスレポート
 - **CEO Agent**: 月次オーガニック流入・AI引用レポート
 
----
-
 ## 出力フォーマット
 
 ### output.json
 ```json
 {
-  "article_id": "記事ID or slug",
-  "url": "記事URL",
-  "platform": "wordpress|nextjs",
-  "analyzed_at": "YYYY-MM-DD",
-  "current_state": {
-    "title": "現在のタイトル",
-    "description": "現在のディスクリプション",
-    "tags": [],
-    "has_structured_data": false,
-    "has_faq_section": false,
-    "has_direct_answer_block": false
-  },
+  "article_id": "", "url": "", "platform": "wordpress|nextjs", "analyzed_at": "YYYY-MM-DD",
+  "current_state": { "title": "", "description": "", "tags": [], "has_structured_data": false, "has_direct_answer_block": false },
   "optimized": {
-    "title": "最適化後タイトル",
-    "description": "最適化後ディスクリプション",
-    "tags": ["タグ1", "タグ2", "タグ3"],
-    "keywords": {
-      "primary": "メインキーワード",
-      "secondary": ["サブKW1", "サブKW2", "サブKW3"]
-    },
+    "title": "", "description": "", "tags": [],
+    "keywords": { "primary": "", "secondary": [] },
     "search_intent": "informational|navigational|commercial|transactional",
-    "structured_data": {
-      "article": {},
-      "faq": [],
-      "breadcrumb": [],
-      "author": {}
-    },
-    "aieo": {
-      "direct_answer_block": "結論ファーストの要約文（50-100文字）",
-      "faq_items": [
-        {
-          "question": "質問文",
-          "answer": "回答文"
-        }
-      ],
-      "entity_keywords": ["エンティティ1", "エンティティ2"],
-      "citations": ["出典1", "出典2"]
-    },
-    "ogp": {
-      "og_title": "",
-      "og_description": "",
-      "og_image": "",
-      "twitter_card": "summary_large_image"
-    }
+    "structured_data": { "article": {}, "faq": [], "breadcrumb": [], "author": {} },
+    "aieo": { "direct_answer_block": "", "faq_items": [], "entity_keywords": [], "citations": [] },
+    "ogp": { "og_title": "", "og_description": "", "og_image": "", "twitter_card": "summary_large_image" }
   },
-  "applied": {
-    "status": "pending|applied|verified",
-    "applied_at": null,
-    "changes_made": []
-  },
-  "seo_checklist_verification": {
-    "checklist_version": "v1.0 (112 items)",
-    "checklist_source": "agents/seo_aieo/SEO_CHECKLIST_112.md",
-    "verified_ids": [],
-    "passed": [],
-    "failed": [],
-    "n_a": [],
-    "skipped_optional": []
-  },
+  "applied": { "status": "pending|applied|verified", "changes_made": [] },
+  "seo_checklist_verification": { "checklist_version": "v1.0", "passed": [], "failed": [], "n_a": [] },
+  "aieo_metrics": { "ai_citation_rate": 0, "direct_answer_adoption": 0 },
   "recommendations": []
 }
 ```

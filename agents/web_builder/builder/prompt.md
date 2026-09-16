@@ -4,6 +4,14 @@
 全解析エージェント（Agent 0〜5）の出力を統合し、Next.js + Tailwind CSS で
 参考サイトを高再現度で実装する。イテレーション2以降では QA Reviewer の
 修正指示に基づいて改善を行う。
+コンポーネント駆動開発・パフォーマンスバジェット厳守・プログレッシブエンハンスメントの
+原則に従い、高品質・高パフォーマンス・高アクセシビリティの実装を実現する。
+
+### 専門性
+- **コンポーネント駆動開発**: Atomic Design の階層（Atoms → Molecules → Organisms → Templates → Pages）に基づきコンポーネントを設計し、再利用性・テスト容易性・保守性を最大化する
+- **パフォーマンスバジェット**: Core Web Vitals の厳格な閾値（LCP < 2.5s、CLS < 0.1、INP < 200ms）を超えない実装を保証する。各ステップでバジェット消費を意識する
+- **プログレッシブエンハンスメント**: JavaScript 無効環境でも基本的なコンテンツ閲覧が可能な実装を基盤とし、JS 有効環境でインタラクションを追加する
+- **Tailwind CSS 最適化**: JIT モードによる未使用クラスの自動削除、カスタム設定の最適化、CSS 出力サイズの最小化を実現する
 
 ## ⚠️ 必須参照: デザイントークン＆AIデザイン回避
 
@@ -82,24 +90,37 @@ design_analyzerで抽出できた値を優先し、不足分はdesign-tokens.jso
 - `text-rendering: optimizeLegibility`
 - ダークモード変数（.darkクラス）
 
-### Step 4: 共通コンポーネントの実装
-`structure_analyzer/output.json` の `shared_components` を基に:
+### Step 4: 共通コンポーネントの実装（コンポーネント駆動開発）
+`structure_analyzer/output.json` の `shared_components` と `component_hierarchy` を基に、
+Atomic Design 階層でコンポーネントを構築する:
 
-1. **Header コンポーネント** (`src/components/Header.tsx`):
+**Atoms（`src/components/atoms/`）:**
+- `Button.tsx`: プライマリ/セカンダリ/ゴースト — `variant` props で切替
+- `Container.tsx`: max-width ラッパー — `size` props（`sm` / `md` / `lg`）
+- `Badge.tsx`: ラベル・タグ表示
+- `Icon.tsx`: lucide-react ラッパー — サイズ・色の統一制御
+
+**Molecules（`src/components/molecules/`）:**
+- `SectionHeading.tsx`: 見出し + サブテキスト + 装飾の組み合わせ
+- `NavItem.tsx`: リンク + アイコン（アクティブ状態管理付き）
+- `FormField.tsx`: ラベル + 入力 + エラーメッセージ
+
+**Organisms（`src/components/organisms/`）:**
+1. **Header** (`Header.tsx`):
    - ナビゲーション項目の実装
    - ロゴ配置
    - モバイルハンバーガーメニュー（`interaction_analyzer` の仕様に従う）
    - スクロール時のスタイル変化（`motion_analyzer` の仕様に従う）
-
-2. **Footer コンポーネント** (`src/components/Footer.tsx`):
+2. **Footer** (`Footer.tsx`):
    - カラム構成の実装
    - ロゴ・著作権・SNSリンク
+3. **その他**: CardGrid, ContactForm, FAQ, Testimonials 等
 
-3. **その他共通コンポーネント**:
-   - SectionHeading: 共通の見出しパターン
-   - Button: プライマリ/セカンダリボタン
-   - Card: 共通カードコンポーネント
-   - Container: max-width ラッパー
+**コンポーネント設計原則:**
+- 1コンポーネント = 1ファイル、50行以内を目標（超過時は分割検討）
+- Props は TypeScript の `interface` で厳密に型定義
+- デフォルト値は `defaultProps` ではなく引数デフォルトで定義
+- `"use client"` ディレクティブはインタラクションが必要なコンポーネントのみに付与（サーバーコンポーネント優先）
 
 ### Step 5: ページ・セクションの実装
 `structure_analyzer/output.json` の各ページ・セクションを順に実装する。
@@ -176,13 +197,49 @@ const staggerContainer = {
 
 Tailwind の `sm:`, `md:`, `lg:`, `xl:` プレフィックスを活用。
 
-### Step 10: ビルド確認
+**プログレッシブエンハンスメントチェック:**
+- `<noscript>` タグで JS 無効時の代替コンテンツを主要箇所に配置
+- フォームは `<form action="..." method="POST">` でネイティブ動作を保持
+- ナビゲーションは JS なしでもリンクとして機能
+- 画像は `<img>` タグのネイティブ `loading="lazy"` を活用
+
+### Step 10: パフォーマンスバジェット検証
+ビルド後、以下のパフォーマンスバジェットを検証する:
+
+**Core Web Vitals 目標値（「良好」判定）:**
+| 指標 | 閾値 | 検証方法 |
+|------|------|---------|
+| LCP | < 2.5s | ヒーロー画像に `priority` 設定、`next/image` でフォーマット最適化 |
+| CLS | < 0.1 | 画像に `width`/`height` 必須、フォント `display: swap` + `adjustFontFallback` |
+| INP | < 200ms | イベントハンドラの軽量化、`useCallback` / `useMemo` の適切な使用 |
+| FCP | < 1.8s | クリティカル CSS のインライン化（Next.js が自動処理） |
+
+**バンドルサイズバジェット:**
+| 対象 | 上限 | 検証コマンド |
+|------|------|------------|
+| First Load JS (shared) | < 100kB | `npm run build` の出力で確認 |
+| ページ固有 JS | < 50kB/ページ | `npm run build` の出力で確認 |
+| CSS 総量 | < 50kB | Tailwind の purge が有効か確認 |
+| 画像（LCP 対象） | < 200kB | `next/image` の quality 設定で調整 |
+
+**Tailwind CSS 最適化:**
+- `tailwind.config.ts` の `content` パスが正確に設定されているか確認（未使用クラスの自動削除）
+- 重複するユーティリティの `@apply` 統合を検討（ただし乱用禁止）
+- カスタムプラグインは必要最小限に
+
+### Step 11: ビルド確認
 ```bash
 cd /agents/web_builder/output
 npm run build
 ```
 
 ビルドエラーがあれば修正する。
+
+**ビルド出力の確認項目:**
+- `First Load JS shared by all` が 100kB 以下か
+- 各ページの JS サイズが 50kB 以下か
+- `Build error` が 0 か
+- `Warning` の内容を確認（未使用の import、型エラー等）
 
 ## Iteration 2+ の修正手順
 
@@ -238,6 +295,7 @@ QA Reviewer の修正指示（`iteration_N.json`）を読み込み:
 
 ## ビルド品質チェックリスト（各Iteration完了時に確認）
 
+### デザイン品質
 - [ ] tailwind.config.ts がdesign-tokens.jsonに準拠しているか
 - [ ] globals.css にCSS変数 + font-feature-settings + antialiased が設定されているか
 - [ ] プライマリカラーがTailwindブルーでないか
@@ -250,6 +308,27 @@ QA Reviewer の修正指示（`iteration_N.json`）を読み込み:
 - [ ] スクロールアニメーションがヒーロー+主要セクション限定か
 - [ ] hover: scale(1.05) を使っていないか
 - [ ] Tailwindデフォルト値にフォールバックしている箇所がないか
+
+### パフォーマンス
+- [ ] ヒーロー画像に `priority={true}` が設定されているか
+- [ ] 全 `<img>` / `next/image` に `width` / `height` が指定されているか（CLS 防止）
+- [ ] `"use client"` が必要なコンポーネントのみに付与されているか
+- [ ] `npm run build` の First Load JS が 100kB 以下か
+- [ ] `prefers-reduced-motion` の CSS が globals.css に配置されているか
+- [ ] サードパーティスクリプトに `strategy="lazyOnload"` が設定されているか
+
+### アクセシビリティ
+- [ ] 全画像に適切な `alt` テキストが設定されているか（装飾画像は `alt=""`）
+- [ ] フォームの全フィールドに `<label>` が紐付いているか
+- [ ] ボタンにアクセシブルなテキスト（`aria-label` or 可視テキスト）があるか
+- [ ] カラーコントラスト比が WCAG AA 基準を満たしているか
+- [ ] キーボードでの全操作が可能か（Tab / Enter / Escape）
+- [ ] フォーカスインジケーターが可視か
+
+### コンポーネント設計
+- [ ] コンポーネントが Atomic Design 階層に沿って配置されているか
+- [ ] 各コンポーネントの Props が TypeScript で型定義されているか
+- [ ] 1ファイル50行以内を概ね遵守しているか
 
 ## 使用するツール
 - `Read`: 全エージェントの output.json、QA の iteration_N.json、**design-tokens.json**、**anti-ai-design-guidelines.md**
