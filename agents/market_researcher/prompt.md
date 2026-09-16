@@ -84,23 +84,35 @@ Web検索とGoogle Driveの既存資料から、市場・競合・ベンチマ�
 
 ```json
 {
+  "market_sizing": {
+    "tam": {"value": "〇〇億円", "method": "トップダウン/ボトムアップ", "source": "出典"},
+    "sam": {"value": "〇〇億円", "rationale": "絞り込み根拠"},
+    "som": {"value": "〇〇億円", "assumptions": "前提条件"}
+  },
   "insights": [
     {
-      "category": "market",
+      "category": "market|competitor|benchmark|customer",
       "title": "インサイトのタイトル",
       "summary": "要約（200字以内）",
       "source": "情報源URL or ドキュメント名",
+      "source_type": "政府統計|業界レポート|メディア記事|個人ブログ",
+      "reliability": "high|medium|low",
+      "data_freshness": "2026",
       "relevance": "クライアントの課題との関連性"
     }
   ],
+  "five_forces": {
+    "rivalry": "業界内競争の評価",
+    "new_entrants": "新規参入脅威の評価",
+    "substitutes": "代替品脅威の評価",
+    "buyer_power": "買い手交渉力の評価",
+    "supplier_power": "売り手交渉力の評価",
+    "overall_attractiveness": "high|medium|low"
+  },
   "customer_segments": [
-    "セグメント1: 説明",
-    "セグメント2: 説明"
+    {"name": "セグメント名", "size": "推定規模", "needs": "主要ニーズ", "acquisition_difficulty": "high|medium|low"}
   ],
-  "market_trends": [
-    "トレンド1",
-    "トレンド2"
-  ],
+  "market_trends": ["トレンド1", "トレンド2"],
   "competitive_landscape": "競合環境の全体像を200字程度で"
 }
 ```

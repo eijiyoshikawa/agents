@@ -71,6 +71,54 @@
 - **5カテゴリ**: Structure(20点), Design(25点), Motion(20点), Interaction(20点), Responsive(15点)
 - **最大イテレーション**: 2周（それ以上は手動修正に切り替え）
 
+## サイト解析メソドロジー
+
+### パフォーマンス予算（参考サイト品質を下回らない）
+| 指標 | 閾値 | 計測方法 |
+|------|------|---------|
+| Lighthouse Performance | ≥ 90 | `npx lighthouse <URL> --output=json` |
+| LCP | < 2.5秒 | Lighthouse / Web Vitals |
+| CLS | < 0.1 | Lighthouse / Web Vitals |
+| INP | < 200ms | Chrome DevTools |
+| 初回バンドルサイズ | < 200KB (gzip) | `next build` の出力確認 |
+| 画像最適化 | WebP/AVIF + next/image | 全画像に適用 |
+
+### ピクセルパーフェクト再現テクニック
+```
+1. スクリーンショット比較: 参考サイトの主要ブレイクポイント（375px / 768px / 1280px / 1440px）をキャプチャ
+2. オーバーレイ検証: デプロイ後のスクリーンショットと重ね合わせ、差分率を計測
+3. 許容差分率: テキスト周辺 5% / レイアウト構造 2% / カラー・スペーシング 1%
+4. フォント代替: ライセンスの関係で同一フォントが使えない場合、x-height・字幅が近いGoogle Fontsを選定
+5. 画像代替: 著作権のある画像は同構図・同サイズのプレースホルダーで代替（Asset Collector が判断）
+```
+
+### アニメーション パフォーマンス最適化
+```
+優先順位:
+  1. CSS transform / opacity のみ（GPU コンポジットレイヤー）
+  2. will-change は発火直前に付与、常時付与は禁止
+  3. requestAnimationFrame ベースのJS アニメーション
+  4. GSAP / Framer Motion は複雑なシーケンスのみ
+回避:
+  - layout thrashing（offsetHeight 読み取り直後の style 変更）
+  - 同時アニメーション 3件以上（メインスレッドブロック）
+  - scroll イベント直接リスナー → IntersectionObserver に置換
+```
+
+### クロスブラウザ・レスポンシブ検証
+```
+必須検証環境:
+  - Chrome 最新版（デスクトップ + モバイル）
+  - Safari 最新版（macOS + iOS）
+  - Firefox 最新版
+  - Edge 最新版
+ブレイクポイント検証: 375px / 768px / 1024px / 1280px / 1440px
+プログレッシブエンハンスメント:
+  - コア体験（コンテンツ閲覧・ナビゲーション）は JS 無効でも機能
+  - アニメーション・インタラクションは JS 有効時のエンハンスメント
+  - @supports でCSS機能を検出し、フォールバックを提供
+```
+
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer（横断チーム）**: パイプライン全体の品質・最終成果物の検証
 - **Tech Lead**: 技術設計・アーキテクチャ・コード品質のレビュー
