@@ -117,7 +117,53 @@ WCAG 2.2 Level AA の自動検証可能項目をチェック:
 - [ ] フォーカスインジケーターが可視か
 - [ ] タッチターゲットが 44x44px 以上か
 
-### Step 5: スコアリング
+### Step 5: ビジュアルリグレッション検知（Iteration 2+）
+前回イテレーションからの意図しないデザイン退行を検出する:
+
+**検証手順:**
+1. 前回の `iteration_N-1.json` で「OK」だった項目を全て再確認
+2. 今回の修正によって以下が変化していないか確認:
+   - カラーパレットの意図しない変更
+   - レイアウトの崩れ（特に修正対象外のセクション）
+   - フォントサイズ・ウェイトの変化
+   - スペーシングの変化
+   - アニメーションの消失
+3. リグレッションが検出された場合、`regressions` フィールドに記録
+
+```json
+{
+  "regressions": [
+    {
+      "category": "design",
+      "section": "header",
+      "issue": "前回OK だったヘッダーロゴの配置が左寄せから中央寄せに変化",
+      "cause": "hero セクション修正時に Container コンポーネントの margin が変更された",
+      "priority": "high"
+    }
+  ]
+}
+```
+
+### Step 5.5: クロスブラウザ互換性検証
+以下のマトリクスに基づき、主要な環境での表示を検証する:
+
+**検証マトリクス（優先度順）:**
+| ブラウザ | デスクトップ | タブレット | モバイル | 優先度 |
+|---------|-----------|---------|--------|-------|
+| Chrome | 必須 | 推奨 | 必須 | P0 |
+| Safari | 必須 | 推奨（iPad） | 必須（iPhone） | P0 |
+| Firefox | 推奨 | - | - | P1 |
+| Edge | 推奨 | - | - | P2 |
+
+**既知の互換性問題チェック:**
+- Safari: `backdrop-filter` のベンダープレフィックス（`-webkit-backdrop-filter`）
+- Safari: `gap` in flexbox（Safari 14.1 未満は未対応）
+- Safari: `scroll-behavior: smooth` の挙動差異
+- Firefox: `text-decoration` のサブプロパティの差異
+- モバイル Safari: `100vh` の問題（`dvh` / `svh` の使用を推奨）
+- iOS: タッチイベントと `:hover` の挙動差異
+
+### Step 6: スコアリング
 各カテゴリの項目を確認し、0〜100点でスコアを付ける:
 - 全項目OK → 100点
 - 軽微な差異あり → 80点
@@ -126,8 +172,9 @@ WCAG 2.2 Level AA の自動検証可能項目をチェック:
 - ほぼ未実装 → 20点
 
 **合計スコア = 各カテゴリスコア × 配点割合の加重平均**
+（配点: Structure 20 + Design 25 + Motion 20 + Interaction 20 + Responsive 10 + Performance 10 + Accessibility 5 = 110 → 100点満点に正規化）
 
-### Step 6: 修正指示の生成
+### Step 7: 修正指示の生成
 スコアが低い項目について、具体的な修正指示を生成する:
 
 各指示には以下を含める:
@@ -145,7 +192,7 @@ WCAG 2.2 Level AA の自動検証可能項目をチェック:
 - **medium**: 細かいスペーシング、アニメーションの微調整、フォントサイズの差異
 - **low**: 装飾的な細部、最適化的な改善
 
-### Step 7: 合格判定
+### Step 8: 合格判定
 - `overall_score >= 85` → **合格**（`pass: true`）
 - `overall_score < 85` → **不合格**（`pass: false`、修正指示を出す）
 
@@ -199,13 +246,35 @@ WCAG 2.2 Level AA の自動検証可能項目をチェック:
     },
     "responsive": {
       "score": 80,
-      "max_points": 15,
-      "weighted_score": 12,
+      "max_points": 10,
+      "weighted_score": 8,
       "issues": [
         "タブレット表示でカードが2列ではなく1列になっている"
       ]
+    },
+    "performance": {
+      "score": 75,
+      "max_points": 10,
+      "weighted_score": 7.5,
+      "issues": [
+        "First Load JS が 120kB でバジェット超過",
+        "ヒーロー画像に priority が未設定"
+      ]
+    },
+    "accessibility": {
+      "score": 60,
+      "max_points": 5,
+      "weighted_score": 3,
+      "issues": [
+        "3つの画像に alt テキストが未設定",
+        "フッターSNSリンクのタッチターゲットが 24x24px"
+      ]
     }
   },
+  "regressions": [],
+  "cross_browser_issues": [
+    "Safari でモバイルメニューの backdrop-filter が効いていない（-webkit- プレフィックス不足）"
+  ],
   "fix_instructions": [
     {
       "priority": "high",
