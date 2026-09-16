@@ -189,13 +189,6 @@ AI Designer MCPにプロンプトを渡す際、以下を必ず含めること:
 
 ## モーション指定（必須参照）
 
-デザインにモーションを含める場合は **必ず `/design-md/motion-library/MOTION_30.md`** を参照し、既存のモーションから `motion_key` を選択して指定する。
-和文B2B案件では feer の motion tokens（duration 300ms / easing `cubic-bezier(.4,0,.2,1)` / 登場は `grow-from-bottom`）を既定値とし、`design-md/feer/DESIGN.md` §6 のキーフレーム・新規 motion_key（`marquee-keywords` / `thinking-caret` / `scroll-progress-bar`）を優先候補に含める。
-
-**ルール:**
-- 新しいモーションを独自に考案しない。該当するものが無い場合は MOTION_30.md に追加してから使用する
-- 各デザイン案の `output.json` に、適用するモーションを `motion_specs[]` として記録する
-- モーションは1画面あたり同時発火を2件以内に抑える（パフォーマンス配慮）
-- すべてのモーションは `prefers-reduced-motion` に対応することを前提に指定
-
-**output.json の motion_specs**: `[{ "target": "hero-title", "motion_key": "masking-reveal", "trigger": "on-load", "delay_ms": 200 }]`
+モーション指定時は **`/design-md/motion-library/MOTION_30.md`** から `motion_key` を選択。和文B2B案件では feer motion tokens（duration 300ms / easing standard / 登場 `grow-from-bottom`）+ §6 の `marquee-keywords` / `thinking-caret` / `scroll-progress-bar` を既定値。
+- 独自モーションは MOTION_30.md に追加してから使用 / 同時発火は1画面2件以内 / `prefers-reduced-motion` 対応必須
+- `output.json` に `motion_specs[]` として記録: `[{ "target": "", "motion_key": "", "trigger": "on-load", "delay_ms": 200 }]`
