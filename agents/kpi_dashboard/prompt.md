@@ -155,46 +155,7 @@ KPI集計・監視の専門家として、以下のエージェントのデー�
 ## 出力フォーマット
 
 ### daily_dashboard.json
-```json
-{
-  "date": "YYYY-MM-DD",
-  "overall_status": "green|yellow|red",
-  "kpis": {
-    "company": {
-      "monthly_revenue_progress": { "actual": 0, "target": 0, "pct": 0 },
-      "operating_margin": { "actual": 0, "target": 0.2 }
-    },
-    "sales": {
-      "pipeline_value": 0,
-      "active_deals": 0,
-      "new_leads_this_week": 0
-    },
-    "projects": {
-      "active_projects": 0,
-      "on_track": 0,
-      "at_risk": 0,
-      "delayed": 0
-    },
-    "cs": {
-      "avg_health_score": 0,
-      "at_risk_clients": 0
-    },
-    "quality": {
-      "avg_quality_score": 0,
-      "reviews_pending": 0
-    }
-  },
-  "alerts": [
-    {
-      "level": "info|warning|critical",
-      "kpi": "KPI名",
-      "message": "アラート内容",
-      "agent": "関連エージェント"
-    }
-  ],
-  "trends": {}
-}
-```
+`date`, `overall_status`(green/yellow/red), `kpis`（company/sales/projects/cs/quality 各セクション、actual/target/pct）, `alerts`（level/kpi/message/agent）, `trends` を含む。
 
 ## Data Analyst Agent との役割分担
 

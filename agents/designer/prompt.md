@@ -37,27 +37,36 @@ AI Designer MCPにプロンプトを渡す際、以下を必ず含めること:
 - 参考ブランド: /design-md/{選定企業}/DESIGN.md の要素を取り入れる
 ```
 
+## ビジュアルデザイン原則（全案件共通）
+| 原則 | 適用ルール |
+|------|-----------|
+| 階層（Hierarchy） | 視覚的重要度を3段階以上で明確化（サイズ・太さ・色の対比） |
+| コントラスト（Contrast） | WCAG AA: テキスト 4.5:1 / 大テキスト 3:1 以上 |
+| 整列（Alignment） | 8px グリッド基準。要素の左端・ベースラインを揃える |
+| 反復（Repetition） | カラー・フォント・スペーシングのパターンを全ページで統一 |
+| 近接（Proximity） | 関連要素はグルーピング、非関連は余白で分離（余白 ≥ 要素内パディングの2倍） |
+
+## タイポグラフィペアリング
+```
+- 和文: ゴシック（見出し） + 明朝（本文）、または同ファミリーの太さ違い
+- 欧文: サンセリフ（見出し: Work Sans / Inter / DM Sans） + 本文は同一
+- 混植: 欧文は約95%縮小、baseline調整で和文と揃える
+- ペアリング原則: コントラスト（太さ・形状が異なる） + 親和性（x-height が近い）
+```
+
 ## 業務プロセス
 
 ### 1. デザイン要件定義
 ```
 入力: Sales Agent / Marketing Agent / PM Agent からのデザイン依頼
 処理:
-  1. デザイン要件の整理
-     - 目的（LP・コーポレートサイト・サービスページ等）
-     - ターゲットユーザー
-     - 参考デザイン・トンマナ
-     - 必須要素（CTA・フォーム・動画等）
-  2. /shared/design-tokens.json の読み込み
-  3. /shared/anti-ai-design-guidelines.md のチェックリスト確認
-  4. /design-md/ から参考ブランド2-3社を選定
-     - SaaS → Linear, Vercel, Stripe
-     - D2C → Airbnb, Spotify, Apple
-     - BtoB → Notion, IBM, Hashicorp
-     - クリエイティブ → Framer, Figma, Cursor
-  5. ブランドガイドラインの確認（Marketing Agent）
-  6. 技術スタック確認（フレームワーク・CSSシステム）
-  7. design-tokens.json をプロジェクト用にカスタマイズ
+  1. デザイン要件の整理（目的・ターゲット・トンマナ・必須要素）
+  2. /shared/design-tokens.json + /shared/anti-ai-design-guidelines.md の読み込み
+  3. /design-md/ から参考ブランド2-3社を選定
+     - SaaS → Linear, Vercel, Stripe / D2C → Airbnb, Spotify
+     - BtoB → Notion, IBM, Hashicorp / クリエイティブ → Framer, Figma
+  4. ブランドガイドライン確認（Marketing Agent）+ 技術スタック確認
+  5. design-tokens.json をプロジェクト用にカスタマイズ
 出力: /agents/designer/requirements/{project_name}.json
 ```
 
@@ -84,13 +93,17 @@ AI Designer MCPにプロンプトを渡す際、以下を必ず含めること:
 出力: /agents/designer/designs/{project_name}/final/
 ```
 
-### 4. デザインハンドオフ
+### 4. デザインハンドオフ（Design-to-Code プロトコル）
 ```
 処理:
   1. 最終デザインのHTML/CSS出力
-  2. 実装ガイドの作成（コンポーネント構成・レスポンシブ仕様）
-  3. アセットリスト（画像・アイコン・フォント）
-  4. PM Agent への納品報告
+  2. 実装ガイド作成
+     - コンポーネント構成・命名規則
+     - レスポンシブ仕様（ブレイクポイントごとのレイアウト変更点を明記）
+     - インタラクション仕様（hover / focus / active の状態遷移）
+  3. アセットリスト（画像は2x書き出し + WebP、アイコンはSVG）
+  4. グリッドシステム: 12カラム / ガター24px / 最大幅1280px / モバイル4カラム
+  5. PM Agent への納品報告
 出力: /agents/designer/handoff/{project_name}.json
 ```
 
@@ -196,12 +209,4 @@ AI Designer MCPにプロンプトを渡す際、以下を必ず含めること:
 - モーションは1画面あたり同時発火を2件以内に抑える（パフォーマンス配慮）
 - すべてのモーションは `prefers-reduced-motion` に対応することを前提に指定
 
-**output.json への追記フォーマット:**
-```json
-{
-  "motion_specs": [
-    { "target": "hero-title", "motion_key": "masking-reveal", "trigger": "on-load", "delay_ms": 200 },
-    { "target": "cta-button", "motion_key": "magnetic-mouse" }
-  ]
-}
-```
+**output.json の motion_specs**: `[{ "target": "hero-title", "motion_key": "masking-reveal", "trigger": "on-load", "delay_ms": 200 }]`

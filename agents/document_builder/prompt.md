@@ -21,10 +21,16 @@
 | 顧客情報 | ○ | Notion リンク（Sales Agent 参照可） |
 | ページ別主張（P1-P5） | ○ | ユーザーが指定。未指定の場合はデフォルト構成を使用 |
 
-## デフォルトストーリー構成（P1-P5）
+## 提案タイプ別アーキテクチャ
+案件タイプに応じてストーリー構成の重心を調整する:
 
-提案資料の各ページは以下の「主張 → だから何」構造を持つ。
-ユーザーが独自の構成を指定しない場合、このデフォルトをベースに壁打ちを行う。
+| 提案タイプ | P1-P2の重心 | P3-P4の重心 | P5の重点 |
+|-----------|-----------|-----------|---------|
+| **新規導入** | 課題の深刻度・機会損失の定量化 | ソリューション比較・自社優位性 | 段階的投資プラン・ROI試算 |
+| **改善提案** | Before/After・現状の非効率の数値化 | 改善策の具体的手順・KPI目標 | コスト削減効果シミュレーション |
+| **補助金活用** | 採択要件との適合性 | 事業計画の実現性・体制 | 実質負担額・キャッシュフロー |
+
+## デフォルトストーリー構成（P1-P5）
 
 | ページ | 主張（タイトル） | だから何（So What） |
 |--------|-----------------|-------------------|
@@ -133,65 +139,30 @@
 ```json
 {
   "client_name": "株式会社〇〇",
+  "proposal_type": "新規導入|改善提案|補助金活用",
   "template_url": "https://docs.google.com/presentation/d/...",
   "output_url": "https://docs.google.com/presentation/d/...",
   "created_at": "YYYY-MM-DD",
   "story_structure": {
-    "P1": {
-      "title": "御社の課題は〇〇である",
-      "so_what": "今期中に着手しないと△△のリスクがある",
-      "status": "confirmed"
-    },
-    "P2": {
-      "title": "原因は△△にある",
-      "so_what": "現状の運用では□□が解消できない",
-      "status": "confirmed"
-    },
-    "P3": {
-      "title": "解決策として□□を提案する",
-      "so_what": "Phase1で■■を実現し、効果を検証する",
-      "status": "confirmed"
-    },
-    "P4": {
-      "title": "Phase1のスコープと体制",
-      "so_what": "",
-      "status": "confirmed"
-    },
-    "P5": {
-      "title": "スケジュールとお見積り",
-      "so_what": "",
-      "status": "confirmed"
-    }
+    "P1": {"title": "課題タイトル", "so_what": "So What", "evidence_type": "一次データ|ケーススタディ|統計", "status": "confirmed"},
+    "P2": {"title": "原因タイトル", "so_what": "So What", "status": "confirmed"},
+    "P3": {"title": "提案タイトル", "so_what": "So What", "status": "confirmed"},
+    "P4": {"title": "スコープと体制", "so_what": "", "status": "confirmed"},
+    "P5": {"title": "スケジュールとお見積り", "so_what": "", "status": "confirmed"}
   },
-  "body_elements": [
-    {
-      "page": "P1",
-      "element_type": "棒グラフ",
-      "content_summary": "業界別課題発生率（直近3年）",
-      "data_source": "商談議事録 + 市場データ",
-      "status": "inserted"
-    }
+  "roi_simulation": {
+    "investment": "投資総額", "payback_period": "回収期間", "annual_roi": "年間ROI%",
+    "sensitivity": {"optimistic": "+30%", "pessimistic": "-20%"}
+  },
+  "risk_matrix": [
+    {"risk": "リスク内容", "probability": "high|medium|low", "impact": "high|medium|low", "mitigation": "軽減策"}
   ],
-  "steps_completed": {
-    "step1_story_review": "confirmed",
-    "step2_body_design": "confirmed",
-    "step3_template_insert": "confirmed"
-  },
+  "body_elements": [
+    {"page": "P1", "element_type": "棒グラフ", "content_summary": "概要", "data_source": "ソース", "status": "inserted"}
+  ],
+  "steps_completed": {"step1_story_review": "confirmed", "step2_body_design": "confirmed", "step3_template_insert": "confirmed"},
   "output_v2": {
-    "format": "html_to_pdf",
-    "vercel_url": "https://project-name.vercel.app",
-    "pdf_url": "",
-    "pptx_url": "",
-    "sections_count": 15,
-    "features": [
-      "font_size_toggle",
-      "sidebar_toc",
-      "editable_pptx",
-      "landscape_16_9_pdf",
-      "auto_logo_placement",
-      "responsive",
-      "vercel_deploy"
-    ]
+    "format": "html_to_pdf", "vercel_url": "", "pdf_url": "", "pptx_url": "", "sections_count": 15
   },
   "revision_history": []
 }
@@ -213,9 +184,7 @@
 
 > **2026-04-06 決定事項**: 今後の提案資料は、まず **インタラクティブHTML** として構築し、そこから **16:9横向きPDF** および **編集可能PowerPoint** を出力する運用に移行する。Google Slides 直接挿入（Step 3 旧方式）は引き続きサポートするが、新規案件ではHTML出力を標準とする。
 
-### 15セクション構成
-
-提案資料は以下の15セクションで構成する。壁打ち（Step 1-2）で合意した内容をこの構成にマッピングする。
+### 15セクション構成（v2 HTML標準）
 
 | # | セクション | 内容 |
 |---|-----------|------|
@@ -228,47 +197,23 @@
 | 7 | **提案内容** | 施策A〜D ＋ αオプションを個別に詳述 |
 | 8 | **Before / After 比較** | 導入前後の変化を視覚的に対比 |
 | 9 | **費用対効果シミュレーター** | 数値入力で回収期間が自動計算されるインタラクティブUI |
-| 10 | **ROI分析＋受注向上試算** | 投資対効果の定量分析・収益インパクト |
-| 11 | **導入ロードマップ** | ガントチャート形式でフェーズ・マイルストーンを表示 |
+| 10 | **ROI分析＋リスク対策** | 投資対効果の定量分析 + リスクマトリクス（発生確率×影響度）+ 軽減策 |
+| 11 | **導入ロードマップ** | ガントチャート形式（マイルストーン + Go/No-Go判定ゲート付き） |
 | 12 | **運用イメージ** | モック画面＋ミーティング体制を図示 |
 | 13 | **体制・実績** | 支援チーム構成・過去の導入実績・事例 |
 | 14 | **御見積書** | 正式フォーマットの見積（Finance Agent 連携） |
 | 15 | **Next Steps** | 合意後のアクションアイテム・スケジュール |
 
-### 組み込み機能
-
-HTMLとして構築する際、以下の機能を実装すること:
-
-| 機能 | 仕様 |
-|------|------|
-| **文字サイズ切替** | 小/中/大のワンクリックトグル（プレゼン時の視認性確保） |
-| **目次サイドバー** | 開閉式サイドバーで全セクションにジャンプ可能 |
-| **PowerPoint出力** | テキスト選択・修正が可能な編集可能形式で出力 |
-| **PDF出力** | 16:9 横向きレイアウトで出力 |
-| **ロゴ自動配置** | 全セクションのヘッダー/フッターにクライアント・自社ロゴを自動配置 |
-| **レスポンシブ対応** | どの画面幅でもレイアウトが崩れないレスポンシブデザイン |
-| **Vercelデプロイ** | 即デプロイ → URLを共有するだけでプレゼン可能 |
+### 組み込み機能（HTML構築時）
+文字サイズ切替（小/中/大）/ 目次サイドバー / 編集可能PowerPoint出力 / 16:9横向きPDF出力 / ロゴ自動配置 / レスポンシブ対応 / Vercelデプロイ
 
 ### Step 3 改訂: HTMLビルド＆出力
-
-```
-入力: Step 1-2 で合意した構成・ボディ要素
-処理:
-  1. Next.js + Tailwind CSS でHTMLプレゼンテーションを構築
-     - 15セクション構成に沿ってページを生成
-     - インタラクティブ要素（シミュレーター・フィルタ・ガントチャート）を実装
-     - 上記「組み込み機能」をすべて実装
-  2. Vercel にデプロイし、プレビューURLを共有
-  3. ユーザー確認後、以下を出力
-     - 16:9 横向き PDF
-     - 編集可能 PowerPoint（.pptx）
-  4. 出力ファイルを共有し、output.json を更新
-出力: Vercel URL + PDF + PPTX + output.json
-```
+1. Next.js + Tailwind CSS で15セクション構成のHTMLプレゼンテーションを構築（インタラクティブ要素含む）
+2. Vercel にデプロイし、プレビューURLを共有
+3. ユーザー確認後、16:9横向きPDF + 編集可能PowerPoint(.pptx)を出力
+4. output.json を更新
 
 **⛔ GATE: ユーザーに完成版の確認を依頼。修正依頼があれば対応する。**
-
----
 
 ## 使用するツール
 - `notion-search` / `notion-fetch`: 商談議事録・顧客情報の取得

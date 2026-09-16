@@ -135,31 +135,13 @@ R=実行, A=承認, C=相談, I=報告
 - パス外タスクには総フロート（余裕日数）を計算し、フロートゼロ接近時に WARNING
 - 週次でクリティカルパスを再計算（タスク完了・遅延により変動するため）
 
-## サービス別標準WBS
-
-### SNS運用代行
-| フェーズ | 期間 | タスク |
-|---------|------|--------|
-| 準備 | 2週間 | アカウント監査、戦略策定、コンテンツカレンダー作成 |
-| 運用開始 | 1週間 | 初月コンテンツ制作、投稿テスト |
-| 月次運用 | 継続 | 投稿制作、広告運用、レポーティング |
-
-### AIシステム開発
-| フェーズ | 期間 | タスク |
-|---------|------|--------|
-| 要件定義 | 2週間 | ヒアリング、要件整理、画面設計 |
-| 設計 | 2週間 | 詳細設計、DB設計、API設計 |
-| 開発 | 4-8週間 | 実装、単体テスト |
-| テスト | 2週間 | 結合テスト、UAT |
-| 導入 | 1週間 | デプロイ、トレーニング |
-
-### LP制作
-| フェーズ | 期間 | タスク |
-|---------|------|--------|
-| 企画 | 1週間 | 構成案、ワイヤーフレーム |
-| デザイン | 2週間 | デザインカンプ、修正 |
-| コーディング | 2週間 | 実装、レスポンシブ対応 |
-| テスト・公開 | 1週間 | 表示テスト、GA設定、公開 |
+## サービス別標準WBS（概要）
+| サービス | 総期間 | 主要フェーズ |
+|---------|--------|------------|
+| SNS運用代行 | 準備3週+継続 | 準備（2w）→運用開始（1w）→月次運用 |
+| AIシステム開発 | 11-15週 | 要件定義（2w）→設計（2w）→開発（4-8w）→テスト（2w）→導入（1w） |
+| LP制作 | 6週 | 企画（1w）→デザイン（2w）→コーディング（2w）→テスト・公開（1w） |
+各サービスの詳細WBSはプロジェクト立ち上げ時に plan.json 内で展開する。
 
 ## レポート先
 - **CEO Agent**: 日次進捗サマリー
@@ -183,31 +165,7 @@ R=実行, A=承認, C=相談, I=報告
 ## 出力フォーマット
 
 ### status.json
-```json
-{
-  "project_id": "client_project",
-  "updated_at": "YYYY-MM-DD",
-  "overall_status": "on_track|at_risk|delayed",
-  "progress_pct": 0,
-  "milestones": [
-    {
-      "name": "マイルストーン名",
-      "due_date": "YYYY-MM-DD",
-      "status": "completed|in_progress|pending|delayed",
-      "completion_pct": 0
-    }
-  ],
-  "tasks_summary": {
-    "total": 0,
-    "completed": 0,
-    "in_progress": 0,
-    "delayed": 0
-  },
-  "risks": [],
-  "next_actions": [],
-  "blockers": []
-}
-```
+`project_id`, `updated_at`, `overall_status`(on_track/at_risk/delayed), `progress_pct`, `milestones`（name/due_date/status/completion_pct）, `tasks_summary`（total/completed/in_progress/delayed）, `risks`, `next_actions`, `blockers`, `evm`（spi/cpi/eac）を含む。
 
 ## 使用ツール
 - ファイル読み書き

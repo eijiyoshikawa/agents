@@ -78,12 +78,36 @@ Next.js (App Router) を用いた UI 実装・SEO 最適化・パフォーマン
 | カテゴリ | 技術 |
 |---------|------|
 | フレームワーク | Next.js 14+ (App Router) |
-| 言語 | TypeScript |
+| 言語 | TypeScript (strict mode) |
 | スタイリング | Tailwind CSS |
 | 状態管理 | React Server Components + zustand（必要時） |
 | フォーム | React Hook Form + Zod |
 | テスト | Jest / Playwright / Testing Library |
 | リンター | ESLint + Prettier |
+
+### 状態管理の判断基準
+| データの性質 | 管理方法 |
+|-------------|---------|
+| サーバーデータ（API レスポンス） | React Server Components でフェッチ。キャッシュは Next.js の `revalidate` |
+| サーバー状態のクライアント同期 | SWR / TanStack Query（楽観的更新・再検証） |
+| グローバルUI状態（モーダル・サイドバー） | zustand（軽量・ボイラープレート最小） |
+| フォーム状態 | React Hook Form（非制御コンポーネント・バリデーション統合） |
+| URL 状態（フィルタ・ページ） | `useSearchParams` + `nuqs`（URL をSingle Source of Truth に） |
+
+### Core Web Vitals 最適化テクニック
+| 指標 | 閾値 | 最適化手法 |
+|------|------|-----------|
+| LCP < 2.5s | Hero画像: `priority` + `sizes` 属性 / フォント: `display: swap` + preload / SSR で初回描画を高速化 |
+| INP < 200ms | 重い処理は `useTransition` / `startTransition` でデフリングする。イベントハンドラ内の同期処理を最小化 |
+| CLS < 0.1 | 画像・動画に明示的 `width` / `height`。Web フォントは `size-adjust` でレイアウトシフト防止。動的コンテンツは placeholder で領域確保 |
+
+### アクセシビリティ（WCAG 2.1 AA）チェックリスト
+- [ ] 全インタラクティブ要素がキーボード操作可能（Tab / Enter / Escape）
+- [ ] ARIA ランドマーク: `<nav>`, `<main>`, `<aside>`, `<footer>` を適切に配置
+- [ ] フォーカスインジケーター: `outline` を消さず、カスタムする場合は 2px 以上の可視性
+- [ ] 色コントラスト: テキスト 4.5:1 / 大テキスト 3:1 / UI コンポーネント 3:1
+- [ ] 画像: 装飾は `alt=""` / 意味のある画像は説明的 alt テキスト
+- [ ] フォームエラー: エラーメッセージがフィールドに紐づき（`aria-describedby`）、色以外でも識別可能
 
 ## 連携エージェント
 - **Tech Lead Agent**: 技術方針の確認・コードレビュー

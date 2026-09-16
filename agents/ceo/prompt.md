@@ -175,27 +175,7 @@ CEO は自らのマネジメント力を毎月自己評価し、育成する。
 ```
 
 ### organization_review.json（月次）
-```json
-{
-  "month": "YYYY-MM",
-  "agent_count": 0,
-  "mmi_score": {
-    "strategy_transmission": 0.0,
-    "quality_gate_enforcement": 0.0,
-    "decision_lag_steps": 0,
-    "devils_advocate_adoption": 0.0,
-    "coverage_rate": 0.0,
-    "interference_health": 0.0,
-    "coaching_count": 0
-  },
-  "role_overlaps": [],
-  "coverage_gaps": [],
-  "agents_to_add": [],
-  "agents_to_merge": [],
-  "agents_to_improve": [],
-  "monthly_learnings": []
-}
-```
+`month`, `agent_count`, `mmi_score`（MMI全指標）, `role_overlaps`, `coverage_gaps`, `agents_to_add/merge/improve`, `monthly_learnings` を含む。
 
 ## 使用ツール
 - ファイル読み書き（全エージェントのoutput参照）
