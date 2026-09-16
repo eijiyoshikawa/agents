@@ -28,19 +28,66 @@ HTMLから全 `<img>` タグと CSS `background-image` を抽出する:
 各画像について:
 1. **元URL**: src 属性の値
 2. **使用箇所**: どのセクションのどの位置で使われているか
-3. **alt テキスト**: 画像の説明
+3. **alt テキスト**: 画像の説明（空の場合は `alt_missing: true` で記録）
 4. **サイズ/アスペクト比**: width, height 属性または CSS
-5. **種類分類**:
+5. **元フォーマット**: jpg / png / webp / avif / svg / gif
+6. **種類分類**:
    - `hero-image`: ヒーローセクション背景
    - `content-image`: コンテンツ内画像
    - `icon-image`: アイコン的な画像
    - `logo`: ロゴ画像
    - `avatar`: 人物写真
    - `decorative`: 装飾画像
-6. **代替戦略**:
+7. **読み込み属性**: `loading="lazy"` / `fetchpriority="high"` / `decoding="async"` の有無
+8. **代替戦略**:
    - Unsplash で類似画像を検索するためのキーワード
    - SVG プレースホルダーで代用する場合のサイズ・色
    - ダミーテキストとアスペクト比だけ合わせる
+
+### Step 1.5: 画像最適化戦略の策定
+収集した各画像に対して最適なフォーマットと配信方式を決定する:
+
+**フォーマット選定マトリクス:**
+| 画像タイプ | 推奨フォーマット | 理由 |
+|-----------|----------------|------|
+| 写真（ヒーロー・コンテンツ） | WebP（フォールバック: JPEG） | 30%軽量化、`next/image` が自動変換 |
+| イラスト・ロゴ（色数少） | SVG | 無限スケーラブル、超軽量 |
+| アイコン | SVG（インライン） | CSS で色変更可能、HTTP リクエスト削減 |
+| スクリーンショット・テキスト入り | PNG → WebP | テキストのシャープさを維持 |
+| アニメーション画像 | WebP animated / Lottie | GIF より60-80%軽量 |
+| 背景パターン | CSS / SVG | 画像ファイル不要 |
+
+**レスポンシブ画像設計:**
+各画像に `srcset` + `sizes` の推奨設定を記録:
+```json
+{
+  "responsive_strategy": {
+    "hero_image": {
+      "sizes": "(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 1280px",
+      "widths": [640, 1024, 1280, 1920],
+      "quality": 85,
+      "priority": true
+    },
+    "content_image": {
+      "sizes": "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px",
+      "widths": [320, 640, 960],
+      "quality": 80,
+      "priority": false
+    },
+    "avatar": {
+      "sizes": "64px",
+      "widths": [64, 128],
+      "quality": 80,
+      "priority": false
+    }
+  }
+}
+```
+
+**`next/image` 設定方針:**
+- ヒーロー画像: `priority={true}` + `sizes` 指定（LCP 最適化）
+- コンテンツ画像: `loading="lazy"` (デフォルト) + `placeholder="blur"`
+- 装飾画像: `loading="lazy"` + `quality={75}`
 
 ### Step 2: フォントの収集
 `design_analyzer/output.json` の typography 情報を基に:

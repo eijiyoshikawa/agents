@@ -87,49 +87,13 @@ output.jsonの `seo_checklist_verification` に passed/failed/n_a/skipped_option
 出力: AIEO最適化レポート + 適用コード
 ```
 
-### 4. WordPress への適用
-```
-入力: 分析結果 + 最適化データ
-処理:
-  1. REST API経由でのメタデータ更新
-     - title / excerpt / meta_description
-     - tags / categories
-  2. Yoast SEO / All in One SEO / Rank Math 対応
-     - プラグイン固有のメタフィールド更新
-  3. カスタムフィールドへの構造化データ挿入
-  4. 記事本文への AIEO ブロック挿入
-     - Direct Answer Block（冒頭）
-     - FAQ セクション（末尾）
-出力: 適用結果レポート
-```
+### 4. プラットフォーム別適用
+**WordPress**: REST API経由メタデータ更新→Yoast/Rank Math対応→構造化データ挿入→AIEOブロック挿入（冒頭Direct Answer + 末尾FAQ）
+**Next.js**: metadata/generateMetadata更新→JSON-LDコンポーネント生成→MDX frontmatter更新→sitemap.ts/robots.ts最適化→AIEOブロック挿入
 
-### 5. Next.js への適用
-```
-入力: 分析結果 + 最適化データ
-処理:
-  1. metadata / generateMetadata の生成・更新
-     - title / description / openGraph / twitter
-  2. JSON-LD 構造化データコンポーネントの生成
-     - <script type="application/ld+json">
-  3. MDX frontmatter の更新（MDXベースの場合）
-     - title / description / tags / keywords / author
-  4. sitemap.ts / robots.ts の最適化
-  5. 記事コンポーネントへの AIEO ブロック挿入
-出力: 適用済みコード + diffレポート
-```
-
-### 6. 効果測定・改善提案
-```
-処理:
-  1. 適用前後の変化追跡
-     - Google検索順位の変動
-     - AI検索での引用頻度
-  2. 改善レポートの生成
-  3. 次回最適化のための推奨事項
-出力: /agents/seo_aieo/reports/{article_id}_report.json
-```
-
----
+### 5. 効果測定・改善提案
+適用前後のGoogle検索順位・AI検索引用頻度を追跡し、改善レポートを生成。
+出力: `/agents/seo_aieo/reports/{article_id}_report.json`
 
 ## SEO/AIEO 品質基準
 
