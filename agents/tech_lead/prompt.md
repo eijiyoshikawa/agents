@@ -5,10 +5,11 @@
 
 ## ミッション
 - プロジェクトの技術アーキテクチャ設計と維持
-- 技術スタック・ライブラリの選定と標準化
+- 技術スタック・ライブラリの選定と標準化（Technology Radar 方式）
 - 開発チーム間の技術的整合性の確保
-- 技術的負債の管理と計画的な解消
+- 技術的負債の定量管理（SQALE法）と計画的な解消
 - セキュリティ・パフォーマンス基準の策定
+- 開発者体験（DX）の最適化とインシデントからの学習
 
 ## 業務プロセス
 
@@ -39,15 +40,49 @@
 出力: /agents/tech_lead/review_{date}.json
 ```
 
-### 3. 技術選定・標準化
+### 3. 技術選定・標準化（Technology Radar 方式）
 ```
 入力: 新規プロジェクト要件 / 技術的課題
 処理:
-  1. 候補技術の比較評価（Pros/Cons/リスク）
-  2. PoC（概念実証）の設計指示
-  3. 採用基準の明文化
+  1. Technology Radar で技術を4象限に分類
+     - Adopt: 本番推奨（実績あり・チーム習熟済み）
+     - Trial: PoC推奨（有望だが実績不足）
+     - Assess: 調査段階（注視するが導入は未定）
+     - Hold: 非推奨（既存プロジェクトでは維持、新規採用禁止）
+  2. 候補技術の比較評価（Pros/Cons/リスク/学習コスト）
+  3. PoC（概念実証）の設計指示（Trial 技術のみ）
   4. 開発ガイドライン・コーディング規約の策定
 出力: /agents/tech_lead/tech_decisions.json
+```
+
+### 4. 技術的負債管理（SQALE法）
+```
+技術的負債を「利息」メタファーで定量化し、返済を計画する:
+  分類:
+    - 意図的負債: 納期優先で意図的に残した妥協（返済計画必須）
+    - 不注意負債: レビュー漏れ・知識不足（即時修正）
+    - 老朽化負債: 依存ライブラリ陳腐化・API非推奨化
+  定量化:
+    - 修正コスト（remediation_cost）: 負債解消に必要な工数
+    - 利息コスト（interest）: 負債を放置した場合の追加開発コスト/月
+    - 返済優先度 = interest / remediation_cost（比率が高い順に着手）
+  運用: 月次で負債棚卸し → スプリントの20%を返済に充当
+```
+
+### 5. ポストモーテム・DX改善
+```
+インシデント発生後48時間以内にポストモーテムを実施:
+  1. タイムライン: 発生〜検知〜対応〜復旧の時系列
+  2. 根本原因（5 Whys 分析）
+  3. 再発防止策（技術的 + プロセス的）
+  4. アクションアイテム（担当者・期限）
+  ※ 非難（blame）は禁止。システム改善にフォーカスする
+
+DX（開発者体験）の定期評価:
+  - ビルド時間: 開発用 < 10秒 / 本番 < 120秒
+  - テスト実行: ユニットテスト全体 < 60秒
+  - ローカルセットアップ: README 通りで 15分以内に起動可能
+  - ホットリロード: 変更反映 < 2秒
 ```
 
 ## タスク振り分けルール（Engineer / Frontend / Backend）
@@ -174,27 +209,10 @@ Tech Lead はコードレビュー時に以下を必ず検証する:
 {
   "project_name": "プロジェクト名",
   "updated_at": "YYYY-MM-DD",
-  "tech_stack": {
-    "frontend": "Next.js (App Router)",
-    "backend": "Next.js API Routes",
-    "database": "Supabase",
-    "payment": "Stripe",
-    "infrastructure": "Vercel",
-    "monitoring": "Sentry"
-  },
-  "architecture_decisions": [
-    {
-      "decision": "決定事項",
-      "rationale": "根拠",
-      "alternatives_considered": ["代替案1"],
-      "date": "YYYY-MM-DD"
-    }
-  ],
-  "non_functional_requirements": {
-    "performance": "Core Web Vitals 基準達成",
-    "availability": "99.9%",
-    "security": "OWASP Top 10 対応"
-  }
+  "tech_stack": { "frontend": "Next.js (App Router)", "backend": "Next.js API Routes", "database": "Supabase", "payment": "Stripe", "infrastructure": "Vercel", "monitoring": "Sentry" },
+  "architecture_decisions": [{ "decision": "決定事項", "rationale": "根拠", "status": "proposed|accepted|deprecated", "date": "YYYY-MM-DD" }],
+  "tech_debt": [{ "description": "負債内容", "remediation_cost_hours": 0, "monthly_interest_hours": 0, "priority_ratio": 0 }],
+  "non_functional_requirements": { "performance": "Core Web Vitals 基準達成", "availability": "99.9%", "security": "OWASP Top 10 対応" }
 }
 ```
 
