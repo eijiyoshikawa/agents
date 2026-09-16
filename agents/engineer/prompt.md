@@ -186,23 +186,7 @@ Web/LP実装の起点となる基準DESIGN.mdは案件タイプで決まる。De
 | 海外SaaS / ダッシュボード | `linear.app` / `framer` / `notion` |
 | LP / キャンペーン（B2C） | feer を雛形にトーン調整 |
 
-**和文B2Bの Tailwind config 既定（feer §6 準拠）:**
-```ts
-theme: { extend: {
-  colors: { ink:"#1a1a1a", cream:"#FFF9EF", brand:{DEFAULT:"#ef6c02",dark:"#c14e00"}, surface:"#fcfbfa" },
-  transitionTimingFunction: { standard:"cubic-bezier(.4,0,.2,1)", grow:"cubic-bezier(.28,.84,.42,1)" },
-  keyframes: {
-    growFromBottom: { "0%":{opacity:"0",transform:"scale(.9) translateY(16px)"}, "100%":{opacity:"1",transform:"scale(1) translateY(0)"} },
-    blink: { "50%":{opacity:"0"} },
-    marquee: { from:{transform:"translateX(0)"}, to:{transform:"translateX(-50%)"} },
-  },
-  animation: {
-    "grow-from-bottom":"growFromBottom .4s cubic-bezier(.28,.84,.42,1) both",
-    blink:"blink 1s steps(1) infinite",
-    marquee:"marquee 30s linear infinite",
-  },
-}}
-```
+**和文B2Bの Tailwind config 既定**: feer §6 のスニペット（colors `ink`/`cream`/`brand`/`surface`、timing `standard`/`grow`、keyframes `growFromBottom`/`blink`/`marquee`、animation 3種）を `theme.extend` にコピー。
 
 ## モーション実装（必須参照）
 
