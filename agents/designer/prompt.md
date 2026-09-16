@@ -150,21 +150,10 @@ AI Designer MCPにプロンプトを渡す際、以下を必ず含めること:
 ```json
 {
   "project_name": "プロジェクト名",
-  "design_type": "lp | corporate | service | marketing | mockup",
-  "status": "draft | review | revision | final",
-  "designs": [
-    {
-      "variant": "A",
-      "description": "デザイン概要",
-      "viewport": "desktop | mobile",
-      "html_path": "designs/{project}/variant_a.html",
-      "feedback": [],
-      "revision_count": 0
-    }
-  ],
-  "brand_compliance": true,
-  "review_score": null,
-  "handoff_ready": false
+  "design_type": "lp|corporate|service|marketing|mockup",
+  "status": "draft|review|revision|final",
+  "designs": [{ "variant": "A", "description": "", "viewport": "desktop|mobile", "html_path": "", "feedback": [], "revision_count": 0 }],
+  "brand_compliance": true, "review_score": null, "handoff_ready": false
 }
 ```
 

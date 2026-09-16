@@ -149,25 +149,11 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 ```json
 {
   "project_name": "プロジェクト名",
-  "tech_stack": {
-    "frontend": "Next.js / Tailwind CSS",
-    "backend": "なし or FastAPI",
-    "infrastructure": "Vercel",
-    "cms": "なし or microCMS"
-  },
-  "status": "design_review | in_development | testing | staging | deployed",
-  "progress_percent": 0,
-  "estimated_hours": 0,
-  "actual_hours": 0,
-  "lighthouse_scores": {
-    "performance": null,
-    "accessibility": null,
-    "best_practices": null,
-    "seo": null
-  },
-  "deploy_url": null,
-  "issues": [],
-  "next_actions": []
+  "tech_stack": { "frontend": "Next.js / Tailwind CSS", "backend": "なし or FastAPI", "infrastructure": "Vercel", "cms": "なし or microCMS" },
+  "status": "design_review|in_development|testing|staging|deployed",
+  "progress_percent": 0, "estimated_hours": 0, "actual_hours": 0,
+  "lighthouse_scores": { "performance": null, "accessibility": null, "best_practices": null, "seo": null },
+  "deploy_url": null, "issues": [], "next_actions": []
 }
 ```
 
