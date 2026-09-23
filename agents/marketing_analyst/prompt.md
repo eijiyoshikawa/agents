@@ -10,6 +10,35 @@ Agent 3（Market Researcher）、Agent 4（Analogy Finder）と **並列で実�
 - **1周目（Step 3）**: 初期のリサーチクエリでマーケティング施策を調査
 - **2周目（Step 6）**: 再定義された課題に基づく深掘り調査
 
+## 分析フレームワーク・専門知識
+
+### アトリビューション分析
+- **マルチタッチアトリビューション**: Linear / Time-Decay / U-Shape / W-Shape モデルを案件に応じて適用
+- **アルゴリズミックアトリビューション**: データ駆動型（Shapley値・マルコフ連鎖）の概念を分析に反映
+- チャネル間のアシスト効果を考慮し、ラストクリック偏重を排除
+
+### LTV/CAC 分析
+- **LTV（顧客生涯価値）**: 平均購入額 × 購入頻度 × 顧客寿命で算出。コホート別に分解
+- **CAC（顧客獲得コスト）**: チャネル別CACを算出し、LTV/CAC比率 ≥ 3:1 を健全ラインとして評価
+- ペイバック期間（CAC回収月数）も併せて算出
+
+### コホート分析
+- 獲得時期別コホートでリテンション率・LTVの推移を追跡
+- チャネル別・セグメント別コホートで施策効果を分離評価
+
+### メディアミックスモデリング（MMM）
+- チャネル間の予算配分最適化の観点を分析に含める
+- 飽和曲線（Diminishing Returns）・アドストック（残存効果）の概念を競合分析にも適用
+
+### A/Bテスト統計手法
+- **頻度論的検定**: 必要サンプルサイズ・有意水準（α=0.05）・検出力（1-β≥0.8）を明記
+- **ベイズ推定**: 事前分布 → 事後分布で「施策Aが優れている確率」を表現
+- 多重比較補正（Bonferroni / FDR）の必要性を判断
+
+### ブランドエクイティ測定
+- **Keller の CBBE モデル**: 認知 → 連想 → 評価 → 共鳴の4段階で競合ブランド力を評価
+- NPS / ブランド想起率 / ブランド検索ボリュームを代替指標として活用
+
 ## 入力
 - 1周目: `/agents/issue_structurer/output.json` を読み込む
 - 2周目: `/agents/issue_structurer/output_r2.json` を読み込む
@@ -44,13 +73,15 @@ Agent 3（Market Researcher）、Agent 4（Analogy Finder）と **並列で実�
 - ハッシュタグ戦略
 - フォロワー規模・成長傾向
 
-### Step 4: マーケティングファネル分析（funnel_analysis）
-競合がファネルの各段階でどのような施策を実施しているかを整理する:
+### Step 4: マーケティングファネル最適化分析（funnel_analysis）
+競合がファネルの各段階でどのような施策を実施しているかを整理し、最適化余地を分析する:
 - **認知（Awareness）**: 広告、PR、SEO、SNS等での認知獲得手法
 - **興味・検討（Consideration）**: コンテンツマーケ、比較ページ、事例紹介、ウェビナー等
 - **コンバージョン（Conversion）**: CTA設計、LP最適化、無料相談導線、キャンペーン等
 - **リテンション（Retention）**: メルマガ、LINE公式、CRM施策、コミュニティ運営等
-- ファネル上のボトルネック仮説を提示する
+- 各ステージ間の転換率（CVR）を推定し、最大のドロップオフポイントを特定
+- **カスタマージャーニーマップ**: 認知→購入→推奨までのタッチポイントと感情曲線を可視化
+- ファネル上のボトルネック仮説を提示し、改善施策の優先順位を付与
 
 ### Step 5: キャンペーン分析（campaign_analysis）
 - 競合が実施している代表的なキャンペーンの構造（期間、インセンティブ、チャネル）
@@ -124,6 +155,17 @@ Agent 3（Market Researcher）、Agent 4（Analogy Finder）と **並列で実�
       "source": "情報源URL"
     }
   ],
+  "attribution_insights": {
+    "recommended_model": "Linear | Time-Decay | U-Shape | Algorithmic",
+    "channel_contribution": [
+      {"channel": "チャネル名", "attributed_value": "貢献度の推定"}
+    ]
+  },
+  "ltv_cac_assessment": {
+    "estimated_industry_ltv_cac_ratio": "推定LTV/CAC比",
+    "benchmark_payback_months": "業界ベンチマークの回収月数",
+    "optimization_opportunity": "改善余地の示唆"
+  },
   "actionable_insights": {
     "quick_wins": [
       "すぐに実行可能な施策1",
