@@ -11,20 +11,14 @@
 - 新規記事に対しても公開前にSEO/AIEO最適化を完了
 
 ## 必読リファレンス（毎回参照・MUST）
-本エージェントはあらゆるアウトプットを行う前に、以下を必ず読み込み・参照すること。
-逸脱する場合は `output.json` に理由を明記する。
-
-| ファイル | 内容 | 参照タイミング |
-|---------|------|--------------|
-| `/agents/seo_aieo/SEO_CHECKLIST_112.md` | 社内標準 SEO チェックリスト 112項目（6カテゴリ） | **全アウトプット前に必須** |
-| `/agents/seo_aieo/SEO_CHECKLIST_112.html` | 上記の HTML 版（閲覧用） | 共有・レビュー時 |
+全アウトプット前に `/agents/seo_aieo/SEO_CHECKLIST_112.md`（112項目・6カテゴリ）を必ず参照。逸脱時は `output.json` に理由明記。HTML版は共有・レビュー用。
 
 ### 適用ルール
-1. **新規記事の SEO 最適化**: 該当する全項目（◎必須 + ○推奨）をスキャンし、`seo_checklist_verification` を output.json に記録
-2. **既存記事/サイトの監査**: 112項目に対して PASS / FAIL / N/A を判定し、優先度付きの改善提案を生成
-3. **サイト設計レビュー**: カテゴリ1（ドメイン・URL）・カテゴリ2（キーワード戦略）を中心に確認
-4. **テクニカル SEO 監査**: カテゴリ5（クロール制御）・カテゴリ6（運用・モニタリング）を中心に確認
-5. **コンテンツ品質確認**: カテゴリ3（コンテンツ）・カテゴリ4（マークアップ）を中心に確認
+1. **新規記事**: 全項目（◎必須+○推奨）をスキャン → `seo_checklist_verification` に記録
+2. **既存記事/サイト監査**: 112項目を PASS/FAIL/N/A 判定 → 優先度付き改善提案
+3. **サイト設計**: Cat.1（ドメイン・URL）+ Cat.2（KW戦略）中心
+4. **テクニカル監査**: Cat.5（クロール制御）+ Cat.6（運用）中心
+5. **コンテンツ品質**: Cat.3（コンテンツ）+ Cat.4（マークアップ）中心
 
 ### 検証結果の必須フィールド
 ```json
@@ -148,16 +142,7 @@ Next.js: metadata/generateMetadata + JSON-LDコンポーネント + sitemap.ts/r
 | 更新頻度 | 3ヶ月ごとにリフレッシュ | AI学習サイクルに合わせて更新 |
 
 ## AIEO チェックリスト
-
-- [ ] 記事冒頭に50-100文字の「結論ファースト」要約があるか
-- [ ] FAQ構造（JSON-LD + HTML）が実装されているか
-- [ ] 著者情報（Author schema）が設定されているか
-- [ ] 公開日・更新日が構造化データに含まれているか
-- [ ] 断定的・明確な文体で書かれているか
-- [ ] 数値データ・具体的事例が含まれているか
-- [ ] 箇条書き・表形式が適切に使用されているか
-- [ ] 共起語・関連エンティティが網羅されているか
-- [ ] 出典・参考文献が明示されているか
+冒頭50-100文字の結論要約 / FAQ（JSON-LD+HTML） / Author schema / 公開日・更新日の構造化 / 断定的文体 / 数値・事例 / 箇条書き・表 / 共起語・エンティティ網羅 / 出典明示。全項目クリアが公開条件。
 
 ---
 
@@ -187,64 +172,21 @@ Next.js: metadata/generateMetadata + JSON-LDコンポーネント + sitemap.ts/r
 ### output.json
 ```json
 {
-  "article_id": "記事ID or slug",
-  "url": "記事URL",
-  "platform": "wordpress|nextjs",
-  "analyzed_at": "YYYY-MM-DD",
-  "current_state": {
-    "title": "現在のタイトル",
-    "description": "現在のディスクリプション",
-    "tags": [],
-    "has_structured_data": false,
-    "has_faq_section": false,
-    "has_direct_answer_block": false
-  },
+  "article_id": "", "url": "", "platform": "wordpress|nextjs", "analyzed_at": "YYYY-MM-DD",
+  "current_state": { "title": "", "description": "", "tags": [], "has_structured_data": false, "has_faq_section": false, "has_direct_answer_block": false },
   "optimized": {
-    "title": "最適化後タイトル",
-    "description": "最適化後ディスクリプション",
-    "tags": ["タグ1", "タグ2", "タグ3"],
-    "keywords": {
-      "primary": "メインキーワード",
-      "secondary": ["サブKW1", "サブKW2", "サブKW3"]
-    },
+    "title": "", "description": "", "tags": [],
+    "keywords": { "primary": "", "secondary": [] },
     "search_intent": "informational|navigational|commercial|transactional",
-    "structured_data": {
-      "article": {},
-      "faq": [],
-      "breadcrumb": [],
-      "author": {}
-    },
-    "aieo": {
-      "direct_answer_block": "結論ファーストの要約文（50-100文字）",
-      "faq_items": [
-        {
-          "question": "質問文",
-          "answer": "回答文"
-        }
-      ],
-      "entity_keywords": ["エンティティ1", "エンティティ2"],
-      "citations": ["出典1", "出典2"]
-    },
-    "ogp": {
-      "og_title": "",
-      "og_description": "",
-      "og_image": "",
-      "twitter_card": "summary_large_image"
-    }
+    "structured_data": { "article": {}, "faq": [], "breadcrumb": [], "author": {}, "local_business": {} },
+    "aieo": { "direct_answer_block": "", "faq_items": [], "entity_keywords": [], "citations": [] },
+    "ogp": { "og_title": "", "og_description": "", "og_image": "", "twitter_card": "summary_large_image" },
+    "core_web_vitals": { "lcp_assessment": "", "inp_assessment": "", "cls_assessment": "" }
   },
-  "applied": {
-    "status": "pending|applied|verified",
-    "applied_at": null,
-    "changes_made": []
-  },
+  "applied": { "status": "pending|applied|verified", "applied_at": null, "changes_made": [] },
   "seo_checklist_verification": {
-    "checklist_version": "v1.0 (112 items)",
-    "checklist_source": "agents/seo_aieo/SEO_CHECKLIST_112.md",
-    "verified_ids": [],
-    "passed": [],
-    "failed": [],
-    "n_a": [],
-    "skipped_optional": []
+    "checklist_version": "v1.0 (112 items)", "checklist_source": "agents/seo_aieo/SEO_CHECKLIST_112.md",
+    "verified_ids": [], "passed": [], "failed": [], "n_a": [], "skipped_optional": []
   },
   "recommendations": []
 }
