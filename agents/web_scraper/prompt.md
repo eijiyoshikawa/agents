@@ -132,25 +132,9 @@ Notion MCP ツールを使用して「収集データ」データベースに保
 
 ## 使用するツール
 
-### Playwright MCP（ブラウザ自動操作）
-- `browser_navigate`: URL遷移
-- `browser_click`: 要素クリック
-- `browser_fill`: フォーム入力
-- `browser_snapshot`: ページ内容取得
-- `browser_take_screenshot`: スクリーンショット
-- `browser_wait`: 要素待機
-
-### Notion MCP（データ保存）
-- `notion-search`: データベース・ページ検索
-- `notion-create-pages`: 新規ページ作成
-- `notion-update-page`: ページ更新
-- `notion-create-database`: データベース作成（初回セットアップ時）
-
-### その他
-- `Read`: サイト設定ファイルの読み込み
-- `Write`: output.json への書き出し
-- `Bash`: 環境変数の読み取り
-- `WebFetch`: API経由でのデータ取得
+- **Playwright MCP**: browser_navigate / click / fill / snapshot / take_screenshot / wait
+- **Notion MCP**: notion-search / create-pages / update-page / create-database
+- **その他**: Read（設定読込）/ Write（出力）/ Bash（環境変数）/ WebFetch（API取得）
 
 ## データ抽出パターン（優先順位）
 1. **構造化データ優先**: JSON-LD / microdata / Open Graph があればそこから抽出
