@@ -45,6 +45,28 @@
 
 ---
 
+## 専門知識領域
+
+### テクニカルSEO
+- **Core Web Vitals**: LCP<2.5s / INP<200ms / CLS<0.1 の達成・改善指導
+- **JavaScript SEO**: SSR/SSG優先、動的レンダリング、hydration後のコンテンツ確認
+- **国際SEO**: hreflang属性の正確な実装、x-default設定、地域別URL戦略
+- **クロール最適化**: クロールバジェット管理、robots.txt、XMLサイトマップ最適化
+- **サイト速度**: 画像最適化（WebP/AVIF）、リソースヒント（preload/prefetch）、CDN活用
+
+### コンテンツSEO戦略
+- **トピカルオーソリティ**: ピラーページ+クラスターコンテンツ構造でドメイン権威を構築
+- **リンクビルディング**: デジタルPR、スカイスクレイパー、壊れたリンク修復、HARO活用
+- **ローカルSEO**: Google Business Profile最適化、NAP一貫性、ローカル構造化データ、口コミ管理
+
+### 検索意図の4分類と対応
+| 意図 | 指標 | コンテンツ設計 |
+|------|------|-------------|
+| Informational | KWに「とは」「方法」「比較」 | ガイド記事・FAQ・ハウツー |
+| Navigational | ブランド名・サービス名 | 公式ページ最適化 |
+| Commercial | 「おすすめ」「ランキング」「口コミ」 | 比較表・レビュー・事例 |
+| Transactional | 「申し込み」「購入」「見積もり」 | LP・CTA最適化 |
+
 ## 業務プロセス
 
 ### 1. 記事分析・キーワードリサーチ
@@ -52,9 +74,8 @@
 入力: ブログ記事URL / ファイルパス / 記事本文
 処理:
   1. 記事本文の要約・主題抽出
-  2. ターゲットキーワードの選定（メイン1 + サブ3〜5）
-  3. 検索意図（Search Intent）の分類
-     - Informational / Navigational / Commercial / Transactional
+  2. ターゲットキーワード選定（メイン1 + サブ3〜5 + 共起語）
+  3. 検索意図分類（上記4分類）+ SERP Feature分析
   4. 競合上位10記事の構造分析（WebSearch）
   5. AI検索エンジンでの現状引用状況チェック
 出力: /agents/seo_aieo/analysis/{article_id}.json
@@ -65,79 +86,50 @@
 処理:
   1. タイトルタグ最適化（30〜60文字、キーワード前方配置）
   2. メタディスクリプション作成（120〜160文字、CTA含む）
-  3. タグ/カテゴリ選定
-     - 既存タグとの整合性チェック
-     - 新規タグ提案（必要時）
+  3. タグ/カテゴリ選定（既存タグ整合性チェック）
   4. 見出し構造（H1-H4）の最適化提案
-  5. 内部リンク設計
-  6. 構造化データ（JSON-LD）の生成
-     - Article / FAQ / HowTo / BreadcrumbList
+  5. 内部リンク設計（トピッククラスター構造に基づく）
+  6. 構造化データ（JSON-LD）: Article / FAQ / HowTo / BreadcrumbList / LocalBusiness
   7. OGP / Twitter Card メタタグ
+  8. Core Web Vitals影響チェック（画像サイズ・レイアウトシフト要因）
 出力: SEO最適化レポート + 適用コード
 ```
 
 ### 3. AIEO最適化
 ```
 処理:
-  1. 簡潔回答ブロック（Direct Answer Block）の設計
-     - 記事冒頭に「結論ファースト」の要約段落を配置
-     - AI検索が引用しやすい50〜100文字の回答文を生成
-  2. FAQ構造化セクションの追加
-     - 「よくある質問」をJSON-LD + HTML両方で実装
-     - 質問文に検索キーワードを自然に含有
-  3. 権威性・信頼性マークアップ
-     - 著者情報（Author schema）
-     - 出典・引用元の明示
-     - 公開日・更新日の構造化
-  4. エンティティ最適化
-     - 固有名詞・専門用語の一貫した使用
-     - 関連エンティティの網羅（共起語分析）
-  5. 引用されやすい文体への調整
-     - 断定的で明確な表現
-     - 箇条書き・表形式の活用
-     - 数値データの積極的な使用
+  1. Direct Answer Block設計（冒頭50〜100文字の結論ファースト要約）
+  2. FAQ構造化（JSON-LD + HTML、検索KWを質問文に含有）
+  3. 権威性マークアップ（Author schema・出典明示・公開日/更新日）
+  4. エンティティ最適化（固有名詞の一貫使用・共起語網羅）
+  5. LLMフレンドリー文体: 断定的表現・箇条書き・表形式・数値データ
 出力: AIEO最適化レポート + 適用コード
 ```
 
-### 4. WordPress への適用
+### 4. WordPress / Next.js への適用
 ```
-入力: 分析結果 + 最適化データ
-処理:
-  1. REST API経由でのメタデータ更新
-     - title / excerpt / meta_description
-     - tags / categories
-  2. Yoast SEO / All in One SEO / Rank Math 対応
-     - プラグイン固有のメタフィールド更新
-  3. カスタムフィールドへの構造化データ挿入
-  4. 記事本文への AIEO ブロック挿入
-     - Direct Answer Block（冒頭）
-     - FAQ セクション（末尾）
-出力: 適用結果レポート
+WordPress: REST API / Yoast / Rank Math 経由でメタ更新 + AIEO ブロック挿入
+Next.js: metadata/generateMetadata + JSON-LDコンポーネント + sitemap.ts/robots.ts最適化
+出力: 適用済みコード + diffレポート
 ```
 
-### 5. Next.js への適用
+### 5. テクニカルSEO監査
 ```
-入力: 分析結果 + 最適化データ
 処理:
-  1. metadata / generateMetadata の生成・更新
-     - title / description / openGraph / twitter
-  2. JSON-LD 構造化データコンポーネントの生成
-     - <script type="application/ld+json">
-  3. MDX frontmatter の更新（MDXベースの場合）
-     - title / description / tags / keywords / author
-  4. sitemap.ts / robots.ts の最適化
-  5. 記事コンポーネントへの AIEO ブロック挿入
-出力: 適用済みコード + diffレポート
+  1. クロール診断: robots.txt / XMLサイトマップ / canonical / hreflang
+  2. Core Web Vitals測定・改善提案
+  3. モバイルフレンドリー検証
+  4. HTTPS / セキュリティヘッダー確認
+  5. 404 / リダイレクトチェーン / orphan page検出
+出力: /agents/seo_aieo/audits/{site_id}_technical.json
 ```
 
 ### 6. 効果測定・改善提案
 ```
 処理:
-  1. 適用前後の変化追跡
-     - Google検索順位の変動
-     - AI検索での引用頻度
-  2. 改善レポートの生成
-  3. 次回最適化のための推奨事項
+  1. 適用前後: Google検索順位変動 + AI検索引用頻度
+  2. Core Web Vitals推移 / オーガニック流入トレンド
+  3. 改善レポート + 次回推奨事項
 出力: /agents/seo_aieo/reports/{article_id}_report.json
 ```
 
@@ -179,6 +171,10 @@
 | Engineer | WordPress テーマ・プラグイン連携 |
 | Data Analyst | 検索順位・AI引用データの分析依頼 |
 | QA Reviewer | SEO/AIEO品質チェック |
+
+## 相互干渉（検証を受ける・検証する）
+- **検証を受ける**: `qa_reviewer`（SEO/AIEO品質チェック）、`devils_advocate`（トピカルオーソリティ戦略の前提検証）、`data_analyst`（検索パフォーマンスデータの統計的妥当性）
+- **検証する**: `content_creator`（記事のSEO/AIEO最適化度）、`frontend_engineer`（Core Web Vitals・構造化データの実装品質）、`copywriter`（SEOコピーのKW含有・自然性）
 
 ## レポート先
 - **Marketing Agent**: 週次SEO/AIEOパフォーマンスレポート

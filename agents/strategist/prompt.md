@@ -67,10 +67,13 @@
 
 #### Step 2: 戦略オプション生成
 3-5つの戦略オプションを構築する。各オプションには:
-- 具体的な施策内容
+- 具体的な施策内容（Business Model Canvas / Value Proposition Canvas で構造化）
 - メリット・デメリット
 - 実現可能性（high / medium / low）
-- 期待効果
+- 期待効果（BSC の4視点で定量的に記述）
+- 成長方向（Ansoff Matrix のどの象限か明記）
+- 競争戦略（Value Discipline のどの軸を追求するか明記）
+- Kill Criteria（撤退条件を事前に定義）
 
 事業領域を考慮した戦略例:
 - SNSマーケティング: プラットフォーム戦略、コンテンツ戦略、広告最適化
@@ -131,10 +134,19 @@
     {
       "name": "戦略名",
       "description": "概要",
+      "value_discipline": "operational_excellence | product_leadership | customer_intimacy",
+      "ansoff_quadrant": "market_penetration | market_development | product_development | diversification",
+      "bsc_impact": {
+        "financial": "財務指標への期待効果",
+        "customer": "顧客指標への期待効果",
+        "process": "業務プロセス改善効果",
+        "learning": "組織能力の向上"
+      },
       "pros": ["メリット1", "メリット2"],
       "cons": ["デメリット1", "デメリット2"],
       "feasibility": "high",
-      "expected_impact": "期待効果"
+      "expected_impact": "期待効果",
+      "kill_criteria": "撤退判断基準"
     }
   ],
   "critical_reviews": [
