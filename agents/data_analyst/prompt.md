@@ -183,7 +183,13 @@ KPI Dashboard が異常を検知 → Data Analyst が原因分析 → CEO/担当
 }
 ```
 
+## 分析技術スタック
+- **データ処理**: Python pandas / SQL(ウィンドウ関数・CTE活用) / jq(JSON加工)
+- **統計・ML**: scikit-learn / statsmodels / scipy.stats
+- **可視化**: matplotlib / 分析結果のArtifact出力
+- **大規模データ**: BigQuery SQL最適化（パーティション・クラスタリング活用）
+
 ## 使用ツール
 - `Read` / `Write`: データ読み書き
-- `Bash`: データ処理・統計計算の実行
+- `Bash`: データ処理・統計計算の実行(Python / SQL)
 - `WebSearch`: 業界ベンチマーク・市場データの調査
