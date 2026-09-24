@@ -293,7 +293,7 @@ export async function fetchCustomers(): Promise<Customer[]> {
 const LIST_FIELD_NAMES = [
   "顧客名", "電話番号", "ステータス", "見込み度合い", "業種", "企業フェーズ",
   "営業手法", "IS担当", "S担当", "都道府県", "架電回数", "最終架電日",
-  "アポイント取得日", "住所", "確認状況", "従業員数", "掲載元メディア",
+  "アポイント取得日", "住所", "確認状況", "従業員数", "掲載元メディア", "未経験可求人",
 ];
 
 let _listPropIds: string[] | null = null;
@@ -336,6 +336,7 @@ function mapListCustomer(pg: any): ListCustomer {
     confirm: sel(pg, "確認状況"),
     employees: number(pg, "従業員数"),
     media: multi(pg, "掲載元メディア"),
+    noExpJob: sel(pg, "未経験可求人"),
   };
 }
 
@@ -426,6 +427,46 @@ export async function fetchWorkedCustomers(): Promise<Customer[]> {
 }
 
 /** 顧客ページの「メモ」を更新（Notion書き込み）。インテグレーションに更新権限が必要。 */
+/**
+ * 未経験可求人スキャンの対象顧客（採用ページURLあり × 未判定）を最大 limit 件返す。
+ * 判定済み(あり/なし/不明)は再スキャンしないため、対象は自然に減っていく。
+ */
+export async function fetchJobScanTargets(limit: number): Promise<{ id: string; name: string; url: string }[]> {
+  const out: { id: string; name: string; url: string }[] = [];
+  let cursor: string | undefined;
+  while (out.length < limit) {
+    const res: any = await client().databases.query({
+      database_id: DB.customers,
+      page_size: Math.min(100, limit - out.length),
+      start_cursor: cursor,
+      filter: {
+        and: [
+          { property: "採用ページ", url: { is_not_empty: true } },
+          { property: "未経験可求人", select: { is_empty: true } },
+        ],
+      },
+    });
+    for (const pg of res.results) {
+      const u = pg.properties?.["採用ページ"]?.url;
+      if (u) out.push({ id: pg.id, name: txt(pg, "顧客名") ?? "", url: u });
+    }
+    if (!res.has_more) break;
+    cursor = res.next_cursor ?? undefined;
+  }
+  return out.slice(0, limit);
+}
+
+/** 未経験可求人の判定結果と確認日を顧客ページへ書き込む */
+export async function updateJobFlag(pageId: string, value: "あり" | "なし" | "不明"): Promise<void> {
+  await client().pages.update({
+    page_id: pageId,
+    properties: {
+      未経験可求人: { select: { name: value } },
+      求人確認日: { date: { start: new Date().toISOString().slice(0, 10) } },
+    },
+  });
+}
+
 export async function updateCustomerMemo(pageId: string, memo: string): Promise<void> {
   await client().pages.update({
     page_id: pageId,

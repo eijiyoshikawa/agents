@@ -25,8 +25,17 @@ export default async function PriorityPage({
   const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
   const mode: PriorityMode = one(sp.tab) === "follow" ? "follow" : "new";
   const pageN = Math.max(1, Number(one(sp.page) ?? "1") || 1);
-  const { rows, total, page, pageSize, scored, errors } = await getPriorityList(mode, pageN);
+  const noExpOnly = one(sp.noexp) === "1";
+  const { rows, total, page, pageSize, scored, errors } = await getPriorityList(mode, pageN, noExpOnly);
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
+
+  const qs = (over: Record<string, string | undefined>) => {
+    const p = new URLSearchParams();
+    const merged = { tab: mode === "follow" ? "follow" : undefined, noexp: noExpOnly ? "1" : undefined, ...over };
+    for (const [k, v] of Object.entries(merged)) if (v) p.set(k, v);
+    const str = p.toString();
+    return str ? `/priority?${str}` : "/priority";
+  };
 
   const tabCls = (active: boolean) =>
     clsx(
@@ -54,9 +63,18 @@ export default async function PriorityPage({
       )}
 
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="flex gap-2">
-          <Link href="/priority" className={tabCls(mode === "new")}>新規（未架電）</Link>
-          <Link href="/priority?tab=follow" className={tabCls(mode === "follow")}>追客（再コール・資料請求・不在）</Link>
+        <div className="flex gap-2 flex-wrap">
+          <Link href={qs({ tab: undefined, page: undefined })} className={tabCls(mode === "new")}>新規（未架電）</Link>
+          <Link href={qs({ tab: "follow", page: undefined })} className={tabCls(mode === "follow")}>追客（再コール・資料請求・不在）</Link>
+          <Link
+            href={qs({ noexp: noExpOnly ? undefined : "1", page: undefined })}
+            className={clsx(
+              "px-3 py-1.5 rounded-lg text-sm font-medium ring-1 transition-colors",
+              noExpOnly ? "bg-accent-teal/20 text-accent-teal ring-accent-teal/30" : "bg-surface text-ink-muted ring-white/10 hover:text-ink",
+            )}
+          >
+            未経験可求人のみ
+          </Link>
         </div>
         <p className="text-xs text-ink-muted">{total.toLocaleString()} 社</p>
       </div>
@@ -72,13 +90,14 @@ export default async function PriorityPage({
               <th className="text-right px-3 py-2.5">従業員</th>
               <th className="text-left px-3 py-2.5">媒体</th>
               <th className="text-left px-3 py-2.5">見込み</th>
+              <th className="text-left px-3 py-2.5">未経験可</th>
               {mode === "follow" && <th className="text-left px-3 py-2.5">状態</th>}
               <th className="text-left px-3 py-2.5">発信</th>
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 && (
-              <tr><td colSpan={9} className="px-4 py-8 text-center text-xs text-ink-muted">対象がありません</td></tr>
+              <tr><td colSpan={10} className="px-4 py-8 text-center text-xs text-ink-muted">対象がありません</td></tr>
             )}
             {rows.map((c, i) => {
               const tier = scoreTier(c.priority);
@@ -104,6 +123,9 @@ export default async function PriorityPage({
                     {c.media.length > 0 ? c.media.join("・") : "—"}
                   </td>
                   <td className="px-3 py-2 text-xs text-ink-soft">{c.rank ?? "—"}</td>
+                  <td className="px-3 py-2 text-xs whitespace-nowrap">
+                    {c.noExpJob === "あり" ? <span className="text-accent-teal font-semibold">あり</span> : <span className="text-ink-muted">{c.noExpJob ?? "—"}</span>}
+                  </td>
                   {mode === "follow" && <td className="px-3 py-2 text-xs text-ink-soft whitespace-nowrap">{c.status}</td>}
                   <td className="px-3 py-2 whitespace-nowrap"><CallButton phone={c.phone} /></td>
                 </tr>
@@ -116,7 +138,7 @@ export default async function PriorityPage({
       <div className="flex items-center justify-center gap-3 text-sm">
         {page > 1 && (
           <Link
-            href={`/priority?${new URLSearchParams({ ...(mode === "follow" ? { tab: "follow" } : {}), page: String(page - 1) })}`}
+            href={qs({ page: String(page - 1) })}
             className="px-3 py-1.5 rounded-lg bg-surface ring-1 ring-white/10 text-ink-muted hover:text-ink"
           >
             ← 前へ
@@ -125,7 +147,7 @@ export default async function PriorityPage({
         <span className="text-xs text-ink-muted tabular-nums">{page} / {totalPages}</span>
         {page < totalPages && (
           <Link
-            href={`/priority?${new URLSearchParams({ ...(mode === "follow" ? { tab: "follow" } : {}), page: String(page + 1) })}`}
+            href={qs({ page: String(page + 1) })}
             className="px-3 py-1.5 rounded-lg bg-surface ring-1 ring-white/10 text-ink-muted hover:text-ink"
           >
             次へ →
