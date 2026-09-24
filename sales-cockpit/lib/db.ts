@@ -61,6 +61,8 @@ export async function ensureSchema(): Promise<void> {
   await sql`ALTER TABLE sc_customers ADD COLUMN IF NOT EXISTS media text`;
   await sql`ALTER TABLE sc_customers ADD COLUMN IF NOT EXISTS priority integer`;
   await sql`CREATE INDEX IF NOT EXISTS idx_sc_customers_priority ON sc_customers(priority)`;
+  // 未経験可求人フラグ（採用ページ自動スキャンで判定。あり/なし/不明）
+  await sql`ALTER TABLE sc_customers ADD COLUMN IF NOT EXISTS no_exp_job text`;
   await sql`CREATE TABLE IF NOT EXISTS sc_contracts (
     id text PRIMARY KEY, name text, status text, monthly bigint, start_date text, end_date text,
     kinds text, churn_risk text, next_renewal text, s_rep text, cs_rep text, health text,
@@ -69,7 +71,7 @@ export async function ensureSchema(): Promise<void> {
   await sql`CREATE TABLE IF NOT EXISTS sc_sync_meta ( key text PRIMARY KEY, value text )`;
 }
 
-const CUST_COLS = 25;
+const CUST_COLS = 26;
 async function upsertCustomers(
   rows: ListCustomer[],
   stamp: string,
@@ -87,15 +89,15 @@ async function upsertCustomers(
         c.id, c.url, c.name, normalizeCompanyName(c.name), c.phone, normalizePhone(c.phone),
         c.status, c.rank, c.industry, c.phase, c.method, c.pref, c.isRep, c.sRep,
         c.callCount, c.lastCallDate, c.appointmentDate, c.lastEdited, c.address, c.confirm,
-        c.employees ?? null, JSON.stringify(c.media ?? []), scoreLead(c),
+        c.employees ?? null, JSON.stringify(c.media ?? []), scoreLead(c), c.noExpJob,
         agency.get(c.id) ?? null, stamp,
       );
       return `(${ph})`;
     });
     // is_dup はここでは書かず、upsert後に recomputeDupFlags() がSQLで全体整合を取る
     const text =
-      `INSERT INTO sc_customers (id,url,name,name_norm,phone,phone_norm,status,rank,industry,phase,method,pref,is_rep,s_rep,call_count,last_call_date,appointment_date,last_edited,address,confirm,employees,media,priority,agency_reason,synced_at) VALUES ${tuples.join(",")} ` +
-      `ON CONFLICT (id) DO UPDATE SET url=EXCLUDED.url,name=EXCLUDED.name,name_norm=EXCLUDED.name_norm,phone=EXCLUDED.phone,phone_norm=EXCLUDED.phone_norm,status=EXCLUDED.status,rank=EXCLUDED.rank,industry=EXCLUDED.industry,phase=EXCLUDED.phase,method=EXCLUDED.method,pref=EXCLUDED.pref,is_rep=EXCLUDED.is_rep,s_rep=EXCLUDED.s_rep,call_count=EXCLUDED.call_count,last_call_date=EXCLUDED.last_call_date,appointment_date=EXCLUDED.appointment_date,last_edited=EXCLUDED.last_edited,address=EXCLUDED.address,confirm=EXCLUDED.confirm,employees=EXCLUDED.employees,media=EXCLUDED.media,priority=EXCLUDED.priority,agency_reason=EXCLUDED.agency_reason,synced_at=EXCLUDED.synced_at`;
+      `INSERT INTO sc_customers (id,url,name,name_norm,phone,phone_norm,status,rank,industry,phase,method,pref,is_rep,s_rep,call_count,last_call_date,appointment_date,last_edited,address,confirm,employees,media,priority,no_exp_job,agency_reason,synced_at) VALUES ${tuples.join(",")} ` +
+      `ON CONFLICT (id) DO UPDATE SET url=EXCLUDED.url,name=EXCLUDED.name,name_norm=EXCLUDED.name_norm,phone=EXCLUDED.phone,phone_norm=EXCLUDED.phone_norm,status=EXCLUDED.status,rank=EXCLUDED.rank,industry=EXCLUDED.industry,phase=EXCLUDED.phase,method=EXCLUDED.method,pref=EXCLUDED.pref,is_rep=EXCLUDED.is_rep,s_rep=EXCLUDED.s_rep,call_count=EXCLUDED.call_count,last_call_date=EXCLUDED.last_call_date,appointment_date=EXCLUDED.appointment_date,last_edited=EXCLUDED.last_edited,address=EXCLUDED.address,confirm=EXCLUDED.confirm,employees=EXCLUDED.employees,media=EXCLUDED.media,priority=EXCLUDED.priority,no_exp_job=EXCLUDED.no_exp_job,agency_reason=EXCLUDED.agency_reason,synced_at=EXCLUDED.synced_at`;
     await sql.query(text, values);
   }
 }
@@ -209,7 +211,7 @@ export async function syncAll(opts?: { mode?: "full" | "incremental" }): Promise
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const SLIM_COLS =
-  "id,url,name,phone,status,rank,industry,phase,method,pref,is_rep,s_rep,call_count,last_call_date,appointment_date,last_edited,address,confirm,employees,media";
+  "id,url,name,phone,status,rank,industry,phase,method,pref,is_rep,s_rep,call_count,last_call_date,appointment_date,last_edited,address,confirm,employees,media,no_exp_job";
 
 function parseMedia(v: unknown): string[] {
   if (typeof v !== "string" || !v) return [];
@@ -227,7 +229,7 @@ function mapSlimRow(r: any): ListCustomer {
     industry: r.industry, phase: r.phase, method: r.method, pref: r.pref, isRep: r.is_rep, sRep: r.s_rep,
     callCount: r.call_count, lastCallDate: r.last_call_date, appointmentDate: r.appointment_date,
     lastEdited: r.last_edited, address: r.address, confirm: r.confirm,
-    employees: r.employees ?? null, media: parseMedia(r.media),
+    employees: r.employees ?? null, media: parseMedia(r.media), noExpJob: r.no_exp_job ?? null,
   };
 }
 
@@ -282,12 +284,15 @@ export async function dbGetPriorityList(
   mode: PriorityMode,
   page: number,
   pageSize: number,
+  noExpOnly = false,
 ): Promise<{ rows: PriorityRow[]; total: number; page: number; pageSize: number; scored: boolean }> {
   const sql = db();
-  const whereSql =
+  const base =
     mode === "new"
       ? `WHERE (status IS NULL OR status = 'アプローチ前') AND (appointment_date IS NULL OR appointment_date = '')`
       : `WHERE status IN ('再コール','資料請求','担当者不在')`;
+  // 未経験可求人ありの企業のみに絞る（採用ページ自動スキャンの判定結果）
+  const whereSql = noExpOnly ? `${base} AND no_exp_job = 'あり'` : base;
   const ps = Math.min(Math.max(pageSize, 1), 100);
   const p = Math.max(page, 1);
   const cnt = (await sql.query(

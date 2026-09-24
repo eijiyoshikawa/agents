@@ -68,6 +68,7 @@ export type ListCustomer = {
   confirm: string | null;
   employees: number | null; // 従業員数（優先スコア算出に使用）
   media: string[]; // 掲載元メディア（リードソース。優先スコア算出に使用）
+  noExpJob: string | null; // 未経験可求人（あり/なし/不明。採用ページ自動スキャンで判定）
 };
 
 /** サーバー側検索の1行（重複/人材紹介フラグ付き） */
