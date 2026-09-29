@@ -26,7 +26,17 @@ export async function GET(req: Request) {
   const noExpOnly = url.searchParams.get("noexp") === "1";
   const limit = Math.min(Math.max(Number(url.searchParams.get("limit") ?? "500") || 500, 1), 2000);
 
-  const { rows } = await dbGetVisitList({ area, statuses, noExpOnly, limit });
+  let rows;
+  try {
+    ({ rows } = await dbGetVisitList({ area, statuses, noExpOnly, limit }));
+  } catch (e) {
+    const code = (e as { code?: string })?.code;
+    const msg =
+      code === "42703"
+        ? "データベースの準備中です（初回同期待ち）。数分後に再度お試しください。"
+        : "リストの取得に失敗しました。時間を置いて再度お試しください。";
+    return new Response(msg, { status: 500 });
+  }
 
   const header = ["顧客名", "住所", "ステータス", "電話番号", "優先スコア", "従業員数", "未経験可求人", "見込み", "業種", "Notionリンク"];
   const lines = [header.join(",")];

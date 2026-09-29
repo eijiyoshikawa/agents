@@ -23,7 +23,21 @@ export default async function VisitsPage({
   const searched = one(sp.q) === "1";
 
   const ready = notionConfigured() || dbConfigured();
-  const result = searched && ready && dbConfigured() ? await dbGetVisitList({ area, statuses, noExpOnly, limit }) : null;
+  let result: Awaited<ReturnType<typeof dbGetVisitList>> | null = null;
+  let loadError: string | null = null;
+  if (searched && ready && dbConfigured()) {
+    try {
+      result = await dbGetVisitList({ area, statuses, noExpOnly, limit });
+    } catch (e) {
+      // 新カラムが未作成（初回同期前）の場合は42703が返る。ページは落とさず案内する。
+      const msg = (e as { code?: string; message?: string });
+      loadError =
+        msg?.code === "42703"
+          ? "データベースの準備中です（デプロイ直後の初回同期待ち）。数分後に再読み込みしてください。"
+          : "リストの取得に失敗しました。時間を置いて再読み込みしてください。";
+      console.error("[visits] load failed:", msg?.message);
+    }
+  }
 
   const exportQs = new URLSearchParams({
     ...(area ? { area } : {}),
@@ -94,6 +108,10 @@ export default async function VisitsPage({
           対象ステータス（クリックで切替）。既定は「接触したがアポに至っていない」全ステータス。「アプローチ前」（未架電）も追加できます。
         </p>
       </form>
+
+      {loadError && (
+        <div className="card p-4 ring-accent-amber/30 bg-accent-amber/5 text-sm text-ink-soft">{loadError}</div>
+      )}
 
       {result && (
         <div className="card p-4 space-y-3">
