@@ -202,6 +202,7 @@ function mapCustomer(pg: any): Customer {
     listing: sel(pg, "上場区分"),
     recruitPage: url(pg, "採用ページ"),
     media: multi(pg, "掲載元メディア"),
+    noExpJob: sel(pg, "未経験可求人"),
     lastEdited: pg.last_edited_time ?? null,
     nextFollow: dateStart(pg, "次回フォロー日"),
     confirm: sel(pg, "確認状況"),

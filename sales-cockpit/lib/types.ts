@@ -41,6 +41,7 @@ export type Customer = {
   listing: string | null; // 上場区分
   recruitPage: string | null; // 採用ページURL
   media: string[]; // 掲載元メディア
+  noExpJob: string | null; // 未経験可求人（あり/なし/不明）
   lastEdited: string | null; // 最終更新日時
   nextFollow: string | null; // 次回フォロー日
   confirm: string | null; // 確認状況（重複チェック）
