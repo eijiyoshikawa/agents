@@ -474,11 +474,42 @@ export async function updateCustomerMemo(pageId: string, memo: string): Promise<
   });
 }
 
+/** 顧客ページの現在のメモを取得（全rich_text要素を連結） */
+async function getCustomerMemo(pageId: string): Promise<string> {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  const pg: any = await client().pages.retrieve({ page_id: pageId });
+  const prop = pg?.properties?.["メモ"];
+  return prop?.type === "rich_text"
+    ? prop.rich_text.map((t: { plain_text?: string }) => t.plain_text ?? "").join("")
+    : "";
+}
+
+/**
+ * 訪問結果の記録: ステータス更新＋メモ末尾へ日付付きで追記（どちらも任意・少なくとも一方）。
+ * 架電記録DBには書かない（架電KPIに訪問を混ぜないため）。
+ */
+export async function recordVisit(input: { customerId: string; status?: string; memo?: string }): Promise<void> {
+  if (input.status && CUSTOMER_STATUS_OPTIONS.has(input.status)) {
+    await client().pages.update({
+      page_id: input.customerId,
+      properties: { ステータス: { status: { name: input.status } } },
+    });
+  }
+  const memo = (input.memo ?? "").trim();
+  if (memo) {
+    const jst = new Date(Date.now() + 9 * 3600 * 1000);
+    const stamp = `【訪問 ${jst.getUTCMonth() + 1}/${jst.getUTCDate()}】`;
+    const cur = await getCustomerMemo(input.customerId);
+    const line = `${stamp}${memo}`;
+    await updateCustomerMemo(input.customerId, cur ? `${cur}\n${line}` : line);
+  }
+}
+
 // ── 架電結果の記録（日付ログ＋ステータス更新） ───────────────────
 const CALL_RESULT_OPTIONS = new Set([
   "通話", "不在", "不通", "受付拒否", "担当者不在", "担当者拒否", "再コール", "クレーム", "見込み客", "資料請求", "アポイント獲得",
 ]);
-const CUSTOMER_STATUS_OPTIONS = new Set([
+export const CUSTOMER_STATUS_OPTIONS = new Set([
   "アプローチ前", "受付拒否", "不通", "担当者不在", "担当者拒否", "再コール", "クレーム", "見込み客", "資料請求",
   "アポイント獲得", "提案中", "商談中", "契約中", "契約終了", "失注", "パートナー",
 ]);

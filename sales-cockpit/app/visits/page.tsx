@@ -156,7 +156,7 @@ export default async function VisitsPage({
           <li>スマホのGoogleマップアプリ →「保存済み」→「マイマップ」で外出先から閲覧。ピンをタップすると電話番号・優先スコア・Notionリンクが見られます</li>
         </ol>
         <p className="text-[11px] text-ink-muted">
-          ※ My Mapsは1レイヤ最大2,000件・1地図10レイヤ。エリアごとにレイヤを分けるのがおすすめです。訪問結果はNotionのステータス更新で記録すれば、次回の書き出しから自動で反映（訪問済みが除外）されます。
+          ※ My Mapsは1レイヤ最大2,000件・1地図10レイヤ。エリアごとにレイヤを分けるのがおすすめです。訪問した結果は <Link href="/visit-log" className="text-brand-glow underline">訪問記録ページ</Link>（スマホ対応）からその場で入力すると、次回の書き出しに自動で反映（訪問済みが除外）されます。
         </p>
       </div>
     </div>
