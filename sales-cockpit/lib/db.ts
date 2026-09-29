@@ -314,6 +314,53 @@ export async function dbGetPriorityList(
   };
 }
 
+// 訪問アプローチ対象にできるステータス（アポイント獲得以前で止まっている接触済み企業）
+export const VISIT_STATUSES = [
+  "受付拒否", "担当者不在", "担当者拒否", "不通", "再コール", "資料請求", "見込み客", "クレーム", "アプローチ前",
+] as const;
+
+/**
+ * 訪問アプローチ用リスト。エリア（住所の部分一致）×ステータスで絞り、
+ * 優先スコア順に返す。Google My Maps のCSV取り込み（最大2,000件/レイヤ）を想定。
+ */
+export async function dbGetVisitList(params: {
+  area: string;
+  statuses: string[];
+  noExpOnly: boolean;
+  limit: number;
+}): Promise<{ rows: PriorityRow[]; total: number }> {
+  const sql = db();
+  const allowed = params.statuses.filter((s) => (VISIT_STATUSES as readonly string[]).includes(s));
+  if (allowed.length === 0) return { rows: [], total: 0 };
+  const vals: unknown[] = [];
+  const add = (v: unknown) => {
+    vals.push(v);
+    return `$${vals.length}`;
+  };
+  const conds: string[] = [];
+  conds.push(`status IN (${allowed.map((s) => add(s)).join(",")})`);
+  conds.push(`(appointment_date IS NULL OR appointment_date = '')`);
+  const area = params.area.trim();
+  if (area) {
+    const like = `%${area.replace(/[\\%_]/g, (m) => "\\" + m)}%`;
+    conds.push(`address LIKE ${add(like)}`);
+  }
+  if (params.noExpOnly) conds.push(`no_exp_job = 'あり'`);
+  const whereSql = `WHERE ${conds.join(" AND ")}`;
+  const limit = Math.min(Math.max(params.limit, 1), 2000);
+
+  const cnt = (await sql.query(`SELECT COUNT(*)::int AS total FROM sc_customers ${whereSql}`, vals)) as Array<{ total: number }>;
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  const rows = (await sql.query(
+    `SELECT ${SLIM_COLS}, priority FROM sc_customers ${whereSql} ORDER BY priority DESC NULLS LAST, employees DESC NULLS LAST, id ASC LIMIT ${add(limit)}`,
+    vals,
+  )) as any[];
+  return {
+    rows: rows.map((r) => ({ ...mapSlimRow(r), priority: r.priority ?? null })),
+    total: cnt[0]?.total ?? 0,
+  };
+}
+
 /**
  * 分析ページの項目別内訳をDB内で集計（GROUP BY）。全件をアプリに読まない。
  * groupCount と同一仕様: 空/NULL は「(未設定)」、件数降順、industry/pref は上位15件。

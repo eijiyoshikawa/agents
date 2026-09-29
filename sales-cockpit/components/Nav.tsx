@@ -8,6 +8,7 @@ import {
   PhoneCall,
   BarChart3,
   Target,
+  MapPin,
   Bookmark,
   Wallet,
   FileText,
@@ -43,6 +44,7 @@ const GROUPS: Group[] = [
     items: [
       { href: "/today", label: "本日の架電", icon: CalendarCheck },
       { href: "/priority", label: "優先アプローチ", icon: Target },
+      { href: "/visits", label: "訪問アプローチ", icon: MapPin },
       { href: "/calls", label: "架電リスト", icon: PhoneCall },
       { href: "/followups", label: "フォロー / 再コール", icon: CalendarClock },
       { href: "/lists", label: "保存リスト", icon: Bookmark },
