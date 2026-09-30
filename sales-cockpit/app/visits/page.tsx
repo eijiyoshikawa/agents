@@ -1,6 +1,6 @@
 import Link from "next/link";
 import clsx from "clsx";
-import { dbConfigured, dbGetVisitList, VISIT_STATUSES } from "@/lib/db";
+import { dbConfigured, dbGetVisitList, EMP_BANDS, VISIT_STATUSES } from "@/lib/db";
 import { notionConfigured } from "@/lib/notion";
 import { scoreTier } from "@/lib/priority";
 
@@ -19,6 +19,8 @@ export default async function VisitsPage({
   const area = (one(sp.area) ?? "").trim();
   const statuses = one(sp.statuses) ? (one(sp.statuses) as string).split(",") : DEFAULT_STATUSES;
   const noExpOnly = one(sp.noexp) === "1";
+  const empRaw = one(sp.emp);
+  const emp = EMP_BANDS.some((b) => b.key === empRaw) ? empRaw : undefined;
   const limit = Math.min(Math.max(Number(one(sp.limit) ?? "500") || 500, 1), 2000);
   const searched = one(sp.q) === "1";
 
@@ -27,7 +29,7 @@ export default async function VisitsPage({
   let loadError: string | null = null;
   if (searched && ready && dbConfigured()) {
     try {
-      result = await dbGetVisitList({ area, statuses, noExpOnly, limit });
+      result = await dbGetVisitList({ area, statuses, noExpOnly, limit, emp });
     } catch (e) {
       // 新カラムが未作成（初回同期前）の場合は42703が返る。ページは落とさず案内する。
       const msg = (e as { code?: string; message?: string });
@@ -43,6 +45,7 @@ export default async function VisitsPage({
     ...(area ? { area } : {}),
     statuses: statuses.join(","),
     ...(noExpOnly ? { noexp: "1" } : {}),
+    ...(emp ? { emp } : {}),
     limit: String(limit),
   }).toString();
 
@@ -70,6 +73,12 @@ export default async function VisitsPage({
             <option value="1000">上位1,000件</option>
             <option value="2000">上位2,000件（My Maps上限）</option>
           </select>
+          <select name="emp" defaultValue={emp ?? ""} className="px-3 py-2 rounded-lg bg-surface ring-1 ring-white/10 text-sm">
+            <option value="">従業員数: すべて</option>
+            {EMP_BANDS.map((b) => (
+              <option key={b.key} value={b.key}>従業員数: {b.label}</option>
+            ))}
+          </select>
           <label className="inline-flex items-center gap-1.5 text-sm text-ink-soft">
             <input type="checkbox" name="noexp" value="1" defaultChecked={noExpOnly} className="accent-teal-400" />
             未経験可求人のみ
@@ -86,6 +95,7 @@ export default async function VisitsPage({
               ...(area ? { area } : {}),
               statuses: next.join(","),
               ...(noExpOnly ? { noexp: "1" } : {}),
+              ...(emp ? { emp } : {}),
               limit: String(limit),
             }).toString();
             return (
