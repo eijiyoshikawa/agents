@@ -78,21 +78,85 @@ function client(): Client {
 // 取得上限ページ数（1ページ=100件）。既定400ページ=40,000件（全件カバー）。env で変更可。
 export const NOTION_MAX_PAGES = Number(process.env.NOTION_MAX_PAGES ?? 400);
 
+// ── マルチデータソース対応（Notion-Version 2025-09-03）────────────────
+// ワークスペースがマルチデータソースへ移行すると、旧 databases.query は
+// 10,000件で has_more:false を返し全件取得できなくなる（2026-09 に実際に発生）。
+// そのため新API POST /v1/data_sources/{id}/query を直接叩き、失敗時のみ旧APIへフォールバックする。
+const NOTION_API = "https://api.notion.com/v1";
+const NOTION_VERSION_DS = "2025-09-03";
+const _dsIdCache = new Map<string, string>(); // database_id → data_source_id
+
+async function notionFetch(path: string, init: RequestInit): Promise<any> {
+  const res = await fetch(`${NOTION_API}${path}`, {
+    ...init,
+    headers: {
+      Authorization: `Bearer ${TOKEN}`,
+      "Notion-Version": NOTION_VERSION_DS,
+      "Content-Type": "application/json",
+      ...(init.headers ?? {}),
+    },
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`Notion API ${res.status}: ${body.slice(0, 300)}`);
+  }
+  return res.json();
+}
+
+/** database_id → data_source_id を解決（プロセス内キャッシュ）。単一ソースDBは先頭を使う。 */
+async function resolveDataSourceId(databaseId: string): Promise<string> {
+  const hit = _dsIdCache.get(databaseId);
+  if (hit) return hit;
+  const db = await notionFetch(`/databases/${databaseId}`, { method: "GET" });
+  const dsId: string | undefined = db?.data_sources?.[0]?.id;
+  if (!dsId) throw new Error("data_sources not found on database");
+  _dsIdCache.set(databaseId, dsId);
+  return dsId;
+}
+
+/**
+ * 1ページ分のクエリ（新API優先・旧APIフォールバック）。
+ * 新APIでは filter_properties はクエリ文字列で渡す。filter の形式は旧APIと同一。
+ */
+async function queryPage(
+  databaseId: string,
+  opts: { cursor?: string; pageSize: number; filter?: any; filterProperties?: string[] },
+): Promise<{ results: any[]; hasMore: boolean; nextCursor?: string }> {
+  try {
+    const dsId = await resolveDataSourceId(databaseId);
+    const qs = (opts.filterProperties ?? []).map((p) => `filter_properties=${encodeURIComponent(p)}`).join("&");
+    const res = await notionFetch(`/data_sources/${dsId}/query${qs ? `?${qs}` : ""}`, {
+      method: "POST",
+      body: JSON.stringify({
+        page_size: opts.pageSize,
+        ...(opts.cursor ? { start_cursor: opts.cursor } : {}),
+        ...(opts.filter ? { filter: opts.filter } : {}),
+      }),
+    });
+    return { results: res.results ?? [], hasMore: Boolean(res.has_more), nextCursor: res.next_cursor ?? undefined };
+  } catch (e) {
+    // 新APIが使えない環境（未移行ワークスペース等）では旧APIで継続する
+    console.warn("[notion] data_sources.query failed, falling back to databases.query:", (e as Error)?.message);
+    const res: any = await client().databases.query({
+      database_id: databaseId,
+      start_cursor: opts.cursor,
+      page_size: opts.pageSize,
+      ...(opts.filter ? { filter: opts.filter } : {}),
+      ...(opts.filterProperties?.length ? { filter_properties: opts.filterProperties } : {}),
+    });
+    return { results: res.results, hasMore: Boolean(res.has_more), nextCursor: res.next_cursor ?? undefined };
+  }
+}
+
 async function queryAll(databaseId: string, filter?: any, filterProperties?: string[]): Promise<any[]> {
   if (!databaseId) return [];
   const out: any[] = [];
   let cursor: string | undefined;
   for (let i = 0; i < NOTION_MAX_PAGES; i++) {
-    const res: any = await client().databases.query({
-      database_id: databaseId,
-      start_cursor: cursor,
-      page_size: 100,
-      ...(filter ? { filter } : {}),
-      ...(filterProperties && filterProperties.length ? { filter_properties: filterProperties } : {}),
-    });
+    const res = await queryPage(databaseId, { cursor, pageSize: 100, filter, filterProperties });
     out.push(...res.results);
-    if (!res.has_more) break;
-    cursor = res.next_cursor ?? undefined;
+    if (!res.hasMore) break;
+    cursor = res.nextCursor;
   }
   return out;
 }
@@ -436,10 +500,9 @@ export async function fetchJobScanTargets(limit: number): Promise<{ id: string; 
   const out: { id: string; name: string; url: string }[] = [];
   let cursor: string | undefined;
   while (out.length < limit) {
-    const res: any = await client().databases.query({
-      database_id: DB.customers,
-      page_size: Math.min(100, limit - out.length),
-      start_cursor: cursor,
+    const res = await queryPage(DB.customers, {
+      pageSize: Math.min(100, limit - out.length),
+      cursor,
       filter: {
         and: [
           { property: "採用ページ", url: { is_not_empty: true } },
@@ -451,8 +514,8 @@ export async function fetchJobScanTargets(limit: number): Promise<{ id: string; 
       const u = pg.properties?.["採用ページ"]?.url;
       if (u) out.push({ id: pg.id, name: txt(pg, "顧客名") ?? "", url: u });
     }
-    if (!res.has_more) break;
-    cursor = res.next_cursor ?? undefined;
+    if (!res.hasMore) break;
+    cursor = res.nextCursor;
   }
   return out.slice(0, limit);
 }
@@ -871,10 +934,9 @@ export async function fetchCustomerByName(name: string): Promise<Customer | null
   const q = name.trim();
   if (!q) return null;
   try {
-    const res: any = await client().databases.query({
-      database_id: DB.customers,
+    const res = await queryPage(DB.customers, {
+      pageSize: 1,
       filter: { property: "顧客名", title: { contains: q } },
-      page_size: 1,
     });
     const pg = res.results?.[0];
     return pg ? mapCustomer(pg) : null;

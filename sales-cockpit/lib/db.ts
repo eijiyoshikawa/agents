@@ -172,6 +172,7 @@ export async function syncAll(opts?: { mode?: "full" | "incremental" }): Promise
   contracts: number;
   ms: number;
   truncated: boolean;
+  suspected_partial: boolean;
 }> {
   const t0 = Date.now();
   await ensureSchema();
@@ -200,13 +201,35 @@ export async function syncAll(opts?: { mode?: "full" | "incremental" }): Promise
   await upsertContracts(contracts, stamp);
   // 取得上限に達している＝Notionを取り切れていない可能性。その場合は削除を行わない（誤削除防止）。
   const truncated = customers.length >= NOTION_MAX_PAGES * 100;
-  if (mode === "full" && !truncated) {
-    await sql.query(`DELETE FROM sc_customers WHERE synced_at < $1`, [stamp]);
+  // 大量削除ガード: 取得件数が既存キャッシュの9割を下回るfull同期は「部分取得」を疑い、
+  // 古い行の削除をスキップする（NotionのAPI仕様変更等でキャッシュ約2万行を消した事故の再発防止）。
+  let suspectedPartial = false;
+  if (mode === "full") {
+    const beforeRes = (await sql.query(`SELECT count(*)::int AS n FROM sc_customers WHERE synced_at < $1`, [
+      stamp,
+    ])) as Array<{ n: number }>;
+    const staleBefore = Number(beforeRes?.[0]?.n ?? 0);
+    const totalBefore = staleBefore; // upsertはsynced_atをstampに更新済みのため、残stale=取得できなかった既存行
+    suspectedPartial = !truncated && customers.length > 0 && totalBefore > Math.max(customers.length * 0.15, 500);
+    if (!truncated && !suspectedPartial) {
+      await sql.query(`DELETE FROM sc_customers WHERE synced_at < $1`, [stamp]);
+    } else if (suspectedPartial) {
+      console.warn(
+        `[sync] mass-delete guard: fetched=${customers.length} but ${totalBefore} cached rows not covered — skip delete`,
+      );
+    }
   }
   await sql.query(`DELETE FROM sc_contracts WHERE synced_at < $1`, [stamp]);
   await metaSet("last_sync", stamp);
   if (mode === "full") await metaSet("last_full_sync", stamp);
-  return { mode, customers: customers.length, contracts: contracts.length, ms: Date.now() - t0, truncated };
+  return {
+    mode,
+    customers: customers.length,
+    contracts: contracts.length,
+    ms: Date.now() - t0,
+    truncated,
+    suspected_partial: suspectedPartial,
+  };
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
