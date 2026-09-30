@@ -1,7 +1,7 @@
 // Postgres(Neon)バックエンド。接続文字列が設定されている時だけ有効。
 // 未設定なら dbConfigured()=false となり、アプリは従来のNotionキャッシュ経路で動作する（フォールバック）。
 import { neon } from "@neondatabase/serverless";
-import { fetchCustomersSlim, fetchContracts, NOTION_MAX_PAGES } from "./notion";
+import { fetchCustomersSlimMeta, fetchContracts, NOTION_MAX_PAGES } from "./notion";
 import { normalizeCompanyName, normalizePhone, agencyReason } from "./leadflags";
 import { scoreLead } from "./priority";
 import type { ListCustomer, Contract, SearchParams, SearchResult, SearchRow, Breakdowns } from "./types";
@@ -189,7 +189,8 @@ export async function syncAll(opts?: { mode?: "full" | "incremental" }): Promise
     mode === "incremental" ? new Date(Date.parse(lastSync as string) - INCR_MARGIN_MS).toISOString() : undefined;
 
   // 顧客は増分/全件を切替。契約は件数が少ないため常に全件（削除整合も毎回取れる）。
-  const [customers, contracts] = await Promise.all([fetchCustomersSlim(editedSince), fetchContracts()]);
+  const [customersMeta, contracts] = await Promise.all([fetchCustomersSlimMeta(editedSince), fetchContracts()]);
+  const customers = customersMeta.rows;
   // 人材紹介の疑いは行単体で決まるため upsert 時に計算。重複候補は upsert 後にSQLで全体再計算。
   const agency = new Map<string, string>();
   for (const c of customers) {
@@ -199,24 +200,32 @@ export async function syncAll(opts?: { mode?: "full" | "incremental" }): Promise
   await upsertCustomers(customers, stamp, agency);
   await recomputeDupFlags();
   await upsertContracts(contracts, stamp);
-  // 取得上限に達している＝Notionを取り切れていない可能性。その場合は削除を行わない（誤削除防止）。
-  const truncated = customers.length >= NOTION_MAX_PAGES * 100;
-  // 大量削除ガード: 取得件数が既存キャッシュの9割を下回るfull同期は「部分取得」を疑い、
-  // 古い行の削除をスキップする（NotionのAPI仕様変更等でキャッシュ約2万行を消した事故の再発防止）。
+  // Notionを取り切れていない可能性がある場合は削除を行わない（誤削除防止）。
+  // queryAll側の明示シグナル（ページ予算切れ・ウィンドウ打ち切り）と件数上限の両方で判定する。
+  const truncated = customersMeta.truncated || customers.length >= NOTION_MAX_PAGES * 100;
+  // 大量削除ガード: full同期でも「今回の取得でカバーされなかった既存キャッシュ行」が
+  // 多い場合は部分取得を疑い、古い行の削除をスキップする。判定ルール:
+  //   - 取得0件なのに既存行がある → 常に異常（空取得での全消去を防ぐ）
+  //   - 未カバー行 > max(取得件数の15%, 500行) → 部分取得の疑い
+  // （NotionのAPI仕様変更でキャッシュ約1.85万行を消した2026-09-30の事故の再発防止。
+  //   詳細: docs/INCIDENT_2026-09-30_notion-10k-limit.md）
   let suspectedPartial = false;
   if (mode === "full") {
     const beforeRes = (await sql.query(`SELECT count(*)::int AS n FROM sc_customers WHERE synced_at < $1`, [
       stamp,
     ])) as Array<{ n: number }>;
-    const staleBefore = Number(beforeRes?.[0]?.n ?? 0);
-    const totalBefore = staleBefore; // upsertはsynced_atをstampに更新済みのため、残stale=取得できなかった既存行
-    suspectedPartial = !truncated && customers.length > 0 && totalBefore > Math.max(customers.length * 0.15, 500);
+    // upsertはsynced_atをstampに更新済みのため、残stale = 今回の取得でカバーされなかった既存行
+    const uncovered = Number(beforeRes?.[0]?.n ?? 0);
+    suspectedPartial =
+      (customers.length === 0 && uncovered > 0) ||
+      (customers.length > 0 && uncovered > Math.max(customers.length * 0.15, 500));
     if (!truncated && !suspectedPartial) {
       await sql.query(`DELETE FROM sc_customers WHERE synced_at < $1`, [stamp]);
     } else if (suspectedPartial) {
-      console.warn(
-        `[sync] mass-delete guard: fetched=${customers.length} but ${totalBefore} cached rows not covered — skip delete`,
+      console.error(
+        `[sync] mass-delete guard: fetched=${customers.length} but ${uncovered} cached rows not covered — skip delete`,
       );
+      await metaSet("last_suspected_partial", `${stamp} fetched=${customers.length} uncovered=${uncovered}`);
     }
   }
   await sql.query(`DELETE FROM sc_contracts WHERE synced_at < $1`, [stamp]);
@@ -305,6 +314,11 @@ export const EMP_BANDS = [
   { key: "300-", label: "300名以上" },
 ] as const;
 export type EmpBand = (typeof EMP_BANDS)[number]["key"];
+
+/** URLパラメータ等の生値をバンドキーへ検証。不正値は undefined（=絞り込みなし） */
+export function parseEmpBand(v: string | null | undefined): EmpBand | undefined {
+  return EMP_BANDS.some((b) => b.key === v) ? (v as EmpBand) : undefined;
+}
 
 /** バンドキー→SQL条件（固定値のみで組み立てるためインジェクション安全）。不明キーはnull */
 function empBandCond(band?: string | null): string | null {

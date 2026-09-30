@@ -1,4 +1,4 @@
-import { dbConfigured, dbGetVisitList, VISIT_STATUSES } from "@/lib/db";
+import { dbConfigured, dbGetVisitList, parseEmpBand, VISIT_STATUSES } from "@/lib/db";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -24,7 +24,7 @@ export async function GET(req: Request) {
   const statusesParam = url.searchParams.get("statuses") ?? "";
   const statuses = statusesParam ? statusesParam.split(",") : [...VISIT_STATUSES].filter((s) => s !== "アプローチ前");
   const noExpOnly = url.searchParams.get("noexp") === "1";
-  const emp = url.searchParams.get("emp");
+  const emp = parseEmpBand(url.searchParams.get("emp"));
   const limit = Math.min(Math.max(Number(url.searchParams.get("limit") ?? "500") || 500, 1), 2000);
 
   let rows;

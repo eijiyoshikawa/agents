@@ -84,38 +84,67 @@ export const NOTION_MAX_PAGES = Number(process.env.NOTION_MAX_PAGES ?? 400);
 // そのため新API POST /v1/data_sources/{id}/query を直接叩き、失敗時のみ旧APIへフォールバックする。
 const NOTION_API = "https://api.notion.com/v1";
 const NOTION_VERSION_DS = "2025-09-03";
-const _dsIdCache = new Map<string, string>(); // database_id → data_source_id
+// database_id → data_source_id。解決に失敗したDBは "LEGACY" を記録し、以後は旧APIのみ使う
+// （毎ページ失敗→フォールバックを繰り返すとAPI呼び出しが倍増するため、判定は1回で固定する）。
+const LEGACY = "LEGACY";
+const _dsIdCache = new Map<string, string>();
 
-async function notionFetch(path: string, init: RequestInit): Promise<any> {
-  const res = await fetch(`${NOTION_API}${path}`, {
-    ...init,
-    headers: {
-      Authorization: `Bearer ${TOKEN}`,
-      "Notion-Version": NOTION_VERSION_DS,
-      "Content-Type": "application/json",
-      ...(init.headers ?? {}),
-    },
-  });
-  if (!res.ok) {
-    const body = await res.text().catch(() => "");
-    throw new Error(`Notion API ${res.status}: ${body.slice(0, 300)}`);
+class NotionHttpError extends Error {
+  constructor(public status: number, body: string) {
+    super(`Notion API ${status}: ${body.slice(0, 300)}`);
   }
-  return res.json();
 }
 
-/** database_id → data_source_id を解決（プロセス内キャッシュ）。単一ソースDBは先頭を使う。 */
-async function resolveDataSourceId(databaseId: string): Promise<string> {
-  const hit = _dsIdCache.get(databaseId);
-  if (hit) return hit;
-  const db = await notionFetch(`/databases/${databaseId}`, { method: "GET" });
-  const dsId: string | undefined = db?.data_sources?.[0]?.id;
-  if (!dsId) throw new Error("data_sources not found on database");
-  _dsIdCache.set(databaseId, dsId);
-  return dsId;
+/** 429/5xx は指数バックオフで最大3回試行（Retry-After があれば優先）。それ以外は即エラー。 */
+async function notionFetch(path: string, init: RequestInit): Promise<any> {
+  let lastErr: Error = new Error("unreachable");
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const res = await fetch(`${NOTION_API}${path}`, {
+      ...init,
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+        "Notion-Version": NOTION_VERSION_DS,
+        "Content-Type": "application/json",
+        ...(init.headers ?? {}),
+      },
+    });
+    if (res.ok) return res.json();
+    const body = await res.text().catch(() => "");
+    lastErr = new NotionHttpError(res.status, body);
+    const transient = res.status === 429 || res.status >= 500;
+    if (!transient || attempt === 2) throw lastErr;
+    const retryAfter = Number(res.headers.get("retry-after")) || 0;
+    const waitMs = retryAfter > 0 ? retryAfter * 1000 : 1000 * 2 ** attempt;
+    await new Promise((r) => setTimeout(r, Math.min(waitMs, 10000)));
+  }
+  throw lastErr;
 }
 
 /**
- * 1ページ分のクエリ（新API優先・旧APIフォールバック）。
+ * database_id → data_source_id を解決（プロセス内キャッシュ）。単一ソースDBは先頭を使う。
+ * 解決できないDB（未移行ワークスペース等）は LEGACY を返し、以後は旧APIで動かす。
+ */
+async function resolveDataSourceId(databaseId: string): Promise<string> {
+  const hit = _dsIdCache.get(databaseId);
+  if (hit) return hit;
+  try {
+    const db = await notionFetch(`/databases/${databaseId}`, { method: "GET" });
+    const dsId: string | undefined = db?.data_sources?.[0]?.id;
+    if (!dsId) throw new Error("data_sources not found on database");
+    _dsIdCache.set(databaseId, dsId);
+    return dsId;
+  } catch (e) {
+    console.warn("[notion] data_source resolution failed — using legacy databases.query:", (e as Error)?.message);
+    _dsIdCache.set(databaseId, LEGACY);
+    return LEGACY;
+  }
+}
+
+/**
+ * 1ページ分のクエリ。data_source_id を解決できたDBは新API（Notion-Version 2025-09-03）、
+ * できなかったDBは旧APIを使う。新APIのクエリが失敗した場合はフォールバックせずエラーにする:
+ * ページネーション途中で旧APIへ切り替えるとカーソル互換がなく、かつ旧APIは10,000件で
+ * 沈黙打ち切りされるため、静かに欠損するより同期を失敗させて次回cronに任せる方が安全。
  * 新APIでは filter_properties はクエリ文字列で渡す。filter の形式は旧APIと同一。
  */
 async function queryPage(
@@ -128,8 +157,8 @@ async function queryPage(
     ...(opts.filter ? { filter: opts.filter } : {}),
     ...(opts.sorts ? { sorts: opts.sorts } : {}),
   };
-  try {
-    const dsId = await resolveDataSourceId(databaseId);
+  const dsId = await resolveDataSourceId(databaseId);
+  if (dsId !== LEGACY) {
     const qs = (opts.filterProperties ?? []).map((p) => `filter_properties=${encodeURIComponent(p)}`).join("&");
     const res = await notionFetch(`/data_sources/${dsId}/query${qs ? `?${qs}` : ""}`, {
       method: "POST",
@@ -141,21 +170,18 @@ async function queryPage(
       nextCursor: res.next_cursor ?? undefined,
       incomplete: res.request_status?.type === "incomplete",
     };
-  } catch (e) {
-    // 新APIが使えない環境（未移行ワークスペース等）では旧APIで継続する
-    console.warn("[notion] data_sources.query failed, falling back to databases.query:", (e as Error)?.message);
-    const res: any = await client().databases.query({
-      database_id: databaseId,
-      ...body,
-      ...(opts.filterProperties?.length ? { filter_properties: opts.filterProperties } : {}),
-    } as any);
-    return {
-      results: res.results,
-      hasMore: Boolean(res.has_more),
-      nextCursor: res.next_cursor ?? undefined,
-      incomplete: res.request_status?.type === "incomplete",
-    };
   }
+  const res: any = await client().databases.query({
+    database_id: databaseId,
+    ...body,
+    ...(opts.filterProperties?.length ? { filter_properties: opts.filterProperties } : {}),
+  } as any);
+  return {
+    results: res.results,
+    hasMore: Boolean(res.has_more),
+    nextCursor: res.next_cursor ?? undefined,
+    incomplete: res.request_status?.type === "incomplete",
+  };
 }
 
 // Notion APIは2026年初頭より「1クエリあたり最大10,000件」でページネーションを打ち切る
@@ -164,20 +190,35 @@ async function queryPage(
 const QUERY_RESULT_LIMIT = 10000;
 const CREATED_ASC = [{ timestamp: "created_time", direction: "ascending" }];
 
-async function queryAll(databaseId: string, filter?: any, filterProperties?: string[]): Promise<any[]> {
-  if (!databaseId) return [];
+/**
+ * 全件取得の本体。truncated=true は「まだ残りがあるのに打ち切った」ことを示す
+ * （ページ予算切れ・ウィンドウ上限・進捗なしガード）。呼び出し側は truncated を
+ * 無視してはならない（フル同期の削除判断に直結する）。
+ */
+async function queryAllMeta(
+  databaseId: string,
+  filter?: any,
+  filterProperties?: string[],
+): Promise<{ pages: any[]; truncated: boolean }> {
+  if (!databaseId) return { pages: [], truncated: false };
   const out: any[] = [];
   const seen = new Set<string>();
   let windowFilter: any | undefined;
   let pagesUsed = 0;
+  let complete = false;
   // 外側ループ = クエリ（ウィンドウ）。内側ループ = そのクエリ内のカーソル送り。
-  for (let w = 0; w < 40 && pagesUsed < NOTION_MAX_PAGES; w++) {
+  for (let w = 0; w < 40; w++) {
     const combined = windowFilter ? (filter ? { and: [filter, windowFilter] } : windowFilter) : filter;
     const lenBefore = out.length;
     let cursor: string | undefined;
     let fetchedInWindow = 0;
     let hitLimit = false;
-    while (pagesUsed < NOTION_MAX_PAGES) {
+    let budgetExhausted = false;
+    for (;;) {
+      if (pagesUsed >= NOTION_MAX_PAGES) {
+        budgetExhausted = true;
+        break;
+      }
       const res = await queryPage(databaseId, {
         cursor,
         pageSize: 100,
@@ -200,16 +241,27 @@ async function queryAll(databaseId: string, filter?: any, filterProperties?: str
       hitLimit = res.incomplete || fetchedInWindow >= QUERY_RESULT_LIMIT;
       break;
     }
-    if (!hitLimit) break; // 取り切った
+    if (budgetExhausted) {
+      console.warn(`[notion] queryAllMeta: page budget (${NOTION_MAX_PAGES}) exhausted at ${out.length} rows`);
+      break;
+    }
+    if (!hitLimit) {
+      complete = true; // 取り切った
+      break;
+    }
     const lastCreated = out[out.length - 1]?.created_time;
     // 進捗が無い（同一created_timeに1万件超が集中）場合は無限ループを避けて打ち切る
     if (!lastCreated || out.length === lenBefore) {
-      console.warn(`[notion] queryAll: cannot advance past 10k window (fetched=${out.length}) — stopping`);
+      console.warn(`[notion] queryAllMeta: cannot advance past 10k window (fetched=${out.length}) — stopping`);
       break;
     }
     windowFilter = { timestamp: "created_time", created_time: { on_or_after: lastCreated } };
   }
-  return out;
+  return { pages: out, truncated: !complete };
+}
+
+async function queryAll(databaseId: string, filter?: any, filterProperties?: string[]): Promise<any[]> {
+  return (await queryAllMeta(databaseId, filter, filterProperties)).pages;
 }
 
 // 実績集計の起点日（この日以降に更新されたもののみ実績へ反映）。env で変更可。
@@ -458,14 +510,24 @@ function mapListCustomer(pg: any): ListCustomer {
 
 /** 全顧客（軽量版・必要項目のみ）。一覧/分析/重複/品質用。詳細はIDで都度取得。 */
 export async function fetchCustomersSlim(editedSince?: string): Promise<ListCustomer[]> {
+  return (await fetchCustomersSlimMeta(editedSince)).rows;
+}
+
+/**
+ * fetchCustomersSlim の同期用バリアント。truncated=true は「Notionを取り切れていない」
+ * ことを示し、フル同期側はこの場合キャッシュの削除を行ってはならない。
+ */
+export async function fetchCustomersSlimMeta(
+  editedSince?: string,
+): Promise<{ rows: ListCustomer[]; truncated: boolean }> {
   const ids = await fetchListPropertyIds();
   // editedSince 指定時は「その時刻以降に更新されたページのみ」取得（増分同期用）。
   // 全2万件超の取り直しを避け、Notion API 呼び出しを数回に抑える。
   const filter = editedSince
     ? { timestamp: "last_edited_time", last_edited_time: { on_or_after: editedSince } }
     : undefined;
-  const pages = await queryAll(DB.customers, filter, ids.length ? ids : undefined);
-  return pages.map(mapListCustomer);
+  const { pages, truncated } = await queryAllMeta(DB.customers, filter, ids.length ? ids : undefined);
+  return { rows: pages.map(mapListCustomer), truncated };
 }
 
 /** 最近更新された顧客のみ（軽量）。今日/週次/サマリの活動集計用。since=YYYY-MM-DD（UTC基準で多めに取得しJST側で絞る） */

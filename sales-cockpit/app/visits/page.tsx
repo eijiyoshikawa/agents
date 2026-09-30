@@ -1,6 +1,6 @@
 import Link from "next/link";
 import clsx from "clsx";
-import { dbConfigured, dbGetVisitList, EMP_BANDS, VISIT_STATUSES } from "@/lib/db";
+import { dbConfigured, dbGetVisitList, EMP_BANDS, parseEmpBand, VISIT_STATUSES } from "@/lib/db";
 import { notionConfigured } from "@/lib/notion";
 import { scoreTier } from "@/lib/priority";
 
@@ -19,8 +19,7 @@ export default async function VisitsPage({
   const area = (one(sp.area) ?? "").trim();
   const statuses = one(sp.statuses) ? (one(sp.statuses) as string).split(",") : DEFAULT_STATUSES;
   const noExpOnly = one(sp.noexp) === "1";
-  const empRaw = one(sp.emp);
-  const emp = EMP_BANDS.some((b) => b.key === empRaw) ? empRaw : undefined;
+  const emp = parseEmpBand(one(sp.emp));
   const limit = Math.min(Math.max(Number(one(sp.limit) ?? "500") || 500, 1), 2000);
   const searched = one(sp.q) === "1";
 
