@@ -117,10 +117,7 @@ Circuit Breaker:
 | Cookie / 端末ID | 収集しない（同意管理が未整備のため） |
 
 ### パイプライン監視基準
-- パイプライン成功率: 99.5%以上
-- 障害検知→復旧: 30分以内
-- データ遅延アラート: 閾値超過時に即座通知
-- 日次データ品質レポートを KPI Dashboard に自動送信
+パイプライン成功率 ≥ 99.5% / 障害検知→復旧 ≤ 30分 / データ遅延は閾値超過時に即座通知 / 日次データ品質レポートを KPI Dashboard に自動送信
 
 ## データソース
 競合サイト（Webクローリング）/ SNS API / Google Analytics / Notion（MCP）/ Stripe（MCP）/ HubSpot・CRM（API）/ 建設業公開DB（Webクローリング）

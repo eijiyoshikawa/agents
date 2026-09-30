@@ -93,17 +93,10 @@ LP・Web サイト・AI システムのフルスタック実装を担当する�
 ### 4. デプロイ・納品
 ```
 処理:
-  1. デプロイ前チェックリスト実行
-     - [ ] 環境変数の設定確認
-     - [ ] ビルドエラーなし
-     - [ ] テスト全通過
-     - [ ] 画像最適化（WebP/AVIF + lazy loading）
-     - [ ] 不要な console.log / デバッグコードの除去
-     - [ ] robots.txt / sitemap.xml の確認
+  1. デプロイ前チェック（環境変数・ビルド・テスト通過・画像最適化・デバッグコード除去・robots.txt 確認）
   2. ステージング環境へのデプロイ・クライアント確認
-  3. 本番デプロイ（Vercel / AWS）
-  4. 本番動作確認・監視設定
-  5. PM Agent への納品報告
+  3. 本番デプロイ（Vercel / AWS）・動作確認・監視設定
+  4. PM Agent への納品報告
 出力: /agents/engineer/deployment/{project_name}.json
 ```
 
@@ -185,23 +178,7 @@ Designer から `design_baseline` が渡されない場合は以下で確定す�
 | 海外SaaS / ダッシュボード | `linear.app` / `framer` / `notion` |
 | LP / キャンペーン（B2C） | feer を雛形にトーン調整 |
 
-**和文B2Bの Tailwind config 既定（feer §6 準拠）:**
-```ts
-theme: { extend: {
-  colors: { ink:"#1a1a1a", cream:"#FFF9EF", brand:{DEFAULT:"#ef6c02",dark:"#c14e00"}, surface:"#fcfbfa" },
-  transitionTimingFunction: { standard:"cubic-bezier(.4,0,.2,1)", grow:"cubic-bezier(.28,.84,.42,1)" },
-  keyframes: {
-    growFromBottom: { "0%":{opacity:"0",transform:"scale(.9) translateY(16px)"}, "100%":{opacity:"1",transform:"scale(1) translateY(0)"} },
-    blink: { "50%":{opacity:"0"} },
-    marquee: { from:{transform:"translateX(0)"}, to:{transform:"translateX(-50%)"} },
-  },
-  animation: {
-    "grow-from-bottom":"growFromBottom .4s cubic-bezier(.28,.84,.42,1) both",
-    blink:"blink 1s steps(1) infinite",
-    marquee:"marquee 30s linear infinite",
-  },
-}}
-```
+**和文B2Bの Tailwind config 既定（feer §6 準拠）:** colors: ink `#1a1a1a` / cream `#FFF9EF` / brand `#ef6c02` / surface `#fcfbfa`、timing: standard `cubic-bezier(.4,0,.2,1)` / grow `cubic-bezier(.28,.84,.42,1)`、animation: grow-from-bottom / blink / marquee。詳細は `/design-md/feer/DESIGN.md` §6 参照。
 
 ## モーション実装（必須参照）
 
