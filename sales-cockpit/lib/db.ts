@@ -297,6 +297,31 @@ export async function dbGetActiveSince(sinceYmd: string): Promise<ListCustomer[]
 export type PriorityMode = "new" | "follow";
 export type PriorityRow = ListCustomer & { priority: number | null };
 
+// 従業員数の絞り込みバンド（スコアリングと同じ区分）。キーはURLパラメータ値。
+export const EMP_BANDS = [
+  { key: "1-29", label: "29名以下" },
+  { key: "30-99", label: "30〜99名" },
+  { key: "100-299", label: "100〜299名" },
+  { key: "300-", label: "300名以上" },
+] as const;
+export type EmpBand = (typeof EMP_BANDS)[number]["key"];
+
+/** バンドキー→SQL条件（固定値のみで組み立てるためインジェクション安全）。不明キーはnull */
+function empBandCond(band?: string | null): string | null {
+  switch (band) {
+    case "1-29":
+      return "employees BETWEEN 1 AND 29";
+    case "30-99":
+      return "employees BETWEEN 30 AND 99";
+    case "100-299":
+      return "employees BETWEEN 100 AND 299";
+    case "300-":
+      return "employees >= 300";
+    default:
+      return null;
+  }
+}
+
 /**
  * 優先アプローチリスト。実績分析ベースの priority スコア降順で1ページ分を返す。
  * - new: 未架電（ステータス空 or アプローチ前・アポなし）＝新規架電の優先順
@@ -308,6 +333,7 @@ export async function dbGetPriorityList(
   page: number,
   pageSize: number,
   noExpOnly = false,
+  emp?: string | null,
 ): Promise<{ rows: PriorityRow[]; total: number; page: number; pageSize: number; scored: boolean }> {
   const sql = db();
   const base =
@@ -315,7 +341,10 @@ export async function dbGetPriorityList(
       ? `WHERE (status IS NULL OR status = 'アプローチ前') AND (appointment_date IS NULL OR appointment_date = '')`
       : `WHERE status IN ('再コール','資料請求','担当者不在')`;
   // 未経験可求人ありの企業のみに絞る（採用ページ自動スキャンの判定結果）
-  const whereSql = noExpOnly ? `${base} AND no_exp_job = 'あり'` : base;
+  const empCond = empBandCond(emp);
+  const whereSql = [base, noExpOnly ? `AND no_exp_job = 'あり'` : "", empCond ? `AND ${empCond}` : ""]
+    .filter(Boolean)
+    .join(" ");
   const ps = Math.min(Math.max(pageSize, 1), 100);
   const p = Math.max(page, 1);
   const cnt = (await sql.query(
@@ -351,6 +380,7 @@ export async function dbGetVisitList(params: {
   statuses: string[];
   noExpOnly: boolean;
   limit: number;
+  emp?: string | null;
 }): Promise<{ rows: PriorityRow[]; total: number }> {
   const sql = db();
   const allowed = params.statuses.filter((s) => (VISIT_STATUSES as readonly string[]).includes(s));
@@ -369,6 +399,8 @@ export async function dbGetVisitList(params: {
     conds.push(`address LIKE ${add(like)}`);
   }
   if (params.noExpOnly) conds.push(`no_exp_job = 'あり'`);
+  const empCond = empBandCond(params.emp);
+  if (empCond) conds.push(empCond);
   const whereSql = `WHERE ${conds.join(" AND ")}`;
   const limit = Math.min(Math.max(params.limit, 1), 2000);
 

@@ -314,11 +314,12 @@ export async function getPriorityList(
   mode: PriorityMode,
   page: number,
   noExpOnly = false,
+  emp?: string | null,
 ): Promise<{ rows: PriorityRow[]; total: number; page: number; pageSize: number; scored: boolean; errors: string[] }> {
   const empty = { rows: [] as PriorityRow[], total: 0, page: 1, pageSize: 50, scored: false };
   if (!dbConfigured()) return { ...empty, errors: ["優先リストにはDB(Neon)接続が必要です。DATABASE_URL を設定してください。"] };
   try {
-    return { ...(await dbGetPriorityList(mode, page, 50, noExpOnly)), errors: [] };
+    return { ...(await dbGetPriorityList(mode, page, 50, noExpOnly, emp)), errors: [] };
   } catch (e) {
     console.error("[data] priority list failed:", (e as Error)?.message);
     return { ...empty, errors: ["優先リストの取得に失敗しました（DB障害の可能性）。時間を置いて再読み込みしてください。"] };

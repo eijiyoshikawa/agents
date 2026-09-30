@@ -2,7 +2,7 @@ import Link from "next/link";
 import clsx from "clsx";
 import { getPriorityList } from "@/lib/data";
 import { scoreTier } from "@/lib/priority";
-import type { PriorityMode } from "@/lib/db";
+import { EMP_BANDS, type PriorityMode } from "@/lib/db";
 import CallButton from "@/components/CallButton";
 
 export const dynamic = "force-dynamic";
@@ -26,12 +26,14 @@ export default async function PriorityPage({
   const mode: PriorityMode = one(sp.tab) === "follow" ? "follow" : "new";
   const pageN = Math.max(1, Number(one(sp.page) ?? "1") || 1);
   const noExpOnly = one(sp.noexp) === "1";
-  const { rows, total, page, pageSize, scored, errors } = await getPriorityList(mode, pageN, noExpOnly);
+  const empRaw = one(sp.emp);
+  const emp = EMP_BANDS.some((b) => b.key === empRaw) ? empRaw : undefined;
+  const { rows, total, page, pageSize, scored, errors } = await getPriorityList(mode, pageN, noExpOnly, emp);
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   const qs = (over: Record<string, string | undefined>) => {
     const p = new URLSearchParams();
-    const merged = { tab: mode === "follow" ? "follow" : undefined, noexp: noExpOnly ? "1" : undefined, ...over };
+    const merged = { tab: mode === "follow" ? "follow" : undefined, noexp: noExpOnly ? "1" : undefined, emp, ...over };
     for (const [k, v] of Object.entries(merged)) if (v) p.set(k, v);
     const str = p.toString();
     return str ? `/priority?${str}` : "/priority";
@@ -77,6 +79,31 @@ export default async function PriorityPage({
           </Link>
         </div>
         <p className="text-xs text-ink-muted">{total.toLocaleString()} 社</p>
+      </div>
+
+      <div className="flex items-center gap-1.5 flex-wrap">
+        <span className="text-xs text-ink-muted mr-1">従業員数:</span>
+        <Link
+          href={qs({ emp: undefined, page: undefined })}
+          className={clsx(
+            "px-2.5 py-1 rounded-full text-xs ring-1 transition-colors",
+            !emp ? "bg-brand/20 text-brand-glow ring-brand/40" : "bg-surface text-ink-muted ring-white/10 hover:text-ink",
+          )}
+        >
+          すべて
+        </Link>
+        {EMP_BANDS.map((b) => (
+          <Link
+            key={b.key}
+            href={qs({ emp: emp === b.key ? undefined : b.key, page: undefined })}
+            className={clsx(
+              "px-2.5 py-1 rounded-full text-xs ring-1 transition-colors",
+              emp === b.key ? "bg-brand/20 text-brand-glow ring-brand/40" : "bg-surface text-ink-muted ring-white/10 hover:text-ink",
+            )}
+          >
+            {b.label}
+          </Link>
+        ))}
       </div>
 
       <div className="card overflow-x-auto">
