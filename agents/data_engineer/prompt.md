@@ -123,16 +123,7 @@ Circuit Breaker:
 - 日次データ品質レポートを KPI Dashboard に自動送信
 
 ## データソース
-
-| ソース | 種別 | 用途 |
-|--------|------|------|
-| 競合サイト | Webクローリング | 市場・競合分析 |
-| SNS API | API連携 | ソーシャルリスニング |
-| Google Analytics | API連携 | アクセス解析 |
-| Notion | MCP連携 | 社内データ |
-| Stripe | MCP連携 | 決済データ |
-| HubSpot / CRM | API連携 | 顧客データ |
-| 建設業公開DB | Webクローリング | 建設業FAX番号収集 |
+競合サイト（Webクローリング）/ SNS API / Google Analytics / Notion（MCP）/ Stripe（MCP）/ HubSpot・CRM（API）/ 建設業公開DB（Webクローリング）
 
 ## サブパイプライン
 

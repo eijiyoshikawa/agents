@@ -149,27 +149,11 @@
 | 不変性 | 既存オブジェクトを直接変更しない |
 | 明示的エラーハンドリング | try/catch でシステム境界を保護 |
 
-### セキュリティレビューチェックリスト（OWASP Top 10）
-```
-□ A01: アクセス制御の不備 — 全エンドポイントに認証・認可チェック
-□ A02: 暗号化の失敗 — 機密データの暗号化・HTTPS強制
-□ A03: インジェクション — パラメータ化クエリ・入力サニタイズ
-□ A04: 安全でない設計 — 脅威モデリング・最小権限原則
-□ A05: セキュリティ設定ミス — デフォルト設定の変更
-□ A06: 脆弱なコンポーネント — 依存パッケージの脆弱性チェック
-□ A07: 認証の不備 — セッション管理・パスワードポリシー
-□ A08: データの整合性不備 — 依存関係の検証・CI/CD保護
-□ A09: ログ・監視の不備 — セキュリティイベントのロギング
-□ A10: SSRF — 外部URLの検証・内部ネットワーク制限
-```
+### セキュリティレビュー（OWASP Top 10）
+コードレビュー時に A01(アクセス制御) / A02(暗号化) / A03(インジェクション) / A04(安全でない設計) / A05(設定ミス) / A06(脆弱コンポーネント) / A07(認証) / A08(データ整合性) / A09(ログ監視) / A10(SSRF) を必ず検証。
 
-### Architecture Decision Records (ADR)
-```
-決定: [何を決定したか]
-ステータス: proposed | accepted | deprecated | superseded
-日付: YYYY-MM-DD
-コンテキスト: [なぜ必要か] → 決定内容 → 代替案 → 結果
-```
+### ADR テンプレート
+`決定 → ステータス(proposed|accepted|deprecated) → 日付 → コンテキスト → 代替案 → 結果` を記録。
 
 ## 連携エージェント
 - **CEO Agent**: 技術戦略の報告・承認
@@ -196,26 +180,12 @@
 ### architecture.json
 ```json
 {
-  "project_name": "プロジェクト名",
-  "updated_at": "YYYY-MM-DD",
-  "tech_stack": {
-    "frontend": "Next.js 15+ (App Router)",
-    "backend": "Next.js API Routes",
-    "database": "Supabase",
-    "payment": "Stripe",
-    "infrastructure": "Vercel",
-    "monitoring": "Sentry"
-  },
-  "architecture_decisions": [
-    {"decision": "", "status": "proposed|accepted|deprecated", "rationale": "", "date": "YYYY-MM-DD"}
-  ],
+  "project_name": "", "updated_at": "YYYY-MM-DD",
+  "tech_stack": {"frontend": "Next.js 15+", "backend": "API Routes", "database": "Supabase", "payment": "Stripe", "infrastructure": "Vercel", "monitoring": "Sentry"},
+  "architecture_decisions": [{"decision": "", "status": "proposed|accepted|deprecated", "rationale": "", "date": ""}],
   "tech_radar": {"adopt": [], "trial": [], "assess": [], "hold": []},
   "tech_debt_summary": {"total_items": 0, "critical": 0, "trend": "improving|stable|worsening"},
-  "non_functional_requirements": {
-    "performance": "Core Web Vitals 基準達成",
-    "availability": "99.9%",
-    "security": "OWASP Top 10 対応"
-  }
+  "non_functional_requirements": {"performance": "Core Web Vitals", "availability": "99.9%", "security": "OWASP Top 10"}
 }
 ```
 

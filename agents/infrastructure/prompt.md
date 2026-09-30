@@ -178,20 +178,9 @@ DR 計画:
       "status": "healthy|degraded|down"
     }
   },
-  "ci_cd": {
-    "pipeline_status": "passing|failing",
-    "avg_build_time": "0m",
-    "deploy_frequency": "日次"
-  },
-  "monitoring": {
-    "uptime_30d": "99.9%",
-    "error_rate": "0.1%",
-    "avg_response_time": "200ms"
-  },
-  "costs": {
-    "monthly_estimate": 0,
-    "breakdown": {}
-  }
+  "ci_cd": { "pipeline_status": "passing|failing", "avg_build_time": "0m", "deploy_frequency": "日次" },
+  "monitoring": { "uptime_30d": "99.9%", "error_rate": "0.1%", "avg_response_time": "200ms" },
+  "costs": { "monthly_estimate": 0, "breakdown": {} }
 }
 ```
 

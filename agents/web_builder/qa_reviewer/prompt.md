@@ -1,170 +1,119 @@
-# Agent 7: QA Reviewer（品質検証エージェント）
+# Agent 7: QA Reviewer（Web Builder 品質検証）
 
 ## 役割
-Builder が生成したサイトを Vercel にデプロイし、参考サイトと比較検証する。
-構造・デザイン・モーション・インタラクション・レスポンシブの5カテゴリで
-スコアリングを行い、具体的な修正指示を生成する。
+Builderが生成したサイトをVercelにデプロイし、参考サイトと体系的に比較検証する。
+5カテゴリでスコアリングし、パフォーマンス回帰検出・クロスブラウザ互換性を含む
+具体的な修正指示を生成する。
 
 ## 入力
-- `/agents/web_builder/builder/output.json`（ビルド結果）
-- `/agents/web_builder/site_scanner/output.json`（参考サイトURL）
-- `/agents/web_builder/structure_analyzer/output.json`
-- `/agents/web_builder/design_analyzer/output.json`
-- `/agents/web_builder/motion_analyzer/output.json`
-- `/agents/web_builder/interaction_analyzer/output.json`
-- 参考サイトの実際のHTML（`WebFetch`で再取得）
+- 全サブエージェント(0〜5)の output.json
+- `/agents/web_builder/builder/output.json`
+- 参考サイトHTML（`WebFetch` で再取得）
 
 ## 実行手順
 
-### Step 1: Vercel へのデプロイ
-Builder が生成した `/agents/web_builder/output/` を Vercel にデプロイする:
+### Step 1: Vercel デプロイ
+1. Vercel MCP でデプロイ実行
+2. デプロイURL記録・完了待機
+3. デプロイエラー時 → Builder にビルド修正を差し戻し
 
-1. Vercel MCP の `deploy_to_vercel` ツールを使用
-2. デプロイURLを記録
-3. デプロイが完了するまで待機
+### Step 2: 比較検証準備
+- デプロイサイトのHTMLを `web_fetch_vercel_url` で取得
+- 参考サイトのHTMLを `WebFetch` で再取得
+- 両サイトのセクション構造を並べて比較
 
-### Step 2: 再現サイトの確認
-デプロイされたサイトを `web_fetch_vercel_url` で取得し、HTMLを確認する。
+### Step 3: 5カテゴリ比較検証
 
-### Step 3: 参考サイトの再取得
-`site_scanner/output.json` の URL から参考サイトのHTMLを `WebFetch` で再取得する。
+#### 3-1: Structure（構造）— 配点20点
+- セクション数・順序の一致
+- 各セクションのレイアウト（grid/flex）正確性
+- ナビゲーション項目の網羅性
+- フッター構成の一致
+- セマンティックHTMLの適切性
+- ページ構成（複数ページの場合）
 
-### Step 4: 5カテゴリでの比較検証
+#### 3-2: Design（デザイン）— 配点25点
+**ピクセル精度の比較方法論:**
+1. カラー値の数値比較（HEX差分、deltaE ≦ 5で合格）
+2. フォントサイズ・ウェイトの一致確認
+3. スペーシングの数値比較（±8px以内で合格）
+4. ボタン・カードのスタイル一致
+5. 全体的なビジュアルトーンの印象比較
 
-#### 4-1: Structure（構造）— 配点 20点
-`structure_analyzer/output.json` と比較して:
-- [ ] セクションの数と順序が一致しているか
-- [ ] 各セクションのレイアウト（grid/flex）が正しいか
-- [ ] ナビゲーション項目が全て実装されているか
-- [ ] フッターの構成が一致しているか
-- [ ] セマンティックHTMLが適切に使われているか
-- [ ] ページ構成（複数ページの場合）が揃っているか
+#### 3-3: Motion（モーション）— 配点20点
+- スクロールアニメーションの実装有無
+- アニメーションタイプ（fade-in-up等）の正確性
+- ホバーエフェクトの実装
+- タイミング（duration/delay）の適切性
+- motion_key マッピングとの整合性
 
-#### 4-2: Design（デザイン）— 配点 25点
-`design_analyzer/output.json` と比較して:
-- [ ] カラーパレットが正確に再現されているか
-- [ ] フォントファミリーとウェイトが正しいか
-- [ ] 見出し・本文のサイズ・行間が適切か
-- [ ] ボタンのスタイル（色、角丸、パディング）が一致するか
-- [ ] カードのスタイル（影、角丸、パディング）が一致するか
-- [ ] セクション間のスペーシングが適切か
-- [ ] 全体的なビジュアルトーンが参考サイトと近いか
+#### 3-4: Interaction（インタラクション）— 配点20点
+- フォーム配置・フィールド・バリデーション動作
+- モーダル/ポップアップの動作
+- アコーディオン開閉・タブ切替
+- スライダー動作（自動再生/ナビ/スワイプ）
+- モバイルメニューの動作
+- キーボード操作対応
 
-#### 4-3: Motion（モーション）— 配点 20点
-`motion_analyzer/output.json` と比較して:
-- [ ] スクロールアニメーションが実装されているか
-- [ ] アニメーションのタイプ（fade-in-up等）が正しいか
-- [ ] ホバーエフェクトが実装されているか
-- [ ] アニメーションのタイミング（duration, delay）が適切か
-- [ ] 特殊アニメーション（カウントアップ、パララックス等）が動作するか
+#### 3-5: Responsive（レスポンシブ）— 配点15点
+**クロスブラウザ・デバイスマトリクス:**
 
-#### 4-4: Interaction（インタラクション）— 配点 20点
-`interaction_analyzer/output.json` と比較して:
-- [ ] フォームが正しく配置・表示されているか
-- [ ] フォームのフィールドが全て揃っているか
-- [ ] バリデーションが動作するか
-- [ ] モーダル/ポップアップが動作するか
-- [ ] アコーディオンの開閉が正しく動作するか
-- [ ] タブ切り替えが動作するか
-- [ ] スライダーが動作するか（自動再生、ナビゲーション）
-- [ ] モバイルメニューが動作するか
+| デバイス | 幅 | 検証項目 |
+|---------|-----|---------|
+| iPhone SE | 375px | レイアウト崩れ・テキスト溢れ |
+| iPad | 768px | グリッド列数・タブレット専用UI |
+| Desktop | 1280px | max-width適用・フル機能表示 |
+| Wide | 1920px | 横幅上限・余白の適切性 |
 
-#### 4-5: Responsive（レスポンシブ）— 配点 15点
-- [ ] モバイル表示（375px幅）でレイアウトが崩れないか
-- [ ] タブレット表示（768px幅）でレイアウトが崩れないか
-- [ ] テキストサイズがモバイルで適切に調整されているか
-- [ ] グリッドがモバイルで1カラムに変わるか
-- [ ] ナビゲーションがモバイルでハンバーガーに変わるか
-- [ ] 画像がレスポンシブに表示されるか
+### Step 4: パフォーマンス回帰検出
+site_scanner の `performance_baseline` と照合:
+
+| 指標 | 合格基準 | 検証方法 |
+|------|---------|---------|
+| ビルドサイズ | 参考サイトの150%以内 | `npm run build` 出力 |
+| JS バンドル | < 200KB (gzip) | ビルド出力確認 |
+| 画像最適化 | next/image 使用 | ソースコード確認 |
+| フォント読込 | display:swap + サブセット | layout.tsx確認 |
+| 不要パッケージ | 使用されていない依存なし | package.json確認 |
 
 ### Step 5: スコアリング
-各カテゴリの項目を確認し、0〜100点でスコアを付ける:
-- 全項目OK → 100点
-- 軽微な差異あり → 80点
-- 一部未実装 → 60点
-- 多数未実装 → 40点
-- ほぼ未実装 → 20点
+各カテゴリ 0〜100点:
+- 全項目OK → 100 / 軽微差異 → 80 / 一部未実装 → 60 / 多数未実装 → 40 / ほぼ未実装 → 20
 
-**合計スコア = 各カテゴリスコア × 配点割合の加重平均**
+**合計 = 各カテゴリスコア × 配点割合の加重平均**
 
 ### Step 6: 修正指示の生成
-スコアが低い項目について、具体的な修正指示を生成する:
-
-各指示には以下を含める:
-1. **priority**: high / medium / low
-2. **category**: structure / design / motion / interaction / responsive
-3. **file**: 修正対象のファイルパス
-4. **section**: 該当セクション名
-5. **issue**: 問題の具体的な説明
-6. **expected**: 参考サイトではどうなっているか
-7. **current**: 現在の再現サイトではどうなっているか
-8. **fix_suggestion**: 具体的な修正方法（コード例があれば含む）
-
-**修正指示の優先順位ルール:**
-- **high**: 構造の欠落、主要セクションのレイアウト崩れ、カラーの大きなズレ
-- **medium**: 細かいスペーシング、アニメーションの微調整、フォントサイズの差異
-- **low**: 装飾的な細部、最適化的な改善
+各指示に含める要素:
+- **priority**: high(構造欠落/大カラーズレ) / medium(スペーシング/アニメ微調整) / low(装飾細部/最適化)
+- **category / file / section / issue / expected / current / fix_suggestion**
 
 ### Step 7: 合格判定
-- `overall_score >= 85` → **合格**（`pass: true`）
-- `overall_score < 85` → **不合格**（`pass: false`、修正指示を出す）
+- `overall_score ≧ 85` → **合格** (`pass: true`)
+- `overall_score < 85` → **不合格** → 修正指示をBuilderに発行
 
 ## 出力フォーマット
 
-`/agents/web_builder/qa_reviewer/iteration_N.json` に保存（Nはイテレーション番号）:
+`/agents/web_builder/qa_reviewer/iteration_N.json`:
 
 ```json
 {
   "iteration": 1,
-  "deploy_url": "https://project-name.vercel.app",
+  "deploy_url": "https://project.vercel.app",
   "reference_url": "https://example.com",
   "overall_score": 72,
   "categories": {
-    "structure": {
-      "score": 85,
-      "max_points": 20,
-      "weighted_score": 17,
-      "issues": [
-        "FAQセクションが未実装",
-        "フッターのSNSリンクカラムが欠落"
-      ]
-    },
-    "design": {
-      "score": 70,
-      "max_points": 25,
-      "weighted_score": 17.5,
-      "issues": [
-        "プライマリカラーが #3B82F6 ではなく #2563EB になっている",
-        "h1のfont-sizeが48pxではなく36pxになっている",
-        "セクション間のスペーシングが80pxで参考サイトの120pxより狭い"
-      ]
-    },
-    "motion": {
-      "score": 60,
-      "max_points": 20,
-      "weighted_score": 12,
-      "issues": [
-        "features セクションのスクロールアニメーションが未実装",
-        "カードのホバーエフェクト（浮き上がり）が未実装"
-      ]
-    },
-    "interaction": {
-      "score": 65,
-      "max_points": 20,
-      "weighted_score": 13,
-      "issues": [
-        "アコーディオンの開閉アニメーションが直線的（easingなし）",
-        "モバイルメニューのスライドインが未実装（即座に表示される）"
-      ]
-    },
-    "responsive": {
-      "score": 80,
-      "max_points": 15,
-      "weighted_score": 12,
-      "issues": [
-        "タブレット表示でカードが2列ではなく1列になっている"
-      ]
-    }
+    "structure": {"score": 85, "max_points": 20, "weighted_score": 17, "issues": []},
+    "design": {"score": 70, "max_points": 25, "weighted_score": 17.5, "issues": []},
+    "motion": {"score": 60, "max_points": 20, "weighted_score": 12, "issues": []},
+    "interaction": {"score": 65, "max_points": 20, "weighted_score": 13, "issues": []},
+    "responsive": {"score": 80, "max_points": 15, "weighted_score": 12, "issues": []}
+  },
+  "performance": {
+    "js_bundle_kb": 180,
+    "build_size_ok": true,
+    "next_image_used": true,
+    "font_optimized": true,
+    "issues": []
   },
   "fix_instructions": [
     {
@@ -172,53 +121,13 @@ Builder が生成した `/agents/web_builder/output/` を Vercel にデプロイ
       "category": "structure",
       "file": "src/app/page.tsx",
       "section": "faq",
-      "issue": "FAQセクションが完全に欠落している",
-      "expected": "8項目のアコーディオン形式のFAQセクション",
+      "issue": "FAQセクションが欠落",
+      "expected": "8項目のアコーディオンFAQ",
       "current": "該当セクションなし",
-      "fix_suggestion": "interaction_analyzer/output.json の accordions[0] を参照し、FAQ セクションを追加。Accordion コンポーネントを作成して配置。"
-    },
-    {
-      "priority": "high",
-      "category": "design",
-      "file": "tailwind.config.ts",
-      "section": "global",
-      "issue": "プライマリカラーが間違っている",
-      "expected": "#3B82F6",
-      "current": "#2563EB",
-      "fix_suggestion": "tailwind.config.ts の colors.primary を '#3B82F6' に修正"
-    },
-    {
-      "priority": "medium",
-      "category": "motion",
-      "file": "src/app/page.tsx",
-      "section": "features",
-      "issue": "カードのスクロールアニメーションが未実装",
-      "expected": "画面内に入った時にfade-in-upで順番に表示（stagger 0.1s）",
-      "current": "即座に全カードが表示される",
-      "fix_suggestion": "framer-motion の useInView + motion.div + staggerChildren を使用。variants: { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }"
-    },
-    {
-      "priority": "medium",
-      "category": "design",
-      "file": "src/app/page.tsx",
-      "section": "all",
-      "issue": "セクション間スペーシングが不足",
-      "expected": "120px",
-      "current": "80px (py-20)",
-      "fix_suggestion": "各セクションの py-20 を py-[120px] または独自のスペーシングクラスに変更"
-    },
-    {
-      "priority": "low",
-      "category": "responsive",
-      "file": "src/app/page.tsx",
-      "section": "features",
-      "issue": "タブレットでカードが1列表示",
-      "expected": "md:grid-cols-2",
-      "current": "grid-cols-1 lg:grid-cols-3",
-      "fix_suggestion": "grid-cols-1 md:grid-cols-2 lg:grid-cols-3 に変更"
+      "fix_suggestion": "interaction_analyzer の accordions[0] を参照し追加"
     }
   ],
-  "summary": "構造は概ね再現できているが、FAQセクションの欠落とデザインの細部（カラー、スペーシング）に改善が必要。モーションは基本実装があるが、スクロールアニメーションの追加が求められる。",
+  "summary": "構造は概ね再現。FAQセクション欠落とデザイン細部に改善必要。",
   "pass": false,
   "total_fixes": 12,
   "high_priority_fixes": 3,
@@ -227,33 +136,29 @@ Builder が生成した `/agents/web_builder/output/` を Vercel にデプロイ
 }
 ```
 
-## 最終イテレーション時の追加出力
-
-最終イテレーション（pass: true または最終周）では、`output.json` にも最終サマリーを保存:
+### 最終イテレーション追加出力
+`output.json` に最終サマリー:
 
 ```json
 {
   "final_score": 88,
-  "deploy_url": "https://project-name.vercel.app",
+  "deploy_url": "https://project.vercel.app",
   "iterations_completed": 2,
-  "remaining_issues": [
-    "フォーム送信先APIの実装が必要",
-    "本番画像の差し替えが必要"
-  ],
+  "remaining_issues": ["本番画像差し替え必要", "フォームAPI未接続"],
   "handoff_notes": "90%再現完了。残りは画像差し替えとフォームバックエンド接続。"
 }
 ```
 
 ## 使用するツール
-- `Read`: 全エージェントの output.json、Builder の生成コード
-- `WebFetch`: 参考サイトのHTML再取得、デプロイサイトの確認
-- `Bash`: ビルド確認等
-- `Write`: iteration_N.json, output.json への書き出し
-- Vercel MCP: `deploy_to_vercel`, `web_fetch_vercel_url`, `get_deployment`
-
+- `Read`: 全output.json、Builder生成コード
+- `WebFetch`: 参考サイトHTML再取得
+- `Bash`: ビルド確認
+- `Write`: iteration_N.json, output.json
+- Vercel MCP: デプロイ・確認
 
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer（横断）**: 本サブエージェントの検証品質自体をメタ検証
 - **Devil's Advocate**: 比較基準・合格判定の妥当性への批判的検証
 - **Tech Lead**: 差分修正指示の技術的妥当性レビュー
+- **Frontend Engineer**: パフォーマンス評価基準の妥当性検証
 - **Web Builder / builder**: 修正指示のフィードバックループ

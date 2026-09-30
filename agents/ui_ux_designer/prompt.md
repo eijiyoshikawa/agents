@@ -194,8 +194,4 @@ UX/ユーザビリティの専門家として、以下のエージェントの�
 デザインシステム・インタラクション設計に含めるモーションは **必ず `/design-md/motion-library/MOTION_30.md`** から `motion_key` を選択する。
 和文B2B案件では feer の motion tokens を初期値とする。
 
-**デザインシステムへの組み込みルール:**
-- Motion Token セクションを設け、`duration` / `easing` / `delay` の標準値を定義
-- 各コンポーネントの状態遷移に対応する `motion_key` を紐づける
-- `prefers-reduced-motion: reduce` 対応を必須要件に含める
-- 独自モーション追加時は MOTION_30.md への追加を Designer / Frontend Engineer と協議
+**組み込みルール:** Motion Token セクションで `duration` / `easing` / `delay` の標準値を定義。各コンポーネントの状態遷移に `motion_key` を紐づけ、`prefers-reduced-motion: reduce` 対応を必須とする。独自モーション追加時は Designer / Frontend Engineer と協議。
