@@ -135,6 +135,22 @@
       "domain": "operations",
       "created_at": "2026-07-06",
       "updated_at": "2026-07-06"
+    },
+    {
+      "id": "GLB-009",
+      "trigger": "外部API（Notion等）からの「全件取得」実装、またはキャッシュDBの一括削除を伴う同期処理を書いている / レビューしている",
+      "action": "①has_more:false を「全件取得完了」と解釈しない。打ち切りシグナル（Notionなら request_status.type === 'incomplete'）を必ず検証し、件数がキリの良い数字（10,000ちょうど等）で止まったらAPI仕様上限を疑う。②キャッシュの一括削除は取得の完全性を検証してから行う（取得件数 vs 既存件数の比較ガードを必須とする）。③切り分けの最初に原本とキャッシュの件数照合を行う。詳細: sales-cockpit/docs/INCIDENT_2026-09-30_notion-10k-limit.md",
+      "confidence": 0.9,
+      "evidence": {
+        "count": 1,
+        "examples": [
+          "2026-09-30: Notion APIの1クエリ10,000件上限（2026年初頭の仕様変更・打ち切り時もhas_more:falseで沈黙）により、Sales Cockpitのフル同期が欠損しNeonキャッシュから約18,500社が削除された。created_timeウィンドウ分割＋大量削除ガードで復旧・恒久対策（PR #38/#39）"
+        ]
+      },
+      "scope": "global",
+      "domain": "engineering",
+      "created_at": "2026-09-30",
+      "updated_at": "2026-09-30"
     }
   ]
 }
