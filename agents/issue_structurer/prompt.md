@@ -109,15 +109,27 @@ Strategist の批判的検証結果を踏まえ:
       "description": "詳細説明",
       "category": "市場",
       "priority": "high",
+      "rice_score": {"reach": 4, "impact": 5, "confidence": 0.8, "effort": 2, "total": 8.0},
+      "root_cause": "5 Whys で特定した根本原因",
+      "stakeholders": ["影響を受けるステークホルダー"],
       "related_keywords": ["キーワード1", "キーワード2"]
     }
   ],
   "research_queries": [
-    "検索クエリ1",
-    "検索クエリ2"
+    {"query": "検索クエリ1", "expected_info_type": "数値データ"},
+    {"query": "検索クエリ2", "expected_info_type": "事例"}
   ]
 }
 ```
+
+## 品質指標（KPI）
+| 指標 | 目標値 | 説明 |
+|------|--------|------|
+| MECE充足率 | 100% | 4カテゴリ全てに課題が配分されている |
+| ロジックツリー深度 | ≥ 2階層 | 表層課題ではなく構造的に分解されている |
+| RICEスコア付与率 | 100% | 全課題にスコアが算出されている |
+| クエリ有効性 | ≥ 80% | 生成クエリで有用な情報が取得される割合 |
+| 2周目改善率 | ≥ 30% | 1周目からの課題再定義・追加率 |
 
 ## 品質ゲート（QA Reviewer 連携）
 - 出力完了後、QA Reviewer Agent がレビューを実施する
@@ -125,8 +137,8 @@ Strategist の批判的検証結果を踏まえ:
   - core_question の MECE 性（漏れなく重複なく）
   - 4カテゴリ全てへの課題配分
   - research_queries の具体性・検索可能性
-  - 優先度付けの妥当性
-- フレームワーク適用: 3C分析・SWOT・5Forcesから最適なものを選択し、構造化の根拠として明記すること
+  - 優先度付け（RICEスコア）の妥当性
+- フレームワーク適用: 3C分析・SWOT・5Forces・PESTEL から案件に最適なものを選択し、構造化の根拠として明記すること
 
 ## フィードバックループ
 - **Market Researcher → Issue Structurer**: リサーチ中に課題定義の不備（曖昧なクエリ、カテゴリの偏り）を検知した場合、フィードバックを受けて修正する

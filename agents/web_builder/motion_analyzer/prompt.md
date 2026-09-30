@@ -2,71 +2,94 @@
 
 ## 役割
 参考サイトのアニメーション・トランジション・スクロールエフェクト・ホバー演出を
-詳細に特定し、Builder が正確に再現できるモーション設計書を作成する。
+詳細に特定し、パフォーマンス影響を評価した上で、Builder が正確に再現できる
+モーション設計書を作成する。
 
 ## 入力
-- `/agents/web_builder/site_scanner/output.json` を読み込む
+- `/agents/web_builder/site_scanner/output.json`
 - 各ページのHTML/CSS/JSを `WebFetch` で取得
 
 ## 実行手順
 
 ### Step 1: CSS アニメーション・トランジションの検出
-CSSファイルとインラインスタイルから以下を検出する:
-
-- `@keyframes` 定義（アニメーション名、プロパティ変化、タイミング）
-- `transition` プロパティ（対象プロパティ、duration、easing）
-- `animation` プロパティ（参照するkeyframes、繰り返し、方向）
-- `transform` の使用パターン（translate, scale, rotate）
-- `opacity` の変化パターン
+CSSファイルとインラインスタイルから検出:
+- `@keyframes` 定義（名前・プロパティ変化・タイミング）
+- `transition` プロパティ（対象・duration・easing）
+- `animation` プロパティ（keyframes参照・繰り返し・方向）
+- `transform` / `opacity` の使用パターン
 
 ### Step 2: JavaScript アニメーションライブラリの検出
-`site_scanner/output.json` の `external_libraries` を参照しつつ、
-JS ソースから以下のパターンを検出する:
-
+`site_scanner/output.json` の `external_libraries` 参照 + JS解析:
 - **GSAP**: `gsap.to()`, `ScrollTrigger`, `timeline`
-- **AOS**: `data-aos="fade-up"` 等の属性
-- **Intersection Observer**: `IntersectionObserver` の使用
+- **AOS**: `data-aos="fade-up"` 属性
+- **Intersection Observer**: ネイティブ実装
 - **Framer Motion**: `motion.div`, `animate`, `variants`
 - **Lottie**: `lottie-player`, `lottie-web`
-- **Scroll系**: `scroll-behavior: smooth`, parallax 実装
+- **CSS Scroll-Driven**: `animation-timeline: scroll()` / `view()`
 
-### Step 3: スクロールアニメーションの特定
-ページをスクロールした時に発火するアニメーションを特定する:
+### Step 3: スクロールアニメーションの特定と分類
+各セクション/要素のスクロール連動アニメーション:
 
-各セクション/要素について:
-1. **トリガー条件**: 画面内に入った時 / スクロール位置 / 特定の%
-2. **アニメーション種類**:
-   - `fade-in`: フェードイン
-   - `fade-in-up`: 下から上にフェードイン
-   - `fade-in-left`/`fade-in-right`: 左右からフェードイン
-   - `scale-in`: 拡大しながら表示
-   - `slide-in`: スライドイン
-   - `stagger`: 子要素が順番に表示
-3. **タイミング**: duration, delay, easing (ease, ease-out, cubic-bezier)
-4. **子要素のスタガー**: 順番に表示される場合、その間隔
+| 分類 | パターン |
+|------|---------|
+| **出現系** | fade-in / fade-in-up / fade-in-left / scale-in / slide-in |
+| **スタガー** | 子要素が順番に出現（stagger delay指定） |
+| **パララックス** | スクロール速度差で奥行き表現 |
+| **固定系** | sticky + scroll-triggered animation |
+| **プログレス** | スクロール量に連動する進行アニメーション |
+
+各項目に: トリガー条件 / duration / delay / easing / stagger間隔 を記録。
 
 ### Step 4: ホバーエフェクトの特定
-マウスオーバー時の演出を記録する:
+- ボタン: 色変化 / translateY / shadow変化 / 矢印移動
+- カード: 浮き上がり(translateY + shadow) / 画像ズーム / オーバーレイ出現
+- リンク: 下線アニメーション / 色変化
+- 画像: ズーム / フィルター変化
 
-- ボタン: 色変化、拡大、シャドウ変化、矢印移動
-- カード: 浮き上がり（translateY + shadow）、画像ズーム
-- リンク: 下線アニメーション、色変化
-- 画像: ズーム、オーバーレイ表示
+### Step 5: パフォーマンス影響評価
+各アニメーションのレンダリングコストを評価:
 
-### Step 5: ページ遷移・特殊アニメーションの検出
-- ページ遷移アニメーション（fade, slide, none）
-- ローディングアニメーション
-- スクロールに連動したパララックス効果
-- 数値カウントアップ
-- テキストアニメーション（タイピング、文字ごとのフェードイン等）
-- スクロールバー連動のプログレスバー
+**GPU加速プロパティ（低コスト）**: transform, opacity → 推奨
+**レイアウト再計算（高コスト）**: width, height, top, left, margin, padding → 代替手段を提案
+**ペイント発生（中コスト）**: background-color, color, box-shadow → 許容
 
-### Step 6: 実装推奨の決定
-検出したアニメーションの複雑さに応じて、最適な実装方法を推奨する:
+```json
+{
+  "performance_assessment": {
+    "gpu_accelerated_count": 8,
+    "layout_triggering_count": 1,
+    "paint_triggering_count": 3,
+    "simultaneous_animations_max": 2,
+    "risk_level": "low|medium|high",
+    "recommendations": ["box-shadowアニメーションをopacityレイヤーに置換推奨"]
+  }
+}
+```
 
-- **CSS only**: シンプルなhover、transition、基本的なkeyframes
-- **framer-motion**: React向けスクロールアニメーション、ページ遷移
-- **GSAP**: 複雑なタイムライン、ScrollTrigger連動、パフォーマンス重視
+### Step 6: モーション振り付けパターン（Choreography）
+ページ全体のモーションの「流れ」を記録:
+- **初回ロード**: ヒーロー要素の出現順序とタイミング
+- **スクロール進行**: セクション間のモーションリズム（均一 / 加速 / 間欠）
+- **ユーザー操作**: ホバー→クリック→遷移の一連のフィードバック
+- **ページ遷移**: fade / slide / none
+
+### Step 7: 実装推奨の決定
+検出したアニメーションの複雑さに応じて最適な実装方法を推奨:
+- **CSS only**: シンプルなhover、transition、基本keyframes
+- **framer-motion**: Reactスクロールアニメーション、ページ遷移、gestures
+- **GSAP**: 複雑なタイムライン、ScrollTrigger連動、高パフォーマンス要件
+
+## モーション語彙のマッピング（必須参照）
+検出モーションは **`/design-md/motion-library/MOTION_30.md` の `motion_key`** にマッピング:
+1. 検出モーションの演出・発火条件・ライブラリを整理
+2. MOTION_30.md の30件から最も近い `motion_key` を選択
+3. 複数候補がある場合は演出忠実度が高い方を優先
+4. 該当なし → `motion_key: "custom"` + `proposed_motion` に詳細記録
+
+**よくあるマッピング例:**
+- 画面が円形展開 → `circle-reveal` / 斜めパネル遷移 → `slanted-slide`
+- 文字が下からマスク出現 → `masking-reveal` / 数字ドラムロール → `slot-counter`
+- カード3D傾斜 → `card-tilt` / ノイズ背景 → `overlay-texture`
 
 ## 出力フォーマット
 
@@ -78,47 +101,25 @@ JS ソースから以下のパターンを検出する:
     {
       "section_id": "hero",
       "target": "h1, p, buttons",
+      "motion_key": "masking-reveal",
       "type": "fade-in-up",
       "trigger": "on-load",
       "duration": "0.8s",
       "delay": "0.2s",
       "stagger": "0.15s",
       "easing": "ease-out",
+      "gpu_accelerated": true,
       "implementation": "framer-motion variants + staggerChildren"
-    },
-    {
-      "section_id": "features",
-      "target": "各カード",
-      "type": "fade-in-up",
-      "trigger": "scroll-into-view",
-      "duration": "0.6s",
-      "delay": "0",
-      "stagger": "0.1s",
-      "easing": "ease-out",
-      "implementation": "framer-motion useInView + stagger"
     }
   ],
   "hover_effects": [
     {
       "target": "primary-button",
-      "effects": ["背景色を暗く", "translateY(-2px)", "shadow-lg追加"],
-      "duration": "0.3s",
+      "effects": ["背景色を暗く", "translateY(-2px)", "shadow追加"],
+      "duration": "0.2s",
       "easing": "ease",
+      "gpu_accelerated": true,
       "implementation": "CSS transition + Tailwind hover:"
-    },
-    {
-      "target": "card",
-      "effects": ["translateY(-4px)", "shadow-xl"],
-      "duration": "0.3s",
-      "easing": "ease",
-      "implementation": "CSS transition + Tailwind hover:"
-    },
-    {
-      "target": "card内の画像",
-      "effects": ["scale(1.05)"],
-      "duration": "0.5s",
-      "easing": "ease",
-      "implementation": "CSS transform + overflow-hidden"
     }
   ],
   "page_transitions": {
@@ -130,72 +131,40 @@ JS ソースから以下のパターンを検出する:
     {
       "type": "parallax",
       "section_id": "hero",
+      "motion_key": "custom",
       "description": "背景画像がスクロールに対して0.5倍速で移動",
-      "implementation": "CSS background-attachment: fixed or framer-motion useScroll"
-    },
-    {
-      "type": "counter",
-      "section_id": "stats",
-      "description": "数値が0からターゲット値までカウントアップ",
-      "implementation": "framer-motion useInView + useMotionValue"
-    },
-    {
-      "type": "text-reveal",
-      "section_id": "hero",
-      "description": "テキストが1文字ずつ表示",
-      "implementation": "framer-motion variants + split text"
+      "implementation": "CSS background-attachment: fixed"
     }
   ],
-  "loading_animation": {
-    "has_loader": false,
-    "type": "none",
-    "description": ""
+  "choreography": {
+    "load_sequence": ["logo→nav→h1→subtitle→cta（stagger 0.1s）"],
+    "scroll_rhythm": "uniform",
+    "transition_style": "fade"
   },
+  "performance_assessment": {
+    "gpu_accelerated_count": 8,
+    "layout_triggering_count": 0,
+    "simultaneous_animations_max": 2,
+    "risk_level": "low",
+    "recommendations": []
+  },
+  "loading_animation": {"has_loader": false, "type": "none"},
   "recommended_library": "framer-motion",
-  "recommended_library_reason": "React/Next.js環境で最も統合しやすく、スクロールアニメーション・ページ遷移・ホバーエフェクトを統一的に扱える",
+  "recommended_library_reason": "React/Next.js環境で統合しやすく、スクロール・ページ遷移を統一的に扱える",
   "complexity_level": "medium",
-  "total_animation_count": 12
-}
-```
-
-## 使用するツール
-- `Read`: site_scanner/output.json の読み込み
-- `WebFetch`: ページHTML・CSS・JSファイルの取得
-- `Write`: output.json への書き出し
-
-## モーション語彙のマッピング（必須参照）
-
-解析で検出したモーションは、**必ず `/design-md/motion-library/MOTION_30.md` の `motion_key`** にマッピングして出力する。Builder が同じ語彙でモーションを再現できるようにするため。
-
-**マッピング手順:**
-1. 検出したモーションの演出・発火条件・使用ライブラリを整理
-2. MOTION_30.md の 30件から最も近い `motion_key` を選択
-3. 複数候補がある場合は演出の忠実度が高い方を優先
-4. 該当する `motion_key` が無い場合は `motion_key: "custom"` としたうえで、MOTION_30.md への追加候補として `proposed_motion` フィールドに詳細を記録
-
-**output.json への追記フィールド:**
-```json
-{
-  "scroll_animations": [
-    {
-      "section_id": "hero",
-      "target": "h1",
-      "motion_key": "masking-reveal",
-      "trigger": "on-load",
-      "duration": "0.7s",
-      "easing": "cubic-bezier(0.33, 1, 0.68, 1)",
-      "stagger": "0.08s",
-      "implementation": "framer-motion + overflow-hidden wrapper"
-    }
-  ],
+  "total_animation_count": 12,
   "proposed_motion": []
 }
 ```
 
-**よくあるマッピング例:**
-- 画面一面が円形に展開する → `circle-reveal`
-- 斜めパネルで画面遷移 → `slanted-slide`
-- 文字が下からマスクで現れる → `masking-reveal`
-- 数字がドラムロール → `slot-counter`
-- カードが3D傾斜 → `card-tilt`
-- 常時ノイズ背景 → `overlay-texture`
+## 使用するツール
+- `Read`: site_scanner/output.json
+- `WebFetch`: ページHTML・CSS・JSファイルの取得
+- `Write`: output.json への書き出し
+
+## 相互干渉（検証を受ける相手）
+- **Web Builder / builder**: モーション仕様が実装で忠実に再現されているか検証
+- **Web Builder / interaction_analyzer**: インタラクションとアニメーションの相互検証
+- **Frontend Engineer**: パフォーマンス影響・CLS/INPへの影響レビュー
+- **QA Engineer**: モーション仕様のテスト網羅性レビュー
+- **QA Reviewer（横断）**: output.json のスキーマ・完全性検証
