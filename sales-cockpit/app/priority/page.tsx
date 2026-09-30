@@ -2,7 +2,7 @@ import Link from "next/link";
 import clsx from "clsx";
 import { getPriorityList } from "@/lib/data";
 import { scoreTier } from "@/lib/priority";
-import { EMP_BANDS, type PriorityMode } from "@/lib/db";
+import { EMP_BANDS, parseEmpBand, type PriorityMode } from "@/lib/db";
 import CallButton from "@/components/CallButton";
 
 export const dynamic = "force-dynamic";
@@ -26,8 +26,7 @@ export default async function PriorityPage({
   const mode: PriorityMode = one(sp.tab) === "follow" ? "follow" : "new";
   const pageN = Math.max(1, Number(one(sp.page) ?? "1") || 1);
   const noExpOnly = one(sp.noexp) === "1";
-  const empRaw = one(sp.emp);
-  const emp = EMP_BANDS.some((b) => b.key === empRaw) ? empRaw : undefined;
+  const emp = parseEmpBand(one(sp.emp));
   const { rows, total, page, pageSize, scored, errors } = await getPriorityList(mode, pageN, noExpOnly, emp);
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
