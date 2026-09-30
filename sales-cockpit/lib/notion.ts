@@ -120,43 +120,94 @@ async function resolveDataSourceId(databaseId: string): Promise<string> {
  */
 async function queryPage(
   databaseId: string,
-  opts: { cursor?: string; pageSize: number; filter?: any; filterProperties?: string[] },
-): Promise<{ results: any[]; hasMore: boolean; nextCursor?: string }> {
+  opts: { cursor?: string; pageSize: number; filter?: any; filterProperties?: string[]; sorts?: any[] },
+): Promise<{ results: any[]; hasMore: boolean; nextCursor?: string; incomplete: boolean }> {
+  const body = {
+    page_size: opts.pageSize,
+    ...(opts.cursor ? { start_cursor: opts.cursor } : {}),
+    ...(opts.filter ? { filter: opts.filter } : {}),
+    ...(opts.sorts ? { sorts: opts.sorts } : {}),
+  };
   try {
     const dsId = await resolveDataSourceId(databaseId);
     const qs = (opts.filterProperties ?? []).map((p) => `filter_properties=${encodeURIComponent(p)}`).join("&");
     const res = await notionFetch(`/data_sources/${dsId}/query${qs ? `?${qs}` : ""}`, {
       method: "POST",
-      body: JSON.stringify({
-        page_size: opts.pageSize,
-        ...(opts.cursor ? { start_cursor: opts.cursor } : {}),
-        ...(opts.filter ? { filter: opts.filter } : {}),
-      }),
+      body: JSON.stringify(body),
     });
-    return { results: res.results ?? [], hasMore: Boolean(res.has_more), nextCursor: res.next_cursor ?? undefined };
+    return {
+      results: res.results ?? [],
+      hasMore: Boolean(res.has_more),
+      nextCursor: res.next_cursor ?? undefined,
+      incomplete: res.request_status?.type === "incomplete",
+    };
   } catch (e) {
     // 新APIが使えない環境（未移行ワークスペース等）では旧APIで継続する
     console.warn("[notion] data_sources.query failed, falling back to databases.query:", (e as Error)?.message);
     const res: any = await client().databases.query({
       database_id: databaseId,
-      start_cursor: opts.cursor,
-      page_size: opts.pageSize,
-      ...(opts.filter ? { filter: opts.filter } : {}),
+      ...body,
       ...(opts.filterProperties?.length ? { filter_properties: opts.filterProperties } : {}),
-    });
-    return { results: res.results, hasMore: Boolean(res.has_more), nextCursor: res.next_cursor ?? undefined };
+    } as any);
+    return {
+      results: res.results,
+      hasMore: Boolean(res.has_more),
+      nextCursor: res.next_cursor ?? undefined,
+      incomplete: res.request_status?.type === "incomplete",
+    };
   }
 }
+
+// Notion APIは2026年初頭より「1クエリあたり最大10,000件」でページネーションを打ち切る
+// （打ち切り時も has_more:false を返す）。上限に達したら created_time 昇順の続きから
+// 新しいクエリを発行し直すことで全件を取得する（クエリごとに1万件の枠が回復する）。
+const QUERY_RESULT_LIMIT = 10000;
+const CREATED_ASC = [{ timestamp: "created_time", direction: "ascending" }];
 
 async function queryAll(databaseId: string, filter?: any, filterProperties?: string[]): Promise<any[]> {
   if (!databaseId) return [];
   const out: any[] = [];
-  let cursor: string | undefined;
-  for (let i = 0; i < NOTION_MAX_PAGES; i++) {
-    const res = await queryPage(databaseId, { cursor, pageSize: 100, filter, filterProperties });
-    out.push(...res.results);
-    if (!res.hasMore) break;
-    cursor = res.nextCursor;
+  const seen = new Set<string>();
+  let windowFilter: any | undefined;
+  let pagesUsed = 0;
+  // 外側ループ = クエリ（ウィンドウ）。内側ループ = そのクエリ内のカーソル送り。
+  for (let w = 0; w < 40 && pagesUsed < NOTION_MAX_PAGES; w++) {
+    const combined = windowFilter ? (filter ? { and: [filter, windowFilter] } : windowFilter) : filter;
+    const lenBefore = out.length;
+    let cursor: string | undefined;
+    let fetchedInWindow = 0;
+    let hitLimit = false;
+    while (pagesUsed < NOTION_MAX_PAGES) {
+      const res = await queryPage(databaseId, {
+        cursor,
+        pageSize: 100,
+        filter: combined,
+        filterProperties,
+        sorts: CREATED_ASC,
+      });
+      pagesUsed++;
+      fetchedInWindow += res.results.length;
+      for (const pg of res.results) {
+        if (pg?.id && !seen.has(pg.id)) {
+          seen.add(pg.id);
+          out.push(pg);
+        }
+      }
+      if (res.hasMore && res.nextCursor) {
+        cursor = res.nextCursor;
+        continue;
+      }
+      hitLimit = res.incomplete || fetchedInWindow >= QUERY_RESULT_LIMIT;
+      break;
+    }
+    if (!hitLimit) break; // 取り切った
+    const lastCreated = out[out.length - 1]?.created_time;
+    // 進捗が無い（同一created_timeに1万件超が集中）場合は無限ループを避けて打ち切る
+    if (!lastCreated || out.length === lenBefore) {
+      console.warn(`[notion] queryAll: cannot advance past 10k window (fetched=${out.length}) — stopping`);
+      break;
+    }
+    windowFilter = { timestamp: "created_time", created_time: { on_or_after: lastCreated } };
   }
   return out;
 }
