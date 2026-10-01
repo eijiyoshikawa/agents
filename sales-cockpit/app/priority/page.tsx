@@ -4,6 +4,7 @@ import { getPriorityList } from "@/lib/data";
 import { scoreTier } from "@/lib/priority";
 import { EMP_BANDS, parseEmpBand, type PriorityMode } from "@/lib/db";
 import CallButton from "@/components/CallButton";
+import VisitFlagButton from "@/components/VisitFlagButton";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -118,12 +119,13 @@ export default async function PriorityPage({
               <th className="text-left px-3 py-2.5">見込み</th>
               <th className="text-left px-3 py-2.5">未経験可</th>
               {mode === "follow" && <th className="text-left px-3 py-2.5">状態</th>}
+              <th className="text-center px-3 py-2.5">訪問候補</th>
               <th className="text-left px-3 py-2.5">発信</th>
             </tr>
           </thead>
           <tbody>
             {rows.length === 0 && (
-              <tr><td colSpan={10} className="px-4 py-8 text-center text-xs text-ink-muted">対象がありません</td></tr>
+              <tr><td colSpan={11} className="px-4 py-8 text-center text-xs text-ink-muted">対象がありません</td></tr>
             )}
             {rows.map((c, i) => {
               const tier = scoreTier(c.priority);
@@ -153,6 +155,7 @@ export default async function PriorityPage({
                     {c.noExpJob === "あり" ? <span className="text-accent-teal font-semibold">あり</span> : <span className="text-ink-muted">{c.noExpJob ?? "—"}</span>}
                   </td>
                   {mode === "follow" && <td className="px-3 py-2 text-xs text-ink-soft whitespace-nowrap">{c.status}</td>}
+                  <td className="px-3 py-2 text-center whitespace-nowrap"><VisitFlagButton id={c.id} initial={c.visitFlag} /></td>
                   <td className="px-3 py-2 whitespace-nowrap"><CallButton phone={c.phone} /></td>
                 </tr>
               );

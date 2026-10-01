@@ -334,6 +334,10 @@ function email(page: any, name: string): string | null {
   const p = P(page, name);
   return p?.type === "email" ? p.email : null;
 }
+function chk(page: any, name: string): boolean {
+  const p = P(page, name);
+  return p?.type === "checkbox" ? Boolean(p.checkbox) : false;
+}
 function url(page: any, name: string): string | null {
   const p = P(page, name);
   return p?.type === "url" ? p.url : null;
@@ -370,6 +374,7 @@ function mapCustomer(pg: any): Customer {
     recruitPage: url(pg, "採用ページ"),
     media: multi(pg, "掲載元メディア"),
     noExpJob: sel(pg, "未経験可求人"),
+    visitFlag: chk(pg, "訪問候補"),
     lastEdited: pg.last_edited_time ?? null,
     nextFollow: dateStart(pg, "次回フォロー日"),
     confirm: sel(pg, "確認状況"),
@@ -461,7 +466,7 @@ export async function fetchCustomers(): Promise<Customer[]> {
 const LIST_FIELD_NAMES = [
   "顧客名", "電話番号", "ステータス", "見込み度合い", "業種", "企業フェーズ",
   "営業手法", "IS担当", "S担当", "都道府県", "架電回数", "最終架電日",
-  "アポイント取得日", "住所", "確認状況", "従業員数", "掲載元メディア", "未経験可求人",
+  "アポイント取得日", "住所", "確認状況", "従業員数", "掲載元メディア", "未経験可求人", "訪問候補",
 ];
 
 let _listPropIds: string[] | null = null;
@@ -505,6 +510,7 @@ function mapListCustomer(pg: any): ListCustomer {
     employees: number(pg, "従業員数"),
     media: multi(pg, "掲載元メディア"),
     noExpJob: sel(pg, "未経験可求人"),
+    visitFlag: chk(pg, "訪問候補"),
   };
 }
 
@@ -631,6 +637,14 @@ export async function fetchJobScanTargets(limit: number): Promise<{ id: string; 
     cursor = res.nextCursor;
   }
   return out.slice(0, limit);
+}
+
+/** 訪問候補チェックを顧客ページへ書き込む（各リスト・企業情報のワンタップ操作用） */
+export async function updateVisitFlag(pageId: string, flag: boolean): Promise<void> {
+  await client().pages.update({
+    page_id: pageId,
+    properties: { 訪問候補: { checkbox: flag } },
+  });
 }
 
 /** 未経験可求人の判定結果と確認日を顧客ページへ書き込む */
