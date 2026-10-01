@@ -20,6 +20,7 @@ export default async function VisitsPage({
   const statuses = one(sp.statuses) ? (one(sp.statuses) as string).split(",") : DEFAULT_STATUSES;
   const noExpOnly = one(sp.noexp) === "1";
   const emp = parseEmpBand(one(sp.emp));
+  const visitOnly = one(sp.visit) === "1";
   const limit = Math.min(Math.max(Number(one(sp.limit) ?? "500") || 500, 1), 2000);
   const searched = one(sp.q) === "1";
 
@@ -28,7 +29,7 @@ export default async function VisitsPage({
   let loadError: string | null = null;
   if (searched && ready && dbConfigured()) {
     try {
-      result = await dbGetVisitList({ area, statuses, noExpOnly, limit, emp });
+      result = await dbGetVisitList({ area, statuses, noExpOnly, limit, emp, visitOnly });
     } catch (e) {
       // 新カラムが未作成（初回同期前）の場合は42703が返る。ページは落とさず案内する。
       const msg = (e as { code?: string; message?: string });
@@ -45,6 +46,7 @@ export default async function VisitsPage({
     statuses: statuses.join(","),
     ...(noExpOnly ? { noexp: "1" } : {}),
     ...(emp ? { emp } : {}),
+    ...(visitOnly ? { visit: "1" } : {}),
     limit: String(limit),
   }).toString();
 
@@ -82,6 +84,10 @@ export default async function VisitsPage({
             <input type="checkbox" name="noexp" value="1" defaultChecked={noExpOnly} className="accent-teal-400" />
             未経験可求人のみ
           </label>
+          <label className="inline-flex items-center gap-1.5 text-sm text-accent-teal font-medium">
+            <input type="checkbox" name="visit" value="1" defaultChecked={visitOnly} className="accent-teal-400" />
+            訪問候補のみ（架電中にチェックした企業）
+          </label>
           <button type="submit" className="px-4 py-2 rounded-lg bg-brand text-white text-sm font-medium hover:bg-brand-soft">
             件数を確認
           </button>
@@ -95,6 +101,7 @@ export default async function VisitsPage({
               statuses: next.join(","),
               ...(noExpOnly ? { noexp: "1" } : {}),
               ...(emp ? { emp } : {}),
+              ...(visitOnly ? { visit: "1" } : {}),
               limit: String(limit),
             }).toString();
             return (
@@ -114,7 +121,9 @@ export default async function VisitsPage({
           })}
         </div>
         <p className="text-[11px] text-ink-muted">
-          対象ステータス（クリックで切替）。既定は「接触したがアポに至っていない」全ステータス。「アプローチ前」（未架電）も追加できます。
+          {visitOnly
+            ? "「訪問候補のみ」が有効のため、ステータス条件は使われません（架電リスト・優先アプローチ・企業情報でチェックした企業が対象です）。"
+            : "対象ステータス（クリックで切替）。既定は「接触したがアポに至っていない」全ステータス。「アプローチ前」（未架電）も追加できます。"}
         </p>
       </form>
 

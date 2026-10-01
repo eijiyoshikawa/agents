@@ -25,11 +25,12 @@ export async function GET(req: Request) {
   const statuses = statusesParam ? statusesParam.split(",") : [...VISIT_STATUSES].filter((s) => s !== "アプローチ前");
   const noExpOnly = url.searchParams.get("noexp") === "1";
   const emp = parseEmpBand(url.searchParams.get("emp"));
+  const visitOnly = url.searchParams.get("visit") === "1";
   const limit = Math.min(Math.max(Number(url.searchParams.get("limit") ?? "500") || 500, 1), 2000);
 
   let rows;
   try {
-    ({ rows } = await dbGetVisitList({ area, statuses, noExpOnly, limit, emp }));
+    ({ rows } = await dbGetVisitList({ area, statuses, noExpOnly, limit, emp, visitOnly }));
   } catch (e) {
     const code = (e as { code?: string })?.code;
     const msg =

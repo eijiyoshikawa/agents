@@ -8,6 +8,7 @@ import { buildHooks } from "@/lib/hooks";
 import { agencyReason } from "@/lib/leadflags";
 import CallButton from "./CallButton";
 import CustomerEditForm from "./CustomerEditForm";
+import VisitFlagButton from "./VisitFlagButton";
 
 export const RANK_COLOR: Record<string, string> = {
   A: "bg-accent-red/15 text-accent-red",
@@ -73,6 +74,7 @@ export function CustomerDetailBody({
 
       <div className="flex flex-wrap items-center gap-2 mt-4">
         {c.phone ? <CallButton phone={c.phone} /> : <GoogleSearchButton c={c} prominent />}
+        <VisitFlagButton id={c.id} initial={c.visitFlag} withLabel />
         <a href={googleSearchUrl(c)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/10 text-slate-200 text-xs font-medium hover:bg-white/20 transition-colors">
           <Search size={13} /> Google検索
         </a>

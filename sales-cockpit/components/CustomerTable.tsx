@@ -5,11 +5,12 @@ import clsx from "clsx";
 import { Search, ChevronDown, ArrowLeft, ArrowRight, X, Bookmark, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import type { Customer, SearchResult, SearchRow } from "@/lib/types";
 import CallButton from "./CallButton";
+import VisitFlagButton from "./VisitFlagButton";
 import { CustomerDetailBody, RANK_COLOR, GoogleSearchButton } from "./CustomerDetailParts";
 
 export type InitialFilters = { q?: string; rep?: string; status?: string; rank?: string; industry?: string };
 
-const COLSPAN = 8;
+const COLSPAN = 9;
 const PAGE_SIZE = 50;
 
 export default function CustomerTable({
@@ -177,6 +178,7 @@ export default function CustomerTable({
               <SortHead label="IS担当" col="isRep" sortKey={sortKey} sortDir={sortDir} onClick={toggleSort} className="text-left px-3 py-2.5" />
               <SortHead label="架電回数" col="callCount" sortKey={sortKey} sortDir={sortDir} onClick={toggleSort} className="text-right px-3 py-2.5" />
               <SortHead label="最終架電" col="lastCallDate" sortKey={sortKey} sortDir={sortDir} onClick={toggleSort} className="text-left px-3 py-2.5" />
+              <th className="text-center font-medium px-3 py-2.5">訪問候補</th>
               <th className="text-right font-medium px-4 py-2.5">発信</th>
             </tr>
           </thead>
@@ -214,6 +216,9 @@ export default function CustomerTable({
                   <td className="px-3 py-2.5 text-xs text-slate-300">{c.isRep ?? "—"}</td>
                   <td className="px-3 py-2.5 text-right tabular-nums">{c.callCount ?? 0}</td>
                   <td className="px-3 py-2.5 text-xs text-slate-400">{c.lastCallDate?.slice(0, 10) ?? "—"}</td>
+                  <td className="px-3 py-2.5 text-center" onClick={(e) => e.stopPropagation()}>
+                    <VisitFlagButton id={c.id} initial={c.visitFlag} />
+                  </td>
                   <td className="px-4 py-2.5 text-right" onClick={(e) => e.stopPropagation()}>
                     {c.phone ? <CallButton phone={c.phone} /> : <GoogleSearchButton c={c} />}
                   </td>

@@ -42,6 +42,7 @@ export type Customer = {
   recruitPage: string | null; // 採用ページURL
   media: string[]; // 掲載元メディア
   noExpJob: string | null; // 未経験可求人（あり/なし/不明）
+  visitFlag: boolean; // 訪問候補（営業が架電中にチェック。訪問アプローチのCSV対象）
   lastEdited: string | null; // 最終更新日時
   nextFollow: string | null; // 次回フォロー日
   confirm: string | null; // 確認状況（重複チェック）
@@ -70,6 +71,7 @@ export type ListCustomer = {
   employees: number | null; // 従業員数（優先スコア算出に使用）
   media: string[]; // 掲載元メディア（リードソース。優先スコア算出に使用）
   noExpJob: string | null; // 未経験可求人（あり/なし/不明。採用ページ自動スキャンで判定）
+  visitFlag: boolean; // 訪問候補（営業が架電中にチェック。訪問アプローチのCSV対象）
 };
 
 /** サーバー側検索の1行（重複/人材紹介フラグ付き） */
