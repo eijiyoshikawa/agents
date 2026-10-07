@@ -110,7 +110,6 @@
   4. 記事本文への AIEO ブロック挿入（Direct Answer Block + FAQ セクション）
 出力: 適用結果レポート
 ```
-
 ### 5. Next.js への適用
 ```
 入力: 分析結果 + 最適化データ
@@ -122,7 +121,6 @@
   5. 記事コンポーネントへの AIEO ブロック挿入
 出力: 適用済みコード + diffレポート
 ```
-
 ### 6. サイト全体SEO監査
 ```
 入力: サイトURL / GSCデータ / ページ一覧
@@ -136,7 +134,6 @@
   7. クロールバジェット最適化（robots.txt / noindex 精査）
 出力: /agents/seo_aieo/audits/{site_id}_audit.json
 ```
-
 ### 7. 効果測定・フィードバックループ
 ```
 処理:
@@ -149,9 +146,7 @@
   4. 四半期: 戦略KW再選定 → コンテンツカレンダー更新
 出力: /agents/seo_aieo/reports/{article_id}_report.json
 ```
-
 ---
-
 ## SEO/AIEO 品質基準
 
 | 基準 | SEO | AIEO |
@@ -175,7 +170,6 @@
 | 構造化データエラー | ゼロ維持 | 週次 |
 
 ## AIEO チェックリスト
-
 - [ ] 記事冒頭に50-100文字の「結論ファースト」要約があるか
 - [ ] FAQ構造（JSON-LD + HTML）が実装されているか
 - [ ] 著者情報（Author schema）が設定されているか
@@ -187,20 +181,17 @@
 - [ ] 出典・参考文献が明示されているか
 
 ## 意思決定フレームワーク
-
 ### キーワード優先度
 `優先度スコア = 検索ボリューム × (1/KW難易度) × 検索意図適合度`
 - **High**: 自社サービス直結 × Commercial/Transactional 意図
 - **Medium**: 業界トピック × Informational × 高ボリューム
 - **Low**: ロングテール × 低ボリューム（AIEO引用狙いは優先度上げ）
-
 ### リソース配分
 - テクニカルSEO : コンテンツSEO = **3:7**（通常時）
 - サイト立ち上げ / リニューアル時 = **7:3**（基盤優先）
 - アルゴリズム更新直後 = テクニカル側を一時引き上げ
 
 ## エッジケース対応
-
 | 状況 | 対応プロトコル |
 |------|-------------|
 | アルゴリズム更新検知 | 順位変動を即時分析→影響範囲特定→修正施策を48h以内に提案 |
@@ -255,16 +246,11 @@
   "platform": "wordpress|nextjs",
   "analyzed_at": "YYYY-MM-DD",
   "current_state": {
-    "title": "現在のタイトル",
-    "description": "現在のディスクリプション",
-    "tags": [],
-    "has_structured_data": false,
-    "has_faq_section": false,
-    "has_direct_answer_block": false
+    "title": "現在のタイトル", "description": "現在のディスクリプション",
+    "tags": [], "has_structured_data": false, "has_faq_section": false, "has_direct_answer_block": false
   },
   "optimized": {
-    "title": "最適化後タイトル",
-    "description": "最適化後ディスクリプション",
+    "title": "最適化後タイトル", "description": "最適化後ディスクリプション",
     "tags": ["タグ1", "タグ2", "タグ3"],
     "keywords": { "primary": "メインKW", "secondary": ["サブKW1", "サブKW2", "サブKW3"] },
     "search_intent": "informational|navigational|commercial|transactional",
