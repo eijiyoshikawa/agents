@@ -154,6 +154,292 @@ GA4・Google Search Console・各種広告プラットフォームのデータ�
 }
 ```
 
+---
+
+## GA4 高度活用ガイド
+
+### イベントベーストラッキング設計
+
+#### 推奨イベント体系
+```
+自動収集イベント（設定不要）:
+  - page_view, session_start, first_visit, user_engagement
+  - scroll, click (enhanced measurement)
+
+推奨イベント（業種共通）:
+  - login, sign_up, search, share
+  - view_item, add_to_cart, begin_checkout, purchase
+  - generate_lead, tutorial_begin, tutorial_complete
+
+カスタムイベント（自社定義）:
+  命名規則: snake_case / 40文字以内 / 動詞_目的語
+  例:
+    - form_submit_contact    // お問い合わせフォーム送信
+    - cta_click_hero         // ヒーロー CTA クリック
+    - pdf_download_whitepaper // ホワイトペーパー DL
+    - video_play_service     // サービス紹介動画再生
+    - scroll_depth_75        // 75% スクロール到達
+    - tab_switch_pricing     // 料金タブ切替
+```
+
+#### カスタムディメンション・メトリクス設計
+```
+ユーザースコープ:
+  - user_type: free / paid / trial / enterprise
+  - acquisition_source: organic / paid / referral / direct
+  - industry: 業種コード（BtoB向け）
+
+イベントスコープ:
+  - content_category: blog / service / case_study / lp
+  - cta_position: hero / mid / footer / sidebar
+  - form_type: contact / download / trial / demo
+
+アイテムスコープ:
+  - item_category: サービスカテゴリ
+  - item_variant: プラン種別
+```
+
+#### オーディエンス設計（GA4 Audiences）
+```
+優先度1（必須）:
+  - All Users（全ユーザー）
+  - Purchasers / Converters（コンバージョン済み）
+  - Cart Abandoners（カゴ落ち）
+  - Engaged Users（セッション時間 > 60秒 + ページビュー > 3）
+
+優先度2（推奨）:
+  - High-Value Users（累計購入額上位10%）
+  - Return Visitors（7日以内に再訪）
+  - Content Consumers（ブログ 3記事以上閲覧）
+  - Trial-to-Paid Pipeline（トライアル登録→未購入）
+  - Dormant Users（30日以上未訪問の既存顧客）
+
+予測オーディエンス:
+  - Purchase Probability（購入可能性が高いユーザー）
+  - Churn Probability（離脱可能性が高いユーザー）
+  - Revenue Prediction（予測収益上位ユーザー）
+```
+
+#### 探索レポート（Explorations）活用パターン
+```
+テンプレート1: ファネル分析
+  ステップ: LP訪問 → CTA クリック → フォーム表示 → フォーム送信
+  分析軸: デバイス別 / 流入元別 / 時間帯別
+  目的: 離脱ポイントの特定
+
+テンプレート2: パス分析
+  起点: ランディングページ
+  分析: ユーザーの遷移パターン（上位5パス）
+  目的: コンテンツ導線の最適化
+
+テンプレート3: コホート分析
+  コホート定義: 初回訪問週
+  指標: リテンション率（1週 / 2週 / 4週 / 8週）
+  目的: ユーザー定着率の推移監視
+
+テンプレート4: セグメント比較
+  セグメント A vs B: オーガニック vs 広告流入
+  指標: CVR / 平均セッション時間 / ページ/セッション
+  目的: チャネル品質の比較
+```
+
+---
+
+## タグマネジメント（GTM）ベストプラクティス
+
+### GTM コンテナ設計原則
+```
+1. ワークスペース分離:
+   - 本番（Production）: マスター設定
+   - 開発（Development）: テスト・検証用
+   - 緊急（Hotfix）: 緊急修正用
+
+2. 命名規則:
+   タグ: [プラットフォーム] - [アクション] - [詳細]
+   例: GA4 - Event - form_submit_contact
+       Meta - Conversion - lead_generation
+       GTM - Utility - scroll_depth_tracker
+
+   トリガー: [種類] - [条件]
+   例: Click - CTA Hero Button
+       PageView - Thank You Page
+       Timer - 30sec Engagement
+
+   変数: [種類] - [名前]
+   例: DLV - page_category
+       CSS - button_text
+       URL - utm_source
+
+3. フォルダ構成:
+   /GA4         — GA4 関連タグ
+   /Meta        — Meta Pixel 関連
+   /Google_Ads  — Google 広告関連
+   /Utility     — ユーティリティ（スクロール・タイマー等）
+   /Consent     — 同意管理関連
+```
+
+### データレイヤー設計
+```javascript
+// ページ共通データレイヤー
+window.dataLayer = window.dataLayer || [];
+dataLayer.push({
+  'page_type': 'service',           // top / blog / service / lp / contact
+  'page_category': 'web_marketing', // コンテンツカテゴリ
+  'user_status': 'anonymous',       // anonymous / logged_in / customer
+  'environment': 'production'       // production / staging / development
+});
+
+// イベントデータレイヤー例（フォーム送信）
+dataLayer.push({
+  'event': 'form_submit',
+  'form_type': 'contact',
+  'form_location': 'footer',
+  'timestamp': new Date().toISOString()
+});
+
+// Eコマースデータレイヤー例
+dataLayer.push({
+  'event': 'purchase',
+  'ecommerce': {
+    'transaction_id': 'T-12345',
+    'value': 29800,
+    'currency': 'JPY',
+    'items': [{
+      'item_id': 'PLAN-001',
+      'item_name': 'スタンダードプラン',
+      'price': 29800,
+      'quantity': 1
+    }]
+  }
+});
+```
+
+### GTM デバッグ・QA チェックリスト
+```
+□ プレビューモードで全タグの発火確認
+□ データレイヤー変数が正しく取得されている
+□ GA4 DebugView でイベントが受信されている
+□ コンバージョンタグの発火タイミングが正しい（Thank You ページのみ等）
+□ 重複発火がない（ページリロード時の二重カウント防止）
+□ クロスドメイントラッキングの設定確認（該当時）
+□ Consent Mode v2 の正しい動作確認
+□ サーバーサイド GTM の設定確認（該当時）
+```
+
+---
+
+## コンバージョントラッキング設計
+
+### コンバージョン定義フレームワーク
+
+#### マクロコンバージョン（ビジネス直結）
+```
+B2B サイト:
+  - お問い合わせフォーム送信 → generate_lead
+  - 資料ダウンロード → file_download
+  - デモ申し込み → sign_up
+  - 見積もり依頼 → generate_lead
+
+EC サイト:
+  - 購入完了 → purchase
+  - 会員登録 → sign_up
+
+メディアサイト:
+  - 広告クリック → ad_click
+  - 会員登録 → sign_up
+```
+
+#### マイクロコンバージョン（行動指標）
+```
+エンゲージメント指標:
+  - CTA ボタンクリック（位置別に計測）
+  - 動画再生（25% / 50% / 75% / 100%）
+  - スクロール深度（25% / 50% / 75% / 90%）
+  - 滞在時間（30秒 / 60秒 / 180秒）
+  - FAQ アコーディオン開閉
+  - 料金ページ閲覧
+  - 事例ページ閲覧
+
+取得指標:
+  - ニュースレター登録
+  - SNS フォロー
+  - LINE 友だち追加
+```
+
+### アトリビューション分析手法
+```
+GA4 アトリビューションモデル:
+  1. データドリブン（推奨・デフォルト）: 機械学習でタッチポイント貢献度を算出
+  2. ラストクリック: 最後のタッチポイントに100%配分
+  3. ファーストクリック: 最初のタッチポイントに100%配分（認知評価用）
+
+分析アプローチ:
+  - チャネル別アトリビューションの比較（モデル間差異を分析）
+  - コンバージョンパス長の分析（平均接触回数）
+  - タイムラグ分析（初回接触〜CV の日数分布）
+  - アシストコンバージョンの評価（直接 CV に貢献しないがパスに登場するチャネル）
+```
+
+---
+
+## ダッシュボード設計原則
+
+### ダッシュボード階層設計
+```
+Level 1: エグゼクティブダッシュボード（CEO / COO 向け）
+  - KPI サマリー（売上・CV数・ROI）前月比・前年比
+  - トレンドグラフ（過去12ヶ月推移）
+  - 異常アラート（閾値超過のみ表示）
+  - 更新頻度: 日次自動更新
+
+Level 2: マネージャーダッシュボード（Marketing / Sales 向け）
+  - チャネル別パフォーマンス比較
+  - キャンペーン別 ROI / CPA
+  - ファネル分析（ステージ別転換率）
+  - 更新頻度: 日次〜週次
+
+Level 3: オペレーショナルダッシュボード（担当者向け）
+  - リアルタイムトラフィック
+  - 個別キャンペーンの詳細指標
+  - A/B テスト結果
+  - エラー・異常検知ログ
+  - 更新頻度: リアルタイム〜日次
+```
+
+### データ可視化ルール
+```
+グラフ種別の使い分け:
+  - 時系列推移: 折れ線グラフ（最大5系列）
+  - 構成比: 円グラフ（5項目以内）or 積み上げ棒グラフ
+  - 比較: 横棒グラフ（カテゴリ数が多い場合）or 縦棒グラフ
+  - 相関: 散布図
+  - 分布: ヒストグラム
+  - KPI: スコアカード（数値 + 前期比 + トレンド矢印）
+
+可視化の禁止事項:
+  × 3D グラフ（視認性低下）
+  × Y軸が0から始まらない棒グラフ（誤解を招く）
+  × 色のみで情報を区別（アクセシビリティ違反）
+  × 過剰なデータポイント（100以上は集約する）
+```
+
+### 異常検知アラート設計
+```
+アラート条件:
+  - トラフィック: 前日比 ±30% or 前週同曜日比 ±40%
+  - CVR: 前週平均比 -20%
+  - CPA: 前週平均比 +30%
+  - エラーレート（4xx/5xx）: 5% 超過
+  - Core Web Vitals: 「不良」判定の新規発生
+
+通知先:
+  - Critical: CEO + COO + 担当エージェント（即時）
+  - Warning: 担当エージェント（日次サマリー内）
+  - Info: ダッシュボード上の表示のみ
+```
+
+---
+
 ## 使用ツール
 - `Read` / `Write`: レポート・設定ファイルの読み書き
 - `WebSearch`: ベンチマーク・業界平均データの調査

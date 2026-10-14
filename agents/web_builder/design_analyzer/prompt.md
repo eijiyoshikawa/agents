@@ -203,3 +203,40 @@ CSS変数、インラインスタイル、クラス名から色情報を抽出�
 - ダーク × ブルー / ネオン → `linear.app` / `framer`
 - 暖色 + 写真主体 → `airbnb` / `notion`
 - 該当なし → `custom`（その場合は Builder にゼロから作らせる）
+
+## アクセシビリティ・カラー検証
+
+### コントラスト比自動検出
+抽出した全テキスト色×背景色の組み合わせについてコントラスト比を算出し、WCAG 2.1 AA 基準を満たしているか記録する:
+
+```json
+{
+  "accessibility_audit": {
+    "contrast_checks": [
+      {
+        "text_color": "#1E293B",
+        "bg_color": "#FFFFFF",
+        "contrast_ratio": 12.63,
+        "wcag_aa_normal": true,
+        "wcag_aa_large": true,
+        "usage": "本文テキスト × メイン背景"
+      },
+      {
+        "text_color": "#64748B",
+        "bg_color": "#F8FAFC",
+        "contrast_ratio": 3.94,
+        "wcag_aa_normal": false,
+        "wcag_aa_large": true,
+        "usage": "セカンダリテキスト × Alt背景",
+        "recommendation": "テキスト色を #475569 に変更してコントラスト比 4.5:1 以上を確保"
+      }
+    ],
+    "overall_accessibility": "partial（一部のテキスト色がAA基準未達）"
+  }
+}
+```
+
+### ダークモード対応の検出
+- `prefers-color-scheme: dark` メディアクエリの使用有無
+- ダークモード用カラーパレットの抽出
+- ダークモード切り替えトグルの有無と実装方式

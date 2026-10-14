@@ -252,6 +252,80 @@ Builder が生成した `/agents/web_builder/output/` を Vercel にデプロイ
 - Vercel MCP: `deploy_to_vercel`, `web_fetch_vercel_url`, `get_deployment`
 
 
+## パフォーマンス比較検証
+
+### Lighthouse スコア比較
+参考サイトと再現サイトの Lighthouse スコアを比較し、パフォーマンス品質を担保する:
+
+```json
+{
+  "lighthouse_comparison": {
+    "reference": {
+      "performance": 78,
+      "accessibility": 85,
+      "best_practices": 92,
+      "seo": 90
+    },
+    "reproduced": {
+      "performance": 92,
+      "accessibility": 95,
+      "best_practices": 100,
+      "seo": 100
+    },
+    "delta": {
+      "performance": "+14（改善）",
+      "accessibility": "+10（改善）",
+      "best_practices": "+8（改善）",
+      "seo": "+10（改善）"
+    },
+    "target_met": true,
+    "notes": "再現サイトは参考サイトを全指標で上回っている"
+  }
+}
+```
+
+**パフォーマンス合格基準:**
+- 再現サイトの Performance >= 90（参考サイトの値に関わらず）
+- 再現サイトの Accessibility >= 90
+- 再現サイトの SEO >= 90
+- 再現サイトの Best Practices >= 90
+
+### Core Web Vitals 検証
+| 指標 | 目標 | 検証方法 |
+|------|------|---------|
+| LCP | < 2.5s | ファーストビュー最大要素の読み込み時間 |
+| INP | < 200ms | クリック・タップへの応答時間 |
+| CLS | < 0.1 | レイアウトシフトの累積スコア |
+
+## SEO 保持検証
+
+再構築後に SEO 価値が損なわれていないことを確認する:
+
+### SEO チェック項目
+- [ ] 全ページに固有の `<title>` が設定されているか
+- [ ] 全ページに `<meta name="description">` が設定されているか
+- [ ] `sitemap.xml` が生成され、全ページが含まれているか
+- [ ] `robots.txt` が適切に設定されているか
+- [ ] `<link rel="canonical">` が正しいURLを指しているか
+- [ ] 構造化データ（JSON-LD）が含まれているか
+- [ ] 見出し階層（h1→h2→h3）が論理的か
+- [ ] 全画像に `alt` 属性が設定されているか
+- [ ] モバイルフレンドリーテストに合格しているか
+
+### アクセシビリティ検証
+- [ ] WCAG 2.1 AA のカラーコントラスト基準を満たしているか
+- [ ] キーボードのみで全操作が可能か
+- [ ] スクリーンリーダーで意味のある読み上げができるか
+- [ ] フォーカスインジケーターが全フォーカス可能要素に表示されるか
+
+## 法的コンプライアンス検証
+
+- [ ] 参考サイトのロゴ・商標がコピーされていないか
+- [ ] 写真・イラストが全てフリーライセンス素材に置換されているか
+- [ ] テキストコンテンツがダミーテキストに置換されているか
+- [ ] フォントが全てライセンス確認済みか
+- [ ] asset_collector/output.json の `license_audit` が全項目クリアか
+
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer（横断）**: 本サブエージェントの検証品質自体をメタ検証
 - **Devil's Advocate**: 比較基準・合格判定の妥当性への批判的検証

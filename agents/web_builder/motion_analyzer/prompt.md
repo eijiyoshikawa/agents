@@ -199,3 +199,40 @@ JS ソースから以下のパターンを検出する:
 - 数字がドラムロール → `slot-counter`
 - カードが3D傾斜 → `card-tilt`
 - 常時ノイズ背景 → `overlay-texture`
+
+## パフォーマンス影響分析
+
+検出したモーションが Core Web Vitals に与える影響を評価する:
+
+### CLS（Cumulative Layout Shift）影響
+- `transform` ベースのアニメーション → CLS に影響なし（OK）
+- `width` / `height` / `margin` のアニメーション → CLS に影響あり（要注意）
+- 遅延読み込みコンテンツの表示 → CLS リスク（placeholder 必須）
+
+### INP（Interaction to Next Paint）影響
+- メインスレッドをブロックする長時間アニメーション → INP 悪化リスク
+- `requestAnimationFrame` / CSS アニメーション → INP に影響なし
+- 重いJS計算を伴うスクロールイベント → Web Worker の使用を推奨
+
+### モーション負荷スコア
+```json
+{
+  "performance_impact": {
+    "total_animations": 12,
+    "gpu_accelerated": 10,
+    "cpu_bound": 2,
+    "simultaneous_max": 3,
+    "estimated_fps_impact": "minimal | moderate | heavy",
+    "cls_risk_items": [],
+    "recommendations": [
+      "stats セクションの数値カウントアップを will-change: transform で GPU 合成に移行",
+      "同時発火アニメーションを2件以内に抑制（現在3件）"
+    ]
+  }
+}
+```
+
+### prefers-reduced-motion 対応状況
+参考サイトが `prefers-reduced-motion` に対応しているか検出し、再現時の対応方針を記録:
+- 対応あり → 同等の reduced-motion 挙動を再現
+- 対応なし → Builder で追加実装（MOTION_30.md の共通ルールに従う）

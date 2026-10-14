@@ -162,6 +162,44 @@ Next.js の `/public` ディレクトリ構成を設計する:
 - `Write`: output.json への書き出し
 
 
+## ライセンス管理
+
+### アセット別ライセンスマトリクス
+| アセット種別 | 著作権 | 代替方針 | 注意事項 |
+|------------|--------|---------|---------|
+| ロゴ・商標 | **使用不可** | SVG ダミーロゴを生成 | 商標権侵害のリスク |
+| 写真（オリジナル） | **使用不可** | Unsplash / Pexels で代替 | 同じ構図・雰囲気の素材を選定 |
+| イラスト（オリジナル） | **使用不可** | SVG プレースホルダー | スタイル・色味を参考に |
+| アイコン（SVGインライン） | 構造参考のみ | lucide-react / heroicons で代替 | 独自アイコンは再描画 |
+| Google Fonts | **使用可** | そのまま使用 | OFL / Apache 2.0 ライセンス |
+| Adobe Fonts | **ライセンス要確認** | Google Fonts で代替候補を提示 | サブスクリプション必要 |
+| 動画素材 | **使用不可** | Pexels Video / Coverr で代替 | 同じ雰囲気の素材を選定 |
+
+### output.json への法的情報追記
+```json
+{
+  "license_audit": {
+    "fonts": [
+      { "family": "Noto Sans JP", "source": "Google Fonts", "license": "OFL-1.1", "commercial_use": true },
+      { "family": "Inter", "source": "Google Fonts", "license": "OFL-1.1", "commercial_use": true }
+    ],
+    "images_replaced": 10,
+    "images_replacement_source": "Unsplash（Unsplash License）",
+    "icons_replaced_with": "lucide-react（ISC License）",
+    "copyrighted_assets_excluded": true,
+    "legal_review_required": false,
+    "notes": "全アセットをフリーライセンス素材に置換済み"
+  }
+}
+```
+
+### 画像最適化推奨
+収集した画像の最適化方針も併せて記録する:
+- **フォーマット**: WebP（フォールバック JPEG/PNG）
+- **圧縮品質**: 写真 80-85% / イラスト・アイコン PNG or SVG
+- **遅延読み込み**: ファーストビュー外の画像は `loading="lazy"`
+- **レスポンシブ画像**: `srcset` で複数サイズ提供（640w / 1024w / 1920w）
+
 ## 相互干渉（検証を受ける相手）
 - **Legal Agent**: 画像・フォント・ロゴの著作権・ライセンス確認
 - **Web Builder / builder**: 収集アセットが再現実装に必要十分か検証

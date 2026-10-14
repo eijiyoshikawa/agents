@@ -286,3 +286,89 @@ motion_analyzer の出力に含まれる `motion_key` は **すべて `/design-m
 - GSAP 系（kinetic-flow の複雑版 / path-animation の高度版）→ `npm install gsap`
 - tsParticles（particle-connect）→ `npm install @tsparticles/react @tsparticles/engine`
 - WebGL（liquid-hover）→ `npm install three` または `npm install ogl`
+
+## SEO 実装チェックリスト
+
+再構築サイトの SEO 価値を保持・向上するための必須実装:
+
+### メタデータ実装
+```tsx
+// src/app/layout.tsx
+export const metadata: Metadata = {
+  title: { default: 'サイト名', template: '%s | サイト名' },
+  description: 'サイト説明',
+  openGraph: { title: '...', description: '...', images: ['/og-image.jpg'] },
+  twitter: { card: 'summary_large_image' },
+  robots: { index: true, follow: true },
+  alternates: { canonical: 'https://example.com' },
+};
+```
+
+### 構造化データ実装
+```tsx
+// JSON-LD を各ページに埋め込み
+<script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "会社名",
+  "url": "https://example.com",
+  "logo": "https://example.com/logo.png"
+}) }} />
+```
+
+### サイトマップ自動生成
+```typescript
+// src/app/sitemap.ts
+export default function sitemap(): MetadataRoute.Sitemap {
+  return [
+    { url: 'https://example.com', lastModified: new Date(), priority: 1 },
+    { url: 'https://example.com/about', lastModified: new Date(), priority: 0.8 },
+    // ...
+  ];
+}
+```
+
+### robots.txt
+```typescript
+// src/app/robots.ts
+export default function robots(): MetadataRoute.Robots {
+  return {
+    rules: { userAgent: '*', allow: '/', disallow: '/api/' },
+    sitemap: 'https://example.com/sitemap.xml',
+  };
+}
+```
+
+## パフォーマンス最適化実装
+
+### 画像最適化
+- すべての `<img>` を `next/image` に置換
+- ファーストビュー画像に `priority` 属性を付与
+- `sizes` 属性でレスポンシブサイズを正確に指定
+- WebP 自動変換（Next.js のデフォルト機能）
+
+### フォント最適化
+```tsx
+// next/font で FOUT/FOIT を防止
+import { Noto_Sans_JP, Inter } from 'next/font/google';
+
+const notoSansJP = Noto_Sans_JP({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  display: 'swap',
+  preload: true,
+});
+```
+
+### バンドルサイズ最適化
+- `dynamic(() => import(...))` でコード分割（モーダル・スライダー等）
+- サードパーティスクリプトは `next/script` の `strategy="lazyOnload"` で遅延読み込み
+- `npm run build` 後のバンドルサイズを確認。ページあたり初期 JS < 100KB を目標
+
+### アクセシビリティ実装
+- [ ] 全画像に意味のある `alt` テキスト（装飾画像は `alt=""`）
+- [ ] フォーカス可能な要素にフォーカスリングを表示
+- [ ] モーダルにフォーカストラップを実装
+- [ ] ARIA ランドマーク（`role` 属性）を適切に設定
+- [ ] スキップリンクを実装（`#main-content` へ）
+- [ ] カラーコントラスト比 WCAG AA 準拠

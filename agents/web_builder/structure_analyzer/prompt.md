@@ -141,6 +141,42 @@
 - `Write`: output.json への書き出し
 
 
+## セマンティックHTML・アクセシビリティ解析
+
+### ARIA ランドマークの検出
+参考サイトの ARIA 使用状況を記録し、再現時のアクセシビリティ品質を担保する:
+- `role="banner"` / `role="navigation"` / `role="main"` / `role="contentinfo"`
+- `aria-label`, `aria-describedby`, `aria-expanded` の使用箇所
+- スキップリンク（`skip-to-content`）の有無
+
+### SEO 構造の解析
+| 要素 | 検出内容 |
+|------|---------|
+| 見出し階層 | h1→h2→h3 の論理的構造が保たれているか |
+| 構造化データ | JSON-LD / Microdata の種類と内容 |
+| メタタグ | canonical, robots, alternate（hreflang） |
+| サイトマップ | sitemap.xml の存在と構造 |
+| パンくずリスト | BreadcrumbList スキーマの有無 |
+
+### output.json への追記フィールド
+```json
+{
+  "seo_structure": {
+    "heading_hierarchy_valid": true,
+    "structured_data": ["Organization", "WebSite", "BreadcrumbList"],
+    "canonical_url": "https://example.com",
+    "has_sitemap": true,
+    "has_robots_txt": true
+  },
+  "accessibility": {
+    "aria_landmarks_used": true,
+    "skip_link_exists": false,
+    "aria_labels_count": 12,
+    "semantic_html_score": "good | partial | poor"
+  }
+}
+```
+
 ## 相互干渉（検証を受ける相手）
 - **Web Builder / builder**: 解析した HTML 構造が再現実装に十分な粒度で表現されているか検証
 - **Web Builder / design_analyzer**: レイアウトとデザイントークンの整合性を相互検証

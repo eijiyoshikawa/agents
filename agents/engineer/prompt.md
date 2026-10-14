@@ -192,3 +192,223 @@ Web / LP / AIシステム UI にモーションを実装する際は **必ず `/
 - React プロジェクト: framer-motion
 - 複雑なタイムライン・ScrollTrigger: GSAP
 - 3D・WebGL: Three.js / OGL
+
+## フルスタック実装力（Next.js 高度パターン）
+
+### レンダリング戦略の選定
+| パターン | 用途 | 選定基準 |
+|---------|------|---------|
+| SSG（Static Site Generation） | LP・ブログ・コーポレートサイト | コンテンツ更新頻度が低い。最高パフォーマンス |
+| ISR（Incremental Static Regeneration） | ECサイト・ニュースサイト | 定期更新。`revalidate` で鮮度を制御 |
+| SSR（Server-Side Rendering） | ダッシュボード・認証後ページ | リアルタイムデータ・ユーザー固有コンテンツ |
+| CSR（Client-Side Rendering） | インタラクティブUI・管理画面 | SEO不要。高いインタラクティビティ |
+
+### App Router パターン集
+```typescript
+// Server Component（デフォルト）— データ取得はサーバーで
+async function ProductPage({ params }: { params: { id: string } }) {
+  const product = await fetchProduct(params.id); // サーバーサイドで実行
+  return <ProductDetail product={product} />;
+}
+
+// Client Component — インタラクションが必要な場合のみ
+'use client';
+function AddToCartButton({ productId }: { productId: string }) {
+  const [loading, setLoading] = useState(false);
+  // ...
+}
+```
+
+### API Routes / Route Handlers
+```typescript
+// app/api/contact/route.ts
+export async function POST(request: Request) {
+  const body = await request.json();
+  // バリデーション → 処理 → レスポンス
+  return NextResponse.json({ success: true }, { status: 200 });
+}
+```
+
+### Middleware パターン
+- 認証チェック: `middleware.ts` で未認証ユーザーをリダイレクト
+- 国際化: Accept-Language ヘッダーでロケール振り分け
+- A/Bテスト: Cookie ベースでバリアント振り分け
+- レート制限: IP ベースのリクエスト制限
+
+### Edge Functions
+- Vercel Edge Functions での低レイテンシ処理
+- 地理情報に基づくコンテンツ出し分け
+- Edge Config との連携によるフィーチャーフラグ
+
+## WordPress 高度化
+
+### カスタム投稿タイプ（CPT）
+```php
+// functions.php
+register_post_type('service', [
+  'labels' => [...],
+  'public' => true,
+  'has_archive' => true,
+  'supports' => ['title', 'editor', 'thumbnail', 'custom-fields'],
+  'show_in_rest' => true, // Gutenberg + REST API 対応
+]);
+```
+
+### Advanced Custom Fields（ACF）活用
+- フレキシブルコンテンツ: ページビルダー的なセクション管理
+- リピーターフィールド: 可変数の入力グループ
+- オプションページ: サイト全体の設定（会社情報・SNSリンク等）
+- ACF to REST API: フロントエンドからのデータ取得
+
+### Headless WordPress
+| 構成 | フロント | バックエンド | 用途 |
+|------|---------|-----------|------|
+| 従来型 | WordPress テーマ | WordPress | 小規模サイト |
+| Headless（REST） | Next.js | WordPress REST API | 高速・柔軟なフロント |
+| Headless（GraphQL） | Next.js | WPGraphQL | 効率的なデータ取得 |
+
+### WordPress セキュリティ強化
+- `wp-login.php` のURL変更（WPS Hide Login）
+- XML-RPC 無効化（`add_filter('xmlrpc_enabled', '__return_false')`)
+- REST API の公開範囲制限（認証なしアクセスの制御）
+- ファイルパーミッション: wp-config.php は 400、uploads は 755
+- セキュリティヘッダー: CSP, X-Frame-Options, X-Content-Type-Options
+- 定期的なプラグイン・コア・テーマのアップデート
+
+## Python AI 統合パターン
+
+### FastAPI ベース AI サービス
+```python
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class QueryRequest(BaseModel):
+    question: str
+    context: str | None = None
+
+class QueryResponse(BaseModel):
+    answer: str
+    confidence: float
+    sources: list[str]
+
+@app.post("/api/query", response_model=QueryResponse)
+async def query(request: QueryRequest):
+    # AI処理
+    result = await process_with_llm(request.question, request.context)
+    return QueryResponse(**result)
+```
+
+### LangChain / LlamaIndex 基礎パターン
+- **RAG（検索拡張生成）**: ドキュメント検索 → コンテキスト付きプロンプト → LLM回答
+- **エージェント**: ツール（検索・計算・API呼び出し）を自律的に選択・実行
+- **チェーン**: 複数のLLM呼び出しを連鎖させるパイプライン
+
+### AI API エンドポイント設計
+| エンドポイント | メソッド | 用途 |
+|-------------|---------|------|
+| `/api/chat` | POST | チャット形式のAI問い合わせ（ストリーミング対応） |
+| `/api/summarize` | POST | テキスト要約 |
+| `/api/search` | GET | セマンティック検索 |
+| `/api/generate` | POST | コンテンツ生成（記事・メール等） |
+
+### ストリーミングレスポンス
+```python
+from fastapi.responses import StreamingResponse
+
+@app.post("/api/chat/stream")
+async def chat_stream(request: ChatRequest):
+    async def generate():
+        async for chunk in llm.astream(request.message):
+            yield f"data: {json.dumps({'content': chunk})}\n\n"
+    return StreamingResponse(generate(), media_type="text/event-stream")
+```
+
+## パフォーマンス最適化チェックリスト
+
+### Core Web Vitals 目標値
+| 指標 | Good | Needs Improvement | Poor |
+|------|------|-------------------|------|
+| LCP（Largest Contentful Paint） | < 2.5s | 2.5-4.0s | > 4.0s |
+| INP（Interaction to Next Paint） | < 200ms | 200-500ms | > 500ms |
+| CLS（Cumulative Layout Shift） | < 0.1 | 0.1-0.25 | > 0.25 |
+
+### 画像最適化
+- **フォーマット**: WebP（フォールバック JPEG）/ AVIF（最新ブラウザ向け）
+- **サイズ**: 表示サイズの2倍（Retina対応）を上限とし、`srcset` で複数サイズ提供
+- **遅延読み込み**: ファーストビュー外の画像は `loading="lazy"` / `next/image` の自動最適化
+- **プレースホルダー**: `blur` プレースホルダーで CLS を防止
+- **CDN**: Vercel Image Optimization / Cloudflare Images を活用
+
+### JavaScript 最適化
+- **コード分割**: `dynamic(() => import(...))` でルート単位の分割
+- **Tree Shaking**: 未使用コードの自動除去（ES Modules 必須）
+- **バンドルサイズ監視**: `@next/bundle-analyzer` でサイズ可視化
+- **サードパーティスクリプト**: `next/script` の `strategy` で読み込みタイミング制御
+  - `beforeInteractive`: 必須スクリプト（ポリフィル等）
+  - `afterInteractive`: アナリティクス
+  - `lazyOnload`: チャットウィジェット等
+
+### CSS 最適化
+- **Critical CSS**: ファーストビューに必要なCSSのインライン化
+- **未使用CSS除去**: Tailwind の purge / content 設定で未使用クラスを除去
+- **フォント最適化**: `next/font` で FOUT/FOIT を防止、`display: swap` 設定
+
+### CDN・キャッシュ戦略
+| リソース | Cache-Control | 理由 |
+|---------|-------------|------|
+| HTML | `s-maxage=1, stale-while-revalidate` | 常に最新を返しつつ高速 |
+| JS/CSS（ハッシュ付き） | `immutable, max-age=31536000` | コンテンツアドレスは永続 |
+| 画像 | `max-age=86400, stale-while-revalidate` | 日次更新で十分 |
+| API レスポンス | `s-maxage=60` | データ鮮度に応じて調整 |
+
+## DevOps 基礎
+
+### Docker 環境管理
+```dockerfile
+# マルチステージビルド（Next.js）
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npm run build
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
+CMD ["node", "server.js"]
+```
+
+### 環境管理
+| 環境 | 用途 | 変数ファイル |
+|------|------|-----------|
+| development | ローカル開発 | `.env.local` |
+| preview | PR プレビュー | `.env.preview`（Vercel設定） |
+| staging | ステージング検証 | `.env.staging` |
+| production | 本番運用 | `.env.production`（Vercel設定） |
+
+**原則**: `.env` ファイルは `.gitignore` に含める。シークレットは Vercel Environment Variables / AWS Secrets Manager 等で管理
+
+### デプロイワークフロー
+```
+feature branch → PR → Preview Deploy → コードレビュー → main マージ
+  → Production Deploy → 監視・アラート確認
+```
+
+### CI/CD パイプライン基本構成
+1. **Lint**: ESLint + Prettier でコードスタイル統一
+2. **Type Check**: `tsc --noEmit` で型エラー検出
+3. **Test**: Jest + Playwright でユニット・E2Eテスト
+4. **Build**: `next build` で本番ビルド成功を確認
+5. **Deploy**: Vercel の Git 連携で自動デプロイ
+
+### 監視・ログ基本設計
+- **エラー追跡**: Sentry でランタイムエラーを自動収集
+- **パフォーマンス**: Vercel Analytics / Web Vitals API
+- **アップタイム**: ヘルスチェックエンドポイント `/api/health`
+- **ログ**: 構造化ログ（JSON形式）でアプリケーションログを出力

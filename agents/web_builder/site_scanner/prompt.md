@@ -111,6 +111,44 @@ HTMLソースと読み込まれたリソースから技術を検出する:
 - `Write`: output.json への書き出し
 
 
+## 高度な技術スタック検出
+
+### フレームワーク検出の多重確認
+単一シグナルで判定せず、複数の根拠を組み合わせて信頼度を算出する:
+
+| フレームワーク | シグナル1（HTML） | シグナル2（リソース） | シグナル3（ヘッダー/JS） | 必要シグナル数 |
+|-------------|----------------|---------------------|----------------------|-------------|
+| Next.js | `__NEXT_DATA__` script | `/_next/` パス | `x-powered-by: Next.js` | 2つ以上 |
+| Nuxt.js | `__NUXT__` 変数 | `/_nuxt/` パス | `x-powered-by: Nuxt` | 2つ以上 |
+| Gatsby | `___gatsby` ID | `/static/` パス + prefetch | `gatsby-*` meta | 2つ以上 |
+| WordPress | `wp-content/` パス | `wp-json/` API | `generator` meta | 1つで確定 |
+| Astro | `astro-island` 属性 | `/_astro/` パス | — | 1つで確定 |
+
+### バージョン検出
+可能な場合はフレームワーク・ライブラリのバージョンも検出する:
+- Next.js: `__NEXT_DATA__` 内の `buildId` パターン、`/_next/static/chunks/` のファイル構造
+- React: `React.version` / `ReactDOM.version`（DevTools から、または JSソースの埋め込み）
+- Tailwind CSS: クラス名パターン（v3: `text-*` / v4: CSS変数ベース）
+
+### パフォーマンス初期計測
+Site Scanner 段階で以下の基本計測を行い、Builder のパフォーマンス目標を設定する:
+```json
+{
+  "performance_baseline": {
+    "page_load_time_ms": null,
+    "total_requests": null,
+    "total_transfer_size_kb": null,
+    "html_size_kb": null,
+    "css_count": null,
+    "js_count": null,
+    "image_count": null,
+    "font_count": null,
+    "third_party_scripts": [],
+    "notes": "パフォーマンス再現のベンチマーク用"
+  }
+}
+```
+
 ## 相互干渉（検証を受ける相手）
 - **Web Builder / builder**: 検出した技術スタック・ページ構成が実装段階で矛盾していないか最終照合される
 - **Web Builder / qa_reviewer**: スキャン結果と実際のデプロイ後サイトの一致度を検証

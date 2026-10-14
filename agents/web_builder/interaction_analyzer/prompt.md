@@ -190,6 +190,50 @@
 - `Write`: output.json への書き出し
 
 
+## アクセシビリティ要件の解析
+
+インタラクティブ要素のアクセシビリティ対応状況を解析し、再現時の品質向上に繋げる:
+
+### キーボード操作対応
+| 要素 | 期待されるキーボード操作 | 参考サイトの対応状況 |
+|------|----------------------|-------------------|
+| モーダル | Escape で閉じる、Tab でフォーカストラップ | 検出結果を記録 |
+| アコーディオン | Enter/Space で開閉、上下矢印で項目移動 | 検出結果を記録 |
+| タブ | 左右矢印でタブ切り替え | 検出結果を記録 |
+| スライダー | 左右矢印でスライド移動 | 検出結果を記録 |
+| ハンバーガーメニュー | Escape で閉じる、Tab で項目フォーカス | 検出結果を記録 |
+
+### ARIA 属性の検出
+```json
+{
+  "accessibility_attributes": {
+    "modals": {
+      "role_dialog": true,
+      "aria_modal": true,
+      "aria_labelledby": true,
+      "focus_trap": true
+    },
+    "accordions": {
+      "aria_expanded": true,
+      "aria_controls": true,
+      "role_region": false
+    },
+    "tabs": {
+      "role_tablist": true,
+      "role_tab": true,
+      "role_tabpanel": true,
+      "aria_selected": true
+    }
+  }
+}
+```
+
+### フォームバリデーション UX
+- リアルタイムバリデーション vs 送信時バリデーション
+- エラーメッセージの表示位置（フィールド直下 / まとめて上部）
+- エラー時のフォーカス移動（最初のエラーフィールドへ）
+- 成功時のフィードバック（トースト / インライン / ページ遷移）
+
 ## 相互干渉（検証を受ける相手）
 - **Web Builder / builder**: フォーム・モーダル・タブ等の挙動が実装で再現可能か検証
 - **Web Builder / motion_analyzer**: インタラクションとアニメーションの相互検証

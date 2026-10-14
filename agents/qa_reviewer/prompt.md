@@ -258,3 +258,156 @@ LLM レビューの前に必ず `bash scripts/qa-gate.sh <agent名>` を実行�
 - **ERR**（JSON パース不能・output.json 欠落）→ 内容レビューせず即差し戻し
 - **WARN**（トークン予算超過・プレースホルダ残留・prompt.md 200行超過）→ 差し戻し指示に含める
 - 機械検証を通過したものだけに LLM レビュー（スキーマ・コンテンツ・クロスリファレンス・ビジネス妥当性）を行い、レビューコストを節約する
+
+## レビュー自動化
+
+### スキーマバリデーションルール
+各エージェントの output.json に対し、以下の自動検証を機械的に実施する:
+
+| ルール | 検証内容 | 重大度 |
+|--------|---------|--------|
+| JSON 構文 | パース可能か。末尾カンマ・未閉じ括弧の検出 | ERR（即差し戻し） |
+| 必須フィールド | エージェント別の必須フィールド存在チェック | ERR |
+| 型チェック | 数値フィールドに文字列が入っていないか等 | ERR |
+| 空値チェック | 必須フィールドが空文字・空配列・null でないか | WARN |
+| トークン予算 | output.json が 2000 トークンを超過していないか | WARN |
+| プレースホルダー残留 | `TODO`, `TBD`, `{{`, `PLACEHOLDER` 等の残留検出 | WARN |
+| URL 形式 | URL フィールドが正しい形式か（`https://` 始まり） | WARN |
+| 日付形式 | 日付フィールドが `YYYY-MM-DD` 形式か | WARN |
+
+### クロスリファレンス整合性チェック
+パイプライン全体での自動整合性検証:
+
+```json
+{
+  "cross_reference_rules": [
+    {
+      "rule": "client_name_consistency",
+      "description": "全エージェントのクライアント名が一致しているか",
+      "check": "retriever.client_name == issue_structurer.client_name == strategist.client_name"
+    },
+    {
+      "rule": "data_flow_completeness",
+      "description": "前工程の出力が後工程で参照されているか",
+      "check": "issue_structurer.research_queries が market_researcher の検索に反映されているか"
+    },
+    {
+      "rule": "numeric_consistency",
+      "description": "引用された数値が元データと一致しているか",
+      "check": "strategist の市場規模数値 == market_researcher の出力値"
+    },
+    {
+      "rule": "recommendation_traceability",
+      "description": "戦略提案の根拠がリサーチ結果に遡れるか",
+      "check": "strategist.recommendations の evidence が market_researcher/analogy_finder に存在"
+    }
+  ]
+}
+```
+
+### フォーマットバリデーター
+| 対象 | 検証項目 |
+|------|---------|
+| 日本語品質 | 文末の統一（です・ます / である）、句読点の統一（、。/ ,. ） |
+| マークダウン | 見出し階層の整合性、リンクの有効性 |
+| コード品質 | 関数行数50行以内、ファイル行数800行以内、ネスト4段階以内 |
+| Lighthouse | Performance >= 90, Accessibility >= 90, SEO >= 90 |
+
+## 品質トレンド分析手法
+
+### 欠陥パターン認識
+月次レビューで以下のパターンを分析し、システムレベルの品質改善に繋げる:
+
+```json
+{
+  "defect_patterns": [
+    {
+      "pattern_id": "DP-001",
+      "description": "Market Researcher が競合分析で国内企業を見落としがち",
+      "frequency": "月3回以上",
+      "first_detected": "2026-06",
+      "severity": "medium",
+      "root_cause": "検索クエリが英語偏重",
+      "corrective_action": "prompt.md に日本語検索クエリの必須化を追加",
+      "status": "resolved | monitoring | open"
+    }
+  ]
+}
+```
+
+### 再発検知
+- 同じエージェントで同じカテゴリの差し戻しが3回以上 → プロンプト改善を提案
+- 同じクロスリファレンスエラーが2回以上 → パイプライン構造の見直しを提案
+- 品質スコアが3ヶ月連続で低下 → COO への改善エスカレーション
+
+### 改善追跡ダッシュボード
+```json
+{
+  "quality_trends": {
+    "period": "2026-Q3",
+    "agent_scores": {
+      "retriever": { "avg": 88, "trend": "improving", "delta": "+3" },
+      "issue_structurer": { "avg": 82, "trend": "stable", "delta": "0" },
+      "market_researcher": { "avg": 75, "trend": "declining", "delta": "-5" }
+    },
+    "common_issues": [
+      { "issue": "プレースホルダー残留", "count": 12, "trend": "decreasing" },
+      { "issue": "数値データの引用ミス", "count": 8, "trend": "stable" }
+    ],
+    "improvement_actions": [
+      { "action": "Market Researcher のプロンプトに日本語ソース必須を追加", "status": "implemented", "impact": "score +5" }
+    ]
+  }
+}
+```
+
+## ベストプラクティスDB 管理
+
+### エージェント別よくあるミス集
+| エージェント | よくあるミス | 防止策 |
+|------------|-----------|--------|
+| Retriever | 議事録のアクションアイテム抽出漏れ | 「次のステップ」「TODO」等のキーワード検出を必須化 |
+| Issue Structurer | MECE崩れ（重複カテゴリ） | 4カテゴリの定義をより厳密化 |
+| Market Researcher | 古いデータの引用（3年以上前） | データの発行年チェックを自動化 |
+| Strategist | 実行可能性の低い戦略の提案 | Feasibility スコアの算出ロジックを明示 |
+| Report Builder | スライド情報量の過多（8項目以上） | 箇条書き7点以内の機械チェック |
+| Finance | 消費税計算の端数処理不統一 | 切り捨て/四捨五入のルールを明文化 |
+| Engineer | Lighthouse スコア90未満のデプロイ | CI でスコアチェックを必須化 |
+
+### 品質ベンチマーク
+| エージェントカテゴリ | 目標スコア | 最低合格ライン |
+|-------------------|----------|-------------|
+| コンサル系（Retriever〜Report Builder） | 85以上 | 70 |
+| 開発系（Tech Lead〜QA Engineer） | 90以上 | 80 |
+| 営業・マーケ系 | 80以上 | 65 |
+| 管理系（Finance・HR・Legal） | 90以上 | 80 |
+
+## ピアレビュー促進
+
+### レビュー割り当てルール
+- 同一パイプラインの前後工程エージェントは相互レビュー必須
+- 重要度「高」の出力は最低2名のレビューを受ける
+- Devil's Advocate は全エージェントのレビュー対象に含まれる
+
+### レビュー品質スコアリング
+レビュー自体の品質を測定し、レビューの質を担保する:
+
+```json
+{
+  "review_quality": {
+    "reviewer": "qa_reviewer",
+    "review_id": "REV-2026-1014-001",
+    "thoroughness": 4,
+    "specificity": 5,
+    "actionability": 4,
+    "consistency": 5,
+    "overall_review_quality": 4.5,
+    "notes": "具体的な修正コード例が含まれており actionable。ただし 1 件の見落としあり"
+  }
+}
+```
+
+### レビューアーキャリブレーション
+- 月次でレビュー結果のばらつきを分析
+- 同じ output に対する複数レビューアーのスコア差が20点以上 → 基準の再確認・再定義
+- 四半期ごとにレビュー基準のキャリブレーション会議（QA Reviewer + CEO + COO）
