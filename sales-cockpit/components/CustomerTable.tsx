@@ -6,6 +6,7 @@ import { Search, ChevronDown, ArrowLeft, ArrowRight, X, Bookmark, Loader2, Chevr
 import type { Customer, SearchResult, SearchRow } from "@/lib/types";
 import CallButton from "./CallButton";
 import VisitFlagButton from "./VisitFlagButton";
+import { Sk } from "./Skeleton";
 import { CustomerDetailBody, RANK_COLOR, GoogleSearchButton } from "./CustomerDetailParts";
 
 export type InitialFilters = { q?: string; rep?: string; status?: string; rank?: string; industry?: string };
@@ -183,10 +184,24 @@ export default function CustomerTable({
             </tr>
           </thead>
           <tbody>
-            {rows.length === 0 && (
+            {rows.length === 0 && loading &&
+              Array.from({ length: 8 }, (_, i) => (
+                <tr key={`sk-${i}`} className="border-b border-white/[0.06]">
+                  <td className="px-4 py-3"><Sk className={clsx("h-4", ["w-40", "w-56", "w-48", "w-36"][i % 4])} /></td>
+                  <td className="px-3 py-3"><Sk className="h-4 w-16" /></td>
+                  <td className="px-3 py-3"><Sk className="h-4 w-6 mx-auto" /></td>
+                  <td className="px-3 py-3"><Sk className="h-4 w-14" /></td>
+                  <td className="px-3 py-3"><Sk className="h-4 w-10" /></td>
+                  <td className="px-3 py-3"><Sk className="h-4 w-8 ml-auto" /></td>
+                  <td className="px-3 py-3"><Sk className="h-4 w-16" /></td>
+                  <td className="px-3 py-3"><Sk className="h-7 w-10 mx-auto" /></td>
+                  <td className="px-4 py-3"><Sk className="h-7 w-16 ml-auto" /></td>
+                </tr>
+              ))}
+            {rows.length === 0 && !loading && (
               <tr>
                 <td colSpan={COLSPAN} className="text-center text-ink-muted py-8 text-sm">
-                  {loading ? "読み込み中…" : "該当する顧客がありません。"}
+                  該当する顧客がありません。
                 </td>
               </tr>
             )}

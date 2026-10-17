@@ -1,11 +1,7 @@
-import Spinner from "@/components/Spinner";
+import { SkDashboardPage } from "@/components/Skeleton";
 
-// 各ページのサーバー側 Notion 取得中に表示されるローディング。
+// サーバー側のデータ取得中に自動表示されるスケルトン（App Router）。
+// ダッシュボード・分析系ページの既定。一覧系ページは各ルートの loading.tsx が優先される。
 export default function Loading() {
-  return (
-    <div className="flex flex-col items-center justify-center py-32 gap-4 animate-fadeIn">
-      <Spinner />
-      <p className="text-sm text-ink-muted animate-pulse">Notion からデータを読み込み中…</p>
-    </div>
-  );
+  return <SkDashboardPage />;
 }
