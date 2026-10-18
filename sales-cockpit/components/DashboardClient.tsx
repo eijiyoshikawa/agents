@@ -10,7 +10,7 @@ import CallButton from "./CallButton";
 import RefreshButton from "./RefreshButton";
 import { yen, pct, num } from "@/lib/format";
 import { monthKey, currentMonthKey, monthRangeLabel, jstDateKey } from "@/lib/period";
-import { isExcludedRep } from "@/lib/reps";
+import { isExcludedRep, DASHBOARD_IS_REPS } from "@/lib/reps";
 
 type Drill = { title: string; rows: DrillCustomer[] } | null;
 
@@ -255,7 +255,8 @@ function GoalCard({ label, g }: { label: string; g: Goal }) {
 }
 
 function RepTable({ data, onPick }: { data: DashboardData; onPick: (rep: string) => void }) {
-  const reps = data.statusActivity.byRep;
+  // 営業担当（DASHBOARD_IS_REPS）のみ表示。役員・未割当は外す
+  const reps = data.statusActivity.byRep.filter((r) => DASHBOARD_IS_REPS.includes(r.rep));
   if (reps.length === 0) {
     return <p className="text-sm text-ink-muted py-8 text-center">コンタクト済みのデータがありません。</p>;
   }
