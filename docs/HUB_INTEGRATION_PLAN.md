@@ -48,27 +48,35 @@ let-inc.net   let-inc.net let-inc.net let-inc.net let-inc.net
 - **各アプリ側の改修**: 検証コード（`hub/shared/`）をコピーし、既存認証の前段に数行追加するだけ。既存 ID/PW はフォールバックとして残す。
 - **同一ホスト化（パスだけで切替）は第 2 段階**: 各アプリの basePath 対応が必要（特に slack_let は `/api/...` 固定リンク）。まずサブドメイン方式で統合する。
 
-## 次にやること（2026-10-19 時点のチェックリスト）
+## 次にやること（2026-10-19 19:00 更新）
 
-### 今すぐ（オーナー作業・10 分）
-1. [ ] **Xserver の DNS を切替**: サーバーパネル → DNS レコード設定 → `let-inc.net` → ホスト名 `hub` の A レコード（202.254.234.133）を削除し、CNAME `cname.vercel-dns.com` を追加（CNAME が選べない場合は A `76.76.21.21`）。反映は数分〜最大 24 時間。
-2. [ ] 反映後 https://hub.let-inc.net を開き、ログイン画面が出ることを確認（https://let-hub-six.vercel.app でも同じ画面が確認できる）。
-3. [ ] 初期パスワードを役員 2 名へ安全な経路（口頭・1Password 等）で配布。配布後、メモは削除。
-4. [ ] 3 名それぞれでログインし、役員として 5 つのダッシュボードが表示されることを確認。
+### 完了
+- [x] hub.let-inc.net の DNS 反映・本番稼働（役員 3 名のログイン可）
+- [x] 経営陣以外のログイン: `/admin/members` でメンバー追加・項目ごとの閲覧制限・初回パスワード変更（保存先 Postgres 設定後に有効）
+- [x] masterAI `/ops`（採用マーケティング運用管理）実装・本番デプロイ。`kpi.let-inc.net` をプロジェクトに追加（DNS 待ち）
+- [x] masterAI に `HUB_SESSION_SECRET` / `HUB_URL` を設定。独自ドメインでは `/kpi` も共通ログイン必須に
 
-### 近日（コード変更・1 アプリずつ）
-5. [ ] `claude/eager-maxwell-y50ck7` を main にマージ（以後 main への push で let-hub が自動デプロイ）。
-6. [ ] slack_let（財務）に共通ログインを組み込む: Vercel 環境変数 `HUB_SESSION_SECRET` 追加 → `finance.let-inc.net` 付与・DNS → `lib/auth.js` 前段で `let_hub` 検証（役員のみ）→ `HUB_URL_FINANCE` を切替、`sso: ready`。
-7. [ ] sales-cockpit（営業）: 同手順で `sales.let-inc.net`。
-8. [ ] jinjiLsystem（人材紹介）: 同手順で `jinji.let-inc.net`。
-9. [ ] masterAI（案件 KPI）: 同手順で `kpi.let-inc.net`。/kpi の無認証状態も同時に解消。
-10. [ ] let-hyoka（評価）: `hyoka.let-inc.net` + Edge Middleware。README の平文パスワード記載を削除。
+### 今すぐ（オーナー作業）
+1. [ ] **Xserver の DNS に 2 件追加**（kpi.let-inc.net 用）
+   - TXT: ホスト名 `_vercel`、値 `vc-domain-verify=kpi.let-inc.net,eaf71ddc31ca8059f1da`（masterai が別チームのため所有確認が必要）
+   - CNAME: ホスト名 `kpi`、値 `cname.vercel-dns.com`
+2. [ ] **Neon（Postgres）を作成して 2 プロジェクトに接続**: Vercel → Storage → Create Database → Neon。
+   - masterai に接続（環境変数 `DATABASE_URL` が入る）→ ローカルで `OPS_DATABASE_URL=<接続文字列> npm run ops:migrate`
+   - let-hub にも同じ DB を接続（`HUB_DATABASE_URL` として追加）→ `cd hub && HUB_DATABASE_URL=<接続文字列> npm run hub:migrate`
+   - 両プロジェクトを Redeploy
+3. [ ] ハブの `/admin/members` で運用担当・セールスを登録（初期パスワードを本人へ）。masterAI の `/ops/staff` にも同じメールで登録
+4. [ ] 初期パスワードの配布（役員 2 名）とメモの削除
 
-### 後で（運用・改善）
-11. [ ] ハブにパスワード変更画面を追加（現状は `scripts/hash-password.mjs` → env 差し替え）。
-12. [ ] 管理職・一般メンバーの追加（`config/members.json`、役割 manager / staff）。
-13. [ ] 各アプリの KPI サマリーをハブに集約（フェーズ 6）。
-14. [ ] 共通ログイン移行後、`CRON_SECRET` 等の既存秘密をローテーション。
+### 近日
+5. [ ] 両リポジトリの作業ブランチを main にマージ（以後は main への push で自動デプロイ）
+6. [ ] `HUB_URL_KPI=https://kpi.let-inc.net/kpi` をハブに設定（DNS 反映後）。以後 /kpi はハブのログインで入る
+7. [ ] slack_let（財務）→ sales-cockpit → jinjiLsystem → let-hyoka の順で共通ログインを組み込み（計画書 D 節）
+
+### 後で
+8. [ ] 2 ヶ月分の作業時間が集まったら工数表を補正
+9. [ ] 要件書 10 章の未確定値（CTR 基準・LP 応募率・面接設定率）を `/ops/settings` に入力
+10. [ ] 応募の自動登録（LP フォーム・LINE の受け口）
+11. [ ] `CRON_SECRET` 等の既存秘密のローテーション
 
 ## 作業一覧（分類別）
 
