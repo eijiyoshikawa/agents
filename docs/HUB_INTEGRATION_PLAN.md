@@ -59,11 +59,12 @@ let-inc.net   let-inc.net let-inc.net let-inc.net let-inc.net
 - [ ] パスワード変更画面（現状は env の差し替えで対応）
 - [ ] KPI サマリー集約（フェーズ 6）
 
-### B. Vercel（プロジェクト `let-hub`）
-- [ ] プロジェクト作成（repo `eijiyoshikawa/agents`、Root Directory `hub`、Framework Next.js）
-- [ ] 環境変数: `AUTH_SECRET` / `HUB_SESSION_SECRET` / `HUB_PASSWORD_HASHES` / `HUB_COOKIE_DOMAIN=.let-inc.net`
-- [ ] ドメイン `hub.let-inc.net` をプロジェクトに追加
-- [ ] 本番デプロイ
+### B. Vercel（プロジェクト `let-hub`、チーム eijiyoshikawas-projects）— 実施済み（2026-10-19）
+- [x] プロジェクト作成（repo `eijiyoshikawa/agents`、Root Directory `hub`、Framework Next.js、Node 22、リージョン hnd1）
+- [x] 環境変数: `AUTH_SECRET` / `HUB_SESSION_SECRET` / `HUB_PASSWORD_HASHES` / `HUB_COOKIE_DOMAIN=.let-inc.net` / `HUB_SESSION_TTL_SECONDS`
+- [x] ドメイン `hub.let-inc.net` をプロジェクトに追加（Vercel 側は verified）
+- [x] 本番デプロイ（ブランチ `claude/eager-maxwell-y50ck7` から）。main にマージ後は push で自動デプロイ
+- 注意: 他プロジェクト（agents / slack-let / sales-cockpit 等）の設定は変更していない
 
 ### C. DNS（Xserver サーバーパネル）— オーナー作業
 - [ ] `hub.let-inc.net` の A レコード（現在 202.254.234.133 = Xserver）を削除し、**CNAME `cname.vercel-dns.com`** を追加（A レコードなら `76.76.21.21`）
