@@ -444,6 +444,68 @@ export async function dbSetVisitFlag(id: string, flag: boolean): Promise<void> {
   await db().query(`UPDATE sc_customers SET visit_flag = $2 WHERE id = $1`, [id, flag]);
 }
 
+/** アポ分析の1セグメント（どんな企業でアポが取れているか） */
+export type ApptSegment = { label: string; contacted: number; appointments: number; rate: number };
+export type ApptAnalysis = {
+  emp: ApptSegment[]; // 従業員数バンド別
+  pref: ApptSegment[]; // 都道府県別（アポ数上位）
+  industry: ApptSegment[]; // 業種別（アポ数上位）
+  media: ApptSegment[]; // 掲載元メディア別
+};
+
+/**
+ * アポ分析をDB内で集計（GROUP BY）。各セグメントの
+ * コンタクト数（ステータスあり・アプローチ前以外）・アポ数（アポ取得日あり）・アポ率を返す。
+ * 「どんな従業員数・エリア・業種・媒体の企業でアポが取れているか」を見るための土台。
+ */
+export async function dbGetApptAnalysis(): Promise<ApptAnalysis> {
+  const CONTACTED = `(status IS NOT NULL AND status <> 'アプローチ前')`;
+  const APPT = `(appointment_date IS NOT NULL AND appointment_date <> '')`;
+  const counts = `COUNT(*) FILTER (WHERE ${CONTACTED})::int AS contacted, COUNT(*) FILTER (WHERE ${APPT})::int AS appointments`;
+  const empLabel = `CASE
+      WHEN employees IS NULL OR employees <= 0 THEN '(未設定)'
+      WHEN employees <= 29 THEN '29名以下'
+      WHEN employees <= 99 THEN '30〜99名'
+      WHEN employees <= 299 THEN '100〜299名'
+      ELSE '300名以上' END`;
+  const parts = [
+    `SELECT 'emp' AS dim, ${empLabel} AS label, ${counts} FROM sc_customers GROUP BY 2`,
+    `SELECT 'pref' AS dim, COALESCE(NULLIF(pref,''),'(未設定)') AS label, ${counts} FROM sc_customers GROUP BY 2`,
+    `SELECT 'industry' AS dim, COALESCE(NULLIF(industry,''),'(未設定)') AS label, ${counts} FROM sc_customers GROUP BY 2`,
+    // 掲載元メディアはJSON配列（複数持つ企業は各メディアに計上）
+    `SELECT 'media' AS dim, m AS label, ${counts} FROM sc_customers,
+       LATERAL jsonb_array_elements_text(CASE WHEN media LIKE '[%' THEN media::jsonb ELSE '[]'::jsonb END) AS m
+     GROUP BY 2`,
+  ];
+  const rows = (await db().query(parts.join(" UNION ALL "), [])) as Array<{
+    dim: string;
+    label: string;
+    contacted: number;
+    appointments: number;
+  }>;
+  const pick = (key: string, limit: number): ApptSegment[] =>
+    rows
+      .filter((r) => r.dim === key)
+      .map((r) => {
+        const contacted = Number(r.contacted);
+        const appointments = Number(r.appointments);
+        return {
+          label: r.label,
+          contacted,
+          appointments,
+          rate: contacted > 0 ? Math.round((appointments / contacted) * 1000) / 10 : 0,
+        };
+      })
+      .sort((a, b) => b.appointments - a.appointments || b.rate - a.rate)
+      .slice(0, limit > 0 ? limit : undefined);
+  return {
+    emp: pick("emp", 0),
+    pref: pick("pref", 15),
+    industry: pick("industry", 15),
+    media: pick("media", 0),
+  };
+}
+
 /**
  * 分析ページの項目別内訳をDB内で集計（GROUP BY）。全件をアプリに読まない。
  * groupCount と同一仕様: 空/NULL は「(未設定)」、件数降順、industry/pref は上位15件。
