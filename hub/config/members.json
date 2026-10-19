@@ -1,0 +1,6 @@
+{
+  "_comment": "ハブにログインできるメンバー。role は exec（役員）/ manager（管理職）/ staff（一般）。メールは小文字で記載。HUB_ALLOWED_DOMAIN を設定すると、ここに無い同ドメインのアカウントは staff として扱う。",
+  "members": [
+    { "email": "eiyoshi99@gmail.com", "name": "吉川 英二", "role": "exec" }
+  ]
+}
