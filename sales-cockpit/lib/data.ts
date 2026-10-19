@@ -19,6 +19,8 @@ import {
   dbGetContracts,
   dbSearchCustomers,
   dbGetBreakdowns,
+  dbGetApptAnalysis,
+  type ApptAnalysis,
   dbGetPipelineSlim,
   dbGetAppointedSlim,
   dbGetActiveSince,
@@ -198,6 +200,20 @@ export async function getAnalytics(): Promise<{ breakdowns: Breakdowns; total: n
   }
   const customers = await safe("顧客管理", loadAllSlim, [] as ListCustomer[], errors);
   return { breakdowns: buildBreakdowns(customers), total: customers.length, errors };
+}
+
+/**
+ * アポ分析（どんな従業員数・エリア・業種・媒体の企業でアポが取れているか）。
+ * DB(Neon)のSQL集計のみ対応。未設定時は空で返しUI側で案内する。
+ */
+export async function getApptAnalysis(): Promise<{ analysis: ApptAnalysis | null; errors: string[] }> {
+  if (!dbConfigured()) return { analysis: null, errors: ["アポ分析にはDB(Neon)接続が必要です。"] };
+  try {
+    return { analysis: await dbGetApptAnalysis(), errors: [] };
+  } catch (e) {
+    console.error("[data] appt analysis failed:", (e as Error)?.message);
+    return { analysis: null, errors: ["アポ分析の集計に失敗しました。時間を置いて再読み込みしてください。"] };
+  }
 }
 
 /** 架電記録（日付つき実績。目標vs実績の突合用） */
