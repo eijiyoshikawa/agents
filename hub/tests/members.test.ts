@@ -37,3 +37,13 @@ describe("ダッシュボード一覧", () => {
     expect(hasRole("exec", "staff")).toBe(true);
   });
 });
+
+describe("safeNext", () => {
+  it("サイト内パスのみ許可", async () => {
+    const { safeNext } = await import("@/lib/safe-next");
+    expect(safeNext("/finance")).toBe("/finance");
+    expect(safeNext("//evil.com")).toBe("/");
+    expect(safeNext("https://evil.com")).toBe("/");
+    expect(safeNext(undefined)).toBe("/");
+  });
+});

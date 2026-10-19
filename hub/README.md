@@ -1,6 +1,8 @@
 # LET 経営ハブ（let-hub）
 
-全社ダッシュボードの統合入口。ここで一度 Google ログインすると、親ドメイン共通の署名付き Cookie（`let_hub`）が発行され、対応済みの各ダッシュボードへ再ログインなしで移動できる。
+全社ダッシュボードの統合入口。ここで一度ログイン（メールアドレス + パスワード）すると、親ドメイン共通の署名付き Cookie（`let_hub`）が発行され、対応済みの各ダッシュボードへ再ログインなしで移動できる。
+
+- 本番 URL: https://hub.let-inc.net （Vercel プロジェクト `let-hub`、Root Directory `hub`）
 
 - 計画・全体設計: [`/docs/HUB_INTEGRATION_PLAN.md`](../docs/HUB_INTEGRATION_PLAN.md)
 - 対象外: ゲンバキャリア（公開サービス・独自ドメインのため統合しない）
@@ -9,7 +11,9 @@
 
 | ファイル | 役割 |
 |---|---|
-| `auth.config.ts` / `auth.ts` | Auth.js v5。Google ログイン。`config/members.json` と `HUB_ALLOWED_DOMAIN` で許可判定 |
+| `auth.config.ts` / `auth.ts` | Auth.js v5。メール + パスワード（scrypt）。Google ログインは OAuth クライアントを設定した場合のみ有効（任意） |
+| `lib/password.ts` / `lib/login-limiter.ts` | パスワード検証（`HUB_PASSWORD_HASHES`）と失敗回数制限（IP 単位 10 回 / 15 分） |
+| `scripts/hash-password.mjs` | パスワードからハッシュを生成（`node scripts/hash-password.mjs <email>`） |
 | `middleware.ts` | 未ログインを `/login` へ。ログイン済みなら `let_hub` Cookie を発行・延長 |
 | `lib/hub-session.ts` | `let_hub` の署名・検証（HMAC-SHA256、Web Crypto） |
 | `lib/members.ts` / `lib/roles.ts` | メンバー解決と役割（`exec` > `manager` > `staff`） |
@@ -27,15 +31,19 @@ cp .env.example .env.local   # 値を埋める
 npm run dev                  # http://localhost:4200
 ```
 
-必須 env: `AUTH_SECRET` / `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` / `HUB_SESSION_SECRET`。
+必須 env: `AUTH_SECRET` / `HUB_SESSION_SECRET` / `HUB_PASSWORD_HASHES` / `HUB_COOKIE_DOMAIN`。
 本番で `HUB_SESSION_SECRET` が無い場合は起動時に例外で停止する（`CRON_SECRET` とは別の値にすること）。
+Google ログインは任意。`AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` を設定した場合のみボタンが表示される。
 
-Google Cloud Console の OAuth クライアントに、リダイレクト URI `https://<hub host>/api/auth/callback/google` を登録する。
+## メンバー・役割・パスワードの管理
 
-## メンバー・役割の追加
+1. `config/members.json` にメールと役割を追記する（現在は役員 3 名）。
+2. パスワードのハッシュを生成する: `node scripts/hash-password.mjs <email>`（パスワードは対話入力。表示も履歴も残らない）。
+3. 出力された `{"<email>":"scrypt$..."}` を、Vercel の環境変数 `HUB_PASSWORD_HASHES`（JSON オブジェクト）に追記して Redeploy する。
+   例: `{"a@let-inc.net":"scrypt$16384$...","b@let-inc.net":"scrypt$16384$..."}`
+4. パスワード変更も同じ手順（該当メールの値を差し替える）。
 
-`config/members.json` にメールと役割を追記してデプロイする。
-`HUB_ALLOWED_DOMAIN=let-inc.net` のように設定すると、一覧に無い同ドメインの Google アカウントは `staff` としてログインできる（段階的な開放用）。
+`HUB_ALLOWED_DOMAIN` は Google ログイン専用（同ドメインの Google アカウントを `staff` として許可）。パスワード認証は登録メンバーのみ。
 
 ## 検証
 

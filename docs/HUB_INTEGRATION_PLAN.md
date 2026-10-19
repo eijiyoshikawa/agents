@@ -1,12 +1,19 @@
 # 経営ハブ統合計画 — 全社ダッシュボードの統合入口と共通ログイン
 
-作成: 2026-10-19 ／ 実装: `/hub`（agents リポジトリ）／ 対象外: ゲンバキャリア
+作成: 2026-10-19 ／ 更新: 2026-10-19 ／ 実装: `/hub`（agents リポジトリ）／ 本番: https://hub.let-inc.net ／ 対象外: ゲンバキャリア
 
 ## 目的
 
-1. 経営ダッシュボード（ハブ）を起点に、全社のダッシュボードへ役員が再ログインなしで移動できるようにする。
+1. 経営ハブを起点に、全社のダッシュボードへ役員が再ログインなしで移動できるようにする。
 2. 情報の分散を防ぐ。入口を一つにし、将来はハブ上に各アプリの KPI サマリーを集約する。
-3. 既存の ID / パスワードは当面流用し、段階的に共通ログインへ移行する。
+3. 既存の ID / パスワードは当面流用し、段階的に共通ログインへ移行する。既存アプリの挙動は変えない（追加のみ）。
+
+## 決定事項
+
+- 認証は **メールアドレス + パスワード**（Google OAuth クライアントは発行しない。後から任意で追加可能）。
+- 役員（`exec`）は次の 3 アカウントのみ: `shota.yoshida@let-inc.net` / `eiyoshi99@gmail.com` / `eiji.yoshikawa@let-inc.net`。
+- 親ドメインは `let-inc.net`（Vercel チーム eijiyoshikawas-projects に登録済み。DNS は Xserver）。
+- ハブは Vercel プロジェクト `let-hub`（Root Directory `hub`）。既存プロジェクトの設定は変更しない。
 
 ## 現状（2026-10-19 棚卸し）
 
@@ -19,50 +26,67 @@
 | 評価制度サイト let-hyoka | agents/outputs/evaluation_criteria | let-hyoka.vercel.app | ブラウザ側パスワード判定 | ページ別 PW |
 | Internal Console | agents/console | GitHub Pages | ブラウザ側パスフレーズ | visibility.json |
 
-全てが別ホストのため Cookie を共有できず、相互リンクも無い。これが統合の唯一の技術的な壁。
+`let-inc.net` 配下の既存サブドメイン（変更しない）: `www`（コーポレート）/ `lsystem`（受発注）/ `analiticspro` / `recruit-se01` / `recruit-se02`。
+全ダッシュボードが別ホストのため Cookie を共有できず、相互リンクも無い。これが統合の唯一の技術的な壁。
 
 ## アーキテクチャ
 
 ```
                  hub.let-inc.net（/hub）
-                 Google ログイン → let_hub Cookie（Domain=.let-inc.net）
+                 メール+PW ログイン → let_hub Cookie（Domain=.let-inc.net）
                            │
    ┌───────────┬───────────┼───────────┬───────────┐
 finance.      sales.      jinji.      kpi.        hyoka.
 let-inc.net   let-inc.net let-inc.net let-inc.net let-inc.net
 (slack_let)   (sales-     (jinji      (masterAI   (let-hyoka)
               cockpit)    Lsystem)    /kpi)
-   各アプリの middleware が let_hub を検証 → 通す。無ければ従来ログインへ
+   各アプリの middleware が let_hub を検証 → 通す。無ければ従来ログインへ（既存挙動は維持）
 ```
 
-- **ドメイン**: Vercel に登録済みの `let-inc.net` を親ドメインとし、各プロジェクトにサブドメインを付与する（コード変更なし。付与はダッシュボード操作）。
-- **共通セッション**: ハブが `let_hub` Cookie（HMAC-SHA256 署名、`{email, name, role, iat, exp}`、既定 7 日、HttpOnly / Secure / SameSite=Lax）を親ドメインに発行。秘密鍵 `HUB_SESSION_SECRET` を全アプリで共有する。`CRON_SECRET` とは分離する。
-- **役割**: `exec`（役員）/ `manager`（管理職）/ `staff`（一般）。`hub/config/members.json` で管理。`HUB_ALLOWED_DOMAIN` で同ドメインの Google アカウントを `staff` として段階開放できる。
+- **共通セッション**: ハブが `let_hub` Cookie（HMAC-SHA256 署名、`{email, name, role, iat, exp}`、既定 7 日、HttpOnly / Secure / SameSite=Lax）を親ドメインに発行。秘密鍵 `HUB_SESSION_SECRET` を全アプリで共有。`CRON_SECRET` とは分離する。
+- **役割**: `exec` / `manager` / `staff`。`hub/config/members.json` で管理。パスワードのハッシュは env `HUB_PASSWORD_HASHES`。
 - **各アプリ側の改修**: 検証コード（`hub/shared/`）をコピーし、既存認証の前段に数行追加するだけ。既存 ID/PW はフォールバックとして残す。
-- **同一ホスト化（パスだけで切替）は第 2 段階**: リバースプロキシ / Vercel Microfrontends で可能だが、各アプリの basePath 対応が必要（特に slack_let は `/api/...` 固定リンク）。まずサブドメイン方式で統合し、必要な画面だけ後から取り込む。
+- **同一ホスト化（パスだけで切替）は第 2 段階**: 各アプリの basePath 対応が必要（特に slack_let は `/api/...` 固定リンク）。まずサブドメイン方式で統合する。
 
-## フェーズ
+## 作業一覧（分類別）
 
-| # | 内容 | 変更対象 | 状態 |
-|---|---|---|---|
-| 0 | ハブ実装（ログイン・役割・遷移一覧・共通 Cookie・検証コード） | agents/hub | **完了（本ブランチ）** |
-| 1 | Vercel プロジェクト `let-hub` 作成（Root Directory `hub`）、env 設定、`hub.let-inc.net` 付与。Google OAuth クライアント作成 | Vercel / GCP | 要オーナー操作 |
-| 2 | 各プロジェクトにサブドメイン付与（finance / sales / jinji / kpi / hyoka） | Vercel | 要オーナー操作 |
-| 3 | slack_let が `let_hub` を受け入れる（役員のみ）。あわせて `CRON_SECRET` が URL クエリに載る現状を解消 | slack_let `lib/auth.js` | 未着手 |
-| 4 | sales-cockpit / jinjiLsystem が受け入れる。既存ユーザーはメールで紐付け | 各 middleware | 未着手 |
-| 5 | masterAI `/kpi` と let-hyoka が受け入れる。/kpi の無認証状態と、let-hyoka の README 平文パスワードをこの時点で解消 | masterAI / evaluation_criteria | 未着手 |
-| 6 | ハブに KPI サマリー集約（各アプリの API をサーバー間トークンで取得） | hub + 各アプリ | 未着手 |
+### A. ハブ本体（agents リポジトリ `hub/`）— 実装済み
+- [x] ログイン（メール + パスワード、失敗 10 回 / 15 分でブロック）
+- [x] 役員 3 名の登録（`config/members.json`）
+- [x] 共通 Cookie `let_hub` の発行・延長（middleware）
+- [x] ダッシュボード一覧（役割で絞り込み、URL は env で切替）
+- [x] 各アプリ向け検証コード（Node / Edge）とテスト
+- [ ] パスワード変更画面（現状は env の差し替えで対応）
+- [ ] KPI サマリー集約（フェーズ 6）
 
-Internal Console はリンク連携のみ（GitHub Pages のため共通 Cookie 不可）。
+### B. Vercel（プロジェクト `let-hub`）
+- [ ] プロジェクト作成（repo `eijiyoshikawa/agents`、Root Directory `hub`、Framework Next.js）
+- [ ] 環境変数: `AUTH_SECRET` / `HUB_SESSION_SECRET` / `HUB_PASSWORD_HASHES` / `HUB_COOKIE_DOMAIN=.let-inc.net`
+- [ ] ドメイン `hub.let-inc.net` をプロジェクトに追加
+- [ ] 本番デプロイ
 
-## オーナーに確認・依頼が必要な事項
+### C. DNS（Xserver サーバーパネル）— オーナー作業
+- [ ] `hub.let-inc.net` の A レコード（現在 202.254.234.133 = Xserver）を削除し、**CNAME `cname.vercel-dns.com`** を追加（A レコードなら `76.76.21.21`）
+- [ ] 反映後、https://hub.let-inc.net がログイン画面を表示することを確認
 
-1. 親ドメインとして `let-inc.net` を使ってよいか（他の用途と衝突しないか）。
-2. 役員として最初に登録するメールアドレス一覧（`hub/config/members.json`）。Google Workspace のドメインがあれば `HUB_ALLOWED_DOMAIN` にも設定する。
-3. Google Cloud Console で OAuth クライアントを発行（リダイレクト URI: `https://hub.let-inc.net/api/auth/callback/google`）。
+### D. 各ダッシュボードの共通ログイン対応（1 アプリずつ・既存ログインは残す）
+| 順 | アプリ | Vercel 側 | コード側 | 備考 |
+|---|---|---|---|---|
+| 1 | slack_let（財務） | `finance.let-inc.net` 付与、`HUB_SESSION_SECRET` 追加 | `lib/auth.js` の `isAuthorized` 前段に `let_hub` 検証（役員のみ） | あわせて `CRON_SECRET` の URL クエリ露出を解消 |
+| 2 | sales-cockpit（営業） | `sales.let-inc.net` 付与、`HUB_SESSION_SECRET` 追加 | `middleware.ts` 前段に `let_hub` 検証 | 既存ユーザーはメールで紐付け |
+| 3 | jinjiLsystem（人材紹介） | `jinji.let-inc.net` 付与、`HUB_SESSION_SECRET` 追加 | `web/src/middleware.ts` 前段に `let_hub` 検証 | 役割は `exec→admin` に写像 |
+| 4 | masterAI（案件 KPI） | `kpi.let-inc.net` 付与、`HUB_SESSION_SECRET` 追加 | `/kpi` に middleware を新設して `let_hub` 検証 | 現状の無認証状態を解消 |
+| 5 | let-hyoka（評価） | `hyoka.let-inc.net` 付与 | 静的サイトのため Edge Middleware で `let_hub` 検証 | README の平文パスワード記載を削除 |
+対応完了ごとに `hub/config/dashboards.json` の `sso` を `ready` に、`HUB_URL_*` を新サブドメインに切り替える。
+
+### E. 運用
+- [ ] 役員へ初期パスワードを安全な経路で配布（チャット・メール平文は避ける）
+- [ ] `HUB_SESSION_SECRET` の共有は Vercel 環境変数のみ（リポジトリ・ドキュメントに書かない）
+- [ ] 共通ログイン導入後、`CRON_SECRET` 等の既存秘密を順次ローテーション
+- [ ] メンバー追加・役割変更は `config/members.json` の PR で行う
 
 ## セキュリティ上の原則
 
-- `HUB_SESSION_SECRET` は `openssl rand -base64 32` で生成し、Vercel の環境変数にのみ置く。リポジトリには書かない。
+- `HUB_SESSION_SECRET` / `AUTH_SECRET` は `openssl rand -base64 32` で生成し、Vercel の環境変数にのみ置く。
 - 役員専用ダッシュボード（財務・評価）は `role === "exec"` のみ通す。各アプリ側でも役割を確認する（ハブの表示制御だけに依存しない）。
-- 既存の秘密（`CRON_SECRET` 等）は共通ログイン導入後に順次ローテーションする。
+- `let_hub` Cookie は `.let-inc.net` 全体に送られる。値は署名付きで、秘密鍵を持つアプリ以外には意味を持たないが、同ドメインに第三者のサイトを置かないこと。
