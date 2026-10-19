@@ -9,11 +9,13 @@
     "start": "next start -p 4200",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "hub:migrate": "node scripts/hub-migrate.mjs"
   },
   "dependencies": {
     "next": "15.5.28",
     "next-auth": "5.0.0-beta.32",
+    "postgres": "^3.4.9",
     "react": "19.0.0",
     "react-dom": "19.0.0"
   },

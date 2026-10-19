@@ -26,6 +26,21 @@ export default auth(async (req) => {
     return NextResponse.redirect(url);
   }
 
+  // 初回ログイン（仮パスワード）はパスワード変更が終わるまで他の画面に入れない
+  if (user.mustChange && !pathname.startsWith("/account/password")) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/account/password";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+  // 管理画面は役員のみ
+  if (pathname.startsWith("/admin") && user.role !== "exec") {
+    const url = req.nextUrl.clone();
+    url.pathname = "/";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+
   // ログイン済み: 共通セッション Cookie（let_hub）を発行・延長する。
   // 残り有効期間が半分を切ったら再発行し、各ダッシュボードへの遷移で切れないようにする。
   const res = NextResponse.next();
@@ -33,7 +48,7 @@ export default auth(async (req) => {
   const now = Math.floor(Date.now() / 1000);
   const ttl = ttlSeconds();
   const stale = !existing || existing.email !== user.email || existing.role !== user.role || existing.exp - now < ttl / 2;
-  if (stale) {
+  if (stale && !user.mustChange) {
     const token = await signHubSession(buildSession({ email: user.email, name: user.name ?? user.email, role: user.role }, now, ttl));
     res.cookies.set(HUB_COOKIE, token, { ...hubCookieOptions(), maxAge: ttl });
   }

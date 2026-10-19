@@ -44,3 +44,10 @@ export function loadPasswordHashes(raw: string | undefined = process.env.HUB_PAS
     return {};
   }
 }
+
+/** 初期パスワード（英数 12 文字・紛らわしい文字を除く） */
+export function generatePassword(length = 12): string {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+  const bytes = randomBytes(length);
+  return Array.from(bytes, (b) => alphabet[b % alphabet.length]).join("");
+}

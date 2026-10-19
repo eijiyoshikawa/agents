@@ -33,12 +33,15 @@ export const authConfig: NextAuthConfig = {
           token.email = m.email;
           token.name = m.name;
           token.role = m.role;
+          token.allow = m.allow ?? null;
         }
       }
       return token;
     },
     async session({ session, token }) {
       session.user.role = isRole(token.role) ? token.role : "staff";
+      session.user.allow = Array.isArray(token.allow) ? token.allow : null;
+      session.user.mustChange = Boolean(token.mustChange);
       if (typeof token.email === "string") session.user.email = token.email;
       if (typeof token.name === "string") session.user.name = token.name;
       return session;

@@ -10,7 +10,7 @@ describe("メンバー解決", () => {
   });
   it("許可ドメインのアカウントは staff", () => {
     const m = resolveMember("someone@let-inc.net", "山田", "let-inc.net");
-    expect(m).toEqual({ email: "someone@let-inc.net", name: "山田", role: "staff" });
+    expect(m).toMatchObject({ email: "someone@let-inc.net", name: "山田", role: "staff" });
     expect(resolveMember("someone@let-inc.net", null, "@let-inc.net")?.name).toBe("someone");
   });
   it("未登録かつ許可ドメイン外は拒否", () => {
@@ -45,5 +45,23 @@ describe("safeNext", () => {
     expect(safeNext("//evil.com")).toBe("/");
     expect(safeNext("https://evil.com")).toBe("/");
     expect(safeNext(undefined)).toBe("/");
+  });
+});
+
+describe("メンバーごとの項目制限", () => {
+  it("allow が null なら役割の全項目、配列ならそのキーだけ（役割の上限は超えない）", async () => {
+    const { dashboardsForMember } = await import("@/lib/dashboards");
+    const env = { HUB_URL_CONSOLE: "" } as unknown as NodeJS.ProcessEnv;
+    expect(dashboardsForMember("manager", null, env).map((d) => d.key)).toContain("sales");
+    expect(dashboardsForMember("manager", ["sales"], env).map((d) => d.key)).toEqual(["sales"]);
+    expect(dashboardsForMember("staff", ["finance", "ops"], env).map((d) => d.key)).toEqual(["ops"]);
+    expect(dashboardsForMember("staff", [], env)).toEqual([]);
+  });
+  it("初期パスワード生成", async () => {
+    const { generatePassword } = await import("@/lib/password");
+    const p = generatePassword();
+    expect(p).toHaveLength(12);
+    expect(/^[A-Za-z0-9]+$/.test(p)).toBe(true);
+    expect(generatePassword()).not.toBe(p);
   });
 });
