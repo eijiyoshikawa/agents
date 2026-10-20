@@ -24,7 +24,7 @@
 | 営業コックピット | https://sales.let-inc.net | sales-cockpit（eijiyoshikawa's projects） | 対応（管理職以上） |
 | 人材紹介 | https://jinji.let-inc.net/dashboard | jinji-l-system（eijiyoshikawa's projects） | 対応（管理職以上。役員=admin） |
 | 財務 | https://finance.let-inc.net/api/financial/dashboard | slack-let（eijiyoshikawa's projects） | 対応（役員のみ） |
-| 評価制度サイト | https://hyoka.let-inc.net （DNS 反映まで https://let-hyoka.vercel.app） | agents（eijiyoshikawa's projects） | 実装済み（役員のみ。DNS と鍵の設定待ち） |
+| 評価制度サイト | https://hyoka.let-inc.net （従来の https://let-hyoka.vercel.app はパスワード式のまま） | agents（eijiyoshikawa's projects） | 対応（役員のみ） |
 
 - 共通ログインの仕組み: ハブが `.let-inc.net` 全体に `let_hub` Cookie（HMAC 署名、7 日）を発行し、各アプリが `HUB_SESSION_SECRET`（5 プロジェクト同一値）で検証。ハブをログアウトすると Cookie は失効する。
 - 保存先 DB: Neon `let-ops`（LET チームの Storage）。masterai は `OPS_DATABASE_DATABASE_URL`、let-hub は `HUB_DATABASE_URL`。テーブルは初回アクセス時に自動作成（`lib/ops/migrate.ts` / `hub/lib/migrate.ts`）。
@@ -52,9 +52,9 @@
 ### 評価制度サイトの共通ログインを有効にする（2026-10-20 追記）
 コードは `outputs/evaluation_criteria/middleware.js` に実装済み（検証 `node outputs/evaluation_criteria/scripts/test-middleware.mjs`）。
 `*.vercel.app` では従来どおりなので、デプロイしても今の使い方は変わらない。有効化に必要なのは次の 3 つ。
-- [ ] **オーナー**: Xserver の DNS に CNAME `hyoka` → `cname.vercel-dns.com` を追加（`hyoka.let-inc.net` は Vercel の `agents` プロジェクトに追加済み。今は Xserver の A レコードを向いている）
-- [ ] **オーナー**: `agents` プロジェクトの `HUB_SESSION_SECRET`（Sensitive）にハブと同じ値を入れる。値は Sensitive で読み出せないので、分からなければ `openssl rand -base64 32` で作り直し、let-hub / masterai / sales-cockpit / jinji-l-system / slack-let / agents の 6 つに同じ値を入れて全部 Redeploy（全員ハブに再ログイン）。次のセッションに「鍵を作り直して」と頼めば代行する
-- [ ] 上記のあと `agents` の作業ブランチを本番デプロイし、ハブ（let-hub）も Redeploy（`dashboards.json` の評価サイトを `hyoka.let-inc.net` / sso ready に変更済み）
+- [x] **オーナー**: Xserver の DNS に CNAME `hyoka` → `cname.vercel-dns.com` を追加 — 2026-10-20 反映済み（Vercel で Valid Configuration）
+- [x] `HUB_SESSION_SECRET` を作り直し、let-hub / masterai / sales-cockpit / jinji-l-system / slack-let / agents の 6 つに同じ値を設定して全部再デプロイ — 2026-10-20 完了（役員はハブに再ログインが必要）
+- [x] `agents` の作業ブランチを本番デプロイ、ハブ（let-hub）も作業ブランチで再デプロイ（評価サイトのカードが `hyoka.let-inc.net` に） — 2026-10-20 完了。未ログインで hyoka.let-inc.net を開くとハブのログインへ転送されることを確認済み
 - 設定済み: `agents` の `HUB_URL`、`HYOKA_EXEC_PASSWORD`（経営陣パスワード。役員は入力なしで開ける）
 - 検証済み: プレビュー環境で未ログイン→ハブのログインへ 302、役員→200＋解錠 Cookie、管理職→経営陣ページ 403・従業員ページ 200 を確認。`agents` の Preview 環境変数 `DELETE_ME_TEST_*` 3 件はその検証の残骸なので削除してよい
 - `*.vercel.app` では何も変わらないので、作業ブランチを本番デプロイ済み（let-hyoka.vercel.app は従来どおり）
