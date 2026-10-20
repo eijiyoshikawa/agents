@@ -45,26 +45,38 @@ outputs/evaluation_criteria/          ← Vercel「agents」プロジェクト�
 
 ### 経営陣用（パスワード保護・4ページ共通解錠）
 
-| URL | パスワード | 内容 |
-|-----|-----------|-----|
-| `https://let-hyoka.vercel.app/` | `letyakuin2026` | 部門選択トップ |
-| `https://let-hyoka.vercel.app/sales` | 同上 | 営業部 |
-| `https://let-hyoka.vercel.app/marketing` | 同上 | マーケ部（上下にv2.0誘導バナー）|
-| `https://let-hyoka.vercel.app/bpo` | 同上 | BPO・不動産事業部 |
+| URL | 入り方 | 内容 |
+|-----|-------|-----|
+| `https://hyoka.let-inc.net/` | 経営ハブの共通ログイン（役員） | 部門選択トップ |
+| `https://hyoka.let-inc.net/sales` | 同上 | 営業部 |
+| `https://hyoka.let-inc.net/marketing` | 同上 | マーケ部（上下にv2.0誘導バナー）|
+| `https://hyoka.let-inc.net/bpo` | 同上 | BPO・不動産事業部 |
+| `https://let-hyoka.vercel.app/…` | 経営陣パスワード（従来どおり） | 上記と同じ内容 |
 
-2026-08-08 に保護追加（従来はパスワード無し）。sessionStorage キーは4ページ共通 `let_auth_exec`。
+- 経営陣パスワードは担当者管理（Vercel `agents` プロジェクトの環境変数 `HYOKA_EXEC_PASSWORD` と同じ値。このリポジトリには書かない）
+- 2026-08-08 に保護追加（従来はパスワード無し）。sessionStorage キーは4ページ共通 `let_auth_exec`
+- 2026-10-20 経営ハブの共通ログイン対応（`middleware.js`。詳細は下記「共通ログイン」）
 
 ### 従業員用・新制度（パスワード保護）
 
 | URL | パスワード | 配布先 |
 |-----|-----------|--------|
-| `/demo/sales` | `saleslet1117` | 営業部メンバー |
-| `/demo/marketing` | `makematsu2026` | マーケ部メンバー |
-| `/demo/bpo` | `sawaletinc2026` | BPO・不動産メンバー |
-| `/marketing/v2` | `makematsu2026` | マーケ部（新制度 v2.0）|
+| `/demo/sales` | 営業部用（担当者管理） | 営業部メンバー |
+| `/demo/marketing` | マーケ部用（担当者管理） | マーケ部メンバー |
+| `/demo/bpo` | BPO用（担当者管理） | BPO・不動産メンバー |
+| `/marketing/v2` | マーケ部用、または経営陣パスワード | マーケ部（新制度 v2.0）|
 
-- 認証はSHA-256ハッシュ + sessionStorage（ブラウザを閉じると再ログイン）
-- パスワード変更手順: 新パスワードを `printf '%s' "新PW" | sha256sum` でハッシュ化し、該当HTMLの `PASS_HASH` 定数を差し替え
+- 認証はSHA-256ハッシュ + sessionStorage（ブラウザを閉じると再ログイン）。平文パスワードはリポジトリに書かない
+- パスワード変更手順: 新パスワードを `printf '%s' "新PW" | sha256sum` でハッシュ化し、該当HTMLの `PASS_HASH` / `DEPT_HASH` / `EXEC_HASH` 定数を差し替え（経営陣パスワードを変えたら `HYOKA_EXEC_PASSWORD` も更新）
+
+### 共通ログイン（経営ハブ / 2026-10-20）
+
+- `middleware.js`（Vercel Edge Middleware）が `hyoka.let-inc.net` で `let_hub` Cookie を検証する。未ログインは `hub.let-inc.net/login` へ、役員以外が経営陣ページを開くと 403
+- 役員には `HYOKA_EXEC_PASSWORD` を解錠用 Cookie（`let_hyoka_unlock`）で渡し、`assets/hub-unlock.js` がページのパスワード入力を自動で済ませる（実績データの暗号化はパスワードのまま）
+- 従業員ページ（`/demo` `/my` `/manual` `/new-system`）はハブにログイン済みなら誰でも到達でき、各ページのパスワードはそのまま
+- `*.vercel.app` では middleware は何もしない（従来どおり）。`HYOKA_PROTECT=1` で検証用に強制できる
+- 必要な環境変数（Vercel `agents` プロジェクト）: `HUB_SESSION_SECRET`（ハブと同じ値）・`HUB_URL`・`HYOKA_EXEC_PASSWORD`
+- 検証: `node outputs/evaluation_criteria/scripts/test-middleware.mjs`
 
 ## デプロイ構成（詳細は HANDOVER.md）
 

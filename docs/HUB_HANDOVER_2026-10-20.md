@@ -6,10 +6,10 @@
 
 | リポジトリ | 役割 | 作業ブランチ |
 |---|---|---|
-| `eijiyoshikawa/agents` | 経営ハブ本体（`hub/`）、営業コックピット（`sales-cockpit/`）、評価制度サイト（`outputs/evaluation_criteria/`）、この引き継ぎ資料（`docs/`） | `claude/eager-maxwell-y50ck7` |
-| `let-incjp/masterAI` | 案件KPI（/kpi）・運用管理（/ops）・CPA目標・ペルソナシート | `claude/eager-maxwell-y50ck7` |
-| `eijiyoshikawa/jinjiLsystem` | 人材紹介管理（`web/`） | `claude/eager-maxwell-y50ck7` |
-| `eijiyoshikawa/slack_let` | 財務ダッシュボード | `claude/eager-maxwell-y50ck7`（main から作り直し済み） |
+| `eijiyoshikawa/agents` | 経営ハブ本体（`hub/`）、営業コックピット（`sales-cockpit/`）、評価制度サイト（`outputs/evaluation_criteria/`）、この引き継ぎ資料（`docs/`） | `claude/epic-babbage-p7cudc`（2026-10-20 夜に `claude/eager-maxwell-y50ck7` を取り込んで継続） |
+| `let-incjp/masterAI` | 案件KPI（/kpi）・運用管理（/ops）・CPA目標・ペルソナシート | `claude/epic-babbage-p7cudc`（同上） |
+| `eijiyoshikawa/jinjiLsystem` | 人材紹介管理（`web/`） | `claude/epic-babbage-p7cudc`（同上） |
+| `eijiyoshikawa/slack_let` | 財務ダッシュボード | `claude/epic-babbage-p7cudc`（同上。main から作り直し済み） |
 | `eijiyoshikawa/genbacareer` | 対象外（特定商取引法ページの代表者名修正 1 件だけ作業ブランチにある） | 必要なときだけ |
 
 **注意**: 各リポジトリの作業ブランチは main 未マージ。main に push があると Vercel の本番がその内容で上書きされる（masterAI で 1 度発生）。本番を直したいときは作業ブランチを Vercel API/ダッシュボードから本番デプロイし直す。根本対処は main へのマージ。
@@ -24,7 +24,7 @@
 | 営業コックピット | https://sales.let-inc.net | sales-cockpit（eijiyoshikawa's projects） | 対応（管理職以上） |
 | 人材紹介 | https://jinji.let-inc.net/dashboard | jinji-l-system（eijiyoshikawa's projects） | 対応（管理職以上。役員=admin） |
 | 財務 | https://finance.let-inc.net/api/financial/dashboard | slack-let（eijiyoshikawa's projects） | 対応（役員のみ） |
-| 評価制度サイト | https://let-hyoka.vercel.app | agents（eijiyoshikawa's projects） | 未対応（JS のパスワード） |
+| 評価制度サイト | https://hyoka.let-inc.net （DNS 反映まで https://let-hyoka.vercel.app） | agents（eijiyoshikawa's projects） | 実装済み（役員のみ。DNS と鍵の設定待ち） |
 
 - 共通ログインの仕組み: ハブが `.let-inc.net` 全体に `let_hub` Cookie（HMAC 署名、7 日）を発行し、各アプリが `HUB_SESSION_SECRET`（5 プロジェクト同一値）で検証。ハブをログアウトすると Cookie は失効する。
 - 保存先 DB: Neon `let-ops`（LET チームの Storage）。masterai は `OPS_DATABASE_DATABASE_URL`、let-hub は `HUB_DATABASE_URL`。テーブルは初回アクセス時に自動作成（`lib/ops/migrate.ts` / `hub/lib/migrate.ts`）。
@@ -49,9 +49,17 @@
 - [ ] Vercel の `let-hyoka` プロジェクトの削除（任意）
 - [ ] 作業ブランチを main にマージする判断（4 リポジトリ）。マージ後は main への push で自動デプロイになる
 
+### 評価制度サイトの共通ログインを有効にする（2026-10-20 追記）
+コードは `outputs/evaluation_criteria/middleware.js` に実装済み（検証 `node outputs/evaluation_criteria/scripts/test-middleware.mjs`）。
+`*.vercel.app` では従来どおりなので、デプロイしても今の使い方は変わらない。有効化に必要なのは次の 3 つ。
+- [ ] **オーナー**: Xserver の DNS に CNAME `hyoka` → `cname.vercel-dns.com` を追加（`hyoka.let-inc.net` は Vercel の `agents` プロジェクトに追加済み。今は Xserver の A レコードを向いている）
+- [ ] **オーナー**: `agents` プロジェクトの `HUB_SESSION_SECRET`（Sensitive）にハブと同じ値を入れる。値は Sensitive で読み出せないので、分からなければ `openssl rand -base64 32` で作り直し、let-hub / masterai / sales-cockpit / jinji-l-system / slack-let / agents の 6 つに同じ値を入れて全部 Redeploy（全員ハブに再ログイン）。次のセッションに「鍵を作り直して」と頼めば代行する
+- [ ] 上記のあと `agents` の作業ブランチを本番デプロイし、ハブ（let-hub）も Redeploy（`dashboards.json` の評価サイトを `hyoka.let-inc.net` / sso ready に変更済み）
+- 設定済み: `agents` の `HUB_URL`、`HYOKA_EXEC_PASSWORD`（経営陣パスワード。役員は入力なしで開ける）
+
 ### 次のセッション（開発）
 - [ ] 作業ブランチの main マージ（オーナー了承後）。masterAI は main が先行しているため `origin/main` を取り込んでから
-- [ ] 評価制度サイト（静的）の共通ログイン対応（Edge Middleware で `let_hub` 検証。`agents` プロジェクト）
+- [x] 評価制度サイト（静的）の共通ログイン対応（Edge Middleware で `let_hub` 検証。`agents` プロジェクト）— 2026-10-20 実装。有効化は上記
 - [ ] 人材紹介の `users` テーブルに役員・管理職を登録して役割を細かく制御（未登録時は 役員=admin / 管理職=CA・RA）
 - [ ] 要件書 10 章の未確定値（CTR 基準・LP 応募率・面接設定率）を `/ops/settings` に入力（オーナー判断の値）
 - [ ] 応募の自動登録（LP フォーム・LINE の受け口）

@@ -79,7 +79,7 @@ let-inc.net   let-inc.net let-inc.net let-inc.net let-inc.net
 ### 近日
 4. [ ] **両リポジトリの作業ブランチを main にマージ**（以後は main への push で自動デプロイ）
    - 注意: masterAI は main への push のたびに本番が main の内容で上書きされる。2026-10-20 に別作業の main push で一度 `/ops` の無いビルドに戻ったため、main を取り込んだ作業ブランチ（e36ce50）を本番へ再デプロイした。マージが済むまでは main に push した後に `claude/eager-maxwell-y50ck7` を再デプロイする必要がある
-5. [ ] slack_let（財務）→ sales-cockpit → jinjiLsystem → let-hyoka の順で共通ログインを組み込み（計画書 D 節）
+5. [x] slack_let（財務）→ sales-cockpit → jinjiLsystem → let-hyoka の順で共通ログインを組み込み（計画書 D 節）。let-hyoka は 2026-10-20 に実装（`hyoka.let-inc.net` の DNS と `agents` プロジェクトの `HUB_SESSION_SECRET` 設定で有効になる）
 
 ### 後で
 6. [ ] 2 ヶ月分の作業時間が集まったら工数表を補正
@@ -116,7 +116,7 @@ let-inc.net   let-inc.net let-inc.net let-inc.net let-inc.net
 | 2 | sales-cockpit（営業） | `sales.let-inc.net` 付与、`HUB_SESSION_SECRET` 追加 | `middleware.ts` 前段に `let_hub` 検証 | 既存ユーザーはメールで紐付け |
 | 3 | jinjiLsystem（人材紹介） | `jinji.let-inc.net` 付与、`HUB_SESSION_SECRET` 追加 | `web/src/middleware.ts` 前段に `let_hub` 検証 | 役割は `exec→admin` に写像 |
 | 4 | masterAI（案件 KPI） | `kpi.let-inc.net` 付与、`HUB_SESSION_SECRET` 追加 | `/kpi` に middleware を新設して `let_hub` 検証 | 現状の無認証状態を解消 |
-| 5 | let-hyoka（評価） | `hyoka.let-inc.net` 付与 | 静的サイトのため Edge Middleware で `let_hub` 検証 | README の平文パスワード記載を削除 |
+| 5 | let-hyoka（評価） | `hyoka.let-inc.net` 付与 | 静的サイトのため Edge Middleware で `let_hub` 検証 | README の平文パスワード記載を削除 — **実装済み 2026-10-20**（`outputs/evaluation_criteria/middleware.js`。DNS と鍵の設定待ち） |
 対応完了ごとに `hub/config/dashboards.json` の `sso` を `ready` に、`HUB_URL_*` を新サブドメインに切り替える。
 
 ### E. 運用

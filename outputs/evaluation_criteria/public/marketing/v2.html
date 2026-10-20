@@ -420,6 +420,8 @@ h1 em { font-style: normal; color: var(--accent); }
   .auth-title { font-size: 19px; }
 }
 </style>
+  <script src="/assets/hub-link.js" defer></script>
+  <script src="/assets/hub-unlock.js" defer></script>
 </head>
 <body>
 
@@ -1058,7 +1060,9 @@ h1 em { font-style: normal; color: var(--accent); }
 
 <script>
 (function() {
+  // 部門用パスワード / 経営陣パスワードのどちらでも開ける（marketing.html と同じ）
   const PASS_HASH = "06d54e2513a16422a07ef460dd6b5c4c4b42d770b78527653e654ea10774572e";
+  const EXEC_HASH = "1e980b5384f2ce83258b28faa11cba9393191c5c95720fc1ca3b7fc464708ea4";
   const STORAGE_KEY = "let_auth_marketing";
 
   async function sha256(text) {
@@ -1071,7 +1075,7 @@ h1 em { font-style: normal; color: var(--accent); }
     document.getElementById('main-content').style.display = '';
   }
 
-  if (sessionStorage.getItem(STORAGE_KEY) === '1') {
+  if (sessionStorage.getItem(STORAGE_KEY) === '1' || sessionStorage.getItem('let_auth_exec') === '1') {
     show();
   }
 
@@ -1080,8 +1084,9 @@ h1 em { font-style: normal; color: var(--accent); }
     const input = document.getElementById('auth-input').value;
     const hash = await sha256(input);
     const errEl = document.getElementById('auth-error');
-    if (hash === PASS_HASH) {
+    if (hash === PASS_HASH || hash === EXEC_HASH) {
       sessionStorage.setItem(STORAGE_KEY, '1');
+      if (hash === EXEC_HASH) sessionStorage.setItem('let_auth_exec', '1');
       show();
     } else {
       errEl.classList.add('show');

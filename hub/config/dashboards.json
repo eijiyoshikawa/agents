@@ -62,9 +62,9 @@
       "desc": "部門別の評価・成果データ（役員ページ / 新制度）",
       "source": "agents/outputs/evaluation_criteria",
       "urlEnv": "HUB_URL_HYOKA",
-      "defaultUrl": "https://let-hyoka.vercel.app/",
+      "defaultUrl": "https://hyoka.let-inc.net/",
       "minRole": "exec",
-      "sso": "planned",
+      "sso": "ready",
       "group": "経営・財務"
     },
     {
