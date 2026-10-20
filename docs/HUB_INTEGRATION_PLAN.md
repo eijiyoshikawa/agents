@@ -48,7 +48,7 @@ let-inc.net   let-inc.net let-inc.net let-inc.net let-inc.net
 - **各アプリ側の改修**: 検証コード（`hub/shared/`）をコピーし、既存認証の前段に数行追加するだけ。既存 ID/PW はフォールバックとして残す。
 - **同一ホスト化（パスだけで切替）は第 2 段階**: 各アプリの basePath 対応が必要（特に slack_let は `/api/...` 固定リンク）。まずサブドメイン方式で統合する。
 
-## 次にやること（2026-10-20 17:00 更新）
+## 次にやること（2026-10-20 18:30 更新。引き継ぎは docs/HUB_HANDOVER_2026-10-20.md）
 
 ### 完了
 - [x] hub.let-inc.net の DNS 反映・本番稼働（役員 3 名のログイン可）
@@ -66,8 +66,9 @@ let-inc.net   let-inc.net let-inc.net let-inc.net let-inc.net
 - [x] masterAI /kpi に「CPA目標」タブ（広告費予算・リスト獲得/応募/採用の単価目標、どこがダメかの判定、かんたん設定）と案件ダッシュボードの CPA 表を追加
 
 ### 今すぐ（オーナー作業）
-0. [ ] **共通ログインの鍵をそろえる（5 プロジェクト）**: `openssl rand -base64 32` で新しい値を作り、let-hub / masterai / sales-cockpit / jinji-l-system / slack-let の `HUB_SESSION_SECRET`（Sensitive）に同じ値を入れて 5 つとも Redeploy。既存の値は Sensitive のため読み出せないので作り直す（ハブに再ログインが必要になるだけ）
-0-2. [ ] **Xserver の DNS に CNAME を 3 件追加**: ホスト名 `sales`・`jinji`・`finance`、値はすべて `cname.vercel-dns.com`（TXT は不要。let-inc.net はこのチームで確認済み）。反映後、ハブの `HUB_URL_SALES=https://sales.let-inc.net/`、`HUB_URL_JINJI=https://jinji.let-inc.net/dashboard`、`HUB_URL_FINANCE=https://finance.let-inc.net/api/financial/dashboard` を設定し、dashboards.json の sso を ready に
+0. [x] 共通ログインの鍵を 5 プロジェクトで統一・再デプロイ済み（2026-10-20）
+0-1. [x] ~~**共通ログインの鍵をそろえる（5 プロジェクト）**: `openssl rand -base64 32` で新しい値を作り、let-hub / masterai / sales-cockpit / jinji-l-system / slack-let の `HUB_SESSION_SECRET`（Sensitive）に同じ値を入れて 5 つとも Redeploy。既存の値は Sensitive のため読み出せないので作り直す（ハブに再ログインが必要になるだけ）
+0-2. [x] DNS 反映済み（sales / jinji / finance → Vercel）。ハブの HUB_URL_SALES / JINJI / FINANCE を設定し、dashboards.json の sso を ready に変更済み ~~**Xserver の DNS に CNAME を 3 件追加**: ホスト名 `sales`・`jinji`・`finance`、値はすべて `cname.vercel-dns.com`（TXT は不要。let-inc.net はこのチームで確認済み）。反映後、ハブの `HUB_URL_SALES=https://sales.let-inc.net/`、`HUB_URL_JINJI=https://jinji.let-inc.net/dashboard`、`HUB_URL_FINANCE=https://finance.let-inc.net/api/financial/dashboard` を設定し、dashboards.json の sso を ready に
 1. [ ] **Neon（Postgres）を作成して 2 プロジェクトに接続**: Vercel → Storage → Create Database → Neon。
    - masterai に接続（環境変数 `DATABASE_URL` が入る）→ ローカルで `OPS_DATABASE_URL=<接続文字列> npm run ops:migrate`
    - let-hub にも同じ DB を接続（`HUB_DATABASE_URL` として追加）→ `cd hub && HUB_DATABASE_URL=<接続文字列> npm run hub:migrate`
