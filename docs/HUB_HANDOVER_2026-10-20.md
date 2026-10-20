@@ -64,7 +64,7 @@
 - [x] 評価制度サイト（静的）の共通ログイン対応（Edge Middleware で `let_hub` 検証。`agents` プロジェクト）— 2026-10-20 実装。有効化は上記
 - [ ] 人材紹介の `users` テーブルに役員・管理職を登録して役割を細かく制御（未登録時は 役員=admin / 管理職=CA・RA）
 - [ ] 要件書 10 章の未確定値（CTR 基準・LP 応募率・面接設定率）を `/ops/settings` に入力（オーナー判断の値）
-- [ ] 応募の自動登録（LP フォーム・LINE の受け口）
+- [x] 応募の自動登録（LP フォーム・LINE の受け口）— 2026-10-20 masterAI に `POST /api/kpi/applicants` を実装（`docs/recruit-ops.md`「応募の自動登録」）。有効化は **オーナー**: masterai の環境変数 `RECRUIT_INTAKE_KEY` に合言葉を設定して Redeploy し、LP フォーム／Lステップ等の Webhook に同じ合言葉と案件 ID を設定
 - [ ] 2 ヶ月分の作業時間が集まったら工数表を補正
 - [ ] `CRON_SECRET` 等の既存秘密のローテーション
 - [ ] Notion の DB_顧客管理「デマント・ジャパン株式会社」に「吉川 英二」の記載あり（別人の可能性があるため未修正。要確認）
