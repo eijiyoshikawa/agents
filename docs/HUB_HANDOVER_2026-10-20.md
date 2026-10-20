@@ -56,6 +56,8 @@
 - [ ] **オーナー**: `agents` プロジェクトの `HUB_SESSION_SECRET`（Sensitive）にハブと同じ値を入れる。値は Sensitive で読み出せないので、分からなければ `openssl rand -base64 32` で作り直し、let-hub / masterai / sales-cockpit / jinji-l-system / slack-let / agents の 6 つに同じ値を入れて全部 Redeploy（全員ハブに再ログイン）。次のセッションに「鍵を作り直して」と頼めば代行する
 - [ ] 上記のあと `agents` の作業ブランチを本番デプロイし、ハブ（let-hub）も Redeploy（`dashboards.json` の評価サイトを `hyoka.let-inc.net` / sso ready に変更済み）
 - 設定済み: `agents` の `HUB_URL`、`HYOKA_EXEC_PASSWORD`（経営陣パスワード。役員は入力なしで開ける）
+- 検証済み: プレビュー環境で未ログイン→ハブのログインへ 302、役員→200＋解錠 Cookie、管理職→経営陣ページ 403・従業員ページ 200 を確認。`agents` の Preview 環境変数 `DELETE_ME_TEST_*` 3 件はその検証の残骸なので削除してよい
+- `*.vercel.app` では何も変わらないので、作業ブランチを本番デプロイ済み（let-hyoka.vercel.app は従来どおり）
 
 ### 次のセッション（開発）
 - [ ] 作業ブランチの main マージ（オーナー了承後）。masterAI は main が先行しているため `origin/main` を取り込んでから
