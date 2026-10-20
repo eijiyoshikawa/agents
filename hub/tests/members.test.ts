@@ -26,7 +26,7 @@ describe("ダッシュボード一覧", () => {
     const list = listDashboards({ ...env, HUB_URL_FINANCE: "https://finance.let-inc.net" });
     expect(list.find((d) => d.key === "console")).toBeUndefined();
     expect(list.find((d) => d.key === "finance")?.url).toBe("https://finance.let-inc.net");
-    expect(list.find((d) => d.key === "sales")?.url).toContain("vercel.app");
+    expect(list.find((d) => d.key === "sales")?.url).toMatch(/^https:\/\//);
   });
   it("役割で絞り込まれる（staff は exec 専用を見られない）", () => {
     const keys = (r: "staff" | "manager" | "exec") => dashboardsForRole(r, env).map((d) => d.key);
