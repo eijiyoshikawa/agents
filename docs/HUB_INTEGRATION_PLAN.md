@@ -1,6 +1,6 @@
 # 経営ハブ統合計画 — 全社ダッシュボードの統合入口と共通ログイン
 
-作成: 2026-10-19 ／ 更新: 2026-10-19 ／ 実装: `/hub`（agents リポジトリ）／ 本番: https://hub.let-inc.net ／ 対象外: ゲンバキャリア
+作成: 2026-10-19 ／ 更新: 2026-10-20 ／ 実装: `/hub`（agents リポジトリ）／ 本番: https://hub.let-inc.net ／ 対象外: ゲンバキャリア
 
 ## 目的
 
@@ -48,35 +48,34 @@ let-inc.net   let-inc.net let-inc.net let-inc.net let-inc.net
 - **各アプリ側の改修**: 検証コード（`hub/shared/`）をコピーし、既存認証の前段に数行追加するだけ。既存 ID/PW はフォールバックとして残す。
 - **同一ホスト化（パスだけで切替）は第 2 段階**: 各アプリの basePath 対応が必要（特に slack_let は `/api/...` 固定リンク）。まずサブドメイン方式で統合する。
 
-## 次にやること（2026-10-19 19:00 更新）
+## 次にやること（2026-10-20 09:40 更新）
 
 ### 完了
 - [x] hub.let-inc.net の DNS 反映・本番稼働（役員 3 名のログイン可）
 - [x] 経営陣以外のログイン: `/admin/members` でメンバー追加・項目ごとの閲覧制限・初回パスワード変更（保存先 Postgres 設定後に有効）
-- [x] masterAI `/ops`（採用マーケティング運用管理）実装・本番デプロイ。`kpi.let-inc.net` をプロジェクトに追加（DNS 待ち）
+- [x] masterAI `/ops`（採用マーケティング運用管理）実装・本番デプロイ
+- [x] `kpi.let-inc.net` の DNS（TXT `_vercel` + CNAME `kpi`）反映・Vercel 所有確認済み。ハブに `HUB_URL_KPI=https://kpi.let-inc.net/kpi` を設定済み（以後 /kpi はハブのログインで入る）
+- [x] ハブを紺色ベースのダッシュボード風デザインに変更（masterAI /kpi・/ops と同じ配色）
 - [x] masterAI に `HUB_SESSION_SECRET` / `HUB_URL` を設定。独自ドメインでは `/kpi` も共通ログイン必須に
 
 ### 今すぐ（オーナー作業）
-1. [ ] **Xserver の DNS に 2 件追加**（kpi.let-inc.net 用）
-   - TXT: ホスト名 `_vercel`、値 `vc-domain-verify=kpi.let-inc.net,eaf71ddc31ca8059f1da`（masterai が別チームのため所有確認が必要）
-   - CNAME: ホスト名 `kpi`、値 `cname.vercel-dns.com`
-2. [ ] **Neon（Postgres）を作成して 2 プロジェクトに接続**: Vercel → Storage → Create Database → Neon。
+1. [ ] **Neon（Postgres）を作成して 2 プロジェクトに接続**: Vercel → Storage → Create Database → Neon。
    - masterai に接続（環境変数 `DATABASE_URL` が入る）→ ローカルで `OPS_DATABASE_URL=<接続文字列> npm run ops:migrate`
    - let-hub にも同じ DB を接続（`HUB_DATABASE_URL` として追加）→ `cd hub && HUB_DATABASE_URL=<接続文字列> npm run hub:migrate`
    - 両プロジェクトを Redeploy
-3. [ ] ハブの `/admin/members` で運用担当・セールスを登録（初期パスワードを本人へ）。masterAI の `/ops/staff` にも同じメールで登録
-4. [ ] 初期パスワードの配布（役員 2 名）とメモの削除
+2. [ ] ハブの `/admin/members` で運用担当・セールスを登録（初期パスワードを本人へ）。masterAI の `/ops/staff` にも同じメールで登録
+3. [ ] 初期パスワードの配布（役員 2 名）とメモの削除
 
 ### 近日
-5. [ ] 両リポジトリの作業ブランチを main にマージ（以後は main への push で自動デプロイ）
-6. [ ] `HUB_URL_KPI=https://kpi.let-inc.net/kpi` をハブに設定（DNS 反映後）。以後 /kpi はハブのログインで入る
-7. [ ] slack_let（財務）→ sales-cockpit → jinjiLsystem → let-hyoka の順で共通ログインを組み込み（計画書 D 節）
+4. [ ] **両リポジトリの作業ブランチを main にマージ**（以後は main への push で自動デプロイ）
+   - 注意: masterAI は main への push のたびに本番が main の内容で上書きされる。2026-10-20 に別作業の main push で一度 `/ops` の無いビルドに戻ったため、main を取り込んだ作業ブランチ（e36ce50）を本番へ再デプロイした。マージが済むまでは main に push した後に `claude/eager-maxwell-y50ck7` を再デプロイする必要がある
+5. [ ] slack_let（財務）→ sales-cockpit → jinjiLsystem → let-hyoka の順で共通ログインを組み込み（計画書 D 節）
 
 ### 後で
-8. [ ] 2 ヶ月分の作業時間が集まったら工数表を補正
-9. [ ] 要件書 10 章の未確定値（CTR 基準・LP 応募率・面接設定率）を `/ops/settings` に入力
-10. [ ] 応募の自動登録（LP フォーム・LINE の受け口）
-11. [ ] `CRON_SECRET` 等の既存秘密のローテーション
+6. [ ] 2 ヶ月分の作業時間が集まったら工数表を補正
+7. [ ] 要件書 10 章の未確定値（CTR 基準・LP 応募率・面接設定率）を `/ops/settings` に入力
+8. [ ] 応募の自動登録（LP フォーム・LINE の受け口）
+9. [ ] `CRON_SECRET` 等の既存秘密のローテーション
 
 ## 作業一覧（分類別）
 
