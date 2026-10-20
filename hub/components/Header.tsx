@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { signOut } from "@/auth";
+import { HUB_COOKIE, hubCookieOptions } from "@/lib/hub-session";
 import { ROLE_LABEL, type Role } from "@/lib/roles";
 
 type Props = { name: string; role: Role; showAdmin?: boolean; showPassword?: boolean; current?: "home" | "admin" | "password" };
@@ -38,6 +40,8 @@ export function Header({ name, role, showAdmin, showPassword, current = "home" }
           <form
             action={async () => {
               "use server";
+              // 共通 Cookie（let_hub）も消して、各ダッシュボードからも抜ける
+              (await cookies()).set(HUB_COOKIE, "", { ...hubCookieOptions(), maxAge: 0 });
               await signOut({ redirectTo: "/login" });
             }}
           >

@@ -10,20 +10,28 @@ const PUBLIC_PATHS = ["/login"];
 
 export default auth(async (req) => {
   const { pathname } = req.nextUrl;
+  const user = req.auth?.user;
+  const authed = Boolean(user?.email && isRole(user?.role));
+  // ハブのログインが切れている（ログアウト・期限切れ）のに共通 Cookie が残っていたら、ここで消す。
+  // これで「ハブをログアウトしたのに各ダッシュボードには入れる」状態を防ぐ
+  const clearHub = (res: NextResponse) => {
+    if (!authed && req.cookies.get(HUB_COOKIE)) res.cookies.set(HUB_COOKIE, "", { ...hubCookieOptions(), maxAge: 0 });
+    return res;
+  };
+
   if (pathname.startsWith("/api/auth") || PUBLIC_PATHS.includes(pathname)) {
-    return NextResponse.next();
+    return clearHub(NextResponse.next());
   }
 
-  const user = req.auth?.user;
   if (!user?.email || !isRole(user.role)) {
     if (pathname.startsWith("/api/")) {
-      return NextResponse.json({ ok: false, error: "認証が必要です" }, { status: 401 });
+      return clearHub(NextResponse.json({ ok: false, error: "認証が必要です" }, { status: 401 }));
     }
     const url = req.nextUrl.clone();
     url.pathname = "/login";
     url.search = "";
     if (pathname !== "/") url.searchParams.set("next", pathname);
-    return NextResponse.redirect(url);
+    return clearHub(NextResponse.redirect(url));
   }
 
   // 初回ログイン（仮パスワード）はパスワード変更が終わるまで他の画面に入れない
