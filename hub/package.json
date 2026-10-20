@@ -10,7 +10,8 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "hub:migrate": "node scripts/hub-migrate.mjs"
+    "hub:migrate": "node scripts/hub-migrate.mjs",
+    "hub:sync-schema": "node scripts/hub-sync-schema.mjs"
   },
   "dependencies": {
     "next": "15.5.28",

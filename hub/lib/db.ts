@@ -1,4 +1,7 @@
-/** ハブのメンバー保存先 Postgres（HUB_DATABASE_URL、無ければ DATABASE_URL）。未設定なら config/members.json と env だけで動く。 */
+/**
+ * ハブのメンバー保存先 Postgres（HUB_DATABASE_URL、無ければ DATABASE_URL）。未設定なら config/members.json と env だけで動く。
+ * テーブルは初回利用時に ensureHubSchema()（lib/migrate.ts）が自動で作る。Node ランタイムからは db() を使う。
+ */
 import postgres, { type Sql } from "postgres";
 
 let client: Sql | undefined;
@@ -16,4 +19,11 @@ export function sql(): Sql {
     client = postgres(url, { max: 3, idle_timeout: 20, connect_timeout: 10, prepare: false, onnotice: () => {}, ssl: /localhost|127\.0\.0\.1/.test(url) ? undefined : "require" });
   }
   return client;
+}
+
+/** スキーマ適用済みのクライアント（Node ランタイム専用。初回はテーブルを自動作成する） */
+export async function db(): Promise<Sql> {
+  const { ensureHubSchema } = await import("./migrate");
+  await ensureHubSchema();
+  return sql();
 }
