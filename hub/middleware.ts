@@ -55,7 +55,7 @@ export default auth(async (req) => {
   const existing = await verifyHubSession(req.cookies.get(HUB_COOKIE)?.value);
   const now = Math.floor(Date.now() / 1000);
   const ttl = ttlSeconds();
-  const stale = !existing || existing.email !== user.email || existing.role !== user.role || existing.exp - now < ttl / 2;
+  const stale = !existing || existing.email !== user.email || existing.role !== user.role || existing.name !== (user.name ?? user.email) || existing.exp - now < ttl / 2;
   if (stale && !user.mustChange) {
     const token = await signHubSession(buildSession({ email: user.email, name: user.name ?? user.email, role: user.role }, now, ttl));
     res.cookies.set(HUB_COOKIE, token, { ...hubCookieOptions(), maxAge: ttl });
