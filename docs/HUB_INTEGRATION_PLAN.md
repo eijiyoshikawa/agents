@@ -48,7 +48,7 @@ let-inc.net   let-inc.net let-inc.net let-inc.net let-inc.net
 - **各アプリ側の改修**: 検証コード（`hub/shared/`）をコピーし、既存認証の前段に数行追加するだけ。既存 ID/PW はフォールバックとして残す。
 - **同一ホスト化（パスだけで切替）は第 2 段階**: 各アプリの basePath 対応が必要（特に slack_let は `/api/...` 固定リンク）。まずサブドメイン方式で統合する。
 
-## 次にやること（2026-10-20 16:00 更新）
+## 次にやること（2026-10-20 17:00 更新）
 
 ### 完了
 - [x] hub.let-inc.net の DNS 反映・本番稼働（役員 3 名のログイン可）
@@ -62,6 +62,7 @@ let-inc.net   let-inc.net let-inc.net let-inc.net let-inc.net
 - [x] slack_let（財務）: 作業ブランチを main から作り直し（古い 4 件は破棄・オーナー了承）、ハブ戻りリンクと共通ログイン（役員のみ）の受け入れを本番反映。`finance.let-inc.net` を Vercel に追加済み（DNS 待ち）
 - [x] 営業コックピット・人材紹介に共通ログイン（let_hub）の受け入れコードを実装・本番反映（`sales.let-inc.net` / `jinji.let-inc.net` を Vercel に追加済み。DNS と共有鍵の設定待ち）。ハブのログアウトで let_hub も失効するよう修正
 - [x] let-hyoka（Vercel の古いプロジェクト、Root Directory "let-recruit " が存在せず push のたびにビルド失敗）はビルドをスキップする設定に変更。評価制度サイトの本番は `agents` プロジェクト（let-hyoka.vercel.app）で、こちらは正常
+- [x] masterAI /kpi に「ペルソナ」タブ（案件ごと・職種ごとのペルソナシート。社内の中途採用ペルソナシートと同じ表＋深掘り項目＋訴求設計。保存先は Ops の Postgres）
 - [x] masterAI /kpi に「CPA目標」タブ（広告費予算・リスト獲得/応募/採用の単価目標、どこがダメかの判定、かんたん設定）と案件ダッシュボードの CPA 表を追加
 
 ### 今すぐ（オーナー作業）
