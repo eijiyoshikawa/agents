@@ -4,20 +4,62 @@
 
 html {
   -webkit-font-smoothing: antialiased;
+  color-scheme: dark;
 }
 
 body {
-  @apply bg-cream text-ink font-sans;
+  @apply text-ink font-sans text-sm leading-relaxed;
   min-height: 100vh;
+  /* masterAI /kpi と同じ紺色グラデーション */
+  background: radial-gradient(1200px 600px at 85% 0, rgba(59, 130, 246, 0.16), transparent 60%),
+    linear-gradient(180deg, #0a1a3d 0, #07122b 900px, #07122b 100%);
+  background-color: #07122b;
 }
 
 @layer components {
   .card {
-    @apply bg-surface rounded-2xl border border-ink/10 shadow-sm;
+    @apply rounded-2xl border border-line bg-surface shadow-card;
   }
   .chip {
     @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
   }
+  .chip-brand { @apply bg-brand-soft text-brand-ink; }
+  .chip-good { @apply bg-good-soft text-good-ink; }
+  .chip-watch { @apply bg-watch-soft text-watch-ink; }
+  .chip-muted { @apply bg-white/5 text-ink-2; }
+
+  .input {
+    @apply mt-1 w-full rounded-lg border border-line-2 bg-surface-2 px-3 py-2 text-ink placeholder:text-ink-3;
+    @apply focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/30;
+  }
+  .input[readonly] { @apply text-ink-2; }
+  select.input option { background: #112350; color: #eef3ff; }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white;
+    @apply hover:bg-brand-dark disabled:opacity-50 transition-colors duration-300 ease-standard;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-lg border border-line-2 px-3 py-1.5 text-xs text-ink-2;
+    @apply hover:bg-white/5 hover:text-ink transition-colors duration-300 ease-standard;
+  }
+  .link { @apply text-brand-ink underline-offset-2 hover:underline; }
+
+  .alert-watch { @apply rounded-lg border border-watch/30 bg-watch-soft p-4 text-sm text-ink; }
+  .alert-risk { @apply rounded-lg border border-risk/30 bg-risk-soft px-3 py-2 text-sm text-risk-ink; }
+
+  /* KPI ダッシュボード風の数値タイル */
+  .stat {
+    @apply card p-4 sm:p-5;
+  }
+  .stat-label { @apply text-[11px] font-medium tracking-wider text-ink-3 uppercase; }
+  .stat-value { @apply mt-1 text-3xl font-bold leading-none tracking-tight tabular-nums; }
+  .stat-sub { @apply mt-2 text-xs text-ink-2; }
+
+  .table-dark { @apply w-full text-sm; }
+  .table-dark thead { @apply text-left text-[11px] uppercase tracking-wider text-ink-3; }
+  .table-dark tbody tr { @apply border-t border-line; }
+  .table-dark td, .table-dark th { @apply py-2 pr-3 align-top; }
 }
 
 @media (prefers-reduced-motion: reduce) {

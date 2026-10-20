@@ -10,9 +10,10 @@ export type Dashboard = {
   url: string;
   minRole: Role;
   sso: SsoStatus;
+  group: string;
 };
 
-type Raw = { key: string; title: string; desc: string; source: string; urlEnv: string; defaultUrl: string; minRole: string; sso: string };
+type Raw = { key: string; title: string; desc: string; source: string; urlEnv: string; defaultUrl: string; minRole: string; sso: string; group?: string };
 
 function resolveUrl(d: Raw, env: NodeJS.ProcessEnv): string {
   const fromEnv = (env[d.urlEnv] ?? "").trim();
@@ -31,6 +32,7 @@ export function listDashboards(env: NodeJS.ProcessEnv = process.env): Dashboard[
       url: resolveUrl(d, env),
       minRole: d.minRole as Role,
       sso: (["ready", "planned", "link-only"].includes(d.sso) ? d.sso : "link-only") as SsoStatus,
+      group: (d.group ?? "").trim() || "その他",
     }))
     .filter((d) => d.url !== "");
 }

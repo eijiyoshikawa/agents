@@ -1,5 +1,5 @@
 {
-  "_comment": "ハブから遷移できるダッシュボード。url は env（urlEnv）優先、無ければ defaultUrl。minRole 以上の役割に表示。sso は共通セッション（let_hub Cookie）受け入れの実装状況: ready / planned / link-only。ゲンバキャリアは公開サービスのため対象外。",
+  "_comment": "ハブから遷移できるダッシュボード。url は env（urlEnv）優先、無ければ defaultUrl。minRole 以上の役割に表示。sso は共通セッション（let_hub Cookie）受け入れの実装状況: ready / planned / link-only。ゲンバキャリアは公開サービスのため対象外。 group はトップページの見出し（任意。無ければ「その他」）。",
   "dashboards": [
     {
       "key": "finance",
@@ -9,7 +9,8 @@
       "urlEnv": "HUB_URL_FINANCE",
       "defaultUrl": "https://slack-let.vercel.app/api/financial/dashboard",
       "minRole": "exec",
-      "sso": "planned"
+      "sso": "planned",
+      "group": "経営・財務"
     },
     {
       "key": "sales",
@@ -19,7 +20,8 @@
       "urlEnv": "HUB_URL_SALES",
       "defaultUrl": "https://salescockpit-let.vercel.app/",
       "minRole": "manager",
-      "sso": "planned"
+      "sso": "planned",
+      "group": "営業・マーケティング"
     },
     {
       "key": "jinji",
@@ -29,7 +31,8 @@
       "urlEnv": "HUB_URL_JINJI",
       "defaultUrl": "https://jinji-l-system.vercel.app/dashboard",
       "minRole": "manager",
-      "sso": "planned"
+      "sso": "planned",
+      "group": "人材紹介"
     },
     {
       "key": "kpi",
@@ -39,7 +42,8 @@
       "urlEnv": "HUB_URL_KPI",
       "defaultUrl": "https://masterai-marketing.vercel.app/kpi",
       "minRole": "manager",
-      "sso": "planned"
+      "sso": "planned",
+      "group": "営業・マーケティング"
     },
     {
       "key": "ops",
@@ -49,7 +53,8 @@
       "urlEnv": "HUB_URL_OPS",
       "defaultUrl": "https://masterai-marketing.vercel.app/ops",
       "minRole": "staff",
-      "sso": "ready"
+      "sso": "ready",
+      "group": "営業・マーケティング"
     },
     {
       "key": "hyoka",
@@ -59,7 +64,8 @@
       "urlEnv": "HUB_URL_HYOKA",
       "defaultUrl": "https://let-hyoka.vercel.app/",
       "minRole": "exec",
-      "sso": "planned"
+      "sso": "planned",
+      "group": "経営・財務"
     },
     {
       "key": "console",
@@ -69,7 +75,8 @@
       "urlEnv": "HUB_URL_CONSOLE",
       "defaultUrl": "",
       "minRole": "staff",
-      "sso": "link-only"
+      "sso": "link-only",
+      "group": "社内ツール"
     }
   ]
 }
