@@ -48,7 +48,7 @@ let-inc.net   let-inc.net let-inc.net let-inc.net let-inc.net
 - **各アプリ側の改修**: 検証コード（`hub/shared/`）をコピーし、既存認証の前段に数行追加するだけ。既存 ID/PW はフォールバックとして残す。
 - **同一ホスト化（パスだけで切替）は第 2 段階**: 各アプリの basePath 対応が必要（特に slack_let は `/api/...` 固定リンク）。まずサブドメイン方式で統合する。
 
-## 次にやること（2026-10-20 14:00 更新）
+## 次にやること（2026-10-20 15:30 更新）
 
 ### 完了
 - [x] hub.let-inc.net の DNS 反映・本番稼働（役員 3 名のログイン可）
@@ -60,9 +60,13 @@ let-inc.net   let-inc.net let-inc.net let-inc.net let-inc.net
 - [x] Neon `let-ops` を masterai に接続（`OPS_DATABASE_DATABASE_URL`）、let-hub に `HUB_DATABASE_URL` を手動設定。テーブルは初回アクセス時に自動作成（手元のマイグレーション不要）
 - [x] 各ダッシュボードから「← 経営ハブ」で戻れるリンクを追加・本番反映: masterAI /kpi・/ops、営業コックピット、人材紹介、評価制度サイト（全ページ）
 - [ ] slack_let（財務）のハブ戻りリンクは**未反映**。作業ブランチが main より 121 コミット古く、古い修正 4 件（セキュリティ修正・依存更新）が main と衝突するため本番へ出せない。方針（古い 4 件を捨てて main から作り直す／手で統合する）を決めてから対応
+- [x] 営業コックピット・人材紹介に共通ログイン（let_hub）の受け入れコードを実装・本番反映（`sales.let-inc.net` / `jinji.let-inc.net` を Vercel に追加済み。DNS と共有鍵の設定待ち）。ハブのログアウトで let_hub も失効するよう修正
+- [x] let-hyoka（Vercel の古いプロジェクト、Root Directory "let-recruit " が存在せず push のたびにビルド失敗）はビルドをスキップする設定に変更。評価制度サイトの本番は `agents` プロジェクト（let-hyoka.vercel.app）で、こちらは正常
 - [x] masterAI /kpi に「CPA目標」タブ（広告費予算・リスト獲得/応募/採用の単価目標、どこがダメかの判定、かんたん設定）と案件ダッシュボードの CPA 表を追加
 
 ### 今すぐ（オーナー作業）
+0. [ ] **共通ログインの鍵をそろえる（4 プロジェクト）**: `openssl rand -base64 32` で新しい値を作り、let-hub / masterai / sales-cockpit / jinji-l-system の `HUB_SESSION_SECRET`（Sensitive）に同じ値を入れて 4 つとも Redeploy。既存の値は Sensitive のため読み出せないので作り直す（ハブに再ログインが必要になるだけ）
+0-2. [ ] **Xserver の DNS に CNAME を 2 件追加**: ホスト名 `sales` と `jinji`、値はどちらも `cname.vercel-dns.com`（TXT は不要。let-inc.net はこのチームで確認済み）。反映後、ハブの `HUB_URL_SALES=https://sales.let-inc.net/`、`HUB_URL_JINJI=https://jinji.let-inc.net/dashboard` を設定し、dashboards.json の sso を ready に
 1. [ ] **Neon（Postgres）を作成して 2 プロジェクトに接続**: Vercel → Storage → Create Database → Neon。
    - masterai に接続（環境変数 `DATABASE_URL` が入る）→ ローカルで `OPS_DATABASE_URL=<接続文字列> npm run ops:migrate`
    - let-hub にも同じ DB を接続（`HUB_DATABASE_URL` として追加）→ `cd hub && HUB_DATABASE_URL=<接続文字列> npm run hub:migrate`
