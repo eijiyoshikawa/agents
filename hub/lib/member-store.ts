@@ -27,14 +27,16 @@ const row = (r: Record<string, unknown>): MemberRecord => ({
 
 export async function findMemberRecord(email: string): Promise<(MemberRecord & { passwordHash: string | null }) | undefined> {
   if (!hubDbConfigured()) return undefined;
-  const rows = await (await db())`SELECT * FROM hub_member WHERE email = ${email.toLowerCase()} LIMIT 1`;
+  const s = await db();
+  const rows = await s`SELECT * FROM hub_member WHERE email = ${email.toLowerCase()} LIMIT 1`;
   if (!rows[0]) return undefined;
   return { ...row(rows[0]), passwordHash: (rows[0].password_hash as string | null) ?? null };
 }
 
 export async function listMemberRecords(): Promise<MemberRecord[]> {
   if (!hubDbConfigured()) return [];
-  const rows = await (await db())`SELECT * FROM hub_member ORDER BY role, name`;
+  const s = await db();
+  const rows = await s`SELECT * FROM hub_member ORDER BY role, name`;
   return rows.map(row);
 }
 
@@ -46,9 +48,11 @@ export async function upsertMemberRecord(m: { email: string; name: string; role:
 }
 
 export async function setMemberPassword(email: string, passwordHash: string, mustChange: boolean, actor: string): Promise<void> {
-  await (await db())`UPDATE hub_member SET password_hash = ${passwordHash}, must_change_password = ${mustChange}, updated_at = now(), updated_by = ${actor} WHERE email = ${email.toLowerCase()}`;
+  const s = await db();
+  await s`UPDATE hub_member SET password_hash = ${passwordHash}, must_change_password = ${mustChange}, updated_at = now(), updated_by = ${actor} WHERE email = ${email.toLowerCase()}`;
 }
 
 export async function setMemberActive(email: string, active: boolean, actor: string): Promise<void> {
-  await (await db())`UPDATE hub_member SET active = ${active}, updated_at = now(), updated_by = ${actor} WHERE email = ${email.toLowerCase()}`;
+  const s = await db();
+  await s`UPDATE hub_member SET active = ${active}, updated_at = now(), updated_by = ${actor} WHERE email = ${email.toLowerCase()}`;
 }

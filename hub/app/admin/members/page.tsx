@@ -17,7 +17,13 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
   if (session.user.role !== "exec") redirect("/");
   const { edit } = await searchParams;
   const dbOk = hubDbConfigured();
-  const members = dbOk ? await listMemberRecords() : [];
+  let dbError: string | null = null;
+  const members = dbOk
+    ? await listMemberRecords().catch((e: unknown) => {
+        dbError = e instanceof Error ? e.message : String(e);
+        return [];
+      })
+    : [];
   const editing = members.find((m) => m.email === edit);
   const dashboards = allDashboardKeys();
 
@@ -32,6 +38,11 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
             入口は同じログイン画面です。ここで追加したメンバーは、役割と「見られる項目」の範囲内のダッシュボードだけが表示されます。初回ログイン時にパスワード変更を求めます。
           </p>
         </div>
+        {dbError && (
+          <div className="alert-watch">
+            メンバー保存先（Postgres）に接続できませんでした: {dbError}。少し待って再読み込みしても直らない場合は HUB_DATABASE_URL の値を確認してください。
+          </div>
+        )}
         {!dbOk && (
           <div className="alert-watch">
             メンバー保存先（HUB_DATABASE_URL）が未設定のため追加できません。Vercel の Storage で Neon を接続し、<code>npm run hub:migrate</code> を実行してください。設定までは
@@ -93,7 +104,7 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
             )}
           </div>
         )}
-        {dbOk && <MemberForm dashboards={dashboards} editing={editing} />}
+        {dbOk && !dbError && <MemberForm dashboards={dashboards} editing={editing} />}
       </section>
       </main>
     </>
