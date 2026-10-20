@@ -7,9 +7,9 @@
       "desc": "売掛・買掛・着地見込み・予実・BEP・試算表・月次決算チェック（MoneyForward 連携）",
       "source": "slack_let",
       "urlEnv": "HUB_URL_FINANCE",
-      "defaultUrl": "https://slack-let.vercel.app/api/financial/dashboard",
+      "defaultUrl": "https://finance.let-inc.net/api/financial/dashboard",
       "minRole": "exec",
-      "sso": "planned",
+      "sso": "ready",
       "group": "経営・財務"
     },
     {
@@ -18,9 +18,9 @@
       "desc": "リード→契約→継続の一体型ダッシュボード（Notion 単一ソース）",
       "source": "agents/sales-cockpit",
       "urlEnv": "HUB_URL_SALES",
-      "defaultUrl": "https://salescockpit-let.vercel.app/",
+      "defaultUrl": "https://sales.let-inc.net/",
       "minRole": "manager",
-      "sso": "planned",
+      "sso": "ready",
       "group": "営業・マーケティング"
     },
     {
@@ -29,9 +29,9 @@
       "desc": "CA/RA 別の目標対実績・ヨミ表・レポート",
       "source": "jinjiLsystem/web",
       "urlEnv": "HUB_URL_JINJI",
-      "defaultUrl": "https://jinji-l-system.vercel.app/dashboard",
+      "defaultUrl": "https://jinji.let-inc.net/dashboard",
       "minRole": "manager",
-      "sso": "planned",
+      "sso": "ready",
       "group": "人材紹介"
     },
     {
@@ -40,9 +40,9 @@
       "desc": "SNS 採用クライアントの週次 KPI・広告実績・利益",
       "source": "masterAI",
       "urlEnv": "HUB_URL_KPI",
-      "defaultUrl": "https://masterai-marketing.vercel.app/kpi",
+      "defaultUrl": "https://kpi.let-inc.net/kpi",
       "minRole": "manager",
-      "sso": "planned",
+      "sso": "ready",
       "group": "営業・マーケティング"
     },
     {
@@ -51,7 +51,7 @@
       "desc": "案件のフェーズ・30ステップのタスク・ヒアリング・チェックリスト・週次/月次報告（masterAI /ops）",
       "source": "masterAI",
       "urlEnv": "HUB_URL_OPS",
-      "defaultUrl": "https://masterai-marketing.vercel.app/ops",
+      "defaultUrl": "https://kpi.let-inc.net/ops",
       "minRole": "staff",
       "sso": "ready",
       "group": "営業・マーケティング"
