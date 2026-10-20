@@ -2,7 +2,7 @@
   "_comment": "ハブにログインできるメンバー。role は exec（役員）/ manager（管理職）/ staff（一般）。メールは小文字で記載。パスワードのハッシュは環境変数 HUB_PASSWORD_HASHES（JSON: メール→scrypt ハッシュ）に置く（リポジトリには書かない）。",
   "members": [
     { "email": "shota.yoshida@let-inc.net", "name": "吉田 翔太", "role": "exec" },
-    { "email": "eiyoshi99@gmail.com", "name": "吉川 英二", "role": "exec" },
-    { "email": "eiji.yoshikawa@let-inc.net", "name": "吉川 英二", "role": "exec" }
+    { "email": "eiyoshi99@gmail.com", "name": "吉川 英治", "role": "exec" },
+    { "email": "eiji.yoshikawa@let-inc.net", "name": "吉川 英治", "role": "exec" }
   ]
 }
