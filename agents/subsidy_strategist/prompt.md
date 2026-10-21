@@ -122,22 +122,11 @@ Writer の申請書ドラフトを審査員の目線で評価:
 ### company_profile.json（自社マスタ）
 ```json
 {
-  "company_name": "",
-  "industry_code": "",
-  "founded_year": 0,
-  "employees": 0,
-  "capital_jpy": 0,
-  "revenue_last_fy_jpy": 0,
+  "company_name": "", "industry_code": "", "founded_year": 0,
+  "employees": 0, "capital_jpy": 0, "revenue_last_fy_jpy": 0,
   "business_domains": [],
-  "past_subsidies": [
-    {"subsidy_id": "", "year": 0, "awarded_jpy": 0, "outcome": ""}
-  ],
-  "attestations": {
-    "wage_increase_declared": false,
-    "dx_certified": false,
-    "health_management_certified": false,
-    "bcp_formulated": false
-  }
+  "past_subsidies": [{"subsidy_id": "", "year": 0, "awarded_jpy": 0, "outcome": ""}],
+  "attestations": {"wage_increase_declared": false, "dx_certified": false, "health_management_certified": false, "bcp_formulated": false}
 }
 ```
 
@@ -146,26 +135,9 @@ Writer の申請書ドラフトを審査員の目線で評価:
 {
   "evaluated_at": "YYYY-MM-DD",
   "candidates": [
-    {
-      "subsidy_id": "",
-      "mandatory_pass": true,
-      "mandatory_score": 0,
-      "bonus_score": 0,
-      "feasibility_score": 0,
-      "total_score": 0,
-      "grade": "A|B|C|D",
-      "blocking_reasons": [],
-      "addressable_gaps": [
-        {"gap": "", "effort_days": 0, "cost_jpy": 0}
-      ]
-    }
+    {"subsidy_id": "", "mandatory_pass": true, "mandatory_score": 0, "bonus_score": 0, "feasibility_score": 0, "total_score": 0, "grade": "A|B|C|D", "blocking_reasons": [], "addressable_gaps": [{"gap": "", "effort_days": 0, "cost_jpy": 0}]}
   ],
-  "portfolio_recommendation": {
-    "primary": "",
-    "secondary": [],
-    "concurrent_ok": true,
-    "total_expected_award_jpy": 0
-  }
+  "portfolio_recommendation": {"primary": "", "secondary": [], "concurrent_ok": true, "total_expected_award_jpy": 0}
 }
 ```
 
@@ -175,33 +147,14 @@ Writer の申請書ドラフトを審査員の目線で評価:
   "evaluation_date": "YYYY-MM-DD",
   "company_ref": "company_profile.json",
   "recommended": {
-    "subsidy_id": "",
-    "match_score": 0,
-    "grade": "A",
-    "expected_award_jpy": 0,
-    "estimated_success_rate": 0.0,
-    "roi_rank": 1,
-    "rationale": "",
-    "blocking_risks": [],
-    "required_prep_days": 0,
-    "timeline": {
-      "brief_issued": "",
-      "draft_due": "",
-      "legal_signoff_due": "",
-      "submission_target": ""
-    }
+    "subsidy_id": "", "match_score": 0, "grade": "A", "expected_award_jpy": 0,
+    "estimated_success_rate": 0.0, "roi_rank": 1, "rationale": "",
+    "blocking_risks": [], "required_prep_days": 0,
+    "timeline": {"brief_issued": "", "draft_due": "", "legal_signoff_due": "", "submission_target": ""}
   },
-  "alternatives": [
-    {"subsidy_id": "", "match_score": 0, "reason_not_top": ""}
-  ],
-  "rejected_with_reasons": [
-    {"subsidy_id": "", "reason": ""}
-  ],
-  "downstream_briefs": {
-    "legal_review_ref": "briefs/{id}_legal.json",
-    "finance_impact_ref": "briefs/{id}_finance.json",
-    "writer_instruction_ref": "briefs/{id}_writer.json"
-  },
+  "alternatives": [{"subsidy_id": "", "match_score": 0, "reason_not_top": ""}],
+  "rejected_with_reasons": [{"subsidy_id": "", "reason": ""}],
+  "downstream_briefs": {"legal_review_ref": "briefs/{id}_legal.json", "finance_impact_ref": "briefs/{id}_finance.json", "writer_instruction_ref": "briefs/{id}_writer.json"},
   "devils_advocate_ref": "/agents/devils_advocate/output.json"
 }
 ```
