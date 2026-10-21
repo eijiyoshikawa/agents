@@ -63,9 +63,11 @@
 ### LP ファクトリー（2026-10-21 新設。詳細は `docs/LP_FACTORY_PROPOSAL.md` と lp-factory の README）
 - [x] リポジトリ `let-incjp/lp-factory`、Vercel プロジェクト `lp-factory`（LET チーム）、`*.aigrowthx.pro` のワイルドカードドメイン付与、初回デプロイ
 - [x] テンプレート `recruit-onepage`（アルファガード構成 × 八百一の CSS 変数設計）、案件 `sample` / `alphaguard`、LINE 待機ページ、共通ストック写真、計測タグ
-- [x] 独自ドメインの自動追加（`sites/*.json` の `domains` → GitHub Actions `sync-domains` が Vercel に追加し DNS 設定を表示）
-- [ ] **オーナー**: Vercel のアクセストークンを GitHub `lp-factory` の Secret `VERCEL_TOKEN` に登録（独自ドメイン自動追加の初期設定。README「独自ドメイン」）
-- [ ] 次: 写真アップロード、masterAI 案件ページ「LP を作る」フォーム → `sites/<slug>.json` 生成・制作物リンク自動登録、採用サイト型テンプレート
+- [x] 独自ドメインの自動追加（`sites/*.json` の `domains` → GitHub Actions `sync-domains` が Vercel に追加）。前提は **DNS は LET の Vercel で管理**（クライアントに DNS 設定を依頼しない）。Vercel 管理のドメインなら追加だけで自動設定、そうでなければ LET 側の作業を Summary に出す
+- [x] **オーナー**: GitHub `lp-factory` の Secret `VERCEL_TOKEN` 登録 — 2026-10-21 完了（`sample-lp.aigrowthx.pro` で push → 自動追加 → 公開まで実証済み）
+- [x] masterAI 案件ページ「制作物・リンク」タブに **「LP を作る」** フォーム（接頭辞＋LINE で `sites/<slug>.json` を GitHub に書き、制作物リンクも自動登録）— 2026-10-21 masterAI #14 で main 反映（`docs/recruit-ops.md`「LP を作る」）
+- [ ] **オーナー**: 「LP を作る」の有効化 — GitHub の Fine-grained PAT（Resource owner `let-incjp`、Repository access は lp-factory のみ、Permissions は Contents: Read and write）を作り、Vercel → masterai → Environment Variables に `LP_FACTORY_GITHUB_TOKEN` として追加 → Redeploy。未設定の間は画面に案内が出て保存できない
+- [ ] 次: 写真アップロード（現状は GitHub の `public/sites/<slug>/` に置く）、採用サイト型テンプレート、masterAI の「LP を作る」で細かい文言（給与例・一日の流れ・声）も編集できるようにする
 
 ### 次のセッション（開発）
 - [x] 作業ブランチの main マージ — 2026-10-21 完了（agents #47 / masterAI #12 / slack_let #107。jinjiLsystem は既にマージ済み）。以後は main への push で自動デプロイ。本番は main の内容で稼働中
