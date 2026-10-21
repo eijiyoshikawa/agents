@@ -6,13 +6,14 @@
 
 | リポジトリ | 役割 | 作業ブランチ |
 |---|---|---|
-| `eijiyoshikawa/agents` | 経営ハブ本体（`hub/`）、営業コックピット（`sales-cockpit/`）、評価制度サイト（`outputs/evaluation_criteria/`）、この引き継ぎ資料（`docs/`） | `claude/epic-babbage-p7cudc`（2026-10-20 夜に `claude/eager-maxwell-y50ck7` を取り込んで継続） |
-| `let-incjp/masterAI` | 案件KPI（/kpi）・運用管理（/ops）・CPA目標・ペルソナシート | `claude/epic-babbage-p7cudc`（同上） |
-| `eijiyoshikawa/jinjiLsystem` | 人材紹介管理（`web/`） | `claude/epic-babbage-p7cudc`（同上） |
-| `eijiyoshikawa/slack_let` | 財務ダッシュボード | `claude/epic-babbage-p7cudc`（同上。main から作り直し済み） |
+| `eijiyoshikawa/agents` | 経営ハブ本体（`hub/`）、営業コックピット（`sales-cockpit/`）、評価制度サイト（`outputs/evaluation_criteria/`）、この引き継ぎ資料（`docs/`） | `main`（2026-10-21 マージ済み。新しい作業は main から新ブランチ） |
+| `let-incjp/masterAI` | 案件KPI（/kpi）・運用管理（/ops）・CPA目標・ペルソナシート・応募 Webhook・制作物リンク | `main`（同上） |
+| `eijiyoshikawa/jinjiLsystem` | 人材紹介管理（`web/`） | `main`（同上） |
+| `eijiyoshikawa/slack_let` | 財務ダッシュボード | `main`（同上） |
+| `let-incjp/lp-factory` | **LP ファクトリー**（採用 LP テンプレート。`<slug>.aigrowthx.pro` で全案件を配信。2026-10-21 新設） | `main`（push が本番。Vercel LET チーム `lp-factory`） |
 | `eijiyoshikawa/genbacareer` | 対象外（特定商取引法ページの代表者名修正 1 件だけ作業ブランチにある） | 必要なときだけ |
 
-**注意**: 各リポジトリの作業ブランチは main 未マージ。main に push があると Vercel の本番がその内容で上書きされる（masterAI で 1 度発生）。本番を直したいときは作業ブランチを Vercel API/ダッシュボードから本番デプロイし直す。根本対処は main へのマージ。
+**2026-10-21**: 4 リポジトリとも main にマージ済み。main への push（マージ）が本番デプロイになるので、main には動作確認済みのものだけを入れる。
 
 ## 本番の URL と Vercel プロジェクト
 
@@ -45,8 +46,8 @@
 
 ### オーナー
 - [ ] ハブ `/admin/members` で運用担当・セールスを登録し初期パスワードを配布。運用管理を使う人は `kpi.let-inc.net/ops/staff` にも登録
-- [ ] 役員 2 名への初期パスワード配布と、メモ（scratchpad の hub-initial-passwords.txt）の削除
-- [ ] Vercel の `let-hyoka` プロジェクトの削除（任意）
+- [ ] 役員 2 名への初期パスワード配布。前回のメモは消えているので作り直す: ハブ `/admin/members` で役員のメールを「メンバーを追加」（役割 exec・見られる項目すべて）すると初期パスワードが 1 回表示される（DB のメンバーが設定ファイルより優先されるので、この方法で役員のパスワードも再発行できる）
+- [x] Vercel の `let-hyoka` プロジェクトの削除 — 2026-10-21 オーナー実施
 - [ ] 作業ブランチを main にマージする判断（4 リポジトリ）。マージ後は main への push で自動デプロイになる
 
 ### 評価制度サイトの共通ログインを有効にする（2026-10-20 追記）
@@ -59,13 +60,21 @@
 - 検証済み: プレビュー環境で未ログイン→ハブのログインへ 302、役員→200＋解錠 Cookie、管理職→経営陣ページ 403・従業員ページ 200 を確認。`agents` の Preview 環境変数 `DELETE_ME_TEST_*` 3 件はその検証の残骸なので削除してよい
 - `*.vercel.app` では何も変わらないので、作業ブランチを本番デプロイ済み（let-hyoka.vercel.app は従来どおり）
 
+### LP ファクトリー（2026-10-21 新設。詳細は `docs/LP_FACTORY_PROPOSAL.md` と lp-factory の README）
+- [x] リポジトリ `let-incjp/lp-factory`、Vercel プロジェクト `lp-factory`（LET チーム）、`*.aigrowthx.pro` のワイルドカードドメイン付与、初回デプロイ
+- [x] テンプレート `recruit-onepage`（アルファガード構成 × 八百一の CSS 変数設計）、案件 `sample` / `alphaguard`、LINE 待機ページ、共通ストック写真、計測タグ
+- [x] 独自ドメインの自動追加（`sites/*.json` の `domains` → GitHub Actions `sync-domains` が Vercel に追加し DNS 設定を表示）
+- [ ] **オーナー**: Vercel のアクセストークンを GitHub `lp-factory` の Secret `VERCEL_TOKEN` に登録（独自ドメイン自動追加の初期設定。README「独自ドメイン」）
+- [ ] 次: 写真アップロード、masterAI 案件ページ「LP を作る」フォーム → `sites/<slug>.json` 生成・制作物リンク自動登録、採用サイト型テンプレート
+
 ### 次のセッション（開発）
-- [ ] 作業ブランチの main マージ（オーナー了承後）。masterAI は main が先行しているため `origin/main` を取り込んでから
+- [x] 作業ブランチの main マージ — 2026-10-21 完了（agents #47 / masterAI #12 / slack_let #107。jinjiLsystem は既にマージ済み）。以後は main への push で自動デプロイ。本番は main の内容で稼働中
 - [x] 評価制度サイト（静的）の共通ログイン対応（Edge Middleware で `let_hub` 検証。`agents` プロジェクト）— 2026-10-20 実装。有効化は上記
 - [ ] 人材紹介の `users` テーブルに役員・管理職を登録して役割を細かく制御（未登録時は 役員=admin / 管理職=CA・RA）
 - [ ] 要件書 10 章の未確定値（CTR 基準・LP 応募率・面接設定率）を `/ops/settings` に入力（オーナー判断の値）
 - [x] 応募の自動登録（LP フォーム・LINE の受け口）— 2026-10-20 masterAI に `POST /api/kpi/applicants` を実装（`docs/recruit-ops.md`「応募の自動登録」）。有効化は **オーナー**: masterai の環境変数 `RECRUIT_INTAKE_KEY` に合言葉を設定して Redeploy し、LP フォーム／Lステップ等の Webhook に同じ合言葉と案件 ID を設定
 - [ ] 2 ヶ月分の作業時間が集まったら工数表を補正
-- [ ] `CRON_SECRET` 等の既存秘密のローテーション
+- [x] `CRON_SECRET` の作り直し（slack-let / sales-cockpit）— 2026-10-21 完了・main デプロイで反映。財務画面の旧ログイン（?token= の Cookie）は無効になった（役員は共通ログインで入る）。`agents` の未使用 `CRON_SECRET` と masterai の `MK_AGENDA_TRIGGER_KEY`（GitHub Actions secret と同時更新が必要）は未実施
+- [x] masterai に `RECRUIT_INTAKE_KEY` を設定（2026-10-21）。値はオーナーに伝達済み。LP フォーム／Lステップ側に同じ値と案件 ID を設定すれば応募が自動登録される
 - [ ] Notion の DB_顧客管理「デマント・ジャパン株式会社」の「代表者名」が「吉川 英二」（顧客側の代表者欄。レコード自体が社名と URL・住所が不一致なので営業担当に確認して修正/削除。手順書 7.）
 - [x] masterAI 案件ページに「制作物・リンク」タブ（LP 等を 公開URL / GitHub / Vercel / Claude Code の 3 点セットで登録、上部にクイックリンク）— 2026-10-20 本番反映
