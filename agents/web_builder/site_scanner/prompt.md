@@ -33,20 +33,21 @@ HTMLから内部リンク（同一ドメイン）を収集し、ページ一覧�
 - 主要ページ（5〜10ページ程度）のURLを収集
 - `site_type: "corporate"` として記録
 
-### Step 3: 技術スタック検出
+### Step 3: 技術スタック検出（フィンガープリンティング）
 HTMLソースと読み込まれたリソースから技術を検出する:
 
 **フレームワーク検出:**
-- `__NEXT_DATA__`, `_next/` → Next.js
+- `__NEXT_DATA__`, `_next/` → Next.js（`buildId` からバージョン推定）
 - `__NUXT__`, `_nuxt/` → Nuxt.js
 - `data-reactroot` → React
-- `ng-version` → Angular
-- WordPress特有のクラス名・パス → WordPress
+- `ng-version` → Angular（バージョン属性も記録）
+- WordPress特有のクラス名・パス → WordPress（`wp-json` API 有無確認）
+- `gatsby` / `astro` / `remix` 固有パターン
 
 **CSSフレームワーク検出:**
-- `tailwind` クラス名パターン → Tailwind CSS
+- `tailwind` クラス名パターン（`text-`, `bg-`, `flex`, `grid`）→ Tailwind CSS
 - `bootstrap` クラス名 → Bootstrap
-- カスタムCSS
+- カスタムCSS / CSS Modules / styled-components
 
 **外部ライブラリ検出:**
 - `gsap`, `ScrollTrigger` → GSAP
@@ -59,6 +60,25 @@ HTMLソースと読み込まれたリソースから技術を検出する:
 **アナリティクス・ツール:**
 - Google Analytics / GTM
 - Facebook Pixel 等
+
+### Step 3b: robots.txt / sitemap.xml 解析
+- `{base_url}/robots.txt` を取得し、Disallow パス・Crawl-delay を記録
+- `{base_url}/sitemap.xml` を取得し、全URL一覧をページ発見に活用
+- sitemap が存在しない場合は Step 2 のリンク収集結果を正とする
+
+### Step 3c: パフォーマンスベースライン記録
+トップページの以下を記録（再現サイトとの比較基準）:
+- HTML ドキュメントサイズ（KB）
+- 外部CSS/JS ファイル数
+- 画像ファイル数・合計サイズ概算
+- `<script>` タグの defer/async 戦略
+
+### Step 3d: セキュリティヘッダー検出
+レスポンスヘッダーから以下を記録:
+- `Content-Security-Policy` の有無
+- `X-Frame-Options` / `X-Content-Type-Options`
+- `Strict-Transport-Security`（HSTS）
+- これらは再現サイトの Vercel 設定参考値として qa_reviewer に渡す
 
 ### Step 4: サイトの特徴メモ
 サイト全体の印象・特徴を簡潔にメモする:

@@ -238,6 +238,7 @@ QA Reviewer の修正指示（`iteration_N.json`）を読み込み:
 
 ## ビルド品質チェックリスト（各Iteration完了時に確認）
 
+### デザイン準拠
 - [ ] tailwind.config.ts がdesign-tokens.jsonに準拠しているか
 - [ ] globals.css にCSS変数 + font-feature-settings + antialiased が設定されているか
 - [ ] プライマリカラーがTailwindブルーでないか
@@ -247,9 +248,26 @@ QA Reviewer の修正指示（`iteration_N.json`）を読み込み:
 - [ ] 見出しのfont-weightが500-600か
 - [ ] border-radiusが3段階以内か
 - [ ] シャドウが多層構成か
+- [ ] Tailwindデフォルト値にフォールバックしている箇所がないか
+
+### モーション・パフォーマンス
 - [ ] スクロールアニメーションがヒーロー+主要セクション限定か
 - [ ] hover: scale(1.05) を使っていないか
-- [ ] Tailwindデフォルト値にフォールバックしている箇所がないか
+- [ ] `prefers-reduced-motion` 対応が globals.css に含まれているか
+- [ ] 同時発火アニメーションが1ページ2件以内か
+
+### ビルド検証（push前に必須）
+- [ ] `npm run build` がエラーなしで完了するか
+- [ ] TypeScript 型エラーが 0 件か
+- [ ] 未使用の import / 変数がないか
+- [ ] `next/image` で width/height が全画像に指定されているか
+- [ ] 動的 import（`next/dynamic`）で大きなコンポーネントを遅延ロードしているか
+
+### Tailwind CSS 最適化
+- カスタムカラー/スペーシングは `tailwind.config.ts` の `extend` で定義（デフォルト上書き禁止）
+- 繰り返しスタイルは `@apply` ではなく React コンポーネント抽出で対応
+- `className` 文字列の条件分岐は `clsx` / `cn` ユーティリティを使用
+- JIT モードで未使用クラスの自動パージを確認
 
 ## 使用するツール
 - `Read`: 全エージェントの output.json、QA の iteration_N.json、**design-tokens.json**、**anti-ai-design-guidelines.md**

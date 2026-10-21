@@ -9,6 +9,16 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 - パフォーマンス最適化（Core Web Vitals 全項目 Good）
 - 納期遵守率90%以上
 
+## アーキテクチャ判断基準
+| 要件 | 推奨構成 | 理由 |
+|------|---------|------|
+| LP（静的） | Next.js SSG + Vercel | ビルド時生成で最速 |
+| LP（動的CTA/AB） | Next.js SSR + Edge Middleware | パーソナライズ対応 |
+| コーポレートサイト | Next.js + headless CMS | 非エンジニアの更新容易性 |
+| SaaS UI | Next.js App Router + API Routes | フルスタック一体型 |
+| WordPress案件 | WordPress + カスタムテーマ | クライアント運用ハードル最小 |
+| AI組み込み | FastAPI + Next.js | Python AI ライブラリ活用 |
+
 ## 技術スタック
 - **フロントエンド**: Next.js / React / Vue.js / Tailwind CSS
 - **バックエンド**: Node.js / Python / FastAPI
@@ -44,20 +54,42 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
   3. バックエンド・API実装（必要な場合）
   4. CMS連携・データ連携
   5. フォーム・問い合わせ機能
+  6. 決済連携（Stripe）実装時の必須事項
+     - PCI DSS 準拠: カード情報はStripe.js/Elementsで直接送信（サーバー経由禁止）
+     - Webhook署名検証の必須実装
+     - テストモード→本番モードの切り替え手順書作成
+  7. サードパーティAPI連携のベストプラクティス
+     - タイムアウト設定（デフォルト10秒）
+     - リトライ（指数バックオフ、最大3回）
+     - サーキットブレーカー（連続失敗5回でフォールバック）
+     - API キーは環境変数管理（ハードコード厳禁）
 出力: ソースコード一式
 ```
 
 ### 3. テスト・品質保証
 ```
 処理:
-  1. クロスブラウザテスト
-  2. レスポンシブ表示確認
-  3. パフォーマンス計測（Lighthouse）
-  4. アクセシビリティチェック
+  1. クロスブラウザテスト（Chrome/Safari/Firefox/Edge + iOS Safari/Android Chrome）
+  2. レスポンシブ表示確認（375px / 768px / 1024px / 1440px）
+  3. パフォーマンス計測（Lighthouse 全カテゴリ 90+）
+  4. アクセシビリティチェック（WCAG 2.1 AA）
   5. セキュリティチェック（OWASP基準）
-  6. SEO基本対策の確認
+  6. SEO技術実装の確認
+     - 構造化データ（JSON-LD: Organization / LocalBusiness / FAQ / Product）
+     - メタタグ（title / description / OGP / canonical）
+     - サイトマップ（sitemap.xml 自動生成）
+     - robots.txt 設定
 出力: /agents/engineer/test_report/{project_name}.json
 ```
+
+### デプロイ検証プロトコル（本番公開前に必須実施）
+- [ ] ステージング環境で全ページ目視確認
+- [ ] 本番と同一環境変数でのビルド成功
+- [ ] 外部API接続（Stripe/CMS/Analytics）の疎通確認
+- [ ] OGP画像のプレビュー確認（og:image のURL有効性）
+- [ ] 404ページ・エラーページの表示確認
+- [ ] SSL証明書の有効性確認
+- [ ] リダイレクトルールの動作確認（旧URL → 新URL）
 
 ### 4. デプロイ・納品
 ```

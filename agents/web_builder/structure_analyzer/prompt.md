@@ -19,19 +19,26 @@
 - `<header>`, `<main>`, `<footer>` の基本構造
 - `<section>` や `<div>` によるセクション分割
 - セクションの出現順序と数
+- セマンティックHTML要素の使用状況（`<article>`, `<aside>`, `<nav>`, `<figure>`）
+- ARIA ランドマーク（`role="banner"`, `role="navigation"`, `role="main"`, `role="contentinfo"`）
+- 見出し階層（h1→h2→h3 の適切なネスト）の検証
 
 ### Step 2: セクション単位の詳細解析
 各セクションについて以下を記録する:
 
 1. **セクションID/クラス名**: 識別に使える属性
 2. **セクションの役割**: hero / about / service / feature / CTA / FAQ / contact / testimonial 等
-3. **レイアウトパターン**:
+3. **レイアウトパターン分類**:
    - `full-width`: 全幅
    - `contained`: max-width制限あり
    - `two-column`: 2カラム（テキスト+画像等）
-   - `grid-3col`: 3カラムグリッド
-   - `grid-4col`: 4カラムグリッド
-   - `alternating`: 左右交互レイアウト
+   - `grid-3col` / `grid-4col`: グリッドレイアウト
+   - `alternating`: 左右交互レイアウト（ジグザグ）
+   - `holy-grail`: ヘッダー+サイドバー+メイン+フッター
+   - `sidebar-left` / `sidebar-right`: サイドバー付き
+   - `masonry`: 不等高カードの瀑布型配置
+   - `split-screen`: 画面2分割（50/50）
+   - `asymmetric`: 非対称レイアウト（60/40等）
 4. **配置方法**: Flexbox / CSS Grid / 絶対配置
 5. **子要素の構成**: 見出し + テキスト + ボタン、カード x 3、画像 + テキスト 等
 6. **推定高さ**: 100vh / auto / 特定px値

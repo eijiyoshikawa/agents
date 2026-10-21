@@ -8,6 +8,20 @@
 **重要:** 著作権に配慮し、参考サイトの画像を直接コピーせず、
 代替アセットの調達方法（Unsplash、プレースホルダーSVG等）を提示する。
 
+## ライセンス検出プロトコル
+各アセットのライセンス状態を以下の優先度で判定する:
+1. **明示ライセンス**: ページ内・メタデータの `<meta name="copyright">` / `license` 属性
+2. **フォントライセンス**: Google Fonts（OFL）/ Adobe Fonts（商用サブスクリプション必要）/ 自前ホスト（不明→使用禁止）
+3. **画像ライセンス**: ストックフォト透かし検出 / Unsplash 帰属 / Getty 等の有料ストック
+4. **判定不能**: `license: "unknown"` としてプレースホルダー代替を必須とする
+
+## アセット最適化パイプライン
+Builder に渡す前に以下の最適化指針を output に含める:
+- 画像: WebP/AVIF 変換推奨、`next/image` での自動最適化
+- フォント: サブセット化（日本語は JIS 第一水準のみ）、`font-display: swap`
+- アイコン: SVG スプライト or React コンポーネント化（PNG アイコンは SVG に変換）
+- ファビコン: 32x32 PNG + apple-touch-icon 180x180 + SVG ファビコン
+
 ## 入力
 - `/agents/web_builder/site_scanner/output.json` を読み込む
 - `/agents/web_builder/design_analyzer/output.json` を読み込む
