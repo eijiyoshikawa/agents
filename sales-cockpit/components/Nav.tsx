@@ -37,6 +37,8 @@ type Group = { label: string; icon: LucideIcon; items: Item[] };
 
 // 単独リンク（ダッシュボード）＋ グループ（マウスホバーで展開）。
 const HOME: Item = { href: "/", label: "ダッシュボード", icon: LayoutDashboard };
+// 経営ハブ（全ダッシュボードの入口）。環境変数で上書き可。
+const HUB_URL = process.env.NEXT_PUBLIC_HUB_URL || "https://hub.let-inc.net";
 
 const GROUPS: Group[] = [
   {
@@ -121,6 +123,13 @@ export default function Nav({ userName }: { userName: string | null }) {
           <span className="inline-block w-2.5 h-2.5 rounded-full bg-brand animate-pulseDot" />
           LET Sales System
         </Link>
+        <a
+          href={HUB_URL}
+          className="inline-flex items-center px-2.5 py-1 rounded-lg border border-white/10 text-xs text-ink-muted hover:text-ink hover:bg-white/[0.06] whitespace-nowrap shrink-0 transition-colors"
+          title="経営ハブ（全ダッシュボードの入口）へ戻る"
+        >
+          ← 経営ハブ
+        </a>
 
         {userName && !onAuthPage && (
           <nav className="hidden md:flex items-center gap-1">

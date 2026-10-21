@@ -17,26 +17,28 @@
 
 株式会社LETの3部門（営業・マーケティング・BPO/不動産）の評価制度を、静的HTMLページとして `let-hyoka.vercel.app` で公開・運用している。経営陣用と従業員用（パスワード保護）の2系統。
 
-## 2. 公開URL・パスワード一覧
+## 2. 公開URL・入り方（パスワードの平文はこのリポジトリに書かない）
 
-### 経営陣用（パスワード保護 / 2026-08-08 に L0→L3 化）
-| URL | パスワード | 内容 |
-|-----|-----------|------|
-| `let-hyoka.vercel.app/` | `letyakuin2026` | 部門選択トップ |
-| `let-hyoka.vercel.app/sales` | 同上 | 営業部 v1.4 |
-| `let-hyoka.vercel.app/marketing` | 同上 | マーケ部 v1.4（上下にv2.0誘導バナーあり）|
-| `let-hyoka.vercel.app/bpo` | 同上 | BPO・不動産事業部 v1.4拡張版 |
+### 経営陣用（2026-08-08 に L0→L3 化、2026-10-20 に経営ハブの共通ログイン対応）
+| URL | 入り方 | 内容 |
+|-----|-------|------|
+| `hyoka.let-inc.net/` | 経営ハブ（hub.let-inc.net）にログイン済みの役員はそのまま開く | 部門選択トップ |
+| `hyoka.let-inc.net/sales` | 同上 | 営業部 v1.4 |
+| `hyoka.let-inc.net/marketing` | 同上 | マーケ部 v1.4（上下にv2.0誘導バナーあり）|
+| `hyoka.let-inc.net/bpo` | 同上 | BPO・不動産事業部 v1.4拡張版 |
+| `let-hyoka.vercel.app/…` | 経営陣パスワード（担当者管理。Vercel `HYOKA_EXEC_PASSWORD` と同じ値） | 同上 |
 
 - 4ページ共通の sessionStorage キー `let_auth_exec` — **1回のログインで経営陣4ページすべて解錠**
 - 従来はパスワード無し（URLを知っていれば誰でも閲覧可）だったが、経営側P&Lを含むため保護を追加
+- 共通ログインの仕組みは `middleware.js` の冒頭コメントと README「共通ログイン」を参照
 
 ### 従業員用・新制度（パスワード保護 / SHA-256 + sessionStorage）
 | URL | パスワード | 内容 |
 |-----|-----------|------|
-| `/demo/sales` | `saleslet1117` | 営業従業員用（P&Lなし・四半期表あり）|
-| `/demo/marketing` | `makematsu2026` | マーケ従業員用（同上）|
-| `/demo/bpo` | `sawaletinc2026` | BPO従業員用（同上）|
-| `/marketing/v2` | `makematsu2026` | **マーケ評価制度 v2.0（チーム評価版）** |
+| `/demo/sales` | 営業部用（担当者管理） | 営業従業員用（P&Lなし・四半期表あり）|
+| `/demo/marketing` | マーケ部用（担当者管理） | マーケ従業員用（同上）|
+| `/demo/bpo` | BPO用（担当者管理） | BPO従業員用（同上）|
+| `/marketing/v2` | マーケ部用、または経営陣パスワード | **マーケ評価制度 v2.0（チーム評価版）** |
 
 ## 3. Git / デプロイ構成（重要）
 
