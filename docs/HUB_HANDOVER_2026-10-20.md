@@ -10,6 +10,7 @@
 | `let-incjp/masterAI` | 案件KPI（/kpi）・運用管理（/ops）・CPA目標・ペルソナシート・応募 Webhook・制作物リンク | `main`（同上） |
 | `eijiyoshikawa/jinjiLsystem` | 人材紹介管理（`web/`） | `main`（同上） |
 | `eijiyoshikawa/slack_let` | 財務ダッシュボード | `main`（同上） |
+| `let-incjp/lp-factory` | **LP ファクトリー**（採用 LP テンプレート。`<slug>.aigrowthx.pro` で全案件を配信。2026-10-21 新設） | `main`（push が本番。Vercel LET チーム `lp-factory`） |
 | `eijiyoshikawa/genbacareer` | 対象外（特定商取引法ページの代表者名修正 1 件だけ作業ブランチにある） | 必要なときだけ |
 
 **2026-10-21**: 4 リポジトリとも main にマージ済み。main への push（マージ）が本番デプロイになるので、main には動作確認済みのものだけを入れる。
@@ -58,6 +59,13 @@
 - 設定済み: `agents` の `HUB_URL`、`HYOKA_EXEC_PASSWORD`（経営陣パスワード。役員は入力なしで開ける）
 - 検証済み: プレビュー環境で未ログイン→ハブのログインへ 302、役員→200＋解錠 Cookie、管理職→経営陣ページ 403・従業員ページ 200 を確認。`agents` の Preview 環境変数 `DELETE_ME_TEST_*` 3 件はその検証の残骸なので削除してよい
 - `*.vercel.app` では何も変わらないので、作業ブランチを本番デプロイ済み（let-hyoka.vercel.app は従来どおり）
+
+### LP ファクトリー（2026-10-21 新設。詳細は `docs/LP_FACTORY_PROPOSAL.md` と lp-factory の README）
+- [x] リポジトリ `let-incjp/lp-factory`、Vercel プロジェクト `lp-factory`（LET チーム）、`*.aigrowthx.pro` のワイルドカードドメイン付与、初回デプロイ
+- [x] テンプレート `recruit-onepage`（アルファガード構成 × 八百一の CSS 変数設計）、案件 `sample` / `alphaguard`、LINE 待機ページ、共通ストック写真、計測タグ
+- [x] 独自ドメインの自動追加（`sites/*.json` の `domains` → GitHub Actions `sync-domains` が Vercel に追加し DNS 設定を表示）
+- [ ] **オーナー**: Vercel のアクセストークンを GitHub `lp-factory` の Secret `VERCEL_TOKEN` に登録（独自ドメイン自動追加の初期設定。README「独自ドメイン」）
+- [ ] 次: 写真アップロード、masterAI 案件ページ「LP を作る」フォーム → `sites/<slug>.json` 生成・制作物リンク自動登録、採用サイト型テンプレート
 
 ### 次のセッション（開発）
 - [x] 作業ブランチの main マージ — 2026-10-21 完了（agents #47 / masterAI #12 / slack_let #107。jinjiLsystem は既にマージ済み）。以後は main への push で自動デプロイ。本番は main の内容で稼働中
