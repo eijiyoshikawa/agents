@@ -7,6 +7,7 @@ import { listMemberRecords } from "@/lib/member-store";
 import { configMembers } from "@/lib/members";
 import { ROLE_LABEL } from "@/lib/roles";
 import { MemberForm } from "./member-form";
+import { ImportConfigMember, MemberRowActions } from "./row-actions";
 import { toggleActiveAction } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -49,19 +50,41 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
             config/members.json の役員のみログインできます。
           </div>
         )}
+        {dbOk && !dbError && editing && (
+          <div id="member-form">
+            <MemberForm dashboards={dashboards} editing={editing} />
+            <p className="mt-2 text-sm">
+              <a href="/admin/members" className="link">編集をやめて一覧に戻る</a>
+            </p>
+          </div>
+        )}
         <div className="card p-6">
-          <h2 className="font-semibold">設定ファイルのメンバー（役員・固定）</h2>
-          <ul className="mt-2 text-sm text-ink">
-            {configMembers().map((m) => (
-              <li key={m.email}>
-                {m.name} <span className="text-ink-3">{m.email}</span> <span className="chip chip-brand ml-1">{ROLE_LABEL[m.role]}</span>
-              </li>
-            ))}
+          <h2 className="font-semibold">設定ファイルのメンバー（役員）</h2>
+          <p className="mt-1 text-xs text-ink-2">
+            config/members.json に固定で入っている役員。「編集できるようにする」を押すと登録メンバーに取り込まれ、氏名・役割・パスワード再発行・無効化を画面から行えます（取り込んだメンバーは設定ファイルより優先されます）。
+          </p>
+          <ul className="mt-3 space-y-2 text-sm text-ink">
+            {configMembers().map((m) => {
+              const inDb = members.find((d) => d.email === m.email);
+              return (
+                <li key={m.email} className="flex flex-wrap items-center gap-2">
+                  <span>
+                    {m.name} <span className="text-ink-3">{m.email}</span> <span className="chip chip-brand ml-1">{ROLE_LABEL[m.role]}</span>
+                  </span>
+                  {inDb ? (
+                    <span className="chip chip-good">登録メンバーで管理中（下の一覧から編集）</span>
+                  ) : dbOk && !dbError ? (
+                    <ImportConfigMember email={m.email} name={m.name} />
+                  ) : null}
+                </li>
+              );
+            })}
           </ul>
         </div>
         {dbOk && (
           <div className="card p-6">
             <h2 className="font-semibold">登録メンバー（{members.length} 名）</h2>
+            <p className="mt-1 text-xs text-ink-2">編集＝氏名・役割・見られる項目の変更。無効化＝ログイン停止（復帰可）。パスワード再発行＝初期パスワードを作り直して 1 回表示。削除＝完全に消す（元に戻せない）。</p>
             {members.length === 0 ? (
               <p className="mt-2 text-sm text-ink-2">まだ登録がありません。</p>
             ) : (
@@ -88,14 +111,17 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
                         {m.mustChangePassword && m.active ? "・初回変更待ち" : ""}
                       </td>
                       <td className="text-right">
-                        <a href={`/admin/members?edit=${encodeURIComponent(m.email)}`} className="link text-xs">
+                        <a href={`/admin/members?edit=${encodeURIComponent(m.email)}#member-form`} className="link text-xs">
                           編集
                         </a>
                         <form action={toggleActiveAction} className="inline ml-2">
                           <input type="hidden" name="email" value={m.email} />
                           <input type="hidden" name="active" value={m.active ? "0" : "1"} />
-                          <button className="link text-xs">{m.active ? "無効化" : "再有効化"}</button>
+                          <button className="link text-xs" title={m.active ? "ログインできなくします（データは残ります）" : "ログインできるようにします"}>
+                            {m.active ? "無効化" : "再有効化"}
+                          </button>
                         </form>
+                        <MemberRowActions email={m.email} name={m.name} isSelf={m.email === session.user.email} />
                       </td>
                     </tr>
                   ))}
@@ -104,7 +130,7 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
             )}
           </div>
         )}
-        {dbOk && !dbError && <MemberForm dashboards={dashboards} editing={editing} />}
+        {dbOk && !dbError && !editing && <MemberForm dashboards={dashboards} />}
       </section>
       </main>
     </>
