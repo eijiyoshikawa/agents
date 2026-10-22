@@ -4,6 +4,10 @@
 
 ## 全体図
 
+![経営ハブ 構成図](images/hub-architecture-2026-10-22.png)
+
+同じ図の Mermaid ソース（GitHub 上で描画される）:
+
 ```mermaid
 flowchart TB
   subgraph users["利用者（役割）"]
@@ -25,9 +29,11 @@ flowchart TB
   exec --> login
   mgr --> login
   staff --> login
-  login --> auth --> members
-  auth --> cookie --> dash
-  exec -. 管理 .-> admin --> members
+  login --> auth
+  auth -- "メンバー照合" --> members
+  auth -- "ログイン成功" --> cookie --> dash
+  members -. "メンバーの追加・編集" .- admin
+  exec -. "役員のみ" .-> admin
 
   subgraph apps["各ダッシュボード（同じ HUB_SESSION_SECRET で let_hub を検証・再ログイン不要）"]
     direction TB
