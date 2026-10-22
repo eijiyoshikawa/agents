@@ -56,3 +56,9 @@ export async function setMemberActive(email: string, active: boolean, actor: str
   const s = await db();
   await s`UPDATE hub_member SET active = ${active}, updated_at = now(), updated_by = ${actor} WHERE email = ${email.toLowerCase()}`;
 }
+
+/** メンバーを完全に削除する（退職等。履歴は残らない。一時停止なら setMemberActive を使う） */
+export async function deleteMemberRecord(email: string): Promise<void> {
+  const s = await db();
+  await s`DELETE FROM hub_member WHERE email = ${email.toLowerCase()}`;
+}

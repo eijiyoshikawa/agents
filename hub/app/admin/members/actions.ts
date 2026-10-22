@@ -4,8 +4,8 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { hubDbConfigured } from "@/lib/db";
 import { allDashboardKeys } from "@/lib/dashboards";
-import { listMemberRecords, setMemberActive, setMemberPassword, upsertMemberRecord } from "@/lib/member-store";
-import { normalizeEmail } from "@/lib/members";
+import { deleteMemberRecord, listMemberRecords, setMemberActive, setMemberPassword, upsertMemberRecord } from "@/lib/member-store";
+import { configMembers, normalizeEmail } from "@/lib/members";
 import { generatePassword, hashPassword } from "@/lib/password";
 import { isRole, type Role } from "@/lib/roles";
 
@@ -53,4 +53,59 @@ export async function toggleActiveAction(fd: FormData): Promise<void> {
   if (!email) return;
   await setMemberActive(email, String(fd.get("active")) === "1", actor);
   revalidatePath("/admin/members");
+}
+
+export type RowActionState = { ok: boolean; message: string; initialPassword?: string; email?: string };
+
+/** 一覧の行から初期パスワードを再発行する（本人には次回ログイン時に変更を求める） */
+export async function reissuePasswordAction(_prev: RowActionState, fd: FormData): Promise<RowActionState> {
+  try {
+    const actor = await requireExec();
+    const email = normalizeEmail(String(fd.get("email") ?? ""));
+    if (!email) return { ok: false, message: "メールアドレスが不正です" };
+    const existing = (await listMemberRecords()).find((m) => m.email === email);
+    if (!existing) return { ok: false, message: "登録メンバーに見つかりません" };
+    const initialPassword = generatePassword();
+    await setMemberPassword(email, hashPassword(initialPassword), true, actor);
+    revalidatePath("/admin/members");
+    return { ok: true, message: `${existing.name} のパスワードを再発行しました`, initialPassword, email };
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : "再発行に失敗しました" };
+  }
+}
+
+/** メンバーを完全に削除する（自分自身は削除できない） */
+export async function deleteMemberAction(_prev: RowActionState, fd: FormData): Promise<RowActionState> {
+  try {
+    const actor = await requireExec();
+    const email = normalizeEmail(String(fd.get("email") ?? ""));
+    if (!email) return { ok: false, message: "メールアドレスが不正です" };
+    if (email === actor) return { ok: false, message: "自分自身は削除できません（他の役員に依頼してください）" };
+    await deleteMemberRecord(email);
+    revalidatePath("/admin/members");
+    return { ok: true, message: `${email} を削除しました` };
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : "削除に失敗しました" };
+  }
+}
+
+/**
+ * 設定ファイル（config/members.json）の役員を DB に取り込み、画面から編集・パスワード再発行・無効化できるようにする。
+ * DB のメンバーは設定ファイルより優先されるので、取り込んだ時点で初期パスワードが新しくなる（1 回だけ表示）。
+ */
+export async function importConfigMemberAction(_prev: RowActionState, fd: FormData): Promise<RowActionState> {
+  try {
+    const actor = await requireExec();
+    const email = normalizeEmail(String(fd.get("email") ?? ""));
+    const cfg = configMembers().find((m) => m.email === email);
+    if (!email || !cfg) return { ok: false, message: "設定ファイルのメンバーに見つかりません" };
+    if ((await listMemberRecords()).some((m) => m.email === email)) return { ok: false, message: "すでに登録メンバーにあります（下の一覧から編集してください）" };
+    await upsertMemberRecord({ email, name: cfg.name, role: cfg.role, allow: cfg.allow ?? null, active: true }, actor);
+    const initialPassword = generatePassword();
+    await setMemberPassword(email, hashPassword(initialPassword), true, actor);
+    revalidatePath("/admin/members");
+    return { ok: true, message: `${cfg.name} を登録メンバーに取り込みました。以後は下の一覧から編集できます`, initialPassword, email };
+  } catch (e) {
+    return { ok: false, message: e instanceof Error ? e.message : "取り込みに失敗しました" };
+  }
 }
