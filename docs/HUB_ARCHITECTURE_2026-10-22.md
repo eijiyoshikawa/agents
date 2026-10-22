@@ -42,7 +42,7 @@ flowchart TB
     sales["営業コックピット<br/>sales.let-inc.net<br/>agents/sales-cockpit ／ Vercel sales-cockpit<br/>manager"]
     kpi["案件 KPI（Recruit Ops）<br/>kpi.let-inc.net/kpi<br/>masterAI ／ Vercel masterai<br/>manager"]
     ops["採用マーケティング運用管理<br/>kpi.let-inc.net/ops<br/>masterAI（担当は /ops/staff で登録）<br/>staff"]
-    jinji["人材紹介 KPI（求人・求職者）<br/>jinji.let-inc.net<br/>jinjiLsystem/web ／ Vercel jinji-l-system<br/>manager（exec→管理者・CA・RA、manager→CA・RA。/settings/users で個別指定）"]
+    jinji["人材紹介 KPI（求人・求職者）<br/>jinji.let-inc.net<br/>jinjiLsystem/web ／ Vercel jinji-l-system<br/>staff（exec→管理者・CA・RA、それ以外→CA・RA。/settings/users で個別指定）"]
     console["Internal Console<br/>GitHub Pages<br/>リンクのみ（SSO 未対応）／ staff"]
   end
 
@@ -91,14 +91,14 @@ flowchart TB
 | 営業コックピット | sales.let-inc.net | agents/sales-cockpit ／ sales-cockpit | `let_hub` | Notion | manager |
 | 案件 KPI（Recruit Ops） | kpi.let-inc.net/kpi | masterAI ／ masterai | `let_hub` | Vercel KV・Notion | manager |
 | 採用マーケ運用管理 | kpi.let-inc.net/ops | masterAI ／ masterai | `let_hub` ＋ /ops/staff | Postgres（Neon） | staff |
-| 人材紹介 KPI | jinji.let-inc.net | jinjiLsystem/web ／ jinji-l-system | `let_hub`（manager 以上）＋ /settings/users | Postgres | manager |
+| 人材紹介 KPI | jinji.let-inc.net | jinjiLsystem/web ／ jinji-l-system | `let_hub`（staff 以上。`HUB_MIN_ROLE` で絞り込み可）＋ /settings/users | Postgres | staff |
 | Internal Console | GitHub Pages | agents/console | なし（リンクのみ） | 静的 | staff |
 | LP ファクトリー（ハブ外） | *.aigrowthx.pro | let-incjp/lp-factory ／ lp-factory | なし（公開） | sites/*.json（masterAI「LP を作る」から生成） | — |
 
 ## 共通の仕組み
 
 - **共通ログイン**: ハブでログイン → 初回パスワード変更後に `let_hub`（HMAC-SHA256、`HUB_SESSION_SECRET`、Domain `.let-inc.net`、payload は email/name/role/期限）を発行。各アプリは同じ秘密で検証するだけで、ユーザー DB を持たない
-- **役割**: `exec` ＞ `manager` ＞ `staff`。ハブの「見られる項目」でさらに絞れる。人材紹介は exec→管理者・CA・RA、manager→CA・RA を既定とし、`/settings/users` で個別指定。運用管理は `/ops/staff` の登録で担当者になる
+- **役割**: `exec` ＞ `manager` ＞ `staff`。ハブの「見られる項目」でさらに絞れる。人材紹介は staff 以上を通し、exec→管理者・CA・RA、それ以外→CA・RA を既定として `/settings/users` で個別指定。運用管理は `/ops/staff` の登録で担当者になる
 - **メンバー管理**: `/admin/members`（役員のみ）。設定ファイルの役員 3 名は固定だが「編集できるようにする」で DB に取り込める（DB が優先）
 - **秘密の所在**: `HUB_SESSION_SECRET`（ハブ＋6 プロジェクト共通）、`HUB_PASSWORD_HASHES`（設定ファイル役員のパスワード）、`HUB_DATABASE_URL`（メンバー DB）。各アプリ固有: `CRON_SECRET`（slack-let / sales-cockpit）、`RECRUIT_INTAKE_KEY`・`LP_FACTORY_GITHUB_TOKEN`・`MK_AGENDA_TRIGGER_KEY`（masterai）、`VERCEL_TOKEN`（lp-factory の GitHub Secret）
 
