@@ -11,32 +11,32 @@
 - 補足: 未登録でもハブ経由で入れる（役員→管理者・CA・RA、それ以外→CA・RA）。細かく分けたい人だけ登録すれば足りる
 - 先に: 画面に黄色の案内「パスワード列を追加する(003 を実行)」が出ていればボタンを押す（2026-10-22 の修正で自動化済み。出なければ対応不要）
 
-### A-2. 人材紹介の旧共通ログイン削除（A-1 の後）
-- [ ] 画面: https://vercel.com/let-9aa5c48c/jinji-l-system/settings/environment-variables
+### A-2. 人材紹介の旧共通ログイン削除（A-1 の後） — **2026-10-22 完了**
+- [x] 画面: https://vercel.com/let-9aa5c48c/jinji-l-system/settings/environment-variables
 - 内容: `SHARED_LOGIN_ID` / `SHARED_LOGIN_PASSWORD`（あれば `SHARED_LOGIN_ROLES`）を Remove → https://vercel.com/let-9aa5c48c/jinji-l-system/deployments の最新 Production を Redeploy
 - 当面残すなら: `SHARED_LOGIN_PASSWORD` だけ新しい値に差し替える（パスワードがチャットに残っているため）
 - 確認: https://jinji.let-inc.net/settings/users の「社内共有アカウント」が「未設定」になる
 
-### A-3. `MK_AGENDA_TRIGGER_KEY` の作り直し（Vercel と GitHub を同じ値に）
-- [ ] 値を作る: Mac のターミナルで `openssl rand -hex 32`
+### A-3. `MK_AGENDA_TRIGGER_KEY` の作り直し（Vercel と GitHub を同じ値に） — **2026-10-22 完了**
+- [x] 値を作る: Mac のターミナルで `openssl rand -hex 32`
 - [ ] Vercel: https://vercel.com/let-9aa5c48c/masterai/settings/environment-variables → `MK_AGENDA_TRIGGER_KEY` → Edit → Save
 - [ ] GitHub: https://github.com/let-incjp/masterAI/settings/secrets/actions → `MK_AGENDA_TRIGGER_KEY` → Update secret
 - [ ] Redeploy: https://vercel.com/let-9aa5c48c/masterai/deployments → 最新 Production → Redeploy
 - [ ] 確認: https://github.com/let-incjp/masterAI/actions/workflows/mk-agenda-regen.yml → Run workflow（会議日を入力・notify は off）→ 緑
 
-### A-4. `agents` の未使用 `CRON_SECRET` 削除
-- [ ] 画面: https://vercel.com/let-9aa5c48c/agents/settings/environment-variables → `CRON_SECRET` → Remove（Redeploy 不要）
+### A-4. `agents` の未使用 `CRON_SECRET` 削除 — **2026-10-22 完了**
+- [x] 画面: https://vercel.com/let-9aa5c48c/agents/settings/environment-variables → `CRON_SECRET` → Remove（Redeploy 不要）
 - 代行可: 「3-b は消しておいて」と依頼すればセッション側で削除できる
 
-### A-5. LP ファクトリー用トークンの期限管理
-- [ ] GitHub PAT「masterai lp-factory」の期限を確認: https://github.com/settings/personal-access-tokens
+### A-5. LP ファクトリー用トークンの期限管理 — **2026-10-22 完了（期限が来たら下記手順）**
+- [x] GitHub PAT「masterai lp-factory」の期限を確認: https://github.com/settings/personal-access-tokens
 - [ ] Vercel トークン「lp-factory sync-domains」の期限を確認: https://vercel.com/account/settings/tokens（無期限なら対応不要）
 - [ ] 期限の 2 週間前にカレンダー登録「LP ファクトリーのトークン更新」
 - 更新先: https://vercel.com/let-9aa5c48c/masterai/settings/environment-variables の `LP_FACTORY_GITHUB_TOKEN` ／ https://github.com/let-incjp/lp-factory/settings/secrets/actions の `VERCEL_TOKEN`
 - 切れたときの症状: 「LP を作る」で 401、lp-factory の Actions `sync-domains` が赤
 
-### A-6. 要件書 10 章の基準値を入力
-- [ ] 画面: https://kpi.let-inc.net/ops/settings（KPI 基準の欄）
+### A-6. 要件書 10 章の基準値を入力 — **2026-10-22 完了**（媒体別 CTR は目安と自社実績を画面に表示するようにした。let-incjp/masterAI#16）
+- [x] 画面: https://kpi.let-inc.net/ops/settings（KPI 基準の欄）
 - 内容: 媒体別 CTR 基準・LP 応募率・面接設定率をオーナー判断の値で入力。入力まで案件ページ「概要」の判定は「基準未設定」
 - 参考: `masterAI/docs/recruit-ops.md`「KPI 基準の判定」
 
