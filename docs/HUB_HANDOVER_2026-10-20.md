@@ -69,6 +69,10 @@
 - [ ] **オーナー**: 「LP を作る」の有効化 — GitHub の Fine-grained PAT（Resource owner `let-incjp`、Repository access は lp-factory のみ、Permissions は Contents: Read and write）を作り、Vercel → masterai → Environment Variables に `LP_FACTORY_GITHUB_TOKEN` として追加 → Redeploy。未設定の間は画面に案内が出て保存できない
 - [ ] 次: 写真アップロード（現状は GitHub の `public/sites/<slug>/` に置く）、採用サイト型テンプレート、masterAI の「LP を作る」で細かい文言（給与例・一日の流れ・声）も編集できるようにする
 
+### リマインド（オーナーから共有待ち）
+- [ ] **新しい社内システムの連携** — オーナーがリポジトリを共有したら、`docs/HUB_ADD_DASHBOARD.md` の 0 章（8 項目）を確認して連携する（A リンクのみ → B 共通ログイン → C 役割連動）。受け入れ側（手順書・Python 版検証コード）は 2026-10-22 に準備済み
+- [x] 人材紹介（jinji.let-inc.net）にハブから直行 — 2026-10-22 staff 以上を通すよう変更（jinjiLsystem #2、agents のカード minRole を staff に）。共有 ID（let-staff）はハブ外の人向けに残置。パスワードはチャットで共有されたので作り直し推奨（Vercel jinji-l-system の `SHARED_LOGIN_PASSWORD`）
+
 ### 次のセッション（開発）
 - [x] 作業ブランチの main マージ — 2026-10-21 完了（agents #47 / masterAI #12 / slack_let #107。jinjiLsystem は既にマージ済み）。以後は main への push で自動デプロイ。本番は main の内容で稼働中
 - [x] 評価制度サイト（静的）の共通ログイン対応（Edge Middleware で `let_hub` 検証。`agents` プロジェクト）— 2026-10-20 実装。有効化は上記

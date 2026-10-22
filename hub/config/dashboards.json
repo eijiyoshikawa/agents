@@ -26,11 +26,11 @@
     {
       "key": "jinji",
       "title": "人材紹介 KPI（求人・求職者管理）",
-      "desc": "CA/RA 別の目標対実績・ヨミ表・レポート",
+      "desc": "CA/RA 別の目標対実績・ヨミ表・レポート。ハブにログインしていれば再ログインなしで直行",
       "source": "jinjiLsystem/web",
       "urlEnv": "HUB_URL_JINJI",
       "defaultUrl": "https://jinji.let-inc.net/dashboard",
-      "minRole": "manager",
+      "minRole": "staff",
       "sso": "ready",
       "group": "人材紹介"
     },
