@@ -20,6 +20,7 @@
 | `lib/dashboards.ts` / `config/dashboards.json` | 遷移先一覧。URL は env 優先、役割で表示を絞る |
 | `shared/verify-hub-session.js` | 各アプリへコピーする検証コード（Node / CommonJS、依存なし） |
 | `shared/verify-hub-session.edge.ts` | 各アプリへコピーする検証コード（Next.js middleware / Edge） |
+| `shared/verify_hub_session.py` | 各アプリへコピーする検証コード（Python 3.8+・標準ライブラリのみ。Flask / FastAPI / Django 向け） |
 | `app/api/me` | 自分のセッションと閲覧可能ダッシュボード（疎通確認用） |
 
 ## セットアップ
@@ -61,6 +62,8 @@ npm run typecheck && npm test && npm run build
 ```
 
 ## 各ダッシュボードを共通ログインに対応させる手順
+
+新しい社内システムを加える手順の全体（依頼時の確認項目・リンクのみ／共通ログイン／役割連動の 3 段階・チェックリスト）は [`/docs/HUB_ADD_DASHBOARD.md`](../docs/HUB_ADD_DASHBOARD.md)。
 
 1. 対象アプリの Vercel 環境変数に、ハブと同じ `HUB_SESSION_SECRET` を追加する。
 2. 対象アプリを親ドメインのサブドメインに載せる（例: `finance.let-inc.net`）。Cookie は `HUB_COOKIE_DOMAIN=.let-inc.net` で共有される。
