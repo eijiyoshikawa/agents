@@ -5,7 +5,7 @@
 
 ## 0. 次のセッションの始め方
 
-1. 6 リポジトリを接続する（下表。サクパスBPO は 2026-10-23 後半に追加）。すべて **main が本番**（main への push＝自動デプロイ）。作業は main から新しいブランチを切る
+1. 7 リポジトリを接続する（下表。サクパスBPO・名刺管理は 2026-10-23 後半に追加）。すべて **main が本番**（main への push＝自動デプロイ）。作業は main から新しいブランチを切る
 2. このファイルの「2. まだ終わっていないこと」から着手するか、オーナーの新しい依頼を受ける
 3. 変更は 1 件ごとに PR → マージ（オーナーの標準指示: 「全部 PR 作成してマージまで」）。マージ前に各リポジトリの検証コマンド（6 章）を通す
 4. 禁止事項（全リポジトリ CLAUDE.md）: 空コミット・自動コミット生成・再トリガー目的のコミット。秘密はリポジトリやチャットに書かない（Vercel の環境変数のみ）
@@ -17,6 +17,7 @@
 | `eijiyoshikawa/jinjiLsystem` | 人材紹介（`web/`） | jinji.let-inc.net（jinji-l-system） |
 | `eijiyoshikawa/slack_let` | 財務ダッシュボード | finance.let-inc.net（slack-let） |
 | `let-incjp/lp-factory` | 採用 LP テンプレート配信（`<接頭辞>.aigrowthx.pro`） | lp-factory（LET チーム） |
+| `let-incjp/meishiLsystem` | 名刺管理（スキャン・CSV 取込・人脈分析）。**本番ブランチは `claude/zen-mendel-53fvzz`**（main ではない。PR の base もこのブランチ） | meishi.let-inc.net（DNS 設定待ち）／ meishi-lsystem.vercel.app（meishi-lsystem・LET チーム） |
 | `let-incjp/sakupassbpo` | サクパスBPO 管理システム（不動産BPO の契約時間・稼働・請求。資料は同リポジトリ `docs/プロジェクトまとめ（2026-10-23時点）.md`） | bpo.let-inc.net（DNS 設定待ち）／ sakupassbpo.vercel.app（sakupassbpo・LET チーム） |
 
 秘密の一覧と所在は `HUB_ARCHITECTURE_2026-10-22.md`「共通の仕組み」。構成図も同ファイル。
@@ -51,6 +52,8 @@
 - **LP ファクトリーの拡張**（masterAI #27・#28）: 「LP を作る」に細かい文言（数字・キャリアと給与例・一日の流れ・社員の声・募集要項・FAQ）、写真の差し替え（9 枠・1 枚 3.5MB まで）、LP の削除
 - **人材紹介の権限の不具合を修正**（jinjiLsystem #4）: ハブ経由の一般（staff）メンバーが管理者権限になっていた（middleware と画面側の判定のずれ）。`jinjiHubAllows` に一本化
 - サクパスBPO の CI 修正（E2E が新しいチェックアウトで `data/` 不在のため起動しなかった）
+- **要件差分の残り 3 件**（masterAI #29。オーナー決定: 広告は記録＋警告だけ／クレーム・審査落ちは記録だけ／面接以降は担当者が代わりに入力し印を付ける）: /ops クリエイティブタブ「広告セットの操作記録」（増額 20% 超・学習期間中の変更・2 週連続未確認の停止を警告。`ops_adset_log`）、概要タブ「クレーム・審査落ち」（Slack 通知なし・ホームのアラートに出る）、/kpi 応募者の「クライアント報告」と報告日
+- **名刺管理を共通ログインに追加**（meishiLsystem #1、agents #65）: ハブのカード「名刺管理」（key `meishi`、staff 以上）→ `meishi.let-inc.net`。ハブのメールと同じメールの担当者を自動で選ぶ。共通パスワードも併用。Vercel に `meishi.let-inc.net` を追加済み
 
 ### 1-5. オーナー作業で完了したもの（2026-10-22）
 人材紹介の旧共通ログイン削除／`agents` の未使用 `CRON_SECRET` 削除／`MK_AGENDA_TRIGGER_KEY` 作り直し／LP ファクトリーのトークン登録／要件書 5 章（KPI 基準値）の入力
@@ -62,6 +65,11 @@
   1. Vercel → `let-hub` の `HUB_SESSION_SECRET` と同じ値を、Vercel → LET チーム → `sakupassbpo` → Settings → Environment Variables に `HUB_SESSION_SECRET`（Production / Preview）で追加 → Redeploy。値が手元に無ければ、鍵を作り直してハブ＋7 プロジェクト（sakupassbpo を含む）すべてに入れ直す（`OWNER_TASKS_2026-10-20.md` 1-B。セッションに「共通ログインの鍵を作り直して全プロジェクトに入れて再デプロイして」と頼めば代行可）
   2. Xserver の DNS に `bpo.let-inc.net` の TXT・CNAME（sakupassbpo `docs/デプロイ手順（Vercel + Neon）.md` 3-5）
   3. ハブのメンバー管理で使う人に「サクパスBPO 管理システム」をチェック。**サクパスBPO の管理画面で同じメールのユーザーを登録**（未登録だと「登録されていません」と出る）
+  - 2026-10-23 夜時点: 1 は完了（オーナー）。2 の DNS 反映待ち
+- [ ] **名刺管理の共通ログインを有効にする**（2026-10-23 追加）
+  1. Vercel → LET チーム → `meishi-lsystem` → Environment Variables に `HUB_SESSION_SECRET`（let-hub と同じ値。Production / Preview）→ Redeploy
+  2. Xserver の DNS（let-inc.net）に TXT `_vercel` = `vc-domain-verify=meishi.let-inc.net,925707b0d80aec26ae0d`（既存の `_vercel` TXT は残して追加）と CNAME `meishi` → `cname.vercel-dns.com`
+  3. 名刺管理の「担当者」画面で、各担当者のメール欄にハブと同じメールを入れる（入れておくと担当者が自動で選ばれる）
 - [ ] **メンバー登録**: https://hub.let-inc.net/admin/members で各メンバーを「ログインできるサイト」にチェックして追加 → 初期パスワードを本人に渡す。まず 1 人で、チェックしたサイトだけがハブに出ること・外したサイトの URL を直接開くと弾かれることを確認してから残りを進める。運用管理（/ops）を使う人は https://kpi.let-inc.net/ops/staff にも同じメールで登録
 - [ ] 役員ご自身は「すべてのサイト」＋権限「役員」で登録（これまでどおり全部に入れる）
 - [ ] 本番確認（2026-10-23 の変更分）: ① /kpi 概要「クエストを開く」でクエスト画面が開く ② 画面切り替え時に中央の「読み込み中」が出る ③ 「評価制度サイト（セールス）」だけのメンバーで hyoka.let-inc.net → /demo/sales に転送、/sales と /demo/marketing は 403
@@ -79,8 +87,9 @@
 ### 2-3. 開発の次フェーズ（依頼があれば）
 - [ ] **次の新しい社内システムの連携**（オーナーがリポジトリを共有したら。`HUB_ADD_DASHBOARD.md` 0 章の 8 項目 → A リンクのみ／B 共通ログイン／C 役割連動。段階分けは `parent`）
 - [x] LP ファクトリーの拡張: 写真アップロード、細かい文言のフォーム編集、masterAI からの LP 削除（2026-10-23。masterAI #27・#28）
-- [ ] 採用サイト型（複数ページ）テンプレート（デザイン・ページ構成の決定が必要）
-- [x] 新しい社内システムの連携: サクパスBPO（2026-10-23。残りはオーナー作業 2-1）
+- [x] 新しい社内システムの連携: サクパスBPO・名刺管理（2026-10-23。残りはオーナー作業 2-1）
+- [x] 要件差分の残り 3 件（広告セットの判断ルール・クレーム／審査落ち・クライアント入力）: 2026-10-23 masterAI #29
+- [ ] 採用サイト型テンプレート（トップ＋職種別＋募集要項。2026-10-23 オーナー決定・着手中）
 - [ ] 要件差分レポートの未実装分（`masterAI/docs/recruit-marketing-ops-gap-report.md` 5 章）: 広告セット単位の判断ルール、クレーム・審査落ちのエスカレーション、クライアント入力（面接以降）の区別
 - [ ] クエストの拡張（要望が出たら）: 担当者をまたぐ週間目標、バッジ獲得の Slack 通知、GA4 連動（今回は見送り）
 - [ ] 人材紹介 `users` の役割の細かい制御、工数表の補正（作業時間が 2 ヶ月分たまったら）
@@ -119,7 +128,7 @@
 - masterAI: #12〜#25（#18/#19 統合、#20/#21 クエストと一括取り込み、#22 取り込みタイムアウト、#23 リンク遷移、#24 読み込み中表示＋apps 受け入れ、#25 未使用コード整理）
 - agents: #47〜#61（#51 メンバー編集・削除、#52/#53 構成図、#54 連携手順書、#55 人材紹介カード、#56〜#59 資料・修正、#60 ログインできるサイト、#61 評価制度サイト 4 段階）
 - jinjiLsystem: #1〜#4 ／ slack_let: #107〜#108 ／ lp-factory: main 直 push（独自ドメイン自動追加・README）
-- 2026-10-23 後半: agents #63（ハブにサクパスBPO）、sakupassbpo #1（共通ログイン）、masterAI #26（判断 5 項目）・#27（LP 細かい文言・削除）・#28（LP 写真）、jinjiLsystem #4（権限の修正）
+- 2026-10-23 後半: agents #63（ハブにサクパスBPO）、sakupassbpo #1（共通ログイン）、masterAI #26（判断 5 項目）・#27（LP 細かい文言・削除）・#28（LP 写真）・#29（要件差分の残り 3 件）、jinjiLsystem #4（権限の修正）、meishiLsystem #1・agents #65（名刺管理を共通ログインに）
 
 ## 6. 検証コマンド（マージ前に通す）
 
