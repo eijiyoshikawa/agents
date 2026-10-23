@@ -53,6 +53,16 @@ res = await middleware(req("/sales", { cookie: `let_hub=${await session("exec")}
 assert.equal(res.headers.get("x-middleware-next"), "1");
 assert.match(res.headers.get("set-cookie"), /^let_hyoka_unlock=p%40ss%20word; Path=\/; Max-Age=\d+; Secure; SameSite=Lax$/);
 
+// 「ログインできるサイト」に hyoka が無いメンバー → 403（役員でも）
+res = await middleware(req("/demo/sales", { cookie: `let_hub=${await session("exec", { apps: ["sales", "kpi"] })}` }));
+assert.equal(res.status, 403);
+// hyoka を含むメンバー → 通過（一般でも従業員ページは見られる）
+res = await middleware(req("/demo/sales", { cookie: `let_hub=${await session("staff", { apps: ["hyoka"] })}` }));
+assert.equal(res.headers.get("x-middleware-next"), "1");
+// apps が配列でない改ざんは拒否
+res = await middleware(req("/demo/sales", { cookie: `let_hub=${await session("staff", { apps: "hyoka" })}` }));
+assert.equal(res.status, 302);
+
 // 役員・従業員ページ → 通過、解錠 Cookie なし
 res = await middleware(req("/demo/sales", { cookie: `let_hub=${await session("exec")}` }));
 assert.equal(res.headers.get("x-middleware-next"), "1");

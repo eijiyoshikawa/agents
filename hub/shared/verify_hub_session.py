@@ -5,10 +5,11 @@ Node 以外のシステム（Flask / FastAPI / Django / GAS からの移行先�
     from verify_hub_session import verify_hub_session, parse_cookie, has_role
     token = parse_cookie(request.headers.get("Cookie")).get("let_hub")
     hub = verify_hub_session(token, os.environ["HUB_SESSION_SECRET"])
-    if hub and has_role(hub["role"], "manager"):
+    if hub and hub_allows(hub, "<dashboards.json の key>", "manager"):
         ...  # hub["email"] / hub["name"] / hub["role"]（"exec" | "manager" | "staff"）
 
 ペイロードは hub/lib/hub-session.ts と同一形式: base64url(JSON).base64url(HMAC-SHA256)
+apps: メンバー管理で「ログインできるサイト」を個別に選んだメンバーだけに入る（key の配列）。無ければ役割で判定。
 """
 from __future__ import annotations
 
@@ -49,9 +50,20 @@ def verify_hub_session(token: Optional[str], secret: Optional[str], now: Optiona
         return None
     if not isinstance(s.get("email"), str) or not isinstance(s.get("exp"), (int, float)) or s.get("role") not in ROLES:
         return None
+    apps = s.get("apps")
+    if apps is not None and (not isinstance(apps, list) or not all(isinstance(a, str) for a in apps)):
+        return None
     if s["exp"] <= (now if now is not None else int(time.time())):
         return None
     return s
+
+
+def hub_allows(session: dict, key: str, min_role: str = "staff") -> bool:
+    """このメンバーが key のサイトにログインできるか（apps があればその一覧、無ければ役割が min_role 以上）"""
+    apps = session.get("apps")
+    if isinstance(apps, list):
+        return key in apps
+    return has_role(session.get("role", ""), min_role)
 
 
 def has_role(role: str, min_role: str) -> bool:

@@ -3,6 +3,7 @@
  *
  * 独自ドメイン（hyoka.let-inc.net）では経営ハブ（hub.let-inc.net）の共通ログイン
  * Cookie `let_hub` を検証し、未ログインならハブのログイン画面へ送る。
+ *   - ハブのメンバー管理で「ログインできるサイト」を個別に選んだメンバー（apps あり）は「評価制度サイト（hyoka）」が含まれるときだけ通す
  *   - 経営陣ページ（/ /sales /marketing /marketing/v2 /bpo）は役員（exec）のみ
  *   - それ以外（/demo /my /manual /new-system、assets、data）はハブにログイン済みなら誰でも
  *   - 役員には HYOKA_EXEC_PASSWORD を解錠用 Cookie で渡し、assets/hub-unlock.js が
@@ -47,6 +48,7 @@ export async function verifyHubSession(token, secret, now = Math.floor(Date.now(
     if (!ok) return null;
     const s = JSON.parse(new TextDecoder().decode(b64urlDecode(payload)));
     if (s.v !== 1 || typeof s.email !== "string" || typeof s.exp !== "number" || !ROLES.includes(s.role)) return null;
+    if (s.apps !== undefined && (!Array.isArray(s.apps) || !s.apps.every((a) => typeof a === "string"))) return null;
     if (s.exp <= now) return null;
     return s;
   } catch {
@@ -105,6 +107,11 @@ export default async function middleware(req) {
   const hub = await verifyHubSession(getCookie(req, HUB_COOKIE), secret);
   if (!hub) {
     return Response.redirect(`${hubUrl}/login`, 302);
+  }
+
+  // 「ログインできるサイト」を個別に選んだメンバーは、評価制度サイト（hyoka）にチェックがなければ入れない
+  if (Array.isArray(hub.apps) && !hub.apps.includes("hyoka")) {
+    return htmlResponse(403, "このサイトへのログイン権限がありません", `評価制度サイトは「ログインできるサイト」に含まれていません（ログイン中: ${escapeHtml(hub.name || hub.email)}）。役員に経営ハブのメンバー管理で付与を依頼してください。<a href="${hubUrl}">経営ハブへ戻る</a>`);
   }
 
   const execPage = isExecPath(url.pathname);

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { buildSession, hubCookieOptions, signHubSession, verifyHubSession } from "@/lib/hub-session";
-import { verifyHubSession as verifyEdge } from "@/shared/verify-hub-session.edge";
+import { buildSession, hubAllows, hubCookieOptions, signHubSession, verifyHubSession } from "@/lib/hub-session";
+import { hubAllows as edgeAllows, verifyHubSession as verifyEdge } from "@/shared/verify-hub-session.edge";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const nodeVerifier = require("../shared/verify-hub-session.js") as typeof import("../shared/verify-hub-session.js");
 
@@ -14,6 +14,36 @@ describe("hub session 署名・検証", () => {
     expect(await verifyHubSession(token, SECRET, NOW + 10)).toEqual(s);
     expect(await verifyEdge(token, SECRET, NOW + 10)).toEqual(s);
     expect(nodeVerifier.verifyHubSession(token, SECRET, NOW + 10)).toEqual(s);
+  });
+
+  it("ログインできるサイト（apps）を含めて署名・復元でき、判定は 3 実装で一致する", async () => {
+    const s = buildSession({ email: "b@example.com", name: "B", role: "staff", apps: ["ops", "jinji"] }, NOW, 3600);
+    expect(s.apps).toEqual(["ops", "jinji"]);
+    const token = await signHubSession(s, SECRET);
+    const ts = await verifyHubSession(token, SECRET, NOW + 10);
+    const edge = await verifyEdge(token, SECRET, NOW + 10);
+    const node = nodeVerifier.verifyHubSession(token, SECRET, NOW + 10);
+    expect(ts).toEqual(s);
+    expect(edge).toEqual(s);
+    expect(node).toEqual(s);
+    // apps があれば役割に関係なくその一覧で判定（staff でも finance を許可できる／exec でも外せる）
+    expect(hubAllows(ts!, "ops", "staff")).toBe(true);
+    expect(hubAllows(ts!, "finance", "exec")).toBe(false);
+    expect(edgeAllows(edge!, "jinji", "manager")).toBe(true);
+    expect(nodeVerifier.hubAllows(node, "kpi", "staff")).toBe(false);
+    const execAll = buildSession({ email: "c@example.com", name: "C", role: "exec", apps: ["sales"] }, NOW, 3600);
+    expect(hubAllows(execAll, "finance", "exec")).toBe(false);
+    // apps が無ければ従来どおり役割で判定
+    const byRole = buildSession({ email: "d@example.com", name: "D", role: "manager", apps: null }, NOW, 3600);
+    expect(byRole.apps).toBeUndefined();
+    expect(hubAllows(byRole, "finance", "exec")).toBe(false);
+    expect(hubAllows(byRole, "sales", "manager")).toBe(true);
+    expect(nodeVerifier.hubAllows(byRole, "sales", "manager")).toBe(true);
+    // apps が配列でない改ざんは拒否
+    const bad = await signHubSession({ ...s, apps: "ops" as never }, SECRET);
+    expect(await verifyHubSession(bad, SECRET, NOW)).toBeNull();
+    expect(await verifyEdge(bad, SECRET, NOW)).toBeNull();
+    expect(nodeVerifier.verifyHubSession(bad, SECRET, NOW)).toBeNull();
   });
 
   it("秘密鍵が違えば全実装で拒否する", async () => {

@@ -1,67 +1,94 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { saveMemberAction, type MemberFormState } from "./actions";
 import type { MemberRecord } from "@/lib/member-store";
 
+/** ハブ上の権限。「すべてのサイト」を選んだときに見られる範囲と、メンバー管理ができるかを決める */
 const ROLE_OPTIONS = [
-  ["staff", "一般（担当案件・運用画面）"],
-  ["manager", "管理職（営業・人材・KPI）"],
-  ["exec", "役員（すべて・メンバー管理）"],
+  ["staff", "一般 — メンバー管理はできない"],
+  ["manager", "管理職 — メンバー管理はできない（「すべて」のとき管理職向けサイトまで）"],
+  ["exec", "役員 — メンバー管理ができる（「すべて」のとき全サイト）"],
 ] as const;
 
-export function MemberForm({ dashboards, editing }: { dashboards: { key: string; title: string; minRole: string }[]; editing?: MemberRecord }) {
+type DashboardOption = { key: string; title: string; minRole: string };
+
+export function MemberForm({ dashboards, editing }: { dashboards: DashboardOption[]; editing?: MemberRecord }) {
   const [state, action, pending] = useActionState<MemberFormState, FormData>(saveMemberAction, { ok: false, message: "" });
-  const allowSet = new Set(editing?.allow ?? []);
+  // 新規は「サイトを選ぶ」から始める（何も選ばずに全部入れてしまう事故を防ぐ）。編集は保存されている設定を初期値にする
+  const [allowAll, setAllowAll] = useState<boolean>(Boolean(editing && editing.allow === null));
+  const [checked, setChecked] = useState<Set<string>>(() => new Set(editing?.allow ?? []));
+  const toggle = (key: string) => setChecked((prev) => {
+    const next = new Set(prev);
+    if (next.has(key)) next.delete(key);
+    else next.add(key);
+    return next;
+  });
+  const selectAllSites = () => setChecked(new Set(dashboards.map((d) => d.key)));
+  const clearSites = () => setChecked(new Set());
+
   return (
-    <form action={action} className="card p-6 space-y-4" key={editing?.email ?? "new"}>
+    <form action={action} className="card p-6 space-y-5" key={editing?.email ?? "new"}>
       <h2 className="font-semibold">{editing ? `メンバーを編集: ${editing.name}` : "メンバーを追加"}</h2>
+
       <div className="grid gap-3 sm:grid-cols-2">
         <label className="block text-sm">
           <span className="text-ink-2">メールアドレス（ログイン ID）</span>
-          <input name="email" type="email" required defaultValue={editing?.email ?? ""} readOnly={Boolean(editing)} className="input" />
+          <input name="email" type="email" required defaultValue={editing?.email ?? ""} readOnly={Boolean(editing)} className="input" placeholder="taro.yamada@let-inc.net" />
         </label>
         <label className="block text-sm">
           <span className="text-ink-2">氏名</span>
-          <input name="name" required defaultValue={editing?.name ?? ""} className="input" />
+          <input name="name" required defaultValue={editing?.name ?? ""} className="input" placeholder="山田 太郎" />
         </label>
-        <label className="block text-sm">
-          <span className="text-ink-2">役割</span>
-          <select name="role" defaultValue={editing?.role ?? "staff"} className="input">
-            {ROLE_OPTIONS.map(([v, l]) => (
-              <option key={v} value={v}>
-                {l}
-              </option>
-            ))}
-          </select>
-        </label>
-        <div className="text-sm">
-          <span className="text-ink-2">見られる項目</span>
-          <div className="mt-1 flex flex-col gap-1">
-            <label className="flex items-center gap-2">
-              <input type="radio" name="allow_mode" value="all" defaultChecked={!editing || editing.allow === null} /> 役割で見られる項目すべて
-            </label>
-            <label className="flex items-center gap-2">
-              <input type="radio" name="allow_mode" value="some" defaultChecked={Boolean(editing && editing.allow !== null)} /> 選んだ項目だけ
-            </label>
-          </div>
-        </div>
       </div>
-      <fieldset className="rounded-lg border border-line p-3">
-        <legend className="px-1 text-xs text-ink-2">項目（「選んだ項目だけ」のとき有効。役割の上限を超える項目は表示されません）</legend>
-        <div className="grid gap-1 sm:grid-cols-2">
+
+      <fieldset className="rounded-lg border border-line p-4">
+        <legend className="px-1 text-sm font-semibold">ログインできるサイト</legend>
+        <p className="text-xs text-ink-2">チェックしたサイトだけがハブに表示され、そのサイトの URL を直接開いたときも同じ判定で通します。</p>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
           {dashboards.map((d) => (
-            <label key={d.key} className="flex items-center gap-2 text-sm">
-              <input type="checkbox" name="allow" value={d.key} defaultChecked={allowSet.has(d.key)} /> {d.title} <span className="text-xs text-ink-3">({d.minRole}以上)</span>
+            <label key={d.key} className={`flex items-start gap-2 rounded-md border px-3 py-2 text-sm ${allowAll ? "border-line opacity-50" : checked.has(d.key) ? "border-brand-ink/60 bg-brand/10" : "border-line"}`}>
+              <input type="checkbox" name="allow" value={d.key} checked={!allowAll && checked.has(d.key)} disabled={allowAll} onChange={() => toggle(d.key)} className="mt-1" />
+              <span>
+                {d.title}
+                <span className="ml-1 text-xs text-ink-3">({d.key})</span>
+              </span>
             </label>
           ))}
         </div>
+        <div className="mt-3 flex flex-wrap items-center gap-3 text-xs">
+          <button type="button" className="link" onClick={selectAllSites} disabled={allowAll}>
+            全部チェック
+          </button>
+          <button type="button" className="link" onClick={clearSites} disabled={allowAll}>
+            全部外す
+          </button>
+          <span className="text-ink-3">{allowAll ? "" : `${checked.size} / ${dashboards.length} サイト`}</span>
+        </div>
+        <label className="mt-3 flex items-center gap-2 text-sm">
+          <input type="checkbox" name="allow_all" value="1" checked={allowAll} onChange={(e) => setAllowAll(e.target.checked)} />
+          すべてのサイト（下の「権限」で見られるサイト全部。今後サイトが増えたときも自動で追加）
+        </label>
       </fieldset>
+
+      <label className="block text-sm">
+        <span className="text-ink-2">権限（ハブでの役割）</span>
+        <select name="role" defaultValue={editing?.role ?? "staff"} className="input">
+          {ROLE_OPTIONS.map(([v, l]) => (
+            <option key={v} value={v}>
+              {l}
+            </option>
+          ))}
+        </select>
+        <span className="mt-1 block text-xs text-ink-3">サイトを個別にチェックした場合、ログインできるサイトはチェックが正です（権限は関係しません）。</span>
+      </label>
+
       {editing && (
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" name="reset_password" value="1" /> パスワードを再発行する（本人には次回ログイン時に変更を求めます）
         </label>
       )}
+
       <div className="flex items-center gap-3">
         <button disabled={pending} className="btn-primary">
           {pending ? "保存中…" : editing ? "更新" : "追加して初期パスワードを発行"}

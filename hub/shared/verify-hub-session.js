@@ -5,9 +5,10 @@
  *   const { verifyHubSession, parseCookie } = require("./verify-hub-session");
  *   const token = parseCookie(req.headers.cookie)["let_hub"];
  *   const hub = verifyHubSession(token, process.env.HUB_SESSION_SECRET);
- *   if (hub) { /* hub.email / hub.name / hub.role ("exec"|"manager"|"staff") *\/ }
+ *   if (hub && hubAllows(hub, "<dashboards.json の key>", "staff")) { /* hub.email / hub.name / hub.role *\/ }
  *
  * ペイロードは hub/lib/hub-session.ts と同一形式: base64url(JSON).base64url(HMAC-SHA256)
+ * apps: メンバー管理で「ログインできるサイト」を個別に選んだメンバーだけに入る（key の配列）。無ければ役割で判定。
  */
 const crypto = require("node:crypto");
 
@@ -28,6 +29,7 @@ function verifyHubSession(token, secret, now = Math.floor(Date.now() / 1000)) {
     if (expected.length !== actual.length || !crypto.timingSafeEqual(expected, actual)) return null;
     const s = JSON.parse(b64urlToBuf(parts[0]).toString("utf8"));
     if (!s || s.v !== 1 || typeof s.email !== "string" || typeof s.exp !== "number" || !ROLES.includes(s.role)) return null;
+    if (s.apps !== undefined && (!Array.isArray(s.apps) || !s.apps.every((a) => typeof a === "string"))) return null;
     if (s.exp <= now) return null;
     return s;
   } catch {
@@ -38,6 +40,12 @@ function verifyHubSession(token, secret, now = Math.floor(Date.now() / 1000)) {
 /** role が minRole 以上か */
 function hasRole(role, minRole) {
   return RANK[role] !== undefined && RANK[minRole] !== undefined && RANK[role] >= RANK[minRole];
+}
+
+/** このメンバーが key のサイトにログインできるか（apps があればその一覧、無ければ役割が minRole 以上） */
+function hubAllows(s, key, minRole = "staff") {
+  if (Array.isArray(s.apps)) return s.apps.includes(key);
+  return hasRole(s.role, minRole);
 }
 
 /** Cookie ヘッダ文字列 → { name: value } */
@@ -59,4 +67,4 @@ function parseCookie(header) {
   return out;
 }
 
-module.exports = { verifyHubSession, hasRole, parseCookie, HUB_COOKIE: "let_hub" };
+module.exports = { verifyHubSession, hasRole, hubAllows, parseCookie, HUB_COOKIE: "let_hub" };

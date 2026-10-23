@@ -2,7 +2,7 @@
 // Edge(middleware) と Node の両方で動くよう Web Crypto(subtle) のみを使用する。
 // 各ダッシュボード側の検証は shared/verify-hub-session.js（Node / CommonJS）または
 // shared/verify-hub-session.edge.ts（Next.js middleware）を使う。ペイロード形式は共通。
-import { isRole, type Role } from "./roles";
+import { hasRole, isRole, type Role } from "./roles";
 
 export const HUB_COOKIE = "let_hub";
 export const DEFAULT_TTL_SECONDS = 7 * 24 * 60 * 60;
@@ -14,6 +14,8 @@ export type HubSession = {
   role: Role;
   iat: number; // 発行時刻 (unix sec)
   exp: number; // 失効時刻 (unix sec)
+  /** ログインできるサイト（dashboards.json の key）。メンバー管理で個別に選んだメンバーだけに入る。無ければ役割で判定 */
+  apps?: string[];
 };
 
 const enc = new TextEncoder();
@@ -50,11 +52,22 @@ export function ttlSeconds(env: NodeJS.ProcessEnv = process.env): number {
 }
 
 export function buildSession(
-  input: { email: string; name: string; role: Role },
+  input: { email: string; name: string; role: Role; apps?: string[] | null },
   now: number = Math.floor(Date.now() / 1000),
   ttl: number = ttlSeconds(),
 ): HubSession {
-  return { v: 1, email: input.email, name: input.name, role: input.role, iat: now, exp: now + ttl };
+  const s: HubSession = { v: 1, email: input.email, name: input.name, role: input.role, iat: now, exp: now + ttl };
+  if (Array.isArray(input.apps)) s.apps = [...input.apps];
+  return s;
+}
+
+/**
+ * このセッションのメンバーが key のサイトにログインできるか。
+ * 「ログインできるサイト」を個別に選んだメンバー（apps あり）はその一覧だけで判定し、それ以外は役割が minRole 以上なら通す。
+ */
+export function hubAllows(s: HubSession, key: string, minRole: Role = "staff"): boolean {
+  if (Array.isArray(s.apps)) return s.apps.includes(key);
+  return hasRole(s.role, minRole);
 }
 
 export async function signHubSession(s: HubSession, secret: string = getHubSecret()): Promise<string> {
@@ -78,6 +91,7 @@ export async function verifyHubSession(
     if (!ok) return null;
     const s = JSON.parse(new TextDecoder().decode(b64urlDecode(payload))) as Partial<HubSession>;
     if (s.v !== 1 || typeof s.email !== "string" || typeof s.exp !== "number" || !isRole(s.role)) return null;
+    if (s.apps !== undefined && (!Array.isArray(s.apps) || !s.apps.every((a) => typeof a === "string"))) return null;
     if (s.exp <= now) return null;
     return s as HubSession;
   } catch {

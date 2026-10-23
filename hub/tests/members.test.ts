@@ -49,12 +49,13 @@ describe("safeNext", () => {
 });
 
 describe("メンバーごとの項目制限", () => {
-  it("allow が null なら役割の全項目、配列ならそのキーだけ（役割の上限は超えない）", async () => {
+  it("allow が null なら役割で見られる全サイト、配列なら「ログインできるサイト」のチェックが正（役割に関係なく）", async () => {
     const { dashboardsForMember } = await import("@/lib/dashboards");
     const env = { HUB_URL_CONSOLE: "" } as unknown as NodeJS.ProcessEnv;
     expect(dashboardsForMember("manager", null, env).map((d) => d.key)).toContain("sales");
+    expect(dashboardsForMember("manager", null, env).map((d) => d.key)).not.toContain("finance");
     expect(dashboardsForMember("manager", ["sales"], env).map((d) => d.key)).toEqual(["sales"]);
-    expect(dashboardsForMember("staff", ["finance", "ops"], env).map((d) => d.key)).toEqual(["ops"]);
+    expect(dashboardsForMember("staff", ["finance", "ops"], env).map((d) => d.key)).toEqual(["finance", "ops"]);
     expect(dashboardsForMember("staff", [], env)).toEqual([]);
   });
   it("初期パスワード生成", async () => {
