@@ -11,7 +11,20 @@ const ROLE_OPTIONS = [
   ["exec", "役員 — メンバー管理ができる（「すべて」のとき全サイト）"],
 ] as const;
 
-type DashboardOption = { key: string; title: string; minRole: string };
+type DashboardOption = { key: string; title: string; minRole: string; parent?: string };
+
+function SiteCheck({ d, on, disabled, onToggle, note, small }: { d: DashboardOption; on: boolean; disabled: boolean; onToggle: () => void; note?: string; small?: boolean }) {
+  return (
+    <label className={`flex items-start gap-2 rounded-md border px-3 py-2 ${small ? "text-xs" : "text-sm"} ${disabled ? "border-line opacity-50" : on ? "border-brand-ink/60 bg-brand/10" : "border-line"}`}>
+      <input type="checkbox" name="allow" value={d.key} checked={on} disabled={disabled} onChange={onToggle} className="mt-1" />
+      <span>
+        {d.title}
+        <span className="ml-1 text-xs text-ink-3">({d.key})</span>
+        {note && <span className="ml-1 text-xs text-ink-3">— {note}</span>}
+      </span>
+    </label>
+  );
+}
 
 export function MemberForm({ dashboards, editing }: { dashboards: DashboardOption[]; editing?: MemberRecord }) {
   const [state, action, pending] = useActionState<MemberFormState, FormData>(saveMemberAction, { ok: false, message: "" });
@@ -24,7 +37,7 @@ export function MemberForm({ dashboards, editing }: { dashboards: DashboardOptio
     else next.add(key);
     return next;
   });
-  const selectAllSites = () => setChecked(new Set(dashboards.map((d) => d.key)));
+  const selectAllSites = () => setChecked(new Set(dashboards.filter((d) => !d.parent).map((d) => d.key)));
   const clearSites = () => setChecked(new Set());
 
   return (
@@ -46,15 +59,24 @@ export function MemberForm({ dashboards, editing }: { dashboards: DashboardOptio
         <legend className="px-1 text-sm font-semibold">ログインできるサイト</legend>
         <p className="text-xs text-ink-2">チェックしたサイトだけがハブに表示され、そのサイトの URL を直接開いたときも同じ判定で通します。</p>
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
-          {dashboards.map((d) => (
-            <label key={d.key} className={`flex items-start gap-2 rounded-md border px-3 py-2 text-sm ${allowAll ? "border-line opacity-50" : checked.has(d.key) ? "border-brand-ink/60 bg-brand/10" : "border-line"}`}>
-              <input type="checkbox" name="allow" value={d.key} checked={!allowAll && checked.has(d.key)} disabled={allowAll} onChange={() => toggle(d.key)} className="mt-1" />
-              <span>
-                {d.title}
-                <span className="ml-1 text-xs text-ink-3">({d.key})</span>
-              </span>
-            </label>
-          ))}
+          {dashboards
+            .filter((d) => !d.parent)
+            .map((d) => {
+              const children = dashboards.filter((c) => c.parent === d.key);
+              const parentOn = !allowAll && checked.has(d.key);
+              return (
+                <div key={d.key} className={children.length ? "sm:col-span-2" : undefined}>
+                  <SiteCheck d={d} on={parentOn} disabled={allowAll} onToggle={() => toggle(d.key)} />
+                  {children.length > 0 && (
+                    <div className="ml-6 mt-1 grid gap-1 sm:grid-cols-3">
+                      {children.map((c) => (
+                        <SiteCheck key={c.key} d={c} on={!allowAll && !parentOn && checked.has(c.key)} disabled={allowAll || parentOn} onToggle={() => toggle(c.key)} note={parentOn ? "全部門に含まれます" : undefined} small />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-3 text-xs">
           <button type="button" className="link" onClick={selectAllSites} disabled={allowAll}>
@@ -63,7 +85,7 @@ export function MemberForm({ dashboards, editing }: { dashboards: DashboardOptio
           <button type="button" className="link" onClick={clearSites} disabled={allowAll}>
             全部外す
           </button>
-          <span className="text-ink-3">{allowAll ? "" : `${checked.size} / ${dashboards.length} サイト`}</span>
+          <span className="text-ink-3">{allowAll ? "" : `${checked.size} 件チェック`}</span>
         </div>
         <label className="mt-3 flex items-center gap-2 text-sm">
           <input type="checkbox" name="allow_all" value="1" checked={allowAll} onChange={(e) => setAllowAll(e.target.checked)} />

@@ -71,11 +71,21 @@ outputs/evaluation_criteria/          ← Vercel「agents」プロジェクト�
 
 ### 共通ログイン（経営ハブ / 2026-10-20）
 
-- `middleware.js`（Vercel Edge Middleware）が `hyoka.let-inc.net` で `let_hub` Cookie を検証する。未ログインは `hub.let-inc.net/login` へ、役員以外が経営陣ページを開くと 403
-- 役員には `HYOKA_EXEC_PASSWORD` を解錠用 Cookie（`let_hyoka_unlock`）で渡し、`assets/hub-unlock.js` がページのパスワード入力を自動で済ませる（実績データの暗号化はパスワードのまま）
-- 従業員ページ（`/demo` `/my` `/manual` `/new-system`）はハブにログイン済みなら誰でも到達でき、各ページのパスワードはそのまま
+- `middleware.js`（Vercel Edge Middleware）が `hyoka.let-inc.net` で `let_hub` Cookie を検証する。未ログインは `hub.let-inc.net/login` へ
+- 見られる範囲は 4 段階。ハブのメンバー管理「ログインできるサイト」で選ぶ（2026-10-23）:
+
+  | ハブのチェック（key） | 見られるページ |
+  |---|---|
+  | 評価制度サイト（役員・全部門）`hyoka` | すべて。経営陣ページ `/` `/sales` `/marketing` `/bpo`（経営側P&Lを含む）＋全部門の従業員ページ |
+  | 評価制度サイト（マーケティング）`hyoka_marketing` | `/demo/marketing` `/manual/marketing` `/marketing/v2` ＋ 共通ページ |
+  | 評価制度サイト（セールス）`hyoka_sales` | `/demo/sales` `/manual/sales` ＋ 共通ページ |
+  | 評価制度サイト（不動産BPO）`hyoka_bpo` | `/demo/bpo` `/manual/bpo` ＋ 共通ページ |
+
+  共通ページ = `/new-system` `/manual` `/my/*`。他部門のページ・経営陣ページを開くと 403。トップ `/` は役員以外には部門の入口を案内（1 部門だけならそこへ転送）。
+  サイトを個別に選んでいないメンバー（「すべてのサイト」）は従来どおり: 役員は全部、それ以外は従業員ページ全部門
+- 解錠: 役員には `HYOKA_EXEC_PASSWORD`、部門ページにはその部門の `HYOKA_PASSWORD_SALES` / `HYOKA_PASSWORD_MARKETING` / `HYOKA_PASSWORD_BPO`（任意）を解錠用 Cookie（`let_hyoka_unlock`）で渡し、`assets/hub-unlock.js` がページのパスワード入力を自動で済ませる（実績データの暗号化はパスワードのまま）。部門のパスワードを環境変数に入れなければ、従来どおり各ページでパスワードを入力する
 - `*.vercel.app` では middleware は何もしない（従来どおり）。`HYOKA_PROTECT=1` で検証用に強制できる
-- 必要な環境変数（Vercel `agents` プロジェクト）: `HUB_SESSION_SECRET`（ハブと同じ値）・`HUB_URL`・`HYOKA_EXEC_PASSWORD`
+- 必要な環境変数（Vercel `agents` プロジェクト）: `HUB_SESSION_SECRET`（ハブと同じ値）・`HUB_URL`・`HYOKA_EXEC_PASSWORD`・任意で `HYOKA_PASSWORD_SALES` / `HYOKA_PASSWORD_MARKETING` / `HYOKA_PASSWORD_BPO`
 - 検証: `node outputs/evaluation_criteria/scripts/test-middleware.mjs`
 
 ## デプロイ構成（詳細は HANDOVER.md）

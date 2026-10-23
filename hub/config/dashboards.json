@@ -1,5 +1,5 @@
 {
-  "_comment": "ハブから遷移できるダッシュボード。url は env（urlEnv）優先、無ければ defaultUrl。minRole 以上の役割に表示。sso は共通セッション（let_hub Cookie）受け入れの実装状況: ready / planned / link-only。ゲンバキャリアは公開サービスのため対象外。 group はトップページの見出し（任意。無ければ「その他」）。",
+  "_comment": "ハブから遷移できるダッシュボード。url は env（urlEnv）優先、無ければ defaultUrl。minRole 以上の役割に表示。sso は共通セッション（let_hub Cookie）受け入れの実装状況: ready / planned / link-only。ゲンバキャリアは公開サービスのため対象外。 group はトップページの見出し（任意。無ければ「その他」）。parent は段階分け（親サイトの一部）: メンバー管理では親の下に出し、親にチェックがあれば含まれる。「すべてのサイト」のメンバーには親だけ表示する。",
   "dashboards": [
     {
       "key": "finance",
@@ -58,12 +58,48 @@
     },
     {
       "key": "hyoka",
-      "title": "評価制度サイト",
-      "desc": "部門別の評価・成果データ（役員ページ / 新制度）",
+      "title": "評価制度サイト（役員・全部門）",
+      "desc": "部門別の評価・成果データ。経営陣ページ（経営側P&Lを含む）と全部門の従業員ページ",
       "source": "agents/outputs/evaluation_criteria",
       "urlEnv": "HUB_URL_HYOKA",
       "defaultUrl": "https://hyoka.let-inc.net/",
       "minRole": "exec",
+      "sso": "ready",
+      "group": "経営・財務"
+    },
+    {
+      "key": "hyoka_marketing",
+      "parent": "hyoka",
+      "title": "評価制度サイト（マーケティング）",
+      "desc": "マーケティング部の従業員用ページ（評価制度・v2.0・ランクアップマニュアル）",
+      "source": "agents/outputs/evaluation_criteria",
+      "urlEnv": "HUB_URL_HYOKA_MARKETING",
+      "defaultUrl": "https://hyoka.let-inc.net/demo/marketing",
+      "minRole": "staff",
+      "sso": "ready",
+      "group": "経営・財務"
+    },
+    {
+      "key": "hyoka_sales",
+      "parent": "hyoka",
+      "title": "評価制度サイト（セールス）",
+      "desc": "営業部の従業員用ページ（評価制度・ランクアップマニュアル）",
+      "source": "agents/outputs/evaluation_criteria",
+      "urlEnv": "HUB_URL_HYOKA_SALES",
+      "defaultUrl": "https://hyoka.let-inc.net/demo/sales",
+      "minRole": "staff",
+      "sso": "ready",
+      "group": "経営・財務"
+    },
+    {
+      "key": "hyoka_bpo",
+      "parent": "hyoka",
+      "title": "評価制度サイト（不動産BPO）",
+      "desc": "BPO・不動産事業部の従業員用ページ（評価制度・ランクアップマニュアル）",
+      "source": "agents/outputs/evaluation_criteria",
+      "urlEnv": "HUB_URL_HYOKA_BPO",
+      "defaultUrl": "https://hyoka.let-inc.net/demo/bpo",
+      "minRole": "staff",
       "sso": "ready",
       "group": "経営・財務"
     },

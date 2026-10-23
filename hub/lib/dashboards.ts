@@ -11,9 +11,11 @@ export type Dashboard = {
   minRole: Role;
   sso: SsoStatus;
   group: string;
+  /** 段階分け: 親サイト（例: hyoka）の一部。親にチェックがあれば含まれる */
+  parent?: string;
 };
 
-type Raw = { key: string; title: string; desc: string; source: string; urlEnv: string; defaultUrl: string; minRole: string; sso: string; group?: string };
+type Raw = { key: string; title: string; desc: string; source: string; urlEnv: string; defaultUrl: string; minRole: string; sso: string; group?: string; parent?: string };
 
 function resolveUrl(d: Raw, env: NodeJS.ProcessEnv): string {
   const fromEnv = (env[d.urlEnv] ?? "").trim();
@@ -33,13 +35,14 @@ export function listDashboards(env: NodeJS.ProcessEnv = process.env): Dashboard[
       minRole: d.minRole as Role,
       sso: (["ready", "planned", "link-only"].includes(d.sso) ? d.sso : "link-only") as SsoStatus,
       group: (d.group ?? "").trim() || "その他",
+      ...(d.parent ? { parent: d.parent } : {}),
     }))
     .filter((d) => d.url !== "");
 }
 
 /** 全ダッシュボード（URL 未設定も含む。権限設定画面の候補用） */
-export function allDashboardKeys(): { key: string; title: string; minRole: Role }[] {
-  return (dashboardsJson.dashboards as Raw[]).filter((d) => isRole(d.minRole)).map((d) => ({ key: d.key, title: d.title, minRole: d.minRole as Role }));
+export function allDashboardKeys(): { key: string; title: string; minRole: Role; parent?: string }[] {
+  return (dashboardsJson.dashboards as Raw[]).filter((d) => isRole(d.minRole)).map((d) => ({ key: d.key, title: d.title, minRole: d.minRole as Role, ...(d.parent ? { parent: d.parent } : {}) }));
 }
 
 /** 役割に応じて閲覧可能なダッシュボードだけを返す */
@@ -53,7 +56,9 @@ export function dashboardsForRole(role: Role, env: NodeJS.ProcessEnv = process.e
  * - allow が配列: メンバー管理の「ログインできるサイト」でチェックしたものだけ（役割に関係なく、チェックが正）
  */
 export function dashboardsForMember(role: Role, allow: string[] | null | undefined, env: NodeJS.ProcessEnv = process.env): Dashboard[] {
-  if (!allow) return dashboardsForRole(role, env);
+  // 段階分けの子（parent あり）は「すべて」のメンバーには出さない（親で全部見られる）
+  if (!allow) return dashboardsForRole(role, env).filter((d) => !d.parent);
   const set = new Set(allow);
-  return listDashboards(env).filter((d) => set.has(d.key));
+  // 親にもチェックがあるときは子を出さない（親で全部見られる）
+  return listDashboards(env).filter((d) => set.has(d.key) && !(d.parent && set.has(d.parent)));
 }

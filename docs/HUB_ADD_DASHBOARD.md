@@ -46,6 +46,7 @@
    - `key`: 英小文字。メンバー管理の「ログインできるサイト」のチェックボックスにこの key で出る。共通 Cookie（let_hub）の `apps` にもこの key が入る
    - `minRole`: 「すべてのサイト」を選んだメンバーに対して、この役割以上に表示。`exec` ＞ `manager` ＞ `staff`（サイトを個別にチェックしたメンバーはチェックが正で、minRole は関係しない）
    - `group`: 「経営・財務」「営業・マーケティング」「人材紹介」「社内ツール」のいずれか（無ければ「その他」）
+   - `parent`（任意）: 1 つのサイトの中を段階分けするとき、親サイトの key を書く（例: 評価制度サイトの `hyoka_marketing` → `"parent": "hyoka"`）。メンバー管理では親の下に出て、親にチェックがあれば含まれる。「すべてのサイト」のメンバーには親だけ表示される。サイト側は `hub.apps` に子の key が入っているかで見せる範囲を分ける（例: `outputs/evaluation_criteria/middleware.js` の `accessFor`）
    - `urlEnv`: Vercel `let-hub` の環境変数で URL を上書きしたいとき用（通常は `defaultUrl` のままでよい）
 2. `cd hub && npm run typecheck && npm test`（dashboards.json の形式はテストで検証される）
 3. main に push → ハブが自動デプロイ → カードが出る
