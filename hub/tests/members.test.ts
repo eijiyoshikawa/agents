@@ -58,6 +58,17 @@ describe("メンバーごとの項目制限", () => {
     expect(dashboardsForMember("staff", ["finance", "ops"], env).map((d) => d.key)).toEqual(["finance", "ops"]);
     expect(dashboardsForMember("staff", [], env)).toEqual([]);
   });
+  it("評価制度サイトの段階（親子）: 「すべて」には親だけ、親にチェックがあれば子は出さない、子だけなら子が出る", async () => {
+    const { dashboardsForMember, allDashboardKeys } = await import("@/lib/dashboards");
+    const env = { HUB_URL_CONSOLE: "" } as unknown as NodeJS.ProcessEnv;
+    const execAll = dashboardsForMember("exec", null, env).map((d) => d.key);
+    expect(execAll).toContain("hyoka");
+    expect(execAll).not.toContain("hyoka_marketing");
+    expect(dashboardsForMember("staff", ["hyoka", "hyoka_sales"], env).map((d) => d.key)).toEqual(["hyoka"]);
+    expect(dashboardsForMember("staff", ["hyoka_marketing", "hyoka_bpo"], env).map((d) => d.key)).toEqual(["hyoka_marketing", "hyoka_bpo"]);
+    expect(dashboardsForMember("staff", ["hyoka_sales"], env)[0]?.url).toBe("https://hyoka.let-inc.net/demo/sales");
+    expect(allDashboardKeys().filter((d) => d.parent === "hyoka").map((d) => d.key)).toEqual(["hyoka_marketing", "hyoka_sales", "hyoka_bpo"]);
+  });
   it("初期パスワード生成", async () => {
     const { generatePassword } = await import("@/lib/password");
     const p = generatePassword();
