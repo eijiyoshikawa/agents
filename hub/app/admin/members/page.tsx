@@ -36,7 +36,7 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
         <div>
           <h1 className="text-lg font-bold">メンバー管理（経営陣以外のログイン）</h1>
           <p className="mt-1 text-sm text-ink-2">
-            入口は同じログイン画面です。ここで追加したメンバーは、役割と「見られる項目」の範囲内のダッシュボードだけが表示されます。初回ログイン時にパスワード変更を求めます。
+            入口は同じログイン画面（hub.let-inc.net/login）です。メンバーごとに「ログインできるサイト」をチェックで選びます。チェックしたサイトだけがハブに表示され、そのサイトに直接アクセスしたときも同じ判定で通します。初回ログイン時にパスワード変更を求めます。
           </p>
         </div>
         {dbError && (
@@ -84,7 +84,7 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
         {dbOk && (
           <div className="card p-6">
             <h2 className="font-semibold">登録メンバー（{members.length} 名）</h2>
-            <p className="mt-1 text-xs text-ink-2">編集＝氏名・役割・見られる項目の変更。無効化＝ログイン停止（復帰可）。パスワード再発行＝初期パスワードを作り直して 1 回表示。削除＝完全に消す（元に戻せない）。</p>
+            <p className="mt-1 text-xs text-ink-2">編集＝氏名・ログインできるサイト・権限の変更。無効化＝ログイン停止（復帰可）。パスワード再発行＝初期パスワードを作り直して 1 回表示。削除＝完全に消す（元に戻せない）。</p>
             {members.length === 0 ? (
               <p className="mt-2 text-sm text-ink-2">まだ登録がありません。</p>
             ) : (
@@ -93,8 +93,8 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
                   <tr>
                     <th className="py-1">氏名</th>
                     <th>メール</th>
-                    <th>役割</th>
-                    <th>見られる項目</th>
+                    <th>ログインできるサイト</th>
+                    <th>権限</th>
                     <th>状態</th>
                     <th></th>
                   </tr>
@@ -104,8 +104,8 @@ export default async function MembersPage({ searchParams }: { searchParams: Prom
                     <tr key={m.email} style={m.active ? undefined : { opacity: 0.5 }}>
                       <td className="py-2">{m.name}</td>
                       <td className="text-ink-2">{m.email}</td>
+                      <td className="text-xs">{m.allow === null ? `すべて（${ROLE_LABEL[m.role]}が見られるサイト全部）` : m.allow.map((k) => dashboards.find((d) => d.key === k)?.title ?? k).join("・") || "（なし）"}</td>
                       <td>{ROLE_LABEL[m.role]}</td>
-                      <td className="text-xs">{m.allow === null ? "役割のすべて" : m.allow.map((k) => dashboards.find((d) => d.key === k)?.title ?? k).join("・") || "（なし）"}</td>
                       <td className="text-xs">
                         {m.active ? "有効" : "無効"}
                         {m.mustChangePassword && m.active ? "・初回変更待ち" : ""}

@@ -29,9 +29,11 @@ export async function saveMemberAction(_prev: MemberFormState, fd: FormData): Pr
     if (!name) return { ok: false, message: "氏名を入力してください" };
     if (!isRole(roleRaw)) return { ok: false, message: "役割が不正です" };
     const role: Role = roleRaw;
-    const allowAll = String(fd.get("allow_mode") ?? "all") === "all";
+    // ログインできるサイト: 「すべて」なら null（役割で見られる全部）、それ以外はチェックしたサイトの key だけ
+    const allowAll = String(fd.get("allow_all") ?? "") === "1";
     const valid = new Set(allDashboardKeys().map((d) => d.key));
     const allow = allowAll ? null : fd.getAll("allow").map(String).filter((k) => valid.has(k));
+    if (allow && allow.length === 0) return { ok: false, message: "ログインできるサイトを 1 つ以上チェックするか、「すべてのサイト」を選んでください" };
     const existing = (await listMemberRecords()).find((m) => m.email === email);
     await upsertMemberRecord({ email, name, role, allow, active: true }, actor);
     const reset = String(fd.get("reset_password") ?? "") === "1";

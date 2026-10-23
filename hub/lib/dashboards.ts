@@ -48,12 +48,12 @@ export function dashboardsForRole(role: Role, env: NodeJS.ProcessEnv = process.e
 }
 
 /**
- * メンバーごとの閲覧可能ダッシュボード。
- * 役割で見られるものの中から、allow が指定されていればそのキーだけに絞る（項目単位の制限）。
+ * メンバーごとにログインできるダッシュボード。
+ * - allow が null: 役割で見られるものすべて（役員＝全部、管理職＝manager 以下、一般＝staff のみ）
+ * - allow が配列: メンバー管理の「ログインできるサイト」でチェックしたものだけ（役割に関係なく、チェックが正）
  */
 export function dashboardsForMember(role: Role, allow: string[] | null | undefined, env: NodeJS.ProcessEnv = process.env): Dashboard[] {
-  const base = dashboardsForRole(role, env);
-  if (!allow) return base;
+  if (!allow) return dashboardsForRole(role, env);
   const set = new Set(allow);
-  return base.filter((d) => set.has(d.key));
+  return listDashboards(env).filter((d) => set.has(d.key));
 }

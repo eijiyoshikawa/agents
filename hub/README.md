@@ -39,7 +39,7 @@ Google ログインは任意。`AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` を設定
 ## 経営陣以外のログイン（メンバー管理）
 
 入口は同じログイン画面。役員が `/admin/members` でメンバーを追加すると初期パスワードが 1 回だけ表示され、本人は初回ログイン時にパスワード変更を求められる。
-メンバーごとに「役割」と「見られる項目（ダッシュボードのキー）」を設定でき、権限のない項目はハブに表示されない。無効化したメンバーはログインできない。
+メンバーごとに「ログインできるサイト」をチェックで選べる（dashboards.json の key）。チェックしたサイトだけがハブに表示され、共通 Cookie（let_hub）の `apps` に入るので、各サイト側も `hubAllows(hub, "<key>")` で同じ判定ができる。「すべてのサイト」を選んだメンバーは従来どおり役割（exec > manager > staff）で判定する。無効化したメンバーはログインできない。
 
 - 保存先: Postgres（`HUB_DATABASE_URL`。masterAI の Ops と同じ Neon `let-ops` を共有してよい）。テーブルは初回利用時に自動作成（`lib/migrate.ts`）。手元で `npm run hub:migrate` を実行しても同じ。SQL を追加したら `npm run hub:sync-schema`
 - 保存先が無い間は、下記の設定ファイル＋環境変数の役員だけがログインできる
