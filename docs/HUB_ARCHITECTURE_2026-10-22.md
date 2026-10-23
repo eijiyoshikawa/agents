@@ -44,6 +44,7 @@ flowchart TB
     ops["採用マーケティング運用管理<br/>kpi.let-inc.net/ops<br/>masterAI（担当は /ops/staff で登録）<br/>staff"]
     jinji["人材紹介 KPI（求人・求職者）<br/>jinji.let-inc.net<br/>jinjiLsystem/web ／ Vercel jinji-l-system<br/>staff（exec→管理者・CA・RA、それ以外→CA・RA。/settings/users で個別指定）"]
     bpo["サクパスBPO 管理システム<br/>bpo.let-inc.net/hub<br/>let-incjp/sakupassbpo ／ Vercel sakupassbpo<br/>manager（同じメールの登録ユーザーとして入る）"]
+    meishi["名刺管理<br/>meishi.let-inc.net<br/>let-incjp/meishiLsystem ／ Vercel meishi-lsystem<br/>staff（共通パスワードも併用）"]
     console["Internal Console<br/>GitHub Pages<br/>リンクのみ（SSO 未対応）／ staff"]
   end
 
@@ -54,6 +55,7 @@ flowchart TB
   dash --> ops
   dash --> jinji
   dash --> bpo
+  dash --> meishi
   dash --> console
 
   subgraph data["データ・外部サービス"]
@@ -95,6 +97,7 @@ flowchart TB
 | 採用マーケ運用管理 | kpi.let-inc.net/ops | masterAI ／ masterai | `let_hub` ＋ /ops/staff | Postgres（Neon） | staff |
 | 人材紹介 KPI | jinji.let-inc.net | jinjiLsystem/web ／ jinji-l-system | `let_hub`（staff 以上。`HUB_MIN_ROLE` で絞り込み可）＋ /settings/users | Postgres | staff |
 | サクパスBPO 管理システム | bpo.let-inc.net | let-incjp/sakupassbpo ／ sakupassbpo | `let_hub`（`/hub` で同じメールの登録ユーザーのセッションを発行）＋通常ログイン（クライアント・ワーカー） | Postgres（Neon） | manager |
+| 名刺管理 | meishi.let-inc.net | let-incjp/meishiLsystem ／ meishi-lsystem | `let_hub`（staff 以上・`meishi` のチェック）＋共通パスワード `APP_PASSWORD` | Postgres（Neon）・Vercel Blob | staff |
 | Internal Console | GitHub Pages | agents/console | なし（リンクのみ） | 静的 | staff |
 | LP ファクトリー（ハブ外） | *.aigrowthx.pro | let-incjp/lp-factory ／ lp-factory | なし（公開） | sites/*.json（masterAI「LP を作る」から生成） | — |
 
@@ -103,7 +106,7 @@ flowchart TB
 - **共通ログイン**: ハブでログイン → 初回パスワード変更後に `let_hub`（HMAC-SHA256、`HUB_SESSION_SECRET`、Domain `.let-inc.net`、payload は email/name/role/期限）を発行。各アプリは同じ秘密で検証するだけで、ユーザー DB を持たない
 - **役割**: `exec` ＞ `manager` ＞ `staff`。ハブの「見られる項目」でさらに絞れる。人材紹介は staff 以上を通し、exec→管理者・CA・RA、それ以外→CA・RA を既定として `/settings/users` で個別指定。運用管理は `/ops/staff` の登録で担当者になる
 - **メンバー管理**: `/admin/members`（役員のみ）。設定ファイルの役員 3 名は固定だが「編集できるようにする」で DB に取り込める（DB が優先）
-- **秘密の所在**: `HUB_SESSION_SECRET`（ハブ＋7 プロジェクト共通。2026-10-23 に sakupassbpo を追加）、`HUB_PASSWORD_HASHES`（設定ファイル役員のパスワード）、`HUB_DATABASE_URL`（メンバー DB）。各アプリ固有: `CRON_SECRET`（slack-let / sales-cockpit）、`RECRUIT_INTAKE_KEY`・`LP_FACTORY_GITHUB_TOKEN`・`MK_AGENDA_TRIGGER_KEY`（masterai）、`VERCEL_TOKEN`（lp-factory の GitHub Secret）
+- **秘密の所在**: `HUB_SESSION_SECRET`（ハブ＋8 プロジェクト共通。2026-10-23 に sakupassbpo・meishi-lsystem を追加）、`HUB_PASSWORD_HASHES`（設定ファイル役員のパスワード）、`HUB_DATABASE_URL`（メンバー DB）。各アプリ固有: `CRON_SECRET`（slack-let / sales-cockpit）、`RECRUIT_INTAKE_KEY`・`LP_FACTORY_GITHUB_TOKEN`・`MK_AGENDA_TRIGGER_KEY`（masterai）、`VERCEL_TOKEN`（lp-factory の GitHub Secret）
 
 ## 関連ドキュメント
 
