@@ -47,7 +47,7 @@
 - 案件ごとの作業は masterAI の「LP を作る」から接頭辞を入れるだけ
 
 ### 1-4. 2026-10-23 後半に終わったこと（すべて main にマージ済み）
-- **サクパスBPO を共通ログインに追加**（sakupassbpo #1、agents #63）: ハブのカード「サクパスBPO 管理システム」（key `bpo`、グループ「不動産BPO」、minRole manager）→ `bpo.let-inc.net/hub`。入れるのは「ログインできるサイト」で bpo にチェック（「すべて」は管理職以上）**かつ** サクパスBPO に同じメールで登録済みの人。権限（管理者／ワーカー／クライアント）はサクパスBPO 側の登録どおり。ハブ経由ではユーザーを作らない。ハブでログアウト・チェックを外すと次の遷移で無効。クライアント・社外ワーカーは従来のメール＋パスワード
+- **サクパスBPO を共通ログインに追加**（sakupassbpo #1、agents #63）: ハブのカード「サクパスBPO 管理システム」（key `bpo`、グループ「不動産BPO」、minRole manager）→ `bpo.let-inc.net/hub`。入れるのは「ログインできるサイト」で bpo にチェック（「すべて」は管理職以上）の人。同じメールのユーザーがいればその権限（管理者／ワーカー／クライアント）、いなければ**初回に管理者として自動登録**（sakupassbpo #2。2026-10-23 オーナー決定）。無効化したユーザーはハブからも入れない。ハブでログアウト・チェックを外すと次の遷移で無効。クライアント・社外ワーカーは従来のメール＋パスワード
 - **統合レビューの判断 5 項目を反映**（masterAI #26。仕様 `masterAI/docs/ops-system.md` 5 章「統合レビューの判断」）: A-2 ヒアリングの記録として残す／A-3 停止中は定常タスクを作らない／A-5 /kpi に「案件の削除」を追加し同時に /ops を終了／A-6 重複値を日次ジョブで 1 回だけ削除（/kpi に値があるものだけ）／A-9 タスクの完了日を手入力・修正
 - **LP ファクトリーの拡張**（masterAI #27・#28）: 「LP を作る」に細かい文言（数字・キャリアと給与例・一日の流れ・社員の声・募集要項・FAQ）、写真の差し替え（9 枠・1 枚 3.5MB まで）、LP の削除
 - **人材紹介の権限の不具合を修正**（jinjiLsystem #4）: ハブ経由の一般（staff）メンバーが管理者権限になっていた（middleware と画面側の判定のずれ）。`jinjiHubAllows` に一本化
@@ -65,9 +65,10 @@
 - [ ] **サクパスBPO の共通ログインを有効にする**（2026-10-23 追加。セッションからは代行できなかった: let-hub の `HUB_SESSION_SECRET` は Sensitive で値を読めないため）
   1. Vercel → `let-hub` の `HUB_SESSION_SECRET` と同じ値を、Vercel → LET チーム → `sakupassbpo` → Settings → Environment Variables に `HUB_SESSION_SECRET`（Production / Preview）で追加 → Redeploy。値が手元に無ければ、鍵を作り直してハブ＋7 プロジェクト（sakupassbpo を含む）すべてに入れ直す（`OWNER_TASKS_2026-10-20.md` 1-B。セッションに「共通ログインの鍵を作り直して全プロジェクトに入れて再デプロイして」と頼めば代行可）
   2. Xserver の DNS に `bpo.let-inc.net` の TXT・CNAME（sakupassbpo `docs/デプロイ手順（Vercel + Neon）.md` 3-5）
-  3. ハブのメンバー管理で使う人に「サクパスBPO 管理システム」をチェック。**サクパスBPO の管理画面で同じメールのユーザーを登録**（未登録だと「登録されていません」と出る）
-  - 2026-10-23 夜時点: 1 は完了（オーナー）。2 の DNS 反映待ち
+  3. ハブのメンバー管理で使う人に「サクパスBPO 管理システム」をチェック（サクパスBPO 側の登録は不要。初回に管理者として自動登録される。sakupassbpo #2）
+  - 2026-10-23: 1・2 完了（オーナー）。`bpo.let-inc.net` は Vercel で検証済み
 - [ ] **名刺管理の共通ログインを有効にする**（2026-10-23 追加）
+  - 2026-10-23: 1・2 完了（オーナー）。`meishi.let-inc.net` は Vercel で検証済み
   1. Vercel → LET チーム → `meishi-lsystem` → Environment Variables に `HUB_SESSION_SECRET`（let-hub と同じ値。Production / Preview）→ Redeploy
   2. Xserver の DNS（let-inc.net）に TXT `_vercel` = `vc-domain-verify=meishi.let-inc.net,925707b0d80aec26ae0d`（既存の `_vercel` TXT は残して追加）と CNAME `meishi` → `cname.vercel-dns.com`
   3. 名刺管理の「担当者」画面で、各担当者のメール欄にハブと同じメールを入れる（入れておくと担当者が自動で選ばれる）

@@ -106,7 +106,7 @@
     {
       "key": "bpo",
       "title": "サクパスBPO 管理システム",
-      "desc": "不動産BPO の契約時間・稼働・請求とワーカーの稼働報告・報酬請求（サクパスBPO に同じメールで登録済みの人が入れる）",
+      "desc": "不動産BPO の契約時間・稼働・請求とワーカーの稼働報告・報酬請求（初めて入ると管理者として自動登録。ワーカー・クライアントはサクパスBPO 側で登録）",
       "source": "let-incjp/sakupassbpo",
       "urlEnv": "HUB_URL_BPO",
       "defaultUrl": "https://bpo.let-inc.net/hub",
