@@ -52,11 +52,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     async jwt({ token, user, trigger }) {
       // ログイン時に加え、5 分ごとにメンバー情報（氏名・役割・見られる項目）を読み直す。
-      // 設定ファイルや管理画面で直した氏名・権限が、再ログインなしで反映されるようにする
+      // 設定ファイルや管理画面で直した氏名・権限が、再ログインなしで反映されるようにする。
+      // 定期の読み直しはキャッシュ経由（管理画面での変更は即時に無効化される）。ログイン時・明示更新時は DB を直接読む
       const now = Math.floor(Date.now() / 1000);
       const refreshedAt = typeof token.refreshedAt === "number" ? token.refreshedAt : 0;
       if (user || trigger === "update" || now - refreshedAt > 300) {
-        const m = await findMember(user?.email ?? token.email, user?.name);
+        const m = await findMember(user?.email ?? token.email, user?.name, { cached: !user && trigger !== "update" });
         if (m) {
           token.email = m.email;
           token.name = m.name;

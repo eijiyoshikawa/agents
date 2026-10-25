@@ -1,7 +1,5 @@
-import { getContracts } from "@/lib/data";
-import { fetchCustomersByIds, fetchCustomerByName } from "@/lib/notion";
+import { getContracts, getMrrCustomerLinks } from "@/lib/data";
 import { yen, num } from "@/lib/format";
-import type { Customer } from "@/lib/types";
 import MrrClient, { type MrrRow } from "@/components/MrrClient";
 
 export const dynamic = "force-dynamic";
@@ -17,25 +15,17 @@ export default async function MrrPage() {
   const { contracts, errors } = await getContracts();
   const active = contracts.filter((c) => c.status && ACTIVE.has(c.status));
 
-  // 契約→顧客の紐付け（①relation ②同名フォールバック）
-  const idMap = await fetchCustomersByIds(active.map((c) => c.customerId ?? "").filter(Boolean));
-  const missing = active.filter((c) => !c.customerId || !idMap.has(c.customerId));
-  const nameMap = new Map<string, Customer>();
-  await Promise.all(
-    missing.map(async (ct) => {
-      const cust = await fetchCustomerByName(companyFromContract(ct.name));
-      if (cust) nameMap.set(ct.id, cust);
-    }),
+  // 契約→顧客の紐付け（①relation ②同名フォールバック）。Notion を契約数ぶん引くためキャッシュ経由（lib/data.ts）
+  const links = await getMrrCustomerLinks(
+    active.map((c) => ({ id: c.id, customerId: c.customerId, company: companyFromContract(c.name) })),
   );
-  const custOf = (ctId: string, customerId: string | null): Customer | null =>
-    (customerId ? idMap.get(customerId) : null) ?? nameMap.get(ctId) ?? null;
 
   const rows: MrrRow[] = active.map((c) => {
-    const cust = custOf(c.id, c.customerId);
+    const cust = links[c.id];
     return {
       id: c.id,
       name: c.name,
-      custId: cust?.id ?? null,
+      custId: cust?.custId ?? null,
       isRep: cust?.isRep ?? null,
       sRep: c.sRep,
       status: c.status,
