@@ -1,6 +1,5 @@
 import type {
   CallEvent,
-  Customer,
   ListCustomer,
   Contract,
   SeriesPoint,
@@ -250,7 +249,7 @@ const FUNNEL_ORDER: { stage: string; statuses: string[]; color: string }[] = [
   { stage: "契約中", statuses: ["契約中", "パートナー"], color: "#2DD4BF" },
 ];
 
-export function buildFunnel(customers: Customer[]): FunnelStage[] {
+export function buildFunnel(customers: ListCustomer[]): FunnelStage[] {
   const counts = new Map<string, number>();
   for (const c of customers) {
     if (!c.status) continue;
@@ -273,11 +272,11 @@ const CONTACTED_STATUS = new Set([
 const APPOINTED_STATUS = new Set(["アポイント獲得", "提案中", "商談中", "契約中", "契約終了", "パートナー"]);
 
 /** since(YYYY-MM-DD)以降にアポ取得日があるか */
-function apptOnOrAfter(c: Customer, since: string): boolean {
+function apptOnOrAfter(c: ListCustomer, since: string): boolean {
   return !!c.appointmentDate && c.appointmentDate.slice(0, 10) >= since;
 }
 
-export function buildStatusActivity(customers: Customer[], since: string): StatusActivity {
+export function buildStatusActivity(customers: ListCustomer[], since: string): StatusActivity {
   let total = 0;
   let contacted = 0;
   let appointments = 0;
@@ -347,7 +346,7 @@ export function buildStatusActivity(customers: Customer[], since: string): Statu
  * よって二重計上を避けるため calls = max(ステータス更新ベース, 当日ログベース) とする。
  * 過去日は最終更新日時が上書きされ再現できないため、本数値は「本日分」専用。
  */
-export function buildTodayActivity(customers: Customer[], calls: CallEvent[]): TodayActivity {
+export function buildTodayActivity(customers: ListCustomer[], calls: CallEvent[]): TodayActivity {
   const today = jstDateKey(new Date());
 
   // 非稼働メンバーは全集計から除外（合計＝担当者別の和を一致させる）。未割当(null)は含める。
@@ -403,7 +402,7 @@ export function buildTodayActivity(customers: Customer[], calls: CallEvent[]): T
 }
 
 /** 当月のアポ獲得数：アポ取得日が今月のもの（非稼働メンバーは除外し担当者別と一致させる） */
-function apptsThisMonth(customers: Customer[]): number {
+function apptsThisMonth(customers: ListCustomer[]): number {
   const cur = currentMonthKey();
   let n = 0;
   for (const c of customers) {
@@ -413,7 +412,7 @@ function apptsThisMonth(customers: Customer[]): number {
   return n;
 }
 
-export function buildStatusBreakdown(customers: Customer[]): { status: string; count: number }[] {
+export function buildStatusBreakdown(customers: ListCustomer[]): { status: string; count: number }[] {
   const counts = new Map<string, number>();
   for (const c of customers) {
     const s = c.status ?? "(未設定)";
@@ -537,7 +536,7 @@ function contractKpis(contracts: Contract[]) {
 // ── 全体ビルド ──────────────────────────────────────────────────
 export function buildDashboard(input: {
   calls: CallEvent[];
-  customers: Customer[];
+  customers: ListCustomer[];
   contracts: Contract[];
   targets: Map<string, number>;
   targetsConfig: TargetsConfig;

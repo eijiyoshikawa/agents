@@ -25,6 +25,9 @@ export default async function PerformancePage({
   const cols = monthColumns(type, month);
   const colKeys = new Set(cols.map((c) => c.key));
 
+  // 目標（Notion）は実績の取得と独立なので先に走らせて並列にする
+  const targetsP = getCallTargets(type, month).catch(() => ({} as Record<string, Record<string, number>>));
+
   // 実績バケット: rep -> key -> 件数
   const actual: Record<string, Record<string, number>> = {};
   const errors: string[] = [];
@@ -50,7 +53,7 @@ export default async function PerformancePage({
     }
   }
 
-  const targets = await getCallTargets(type, month).catch(() => ({} as Record<string, Record<string, number>>));
+  const targets = await targetsP;
 
   const reps = [...new Set([...Object.keys(targets), ...Object.keys(actual)])].filter((r) => !isExcludedRep(r)).sort();
   const sum = (o: Record<string, number> | undefined) => Object.values(o ?? {}).reduce((s, v) => s + v, 0);

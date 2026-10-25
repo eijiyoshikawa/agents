@@ -44,12 +44,17 @@ export function configMembers(): Member[] {
 /**
  * DB（hub_member）→ 設定ファイル → 許可ドメイン の順でメンバーを解決する（Node 専用）。
  * DB のメンバーは active でなければ拒否。
+ * cached: ログイン中の定期読み直し用。DB の行をキャッシュ経由で読む（書き込み時に即時無効化。lib/member-store.ts）。
  */
-export async function findMember(email: string | null | undefined, fallbackName?: string | null): Promise<Member | null> {
+export async function findMember(
+  email: string | null | undefined,
+  fallbackName?: string | null,
+  opts: { cached?: boolean } = {},
+): Promise<Member | null> {
   const e = normalizeEmail(email);
   if (!e) return null;
-  const { findMemberRecord } = await import("./member-store");
-  const rec = await findMemberRecord(e).catch(() => undefined);
+  const { findMemberRecord, findMemberRecordCached } = await import("./member-store");
+  const rec = await (opts.cached ? findMemberRecordCached(e) : findMemberRecord(e)).catch(() => undefined);
   if (rec) return rec.active ? { email: rec.email, name: rec.name, role: rec.role, allow: rec.allow, mustChangePassword: rec.mustChangePassword } : null;
   return resolveMember(e, fallbackName);
 }

@@ -604,10 +604,14 @@ export async function fetchPipelineSlim(): Promise<ListCustomer[]> {
   return pages.map(mapListCustomer);
 }
 
-/** 着手済み顧客（ステータスあり・アプローチ前以外）。ダッシュボード集計用（正確・高速）。 */
-export async function fetchWorkedCustomers(): Promise<Customer[]> {
-  const pages = await queryAll(DB.customers, WORKED_FILTER);
-  return pages.map(mapCustomer);
+/**
+ * 着手済み顧客（ステータスあり・アプローチ前以外）。ダッシュボード集計用（正確・高速）。
+ * 集計・ドリルダウンは一覧用の項目だけを使うため軽量版で取得する（メモ等の長文を転送しない）。
+ */
+export async function fetchWorkedCustomers(): Promise<ListCustomer[]> {
+  const ids = await fetchListPropertyIds();
+  const pages = await queryAll(DB.customers, WORKED_FILTER, ids.length ? ids : undefined);
+  return pages.map(mapListCustomer);
 }
 
 /** 顧客ページの「メモ」を更新（Notion書き込み）。インテグレーションに更新権限が必要。 */

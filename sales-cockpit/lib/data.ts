@@ -1,4 +1,6 @@
+import { cache } from "react";
 import { unstable_cache } from "next/cache";
+import { versionedMemo } from "./memo-cache";
 import {
   fetchCustomersSlim,
   fetchRecentlyEditedSlim,
@@ -10,6 +12,8 @@ import {
   fetchIsKpiCalls,
   fetchContracts,
   fetchCustomerFieldOptions,
+  fetchCustomersByIds,
+  fetchCustomerByName,
   notionConfigured,
   getStoredTargets,
 } from "./notion";
@@ -50,21 +54,26 @@ const TTL = Number(process.env.NOTION_REVALIDATE_SECONDS ?? 1800);
 const TTL_FULL = Number(process.env.NOTION_FULL_REVALIDATE_SECONDS ?? 86400);
 // キー末尾のバージョンは、取得項目（スキーマ）を変えたら上げて旧キャッシュを破棄する。
 // 一覧/分析は軽量版（必要プロパティのみ）でキャッシュ。詳細はIDで都度取得する。
-const cachedCustomersSlim = unstable_cache(fetchCustomersSlim, ["sc-customers-slim-v1"], { revalidate: TTL_FULL, tags: ["customers-full"] });
+// 全件（≈16MB）・着手済み（≈3.1MB）はデータキャッシュの 2MB 上限を超えて保存されないため、版ID方式のメモ（lib/memo-cache.ts）で持つ。
+const cachedCustomersSlim = versionedMemo(() => fetchCustomersSlim(), "sc-customers-slim-v2", { revalidate: TTL_FULL, tags: ["customers-full"] });
 // ダッシュボードは着手済み顧客のみ（全件28k+は非現実的なため正確・高速に集計）
-const cachedWorked = unstable_cache(fetchWorkedCustomers, ["sc-worked-v1"], { revalidate: TTL, tags: ["customers"] });
+const cachedWorked = versionedMemo(fetchWorkedCustomers, "sc-worked-v2", { revalidate: TTL, tags: ["customers"] });
 // 今日/週次/サマリ用の軽量取得（最近更新・アポ有り・商談ステータス）。編集で即更新したいので "customers" タグ。
 const cachedRecentEdited = unstable_cache(fetchRecentlyEditedSlim, ["sc-recent-v1"], { revalidate: TTL, tags: ["customers"] });
 const cachedAppointed = unstable_cache(fetchAppointedSlim, ["sc-appointed-v1"], { revalidate: TTL, tags: ["customers"] });
 const cachedPipeline = unstable_cache(fetchPipelineSlim, ["sc-pipeline-v1"], { revalidate: TTL, tags: ["customers"] });
 const cachedCalls = unstable_cache(fetchCalls, ["sc-calls-v2"], { revalidate: TTL, tags: ["calls"] });
+// IS架電KPI は Notion 上で直接入力され、アプリからの保存経路がない（タグで即時無効化できない）ため短めのTTL。
+// "calls" タグにも載せ、「最新の情報に更新」ボタンでは即時に取り直す。
+const IS_KPI_TTL = Math.min(TTL, 300);
+const cachedIsKpiCalls = unstable_cache(fetchIsKpiCalls, ["sc-iskpi-v1"], { revalidate: IS_KPI_TTL, tags: ["calls"] });
 const cachedContracts = unstable_cache(fetchContracts, ["sc-contracts-v2"], { revalidate: TTL, tags: ["contracts"] });
 const cachedTargets = unstable_cache(getStoredTargets, ["sc-targets-v2"], { revalidate: TTL, tags: ["targets"] });
 const cachedFollowups = unstable_cache(fetchFollowups, ["sc-followups-v1"], { revalidate: TTL, tags: ["customers"] });
 const cachedFieldOptions = unstable_cache(fetchCustomerFieldOptions, ["sc-fieldopts-v1"], { revalidate: 3600, tags: ["schema"] });
 
 // Postgres(Neon)が設定されていればDBから読む（最速）。未設定・DB読取失敗時はNotionキャッシュにフォールバック。
-const cachedDbAll = unstable_cache(dbGetAllSlim, ["sc-db-all-v1"], { revalidate: TTL_FULL, tags: ["customers-full"] });
+const cachedDbAll = versionedMemo(dbGetAllSlim, "sc-db-all-v2", { revalidate: TTL_FULL, tags: ["customers-full"] });
 const cachedDbContracts = unstable_cache(dbGetContracts, ["sc-db-contracts-v1"], { revalidate: TTL, tags: ["contracts"] });
 async function loadAllSlim(): Promise<ListCustomer[]> {
   if (!dbConfigured()) return cachedCustomersSlim();
@@ -76,7 +85,8 @@ async function loadAllSlim(): Promise<ListCustomer[]> {
     return cachedCustomersSlim();
   }
 }
-async function loadContracts(): Promise<Contract[]> {
+// 同じリクエスト内で複数回呼ばれる取得（週次: ダッシュボード＋契約＋架電 等）は 1 回の読み込みで済ませる（React cache）。
+const loadContracts = cache(async (): Promise<Contract[]> => {
   if (!dbConfigured()) return cachedContracts();
   try {
     return await cachedDbContracts();
@@ -84,7 +94,8 @@ async function loadContracts(): Promise<Contract[]> {
     console.error("[data] DB contracts read failed, falling back to Notion:", (e as Error)?.message);
     return cachedContracts();
   }
-}
+});
+const loadCalls = cache(() => cachedCalls());
 
 // 検索用インデックス。重い全件走査（重複判定・人材紹介判定・正規化）を
 // データ単位で1回だけ計算してキャッシュする。ページ送り・検索の毎リクエストで
@@ -100,7 +111,8 @@ async function buildSearchIndex(): Promise<SearchIndex> {
   }
   return { all, dupIds: [...dupIds], agency };
 }
-const cachedSearchIndex = unstable_cache(buildSearchIndex, ["sc-search-index-v1"], {
+// 全件を含むため 2MB を超える → 版ID方式のメモで持つ（lib/memo-cache.ts）
+const cachedSearchIndex = versionedMemo(buildSearchIndex, "sc-search-index-v2", {
   revalidate: TTL_FULL,
   tags: ["customers-full"],
 });
@@ -144,27 +156,22 @@ export async function getDashboard(): Promise<DashboardData> {
     return emptyDashboard("NOTION_TOKEN が未設定です。Vercel の環境変数に NOTION_TOKEN を設定してください。");
   }
 
-  const [customers, recCalls, contracts] = await Promise.all([
-    safe("顧客管理", cachedWorked, [] as Customer[], errors),
-    safe("架電記録", cachedCalls, [] as CallEvent[], errors),
+  // 互いに独立した取得は並列に行う（以前は IS架電KPI・目標を順番に待っていた）。
+  const [customers, recCalls, contracts, kpiCalls, stored] = await Promise.all([
+    safe("顧客管理", cachedWorked, [] as ListCustomer[], errors),
+    safe("架電記録", loadCalls, [] as CallEvent[], errors),
     safe("契約管理", loadContracts, [] as Contract[], errors),
+    // IS架電KPI はマルチソースDBで現APIバージョン非対応のことがあるため、失敗しても警告は出さず無視する。
+    cachedIsKpiCalls().catch(() => [] as CallEvent[]),
+    /* 目標設定DB未接続などは静かに無視し、ファイル設定にフォールバック */
+    cachedTargets().catch(() => null),
   ]);
-  // IS架電KPI はマルチソースDBで現APIバージョン非対応のことがあるため、失敗しても警告は出さず無視する。
-  let kpiCalls: CallEvent[] = [];
-  try {
-    kpiCalls = await fetchIsKpiCalls();
-  } catch {
-    kpiCalls = [];
-  }
 
   // 「両方使っている／統合したい」方針: 架電記録 を主ソースとし IS架電KPI を統合。
   const calls: CallEvent[] = [...recCalls, ...kpiCalls];
   // 目標: サイト内設定（Notion 目標設定DB）を最優先。無ければ config/targets.json。
-  let effectiveConfig: TargetsConfig = targetsConfig;
-  try {
-    const stored = await cachedTargets();
-    if (stored) {
-      effectiveConfig = {
+  const effectiveConfig: TargetsConfig = stored
+    ? {
         workingDaysPerMonth: stored.workingDaysPerMonth,
         company: {
           monthlyAppointments: stored.monthlyAppointments,
@@ -175,11 +182,8 @@ export async function getDashboard(): Promise<DashboardData> {
         dailyCallsDefault: stored.dailyCallsDefault,
         dailyCallsByRep: stored.dailyCallsByRep,
         monthlyCallsByRep: {},
-      };
-    }
-  } catch {
-    /* 目標設定DB未接続などは静かに無視し、ファイル設定にフォールバック */
-  }
+      }
+    : targetsConfig;
   const targets = buildTargets(calls, effectiveConfig);
 
   return buildDashboard({ calls, customers, contracts, targets, targetsConfig: effectiveConfig, errors });
@@ -220,7 +224,7 @@ export async function getApptAnalysis(): Promise<{ analysis: ApptAnalysis | null
 export async function getCalls(): Promise<{ calls: CallEvent[]; errors: string[] }> {
   const errors: string[] = [];
   if (!notionConfigured()) return { calls: [], errors: ["NOTION_TOKEN が未設定です。"] };
-  const calls = await safe("架電記録", cachedCalls, [] as CallEvent[], errors);
+  const calls = await safe("架電記録", loadCalls, [] as CallEvent[], errors);
   return { calls, errors };
 }
 
@@ -230,13 +234,10 @@ export async function getTimingBoard(): Promise<{ board: TimingBoard; errors: st
   if (!notionConfigured()) {
     return { board: buildTimingBoard([]), errors: ["NOTION_TOKEN が未設定です。"] };
   }
-  const recCalls = await safe("架電記録", cachedCalls, [] as CallEvent[], errors);
-  let kpiCalls: CallEvent[] = [];
-  try {
-    kpiCalls = await fetchIsKpiCalls();
-  } catch {
-    kpiCalls = [];
-  }
+  const [recCalls, kpiCalls] = await Promise.all([
+    safe("架電記録", loadCalls, [] as CallEvent[], errors),
+    cachedIsKpiCalls().catch(() => [] as CallEvent[]),
+  ]);
   return { board: buildTimingBoard([...recCalls, ...kpiCalls]), errors };
 }
 
@@ -378,4 +379,35 @@ export async function getAppointedCustomers(): Promise<{ customers: ListCustomer
   }
   const customers = await safe("アポ有り", cachedAppointed, [] as ListCustomer[], errors);
   return { customers, errors };
+}
+
+// MRR（担当者別）用: 稼働契約 → 顧客（IS担当）の紐付け。契約ごとに Notion を 1 回ずつ引く（稼働30件で約30リクエスト）ため
+// 結果をキャッシュする。IS担当の編集は "customers"、契約の同期は "contracts" タグで即時に無効化され、
+// Notion で直接編集された分は短めのTTLで追従する。
+export type MrrCustomerLink = { custId: string; isRep: string | null };
+type MrrLinkInput = { id: string; customerId: string | null; company: string };
+async function resolveMrrCustomerLinks(items: MrrLinkInput[]): Promise<Record<string, MrrCustomerLink>> {
+  // ①relation ②同名フォールバック
+  const idMap = await fetchCustomersByIds(items.map((c) => c.customerId ?? "").filter(Boolean));
+  const missing = items.filter((c) => !c.customerId || !idMap.has(c.customerId));
+  const nameMap = new Map<string, Customer>();
+  await Promise.all(
+    missing.map(async (ct) => {
+      const cust = await fetchCustomerByName(ct.company);
+      if (cust) nameMap.set(ct.id, cust);
+    }),
+  );
+  const out: Record<string, MrrCustomerLink> = {};
+  for (const c of items) {
+    const cust = (c.customerId ? idMap.get(c.customerId) : null) ?? nameMap.get(c.id) ?? null;
+    if (cust) out[c.id] = { custId: cust.id, isRep: cust.isRep };
+  }
+  return out;
+}
+const cachedMrrCustomerLinks = unstable_cache(resolveMrrCustomerLinks, ["sc-mrr-links-v1"], {
+  revalidate: Math.min(TTL, 300),
+  tags: ["customers", "contracts"],
+});
+export async function getMrrCustomerLinks(items: MrrLinkInput[]): Promise<Record<string, MrrCustomerLink>> {
+  return cachedMrrCustomerLinks(items);
 }
