@@ -62,18 +62,11 @@
 ## 2. まだ終わっていないこと
 
 ### 2-1. オーナー作業（画面操作）
-- [ ] **サクパスBPO の共通ログインを有効にする**（2026-10-23 追加。セッションからは代行できなかった: let-hub の `HUB_SESSION_SECRET` は Sensitive で値を読めないため）
-  1. Vercel → `let-hub` の `HUB_SESSION_SECRET` と同じ値を、Vercel → LET チーム → `sakupassbpo` → Settings → Environment Variables に `HUB_SESSION_SECRET`（Production / Preview）で追加 → Redeploy。値が手元に無ければ、鍵を作り直してハブ＋7 プロジェクト（sakupassbpo を含む）すべてに入れ直す（`OWNER_TASKS_2026-10-20.md` 1-B。セッションに「共通ログインの鍵を作り直して全プロジェクトに入れて再デプロイして」と頼めば代行可）
-  2. Xserver の DNS に `bpo.let-inc.net` の TXT・CNAME（sakupassbpo `docs/デプロイ手順（Vercel + Neon）.md` 3-5）
-  3. ハブのメンバー管理で使う人に「サクパスBPO 管理システム」をチェック（サクパスBPO 側の登録は不要。初回に管理者として自動登録される。sakupassbpo #2）
-  - 2026-10-23: 1・2 完了（オーナー）。`bpo.let-inc.net` は Vercel で検証済み
-- [ ] **名刺管理の共通ログインを有効にする**（2026-10-23 追加）
-  - 2026-10-23: 1・2 完了（オーナー）。`meishi.let-inc.net` は Vercel で検証済み
-  1. Vercel → LET チーム → `meishi-lsystem` → Environment Variables に `HUB_SESSION_SECRET`（let-hub と同じ値。Production / Preview）→ Redeploy
-  2. Xserver の DNS（let-inc.net）に TXT `_vercel` = `vc-domain-verify=meishi.let-inc.net,925707b0d80aec26ae0d`（既存の `_vercel` TXT は残して追加）と CNAME `meishi` → `cname.vercel-dns.com`
-  3. 名刺管理の「担当者」画面で、各担当者のメール欄にハブと同じメールを入れる（入れておくと担当者が自動で選ばれる）
-- [ ] **メンバー登録**: https://hub.let-inc.net/admin/members で各メンバーを「ログインできるサイト」にチェックして追加 → 初期パスワードを本人に渡す。まず 1 人で、チェックしたサイトだけがハブに出ること・外したサイトの URL を直接開くと弾かれることを確認してから残りを進める。運用管理（/ops）を使う人は https://kpi.let-inc.net/ops/staff にも同じメールで登録
-- [ ] 役員ご自身は「すべてのサイト」＋権限「役員」で登録（これまでどおり全部に入れる）
+- [x] サクパスBPO・名刺管理の共通ログイン（`HUB_SESSION_SECRET`・DNS・ドメイン検証）— 2026-10-23 完了。`bpo.let-inc.net`・`meishi.let-inc.net` とも Vercel で検証済み
+- [x] メンバー登録（ハブのメンバー管理で「ログインできるサイト」を選んで招待）— 2026-10-25 オーナー完了
+- [ ] 名刺管理の「担当者」画面で、各担当者のメール欄にハブと同じメールを入れる（担当者の自動選択用。任意）
+- [ ] 運用管理（/ops）で案件を受け持つ人を https://kpi.let-inc.net/ops/staff に同じメールで登録（担当者として扱うため）
+- [ ] ハブ経由のログイン確認: ハブのカードから サクパスBPO（初回は管理者として自動登録）・名刺管理（担当者が自分）にパスワードなしで入れること
 - [ ] 本番確認（2026-10-23 の変更分）: ① /kpi 概要「クエストを開く」でクエスト画面が開く ② 画面切り替え時に中央の「読み込み中」が出る ③ 「評価制度サイト（セールス）」だけのメンバーで hyoka.let-inc.net → /demo/sales に転送、/sales と /demo/marketing は 403
 - [ ] 任意: 評価制度サイトの部門ページを自動解錠したければ Vercel `agents` に `HYOKA_PASSWORD_SALES` / `HYOKA_PASSWORD_MARKETING` / `HYOKA_PASSWORD_BPO`（各部門の従業員用パスワード）を設定
 - [ ] 人材紹介 `users` の他メンバー登録（細かく役割を分けたい人だけ。`OPEN_TASKS_2026-10-22.md` A-1）
@@ -92,7 +85,6 @@
 - [x] 新しい社内システムの連携: サクパスBPO・名刺管理（2026-10-23。残りはオーナー作業 2-1）
 - [x] 要件差分の残り 3 件（広告セットの判断ルール・クレーム／審査落ち・クライアント入力）: 2026-10-23 masterAI #29
 - [x] 採用サイト型テンプレート（トップ＋職種別＋募集要項。2026-10-23。lp-factory #1・masterAI #30。見本 https://sample-site.aigrowthx.pro/）
-- [ ] 要件差分レポートの未実装分（`masterAI/docs/recruit-marketing-ops-gap-report.md` 5 章）: 広告セット単位の判断ルール、クレーム・審査落ちのエスカレーション、クライアント入力（面接以降）の区別
 - [ ] クエストの拡張（要望が出たら）: 担当者をまたぐ週間目標、バッジ獲得の Slack 通知、GA4 連動（今回は見送り）
 - [ ] 人材紹介 `users` の役割の細かい制御、工数表の補正（作業時間が 2 ヶ月分たまったら）
 - [ ] Notion 担当マッピング DB・営業コックピットの顧客ステータスとの整合（表示用ミラーのまま）
