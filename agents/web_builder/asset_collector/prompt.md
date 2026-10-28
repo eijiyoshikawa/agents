@@ -56,11 +56,36 @@ HTMLから全 `<img>` タグと CSS `background-image` を抽出する:
    - `react-icons`: 複数ライブラリを統合
    各アイコンに対して推奨ライブラリのアイコン名を対応付ける
 
-### Step 4: ファビコン・OGP画像
-- ファビコン: 形状・色の説明とプレースホルダー生成方針
-- OGP画像: サイズ・デザインの説明
+### Step 4: 画像最適化分析
+各画像の最適化状況を記録する:
+- **フォーマット**: JPEG / PNG / WebP / AVIF / SVG の使い分け
+- **次世代フォーマット対応**: `<picture>` + `<source type="image/webp">` の有無
+- **レスポンシブ画像**: `srcset` / `sizes` 属性の使用状況
+- **遅延読み込み**: `loading="lazy"` / Intersection Observer ベースの実装
+- **画像CDN**: Cloudinary / imgix / Vercel Image Optimization の使用
+- **最適化推奨**: 未最適化画像に対する改善提案（フォーマット変換・リサイズ・圧縮）
 
-### Step 5: ローカルファイルパス設計
+### Step 5: フォントライセンス検証
+- **Google Fonts**: OFL (SIL Open Font License) — 商用利用可
+- **Adobe Fonts**: サブスクリプション必須 — ライセンス状況を記録
+- **商用フォント**: ライセンス購入の必要性を明記（Morisawa / FONTWORKS / TypeBank 等）
+- **代替フォント提案**: ライセンスが不明なフォントに対し、無料の類似フォントを提案
+
+### Step 6: アイコンシステム抽出
+アイコンの実装方式を詳細に分類:
+- **SVG スプライト**: `<svg><use xlink:href="#icon-name">` パターン
+- **インライン SVG**: 直接埋め込み（コンポーネント化推奨）
+- **アイコンフォント**: Font Awesome / Material Icons（ウェイト・バージョン記録）
+- **画像アイコン**: PNG/SVG ファイル（パス・サイズ記録）
+- **カスタムアイコン**: 独自デザインのアイコン（SVG抽出可否を判断）
+
+### Step 7: ファビコン・OGP・App Icon
+- **ファビコン**: 形状・色の説明、サイズバリエーション（16x16, 32x32, apple-touch-icon 180x180）
+- **OGP画像**: サイズ（1200x630 推奨）・デザイン・テキスト有無
+- **App Icon**: PWA 向け manifest.json 内アイコン（192x192, 512x512）
+- **Twitter Card**: `twitter:card` タイプ（summary / summary_large_image）
+
+### Step 8: ローカルファイルパス設計
 Next.js の `/public` ディレクトリ構成を設計する:
 
 ```
@@ -149,6 +174,23 @@ Next.js の `/public` ディレクトリ構成を設計する:
     "public/images/content/": "コンテンツ画像",
     "public/images/avatars/": "人物・テスティモニアル写真",
     "public/images/logos/": "ロゴ・パートナーロゴ"
+  },
+  "image_optimization": {
+    "webp_used": false,
+    "avif_used": false,
+    "srcset_used": false,
+    "lazy_loading": true,
+    "image_cdn": "none | vercel | cloudinary | imgix",
+    "unoptimized_images": []
+  },
+  "font_licensing": [
+    {"family": "Noto Sans JP", "license": "OFL", "commercial_use": true, "cost": "free"},
+    {"family": "Inter", "license": "OFL", "commercial_use": true, "cost": "free"}
+  ],
+  "ogp_assets": {
+    "og_image": {"url": "", "width": 1200, "height": 630, "has_text": true},
+    "twitter_card": "summary_large_image",
+    "apple_touch_icon": true
   },
   "total_images": 12,
   "images_requiring_placeholder": 10,

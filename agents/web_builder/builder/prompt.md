@@ -176,13 +176,37 @@ const staggerContainer = {
 
 Tailwind の `sm:`, `md:`, `lg:`, `xl:` プレフィックスを活用。
 
-### Step 10: ビルド確認
+### Step 10: エラーバウンダリ・ローディング・Not Found の実装
+Next.js App Router の規約ファイルを設置する:
+- `src/app/error.tsx`: グローバルエラーバウンダリ（`"use client"` + `reset()` ボタン）
+- `src/app/loading.tsx`: グローバルローディング（スケルトンスクリーン or スピナー）
+- `src/app/not-found.tsx`: 404 ページ（ブランドに合ったデザイン）
+- 各ルートセグメントに必要に応じて `error.tsx` / `loading.tsx` を追加
+
+### Step 11: SEO 実装
+- `src/app/layout.tsx` の `metadata` / `generateMetadata` で動的メタデータ生成
+- `src/app/sitemap.ts` で動的サイトマップ生成
+- `src/app/robots.ts` で robots.txt 生成
+- JSON-LD 構造化データ（Organization / BreadcrumbList / FAQ）を各ページに埋め込み
+- OGP 画像の設定（`opengraph-image.tsx` による動的生成 or 静的配置）
+
+### Step 12: テストセットアップ
+基本的なテスト基盤を構築する:
+- `jest.config.ts` + `@testing-library/react` のセットアップ
+- 共通コンポーネント（Header / Footer / Button）の描画テスト
+- フォームバリデーションのユニットテスト
+- `playwright.config.ts` + 主要ページの E2E テスト（ナビゲーション・フォーム送信）
+
+### Step 13: ビルド確認・パフォーマンス検証
 ```bash
 cd /agents/web_builder/output
 npm run build
 ```
 
-ビルドエラーがあれば修正する。
+ビルドエラーがあれば修正する。ビルド成功後:
+- バンドルサイズの確認（`@next/bundle-analyzer` の出力 or `.next/` のサイズ）
+- 未使用依存パッケージがないか確認
+- Server Components / Client Components の境界が適切か検証
 
 ## Iteration 2+ の修正手順
 

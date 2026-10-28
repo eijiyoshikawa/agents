@@ -61,7 +61,29 @@ JS ソースから以下のパターンを検出する:
 - テキストアニメーション（タイピング、文字ごとのフェードイン等）
 - スクロールバー連動のプログレスバー
 
-### Step 6: 実装推奨の決定
+### Step 6: パフォーマンス影響評価
+検出したアニメーションの Core Web Vitals への影響を評価する:
+- **CLS リスク**: レイアウトシフトを引き起こすアニメーション（height/width 変化、position 変更）を特定
+- **INP リスク**: メインスレッドをブロックする JS アニメーション（requestAnimationFrame 多用、複雑な GSAP タイムライン）
+- **LCP リスク**: ヒーローセクションの表示を遅延させるアニメーション（初期 opacity:0 → fade-in）
+- **GPU 加速**: `transform` / `opacity` のみ変化する（GPU 合成可能）アニメーションの割合
+- 各アニメーションに `performance_impact: "safe" | "monitor" | "risky"` を付与
+
+### Step 7: reduced-motion 対応状況の検出
+- `@media (prefers-reduced-motion: reduce)` の定義有無
+- reduced-motion 時の代替表示（即座表示 / 簡略アニメーション / 非表示）
+- `prefers-reduced-motion` 未対応のアニメーション一覧（改善必須項目として記録）
+
+### Step 8: マイクロインタラクションのカタログ化
+大きなアニメーション以外の細かい演出を網羅する:
+- フォーカスリング / フォーカス時の拡大
+- 入力フィールドのラベルフロート
+- チェックボックス / トグルのカスタムアニメーション
+- ローディングスピナー / スケルトンスクリーン
+- 通知トースト / スナックバーの出現演出
+- スクロールプログレスバー
+
+### Step 9: 実装推奨の決定
 検出したアニメーションの複雑さに応じて、最適な実装方法を推奨する:
 
 - **CSS only**: シンプルなhover、transition、基本的なkeyframes
@@ -146,10 +168,26 @@ JS ソースから以下のパターンを検出する:
       "implementation": "framer-motion variants + split text"
     }
   ],
+  "micro_interactions": [
+    {"target": "input-field", "type": "label-float", "trigger": "focus", "implementation": "CSS :focus-within + transform"},
+    {"target": "checkbox", "type": "check-animation", "trigger": "change", "implementation": "SVG path + CSS transition"}
+  ],
   "loading_animation": {
     "has_loader": false,
     "type": "none",
     "description": ""
+  },
+  "performance_assessment": {
+    "gpu_accelerated_ratio": "80%",
+    "cls_risk_animations": [],
+    "inp_risk_animations": [],
+    "lcp_blocking_animations": [],
+    "overall_impact": "safe | monitor | risky"
+  },
+  "reduced_motion_support": {
+    "has_media_query": false,
+    "unsupported_animations": [],
+    "fallback_strategy": "instant | simplified | none"
   },
   "recommended_library": "framer-motion",
   "recommended_library_reason": "React/Next.js環境で最も統合しやすく、スクロールアニメーション・ページ遷移・ホバーエフェクトを統一的に扱える",

@@ -57,9 +57,19 @@
 - ヘッダー高さ
 - 共通パディング
 
-### Step 6: ページ間の共通/固有要素の整理
+### Step 6: セマンティクス・アクセシビリティ構造解析
+HTML5 セマンティクスと ARIA の使用状況を記録する:
+- **セマンティック要素**: `<article>`, `<aside>`, `<nav>`, `<section>`, `<main>`, `<figure>` の使用率
+- **ARIA ランドマーク**: `role="banner"`, `role="navigation"`, `role="main"`, `role="contentinfo"` の有無
+- **見出し階層**: h1〜h6 のネスト構造（h1の数、スキップの有無を検証）
+- **パンくずリスト**: `<nav aria-label="breadcrumb">` / `<ol>` ベースのパンくず構造
+- **URL構造**: パス階層の深さ、命名規則（kebab-case / 日本語URL / ID）
+- **構造化データ**: `<script type="application/ld+json">` の存在・種類（Organization / BreadcrumbList 等）
+
+### Step 7: ページ間の共通/固有要素の整理
 - 共通コンポーネント: Header, Footer, CTA Section 等
 - ページ固有のセクション構成
+- テンプレートパターンの特定（記事詳細ページ / 一覧ページ / LP等）
 
 ## 出力フォーマット
 
@@ -131,7 +141,16 @@
     "Footer（全ページ共通）",
     "CTA Section（複数ページで使用）",
     "Section Heading（共通見出しパターン）"
-  ]
+  ],
+  "semantics": {
+    "semantic_elements_usage": {"article": 0, "aside": 0, "nav": 2, "section": 8, "main": 1, "figure": 3},
+    "aria_landmarks": ["banner", "navigation", "main", "contentinfo"],
+    "heading_hierarchy": {"h1_count": 1, "hierarchy_valid": true, "skip_detected": false},
+    "breadcrumb": {"exists": false, "format": "none"},
+    "structured_data": ["Organization", "BreadcrumbList"],
+    "url_structure": {"pattern": "kebab-case", "max_depth": 2, "japanese_urls": false}
+  },
+  "page_templates": ["top", "service_detail", "blog_list", "blog_detail", "contact"]
 }
 ```
 

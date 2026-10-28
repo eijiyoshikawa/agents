@@ -57,10 +57,46 @@ HTMLソースと読み込まれたリソースから技術を検出する:
 - `jQuery` → jQuery
 
 **アナリティクス・ツール:**
-- Google Analytics / GTM
-- Facebook Pixel 等
+- Google Analytics (GA4 / UA) / GTM
+- Facebook Pixel / Meta Pixel
+- Hotjar / Microsoft Clarity（ヒートマップ）
+- Mixpanel / Amplitude（プロダクトアナリティクス）
 
-### Step 4: サイトの特徴メモ
+**CMS・ヘッドレスCMS検出:**
+- WordPress: `wp-content/`, `wp-json/` API
+- Contentful: `cdn.contentful.com`
+- microCMS: `microcms.io` API
+- Strapi / Sanity / Prismic のAPIエンドポイント
+
+**CDN・ホスティング検出:**
+- Vercel: `x-vercel-id` ヘッダー / `.vercel.app`
+- Cloudflare: `cf-ray` ヘッダー
+- AWS CloudFront: `x-amz-cf-id`
+- Fastly: `x-served-by`
+- Netlify: `x-nf-request-id`
+
+**セキュリティヘッダー解析:**
+- `Content-Security-Policy` / `X-Frame-Options` / `Strict-Transport-Security`
+- HTTPS強制の有無、SSL/TLS バージョン推定
+
+**パフォーマンス指標（簡易計測）:**
+- HTML応答サイズ（gzip前後）
+- 外部リソース数（CSS/JS/画像/フォント）
+- レンダリングブロックリソースの有無
+- `<link rel="preload">` / `<link rel="preconnect">` の活用状況
+
+### Step 4: sitemap.xml / robots.txt 解析
+- `WebFetch` で `/robots.txt` と `/sitemap.xml` を取得
+- クローラ許可範囲、Sitemap URL、更新頻度（`<changefreq>`）を記録
+- robots.txt のカスタムルール（Disallow パターン）を記録
+
+### Step 5: モバイル対応度チェック
+- viewport meta の設定値
+- `<link rel="alternate" media="only screen and (max-width: 640px)">` の有無
+- AMP対応の有無（`<html amp>` / `amphtml` link）
+- PWA対応（`manifest.json` / Service Worker 登録）
+
+### Step 6: サイトの特徴メモ
 サイト全体の印象・特徴を簡潔にメモする:
 - デザインの方向性（ミニマル/リッチ/コーポレート等）
 - 主なビジュアル要素（動画背景/パララックス/大きな写真等）
@@ -89,10 +125,36 @@ HTMLソースと読み込まれたリソースから技術を検出する:
   "tech_stack": {
     "framework": "Next.js | WordPress | static | unknown",
     "css": "Tailwind CSS | Bootstrap | custom",
-    "cms": "WordPress | none",
-    "analytics": "Google Analytics | GTM | none"
+    "cms": "WordPress | microCMS | Contentful | none",
+    "analytics": ["GA4", "GTM", "Clarity"],
+    "cdn": "Vercel | Cloudflare | CloudFront | unknown",
+    "hosting": "Vercel | Netlify | AWS | unknown"
   },
   "external_libraries": ["GSAP", "Swiper", "AOS"],
+  "security_headers": {
+    "https": true,
+    "hsts": true,
+    "csp": false,
+    "x_frame_options": "DENY | SAMEORIGIN | none"
+  },
+  "performance_snapshot": {
+    "html_size_kb": 0,
+    "external_resources": {"css": 0, "js": 0, "images": 0, "fonts": 0},
+    "render_blocking_resources": 0,
+    "preload_hints": []
+  },
+  "sitemap_robots": {
+    "has_sitemap": true,
+    "has_robots_txt": true,
+    "crawl_allowed": true,
+    "sitemap_urls_count": 0
+  },
+  "mobile_pwa": {
+    "viewport_configured": true,
+    "amp": false,
+    "pwa": false,
+    "service_worker": false
+  },
   "meta": {
     "title": "サイトタイトル",
     "description": "メタディスクリプション",

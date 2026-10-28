@@ -132,66 +132,13 @@ Google Slides テンプレートを基に、意思決定者が Phase 1 に合意
 ```json
 {
   "client_name": "株式会社〇〇",
-  "template_url": "https://docs.google.com/presentation/d/...",
-  "output_url": "https://docs.google.com/presentation/d/...",
+  "template_url": "https://docs.google.com/...",
+  "output_url": "https://docs.google.com/...",
   "created_at": "YYYY-MM-DD",
-  "story_structure": {
-    "P1": {
-      "title": "御社の課題は〇〇である",
-      "so_what": "今期中に着手しないと△△のリスクがある",
-      "status": "confirmed"
-    },
-    "P2": {
-      "title": "原因は△△にある",
-      "so_what": "現状の運用では□□が解消できない",
-      "status": "confirmed"
-    },
-    "P3": {
-      "title": "解決策として□□を提案する",
-      "so_what": "Phase1で■■を実現し、効果を検証する",
-      "status": "confirmed"
-    },
-    "P4": {
-      "title": "Phase1のスコープと体制",
-      "so_what": "",
-      "status": "confirmed"
-    },
-    "P5": {
-      "title": "スケジュールとお見積り",
-      "so_what": "",
-      "status": "confirmed"
-    }
-  },
-  "body_elements": [
-    {
-      "page": "P1",
-      "element_type": "棒グラフ",
-      "content_summary": "業界別課題発生率（直近3年）",
-      "data_source": "商談議事録 + 市場データ",
-      "status": "inserted"
-    }
-  ],
-  "steps_completed": {
-    "step1_story_review": "confirmed",
-    "step2_body_design": "confirmed",
-    "step3_template_insert": "confirmed"
-  },
-  "output_v2": {
-    "format": "html_to_pdf",
-    "vercel_url": "https://project-name.vercel.app",
-    "pdf_url": "",
-    "pptx_url": "",
-    "sections_count": 15,
-    "features": [
-      "font_size_toggle",
-      "sidebar_toc",
-      "editable_pptx",
-      "landscape_16_9_pdf",
-      "auto_logo_placement",
-      "responsive",
-      "vercel_deploy"
-    ]
-  },
+  "story_structure": { "P1": {"title": "...", "so_what": "...", "status": "confirmed"}, "P2-P5": "同構造" },
+  "body_elements": [{ "page": "P1", "element_type": "棒グラフ", "content_summary": "...", "data_source": "...", "status": "inserted" }],
+  "steps_completed": { "step1_story_review": "confirmed", "step2_body_design": "confirmed", "step3_template_insert": "confirmed" },
+  "output_v2": { "format": "html_to_pdf", "vercel_url": "...", "pdf_url": "", "pptx_url": "", "sections_count": 15, "features": ["font_size_toggle","sidebar_toc","editable_pptx","landscape_16_9_pdf","auto_logo_placement","responsive","vercel_deploy"] },
   "revision_history": []
 }
 ```
@@ -268,6 +215,37 @@ HTMLとして構築する際、以下の機能を実装すること:
 **⛔ GATE: ユーザーに完成版の確認を依頼。修正依頼があれば対応する。**
 
 ---
+
+## ドキュメントデザイン原則（CRAP + ビジュアルヒエラルキー）
+
+全資料に適用する4大原則:
+| 原則 | 適用 |
+|------|------|
+| **Contrast（コントラスト）** | 見出し/本文の明確な差（フォントサイズ1.5倍以上）、アクセントカラーで注目ポイントを強調 |
+| **Repetition（反復）** | カラー・フォント・アイコンスタイルを全ページで統一、ヘッダー/フッターの一貫性 |
+| **Alignment（整列）** | グリッドベースのレイアウト、左揃え基本（日本語は両端揃え可）、要素間の見えない線を意識 |
+| **Proximity（近接）** | 関連情報のグループ化、余白で論理構造を視覚化、1スライド1メッセージ |
+
+**ビジュアルヒエラルキー**: タイトル → サブタイトル → キーメッセージ → 補足データの4層構造を厳守。視線誘導（Z型/F型パターン）を意識した配置。
+
+## データストーリーテリング手法
+
+数値・データを提案に組み込む際の標準プロセス:
+1. **コンテキスト設定**: 「なぜこの数字が重要か」を先に提示
+2. **ビジュアル選択**: 比較→棒グラフ、推移→折れ線、構成→円/ツリーマップ、関係→散布図
+3. **アノテーション**: データポイントに「だから何」を直接書き込み、読み手の解釈コストを最小化
+4. **アクション接続**: データから導かれる次のアクションを同ページ内に明示
+
+## 日本語ビジネス文書規格
+
+提案書以外の文書作成にも対応するための知識:
+| 文書種別 | 構成要素 | 留意点 |
+|---------|---------|--------|
+| **稟議書** | 件名・起案理由・内容・効果・費用・リスク・決裁欄 | 結論→理由の順。金額は税込/税別を明記 |
+| **報告書** | 目的・結論・詳細・所感・添付資料 | 結論ファーストの「逆三角形」構成 |
+| **企画書** | 背景・目的・施策・スケジュール・予算・KPI | 意思決定者が3分で判断できるエグゼクティブサマリー必須 |
+
+**エグゼクティブサマリー技法**: 全文書の冒頭に「30秒で分かる要約」を配置。結論→根拠→投資対効果→ネクストステップの4要素を3行以内にまとめる。
 
 ## 使用するツール
 - `notion-search` / `notion-fetch`: 商談議事録・顧客情報の取得

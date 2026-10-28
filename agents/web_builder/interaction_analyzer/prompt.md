@@ -71,7 +71,29 @@
 - **ヘッダー変化**: スクロール時のヘッダー縮小 / 背景色変化
 - **スクロールトップボタン**: 表示条件、位置、アニメーション
 
-### Step 6: その他のインタラクティブ要素
+### Step 6: フォームバリデーションパターンの詳細解析
+各フォームのバリデーション実装を詳細に記録:
+- **クライアントサイド**: HTML5 ネイティブ（`required`, `pattern`）/ JavaScript カスタム / ライブラリ（Zod, Yup）
+- **リアルタイムバリデーション**: 入力中に検証するか / blur時か / submit時か
+- **エラー表示**: フィールド下 / ツールチップ / サマリー（フォーム上部）
+- **エラーメッセージのスタイル**: テキスト色・アイコン・アニメーション
+- **サクセスフィードバック**: 入力完了時のチェックマーク等
+
+### Step 7: キーボードナビゲーション・アクセシビリティ
+- **フォーカス管理**: Tab 順序の論理性、`tabindex` の使用状況
+- **フォーカスインジケーター**: outline / ring / カスタムスタイル
+- **キーボードショートカット**: Escape でモーダル閉じ、Enter で送信等
+- **スクリーンリーダー対応**: `aria-label`, `aria-describedby`, `aria-live` の使用
+- **フォーカストラップ**: モーダル内のフォーカス閉じ込め実装
+
+### Step 8: タッチジェスチャー・モバイル最適化
+- **スワイプ**: スライダーでの左右スワイプ、メニューの引き出し
+- **プルトゥリフレッシュ**: 下にスワイプでの更新（PWA的な挙動）
+- **ピンチズーム**: 画像ギャラリーでのズーム有無
+- **タッチターゲット**: ボタン・リンクの最小サイズ（44x44px 以上の WCAG 推奨）
+- **ホバー代替**: タッチデバイスでのホバーエフェクト代替（タップ展開等）
+
+### Step 9: その他のインタラクティブ要素
 - **ツールチップ**: ホバー時の説明表示
 - **ドロップダウン**: 選択メニュー
 - **コピーボタン**: テキスト/URLのコピー
@@ -79,6 +101,10 @@
 - **Cookie同意バナー**: 表示条件、レイアウト
 - **画像ギャラリー**: ライトボックス表示
 - **動画再生**: インライン再生 / モーダル再生
+- **検索機能**: インクリメンタルサーチ / フィルタ / ソートUI
+- **無限スクロール vs ページネーション**: 一覧ページの読み込み方式
+- **トースト/通知**: 出現位置・自動消去時間・スタック挙動
+- **ドラッグ&ドロップ**: カンバン / ファイルアップロード / 並び替え
 
 ## 出力フォーマット
 
@@ -172,6 +198,26 @@
       "position": "bottom-right",
       "animation": "fade-in"
     }
+  },
+  "form_validation_patterns": {
+    "validation_timing": "realtime | on-blur | on-submit",
+    "error_display": "inline | tooltip | summary",
+    "error_style": {"color": "#EF4444", "icon": true, "animation": "shake"},
+    "success_feedback": true,
+    "library": "native | zod | yup | custom"
+  },
+  "keyboard_accessibility": {
+    "tab_order_logical": true,
+    "focus_indicator": "outline | ring | custom | none",
+    "escape_closes_modals": true,
+    "focus_trap_in_modals": true,
+    "aria_labels_present": true,
+    "skip_navigation_link": false
+  },
+  "touch_optimization": {
+    "swipe_gestures": ["slider", "mobile-menu"],
+    "min_touch_target_44px": true,
+    "hover_alternatives": "tap-expand | long-press | none"
   },
   "other_interactions": [
     {

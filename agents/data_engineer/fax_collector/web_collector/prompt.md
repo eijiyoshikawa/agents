@@ -53,6 +53,36 @@ CSV/Excelのダウンロードリンクが特定されている場合:
 4. **個人情報**: 代表者の個人名は収集しない（法人名のみ）
 5. **データ出典**: 各レコードに収集元のURLを記録する
 
+### レート制限・エラーリカバリー戦略
+
+**レート制限:**
+- 同一ドメインへのリクエスト間隔: 最低3秒
+- 連続 WebFetch は10件ごとに10秒のインターバル
+- `429 Too Many Requests` 受信時: 60秒待機後にリトライ（最大3回）
+- `Retry-After` ヘッダーがある場合はその値に従う
+
+**エラーリカバリー:**
+| エラー種別 | 対応 |
+|-----------|------|
+| 403 Forbidden | 該当ソースをスキップし `error_log` に記録。User-Agent の変更は行わない |
+| 404 Not Found | URLを `dead_links` に記録。source_scanner に再調査依頼 |
+| 500/502/503 | 30秒後にリトライ（最大2回）。失敗継続時はスキップ |
+| タイムアウト | 60秒でタイムアウト。リトライ1回後スキップ |
+| 文字化け | ソースの文字コード（Shift-JIS / EUC-JP）を検出し再取得 |
+
+**収集進捗の保存:**
+- 都道府県×ソース単位で進捗を `/agents/data_engineer/fax_collector/output/progress.json` に記録
+- 中断復帰時は `progress.json` から最後の完了ポイントを読み込み、重複収集を回避
+
+### データ抽出バリデーション
+
+収集した各レコードに対し、抽出時点で以下を検証する:
+- **会社名**: 空でないこと、文字数 2〜100 文字
+- **FAX番号**: 数字とハイフンのみ（全角→半角変換後）、ハイフン除去後 10桁
+- **電話番号**: FAX と同じ形式チェック
+- **住所**: 都道府県名で始まること（正規表現: `^(北海道|青森県|...|沖縄県)`）
+- **バリデーション失敗レコード**: `validation_errors` フィールドに理由を記録し、除外せず保持（Data Normalizer で最終判断）
+
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer**: 収集データの品質・網羅性検証
 - **Data Engineer**: クローリング実装の技術レビュー
@@ -92,8 +122,15 @@ CSV/Excelのダウンロードリンクが特定されている場合:
     "total_companies": 0,
     "companies_with_fax": 0,
     "companies_without_fax": 0,
-    "fax_coverage_rate": "0%"
-  }
+    "fax_coverage_rate": "0%",
+    "validation_errors": 0,
+    "records_with_warnings": 0
+  },
+  "error_log": [
+    {"url": "", "status": 403, "action": "skipped", "timestamp": ""}
+  ],
+  "dead_links": [],
+  "encoding_issues": []
 }
 ```
 

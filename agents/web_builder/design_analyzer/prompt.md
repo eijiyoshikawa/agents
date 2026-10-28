@@ -75,7 +75,29 @@ CSS変数、インラインスタイル、クラス名から色情報を抽出�
 4. **アイコン**:
    - スタイル（線画/塗り）、サイズ、色
 
-### Step 6: セクション別デザインノート
+### Step 6: アクセシビリティ・カラーコントラスト検証
+WCAG 2.1 AA 基準でカラーコントラストを検証する:
+- **テキスト × 背景**: コントラスト比 4.5:1 以上（通常テキスト）、3:1 以上（大テキスト 18px+）
+- **ボタン × 背景**: CTA ボタンの視認性確認
+- **リンク色**: 周囲テキストとの識別性（色のみに依存しない下線等の有無）
+- **不合格カラーペア**: コントラスト比が基準未達の組み合わせをリストアップ
+- 各ペアの改善提案（明度調整値）を付記
+
+### Step 7: ダークモード対応検出
+- `prefers-color-scheme: dark` メディアクエリの有無
+- `.dark` / `[data-theme="dark"]` クラスベースの切り替えの有無
+- ダークモード時のカラーパレット抽出（存在する場合）
+- トグルUIの実装方式
+
+### Step 8: CSS カスタムプロパティ体系の抽出
+`:root` / `body` に定義された CSS 変数を体系的に記録する:
+- カラー変数（`--color-*`, `--bg-*`, `--text-*`）
+- スペーシング変数（`--space-*`, `--gap-*`）
+- タイポグラフィ変数（`--font-*`, `--text-*`）
+- レスポンシブブレークポイント変数
+- 変数の命名規則パターン（BEM系 / Tailwind系 / 独自体系）
+
+### Step 9: セクション別デザインノート
 各セクションのビジュアル的な特徴を記録する:
 - 背景処理（色/画像/グラデーション/動画）
 - テキスト色（背景に応じた変化）
@@ -161,10 +183,31 @@ CSS変数、インラインスタイル、クラス名から色情報を抽出�
       "overlay": "none"
     }
   },
+  "accessibility": {
+    "contrast_pairs": [
+      {"fg": "#1E293B", "bg": "#FFFFFF", "ratio": 12.6, "pass_aa": true},
+      {"fg": "#64748B", "bg": "#F8FAFC", "ratio": 4.2, "pass_aa": false, "fix": "#5A6A7D で 4.5:1 達成"}
+    ],
+    "color_only_indicators": false,
+    "focus_visible_style": "outline | ring | custom | none"
+  },
+  "dark_mode": {
+    "supported": false,
+    "method": "media-query | class-toggle | none",
+    "dark_palette": {}
+  },
+  "css_custom_properties": {
+    "naming_convention": "BEM | tailwind | custom",
+    "color_vars": [],
+    "spacing_vars": [],
+    "typography_vars": [],
+    "total_vars": 0
+  },
   "visual_style": {
     "overall_tone": "modern-clean | corporate | playful | luxury | minimal",
     "border_radius_system": "small: 4px, medium: 8px, large: 12px, xl: 24px",
     "shadow_style": "subtle | medium | dramatic | none",
+    "gradient_patterns": [],
     "decorative_elements": ["斜めセクション区切り", "ドットパターン背景", "グラデーションオーバーレイ"]
   },
   "sections_design": [
