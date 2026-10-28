@@ -88,6 +88,46 @@
   P3（低）  : 軽微な問題   → 次スプリント
 ```
 
+## 災害復旧・事業継続（DR/BCP）
+
+| 指標 | 目標値 | 実現方法 |
+|------|--------|---------|
+| RTO（復旧時間目標） | ≤ 1時間 | Vercel の自動ロールバック + Supabase Point-in-Time Recovery |
+| RPO（復旧時点目標） | ≤ 15分 | Supabase のWAL ベースバックアップ（自動） |
+| バックアップ | 日次自動 | Supabase daily backups + 手動エクスポート月次 |
+| 復旧テスト | 四半期実施 | ステージング環境でバックアップからの復旧訓練 |
+
+## コスト最適化戦略
+
+| 対策 | 方法 | 期待削減率 |
+|------|------|----------|
+| 画像最適化 | next/image + Vercel Image Optimization | 帯域 40-60% 削減 |
+| Edge Cache活用 | 静的アセットのCache-Control 最適化 | サーバー負荷 50% 削減 |
+| 不要ログ削減 | Sentry のサンプリングレート調整（本番20%） | Sentry費用 80% 削減 |
+| ビルドキャッシュ | Vercel Remote Caching 有効化 | ビルド時間 30-50% 短縮 |
+| 定期棚卸し | 未使用環境変数・プレビューデプロイの月次クリーンアップ | — |
+
+月次コストが前月比 120% を超えた場合、Finance Agent + Tech Lead にアラートを発出する。
+
+## セキュリティ強化基準
+
+### 必須セキュリティヘッダー（next.config.js で設定）
+```
+Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'
+X-Frame-Options: DENY
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+```
+
+### シークレットローテーション管理
+| シークレット種別 | ローテーション周期 | 手順 |
+|----------------|-----------------|------|
+| API キー（Stripe / Supabase） | 90日 | 新キー発行→環境変数更新→旧キー無効化（24h猶予） |
+| OAuth クライアントシークレット | 180日 | 同上 |
+| Webhook シークレット | 90日 | エンドポイント更新→検証切り替え |
+
 ## インフラ構成
 
 | コンポーネント | サービス | 用途 |

@@ -43,6 +43,46 @@ Stitch からエクスポートしたコードを整備する:
 - クロスブラウザ・デバイス確認項目の作成
 - 納品物一式の整理
 
+## Web制作品質基準
+
+### パフォーマンス最適化（必達基準）
+| 指標 | 目標値 | 計測ツール |
+|------|--------|----------|
+| LCP | ≤ 2.5秒 | Lighthouse / PageSpeed Insights |
+| INP | ≤ 200ms | Chrome UX Report |
+| CLS | ≤ 0.1 | Lighthouse |
+| Lighthouse Performance | ≥ 90 | Lighthouse |
+| 画像最適化 | WebP/AVIF + srcset + lazy loading | 手動確認 |
+
+### SEOファースト実装チェックリスト
+- [ ] セマンティックHTML（h1-h6の階層、article/section/nav/main）
+- [ ] メタタグ完備（title 30文字以内、description 120文字以内）
+- [ ] OGP / Twitter Card 設定
+- [ ] JSON-LD 構造化データ（Organization / LocalBusiness / FAQ 等）
+- [ ] robots.txt + XML sitemap
+- [ ] canonical URL 設定
+- [ ] 画像 alt 属性（全画像、日本語で内容を説明）
+
+### 日本語Webアクセシビリティ（JIS X 8341-3 準拠）
+| 項目 | 基準 |
+|------|------|
+| コントラスト比 | テキスト 4.5:1 以上、大文字 3:1 以上 |
+| フォーカスインジケーター | キーボード操作時に視認可能 |
+| 代替テキスト | 全画像・アイコンに日本語 alt |
+| フォームラベル | 全入力欄に `<label>` 紐付け |
+| 日本語フォント | font-feature-settings: "palt" 1 設定 |
+| ルビ対応 | 難読漢字にはルビ（`<ruby>`タグ）を付与 |
+
+### 納品前ローンチチェックリスト
+- [ ] 全ページのリンク切れチェック
+- [ ] フォーム送信テスト（バリデーション・完了画面・メール通知）
+- [ ] 404ページのカスタマイズ
+- [ ] favicon / apple-touch-icon 設定
+- [ ] GA4 / GTM タグ設置・動作確認
+- [ ] SSL証明書・HTTPS強制リダイレクト確認
+- [ ] 主要ブラウザ確認（Chrome / Safari / Edge / Firefox）
+- [ ] SP表示確認（iPhone SE〜iPhone 15 Pro Max幅）
+
 ## 出力フォーマット
 
 `/agents/web_creator/output.json` に保存:

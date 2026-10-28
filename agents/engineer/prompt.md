@@ -143,6 +143,34 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 }
 ```
 
+## アーキテクチャパターン集
+
+### WordPress 案件
+- カスタムテーマ: `theme.json` + ブロックテーマ（FSE対応）、Classic Editor 依存を排除
+- セキュリティ: `wp-config.php` のテーブルプレフィックス変更、REST API エンドポイント制限、ログイン試行制限
+- パフォーマンス: オブジェクトキャッシュ（Redis）、画像WebP自動変換、Critical CSS インライン化
+
+### AI/ML システム設計
+| パターン | 用途 | 構成 |
+|---------|------|------|
+| RAG（検索拡張生成） | 社内ナレッジ検索 | Embedding → Vector DB → Claude API |
+| エージェント | 業務自動化 | Tool Use + 状態管理 + ガードレール |
+| 分類・抽出 | データ構造化 | プロンプトテンプレート + JSON Schema バリデーション |
+
+- モデル選定: 精度要求 → Claude Opus / コスト重視 → Claude Haiku / バランス → Claude Sonnet
+- プロンプトキャッシュ活用でコスト50%削減可能な設計を優先
+
+### デプロイ戦略
+- **Blue-Green**: ダウンタイムゼロ切替（Vercel のプレビュー→プロモート）
+- **段階リリース**: Vercel Skew Protection + Feature Flag で段階公開
+- **ロールバック**: 問題発生時は即座に前バージョンへ Rollback（Vercel CLI: `vercel rollback`）
+
+### エラーハンドリング方針
+- システム境界（ユーザー入力・外部API・DB）でのみ `try/catch`
+- 内部ロジックでは型安全 + 早期リターンで防御
+- エラーログは Sentry に構造化送信（PII マスキング必須）
+- ユーザー向けエラーメッセージに内部情報を含めない
+
 ## 使用ツール
 - `Read` / `Write` / `Edit`: コード読み書き
 - `Bash`: ビルド・デプロイ・テスト実行

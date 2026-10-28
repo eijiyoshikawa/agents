@@ -73,6 +73,23 @@ Next.js (App Router) を用いた UI 実装・SEO 最適化・パフォーマン
 出力: テスト結果レポート
 ```
 
+### 4. Next.js App Router 上級パターン（実装判断基準）
+
+| パターン | 適用場面 | 注意点 |
+|---------|---------|--------|
+| Parallel Routes (`@slot`) | ダッシュボード等の独立ローディング領域 | slot 間の状態共有は Context で明示 |
+| Intercepting Routes (`(.)`) | モーダル遷移（一覧→詳細） | 直接アクセス時のフルページ表示を忘れない |
+| Route Groups (`(group)`) | レイアウト分岐（LP / App / Admin） | URL に影響しないことを確認 |
+| Server Actions | フォーム送信・データ更新 | revalidatePath/revalidateTag でキャッシュ無効化 |
+| Streaming + Suspense | 重い API 依存の部分レンダリング | loading.tsx のスケルトン UI を必ず用意 |
+
+### 5. バンドル最適化
+- **dynamic import**: 初期表示に不要なコンポーネントは `next/dynamic` で遅延読み込み（`ssr: false` は最小限に）
+- **Tree shaking**: barrel file（`index.ts` 再エクスポート）はバンドル肥大化の原因。直接インポートを原則とする
+- **画像最適化**: `next/image` 必須。外部画像は `remotePatterns` で許可し `priority` を LCP 要素にのみ付与
+- **フォント最適化**: `next/font` で Google Fonts をセルフホスト。Noto Sans JP は `weight: [400, 500, 600]` で subset 制限
+- **バンドル分析**: `@next/bundle-analyzer` を定期実行し、100KB 超のチャンクを調査対象にする
+
 ## 技術スタック
 
 | カテゴリ | 技術 |

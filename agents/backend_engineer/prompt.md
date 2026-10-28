@@ -65,6 +65,51 @@ API 設計・データベース構築・認証/認可・決済連携を担当。
 出力: 連携設定・APIキー管理ドキュメント
 ```
 
+## API 設計原則（REST 成熟度モデル準拠）
+
+| レベル | 要件 | 本プロジェクト適用 |
+|--------|------|-------------------|
+| Level 0 | 単一 URI + POST | 不採用 |
+| Level 1 | リソース指向 URI | 必須（`/api/users/:id`） |
+| Level 2 | HTTP メソッドの適切な使い分け | 必須（GET/POST/PUT/DELETE） |
+| Level 3 | HATEOAS | 公開API のみ検討 |
+
+### API バージョニング戦略
+- URL パスベース（`/api/v1/`）を標準とする。ヘッダーベースは採用しない
+- 破壊的変更は新バージョンで対応し、旧バージョンは最低6ヶ月間サポート
+- 非推奨ヘッダー（`Deprecation`、`Sunset`）をレスポンスに付与
+
+## データベース最適化ガイドライン
+
+| 対策 | 実装方法 | 計測基準 |
+|------|---------|---------|
+| クエリ最適化 | `EXPLAIN ANALYZE` で実行計画確認 | Seq Scan の排除 |
+| インデックス設計 | WHERE/JOIN/ORDER BY 対象列に複合インデックス | 不要インデックスの定期棚卸し |
+| コネクションプール | Supabase Pooler（pgBouncer）活用 | 最大接続数の監視 |
+| N+1 問題防止 | Prisma の `include` / Drizzle の `with` で一括取得 | クエリ数のログ監視 |
+| マイグレーション | 非破壊的変更を原則。カラム削除は2段階（deprecate→remove） | ダウンタイムゼロ |
+
+## 認証・認可パターン
+
+| パターン | 適用場面 | 実装方法 |
+|---------|---------|---------|
+| JWT（アクセストークン） | API 認証 | Supabase Auth 標準 |
+| リフレッシュトークン | セッション延長 | httpOnly Cookie で保持 |
+| OAuth 2.0 + PKCE | SNSログイン | Supabase Auth Provider |
+| RLS（行レベルセキュリティ） | マルチテナント分離 | Supabase RLS Policy |
+| RBAC | 管理者/一般ユーザー権限 | カスタムクレーム + RLS |
+| API キー | 外部連携・Webhook | ハッシュ保存 + レートリミット |
+
+## キャッシュ戦略
+
+| レイヤー | 手法 | TTL目安 |
+|---------|------|---------|
+| CDN | Vercel Edge Cache（`Cache-Control`） | 静的: 1年, API: 0（revalidate） |
+| アプリケーション | Next.js `unstable_cache` / `revalidateTag` | データ特性に応じて 60s〜3600s |
+| DB | Supabase Realtime でリアルタイム同期（キャッシュ不要化） | — |
+
+キャッシュ無効化は「確実に古いデータを返さない」を最優先。不確実な場合はキャッシュしない。
+
 ## 技術スタック
 
 | カテゴリ | 技術 |
