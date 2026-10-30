@@ -69,18 +69,42 @@ export async function listMemberRecords(): Promise<MemberRecord[]> {
   return rows.map(row);
 }
 
-export async function upsertMemberRecord(m: { email: string; name: string; role: Role; allow: string[] | null; active: boolean }, actor: string): Promise<void> {
+type MemberInput = { email: string; name: string; role: Role; allow: string[] | null; active: boolean };
+/** 初期パスワードを同じ書き込みで設定する（INSERT/UPDATE と別に UPDATE しない＝DB 往復を 1 回減らす） */
+type PasswordInput = { hash: string; mustChange: boolean };
+
+export async function upsertMemberRecord(m: MemberInput, actor: string, password?: PasswordInput): Promise<void> {
   const s = await db();
-  await s`INSERT INTO hub_member (email, name, role, allow, active, updated_by)
-    VALUES (${m.email.toLowerCase()}, ${m.name}, ${m.role}, ${m.allow === null ? null : s.json(m.allow)}, ${m.active}, ${actor})
-    ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name, role = EXCLUDED.role, allow = EXCLUDED.allow, active = EXCLUDED.active, updated_at = now(), updated_by = EXCLUDED.updated_by`;
+  const allow = m.allow === null ? null : s.json(m.allow);
+  if (password) {
+    await s`INSERT INTO hub_member (email, name, role, allow, active, password_hash, must_change_password, updated_by)
+      VALUES (${m.email.toLowerCase()}, ${m.name}, ${m.role}, ${allow}, ${m.active}, ${password.hash}, ${password.mustChange}, ${actor})
+      ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name, role = EXCLUDED.role, allow = EXCLUDED.allow, active = EXCLUDED.active,
+        password_hash = EXCLUDED.password_hash, must_change_password = EXCLUDED.must_change_password, updated_at = now(), updated_by = EXCLUDED.updated_by`;
+  } else {
+    await s`INSERT INTO hub_member (email, name, role, allow, active, updated_by)
+      VALUES (${m.email.toLowerCase()}, ${m.name}, ${m.role}, ${allow}, ${m.active}, ${actor})
+      ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name, role = EXCLUDED.role, allow = EXCLUDED.allow, active = EXCLUDED.active, updated_at = now(), updated_by = EXCLUDED.updated_by`;
+  }
   invalidateMembers();
 }
 
-export async function setMemberPassword(email: string, passwordHash: string, mustChange: boolean, actor: string): Promise<void> {
+/** 未登録のときだけ追加する（取り込み用）。追加したら true、すでにあれば false */
+export async function insertMemberIfAbsent(m: MemberInput, actor: string, password: PasswordInput): Promise<boolean> {
   const s = await db();
-  await s`UPDATE hub_member SET password_hash = ${passwordHash}, must_change_password = ${mustChange}, updated_at = now(), updated_by = ${actor} WHERE email = ${email.toLowerCase()}`;
+  const rows = await s`INSERT INTO hub_member (email, name, role, allow, active, password_hash, must_change_password, updated_by)
+    VALUES (${m.email.toLowerCase()}, ${m.name}, ${m.role}, ${m.allow === null ? null : s.json(m.allow)}, ${m.active}, ${password.hash}, ${password.mustChange}, ${actor})
+    ON CONFLICT (email) DO NOTHING RETURNING email`;
+  if (rows.length > 0) invalidateMembers();
+  return rows.length > 0;
+}
+
+/** パスワードを設定する。対象の氏名を返す（登録が無ければ undefined） */
+export async function setMemberPassword(email: string, passwordHash: string, mustChange: boolean, actor: string): Promise<string | undefined> {
+  const s = await db();
+  const rows = await s`UPDATE hub_member SET password_hash = ${passwordHash}, must_change_password = ${mustChange}, updated_at = now(), updated_by = ${actor} WHERE email = ${email.toLowerCase()} RETURNING name`;
   invalidateMembers();
+  return rows[0] ? String(rows[0].name) : undefined;
 }
 
 export async function setMemberActive(email: string, active: boolean, actor: string): Promise<void> {

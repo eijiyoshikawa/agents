@@ -2,9 +2,10 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { authConfig } from "./auth.config";
 import { clearFailures, clientKey, isBlocked, recordFailure } from "@/lib/login-limiter";
-import { findMember, normalizeEmail } from "@/lib/members";
+import { findMember, normalizeEmail, resolveMember, type Member } from "@/lib/members";
 import { findMemberRecord } from "@/lib/member-store";
 import { loadPasswordHashes, verifyPassword } from "@/lib/password";
+import { isRole } from "@/lib/roles";
 
 /**
  * メールアドレス + パスワード。
@@ -21,23 +22,24 @@ const credentials = Credentials({
     const email = normalizeEmail(typeof raw?.email === "string" ? raw.email : null);
     const password = typeof raw?.password === "string" ? raw.password : "";
     if (!email) return null;
+    // DB は 1 回だけ読む。照合済みのメンバー情報を返し、signIn / jwt コールバックで同じ行を読み直さない（ログイン時の DB 往復 3 回 → 1 回）
     const rec = await findMemberRecord(email).catch(() => undefined);
     let ok = false;
-    let name = "";
+    let member: Member | null = null;
     if (rec) {
       ok = rec.active && verifyPassword(password, rec.passwordHash ?? undefined);
-      name = rec.name;
+      member = { email: rec.email, name: rec.name, role: rec.role, allow: rec.allow, mustChangePassword: rec.mustChangePassword };
     } else {
-      const member = await findMember(email);
+      // DB に無い（または DB に届かない）ときは設定ファイルのメンバー（findMember の DB 以外の分岐と同じ）
+      member = resolveMember(email);
       ok = member !== null && verifyPassword(password, loadPasswordHashes()[member.email]);
-      name = member?.name ?? "";
     }
-    if (!ok) {
+    if (!ok || !member) {
       recordFailure(key);
       return null;
     }
     clearFailures(key);
-    return { id: email, email, name };
+    return { id: email, email, name: member.name, role: member.role, allow: member.allow ?? null, mustChangePassword: Boolean(member.mustChangePassword) };
   },
 });
 
@@ -47,7 +49,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     ...authConfig.callbacks,
     // DB のメンバーも許可する（Edge 用の auth.config は設定ファイルのみ）
-    async signIn({ user }) {
+    async signIn({ user, account }) {
+      // パスワードログインは authorize で有効なメンバーと確認済み
+      if (account?.provider === "credentials" && isRole(user.role)) return true;
       return (await findMember(user.email, user.name)) !== null;
     },
     async jwt({ token, user, trigger }) {
@@ -56,7 +60,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // 定期の読み直しはキャッシュ経由（管理画面での変更は即時に無効化される）。ログイン時・明示更新時は DB を直接読む
       const now = Math.floor(Date.now() / 1000);
       const refreshedAt = typeof token.refreshedAt === "number" ? token.refreshedAt : 0;
-      if (user || trigger === "update" || now - refreshedAt > 300) {
+      if (user && isRole(user.role) && user.email) {
+        // パスワードログイン直後: authorize が読んだばかりの内容をそのまま使う
+        token.email = user.email;
+        token.name = user.name;
+        token.role = user.role;
+        token.allow = user.allow ?? null;
+        token.mustChange = Boolean(user.mustChangePassword);
+        token.refreshedAt = now;
+      } else if (user || trigger === "update" || now - refreshedAt > 300) {
         const m = await findMember(user?.email ?? token.email, user?.name, { cached: !user && trigger !== "update" });
         if (m) {
           token.email = m.email;

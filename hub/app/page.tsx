@@ -65,7 +65,7 @@ export default async function HomePage() {
           <div className="stat">
             <div className="stat-label">あなたの役割</div>
             <div className="stat-value text-[#8f8cf5]">{ROLE_LABEL[role]}</div>
-            <div className="stat-sub">{email}</div>
+            <div className="stat-sub break-all">{email}</div>
           </div>
         </section>
 

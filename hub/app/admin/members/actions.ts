@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { auth } from "@/auth";
 import { hubDbConfigured } from "@/lib/db";
 import { allDashboardKeys } from "@/lib/dashboards";
-import { deleteMemberRecord, listMemberRecords, setMemberActive, setMemberPassword, upsertMemberRecord } from "@/lib/member-store";
+import { deleteMemberRecord, findMemberRecord, insertMemberIfAbsent, setMemberActive, setMemberPassword, upsertMemberRecord } from "@/lib/member-store";
 import { configMembers, normalizeEmail } from "@/lib/members";
 import { generatePassword, hashPassword } from "@/lib/password";
 import { isRole, type Role } from "@/lib/roles";
@@ -34,14 +34,11 @@ export async function saveMemberAction(_prev: MemberFormState, fd: FormData): Pr
     const valid = new Set(allDashboardKeys().map((d) => d.key));
     const allow = allowAll ? null : fd.getAll("allow").map(String).filter((k) => valid.has(k));
     if (allow && allow.length === 0) return { ok: false, message: "ログインできるサイトを 1 つ以上チェックするか、「すべてのサイト」を選んでください" };
-    const existing = (await listMemberRecords()).find((m) => m.email === email);
-    await upsertMemberRecord({ email, name, role, allow, active: true }, actor);
+    // 一覧全体ではなく対象の 1 行だけ読む。初期パスワードは追加・更新と同じ書き込みで設定する
+    const existing = await findMemberRecord(email);
     const reset = String(fd.get("reset_password") ?? "") === "1";
-    let initialPassword: string | undefined;
-    if (!existing || !existing.hasPassword || reset) {
-      initialPassword = generatePassword();
-      await setMemberPassword(email, hashPassword(initialPassword), true, actor);
-    }
+    const initialPassword = !existing || !existing.hasPassword || reset ? generatePassword() : undefined;
+    await upsertMemberRecord({ email, name, role, allow, active: true }, actor, initialPassword ? { hash: hashPassword(initialPassword), mustChange: true } : undefined);
     revalidatePath("/admin/members");
     return { ok: true, message: existing ? "更新しました" : "追加しました", initialPassword, email };
   } catch (e) {
@@ -65,12 +62,11 @@ export async function reissuePasswordAction(_prev: RowActionState, fd: FormData)
     const actor = await requireExec();
     const email = normalizeEmail(String(fd.get("email") ?? ""));
     if (!email) return { ok: false, message: "メールアドレスが不正です" };
-    const existing = (await listMemberRecords()).find((m) => m.email === email);
-    if (!existing) return { ok: false, message: "登録メンバーに見つかりません" };
     const initialPassword = generatePassword();
-    await setMemberPassword(email, hashPassword(initialPassword), true, actor);
+    const name = await setMemberPassword(email, hashPassword(initialPassword), true, actor);
+    if (name === undefined) return { ok: false, message: "登録メンバーに見つかりません" };
     revalidatePath("/admin/members");
-    return { ok: true, message: `${existing.name} のパスワードを再発行しました`, initialPassword, email };
+    return { ok: true, message: `${name} のパスワードを再発行しました`, initialPassword, email };
   } catch (e) {
     return { ok: false, message: e instanceof Error ? e.message : "再発行に失敗しました" };
   }
@@ -101,10 +97,9 @@ export async function importConfigMemberAction(_prev: RowActionState, fd: FormDa
     const email = normalizeEmail(String(fd.get("email") ?? ""));
     const cfg = configMembers().find((m) => m.email === email);
     if (!email || !cfg) return { ok: false, message: "設定ファイルのメンバーに見つかりません" };
-    if ((await listMemberRecords()).some((m) => m.email === email)) return { ok: false, message: "すでに登録メンバーにあります（下の一覧から編集してください）" };
-    await upsertMemberRecord({ email, name: cfg.name, role: cfg.role, allow: cfg.allow ?? null, active: true }, actor);
     const initialPassword = generatePassword();
-    await setMemberPassword(email, hashPassword(initialPassword), true, actor);
+    const added = await insertMemberIfAbsent({ email, name: cfg.name, role: cfg.role, allow: cfg.allow ?? null, active: true }, actor, { hash: hashPassword(initialPassword), mustChange: true });
+    if (!added) return { ok: false, message: "すでに登録メンバーにあります（下の一覧から編集してください）" };
     revalidatePath("/admin/members");
     return { ok: true, message: `${cfg.name} を登録メンバーに取り込みました。以後は下の一覧から編集できます`, initialPassword, email };
   } catch (e) {

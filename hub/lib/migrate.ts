@@ -19,10 +19,25 @@ export function ensureHubSchema(): Promise<void> {
   return ready;
 }
 
+/** 適用済みの名前。管理表がまだ無い（初回）ときは null */
+async function appliedNames(db: ReturnType<typeof sql>): Promise<Set<string> | null> {
+  try {
+    return new Set((await db`SELECT name FROM hub_migration`).map((r) => String(r.name)));
+  } catch (e) {
+    if ((e as { code?: string }).code === "42P01") return null; // undefined_table
+    throw e;
+  }
+}
+
 async function run(): Promise<void> {
   const db = sql();
-  await db`CREATE TABLE IF NOT EXISTS hub_migration (name text PRIMARY KEY, applied_at timestamptz NOT NULL DEFAULT now())`;
-  const applied = new Set((await db`SELECT name FROM hub_migration`).map((r) => String(r.name)));
+  // 通常（適用済み）はこの SELECT 1 往復で終わる。管理表が無い初回だけ作成する（起動直後の DB 往復を 1 回減らす）
+  let found = await appliedNames(db);
+  if (!found) {
+    await db`CREATE TABLE IF NOT EXISTS hub_migration (name text PRIMARY KEY, applied_at timestamptz NOT NULL DEFAULT now())`;
+    found = new Set();
+  }
+  const applied = found;
   const pending = HUB_SCHEMA.filter((m) => !applied.has(m.name));
   if (pending.length === 0) return;
   await db.begin(async (tx) => {
