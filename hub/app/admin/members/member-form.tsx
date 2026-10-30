@@ -13,14 +13,20 @@ const ROLE_OPTIONS = [
 
 type DashboardOption = { key: string; title: string; minRole: string; parent?: string };
 
-function SiteCheck({ d, on, disabled, onToggle, note, small }: { d: DashboardOption; on: boolean; disabled: boolean; onToggle: () => void; note?: string; small?: boolean }) {
+function SiteCheck({ d, on, disabled, onToggle, note, small, fill }: { d: DashboardOption; on: boolean; disabled: boolean; onToggle: () => void; note?: string; small?: boolean; fill?: boolean }) {
   return (
-    <label className={`flex items-start gap-2 rounded-md border px-3 py-2 ${small ? "text-xs" : "text-sm"} ${disabled ? "border-line opacity-50" : on ? "border-brand-ink/60 bg-brand/10" : "border-line"}`}>
-      <input type="checkbox" name="allow" value={d.key} checked={on} disabled={disabled} onChange={onToggle} className="mt-1" />
-      <span>
-        {d.title}
-        <span className="ml-1 text-xs text-ink-3">({d.key})</span>
-        {note && <span className="ml-1 text-xs text-ink-3">— {note}</span>}
+    <label
+      className={`check rounded-md border px-3 py-2 transition-colors duration-300 ease-standard ${fill ? "h-full" : ""} ${small ? "text-xs" : "text-sm"} ${
+        disabled ? "border-line opacity-50" : on ? "border-brand-ink/60 bg-brand/10" : "border-line hover:border-line-2"
+      }`}
+    >
+      <input type="checkbox" name="allow" value={d.key} checked={on} disabled={disabled} onChange={onToggle} />
+      <span className="min-w-0">
+        <span className="block text-ink">{d.title}</span>
+        <span className="block text-[11px] leading-4 text-ink-3">
+          {d.key}
+          {note && `・${note}`}
+        </span>
       </span>
     </label>
   );
@@ -66,9 +72,9 @@ export function MemberForm({ dashboards, editing }: { dashboards: DashboardOptio
               const parentOn = !allowAll && checked.has(d.key);
               return (
                 <div key={d.key} className={children.length ? "sm:col-span-2" : undefined}>
-                  <SiteCheck d={d} on={parentOn} disabled={allowAll} onToggle={() => toggle(d.key)} />
+                  <SiteCheck d={d} on={parentOn} disabled={allowAll} onToggle={() => toggle(d.key)} fill={children.length === 0} />
                   {children.length > 0 && (
-                    <div className="ml-6 mt-1 grid gap-1 sm:grid-cols-3">
+                    <div className="ml-6 mt-1.5 grid gap-1.5 sm:grid-cols-3">
                       {children.map((c) => (
                         <SiteCheck key={c.key} d={c} on={!allowAll && !parentOn && checked.has(c.key)} disabled={allowAll || parentOn} onToggle={() => toggle(c.key)} note={parentOn ? "全部門に含まれます" : undefined} small />
                       ))}
@@ -78,18 +84,18 @@ export function MemberForm({ dashboards, editing }: { dashboards: DashboardOptio
               );
             })}
         </div>
-        <div className="mt-3 flex flex-wrap items-center gap-3 text-xs">
-          <button type="button" className="link" onClick={selectAllSites} disabled={allowAll}>
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+          <button type="button" className="btn-ghost btn-sm" onClick={selectAllSites} disabled={allowAll}>
             全部チェック
           </button>
-          <button type="button" className="link" onClick={clearSites} disabled={allowAll}>
+          <button type="button" className="btn-ghost btn-sm" onClick={clearSites} disabled={allowAll}>
             全部外す
           </button>
-          <span className="text-ink-3">{allowAll ? "" : `${checked.size} 件チェック`}</span>
+          {!allowAll && <span className="chip chip-muted tabular-nums">{checked.size} 件チェック</span>}
         </div>
-        <label className="mt-3 flex items-center gap-2 text-sm">
+        <label className="check mt-3 text-sm">
           <input type="checkbox" name="allow_all" value="1" checked={allowAll} onChange={(e) => setAllowAll(e.target.checked)} />
-          すべてのサイト（下の「権限」で見られるサイト全部。今後サイトが増えたときも自動で追加）
+          <span>すべてのサイト（下の「権限」で見られるサイト全部。今後サイトが増えたときも自動で追加）</span>
         </label>
       </fieldset>
 
@@ -106,12 +112,13 @@ export function MemberForm({ dashboards, editing }: { dashboards: DashboardOptio
       </label>
 
       {editing && (
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" name="reset_password" value="1" /> パスワードを再発行する（本人には次回ログイン時に変更を求めます）
+        <label className="check text-sm">
+          <input type="checkbox" name="reset_password" value="1" />
+          <span>パスワードを再発行する（本人には次回ログイン時に変更を求めます）</span>
         </label>
       )}
 
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <button disabled={pending} className="btn-primary">
           {pending ? "保存中…" : editing ? "更新" : "追加して初期パスワードを発行"}
         </button>
@@ -120,7 +127,7 @@ export function MemberForm({ dashboards, editing }: { dashboards: DashboardOptio
       {state.initialPassword && (
         <div className="alert-watch">
           <div className="font-semibold text-watch-ink">初期パスワード（この画面を閉じると再表示できません。本人に安全な方法で伝えてください）</div>
-          <div className="mt-2 font-mono text-base tracking-wider">{state.initialPassword}</div>
+          <div className="mt-2 break-all font-mono text-base tracking-wider">{state.initialPassword}</div>
           <div className="mt-1 text-xs text-watch-ink">ログイン ID: {state.email}。初回ログイン時にパスワード変更を求めます。</div>
         </div>
       )}

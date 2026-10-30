@@ -16,6 +16,22 @@ body {
   background-color: #07122b;
 }
 
+@layer base {
+  /*
+   * 日本語の折り返しを整える（全画面共通）。
+   * - auto-phrase: 文節の切れ目で改行する（Chrome / Edge。他のブラウザは従来どおり）
+   * - pretty / balance: 最後の行が「い。」のように 1〜2 文字だけ残らないようにする
+   */
+  body {
+    word-break: auto-phrase;
+    overflow-wrap: break-word;
+    text-wrap: pretty;
+  }
+  h1, h2, h3, h4 { text-wrap: balance; }
+  /* 短いラベル（ボタン・タグ・ステータス・表の見出し）は途中で改行させない */
+  button, th, .chip, .stat-label { white-space: nowrap; }
+}
+
 @layer components {
   .card {
     @apply rounded-2xl border border-line bg-surface shadow-card;
@@ -41,9 +57,27 @@ body {
   }
   .btn-ghost {
     @apply inline-flex items-center justify-center rounded-lg border border-line-2 px-3 py-1.5 text-xs text-ink-2;
-    @apply hover:bg-white/5 hover:text-ink transition-colors duration-300 ease-standard;
+    @apply hover:bg-white/5 hover:text-ink disabled:opacity-50 transition-colors duration-300 ease-standard;
   }
-  .link { @apply text-brand-ink underline-offset-2 hover:underline; }
+  /* 表の行操作などの小さいボタン */
+  .btn-sm { @apply gap-1 rounded-md px-2.5 py-1 leading-5; }
+  .btn-danger { @apply border-risk/40 text-risk-ink hover:bg-risk-soft hover:text-risk-ink; }
+  .btn-ghost, .btn-primary { white-space: nowrap; }
+  .link { @apply text-brand-ink underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:text-ink-3 disabled:no-underline; }
+
+  /* チェックボックス + 説明文。チェックは 1 行目の中央に揃え、説明が折り返しても上にずれない */
+  .check { @apply flex items-start gap-2; }
+  .check > input[type="checkbox"] {
+    flex: none;
+    width: 1rem;
+    height: 1rem;
+    margin-top: 0.3em;
+    margin-top: calc((1lh - 1rem) / 2);
+    accent-color: #3b82f6;
+  }
+
+  /* ステータス（状態）表示: chip に付けると先頭に色の点が付く（class="chip chip-good status"） */
+  .status::before { content: ""; @apply h-1.5 w-1.5 shrink-0 rounded-full bg-current; }
 
   .alert-watch { @apply rounded-lg border border-watch/30 bg-watch-soft p-4 text-sm text-ink; }
   .alert-risk { @apply rounded-lg border border-risk/30 bg-risk-soft px-3 py-2 text-sm text-risk-ink; }
@@ -60,6 +94,27 @@ body {
   .table-dark thead { @apply text-left text-[11px] uppercase tracking-wider text-ink-3; }
   .table-dark tbody tr { @apply border-t border-line; }
   .table-dark td, .table-dark th { @apply py-2 pr-3 align-top; }
+  .table-dark th { @apply font-medium; }
+}
+
+/*
+ * タブレット・スマホ幅（1024px 未満）では表を「1 行 = 1 枚のカード」に組み替える（横スクロールさせない）。
+ * 各セルの見出しは data-label から出す。data-label の無いセル（氏名・操作）は見出しなしで全幅。
+ */
+@media (max-width: 1023.98px) {
+  .table-stack, .table-stack tbody { display: block; }
+  .table-stack thead { @apply sr-only; }
+  .table-stack tbody tr { @apply grid gap-1.5 py-3; }
+  .table-stack tbody td { @apply block p-0; }
+  .table-stack tbody td[data-label] { @apply grid grid-cols-[4.5rem_minmax(0,1fr)] items-start gap-2; }
+  /* 極端に狭い端末（〜360px）でタグが枠からはみ出すときだけ、タグ内で文節改行を許す */
+  .table-stack tbody td .chip { max-width: 100%; white-space: normal; text-align: left; }
+  .table-stack tbody td[data-label]::before { content: attr(data-label); white-space: nowrap; @apply pt-0.5 text-[11px] leading-5 tracking-wider text-ink-3; }
+}
+/* 幅 400px 未満の端末では見出しを値の上に置き、値（タグ）に横幅を全部使わせる */
+@media (max-width: 399.98px) {
+  .table-stack tbody td[data-label] { @apply grid-cols-1 gap-0.5; }
+  .table-stack tbody td[data-label]::before { @apply pt-0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

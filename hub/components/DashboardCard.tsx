@@ -12,8 +12,9 @@ export function DashboardCard({ d, index }: { d: Dashboard; index: number }) {
   return (
     <a
       href={d.url}
-      className="card group relative block overflow-hidden p-5 animate-grow-from-bottom motion-reduce:animate-none hover:-translate-y-0.5 hover:border-line-2 hover:shadow-lg transition-all duration-300 ease-standard"
-      style={{ animationDelay: `${index * 60}ms` }}
+      className="card group relative flex flex-col overflow-hidden p-5 animate-grow-from-bottom motion-reduce:animate-none hover:-translate-y-0.5 hover:border-line-2 hover:shadow-lg transition-all duration-300 ease-standard"
+      // 登場の時間差は最大 0.2 秒まで（件数が多いと最後のカードが出るまで 1 秒近く待たされていた）
+      style={{ animationDelay: `${Math.min(index, 5) * 40}ms` }}
     >
       <span aria-hidden className={`absolute inset-y-0 left-0 w-1 ${sso.dot} opacity-80`} />
       <div className="flex items-start justify-between gap-3 pl-2">
@@ -23,11 +24,13 @@ export function DashboardCard({ d, index }: { d: Dashboard; index: number }) {
         </span>
       </div>
       <p className="mt-2 pl-2 text-sm leading-relaxed text-ink-2">{d.desc}</p>
-      <div className="mt-4 flex flex-wrap items-center gap-2 pl-2">
+      {/* タグの行はカードの下端に揃える（同じ段のカードで高さがずれないように） */}
+      <div className="mt-auto flex flex-wrap items-center gap-2 pl-2 pt-4">
         <span className={`chip ${sso.cls}`}>{sso.text}</span>
         <span className="chip chip-muted">{ROLE_LABEL[d.minRole]}以上</span>
-        <span className="ml-auto text-[11px] text-ink-3">{d.source}</span>
       </div>
+      {/* 出どころは常に別の行（タグの横に入ったり折り返したりで、カードごとに位置がずれないように） */}
+      <div className="mt-2 pl-2 text-right text-[11px] leading-4 text-ink-3 [overflow-wrap:anywhere]">{d.source}</div>
     </a>
   );
 }

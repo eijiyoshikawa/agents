@@ -20,7 +20,7 @@ export function PasswordForm({ forced }: { forced: boolean }) {
         <span className="text-ink-2">新しいパスワード（確認）</span>
         <input name="confirm" type="password" required minLength={10} autoComplete="new-password" className="input" />
       </label>
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <button disabled={pending} className="btn-primary">
           {pending ? "変更中…" : "変更する"}
         </button>

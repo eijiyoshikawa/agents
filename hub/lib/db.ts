@@ -16,7 +16,8 @@ export function sql(): Sql {
   const url = hubDbUrl();
   if (!url) throw new Error("HUB_DATABASE_URL が未設定です");
   if (!client) {
-    client = postgres(url, { max: 3, idle_timeout: 20, connect_timeout: 30, prepare: false, onnotice: () => {}, ssl: /localhost|127\.0\.0\.1/.test(url) ? undefined : "require" });
+    // fetch_types: false — 接続ごとに型一覧を読みに行く 1 往復を省く（配列型のパラメータは使っていない。allow は jsonb）
+    client = postgres(url, { max: 3, idle_timeout: 20, connect_timeout: 30, prepare: false, fetch_types: false, onnotice: () => {}, ssl: /localhost|127\.0\.0\.1/.test(url) ? undefined : "require" });
   }
   return client;
 }
