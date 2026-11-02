@@ -2,6 +2,17 @@
   "_comment": "ハブから遷移できるダッシュボード。url は env（urlEnv）優先、無ければ defaultUrl。minRole 以上の役割に表示。sso は共通セッション（let_hub Cookie）受け入れの実装状況: ready / planned / link-only。ゲンバキャリアは公開サービスのため対象外。 group はトップページの見出し（任意。無ければ「その他」）。parent は段階分け（親サイトの一部）: メンバー管理では親の下に出し、親にチェックがあれば含まれる。「すべてのサイト」のメンバーには親だけ表示する。",
   "dashboards": [
     {
+      "key": "exec",
+      "title": "経営ダッシュボード（全社の年間目標の進捗）",
+      "desc": "財務と全システム（人材紹介・採用マーケ・BPO・Analytics Pro・名刺・採用LP）の年間目標に対する進捗を1画面で。毎朝7:00更新",
+      "source": "slack_let",
+      "urlEnv": "HUB_URL_EXEC",
+      "defaultUrl": "https://finance.let-inc.net/exec",
+      "minRole": "exec",
+      "sso": "ready",
+      "group": "経営・財務"
+    },
+    {
       "key": "finance",
       "title": "財務・予実・キャッシュフロー",
       "desc": "売掛・買掛・着地見込み・予実・BEP・試算表・月次決算チェック（MoneyForward 連携）",
