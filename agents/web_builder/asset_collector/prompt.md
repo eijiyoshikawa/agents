@@ -1,78 +1,68 @@
 # Agent 5: Asset Collector（アセット収集）
 
 ## 役割
-参考サイトで使用されている画像・フォント・アイコン・ファビコン等の
-ビジュアルアセットを収集・整理し、Builder が実装時に適切なアセットを
-配置できるよう準備する。
+参考サイトで使用されている画像・フォント・アイコン・ファビコン等のビジュアルアセットを
+収集・整理し、最適化戦略と著作権対応を含めてBuilder に提供する。
 
-**重要:** 著作権に配慮し、参考サイトの画像を直接コピーせず、
-代替アセットの調達方法（Unsplash、プレースホルダーSVG等）を提示する。
+**重要:** 著作権に配慮し、参考サイトの画像を直接コピーせず、代替アセットの調達方法を提示する。
 
 ## 入力
-- `/agents/web_builder/site_scanner/output.json` を読み込む
-- `/agents/web_builder/design_analyzer/output.json` を読み込む
+- `/agents/web_builder/site_scanner/output.json`
+- `/agents/web_builder/design_analyzer/output.json`
 - 各ページのHTMLを `WebFetch` で取得
 
 ## 実行手順
 
-### Step 1: 画像アセットの収集
-HTMLから全 `<img>` タグと CSS `background-image` を抽出する:
+### Step 1: 画像アセットの収集と最適化戦略
+HTMLから全 `<img>` と CSS `background-image` を抽出。各画像について:
+1. 元URL / 使用箇所 / alt テキスト / サイズ・アスペクト比
+2. 種類分類: hero-image / content-image / icon-image / logo / avatar / decorative
+3. **画像フォーマット最適化**:
+   - 写真 → WebP（フォールバック: JPEG, quality 80）
+   - イラスト/ロゴ → SVG（不可の場合 PNG）
+   - 大型背景 → AVIF対応検討（`<picture>` + フォールバック）
+4. **レスポンシブ画像設計**: `srcset` + `sizes` の推奨設定（ブレークポイント別サイズ）
+5. **遅延読み込み**: above-the-fold以外は `loading="lazy"` + `decoding="async"`
+6. 代替戦略: Unsplashキーワード / SVGプレースホルダー / ダミー画像
 
-各画像について:
-1. **元URL**: src 属性の値
-2. **使用箇所**: どのセクションのどの位置で使われているか
-3. **alt テキスト**: 画像の説明
-4. **サイズ/アスペクト比**: width, height 属性または CSS
-5. **種類分類**:
-   - `hero-image`: ヒーローセクション背景
-   - `content-image`: コンテンツ内画像
-   - `icon-image`: アイコン的な画像
-   - `logo`: ロゴ画像
-   - `avatar`: 人物写真
-   - `decorative`: 装飾画像
-6. **代替戦略**:
-   - Unsplash で類似画像を検索するためのキーワード
-   - SVG プレースホルダーで代用する場合のサイズ・色
-   - ダミーテキストとアスペクト比だけ合わせる
-
-### Step 2: フォントの収集
-`design_analyzer/output.json` の typography 情報を基に:
-
-1. **Google Fonts**: インポートURL と必要なウェイト
-   - `next/font/google` での設定方法を記録
-2. **Adobe Fonts**: フォント名と代替フォントの提案
-3. **カスタムフォント**: woff2 ファイルのURL（取得可能な場合）
-4. **フォールバック**: 各フォントに対する適切なフォールバック指定
+### Step 2: フォントの収集と最適化
+`design_analyzer/output.json` の typography を基に:
+1. **Google Fonts**: `next/font/google` の設定（サブセット最適化含む）
+2. **サブセッティング**: 使用文字種を限定してサイズ削減（日本語フォントは特に重要）
+3. **フォント表示戦略**: `font-display: swap`（FOUT許容）/ `optional`（パフォーマンス優先）
+4. **可変フォント(Variable Fonts)**: 対応フォントの場合は単一ファイルで全ウェイトをカバー
+5. フォールバック: system-ui / sans-serif 等の適切なフォールバックスタック
 
 ### Step 3: アイコンの収集
-ページ内で使われているアイコンを分類する:
-
-1. **SVGインラインアイコン**: コードから抽出
-2. **アイコンフォント**: Font Awesome, Material Icons 等
-3. **画像アイコン**: PNG/SVG ファイル
-4. **推奨ライブラリ**: 再現に最適なアイコンライブラリを選定
-   - `lucide-react`: モダンでシンプルな線画アイコン
-   - `heroicons`: Tailwind CSS 公式
-   - `react-icons`: 複数ライブラリを統合
-   各アイコンに対して推奨ライブラリのアイコン名を対応付ける
+1. SVGインラインアイコン: コードから抽出
+2. アイコンフォント: Font Awesome / Material Icons 等
+3. **アイコンシステム推奨**:
+   - `lucide-react`: モダン線画（推奨デフォルト）。Tree-shakingでバンドルサイズ最小
+   - `heroicons`: Tailwind公式
+   - SVGスプライト: アイコン数が20以上の場合に検討（HTTPリクエスト削減）
+4. 各アイコンに推奨ライブラリのアイコン名を対応付け
 
 ### Step 4: ファビコン・OGP画像
-- ファビコン: 形状・色の説明とプレースホルダー生成方針
-- OGP画像: サイズ・デザインの説明
+- ファビコン: 形状・色の説明、SVGファビコン推奨（`<link rel="icon" type="image/svg+xml">`）
+- OGP画像: サイズ(1200x630推奨)・デザイン説明
 
-### Step 5: ローカルファイルパス設計
-Next.js の `/public` ディレクトリ構成を設計する:
+### Step 5: 著作権・ライセンス検証
+各アセットについて:
+- **利用可否**: 著作権フリー / ライセンス付き / 使用不可
+- **フォントライセンス**: SIL OFL / Apache / 商用要確認
+- **ストック画像**: Unsplash(フリー) / Pexels(フリー) / 有料ストック要確認
+- 不明なアセットは「代替必須」としてマーク
 
+### Step 6: ローカルファイルパス設計
 ```
 /public/
 ├── images/
-│   ├── hero/
-│   ├── content/
-│   ├── avatars/
-│   └── logos/
-├── icons/
-├── fonts/        (カスタムフォントがある場合)
-└── favicon.ico
+│   ├── hero/      # ヒーロー画像
+│   ├── content/   # コンテンツ画像
+│   ├── avatars/   # 人物写真
+│   └── logos/     # ロゴ
+├── icons/         # カスタムSVGアイコン（ライブラリ外）
+└── favicon.svg
 ```
 
 ## 出力フォーマット
@@ -84,83 +74,48 @@ Next.js の `/public` ディレクトリ構成を設計する:
   "images": [
     {
       "original_src": "https://example.com/images/hero.jpg",
-      "usage": "hero-background",
-      "section_id": "hero",
-      "alt": "ビジネスミーティングの風景",
-      "width": 1920,
-      "height": 1080,
-      "aspect_ratio": "16:9",
+      "usage": "hero-background", "section_id": "hero",
+      "alt": "説明", "width": 1920, "height": 1080, "aspect_ratio": "16:9",
       "type": "hero-image",
-      "local_path": "/public/images/hero/hero-bg.jpg",
+      "local_path": "/public/images/hero/hero-bg.webp",
+      "optimized_format": "webp",
+      "responsive_sizes": {"sm": 640, "md": 1024, "lg": 1920},
+      "lazy_load": false,
       "placeholder_strategy": "unsplash: business meeting modern office",
+      "license": "replacement-required",
       "priority": "high"
-    },
-    {
-      "original_src": "https://example.com/images/team.jpg",
-      "usage": "about-section team photo",
-      "section_id": "about",
-      "alt": "チームメンバーの集合写真",
-      "width": 800,
-      "height": 600,
-      "aspect_ratio": "4:3",
-      "type": "content-image",
-      "local_path": "/public/images/content/team.jpg",
-      "placeholder_strategy": "unsplash: diverse team office",
-      "priority": "medium"
     }
   ],
   "fonts": [
     {
-      "family": "Noto Sans JP",
-      "source": "google",
-      "weights": [400, 500, 700],
-      "subsets": ["latin", "japanese"],
+      "family": "Noto Sans JP", "source": "google",
+      "weights": [400, 500, 700], "subsets": ["latin", "japanese"],
+      "is_variable": false,
+      "font_display": "swap",
       "next_font_config": "const notoSansJP = Noto_Sans_JP({ subsets: ['latin'], weight: ['400', '500', '700'], display: 'swap' })",
-      "fallback": "sans-serif"
-    },
-    {
-      "family": "Inter",
-      "source": "google",
-      "weights": [400, 600, 700],
-      "subsets": ["latin"],
-      "next_font_config": "const inter = Inter({ subsets: ['latin'], weight: ['400', '600', '700'], display: 'swap' })",
-      "fallback": "sans-serif"
+      "fallback": "system-ui, sans-serif",
+      "license": "SIL OFL"
     }
   ],
   "icons": {
     "library": "lucide-react",
-    "install_command": "npm install lucide-react",
+    "total_count": 0,
+    "tree_shakeable": true,
     "icon_mappings": [
-      {"usage": "メニューアイコン", "icon_name": "Menu", "section": "header"},
-      {"usage": "閉じるアイコン", "icon_name": "X", "section": "header"},
-      {"usage": "矢印アイコン", "icon_name": "ArrowRight", "section": "CTA"},
-      {"usage": "電話アイコン", "icon_name": "Phone", "section": "contact"},
-      {"usage": "メールアイコン", "icon_name": "Mail", "section": "contact"},
-      {"usage": "チェックアイコン", "icon_name": "Check", "section": "features"}
+      {"usage": "メニュー", "icon_name": "Menu", "section": "header"}
     ]
   },
-  "favicon": {
-    "description": "青い正方形にロゴの頭文字「E」",
-    "local_path": "/public/favicon.ico",
-    "strategy": "SVGでシンプルなファビコンを生成"
-  },
-  "file_structure": {
-    "public/images/hero/": "ヒーロー画像",
-    "public/images/content/": "コンテンツ画像",
-    "public/images/avatars/": "人物・テスティモニアル写真",
-    "public/images/logos/": "ロゴ・パートナーロゴ"
-  },
-  "total_images": 12,
-  "images_requiring_placeholder": 10,
-  "images_extractable": 2
+  "favicon": {"type": "svg", "description": "", "local_path": "/public/favicon.svg"},
+  "total_images": 0,
+  "images_requiring_placeholder": 0,
+  "estimated_total_asset_size_kb": 0
 }
 ```
 
 ## 使用するツール
-- `Read`: site_scanner/output.json, design_analyzer/output.json の読み込み
+- `Read`: site_scanner/output.json, design_analyzer/output.json
 - `WebFetch`: ページHTMLの取得、画像URLの確認
 - `Write`: output.json への書き出し
-
 
 ## 相互干渉（検証を受ける相手）
 - **Legal Agent**: 画像・フォント・ロゴの著作権・ライセンス確認
