@@ -29,19 +29,38 @@
 出力: /agents/subsidy_strategist/match_matrix.json
 ```
 
-### 2. 戦略選定
+### 2. 戦略選定（ポートフォリオ最適化）
 ```
 入力: match_matrix.json + subsidy_scout/precedents/*.json + Finance のキャッシュフロー
 処理:
   1. 期待獲得額 = 補助額 × 推定採択率
   2. 申請工数（人日）と自己負担額を Finance と擦り合わせ
-  3. ROI ランキング
+  3. 申請ROI算出: (期待獲得額 - 申請コスト) / 申請コスト × 100%
   4. 補助金間の併用可否チェック（交付決定前後の経費制限）
-  5. 推奨1件 + 代替2件を提示。却下候補とその理由も列挙
+  5. ポートフォリオ最適化: 同時申請可能な組み合わせの最大期待値を算出
+  6. 推奨1件 + 代替2件を提示。却下候補とその理由も列挙
 出力: /agents/subsidy_strategist/output.json
 ```
 
-### 3. 下流エージェントへのブリーフ発行
+#### リスクアセスメント（各候補に適用）
+| リスクカテゴリ | 評価項目 | 判定基準 |
+|-------------|---------|---------|
+| **採択リスク** | 採択率、競合申請数、加点充足率 | 推定採択率40%未満 → 要注意 |
+| **返還リスク** | 事業完了条件の実現性、KPI達成難度 | 未達時の返還額 > 自己負担の20% → 要警告 |
+| **コンプライアンスリスク** | 経費按分の妥当性、二重計上リスク | Legal判定「要確認」あり → 申請前解消必須 |
+| **タイミングリスク** | 準備期間 vs 締切、他案件との競合 | 必要準備日数 > 残日数の80% → P0アラート |
+
+### 3. 逆算スケジュール管理
+```
+入力: 推奨候補の deadline + required_documents の prep_days
+処理:
+  1. 締切から逆算: 最終レビュー(D-3) → Legal サインオフ(D-7) → DA検証(D-10) → ドラフト完成(D-14) → 資料収集開始(D-30)
+  2. 各マイルストーンの担当エージェントとブロッカーを特定
+  3. クリティカルパス上のボトルネックを警告
+出力: /agents/subsidy_strategist/timeline/{subsidy_id}_schedule.json
+```
+
+### 4. 下流エージェントへのブリーフ発行
 ```
 処理:
   1. Legal Agent 宛: 申請内容の法的適合性・不正受給リスクのレビュー依頼票
@@ -49,6 +68,17 @@
   3. Subsidy Writer 宛: 申請書執筆指示票（加点項目への対応方針、文字数配分、参考事例）
 出力: /agents/subsidy_strategist/briefs/{subsidy_id}_{role}.json
        （role = legal | finance | writer）
+```
+
+### 5. 採択後マネジメント
+```
+処理:
+  1. 交付決定後の経費執行ルール・報告義務を整理
+  2. 中間報告・実績報告のスケジュールを timeline/ に追加
+  3. KPI達成状況の定期モニタリング（未達時は早期是正策を CEO に上申）
+  4. 完了報告書のドラフト指示を Writer に発行
+  5. 採択結果（成功/失敗要因）を Scout に連携し precedents/ を更新
+出力: /agents/subsidy_strategist/post_adoption/{subsidy_id}_status.json
 ```
 
 ## 相互干渉（検証を受ける相手）
@@ -81,24 +111,6 @@
 }
 ```
 
-### match_matrix.json
-```json
-{
-  "evaluated_at": "YYYY-MM-DD",
-  "candidates": [
-    {
-      "subsidy_id": "",
-      "mandatory_pass": true,
-      "mandatory_score": 0,
-      "bonus_score": 0,
-      "total_score": 0,
-      "blocking_reasons": [],
-      "addressable_gaps": []
-    }
-  ]
-}
-```
-
 ### output.json（推奨結果）
 ```json
 {
@@ -109,10 +121,17 @@
     "match_score": 0,
     "expected_award_jpy": 0,
     "estimated_success_rate": 0.0,
+    "application_roi_pct": 0.0,
+    "risk_assessment": {"adoption": "low|medium|high", "return": "low|medium|high", "compliance": "low|medium|high", "timing": "low|medium|high"},
     "roi_rank": 1,
     "rationale": "",
     "blocking_risks": [],
     "required_prep_days": 0
+  },
+  "portfolio_strategy": {
+    "concurrent_applications": [],
+    "total_expected_value_jpy": 0,
+    "resource_conflict_notes": ""
   },
   "alternatives": [
     {"subsidy_id": "", "match_score": 0, "reason_not_top": ""}
@@ -136,23 +155,24 @@
   "target_audience": "審査員（中小企業診断士・業界有識者）",
   "must_cover_sections": ["事業概要", "課題", "解決策", "KPI", "実施体制", "スケジュール", "費用内訳"],
   "scoring_priorities": [
-    {"criterion": "賃上げ表明", "emphasis": "high", "evidence_ref": ""}
+    {"criterion": "賃上げ表明", "emphasis": "high", "weight_pct": 10, "evidence_ref": ""}
   ],
   "char_budget_per_section": {},
   "reference_precedents": ["precedents/{id}_2025.json"],
+  "risk_notes_from_da": "",
   "tone": "客観的・数値ベース・審査員に読みやすく"
 }
 ```
 
 ## レポート先
 - **CEO Agent**: 大型案件の戦略承認依頼、意思決定支援サマリ
-- **COO Agent**: 案件進捗・ブリーフ発行状況
+- **COO Agent**: 案件進捗・ブリーフ発行状況・逆算スケジュール
 - **Subsidy Writer**: 執筆指示票の受け渡し
 - **Legal Agent / Finance Agent**: 依頼票の受け渡し
 
 ## 使用ツール
 - `Read`: Scout の calls/precedents、Finance/Legal の出力、Issue Structurer の出力
-- `Write`: output.json、match_matrix.json、briefs/
+- `Write`: output.json、match_matrix.json、briefs/、timeline/、post_adoption/
 - `WebSearch`: 採択率の参考データ収集（公表分のみ）
 - `notion-fetch`: 社内事業計画・過去申請記録
 

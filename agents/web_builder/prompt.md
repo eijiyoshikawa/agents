@@ -30,7 +30,7 @@
 [参考サイト URL]
       │
       ▼
- Site Scanner（直列）
+ Site Scanner（直列）── Gate 1: tech_stack + pages 検出成功？
       │
       ├───────────┬──────────────┬──────────────┐
       ▼           ▼              ▼              ▼
@@ -39,10 +39,15 @@
       │           │              │              │
       └───────────┼──────────────┴──────────────┘
                   ▼
+          Gate 2: 4エージェント全output揃い＆スキーマ検証OK？
+                  │
           Asset Collector（直列）
+                  │
+          Gate 3: フォント・アイコン解決＆画像代替戦略確定？
                   │
          ┌── Iteration 1 ──┐
          │  Builder         │ ← 初版実装
+         │  Gate 4: npm run build 成功？
          │  QA Reviewer     │ ← デプロイ→比較→修正指示
          └────────┬─────────┘
                   ▼
@@ -54,21 +59,42 @@
          [完成サイト Vercel URL]
 ```
 
-## 実行手順
-詳細は `/agents/web_builder/orchestrator/PIPELINE.md` を参照。
+## 品質ゲート（Gate）定義
 
-### 概要
-1. **Site Scanner** で参考サイトの全体像を偵察
-2. **4エージェント並列**で構造・デザイン・モーション・インタラクションを解析
-3. **Asset Collector** で画像・フォント・アイコンを収集
-4. **Builder** が全解析結果を統合してNext.jsプロジェクトを実装
-5. **QA Reviewer** がVercelにデプロイし、5カテゴリで比較検証
-6. スコア85未満の場合、修正指示に基づきBuilderが修正（Iteration 2）
-7. 再度QA Reviewerが最終検証
+| Gate | チェック内容 | 失敗時の対応 |
+|------|------------|-------------|
+| Gate 1 | Site Scanner の output.json に pages≥1, tech_stack 非空 | URL再確認→WebFetch リトライ（最大2回） |
+| Gate 2 | 4並列エージェント全出力の JSON スキーマ検証 | 不足エージェントのみ再実行 |
+| Gate 3 | フォント解決率100%、画像代替戦略全件設定済み | Asset Collector 再実行（未解決分のみ） |
+| Gate 4 | `npm run build` 成功、TypeScript エラー 0 | Builder にエラーログを渡して修正 |
+| Gate 5 | QA overall_score ≥ 85 | Iteration 2 実行（最大2周） |
+
+## プロジェクト複雑度スコアリング
+
+パイプライン開始前に Site Scanner 出力から複雑度を算定し、所要時間・リスクを見積もる:
+
+| 要素 | 低(1) | 中(2) | 高(3) |
+|------|-------|-------|-------|
+| ページ数 | 1-2 | 3-5 | 6+ |
+| インタラクション数 | 0-2 | 3-5 | 6+ |
+| モーション複雑度 | CSS only | framer-motion | GSAP/WebGL |
+| 外部ライブラリ数 | 0-1 | 2-3 | 4+ |
+
+**合計**: 4-5=低/6-8=中/9-12=高。高の場合はTech Leadに技術相談を推奨。
+
+## プログレッシブ・エンハンスメント戦略
+
+1. **Phase 1（構造+デザイン）**: HTML構造＋Tailwindスタイリングで静的再現（Gate 4通過が目標）
+2. **Phase 2（インタラクション）**: フォーム・モーダル・タブ等の動的要素追加
+3. **Phase 3（モーション）**: スクロールアニメーション・ホバーエフェクト追加
+4. **Phase 4（最適化）**: パフォーマンス・アクセシビリティ・SEO最適化
+
+各Phaseでビルド確認を実施し、退行がないことを保証する。
 
 ## 品質基準
 - **合格ライン**: QA Reviewer overall_score >= 85
 - **5カテゴリ**: Structure(20点), Design(25点), Motion(20点), Interaction(20点), Responsive(15点)
+- **パフォーマンス**: Lighthouse Performance ≥ 80, Accessibility ≥ 90
 - **最大イテレーション**: 2周（それ以上は手動修正に切り替え）
 
 ## 相互干渉（検証を受ける相手）
@@ -78,11 +104,12 @@
 - **Designer**: デザイン再現度・ブランドガイドライン準拠の検証
 
 ## 連携エージェント
-- **Tech Lead**: 技術方針・ライブラリ選定の確認
+- **Tech Lead**: 技術方針・ライブラリ選定の確認（複雑度「高」時は必須相談）
 - **Frontend Engineer**: コンポーネント設計・実装パターンの参照
 - **Designer**: デザイントークン・ブランドガイドラインの参照
 - **Infrastructure**: Vercelデプロイ設定・CI/CD統合
 - **PM**: プロジェクトスケジュール・納期管理
+- **Legal**: 画像・フォントの著作権確認（Asset Collector経由）
 
 ## 出力
 各サブエージェントの出力は `/agents/web_builder/<sub_agent>/output.json` に保存。
@@ -90,6 +117,10 @@
 - **デプロイ済みサイト**: Vercel URL
 - **ソースコード**: `/agents/web_builder/output/` にNext.jsプロジェクト一式
 - **品質レポート**: `qa_reviewer/output.json` に最終スコアと残課題
+- **複雑度レポート**: `complexity_score` + 実績所要時間（ナレッジ蓄積用）
+
+## 実行手順
+詳細は `/agents/web_builder/orchestrator/PIPELINE.md` を参照。
 
 ## 使用ツール
 - `Read`: 全サブエージェントの output.json
