@@ -12,74 +12,49 @@
 ## 実行手順
 
 ### Step 1: CSSの取得と解析
-`WebFetch` でページのHTMLを取得し、以下のCSS情報を収集する:
+- `<link rel="stylesheet">` の外部CSS、`<style>` のインラインCSS
+- CSSカスタムプロパティ（`--primary-color` 等）の定義
+- `:root` / `body` のグローバルスタイル
+- **ダークモードパターン検出**: `prefers-color-scheme: dark` / `.dark` クラス / `data-theme`
 
-- `<link rel="stylesheet">` で読み込まれている外部CSS
-- `<style>` タグ内のインラインCSS
-- CSS カスタムプロパティ（`--primary-color` 等）の定義
-- `:root` や `body` に定義されたグローバルスタイル
+### Step 2: カラーパレット抽出
+1. **プライマリ / セカンダリ / アクセント**: ブランドカラー
+2. **背景色**: メイン / セクション交互 / ダーク背景
+3. **テキスト**: 見出し色 / 本文色 / 薄テキスト
+4. **グレースケール**: ボーダー / 区切り線 / disabled
+5. **コントラスト比検証**: テキスト/背景の組み合わせがWCAG AA基準（4.5:1以上）を満たすか記録
+6. **カラーハーモニー**: 補色/類似色/トライアド等のパターン識別
+- 色はHEXコード統一。ダークモード対応時はライト/ダーク両パレットを抽出
 
-### Step 2: カラーパレットの抽出
-サイト全体で使用されているカラーを分類する:
+### Step 3: タイポグラフィ抽出
+- **フォントファミリー**: 日本語 / 欧文 / Google Fonts URL
+- **見出しスタイル** (h1〜h4): size / weight / line-height / letter-spacing / モバイル時変化
+- **本文**: size / weight / line-height（日本語は1.8〜2.0が多い）
+- **その他**: キャプション / ラベル / ボタンテキスト
+- **フルードタイポグラフィ検出**: `clamp()` / `calc()` によるレスポンシブフォントサイズの使用有無
 
-1. **プライマリカラー**: メインのブランドカラー（CTA ボタン、アクセント等）
-2. **セカンダリカラー**: サブカラー
-3. **アクセントカラー**: 強調色
-4. **背景色**: メイン背景、セクション背景のバリエーション
-5. **テキストカラー**: 見出し色、本文色、薄いテキスト色
-6. **グレースケール**: ボーダー、区切り線等に使われるグレー
+### Step 4: スペーシングシステム解析
+- セクション間上下マージン/パディング
+- コンテンツ領域左右パディング、カード間ギャップ
+- **グリッドシステム検出**: 8pxグリッド / 4pxグリッド / 不規則
+- **モジュラースケール**: spacing値が一定の比率（1.5倍等）に従っているか
 
-CSS変数、インラインスタイル、クラス名から色情報を抽出する。
-色は HEX コード（`#RRGGBB`）で統一して記録する。
-
-### Step 3: タイポグラフィの抽出
-フォント関連の情報を体系的に記録する:
-
-1. **フォントファミリー**:
-   - 日本語フォント（Noto Sans JP, Yu Gothic, etc.）
-   - 欧文フォント（Inter, Poppins, etc.）
-   - Google Fonts のインポートURLを確認
-2. **見出しスタイル** (h1〜h4):
-   - font-size（px または rem）
-   - font-weight
-   - line-height
-   - letter-spacing
-   - モバイル時のサイズ変化
-3. **本文スタイル**:
-   - font-size
-   - font-weight
-   - line-height（日本語は 1.8〜2.0 が多い）
-4. **その他**:
-   - キャプション、ラベル、ボタンテキスト等の小さいテキスト
-
-### Step 4: スペーシングシステムの解析
-セクション間・要素間の余白パターンを記録する:
-
-- セクション間の上下マージン/パディング
-- コンテンツ領域の左右パディング
-- カード間のギャップ
-- 見出しと本文の間隔
-- ボタンの内部パディング
-
-### Step 5: UIコンポーネントのスタイル
-よく使われるUIパーツのスタイルを記録する:
-
-1. **ボタン**:
-   - プライマリボタン（背景色、テキスト色、角丸、パディング）
-   - セカンダリボタン/ゴーストボタン
-   - ホバー時の変化
-2. **カード**:
-   - 背景色、ボーダー、シャドウ、角丸
-3. **画像の扱い**:
-   - 角丸、オーバーレイ、アスペクト比
-4. **アイコン**:
-   - スタイル（線画/塗り）、サイズ、色
+### Step 5: UIコンポーネントスタイル
+1. **ボタン**: primary / secondary / ghost（bg, text, radius, padding, hover変化）
+2. **カード**: bg / border / shadow / radius（hover時の変化含む）
+3. **画像**: radius / overlay / aspect-ratio
+4. **アイコン**: スタイル（線画/塗り） / サイズ / 色
 
 ### Step 6: セクション別デザインノート
-各セクションのビジュアル的な特徴を記録する:
-- 背景処理（色/画像/グラデーション/動画）
-- テキスト色（背景に応じた変化）
-- 特殊な装飾要素（斜めの区切り線、波形、パターン背景等）
+各セクションの背景処理・テキスト色・特殊装飾（斜めの区切り線、波形、パターン背景等）
+
+## デザイン基準マッピング（必須）
+
+抽出結果を社内の基準DESIGN.md（`design-md/` 配下）と照合:
+- 日本語コーポレート/B2B → 多くの場合 **`feer`** が最も近い
+- ダーク×ブルー/ネオン → `linear.app` / `framer`
+- 暖色+写真主体 → `airbnb` / `notion`
+- 該当なし → `custom`
 
 ## 出力フォーマット
 
@@ -88,93 +63,44 @@ CSS変数、インラインスタイル、クラス名から色情報を抽出�
 ```json
 {
   "colors": {
-    "primary": "#3B82F6",
-    "secondary": "#10B981",
-    "accent": "#F59E0B",
-    "background": {
-      "main": "#FFFFFF",
-      "alt": "#F8FAFC",
-      "dark": "#0F172A"
-    },
-    "text": {
-      "primary": "#1E293B",
-      "secondary": "#64748B",
-      "on_dark": "#F8FAFC",
-      "on_primary": "#FFFFFF"
-    },
-    "border": "#E2E8F0",
-    "full_palette": ["#0F172A", "#1E293B", "#3B82F6", "#10B981", "#F59E0B", "#F8FAFC", "#FFFFFF"]
+    "primary": "#HEX", "secondary": "#HEX", "accent": "#HEX",
+    "background": {"main": "#HEX", "alt": "#HEX", "dark": "#HEX"},
+    "text": {"primary": "#HEX", "secondary": "#HEX", "on_dark": "#HEX"},
+    "border": "#HEX",
+    "contrast_issues": [{"fg": "#HEX", "bg": "#HEX", "ratio": 0.0, "passes_aa": false}],
+    "dark_mode": {"detected": false, "method": "prefers-color-scheme | class | none"}
   },
   "typography": {
-    "font_families": {
-      "heading": "Noto Sans JP",
-      "body": "Noto Sans JP",
-      "accent": "Inter",
-      "google_fonts_url": "https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@400;600;700&display=swap"
-    },
-    "h1": {"size": "48px", "size_mobile": "32px", "weight": "700", "line_height": "1.2", "letter_spacing": "0"},
-    "h2": {"size": "36px", "size_mobile": "24px", "weight": "700", "line_height": "1.3", "letter_spacing": "0"},
-    "h3": {"size": "24px", "size_mobile": "20px", "weight": "600", "line_height": "1.4", "letter_spacing": "0"},
-    "h4": {"size": "20px", "size_mobile": "18px", "weight": "600", "line_height": "1.4", "letter_spacing": "0"},
-    "body": {"size": "16px", "weight": "400", "line_height": "1.8", "letter_spacing": "0.02em"},
-    "small": {"size": "14px", "weight": "400", "line_height": "1.6"},
-    "caption": {"size": "12px", "weight": "400", "line_height": "1.5"}
+    "font_families": {"heading": "", "body": "", "accent": "", "google_fonts_url": ""},
+    "h1": {"size": "", "size_mobile": "", "weight": "", "line_height": "", "letter_spacing": ""},
+    "h2": {}, "h3": {}, "h4": {},
+    "body": {"size": "", "weight": "", "line_height": "", "letter_spacing": ""},
+    "small": {}, "caption": {},
+    "fluid_typography": false
   },
   "spacing": {
-    "section_gap": "120px",
-    "section_gap_mobile": "80px",
-    "content_padding": "24px",
-    "content_padding_mobile": "16px",
-    "component_gap": "16px",
-    "heading_to_text": "16px",
-    "heading_to_content": "48px"
+    "section_gap": "", "section_gap_mobile": "",
+    "content_padding": "", "content_padding_mobile": "",
+    "grid_system": "8px | 4px | irregular",
+    "modular_scale": "none | ratio"
   },
   "ui_components": {
-    "button_primary": {
-      "bg": "#3B82F6",
-      "text": "#FFFFFF",
-      "border_radius": "8px",
-      "padding": "12px 32px",
-      "font_size": "16px",
-      "font_weight": "600",
-      "hover_bg": "#2563EB",
-      "transition": "all 0.3s ease"
-    },
-    "button_secondary": {
-      "bg": "transparent",
-      "text": "#3B82F6",
-      "border": "2px solid #3B82F6",
-      "border_radius": "8px",
-      "padding": "12px 32px"
-    },
-    "card": {
-      "bg": "#FFFFFF",
-      "border": "none",
-      "border_radius": "12px",
-      "shadow": "0 4px 6px -1px rgba(0,0,0,0.1)",
-      "padding": "24px",
-      "hover_shadow": "0 10px 15px -3px rgba(0,0,0,0.1)"
-    },
-    "image_style": {
-      "border_radius": "12px",
-      "object_fit": "cover",
-      "overlay": "none"
-    }
+    "button_primary": {"bg": "", "text": "", "border_radius": "", "padding": "", "hover_bg": "", "transition": ""},
+    "button_secondary": {},
+    "card": {"bg": "", "border_radius": "", "shadow": "", "hover_shadow": ""},
+    "image_style": {"border_radius": "", "object_fit": "cover"}
   },
   "visual_style": {
     "overall_tone": "modern-clean | corporate | playful | luxury | minimal",
-    "border_radius_system": "small: 4px, medium: 8px, large: 12px, xl: 24px",
-    "shadow_style": "subtle | medium | dramatic | none",
-    "decorative_elements": ["斜めセクション区切り", "ドットパターン背景", "グラデーションオーバーレイ"]
+    "border_radius_system": "統一された段階数と値",
+    "shadow_style": "subtle | medium | dramatic | none"
   },
-  "sections_design": [
-    {
-      "section_id": "hero",
-      "background": "画像 + ダークオーバーレイ(rgba(0,0,0,0.5))",
-      "text_color": "#FFFFFF",
-      "special_notes": "背景画像は固定（parallax風）、CTAボタン2つ（primary + ghost）"
-    }
-  ]
+  "baseline_match": {
+    "best_fit": "feer | linear.app | framer | notion | airbnb | custom",
+    "confidence": 0.0,
+    "rationale": "",
+    "deviations": []
+  }
 }
 ```
 
@@ -183,23 +109,8 @@ CSS変数、インラインスタイル、クラス名から色情報を抽出�
 - `WebFetch`: ページHTML・外部CSSファイルの取得
 - `Write`: output.json への書き出し
 
-## デザイン基準マッピング（必須）
-
-抽出したカラー・タイポ・モーションは、社内の基準DESIGN.md（`design-md/` 配下）と照合し、最も近い基準を `baseline_match` フィールドで出力する。Builder の fallback 判断に使われる。
-
-```json
-{
-  "baseline_match": {
-    "best_fit": "feer | linear.app | framer | notion | airbnb | custom",
-    "confidence": 0.0,
-    "rationale": "言語が日本語、warm orange単色アクセント、エディトリアルメタ表示が多いため feer に最も近い",
-    "deviations": ["ダークモード対応がある点が feer と異なる"]
-  }
-}
-```
-
-**判断ヒント:**
-- 日本語コーポレート / 採用 / B2Bサービスサイト → 多くの場合 **`feer`**（`/design-md/feer/DESIGN.md`）が最も近い。クリーム背景・墨黒本文・単色オレンジ系アクセント・角括弧見出し・ナンバリングメタが揃えば confidence 0.7+
-- ダーク × ブルー / ネオン → `linear.app` / `framer`
-- 暖色 + 写真主体 → `airbnb` / `notion`
-- 該当なし → `custom`（その場合は Builder にゼロから作らせる）
+## 相互干渉（検証を受ける相手）
+- **Web Builder / builder**: デザイントークンがTailwind設定に正しく変換されるか検証
+- **Web Builder / structure_analyzer**: レイアウトとデザイントークンの整合性を相互検証
+- **UI/UX Designer**: カラーコントラスト・タイポグラフィのアクセシビリティ検証
+- **QA Reviewer（横断）**: output.json のスキーマ・完全性検証
