@@ -608,6 +608,12 @@ export async function dbSearchCustomers(p: SearchParams): Promise<SearchResult> 
   }
   if (p.rank) where.push(`rank = ${add(p.rank)}`);
   if (p.industry) where.push(`industry = ${add(p.industry)}`);
+  if (p.media) {
+    // media はJSON配列のtext列。旧データ等の非JSON値はCASEで除外して含有判定する
+    where.push(
+      `(CASE WHEN media LIKE '[%' THEN media::jsonb ELSE '[]'::jsonb END) @> ${add(JSON.stringify([p.media]))}::jsonb`,
+    );
+  }
   const q = (p.q ?? "").trim();
   if (q) {
     // LIKE のメタ文字をエスケープして部分一致（会社名・電話番号）

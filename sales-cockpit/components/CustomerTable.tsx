@@ -9,7 +9,7 @@ import VisitFlagButton from "./VisitFlagButton";
 import { Sk } from "./Skeleton";
 import { CustomerDetailBody, RANK_COLOR, GoogleSearchButton } from "./CustomerDetailParts";
 
-export type InitialFilters = { q?: string; rep?: string; status?: string; rank?: string; industry?: string };
+export type InitialFilters = { q?: string; rep?: string; status?: string; rank?: string; industry?: string; media?: string };
 
 const COLSPAN = 9;
 const PAGE_SIZE = 50;
@@ -28,6 +28,7 @@ export default function CustomerTable({
   const [status, setStatus] = useState(initial?.status ?? "");
   const [rank, setRank] = useState(initial?.rank ?? "");
   const [industry, setIndustry] = useState(initial?.industry ?? "");
+  const [media, setMedia] = useState(initial?.media ?? "");
   const [dupOnly, setDupOnly] = useState(false);
   const [agencyMode, setAgencyMode] = useState<"all" | "exclude" | "only">("all");
   const [sortKey, setSortKey] = useState<string>("lastCallDate");
@@ -49,6 +50,7 @@ export default function CustomerTable({
   const onStatus = (v: string) => { setStatus(v); resetTo1(); };
   const onRank = (v: string) => { setRank(v); resetTo1(); };
   const onIndustry = (v: string) => { setIndustry(v); resetTo1(); };
+  const onMedia = (v: string) => { setMedia(v); resetTo1(); };
   const toggleSort = (key: string) => {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     else { setSortKey(key); setSortDir("asc"); }
@@ -57,7 +59,7 @@ export default function CustomerTable({
 
   const buildQs = (pageN: number) =>
     new URLSearchParams({
-      q, rep, status, rank, industry, agencyMode,
+      q, rep, status, rank, industry, media, agencyMode,
       dupOnly: dupOnly ? "1" : "",
       sort: sortKey, dir: sortDir, page: String(pageN), pageSize: String(PAGE_SIZE),
     }).toString();
@@ -112,7 +114,7 @@ export default function CustomerTable({
     }, cached ? 150 : 300);
     return () => { ctrl.abort(); clearTimeout(t); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [q, rep, status, rank, industry, dupOnly, agencyMode, sortKey, sortDir, page]);
+  }, [q, rep, status, rank, industry, media, dupOnly, agencyMode, sortKey, sortDir, page]);
 
   const rows = data.rows;
   const totalPages = Math.max(1, Math.ceil(data.total / data.pageSize));
@@ -138,6 +140,7 @@ export default function CustomerTable({
         <Select value={status} onChange={onStatus} options={options["ステータス"] ?? []} placeholder="ステータス（全て）" includeNone />
         <Select value={rank} onChange={onRank} options={options["見込み度合い"] ?? []} placeholder="見込み度合い（全て）" />
         <Select value={industry} onChange={onIndustry} options={options["業種"] ?? []} placeholder="業種（全て）" />
+        <Select value={media} onChange={onMedia} options={options["掲載元メディア"] ?? []} placeholder="媒体（全て）" />
         <button
           onClick={() => { setDupOnly((v) => !v); resetTo1(); }}
           className={clsx(
@@ -165,7 +168,7 @@ export default function CustomerTable({
           <span className="text-accent-amber">・重複候補 {data.totalDup.toLocaleString()}</span>
           <span className="text-accent-violet">・人材紹介の疑い {data.totalAgency.toLocaleString()}</span>
         </p>
-        <SaveListBar filters={{ q, rep, status, rank, industry }} count={data.total} />
+        <SaveListBar filters={{ q, rep, status, rank, industry, media }} count={data.total} />
       </div>
 
       <div className="card overflow-x-auto">

@@ -20,6 +20,7 @@ export async function GET(req: Request) {
     status: sp.get("status") ?? "",
     rank: sp.get("rank") ?? "",
     industry: sp.get("industry") ?? "",
+    media: sp.get("media") ?? "",
     agencyMode: (sp.get("agencyMode") as SearchParams["agencyMode"]) ?? "all",
     dupOnly: sp.get("dupOnly") === "1",
     sort: sp.get("sort") ?? "lastCallDate",

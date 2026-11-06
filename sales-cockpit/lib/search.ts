@@ -44,6 +44,7 @@ export function searchInMemory(
     }
     if (p.rank && c.rank !== p.rank) return false;
     if (p.industry && c.industry !== p.industry) return false;
+    if (p.media && !(c.media ?? []).includes(p.media)) return false;
     if (q && !(c.name.toLowerCase().includes(q) || (c.phone ?? "").includes(q))) return false;
     if (p.dupOnly && !dupIds.has(c.id)) return false;
     if (p.agencyMode === "exclude" && agency.has(c.id)) return false;

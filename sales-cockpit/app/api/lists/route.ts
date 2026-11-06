@@ -34,6 +34,7 @@ export async function POST(req: Request) {
       status: f.status || undefined,
       rank: f.rank || undefined,
       industry: f.industry || undefined,
+      media: f.media || undefined,
     };
     await createSavedList({ name, creator: session.name, filters, count: Number(body.count) || 0 });
     return NextResponse.json({ ok: true });
