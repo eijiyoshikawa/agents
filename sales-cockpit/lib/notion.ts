@@ -429,6 +429,9 @@ export async function fetchCustomerFieldOptions(): Promise<Record<string, string
       const opts = p?.status?.options ?? p?.select?.options ?? [];
       out[name] = opts.map((o: any) => o.name).filter(Boolean);
     }
+    // 架電リストの媒体フィルタ用（編集対象ではないがmulti_selectの選択肢を返す）
+    const mediaOpts = db.properties?.["掲載元メディア"]?.multi_select?.options ?? [];
+    out["掲載元メディア"] = mediaOpts.map((o: any) => o.name).filter(Boolean);
   } catch {
     /* スキーマ取得失敗時は空 */
   }
@@ -830,7 +833,7 @@ export async function getStoredTargets(): Promise<StoredTargets | null> {
 }
 
 // ── 保存架電リスト ───────────────────────────────────────────────
-export type ListFilters = { q?: string; rep?: string; status?: string; rank?: string; industry?: string };
+export type ListFilters = { q?: string; rep?: string; status?: string; rank?: string; industry?: string; media?: string };
 export type SavedList = {
   pageId: string;
   name: string;

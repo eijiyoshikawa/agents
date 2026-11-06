@@ -19,6 +19,7 @@ function filterLabel(filters: SavedList["filters"]): string {
   if (filters.status) parts.push(filters.status);
   if (filters.rank) parts.push(`見込${filters.rank}`);
   if (filters.industry) parts.push(filters.industry);
+  if (filters.media) parts.push(`媒体:${filters.media}`);
   return parts.length ? parts.join(" / ") : "条件なし（全件）";
 }
 

@@ -20,6 +20,7 @@ export default async function CallsPage({
     status: str(sp.status),
     rank: str(sp.rank),
     industry: str(sp.industry),
+    media: str(sp.media),
   };
   const [{ result, errors }, options] = await Promise.all([
     searchCustomers({ ...initial, sort: "lastCallDate", dir: "desc", page: 1, pageSize: 50 }),

@@ -84,6 +84,7 @@ export type SearchParams = {
   status?: string;
   rank?: string;
   industry?: string;
+  media?: string; // 掲載元メディア（電工ナビ・GATEN職等）
   agencyMode?: "all" | "exclude" | "only";
   dupOnly?: boolean;
   sort?: string;
