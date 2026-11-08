@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import clsx from "clsx";
 import { X, ExternalLink } from "lucide-react";
 import type { DashboardData, Goal, DrillCustomer } from "@/lib/types";
+import type { PeriodSummary, PeriodCell } from "@/lib/periods";
 import { KpiCard } from "./KpiCard";
 import { MrrChart, FunnelChart, CategoryBar } from "./chartsDynamic";
 import CallButton from "./CallButton";
@@ -14,7 +15,7 @@ import { isExcludedRep, DASHBOARD_IS_REPS } from "@/lib/reps";
 
 type Drill = { title: string; rows: DrillCustomer[] } | null;
 
-export default function DashboardClient({ data }: { data: DashboardData }) {
+export default function DashboardClient({ data, periods = [] }: { data: DashboardData; periods?: PeriodSummary[] }) {
   const k = data.kpi;
   const a = data.statusActivity;
   const since = data.metricsSince;
@@ -66,44 +67,14 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
         </div>
       )}
 
-      {/* 本日の架電（Notion手動＋システム統合） */}
-      <section>
-        <div className="flex items-baseline justify-between mb-2">
-          <h2 className="text-sm font-semibold text-ink">本日の架電（{todayKey}・JST）</h2>
-          <span className="text-xs text-ink-muted">
-            内訳: ステータス更新 {num(data.today.statusCalls)} / システム架電記録 {num(data.today.systemCalls)}（重複は統合・最大値を採用）
-          </span>
-        </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <KpiCard
-            label="本日の架電数（統合）"
-            value={num(data.today.calls)}
-            accent="brand"
-            onClick={() => open(`本日の架電（ステータス更新ベース ${num(data.today.statusCalls)}件）`, todayContactedRows)}
-          />
-          <KpiCard label="本日のアポ獲得（取得日基準）" value={num(data.today.appointments)} accent="pink" />
-        </div>
-        {data.today.byRep.length > 0 && (
-          <p className="text-xs text-ink-muted mt-2">
-            担当者別:{" "}
-            {data.today.byRep.map((r) => `${r.rep} ${r.calls}件${r.appointments ? `(アポ${r.appointments})` : ""}`).join(" ・ ")}
-          </p>
-        )}
-        <p className="text-xs text-ink-muted mt-1">
-          ※ Notionで顧客ステータスを更新した架電も計上（架電後にステータスを更新する運用前提）。過去日は最終更新日時が上書きされるため、本数値は本日分のみ。
-        </p>
-      </section>
+      {/* 今日・今週・今月（2026-11-09 代表依頼: 全体の累計ではなく週間・月間で見る） */}
+      <PeriodTable periods={periods} />
 
-      {/* KPI（クリックで内訳） */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <KpiCard label={`コンタクト済み（${sinceLabel}）`} value={num(a.contacted)} accent="brand" onClick={() => open("コンタクト済み", worked)} />
-        <KpiCard label="アポ獲得（アポ取得日基準）" value={num(a.appointments)} accent="pink" onClick={() => open("アポ獲得", apptRows)} />
-        <KpiCard label="アポ率（アポ÷コンタクト）" value={pct(a.apptRate)} accent="indigo" />
-        <KpiCard label="今月のアポ獲得" value={num(data.goals.monthlyAppointments.actual)} accent="pink" onClick={() => open("今月のアポ獲得", apptThisMonthRows)} />
         <KpiCard label="MRR（月次経常収益）" value={yen(k.mrr)} accent="teal" />
         <KpiCard label="稼働中の契約数" value={num(k.activeContracts)} accent="teal" />
-        <KpiCard label="今月の新規契約：採用SNS" value={num(k.newContractsSnsThisMonth)} accent="amber" />
-        <KpiCard label="今月の新規契約：人材紹介" value={num(k.newContractsAgencyThisMonth)} accent="amber" />
+        <KpiCard label="今月のアポ獲得（アポ取得日）" value={num(data.goals.monthlyAppointments.actual)} accent="pink" onClick={() => open("今月のアポ獲得", apptThisMonthRows)} />
+        <KpiCard label={`本日の架電（ステータス更新含む）`} value={num(data.today.calls)} accent="brand" onClick={() => open(`本日の架電（ステータス更新ベース ${num(data.today.statusCalls)}件）`, todayContactedRows)} />
       </div>
 
       {/* 目標達成状況 */}
@@ -120,7 +91,7 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
           </div>
         </div>
         <p className="text-xs text-ink-muted mt-2">
-          ※ 架電日が記録されていないため週次/月次の架電推移は表示できません。アポは「アポ取得日」基準です。
+          ※ アポは「アポ取得日」基準です。日ごとの件数・担当者ごとの「今日できていないこと」は <a href="/daily" className="underline hover:text-brand-glow">日次ボード</a> へ。
         </p>
       </section>
 
@@ -289,3 +260,64 @@ function RepTable({ data, onPick }: { data: DashboardData; onPick: (rep: string)
     </div>
   );
 }
+
+const PERIOD_ROWS: { key: keyof Omit<PeriodSummary, "period" | "label" | "range">; label: string }[] = [
+  { key: "calls", label: "架電（記録）" },
+  { key: "connected", label: "接触" },
+  { key: "appts", label: "アポ獲得" },
+  { key: "meetings", label: "商談実施" },
+  { key: "contractsSns", label: "新規契約：採用SNS" },
+  { key: "contractsAgency", label: "新規契約：人材紹介" },
+];
+
+function Cell({ c }: { c: PeriodCell }) {
+  const short = c.target !== null && c.target > 0 && c.actual < c.target;
+  return (
+    <td className="py-2 text-right tabular-nums">
+      <span className={clsx("text-sm sm:text-base font-semibold", short ? "text-accent-amber" : "text-ink")}>{num(c.actual)}</span>
+      <span className="text-xs text-ink-muted"> / {c.target === null ? "—" : num(c.target)}</span>
+      {c.target !== null && c.target > 0 && <div className={clsx("text-[11px]", short ? "text-accent-amber" : "text-brand-glow")}>{short ? `あと ${num(Math.ceil((c.target - c.actual) * 10) / 10)}` : "達成"}</div>}
+    </td>
+  );
+}
+
+function PeriodTable({ periods }: { periods: PeriodSummary[] }) {
+  if (periods.length === 0) return null;
+  return (
+    <section className="card p-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-2 mb-3">
+        <h2 className="text-sm font-semibold text-ink">今日・今週・今月（実績 / 目標）</h2>
+        <a href="/daily" className="text-xs text-brand-glow hover:underline">日次ボードで担当者別・日別を見る →</a>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs sm:text-sm">
+          <thead>
+            <tr className="text-xs text-ink-muted border-b border-white/10">
+              <th className="text-left font-medium py-2">項目</th>
+              {periods.map((p) => (
+                <th key={p.period} className="text-right font-medium py-2">
+                  {p.label}
+                  <div className="text-[11px] font-normal">{p.range}</div>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {PERIOD_ROWS.map((r) => (
+              <tr key={r.key} className="border-b border-white/[0.06] last:border-0">
+                <td className="py-2 pr-2 text-ink-soft">{r.label}</td>
+                {periods.map((p) => (
+                  <Cell key={p.period} c={p[r.key]} />
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="text-xs text-ink-muted mt-2">
+        架電・接触・アポは「架電結果を記録」の日付、商談実施はアポ管理の結果、新規契約は契約開始日で数えます。目標は「目標設定」の値を営業日で按分（今日までの分）。「—」は目標が未設定です。
+      </p>
+    </section>
+  );
+}
+

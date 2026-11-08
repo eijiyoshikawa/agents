@@ -13,6 +13,7 @@ const DEFAULTS = {
   calls: "f2a72c62-21ed-4de5-acb0-00848c9b0cbe", // 📞 架電記録
   contracts: "b079ca72-2a13-4562-96d6-cd83b4787bbd", // 🤝 契約管理DB
   isKpi: "f9fa0d32-3eb1-4625-9f4a-e06cc0cedb6b", // 📞 IS架電KPI（架電ログ）
+  appointments: "6211fde7-5823-4778-93ca-18aa5db5e7bd", // 📅 アポ管理（1アポ=1行。2026-11-09 追加）
 };
 
 export const DB = {
@@ -20,6 +21,7 @@ export const DB = {
   calls: process.env.NOTION_DB_CALLS || DEFAULTS.calls,
   contracts: process.env.NOTION_DB_CONTRACTS || DEFAULTS.contracts,
   isKpi: process.env.NOTION_DB_ISKPI || DEFAULTS.isKpi,
+  appointments: process.env.NOTION_DB_APPOINTMENTS || DEFAULTS.appointments,
   // アプリ管理用（MCPで自動生成）
   users: process.env.NOTION_DB_USERS || "791601fb-82eb-4130-aa0f-727bde6b9444",
   targets: process.env.NOTION_DB_TARGETS || "2b8a2f71-e915-434a-ae5b-a3d2eb84aa47",
@@ -439,6 +441,52 @@ export async function fetchCustomerFieldOptions(): Promise<Record<string, string
 }
 
 /** 顧客の各項目を更新（型に応じてNotionへ書き込み。空文字はクリア） */
+// ── 顧客ステータス → 契約管理DB のステータス（2026-11-09 代表依頼「システムで変更したら全てに変更」） ──
+// 顧客を「契約中」「契約終了」にしたとき、契約中から見込み客などに戻したときに、その顧客の契約（🤝 契約管理DB）も合わせる。
+// 契約管理DB は MRR の元。案件KPI・担当マッピングは masterAI の 5 分おきの同期が契約管理DB から追従する。
+const CONTRACT_ON = new Set(["契約中", "更新待ち", "試用期間"]);
+
+/** 顧客ステータスの変化から、契約のステータスをどう変えるか（純粋関数。変えないなら undefined） */
+export function contractStatusForCustomerChange(prev: string | null | undefined, next: string | null | undefined, contractStatus: string | null): string | undefined {
+  if (!next || prev === next) return undefined;
+  if (next === "契約中") return contractStatus === "契約締結前" ? "契約中" : undefined;
+  if (next === "契約終了") return contractStatus && CONTRACT_ON.has(contractStatus) ? "解約済み" : undefined;
+  // 契約中だった顧客を営業の段階（見込み客・提案中など）に戻した → 契約前
+  if (prev === "契約中" && contractStatus && CONTRACT_ON.has(contractStatus)) return "契約締結前";
+  return undefined;
+}
+
+/** 顧客のステータスを変えたあとに、その顧客の契約を合わせる。変えた契約の数を返す */
+export async function syncContractsForCustomer(customerId: string, prev: string | null | undefined, next: string | null | undefined): Promise<number> {
+  if (!next || prev === next) return 0;
+  const res: any = await client().databases.query({
+    database_id: DB.contracts,
+    filter: { property: "顧客", relation: { contains: customerId } },
+    page_size: 50,
+  });
+  let changed = 0;
+  for (const pg of res.results ?? []) {
+    const cur = sel(pg, "ステータス");
+    const want = contractStatusForCustomerChange(prev, next, cur);
+    if (!want) continue;
+    const props: any = { ステータス: { select: { name: want } } };
+    if (want === "解約済み" && !dateStart(pg, "契約終了日")) props["契約終了日"] = { date: { start: new Date().toISOString().slice(0, 10) } };
+    await client().pages.update({ page_id: pg.id, properties: props });
+    changed++;
+  }
+  return changed;
+}
+
+/** 顧客の今のステータス（変更前の値を知るため） */
+export async function customerStatusOf(pageId: string): Promise<string | null> {
+  try {
+    const pg: any = await client().pages.retrieve({ page_id: pageId });
+    return pg.properties?.["ステータス"]?.status?.name ?? pg.properties?.["ステータス"]?.select?.name ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function updateCustomer(pageId: string, fields: Record<string, string>): Promise<void> {
   const props: any = {};
   for (const [name, raw] of Object.entries(fields)) {
@@ -724,6 +772,8 @@ export async function recordCall(input: {
   memo?: string;
   repName?: string;
   setAppointmentDate?: boolean;
+  product?: string; // 入口商材（2026-11-09 追加）
+  scheduledAt?: string; // アポ獲得時の実施予定日時（YYYY-MM-DDTHH:mm、JST）
 }): Promise<void> {
   const now = new Date().toISOString();
   // ① 架電記録（日付ログ）。結果が架電記録の選択肢にあれば設定、無ければ「通話」。
@@ -737,7 +787,21 @@ export async function recordCall(input: {
   if (input.repName && CALL_REP_OPTIONS.has(input.repName)) {
     logProps["担当者"] = { select: { name: input.repName } };
   }
+  if (input.product && PRODUCT_OPTIONS.has(input.product)) {
+    logProps["入口商材"] = { select: { name: input.product } };
+  }
   await client().pages.create({ parent: { database_id: DB.calls }, properties: logProps });
+
+  // アポ獲得 → 📅 アポ管理に 1 行（実施予定日時つき。未入力でも行は作り、日次ボードで入力を促す）
+  if (input.result === "アポイント獲得") {
+    await createAppointment({
+      customerId: input.customerId,
+      customerName: input.customerName,
+      rep: input.repName,
+      scheduledAt: input.scheduledAt,
+      product: input.product,
+    }).catch((e) => console.error("[appointment] create failed", e?.message));
+  }
 
   // ② 顧客ステータス更新（結果が顧客ステータスの選択肢のときのみ）
   const custProps: any = {};
@@ -748,7 +812,122 @@ export async function recordCall(input: {
     custProps["アポイント取得日"] = { date: { start: now.slice(0, 10) } };
   }
   if (Object.keys(custProps).length > 0) {
+    const prev = custProps["ステータス"] ? await customerStatusOf(input.customerId) : null;
     await client().pages.update({ page_id: input.customerId, properties: custProps });
+    if (custProps["ステータス"]) await syncContractsForCustomer(input.customerId, prev, input.result).catch(() => 0);
+  }
+}
+
+// ── 📅 アポ管理（2026-11-09 代表決定: 実施予定日・結果・リスケの管理） ─────────────
+export const PRODUCT_OPTIONS = new Set(["コミット型（完全成果報酬）", "SNS運用代行", "人材紹介", "AI GROWTH X", "その他"]);
+export const APPOINTMENT_OUTCOMES = ["実施", "リスケ", "キャンセル", "先方不在"] as const;
+export type AppointmentOutcome = (typeof APPOINTMENT_OUTCOMES)[number];
+
+export type Appointment = {
+  id: string;
+  url: string;
+  customerId: string | null;
+  customerName: string;
+  rep: string | null;
+  obtainedOn: string | null; // アポ取得日
+  scheduledAt: string | null; // 実施予定日時（ISO）
+  result: string | null; // 予定 / 実施 / リスケ / キャンセル / 先方不在
+  resultOn: string | null; // 結果記録日
+  doneOn: string | null; // 実施日
+  originalDate: string | null; // 元の予定日（リスケ前の最初の予定）
+  reschedules: number;
+  product: string | null;
+};
+
+/** "2026-11-12T14:00"（JST の入力欄）→ "2026-11-12T14:00:00+09:00"。日付だけならそのまま */
+export function jstDateTime(v: string | undefined | null): string | null {
+  const s = (v ?? "").trim();
+  if (!s) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(s)) return `${s}:00+09:00`;
+  return s;
+}
+
+const jstToday = () => new Date(Date.now() + 9 * 3600_000).toISOString().slice(0, 10);
+
+export async function fetchAppointments(): Promise<Appointment[]> {
+  if (!DB.appointments) return [];
+  const pages = await queryAll(DB.appointments);
+  return pages.map((pg) => ({
+    id: pg.id,
+    url: pg.url,
+    customerId: relationIds(pg, "顧客")[0] ?? null,
+    customerName: txt(pg, "件名") ?? "",
+    rep: sel(pg, "担当者"),
+    obtainedOn: dateStart(pg, "アポ取得日"),
+    scheduledAt: dateStart(pg, "実施予定日時"),
+    result: sel(pg, "結果"),
+    resultOn: dateStart(pg, "結果記録日"),
+    doneOn: dateStart(pg, "実施日"),
+    originalDate: dateStart(pg, "元の予定日"),
+    reschedules: number(pg, "リスケ回数") ?? 0,
+    product: sel(pg, "入口商材"),
+  }));
+}
+
+export async function createAppointment(input: { customerId: string; customerName: string; rep?: string; scheduledAt?: string | null; product?: string; obtainedOn?: string; reschedules?: number; originalDate?: string | null; memo?: string }): Promise<string> {
+  const props: any = {
+    件名: tt(input.customerName || "アポ"),
+    顧客: { relation: [{ id: input.customerId }] },
+    アポ取得日: { date: { start: input.obtainedOn ?? jstToday() } },
+    結果: { select: { name: "予定" } },
+    リスケ回数: { number: input.reschedules ?? 0 },
+  };
+  const at = jstDateTime(input.scheduledAt);
+  if (at) props["実施予定日時"] = { date: { start: at } };
+  if (input.rep && CALL_REP_OPTIONS.has(input.rep)) props["担当者"] = { select: { name: input.rep } };
+  if (input.product && PRODUCT_OPTIONS.has(input.product)) props["入口商材"] = { select: { name: input.product } };
+  if (input.originalDate) props["元の予定日"] = { date: { start: input.originalDate } };
+  if (input.memo) props["メモ"] = rt(input.memo);
+  const pg: any = await client().pages.create({ parent: { database_id: DB.appointments }, properties: props });
+  return pg.id;
+}
+
+/** 実施予定日時を入れる（未入力のアポ） */
+export async function setAppointmentSchedule(id: string, scheduledAt: string): Promise<void> {
+  const at = jstDateTime(scheduledAt);
+  if (!at) throw new Error("実施予定日時を入れてください");
+  await client().pages.update({ page_id: id, properties: { 実施予定日時: { date: { start: at } } } });
+}
+
+/**
+ * 結果を記録する。リスケは今の行を「リスケ」で閉じ、新しい予定日で次の行を作る（元の予定日・リスケ回数を引き継ぐ）。
+ * 実施なら、顧客ステータスが「アポイント獲得」のときだけ「商談中」に進める。
+ */
+export async function recordAppointmentOutcome(input: { id: string; outcome: AppointmentOutcome; newDate?: string; memo?: string; repName?: string }): Promise<void> {
+  const pg: any = await client().pages.retrieve({ page_id: input.id });
+  const today = jstToday();
+  const scheduled = dateStart(pg, "実施予定日時");
+  const props: any = { 結果: { select: { name: input.outcome } }, 結果記録日: { date: { start: today } } };
+  if (input.outcome === "実施") props["実施日"] = { date: { start: (scheduled ?? today).slice(0, 10) <= today ? (scheduled ?? today).slice(0, 10) : today } };
+  if (input.memo) {
+    const cur = txt(pg, "メモ") ?? "";
+    props["メモ"] = rt(cur ? `${cur}\n${today} ${input.memo}` : `${today} ${input.memo}`);
+  }
+  if (input.outcome === "リスケ" && !jstDateTime(input.newDate)) throw new Error("リスケ後の予定日を入れてください");
+  await client().pages.update({ page_id: input.id, properties: props });
+  const customerId = relationIds(pg, "顧客")[0] ?? null;
+  if (input.outcome === "リスケ" && customerId) {
+    await createAppointment({
+      customerId,
+      customerName: txt(pg, "件名") ?? "",
+      rep: sel(pg, "担当者") ?? input.repName,
+      scheduledAt: input.newDate,
+      product: sel(pg, "入口商材") ?? undefined,
+      obtainedOn: dateStart(pg, "アポ取得日") ?? undefined,
+      reschedules: (number(pg, "リスケ回数") ?? 0) + 1,
+      originalDate: dateStart(pg, "元の予定日") ?? (scheduled ? scheduled.slice(0, 10) : null),
+      memo: input.memo ? `リスケ: ${input.memo}` : undefined,
+    });
+  }
+  if (input.outcome === "実施" && customerId) {
+    const prev = await customerStatusOf(customerId);
+    if (prev === "アポイント獲得") await client().pages.update({ page_id: customerId, properties: { ステータス: { status: { name: "商談中" } } } });
   }
 }
 
@@ -998,6 +1177,8 @@ export async function fetchCalls(): Promise<CallEvent[]> {
       isConnected: !!result && CONNECTED_RESULTS.has(result),
       source: "架電記録" as const,
       monthlyTarget: null,
+      customerId: relationIds(pg, "顧客")[0] ?? null,
+      product: sel(pg, "入口商材"),
     };
   });
 }
@@ -1017,6 +1198,8 @@ export async function fetchIsKpiCalls(): Promise<CallEvent[]> {
       isConnected: !!status && CONNECTED_RESULTS.has(status),
       source: "IS架電KPI" as const,
       monthlyTarget: number(pg, "月次目標架電数"),
+      customerId: null,
+      product: null,
     };
   });
 }
