@@ -10,6 +10,8 @@ export type CallEvent = {
   isConnected: boolean; // 通話/接続できたか
   source: "架電記録" | "IS架電KPI";
   monthlyTarget: number | null; // IS架電KPIの月次目標架電数（その月/担当）
+  customerId?: string | null; // 架電記録の顧客（フォロー対応の判定用）
+  product?: string | null; // 入口商材（SNS運用代行・コミット型など。2026-11-09 追加）
 };
 
 /** 顧客（📊DB_顧客管理） */

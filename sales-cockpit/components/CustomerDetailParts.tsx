@@ -182,15 +182,37 @@ function MemoEditor({ customerId, initial }: { customerId: string; initial: stri
   );
 }
 
+const PRODUCTS = ["SNS運用代行", "コミット型（完全成果報酬）", "人材紹介", "AI GROWTH X", "その他"];
+const PRODUCT_KEY = "sc-call-product";
+
 function CallRecorder({ c, onNext }: { c: Customer; onNext?: () => void }) {
   const [result, setResult] = useState("");
   const [memo, setMemo] = useState("");
+  // 入口商材は前回選んだものを覚えておく（この端末だけ）
+  const [product, setProduct] = useState("");
+  const [scheduledAt, setScheduledAt] = useState("");
+  useEffect(() => {
+    try {
+      setProduct(localStorage.getItem(PRODUCT_KEY) ?? "");
+    } catch {
+      /* 保存できない環境では毎回選ぶ */
+    }
+  }, []);
+  const pickProduct = (v: string) => {
+    setProduct(v);
+    try {
+      localStorage.setItem(PRODUCT_KEY, v);
+    } catch {
+      /* noop */
+    }
+  };
   const [state, setState] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [err, setErr] = useState("");
 
   useEffect(() => {
     setResult("");
     setMemo("");
+    setScheduledAt("");
     setState("idle");
   }, [c.id]);
 
@@ -200,13 +222,18 @@ function CallRecorder({ c, onNext }: { c: Customer; onNext?: () => void }) {
       setState("error");
       return;
     }
+    if (result === "アポイント獲得" && !scheduledAt) {
+      setErr("アポの実施予定日時を入れてください");
+      setState("error");
+      return;
+    }
     setState("saving");
     setErr("");
     try {
       const res = await fetch("/api/call-log", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ customerId: c.id, customerName: c.name, result, memo }),
+        body: JSON.stringify({ customerId: c.id, customerName: c.name, result, memo, product: product || undefined, scheduledAt: result === "アポイント獲得" ? scheduledAt : undefined }),
       });
       const j = await res.json();
       if (!j.ok) throw new Error(j.error || "記録失敗");
@@ -230,6 +257,20 @@ function CallRecorder({ c, onNext }: { c: Customer; onNext?: () => void }) {
             </option>
           ))}
         </select>
+        <select value={product} onChange={(e) => pickProduct(e.target.value)} aria-label="入口商材" className="px-3 py-2 rounded-lg bg-night-1 ring-1 ring-white/10 text-sm focus:outline-none focus:ring-brand-glow/50">
+          <option value="">入口商材を選択</option>
+          {PRODUCTS.map((p) => (
+            <option key={p} value={p}>
+              {p}
+            </option>
+          ))}
+        </select>
+        {result === "アポイント獲得" && (
+          <label className="flex items-center gap-1.5 text-xs text-ink-soft">
+            実施予定日時
+            <input type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} className="px-2.5 py-2 rounded-lg bg-night-1 ring-1 ring-accent-pink/40 text-sm" />
+          </label>
+        )}
         <input value={memo} onChange={(e) => setMemo(e.target.value)} placeholder="ひとことメモ（任意）" className="flex-1 min-w-40 px-3 py-2 rounded-lg bg-night-1 ring-1 ring-white/10 text-sm focus:outline-none focus:ring-brand-glow/50" />
         <button onClick={() => save(false)} disabled={state === "saving"} className="px-3 py-2 rounded-lg bg-brand text-white text-xs font-medium hover:bg-brand-soft disabled:opacity-50">
           記録

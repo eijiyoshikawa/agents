@@ -45,6 +45,7 @@ const GROUPS: Group[] = [
     label: "営業活動",
     icon: PhoneCall,
     items: [
+      { href: "/daily", label: "日次ボード（できていないこと）", icon: ClipboardCheck },
       { href: "/today", label: "本日の架電", icon: CalendarCheck },
       { href: "/priority", label: "優先アプローチ", icon: Target },
       { href: "/visits", label: "訪問アプローチ", icon: MapPin },

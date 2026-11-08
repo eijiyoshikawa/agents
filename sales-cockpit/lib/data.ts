@@ -9,6 +9,7 @@ import {
   fetchWorkedCustomers,
   fetchFollowups,
   fetchCalls,
+  fetchAppointments,
   fetchIsKpiCalls,
   fetchContracts,
   fetchCustomerFieldOptions,
@@ -32,7 +33,7 @@ import {
   type PriorityMode,
   type PriorityRow,
 } from "./db";
-import { PIPELINE_STATUSES } from "./notion";
+import { PIPELINE_STATUSES, type Appointment } from "./notion";
 import { EXCLUDED_REPS } from "./reps";
 import { buildDashboard, buildTargets, buildBreakdowns, type TargetsConfig } from "./aggregate";
 import { buildTimingBoard, type TimingBoard } from "./timing";
@@ -96,6 +97,7 @@ const loadContracts = cache(async (): Promise<Contract[]> => {
   }
 });
 const loadCalls = cache(() => cachedCalls());
+const cachedAppointments = unstable_cache(fetchAppointments, ["sc-appointments-v1"], { revalidate: TTL, tags: ["appointments"] });
 
 // 検索用インデックス。重い全件走査（重複判定・人材紹介判定・正規化）を
 // データ単位で1回だけ計算してキャッシュする。ページ送り・検索の毎リクエストで
@@ -226,6 +228,30 @@ export async function getCalls(): Promise<{ calls: CallEvent[]; errors: string[]
   if (!notionConfigured()) return { calls: [], errors: ["NOTION_TOKEN が未設定です。"] };
   const calls = await safe("架電記録", loadCalls, [] as CallEvent[], errors);
   return { calls, errors };
+}
+
+/** 目標（設定画面で保存した値。無ければ config/targets.json） */
+export async function getTargets(): Promise<{ dailyCallsDefault: number; dailyCallsByRep: Record<string, number>; workingDaysPerMonth: number; monthlyAppointments: number; monthlyContractsSns: number; monthlyContractsAgency: number } | null> {
+  const stored = await cachedTargets().catch(() => null);
+  const raw: any = targetsRaw;
+  const byRep: Record<string, number> = {};
+  for (const [k, v] of Object.entries(stored?.dailyCallsByRep ?? raw.dailyCallsByRep ?? {})) if (!k.startsWith("_") && typeof v === "number" && v > 0) byRep[k] = v;
+  return {
+    dailyCallsDefault: stored?.dailyCallsDefault ?? raw.dailyCallsDefault ?? 0,
+    dailyCallsByRep: byRep,
+    workingDaysPerMonth: stored?.workingDaysPerMonth ?? raw.workingDaysPerMonth ?? 20,
+    monthlyAppointments: stored?.monthlyAppointments ?? raw.company?.monthlyAppointments ?? 0,
+    monthlyContractsSns: stored?.monthlyContractsSns ?? 0,
+    monthlyContractsAgency: stored?.monthlyContractsAgency ?? 0,
+  };
+}
+
+/** 📅 アポ管理（実施予定・結果・リスケ） */
+export async function getAppointments(): Promise<{ appointments: Appointment[]; errors: string[] }> {
+  const errors: string[] = [];
+  if (!notionConfigured()) return { appointments: [], errors: ["NOTION_TOKEN が未設定です。"] };
+  const appointments = await safe("アポ管理", cachedAppointments, [] as Appointment[], errors);
+  return { appointments, errors };
 }
 
 /** 架電・アポのタイミング分析（曜日×時間帯）。架電記録＋IS架電KPIを集計。 */
