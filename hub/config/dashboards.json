@@ -4,7 +4,7 @@
     {
       "key": "exec",
       "title": "経営ダッシュボード（全社の年間目標の進捗）",
-      "desc": "財務と全システム（人材紹介・採用マーケ・BPO・Analytics Pro・名刺・採用LP）の年間目標に対する進捗を1画面で。毎朝7:00更新",
+      "desc": "財務と各システム（人材紹介・採用マーケ・BPO・Analytics Pro・採用LP）の年間目標に対する進捗を1画面で。毎朝7:00更新",
       "source": "slack_let",
       "urlEnv": "HUB_URL_EXEC",
       "defaultUrl": "https://finance.let-inc.net/exec",
@@ -19,6 +19,17 @@
       "source": "slack_let",
       "urlEnv": "HUB_URL_FINANCE",
       "defaultUrl": "https://finance.let-inc.net/api/financial/dashboard",
+      "minRole": "exec",
+      "sso": "ready",
+      "group": "経営・財務"
+    },
+    {
+      "key": "own-recruit",
+      "title": "自社採用ダッシュボード",
+      "desc": "LET自社採用の計画対比・週次KPI・選考滞留・チャネル別の応募単価／面談単価／採用単価（Notion 採用DB × MF 採用コスト）",
+      "source": "slack_let",
+      "urlEnv": "HUB_URL_OWN_RECRUIT",
+      "defaultUrl": "https://finance.let-inc.net/api/financial/own-recruit",
       "minRole": "exec",
       "sso": "ready",
       "group": "経営・財務"
