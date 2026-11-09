@@ -31,11 +31,20 @@ const SECRET = process.env.CRON_SECRET;
 const ITER = 150000;
 
 // パスワードは各ページの認証ゲートと同一 (README.md の一覧参照)
+// 配信パスワードはリポジトリに書かない（2026-11-09 代表指示）。実行時に環境変数で渡す:
+//   EVAL_PW_EXEC（経営陣）/ EVAL_PW_SALES / EVAL_PW_MARKETING / EVAL_PW_BPO
+// 値は Notion「MF連携設定」の eval_page_password_* と同じもの
+function requiredEnv(name) {
+  const v = process.env[name];
+  if (!v) throw new Error(`環境変数 ${name} が未設定です（配信パスワード。Notion「MF連携設定」の eval_page_password_* を参照）`);
+  return v;
+}
+
 const TARGETS = [
-  { out: "eval-exec.enc.json", password: "letyakuin2026", depts: null }, // 経営陣: 全部門
-  { out: "eval-sales.enc.json", password: "saleslet1117", depts: ["営業"] },
-  { out: "eval-marketing.enc.json", password: "makematsu2026", depts: ["マーケティング"] },
-  { out: "eval-bpo.enc.json", password: "bpolet2026", depts: ["BPO"] },
+  { out: "eval-exec.enc.json", password: requiredEnv("EVAL_PW_EXEC"), depts: null }, // 経営陣: 全部門
+  { out: "eval-sales.enc.json", password: requiredEnv("EVAL_PW_SALES"), depts: ["営業"] },
+  { out: "eval-marketing.enc.json", password: requiredEnv("EVAL_PW_MARKETING"), depts: ["マーケティング"] },
+  { out: "eval-bpo.enc.json", password: requiredEnv("EVAL_PW_BPO"), depts: ["BPO"] },
 ];
 
 function fyArg() {
