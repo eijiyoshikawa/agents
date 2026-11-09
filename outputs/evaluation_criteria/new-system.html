@@ -391,7 +391,7 @@ tr.hl td { background: #FBF7EA; }
     </div>
     <div class="phil-item">
       <div class="phil-label">ボーナス</div>
-      <div class="phil-val">チーム粗利の15%が原資。ランクに応じて全員で分配（上限なし）</div>
+      <div class="phil-val">事業部（営業・マーケ）の営業利益の25%が原資。ランクに応じて全員で分配（上限なし・赤字の期は支給なし）</div>
     </div>
     <div class="phil-item">
       <div class="phil-label">データ</div>
@@ -417,10 +417,10 @@ tr.hl td { background: #FBF7EA; }
   <div class="track bonus">
     <div class="track-head"><span class="track-tag">Bonus</span><span class="track-title">チームの粗利 → ボーナス</span></div>
     <div class="track-body">
-      <div class="track-big">営業・マーケみんなで作ったチーム粗利の15%が、そのままボーナスの原資になる</div>
+      <div class="track-big">営業・マーケみんなで作った事業部の営業利益の25%が、そのままボーナスの原資になる</div>
       <ul>
         <li>原資はランクに応じて全員で分配</li>
-        <li>粗利が増えるほど原資も増える（上限なし）</li>
+        <li>営業利益が増えるほど原資も増える（上限なし）。事業部の営業利益が赤字の期は支給なし</li>
       </ul>
     </div>
   </div>
@@ -466,10 +466,11 @@ tr.hl td { background: #FBF7EA; }
 </div>
 <div class="sec-note">目標は期首に一人ひとり合意して決めます（期末に後付けで引き上げない・達成機会のない目標は設定しない）。役員が担う分は社員の数字に付かず、返金は発生した期にマイナスします。数字はすべてMF会計の実仕訳ベースです。</div>
 
-<div class="sec-title">Step 3 — ボーナス（チーム粗利の15%を、ランクに応じて分配）</div>
+<div class="sec-title">Step 3 — ボーナス（事業部の営業利益の25%を、ランクに応じて分配）</div>
 <div class="formula">
   <span class="comment">// 営業・マーケ合同。半年ごとに計算（年2回支給）</span><br>
-  ボーナス原資 = 半期のチーム粗利（売上 − 広告費 − 外注費）× <span class="highlight">15%</span><br>
+  事業部の営業利益 = 半期のチーム粗利（売上 − 広告費 − 外注費）− 人件費（社保込み）− オフィス家賃（人数割）<br>
+  ボーナス原資 = 事業部の営業利益 × <span class="highlight">25%</span>（営業利益が赤字の期は 0）<br>
   あなたの取り分 = 原資 × <span class="highlight">あなたのランクのウェイト</span> ÷ 全員のウェイト合計
 </div>
 <div class="ladder-wrap">
@@ -495,26 +496,27 @@ tr.hl td { background: #FBF7EA; }
       <div class="cond">R5</div>
     </div>
   </div>
-  <div class="sec-note">チームの粗利が伸びるほど原資も増えます — <b>上限はありません</b>。同じ案件を営業とマーケで協力して伸ばすことが、そのまま全員のボーナスになります。原資の粗利は会社の実額で数えます（営業とマーケの二重カウントはしません）。</div>
+  <div class="sec-note">2026年10月からのルールです（それまでは「チーム粗利 × 15%」）。入社後3ヶ月は準備期間として、その人の人件費と家賃の分を事業部に入れません（会社が負担します）。配賦する費目は期首に決めて固定し、期の途中で変えません。</div>
+  <div class="sec-note">チームの営業利益が伸びるほど原資も増えます — <b>上限はありません</b>。同じ案件を営業とマーケで協力して伸ばすことが、そのまま全員のボーナスになります。原資の粗利は会社の実額で数えます（営業とマーケの二重カウントはしません）。</div>
   <div class="sec-note">分配は<b>ランクのウェイト</b>で決まります。全員が同じランクの間は均等割。昇格（Step 2）するとウェイトが上がり、同じ原資でも取り分が増えます。期の途中で入社・退社した場合は在籍月数で按分します。確定額は半期末に会社から通知します（このページの表示は現在ペースの見込みです）。</div>
-  <div style="margin:14px 0 4px; font-weight:600;">早見表 — チームでいくら稼ぐと、いくらになるか（現4名・全員R2で均等割の場合）</div>
+  <div style="margin:14px 0 4px; font-weight:600;">早見表 — 事業部の営業利益がいくらだと、いくらになるか（4名・全員R2で均等割の場合）</div>
   <div style="overflow-x:auto;">
   <table style="width:100%; border-collapse:collapse; font-size:13px;">
     <tr style="border-bottom:2px solid var(--ink,#222);">
-      <th style="text-align:left; padding:6px 8px;">半期のチーム粗利</th>
+      <th style="text-align:left; padding:6px 8px;">半期の事業部 営業利益</th>
       <th style="text-align:right; padding:6px 8px;">（月あたり）</th>
-      <th style="text-align:right; padding:6px 8px;">ボーナス原資（15%）</th>
+      <th style="text-align:right; padding:6px 8px;">ボーナス原資（25%）</th>
       <th style="text-align:right; padding:6px 8px;">1人あたり</th>
     </tr>
-    <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">600万円</td><td style="text-align:right; padding:6px 8px;">100万円</td><td style="text-align:right; padding:6px 8px;">90万円</td><td style="text-align:right; padding:6px 8px;">22.5万円</td></tr>
-    <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">900万円</td><td style="text-align:right; padding:6px 8px;">150万円</td><td style="text-align:right; padding:6px 8px;">135万円</td><td style="text-align:right; padding:6px 8px;">33.8万円</td></tr>
-    <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">1,200万円</td><td style="text-align:right; padding:6px 8px;">200万円</td><td style="text-align:right; padding:6px 8px;">180万円</td><td style="text-align:right; padding:6px 8px;">45万円</td></tr>
-    <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">1,600万円</td><td style="text-align:right; padding:6px 8px;">267万円</td><td style="text-align:right; padding:6px 8px;">240万円</td><td style="text-align:right; padding:6px 8px;">60万円</td></tr>
-    <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">2,000万円</td><td style="text-align:right; padding:6px 8px;">333万円</td><td style="text-align:right; padding:6px 8px;">300万円</td><td style="text-align:right; padding:6px 8px;">75万円</td></tr>
-    <tr><td style="padding:6px 8px;">2,400万円</td><td style="text-align:right; padding:6px 8px;">400万円</td><td style="text-align:right; padding:6px 8px;">360万円</td><td style="text-align:right; padding:6px 8px;">90万円</td></tr>
+    <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">300万円</td><td style="text-align:right; padding:6px 8px;">50万円</td><td style="text-align:right; padding:6px 8px;">75万円</td><td style="text-align:right; padding:6px 8px;">18.75万円</td></tr>
+    <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">600万円</td><td style="text-align:right; padding:6px 8px;">100万円</td><td style="text-align:right; padding:6px 8px;">150万円</td><td style="text-align:right; padding:6px 8px;">37.5万円</td></tr>
+    <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">900万円</td><td style="text-align:right; padding:6px 8px;">150万円</td><td style="text-align:right; padding:6px 8px;">225万円</td><td style="text-align:right; padding:6px 8px;">56.25万円</td></tr>
+    <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">1,200万円</td><td style="text-align:right; padding:6px 8px;">200万円</td><td style="text-align:right; padding:6px 8px;">300万円</td><td style="text-align:right; padding:6px 8px;">75万円</td></tr>
+    <tr style="border-bottom:1px solid #ddd;"><td style="padding:6px 8px;">1,800万円</td><td style="text-align:right; padding:6px 8px;">300万円</td><td style="text-align:right; padding:6px 8px;">450万円</td><td style="text-align:right; padding:6px 8px;">112.5万円</td></tr>
+    <tr><td style="padding:6px 8px;">2,400万円</td><td style="text-align:right; padding:6px 8px;">400万円</td><td style="text-align:right; padding:6px 8px;">600万円</td><td style="text-align:right; padding:6px 8px;">150万円</td></tr>
   </table>
   </div>
-  <div class="sec-note" style="margin-top:6px;">目安: 月額30万円のSNS運用1件 ＝ 粗利約24万円/月 ＝ 半期約144万円。1件増えるだけで原資は半期+21.6万円増えます。人数が増えたときやランクに差がついたときは、上の分配式に従って1人あたりの額が変わります。</div>
+  <div class="sec-note" style="margin-top:6px;">目安: 月額30万円のSNS運用1件 ＝ 粗利約24万円/月 ＝ 半期約144万円。人を増やさずに1件増えれば、営業利益も約144万円増え、原資は半期+36万円増えます。人数が増えたときやランクに差がついたときは、上の分配式に従って1人あたりの額が変わります。</div>
   <div class="sec-note">※ <b>不動産/BPO職のボーナスだけは判定方法が異なります</b>: 半期の<b>原価率（原価 ÷ 売上）が40%以下</b>であれば月給1ヶ月分を支給します（プール分配の対象外です）。昇格・降格の判定は他職種と同じ「個人の達成率」です。</div>
 </div>
 
@@ -547,7 +549,7 @@ tr.hl td { background: #FBF7EA; }
 (function() {
   // 2026-09-07: 個人パスワード制。本人の実績・取り分だけが表示される
   // (同じ職種でも同僚の数字は見えない)。経営陣パスワードのみ全員分を表示。
-  // 旧・職種パスワード (saleslet1117等) ではこのページは開かない。
+  // 旧・職種パスワード (部門別のもの等) ではこのページは開かない。
   const HASH_TO_KIND = {
     "1e980b5384f2ce83258b28faa11cba9393191c5c95720fc1ca3b7fc464708ea4": "exec",
     "3d4a61017b7e31d2bb3435ec8544e284143893fb4e0a0e0c79630a14c04ecaa0": "ehara",
@@ -856,8 +858,8 @@ tr.hl td { background: #FBF7EA; }
     let bonus = '';
     if (ps) {
       bonus = ps.share > 0
-        ? `<div class="mbonus">🎁 ボーナス取り分（現ペースの見込み）: ${man(ps.share)}　— ランク${esc(ps.rank)}・ウェイト${ps.weight}。チーム粗利+100万円ごとに 約+${man(ps.marginal100)}</div>`
-        : `<div class="mbonus off">チーム粗利がプラスになると分配が始まります（チーム粗利+100万円ごとに あなたの取り分 約+${man(ps.marginal100)}）</div>`;
+        ? `<div class="mbonus">🎁 ボーナス取り分（現ペースの見込み）: ${man(ps.share)}　— ランク${esc(ps.rank)}・ウェイト${ps.weight}。営業利益+100万円ごとに 約+${man(ps.marginal100)}</div>`
+        : `<div class="mbonus off">事業部の営業利益がプラスになると分配が始まります（営業利益+100万円ごとに あなたの取り分 約+${man(ps.marginal100)}）</div>`;
     } else if (t.bonus_rule === 'cost_rate') {
       bonus = t.bonus_months
         ? `<div class="mbonus">🎁 原価率クリア中: ボーナス${t.bonus_months}ヶ月分 ＝ ${man(m.monthly_salary * t.bonus_months)}</div>`
@@ -959,13 +961,17 @@ tr.hl td { background: #FBF7EA; }
       root.innerHTML = '<div class="live-status">表示できるチームがありません。</div>';
       return;
     }
-    // 営業・マーケ合同ボーナスプール (チーム粗利×15%・ランクウェイト分配)
+    // 営業・マーケ合同ボーナスプール (2026-10〜: 事業部の営業利益×25% / それ以前: チーム粗利×15%。ランクウェイト分配)
     const poolShare = {};
     let poolHtml = '';
     if (data.pool) {
+      const opMode = data.pool.method === 'operating-profit';
+      const rate = data.pool.rate || 0.15;
+      const pct = Math.round(rate * 100);
+      const baseLabel = opMode ? '事業部の営業利益' : 'チーム粗利';
       const totalW = data.pool.total_weight || data.pool.members.reduce((s, pm) => s + pm.weight, 0) || 1;
       for (const pm of data.pool.members) {
-        pm.marginal100 = (1000000 * 0.15 * pm.weight) / totalW; // チーム粗利+100万円あたりの取り分増
+        pm.marginal100 = (1000000 * rate * pm.weight) / totalW; // 営業利益(旧: 粗利)+100万円あたりの取り分増
         poolShare[pm.name] = pm;
       }
       const shares = data.pool.members
@@ -973,13 +979,15 @@ tr.hl td { background: #FBF7EA; }
         .join('　／　');
       poolHtml = `<div class="team-block">
         <div class="team-head">
-          <span class="team-name">💰 ボーナス原資（営業・マーケ合同）<small>チーム粗利 × 15%</small></span>
+          <span class="team-name">💰 ボーナス原資（営業・マーケ合同）<small>${baseLabel} × ${pct}%</small></span>
           <span class="bonus-badge${data.pool.amount > 0 ? '' : ' off'}">現ペースの原資 ${man(data.pool.amount)}</span>
         </div>
         <div class="team-body">
-          <div class="team-nums">チーム粗利 <b>${man(data.pool.gross_profit)}</b>（売上 ${man(data.pool.sales)} − 広告費・外注費 ${man(data.pool.direct_cost)}）× 15% ＝ 原資 <b>${man(data.pool.amount)}</b></div>
+          <div class="team-nums">チーム粗利 <b>${man(data.pool.gross_profit)}</b>（売上 ${man(data.pool.sales)} − 広告費・外注費 ${man(data.pool.direct_cost)}）${opMode ? '' : ` × ${pct}% ＝ 原資 <b>${man(data.pool.amount)}</b>`}</div>
+          ${opMode ? `<div class="team-nums">事業部の営業利益 <b>${man(data.pool.operating_profit)}</b>（チーム粗利 − 人件費・家賃の配賦${data.pool.labor_cost != null ? ` ${man((data.pool.labor_cost || 0) + (data.pool.rent_share || 0))}` : ''}）× ${pct}% ＝ 原資 <b>${man(data.pool.amount)}</b>${data.pool.loss ? '　<b>— 営業利益が赤字のため、この期は今のところ支給なし</b>' : ''}</div>` : ''}
+          ${opMode && data.pool.labor_cost != null ? `<div class="team-nums" style="opacity:.75;">内訳（経営陣のみ表示）: 人件費 ${man(data.pool.labor_cost)}／家賃の人数割 ${data.pool.rent_monthly ? man(data.pool.rent_share) : '未設定（MF連携設定 neweval_office_rent_monthly）'}${(data.pool.ramp_members || []).length ? `／入社3ヶ月以内で除外: ${data.pool.ramp_members.map(esc).join('・')}` : ''}${(data.pool.missing_labor || []).length ? `／月額人件費が未入力: ${data.pool.missing_labor.map(esc).join('・')}` : ''}${(data.pool.no_join_date || []).length ? `／入社日が未入力: ${data.pool.no_join_date.map(esc).join('・')}` : ''}</div>` : ''}
           <div class="team-nums">取り分（ランクウェイト分配）: ${shares}</div>
-          <div class="team-nums">📈 チーム粗利が100万円増えるごとに原資 +15万円（SNS運用1件 ≒ 粗利24万円/月 ＝ 半期+144万円 → 原資+21.6万円）</div>
+          <div class="team-nums">📈 ${baseLabel}が100万円増えるごとに原資 +${pct}万円（SNS運用1件 ≒ 粗利24万円/月 ＝ 半期+144万円 → 原資+${(144 * rate).toFixed(1).replace(/\.0$/, '')}万円）</div>
           <div class="team-nums" style="opacity:.65;">※ 表示は現在ペースの見込みです。確定額は半期末に会社から通知します。</div>
         </div>
       </div>`;
