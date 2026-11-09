@@ -58,22 +58,11 @@
     },
     {
       "key": "kpi",
-      "title": "案件 KPI（Recruit Ops）",
-      "desc": "SNS 採用クライアントの週次 KPI・広告実績・利益",
+      "title": "採用マーケティング（案件KPI・運用管理）",
+      "desc": "SNS 採用クライアントの週次 KPI・広告実績・収支と、案件のフェーズ・30ステップのタスク・ヒアリング・チェックリスト・週次/月次報告を 1 つの案件ページで",
       "source": "masterAI",
       "urlEnv": "HUB_URL_KPI",
       "defaultUrl": "https://kpi.let-inc.net/kpi",
-      "minRole": "manager",
-      "sso": "ready",
-      "group": "営業・マーケティング"
-    },
-    {
-      "key": "ops",
-      "title": "採用マーケティング運用管理",
-      "desc": "案件のフェーズ・30ステップのタスク・ヒアリング・チェックリスト・週次/月次報告（masterAI /ops）",
-      "source": "masterAI",
-      "urlEnv": "HUB_URL_OPS",
-      "defaultUrl": "https://kpi.let-inc.net/ops",
       "minRole": "staff",
       "sso": "ready",
       "group": "営業・マーケティング"

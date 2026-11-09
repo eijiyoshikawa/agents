@@ -1,5 +1,6 @@
 import dashboardsJson from "@/config/dashboards.json";
 import { hasRole, isRole, type Role } from "./roles";
+import { normalizeAllow } from "./dashboard-aliases";
 
 export type SsoStatus = "ready" | "planned" | "link-only";
 export type Dashboard = {
@@ -58,7 +59,7 @@ export function dashboardsForRole(role: Role, env: NodeJS.ProcessEnv = process.e
 export function dashboardsForMember(role: Role, allow: string[] | null | undefined, env: NodeJS.ProcessEnv = process.env): Dashboard[] {
   // 段階分けの子（parent あり）は「すべて」のメンバーには出さない（親で全部見られる）
   if (!allow) return dashboardsForRole(role, env).filter((d) => !d.parent);
-  const set = new Set(allow);
+  const set = new Set(normalizeAllow(allow));
   // 親にもチェックがあるときは子を出さない（親で全部見られる）
   return listDashboards(env).filter((d) => set.has(d.key) && !(d.parent && set.has(d.parent)));
 }

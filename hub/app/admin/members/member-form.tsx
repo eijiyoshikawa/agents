@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { saveMemberAction, type MemberFormState } from "./actions";
 import type { MemberRecord } from "@/lib/member-store";
+import { normalizeAllow } from "@/lib/dashboard-aliases";
 
 /** ハブ上の権限。「すべてのサイト」を選んだときに見られる範囲と、メンバー管理ができるかを決める */
 const ROLE_OPTIONS = [
@@ -36,7 +37,7 @@ export function MemberForm({ dashboards, editing }: { dashboards: DashboardOptio
   const [state, action, pending] = useActionState<MemberFormState, FormData>(saveMemberAction, { ok: false, message: "" });
   // 新規は「サイトを選ぶ」から始める（何も選ばずに全部入れてしまう事故を防ぐ）。編集は保存されている設定を初期値にする
   const [allowAll, setAllowAll] = useState<boolean>(Boolean(editing && editing.allow === null));
-  const [checked, setChecked] = useState<Set<string>>(() => new Set(editing?.allow ?? []));
+  const [checked, setChecked] = useState<Set<string>>(() => new Set(normalizeAllow(editing?.allow ?? [])));
   const toggle = (key: string) => setChecked((prev) => {
     const next = new Set(prev);
     if (next.has(key)) next.delete(key);

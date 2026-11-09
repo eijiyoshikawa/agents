@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { Header } from "@/components/Header";
 import { hubDbConfigured } from "@/lib/db";
 import { allDashboardKeys } from "@/lib/dashboards";
+import { normalizeAllow } from "@/lib/dashboard-aliases";
 import { listMemberRecords } from "@/lib/member-store";
 import { configMembers } from "@/lib/members";
 import { ROLE_LABEL, type Role } from "@/lib/roles";
@@ -26,7 +27,7 @@ function SiteChips({ allow, role, dashboards }: { allow: string[] | null; role: 
   if (allow.length === 0) return <span className="chip chip-muted">なし</span>;
   return (
     <div className="flex flex-wrap gap-1">
-      {allow.map((k) => (
+      {normalizeAllow(allow).map((k) => (
         <span key={k} className="chip chip-muted">
           {dashboards.find((d) => d.key === k)?.title ?? k}
         </span>

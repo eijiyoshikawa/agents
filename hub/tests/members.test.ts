@@ -55,7 +55,10 @@ describe("メンバーごとの項目制限", () => {
     expect(dashboardsForMember("manager", null, env).map((d) => d.key)).toContain("sales");
     expect(dashboardsForMember("manager", null, env).map((d) => d.key)).not.toContain("finance");
     expect(dashboardsForMember("manager", ["sales"], env).map((d) => d.key)).toEqual(["sales"]);
-    expect(dashboardsForMember("staff", ["finance", "ops"], env).map((d) => d.key)).toEqual(["finance", "ops"]);
+    expect(dashboardsForMember("staff", ["finance", "jinji"], env).map((d) => d.key).sort()).toEqual(["finance", "jinji"]);
+    // 統合した「採用マーケティング運用管理（ops）」にチェックしていた人は、統合後の kpi を見られる
+    expect(dashboardsForMember("staff", ["ops"], env).map((d) => d.key)).toEqual(["kpi"]);
+    expect(dashboardsForMember("staff", ["ops", "kpi"], env).map((d) => d.key)).toEqual(["kpi"]);
     expect(dashboardsForMember("staff", [], env)).toEqual([]);
   });
   it("評価制度サイトの段階（親子）: 「すべて」には親だけ、親にチェックがあれば子は出さない、子だけなら子が出る", async () => {
