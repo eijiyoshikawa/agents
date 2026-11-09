@@ -333,6 +333,23 @@ tr.hl td { background: #FBF7EA; }
 .auth-error.show { display: block; }
 .auth-footer { margin-top: 20px; padding-top: 16px; border-top: 1px solid #e3e1da;
   font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #8a877e; text-align: center; letter-spacing: 1px; }
+/* 昇給クエスト（2026-11-09 代表依頼: 何を達成したらランクアップ＝昇給かをクエストで） */
+.quest { margin: 10px 0 14px; padding: 12px 14px; border: 1px solid #E2DED5; border-radius: 6px; background: #FBFAF7; }
+.quest-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
+.quest-title { font-weight: 700; font-size: 14px; }
+.quest-title small { font-weight: 500; color: var(--ink-3); margin-left: 6px; font-size: 11.5px; }
+.quest-meter { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--ink-3); }
+.quest-list { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
+.quest-item { display: grid; grid-template-columns: 22px 1fr; gap: 2px 8px; align-items: start; }
+.quest-item .qmark { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; background: #ECEAE4; color: var(--ink-3); }
+.quest-item.clear .qmark { background: var(--green); color: #fff; }
+.quest-item.progress .qmark { background: var(--blue); color: #fff; }
+.quest-item .qtitle { font-size: 13px; font-weight: 600; }
+.quest-item .qhint { grid-column: 2; font-size: 12px; color: var(--ink-3); }
+.quest-item .qbar { grid-column: 2; height: 6px; border-radius: 3px; background: #ECEAE4; overflow: hidden; }
+.quest-item .qbar i { display: block; height: 100%; background: var(--blue); }
+.quest-item.clear .qbar i { background: var(--green); }
+.quest-goal { margin-top: 10px; font-size: 12.5px; }
 </style>
   <script src="/assets/hub-link.js" defer></script>
 </head>
@@ -743,6 +760,28 @@ tr.hl td { background: #FBF7EA; }
     </div>`;
   }
 
+  // 昇給クエスト: 昇格条件を「あと何をすればよいか」つきで表示（slack-let lib/new-eval.js buildQuests）
+  function questBlock(m) {
+    const q = m.quest;
+    if (!q) return '';
+    const MARK = { clear: '✓', progress: '…', todo: '!', manual: '◎', max: '★' };
+    const LABEL = { clear: '達成', progress: '挑戦中', todo: '未入力・準備中', manual: '役員が確認', max: '最高ランク' };
+    const items = (q.quests || []).map(x => {
+      const bar = x.progress != null ? `<div class="qbar"><i style="width:${Math.round(x.progress * 100)}%"></i></div>` : '';
+      return `<li class="quest-item ${esc(x.status)}"><span class="qmark" title="${LABEL[x.status] || ''}">${MARK[x.status] || '・'}</span><span class="qtitle">${esc(x.title)} <span style="font-weight:500;color:var(--ink-3);font-size:11.5px">— ${LABEL[x.status] || ''}</span></span>${bar}<span class="qhint">${esc(x.hint || '')}</span></li>`;
+    }).join('');
+    const goal = q.next_rank
+      ? `クリアすると <b>${esc(q.rank)} → ${esc(q.next_rank)}</b>${q.raise ? `（制度月給 ${Math.round(q.salary_now / 10000)}万 → ${Math.round(q.salary_next / 10000)}万・<b>月 +${Math.round(q.raise / 10000)}万</b>）` : ''}。半期ごと（10〜3月／4〜9月）に判定し、飛び級はありません。`
+      : '最高ランクです。';
+    const review = q.ready_for_review ? '<div class="quest-goal" style="color:var(--green)"><b>自動で判定できるクエストはすべて達成しています。</b>残りは役員による役割の確認です。</div>' : '';
+    return `<div class="quest">
+      <div class="quest-head"><span class="quest-title">🏆 昇給クエスト<small>${esc(q.rank)} → ${esc(q.next_rank || '—')}</small></span><span class="quest-meter">達成 ${q.cleared} / ${q.total}（＋役員確認 1）</span></div>
+      <ul class="quest-list">${items}</ul>
+      <div class="quest-goal">${goal}</div>
+      ${review}
+    </div>`;
+  }
+
   // 正式判定（役割配分方式・2026-09-07 決定）: 本人評価粗利 = 案件粗利 × 役割配分率 × 本人担当割合
   function formalBlock(m) {
     const pe = m.personal_eval;
@@ -855,6 +894,7 @@ tr.hl td { background: #FBF7EA; }
         <span class="member-name">${esc(m.name)}<span class="rank-chip">${esc(m.rank)} ／ 月給${Math.round(m.monthly_salary / 10000)}万</span></span>
         <span class="outlook ${ocls}">${olabel}</span>
       </div>
+      ${questBlock(m)}
       ${formalBlock(m)}
       <details class="mref">
         <summary>参考: 旧基準の達成率（配分前・粗利 ÷ 月給×1.15×倍率）— 正式判定には使いません</summary>
