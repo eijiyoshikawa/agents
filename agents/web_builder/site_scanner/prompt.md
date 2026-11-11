@@ -36,35 +36,73 @@ HTMLから内部リンク（同一ドメイン）を収集し、ページ一覧�
 ### Step 3: 技術スタック検出
 HTMLソースと読み込まれたリソースから技術を検出する:
 
-**フレームワーク検出:**
-- `__NEXT_DATA__`, `_next/` → Next.js
-- `__NUXT__`, `_nuxt/` → Nuxt.js
-- `data-reactroot` → React
-- `ng-version` → Angular
-- WordPress特有のクラス名・パス → WordPress
+**フレームワーク検出（フィンガープリンティング）:**
+- `__NEXT_DATA__`, `_next/`, `next/image` loader → Next.js（バージョンは `buildId` パターンで推定）
+- `__NUXT__`, `_nuxt/`, `__NUXT_ASYNC_DATA__` → Nuxt.js
+- `data-reactroot`, `_reactListening` → React（バンドルサイズからCRA/Vite/Remix判別）
+- `ng-version`, `ng-app` → Angular
+- WordPress特有のクラス名・`/wp-content/`・`/wp-includes/` → WordPress
+- `__GATSBY`, `/static/` + `page-data.json` → Gatsby
+- `astro-island`, `astro-slot` → Astro
+- `data-sveltekit` → SvelteKit
 
 **CSSフレームワーク検出:**
-- `tailwind` クラス名パターン → Tailwind CSS
-- `bootstrap` クラス名 → Bootstrap
-- カスタムCSS
+- Tailwindユーティリティクラスパターン（`flex`, `pt-`, `text-`が同一要素に3+） → Tailwind CSS
+- `bootstrap`, `container-fluid`, `row col-` → Bootstrap
+- `chakra-`, `css-` + ハッシュ → Chakra UI
+- CSS Modules（`_module__` パターン） / styled-components（`sc-` プレフィックス）
+- カスタムCSS（上記に該当しない場合）
 
 **外部ライブラリ検出:**
-- `gsap`, `ScrollTrigger` → GSAP
-- `swiper` → Swiper
-- `aos` → AOS (Animate On Scroll)
-- `lottie` → Lottie
-- `three.js`, `WebGL` → Three.js
-- `jQuery` → jQuery
+- `gsap`, `ScrollTrigger`, `SplitText` → GSAP（バージョン特定含む）
+- `swiper`, `swiper-wrapper` → Swiper
+- `data-aos` → AOS (Animate On Scroll)
+- `lottie-player`, `lottie-web` → Lottie
+- `three.js`, `WebGL`, `<canvas>` → Three.js / WebGL
+- `jQuery`, `$(`→ jQuery
+- `locomotive-scroll` → Locomotive Scroll
+- `barba`, `data-barba` → Barba.js（ページ遷移）
+
+**CDN・ホスティング検出:**
+- `vercel.app`, `x-vercel-id` ヘッダー → Vercel
+- `netlify.app`, `x-nf-request-id` → Netlify
+- `cloudflare`, `cf-ray` → Cloudflare
+- `amazonaws.com` → AWS
+
+**パフォーマンスプロファイル:**
+- リソース数（CSS/JS/画像の各ファイル数）
+- 推定総ページ重量（HTML + CSS + JS + 画像の概算）
+- レンダリング方式の推定（SSR/SSG/CSR/ISR）
+
+**セキュリティヘッダー確認:**
+- `Content-Security-Policy` の有無と主要ディレクティブ
+- `X-Frame-Options`, `X-Content-Type-Options` の設定状況
+- HTTPS 強制の確認
 
 **アナリティクス・ツール:**
-- Google Analytics / GTM
-- Facebook Pixel 等
+- Google Analytics（GA4: `gtag` / UA: `analytics.js`）/ GTM
+- Facebook Pixel / Meta Pixel
+- Hotjar / Microsoft Clarity（ヒートマップ系）
 
-### Step 4: サイトの特徴メモ
+### Step 4: クロール戦略の最適化
+サイト規模に応じたクロール戦略を決定する:
+
+| サイト規模 | ページ数 | 戦略 |
+|-----------|---------|------|
+| LP | 1 | 単一ページ全セクション精査 |
+| 小規模 | 2-5 | 全ページ取得 |
+| 中規模 | 6-15 | 主要ページ（top/about/service/contact）+ 代表的サブページ2-3 |
+| 大規模 | 16+ | 主要ページ + 各カテゴリの代表1ページ（最大10ページ） |
+
+- SPA（Single Page Application）検出時: 初回HTMLが空に近い場合はJSレンダリング後のDOMが必要と記録
+- robots.txt / sitemap.xml があれば参照しページ優先度を確認
+
+### Step 5: サイトの特徴メモ
 サイト全体の印象・特徴を簡潔にメモする:
 - デザインの方向性（ミニマル/リッチ/コーポレート等）
 - 主なビジュアル要素（動画背景/パララックス/大きな写真等）
 - ターゲットユーザーの推測
+- 再現難易度の初期見積もり（low/medium/high）と根拠
 
 ## 出力フォーマット
 
@@ -101,7 +139,24 @@ HTMLソースと読み込まれたリソースから技術を検出する:
   "total_pages": 5,
   "primary_language": "ja",
   "site_characteristics": "ミニマルデザイン。大きなヒーロー画像とスムーズスクロール。BtoB向けSaaS。",
-  "responsive": true
+  "responsive": true,
+  "cdn": "Vercel | Cloudflare | AWS | unknown",
+  "rendering_method": "SSR | SSG | CSR | ISR | hybrid",
+  "performance_profile": {
+    "total_resources": 0,
+    "estimated_page_weight_kb": 0,
+    "js_files_count": 0,
+    "css_files_count": 0,
+    "image_count": 0
+  },
+  "security_headers": {
+    "csp": false,
+    "x_frame_options": "DENY | SAMEORIGIN | none",
+    "https_enforced": true
+  },
+  "crawl_strategy": "full | selective | lp-single",
+  "reproduction_difficulty": "low | medium | high",
+  "reproduction_difficulty_reason": "理由"
 }
 ```
 

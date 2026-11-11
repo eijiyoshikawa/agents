@@ -71,7 +71,30 @@
 - **ヘッダー変化**: スクロール時のヘッダー縮小 / 背景色変化
 - **スクロールトップボタン**: 表示条件、位置、アニメーション
 
-### Step 6: その他のインタラクティブ要素
+### Step 6: フォームバリデーションパターンの詳細解析
+フォームのバリデーション実装を詳細に記録する:
+- **バリデーションタイミング**: onBlur（フォーカス離脱時）/ onChange（入力中）/ onSubmit（送信時）
+- **エラー表示方式**: インラインメッセージ / ツールチップ / トースト / フィールドハイライト
+- **エラーメッセージの位置**: フィールド下 / フィールド上 / ツールチップ
+- **成功フィードバック**: チェックマーク表示 / 枠色変化 / なし
+- **フォーム全体のエラーサマリー**: 送信時に未入力フィールドリスト表示の有無
+
+### Step 7: エラー・ローディング・空状態パターンの解析
+各インタラクティブ要素の状態遷移を記録する:
+- **ローディング状態**: スピナー / スケルトン / プログレスバー / ボタンローディング
+- **エラー状態**: リトライボタン / エラーメッセージ / フォールバックUI
+- **空状態**: データなし時の表示（イラスト + メッセージ / CTA誘導）
+- **マイクロフィードバック**: ボタンクリック時の視覚反応（ripple / scale / 色変化）
+
+### Step 8: アクセシビリティインタラクションの解析
+インタラクティブ要素のアクセシビリティ実装を確認する:
+- **キーボード操作**: Tab順序 / Enter/Space発火 / Escape閉じる / 矢印キーナビ
+- **ARIA属性**: `aria-expanded`, `aria-hidden`, `aria-label`, `role` の使用
+- **フォーカス管理**: モーダルオープン時のフォーカストラップ / 閉じた時のフォーカス復帰
+- **スクリーンリーダー**: `aria-live` リージョン / 動的コンテンツの通知
+- 評価結果を `accessibility_quality`: "excellent" / "good" / "poor" で記録
+
+### Step 9: その他のインタラクティブ要素
 - **ツールチップ**: ホバー時の説明表示
 - **ドロップダウン**: 選択メニュー
 - **コピーボタン**: テキスト/URLのコピー
@@ -79,6 +102,8 @@
 - **Cookie同意バナー**: 表示条件、レイアウト
 - **画像ギャラリー**: ライトボックス表示
 - **動画再生**: インライン再生 / モーダル再生
+- **無限スクロール / ページネーション**: ブログ・実績ページ等
+- **検索UI**: インクリメンタルサーチ / フィルター / ソート
 
 ## 出力フォーマット
 
@@ -172,6 +197,23 @@
       "position": "bottom-right",
       "animation": "fade-in"
     }
+  },
+  "validation_patterns": {
+    "timing": "onBlur | onChange | onSubmit",
+    "error_display": "inline | tooltip | toast",
+    "success_feedback": "checkmark | border-color | none"
+  },
+  "state_patterns": {
+    "loading_ui": "spinner | skeleton | progress-bar | button-loading | none",
+    "error_ui": "retry-button | error-message | fallback | none",
+    "empty_ui": "illustration | message | cta | none"
+  },
+  "accessibility_quality": "excellent | good | poor",
+  "accessibility_details": {
+    "keyboard_navigable": true,
+    "aria_attributes_used": true,
+    "focus_management": true,
+    "screen_reader_support": false
   },
   "other_interactions": [
     {

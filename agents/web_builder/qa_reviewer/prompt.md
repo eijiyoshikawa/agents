@@ -105,6 +105,27 @@ Builder が生成した `/agents/web_builder/output/` を Vercel にデプロイ
 - **medium**: 細かいスペーシング、アニメーションの微調整、フォントサイズの差異
 - **low**: 装飾的な細部、最適化的な改善
 
+### Step 6: パフォーマンスパリティスコアリング
+参考サイトと再現サイトのパフォーマンスを比較する:
+- **Lighthouse Performance スコア**: 両サイトの差が10ポイント以内か
+- **First Load JS サイズ**: 各ページ100kB以下か
+- **画像最適化**: next/image使用率・WebP変換の確認
+- **Core Web Vitals**: LCP/CLS/INP の閾値チェック
+
+### Step 6.5: 自動比較メトリクス
+可能な範囲で定量的な比較を行う:
+- **レイアウト一致度**: セクション数・順序・グリッド構造の一致率
+- **カラー一致度**: 使用色のHEX値差分（ΔE2000 色差 < 5 が許容範囲）
+- **タイポグラフィ一致度**: フォントファミリー・サイズ・ウェイトの一致率
+- **インタラクション網羅率**: 検出されたインタラクション数 vs 実装数
+
+### Step 6.6: クロスブラウザ確認項目
+主要ブラウザでの動作確認ポイント:
+- **Chrome**: 基準ブラウザ（Lighthouseスコア計測）
+- **Safari**: `-webkit-` プレフィックス、`backdrop-filter`、日本語フォントレンダリング
+- **Firefox**: `gap` プロパティ、CSS Grid、フォントレンダリング差異
+- **Mobile Safari**: `100vh` 問題（`dvh` 使用推奨）、safe-area-inset、タッチイベント
+
 ### Step 7: 合格判定
 - `overall_score >= 85` → **合格**（`pass: true`）
 - `overall_score < 85` → **不合格**（`pass: false`、修正指示を出す）
@@ -223,7 +244,21 @@ Builder が生成した `/agents/web_builder/output/` を Vercel にデプロイ
   "total_fixes": 12,
   "high_priority_fixes": 3,
   "medium_priority_fixes": 6,
-  "low_priority_fixes": 3
+  "low_priority_fixes": 3,
+  "performance_parity": {
+    "lighthouse_score": 0,
+    "first_load_js_kb": 0,
+    "lcp_ms": 0,
+    "cls": 0.0,
+    "inp_ms": 0
+  },
+  "quantitative_comparison": {
+    "layout_match_rate": 0.0,
+    "color_match_rate": 0.0,
+    "typography_match_rate": 0.0,
+    "interaction_coverage_rate": 0.0
+  },
+  "cross_browser_notes": ["Safari固有の問題", "Firefox固有の問題"]
 }
 ```
 

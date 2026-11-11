@@ -176,13 +176,38 @@ const staggerContainer = {
 
 Tailwind の `sm:`, `md:`, `lg:`, `xl:` プレフィックスを活用。
 
-### Step 10: ビルド確認
+### Step 10: コード品質の自己チェック
+ビルド前にコード品質を確認する:
+
+**コンポーネント設計品質:**
+- 各コンポーネントが単一責任（1ファイル100行以内推奨）
+- Props の型定義が明確（TypeScript interface で全プロパティに型）
+- Server Component / Client Component の境界が最小限（`"use client"` は本当に必要な箇所のみ）
+- コンポーネントの再利用性（同じUIパターンが2箇所以上で使われる場合は共通化）
+
+**パフォーマンス最適化:**
+- `next/image` の `priority` 属性をATF（Above The Fold）画像に設定
+- `next/dynamic` による動的インポート（重いライブラリのコード分割）
+- `loading="lazy"` がBTF（Below The Fold）画像に設定
+- フォントは `next/font` で最適化（`display: 'swap'`）
+- 不要な `"use client"` によるバンドル膨張がないか
+
+**アクセシビリティ実装:**
+- 全 `<img>` に適切な `alt` テキスト（装飾画像は `alt=""`）
+- フォーカス可能な要素に `:focus-visible` スタイル
+- カラーコントラスト比 WCAG AA 準拠（テキスト4.5:1 / 大テキスト3:1）
+- モーダル・ドロワーにフォーカストラップ
+- `<html lang="ja">` の設定
+
+### Step 11: ビルド確認
 ```bash
 cd /agents/web_builder/output
 npm run build
 ```
 
-ビルドエラーがあれば修正する。
+ビルドエラーがあれば修正する。ビルド成功後、以下も確認:
+- `npm run build` のページサイズ警告がないか
+- First Load JS が各ページ100kB以下か
 
 ## Iteration 2+ の修正手順
 
@@ -238,6 +263,7 @@ QA Reviewer の修正指示（`iteration_N.json`）を読み込み:
 
 ## ビルド品質チェックリスト（各Iteration完了時に確認）
 
+### デザイン品質
 - [ ] tailwind.config.ts がdesign-tokens.jsonに準拠しているか
 - [ ] globals.css にCSS変数 + font-feature-settings + antialiased が設定されているか
 - [ ] プライマリカラーがTailwindブルーでないか
@@ -247,9 +273,26 @@ QA Reviewer の修正指示（`iteration_N.json`）を読み込み:
 - [ ] 見出しのfont-weightが500-600か
 - [ ] border-radiusが3段階以内か
 - [ ] シャドウが多層構成か
+- [ ] Tailwindデフォルト値にフォールバックしている箇所がないか
+
+### モーション品質
 - [ ] スクロールアニメーションがヒーロー+主要セクション限定か
 - [ ] hover: scale(1.05) を使っていないか
-- [ ] Tailwindデフォルト値にフォールバックしている箇所がないか
+- [ ] `prefers-reduced-motion` グローバルCSSが配置されているか
+- [ ] 1画面あたり同時発火モーションが2件以内か
+
+### コード品質
+- [ ] `"use client"` が必要最小限か（Server Componentデフォルト）
+- [ ] TypeScript の `any` 型を使用していないか
+- [ ] 全 `<img>` が `next/image` に置き換わっているか
+- [ ] ATF画像に `priority` が設定されているか
+- [ ] コンポーネントが100行以内か（超過時は分割検討）
+
+### アクセシビリティ
+- [ ] 全画像に適切な `alt` テキストがあるか
+- [ ] `<html lang="ja">` が設定されているか
+- [ ] フォーカススタイル（`:focus-visible`）が定義されているか
+- [ ] カラーコントラスト比がWCAG AA準拠か
 
 ## 使用するツール
 - `Read`: 全エージェントの output.json、QA の iteration_N.json、**design-tokens.json**、**anti-ai-design-guidelines.md**

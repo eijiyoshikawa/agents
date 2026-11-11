@@ -61,7 +61,33 @@ CSS変数、インラインスタイル、クラス名から色情報を抽出�
 - 見出しと本文の間隔
 - ボタンの内部パディング
 
-### Step 5: UIコンポーネントのスタイル
+**スペーシングリズムの検出:**
+余白値を収集し、基底値（base unit）を推定する:
+- 4px ベース（4, 8, 12, 16, 24, 32, 48, 64, 96）
+- 8px ベース（8, 16, 24, 32, 48, 64, 96, 128）
+- 不規則（基底値なし → `spacing_rhythm: "irregular"` と記録）
+
+### Step 4.5: タイポグラフィックスケールの特定
+フォントサイズの比率関係を分析する:
+- 使用されている全フォントサイズを収集
+- スケール比率を推定（Major Third 1.25 / Perfect Fourth 1.333 / Minor Third 1.2 等）
+- `type_scale_ratio` として記録（不規則な場合は `"custom"`）
+
+### Step 5: デザインシステム検出
+サイトが体系的なデザインシステムを使用しているか判定する:
+- CSS カスタムプロパティ（`--color-*`, `--spacing-*`, `--font-*`）の命名体系
+- トークンの一貫性（同じ値が変数で再利用されているか）
+- コンポーネントバリアント（ボタンのサイズ違い、カラーバリエーション）
+- 結果を `design_system_detected`: true/false で記録
+
+### Step 5.5: ブランドアイデンティティの抽出
+サイトから読み取れるブランド特性を記録する:
+- **トーン**: professional / playful / luxurious / minimal / bold
+- **ビジュアル密度**: sparse（余白多い）/ balanced / dense（情報量多い）
+- **画像スタイル**: photography / illustration / icon-heavy / mixed
+- **全体的な印象キーワード**: 3-5語で表現
+
+### Step 6: UIコンポーネントのスタイル
 よく使われるUIパーツのスタイルを記録する:
 
 1. **ボタン**:
@@ -160,6 +186,23 @@ CSS変数、インラインスタイル、クラス名から色情報を抽出�
       "object_fit": "cover",
       "overlay": "none"
     }
+  },
+  "spacing_rhythm": {
+    "base_unit": 8,
+    "scale": [8, 16, 24, 32, 48, 64, 96, 128],
+    "regularity": "systematic | irregular"
+  },
+  "type_scale": {
+    "ratio": 1.25,
+    "ratio_name": "Major Third | Perfect Fourth | Minor Third | custom",
+    "sizes_used": ["12px", "14px", "16px", "20px", "24px", "32px", "48px"]
+  },
+  "design_system_detected": false,
+  "brand_identity": {
+    "tone": "professional | playful | luxurious | minimal | bold",
+    "visual_density": "sparse | balanced | dense",
+    "image_style": "photography | illustration | icon-heavy | mixed",
+    "impression_keywords": ["キーワード1", "キーワード2", "キーワード3"]
   },
   "visual_style": {
     "overall_tone": "modern-clean | corporate | playful | luxury | minimal",

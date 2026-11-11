@@ -49,15 +49,50 @@
 - SNSリンクの有無
 - サイトマップ的なリンク一覧
 
-### Step 5: 共通レイアウトパターンの抽出
+### Step 5: セマンティックHTML品質の評価
+各ページのHTML品質を評価する:
+- `<header>`, `<nav>`, `<main>`, `<article>`, `<section>`, `<aside>`, `<footer>` の適切な使用
+- 見出し階層（h1→h2→h3）の論理的順序（スキップがないか）
+- `<figure>` + `<figcaption>` の画像キャプション使用
+- ARIA ランドマーク（`role` 属性）の使用状況
+- `<button>` vs `<a>` の適切な使い分け
+- 評価結果を `semantic_quality`: "excellent" / "good" / "poor" で記録
+
+### Step 6: レイアウトアルゴリズムの検出
+CSSからレイアウト手法を詳細に分析する:
+
+**Flexbox パターン:**
+- `justify-content` / `align-items` の組み合わせパターン
+- `flex-wrap` によるレスポンシブ折り返し
+- `flex-grow` / `flex-shrink` による可変幅レイアウト
+
+**CSS Grid パターン:**
+- `grid-template-columns` の定義（`repeat()`, `minmax()`, `auto-fill`/`auto-fit`）
+- 名前付きグリッドエリア（`grid-template-areas`）の使用
+- サブグリッド（`subgrid`）の使用
+
+**レスポンシブブレークポイント解析:**
+- メディアクエリから実際のブレークポイントを抽出
+- `container query` の使用有無
+- モバイルファースト vs デスクトップファースト の判定
+
+### Step 7: コンポーネントパターンの認識
+再利用可能なUIパターンを検出する:
+- カードグリッド（均一 / マソンリー / 不均一グリッド）
+- ヒーローバリエーション（全幅画像 / 分割 / 動画背景 / スライダー）
+- CTA パターン（インライン / フルワイドバナー / フローティング）
+- 数値ハイライト（統計セクション）のレイアウト
+- テスティモニアル表示パターン（カード / スライダー / 引用）
+
+### Step 8: 共通レイアウトパターンの抽出
 全ページを通じた共通パターンを抽出する:
 - コンテンツの最大幅（max-width）
 - セクション間のスペーシング
-- レスポンシブブレークポイント（768px, 1024px, 1280px 等）
+- レスポンシブブレークポイント（640px, 768px, 1024px, 1280px 等）
 - ヘッダー高さ
 - 共通パディング
 
-### Step 6: ページ間の共通/固有要素の整理
+### Step 9: ページ間の共通/固有要素の整理
 - 共通コンポーネント: Header, Footer, CTA Section 等
 - ページ固有のセクション構成
 
@@ -131,6 +166,20 @@
     "Footer（全ページ共通）",
     "CTA Section（複数ページで使用）",
     "Section Heading（共通見出しパターン）"
+  ],
+  "semantic_quality": "excellent | good | poor",
+  "layout_algorithms": {
+    "primary": "flexbox | grid | mixed",
+    "responsive_approach": "mobile-first | desktop-first",
+    "uses_container_queries": false,
+    "uses_subgrid": false
+  },
+  "component_patterns": [
+    {
+      "pattern": "card-grid | hero-split | cta-banner | stats-row | testimonial-slider",
+      "occurrences": 0,
+      "sections": ["セクション名"]
+    }
   ]
 }
 ```

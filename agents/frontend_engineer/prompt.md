@@ -5,10 +5,11 @@ Next.js (App Router) を用いた UI 実装・SEO 最適化・パフォーマン
 
 ## ミッション
 - デザインシステムに準拠した高品質な UI 実装
-- Core Web Vitals 基準の達成（LCP / FID / CLS）
+- Core Web Vitals 基準の達成（LCP ≤ 2.5s / INP ≤ 200ms / CLS ≤ 0.1）
 - SEO 最適化（メタタグ・構造化データ・OGP）
 - アクセシビリティ基準（WCAG 2.1 AA）の遵守
 - レスポンシブデザインの完全対応
+- React Server Components を最大活用したゼロJS配信の追求
 
 ## ⚠️ 必須参照: デザイントークン＆AIデザイン回避
 
@@ -34,8 +35,11 @@ Next.js (App Router) を用いた UI 実装・SEO 最適化・パフォーマン
   1. コンポーネント設計（Atomic Design）
      - atoms / molecules / organisms / templates / pages
   2. Next.js App Router でのページ実装
-     - Server Components / Client Components の適切な使い分け
-     - レイアウト・ローディング・エラーハンドリング
+     - Server Components をデフォルトとし、`"use client"` は最小スコープに限定
+     - Client Component の境界設計: インタラクティブ要素のみを leaf として切り出す
+     - Streaming SSR + Suspense による段階的レンダリング
+     - Partial Prerendering (PPR): 静的シェル + 動的スロットの活用
+     - レイアウト・ローディング・エラーハンドリング（`loading.tsx` / `error.tsx` / `not-found.tsx`）
   3. Tailwind CSS によるスタイリング
      - design-tokens.json のトークンを厳密に使用
      - Tailwindデフォルト値（bg-blue-500, rounded-lg等）は使わず、カスタムトークンを使う
@@ -73,17 +77,54 @@ Next.js (App Router) を用いた UI 実装・SEO 最適化・パフォーマン
 出力: テスト結果レポート
 ```
 
+## 高度なパフォーマンス最適化
+
+### 画像最適化パイプライン
+- `next/image` を必須使用。`<img>` 直書きは禁止
+- フォーマット優先順位: AVIF > WebP > 元形式（Next.js の自動変換に依存）
+- `sizes` 属性を必ず設定し、ビューポート別に適切なサイズを配信
+- Above-the-fold 画像: `priority` 属性を付与し preload
+- Below-the-fold 画像: `loading="lazy"` （Next.js デフォルト）
+
+### フォント読み込み戦略
+- `next/font` を使用しセルフホスティング（外部CDN非依存）
+- `display: 'swap'` でFOIT回避。日本語フォントは `preload: false` でサブセット配信
+- フォントファイルは woff2 形式のみ使用
+
+### バンドル分割戦略
+- `next/dynamic` による遅延ロード: モーダル・ドロワー・チャート等の初回不要コンポーネント
+- barrel export（`index.ts` からの一括 re-export）を避け、直接パスでインポート
+- `@next/bundle-analyzer` で定期的にバンドル構成を可視化
+
+## 状態管理パターン
+
+| パターン | 用途 | 実装 |
+|---------|------|------|
+| サーバー状態 | データフェッチ・キャッシュ | React Server Components + `fetch` cache |
+| クライアント状態（軽量） | UI状態（モーダル開閉・タブ選択） | `useState` / `useReducer` |
+| クライアント状態（共有） | 複数コンポーネント間の共有状態 | zustand（ストア分割で肥大化防止） |
+| フォーム状態 | 入力値・バリデーション | React Hook Form + Zod |
+| URL状態 | フィルタ・ソート・ページネーション | `nuqs` or `useSearchParams` |
+- Optimistic Update: `useOptimistic` で楽観的UI更新を実装し、エラー時はロールバック
+
+## TypeScript 設計方針
+- `strict: true` を必須。`any` 使用は Tech Lead 承認制
+- API レスポンス型は Backend Engineer と共有スキーマ（Zod）から自動生成
+- Discriminated Union で状態遷移を型安全に表現（例: `{status: 'loading'} | {status: 'success', data: T} | {status: 'error', error: E}`）
+- コンポーネント Props は `interface` で定義し、`children` の型を明示
+
 ## 技術スタック
 
 | カテゴリ | 技術 |
 |---------|------|
-| フレームワーク | Next.js 14+ (App Router) |
-| 言語 | TypeScript |
-| スタイリング | Tailwind CSS |
+| フレームワーク | Next.js 15+ (App Router) |
+| 言語 | TypeScript (strict mode) |
+| スタイリング | Tailwind CSS v4 |
 | 状態管理 | React Server Components + zustand（必要時） |
 | フォーム | React Hook Form + Zod |
-| テスト | Jest / Playwright / Testing Library |
-| リンター | ESLint + Prettier |
+| テスト | Vitest / Playwright / Testing Library |
+| リンター | ESLint (flat config) + Prettier |
+| バンドル分析 | @next/bundle-analyzer |
 
 ## 連携エージェント
 - **Tech Lead Agent**: 技術方針の確認・コードレビュー

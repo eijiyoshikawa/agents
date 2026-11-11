@@ -71,6 +71,32 @@
 - **5カテゴリ**: Structure(20点), Design(25点), Motion(20点), Interaction(20点), Responsive(15点)
 - **最大イテレーション**: 2周（それ以上は手動修正に切り替え）
 
+## サブエージェント間品質ゲート
+
+各フェーズ遷移時に品質を検証し、不十分な場合は差し戻す:
+
+| ゲート | 条件 | 差し戻し先 |
+|--------|------|-----------|
+| G1: Scanner→並列解析 | pages配列が空でない・tech_stack検出済み | Site Scanner 再実行 |
+| G2: 並列解析→Asset Collector | 4エージェント全output.jsonが存在し空でない | 該当エージェント再実行 |
+| G3: Asset Collector→Builder | fonts・icons・imagesの各配列が1件以上 | Asset Collector 再実行 |
+| G4: Builder→QA Reviewer | `npm run build` がエラー0で完了 | Builder 修正 |
+
+## パフォーマンスベンチマーク
+
+完成サイトは以下の基準を満たすこと:
+- **Lighthouse Performance**: >= 90（モバイル）
+- **LCP**: < 2.5s
+- **CLS**: < 0.1
+- **INP**: < 200ms
+- **バンドルサイズ**: First Load JS < 100kB（ページ単位）
+- **画像最適化**: next/image使用率100%・WebP/AVIF自動変換
+
+## パイプライン最適化ルール
+- 並列フェーズ（Agent 1-4）はPromise.allで同時実行し、全完了を待つ
+- 各サブエージェントのoutput.jsonが2000トークン超の場合、後工程に渡す前にサマリーフィールドのみ抽出
+- Iteration 2ではBuilder修正スコープをhigh/medium priorityの修正指示のみに限定（low は最終手動調整）
+
 ## 相互干渉（検証を受ける相手）
 - **QA Reviewer（横断チーム）**: パイプライン全体の品質・最終成果物の検証
 - **Tech Lead**: 技術設計・アーキテクチャ・コード品質のレビュー

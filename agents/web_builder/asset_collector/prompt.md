@@ -56,11 +56,37 @@ HTMLから全 `<img>` タグと CSS `background-image` を抽出する:
    - `react-icons`: 複数ライブラリを統合
    各アイコンに対して推奨ライブラリのアイコン名を対応付ける
 
-### Step 4: ファビコン・OGP画像
-- ファビコン: 形状・色の説明とプレースホルダー生成方針
-- OGP画像: サイズ・デザインの説明
+### Step 4: アセット形式の最適化推奨
+収集した各アセットに対して最適な形式を推奨する:
 
-### Step 5: ローカルファイルパス設計
+| 元形式 | 推奨形式 | 条件 |
+|--------|---------|------|
+| JPEG/PNG（写真） | WebP（next/imageが自動変換） | サイズ > 50KB |
+| PNG（透過あり） | WebP or AVIF | next/imageで自動処理 |
+| SVG（アイコン） | インラインSVG or lucide-react | コンポーネント化推奨 |
+| GIF（アニメ） | MP4/WebM or Lottie | 容量削減のため |
+| 大画像（> 1MB） | リサイズ + WebP | 幅2000px以下に |
+
+### Step 4.5: ライセンス・著作権の詳細確認
+アセットのライセンス状況を体系的に記録する:
+- **ロゴ**: 常に `license: "proprietary"` — 再現時はプレースホルダーテキストロゴで代替
+- **写真**: `license: "unknown"` — Unsplashで類似検索 or プレースホルダー
+- **アイコン**: ライブラリ特定時は `license: "MIT"` 等を記録
+- **フォント**: Google Fonts → `license: "open"` / Adobe Fonts → `license: "subscription"` / カスタム → `license: "unknown"`
+- 各アセットに `license` フィールドと `can_reuse`: true/false を付与
+
+### Step 4.6: オープンソース代替アセットの調達
+著作権上再利用できないアセットの代替を具体的に提案する:
+- **写真**: Unsplash / Pexels の検索キーワード + 推奨画像の特徴（構図、色調、被写体）
+- **イラスト**: unDraw / Storyset / Humaaans から類似スタイルを提案
+- **アイコン**: lucide-react / heroicons / phosphor-icons から対応アイコンをマッピング
+- **動画**: Coverr / Pexels Video で類似素材を検索
+
+### Step 5: ファビコン・OGP画像
+- ファビコン: 形状・色の説明とプレースホルダー生成方針
+- OGP画像: サイズ（1200x630px推奨）・デザインの説明
+
+### Step 6: ローカルファイルパス設計
 Next.js の `/public` ディレクトリ構成を設計する:
 
 ```
@@ -152,7 +178,21 @@ Next.js の `/public` ディレクトリ構成を設計する:
   },
   "total_images": 12,
   "images_requiring_placeholder": 10,
-  "images_extractable": 2
+  "images_extractable": 2,
+  "optimization_recommendations": [
+    {
+      "asset": "hero-bg.jpg",
+      "current_format": "JPEG",
+      "recommended_format": "WebP (auto via next/image)",
+      "estimated_savings_percent": 30
+    }
+  ],
+  "license_summary": {
+    "reusable": 0,
+    "placeholder_needed": 0,
+    "proprietary_logos": 0,
+    "open_source_fonts": 0
+  }
 }
 ```
 

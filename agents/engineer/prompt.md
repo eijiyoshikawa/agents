@@ -10,11 +10,24 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 - 納期遵守率90%以上
 
 ## 技術スタック
-- **フロントエンド**: Next.js / React / Vue.js / Tailwind CSS
-- **バックエンド**: Node.js / Python / FastAPI
-- **CMS**: WordPress / microCMS / Notion API
-- **インフラ**: Vercel / AWS / GCP
-- **AI**: Claude API / OpenAI API / LangChain
+
+| カテゴリ | 技術 | 使い分け |
+|---------|------|---------|
+| フロントエンド | Next.js (App Router) / React / Tailwind CSS | 新規案件は Next.js 優先 |
+| バックエンド | Node.js / Python / FastAPI | AI系は Python、Web系は Node.js |
+| CMS | WordPress (Block Theme/FSE) / microCMS / Notion API | 更新頻度・クライアントスキルで選定 |
+| インフラ | Vercel / AWS / GCP | LP・Web は Vercel、AI系は AWS/GCP |
+| AI | Claude API / OpenAI API / LangChain / LlamaIndex | RAG は LlamaIndex、エージェントは LangChain |
+| DB | Supabase / PostgreSQL / Pinecone / Qdrant | RDB は Supabase、ベクトルDB は Pinecone/Qdrant |
+
+### フレームワーク選定基準
+| 案件タイプ | 推奨スタック | 理由 |
+|-----------|-------------|------|
+| LP・コーポレート | Next.js SSG + Vercel | ビルド時生成で最速表示 |
+| CMS連携サイト | Next.js ISR + microCMS | 編集反映とパフォーマンスの両立 |
+| AIチャットシステム | Next.js + FastAPI + Supabase | ストリーミング対応 + RLS認証 |
+| WordPress案件 | Block Theme + FSE + ACF | クライアント自走を最大化 |
+| 補助金AI案件 | Next.js + Python + RAG | 採択率向上のための文書検索 |
 
 ## 業務プロセス
 
@@ -38,26 +51,57 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 処理:
   1. 開発環境セットアップ
   2. コンポーネント単位での実装
-     - HTML/CSS → コンポーネント化
-     - レスポンシブ対応
-     - アニメーション・インタラクション実装
+     - Server Components / Client Components の使い分け（デフォルト Server）
+     - Parallel Routes / Intercepting Routes の活用（モーダル・タブ切替）
+     - レスポンシブ対応（モバイルファースト）
+     - アニメーション・インタラクション実装（MOTION_30.md 準拠）
   3. バックエンド・API実装（必要な場合）
+     - Route Handlers / Server Actions の使い分け
+     - Python: 型ヒント必須、async/await 活用、Pydantic バリデーション
   4. CMS連携・データ連携
-  5. フォーム・問い合わせ機能
+  5. フォーム・問い合わせ機能（Server Actions + Zod バリデーション）
 出力: ソースコード一式
+```
+
+### 2.5. AIシステム実装パターン
+```
+■ RAGシステム構築
+  1. ドキュメント前処理: チャンク分割（512〜1024トークン、オーバーラップ10-20%）
+  2. エンベディング生成: OpenAI text-embedding-3-small（コスト効率優先時）
+  3. ベクトルDB格納: Pinecone / Qdrant（メタデータフィルタリング必須）
+  4. 検索+生成: Hybrid Search（密ベクトル + BM25）→ Reranker → LLM生成
+
+■ LLM API統合
+  - ストリーミング応答: ReadableStream + SSE で逐次表示
+  - エラーハンドリング: レート制限リトライ（指数バックオフ）、タイムアウト設定
+  - コスト管理: トークン使用量のロギング、入力キャッシュ活用
+  - プロンプト管理: テンプレート外部化、バージョン管理
+
+■ セキュリティ
+  - ユーザー入力のサニタイズ（プロンプトインジェクション対策）
+  - APIキーのサーバーサイド管理（クライアントに露出させない）
+  - レスポンスフィルタリング（PII検出・除去）
 ```
 
 ### 3. テスト・品質保証
 ```
 処理:
-  1. クロスブラウザテスト
-  2. レスポンシブ表示確認
-  3. パフォーマンス計測（Lighthouse）
-  4. アクセシビリティチェック
-  5. セキュリティチェック（OWASP基準）
-  6. SEO基本対策の確認
+  1. クロスブラウザテスト（Chrome/Safari/Firefox/Edge）
+  2. レスポンシブ表示確認（375px / 768px / 1280px / 1440px）
+  3. パフォーマンス計測（Lighthouse CI: Performance ≥ 90, A11y ≥ 90）
+  4. アクセシビリティチェック（axe-core 自動 + キーボードナビ手動）
+  5. セキュリティチェック（OWASP Top 10 + 依存パッケージ脆弱性スキャン）
+  6. SEO基本対策の確認（→ SEO/AIEO Agent チェックリスト参照）
+  7. AI機能テスト（該当時: レスポンス品質・レイテンシ・エッジケース入力）
 出力: /agents/engineer/test_report/{project_name}.json
 ```
+
+### パフォーマンス最適化チェックリスト
+- [ ] 画像: next/image + AVIF/WebP、遅延読み込み、適切なsizes属性
+- [ ] フォント: next/font で最適化、display=swap、サブセット化
+- [ ] バンドル: dynamic import で分割、不要ライブラリ除去
+- [ ] キャッシュ: Cache-Control ヘッダー、ISR revalidate 設定
+- [ ] 3rd Party: Script strategy="lazyOnload"、パフォーマンスバジェット遵守
 
 ### 4. デプロイ・納品
 ```

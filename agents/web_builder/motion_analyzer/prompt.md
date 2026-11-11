@@ -61,12 +61,39 @@ JS ソースから以下のパターンを検出する:
 - テキストアニメーション（タイピング、文字ごとのフェードイン等）
 - スクロールバー連動のプログレスバー
 
-### Step 6: 実装推奨の決定
+### Step 6: スクロール駆動アニメーションの検出
+CSS `scroll-timeline` / `animation-timeline` や JS `ScrollTimeline` API を検出する:
+- `animation-timeline: scroll()` / `view()` の使用
+- スクロール位置に連動したプログレス表示（読了率バー等）
+- パララックスの実装方式（CSS vs JS vs ライブラリ）
+- Scroll Snap の使用（`scroll-snap-type`, `scroll-snap-align`）
+
+### Step 7: モーション振り付けパターンの分析
+複数アニメーションの協調パターンを記録する:
+- **ステージング**: 要素が順番に登場する順序とタイミング設計
+- **同期パターン**: 複数要素が同時に動く場合のグループ化
+- **因果連鎖**: 1つのアニメーション完了が次のトリガーになるパターン
+- **モーション密度**: 1画面あたりの同時アニメーション数（多すぎるとCLS/INP悪化）
+
+### Step 8: reduced-motion 代替の評価
+参考サイトの `prefers-reduced-motion` 対応状況を確認する:
+- メディアクエリ `@media (prefers-reduced-motion: reduce)` の有無
+- 対応がない場合、各アニメーションの代替案（instant表示/opacity変化のみ等）を提案
+- 出力の各アニメーション項目に `reduced_motion_alternative` フィールドを付与
+
+### Step 9: アニメーションパフォーマンス影響の評価
+検出したアニメーションのパフォーマンスリスクを評価する:
+- **低リスク**: `transform`, `opacity` のみ使用（GPU合成可能）
+- **中リスク**: `width`, `height`, `padding` のアニメーション（リフロー発生）
+- **高リスク**: `box-shadow`, `filter`, 大量DOM要素の同時アニメーション
+- 各アニメーションに `performance_risk`: "low" / "medium" / "high" を付与
+
+### Step 10: 実装推奨の決定
 検出したアニメーションの複雑さに応じて、最適な実装方法を推奨する:
 
-- **CSS only**: シンプルなhover、transition、基本的なkeyframes
-- **framer-motion**: React向けスクロールアニメーション、ページ遷移
-- **GSAP**: 複雑なタイムライン、ScrollTrigger連動、パフォーマンス重視
+- **CSS only**: シンプルなhover、transition、基本的なkeyframes、scroll-driven animation
+- **framer-motion**: React向けスクロールアニメーション、ページ遷移、レイアウトアニメーション
+- **GSAP**: 複雑なタイムライン、ScrollTrigger連動、パフォーマンス重視、SVGアニメーション
 
 ## 出力フォーマット
 
@@ -154,7 +181,26 @@ JS ソースから以下のパターンを検出する:
   "recommended_library": "framer-motion",
   "recommended_library_reason": "React/Next.js環境で最も統合しやすく、スクロールアニメーション・ページ遷移・ホバーエフェクトを統一的に扱える",
   "complexity_level": "medium",
-  "total_animation_count": 12
+  "total_animation_count": 12,
+  "scroll_driven_animations": [
+    {
+      "type": "progress-bar | parallax | scroll-snap | timeline-linked",
+      "implementation": "CSS scroll-timeline | JS ScrollTimeline | library",
+      "section_id": "セクション名"
+    }
+  ],
+  "choreography_patterns": {
+    "staging_groups": 0,
+    "max_simultaneous_animations": 0,
+    "causal_chains": false
+  },
+  "performance_summary": {
+    "low_risk_count": 0,
+    "medium_risk_count": 0,
+    "high_risk_count": 0,
+    "recommendations": ["高リスクアニメーションの代替案"]
+  },
+  "reduced_motion_coverage": "full | partial | none"
 }
 ```
 
