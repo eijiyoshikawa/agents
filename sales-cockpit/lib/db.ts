@@ -111,16 +111,26 @@ async function upsertCustomers(
  */
 async function recomputeDupFlags(): Promise<void> {
   const sql = db();
+  // 確認状況「OK」（重複ではない＝別会社と確認済み）は数えない（2026-11-17 代表依頼「別会社」ボタン）
   await sql.query(
-    `UPDATE sc_customers c SET is_dup = d.dup FROM (
+    `UPDATE sc_customers c SET is_dup = COALESCE(d.dup, false) FROM sc_customers c2 LEFT JOIN (
        SELECT id,
          ((name_norm IS NOT NULL AND name_norm <> '' AND COUNT(*) OVER (PARTITION BY name_norm) > 1)
           OR (phone_norm IS NOT NULL AND length(phone_norm) >= 9 AND COUNT(*) OVER (PARTITION BY phone_norm) > 1)) AS dup
-       FROM sc_customers
-     ) d
-     WHERE c.id = d.id AND c.is_dup IS DISTINCT FROM d.dup`,
+       FROM sc_customers WHERE confirm IS DISTINCT FROM 'OK'
+     ) d ON d.id = c2.id
+     WHERE c.id = c2.id AND c.is_dup IS DISTINCT FROM COALESCE(d.dup, false)`,
     [],
   );
+}
+
+/** 重複をまとめた・別会社と確認したあとに、一覧の控え（DB）を直して重複フラグを数え直す */
+export async function dbAfterDedupe(input: { removedIds?: string[]; confirmOk?: string[] }): Promise<void> {
+  if (!dbConfigured()) return;
+  const sql = db();
+  if (input.removedIds?.length) await sql.query(`DELETE FROM sc_customers WHERE id = ANY($1::text[])`, [input.removedIds]);
+  if (input.confirmOk?.length) await sql.query(`UPDATE sc_customers SET confirm = 'OK' WHERE id = ANY($1::text[])`, [input.confirmOk]);
+  await recomputeDupFlags();
 }
 
 const CONTRACT_COLS = 14;
