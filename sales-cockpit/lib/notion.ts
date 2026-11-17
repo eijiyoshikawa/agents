@@ -73,6 +73,11 @@ function client(): Client {
   return _client;
 }
 
+/** 重複のまとめ（lib/dedupe.ts）など、ページを直接読み書きする処理用 */
+export function notionClient(): Client {
+  return client();
+}
+
 /**
  * データベース全ページをページネーションして取得（任意でNotionフィルタ指定）。
  * filterProperties を渡すと、そのプロパティIDのみ返却されるため転送量・処理が大幅に軽くなる。

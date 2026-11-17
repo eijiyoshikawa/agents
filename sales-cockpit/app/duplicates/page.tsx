@@ -19,6 +19,8 @@ export default async function DuplicatesPage() {
       phone: m.phone,
       isRep: m.isRep,
       confirm: m.confirm,
+      callCount: m.callCount,
+      address: m.address,
     })),
   }));
   const totalDup = groups.reduce((s, g) => s + g.members.length, 0);
@@ -28,7 +30,9 @@ export default async function DuplicatesPage() {
       <div>
         <h1 className="text-xl font-bold text-ink">重複チェック（被りチェック）</h1>
         <p className="text-xs text-ink-muted mt-0.5">
-          会社名（法人格除去）または電話番号が一致する候補。{groups.length} グループ・{totalDup} 件。「重複としてマーク」で Notion の確認状況を更新します（上位300グループ）。
+          会社名（法人格除去）または電話番号が一致する候補。{groups.length} グループ・{totalDup} 件（上位300グループを表示）。
+          同じ会社なら「残す」を選んで「1つにまとめる」（架電記録などの紐付け・メモも残す側へ移し、ほかは Notion のゴミ箱へ。30日は戻せます）。
+          別の会社なら「別会社（重複ではない）」を押すと候補から外れます。
         </p>
       </div>
 

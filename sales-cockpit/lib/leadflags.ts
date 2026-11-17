@@ -1,6 +1,6 @@
 // 無課金・ルールベースの「被りチェック」と「人材紹介会社フラグ」。
 // Customer / ListCustomer どちらでも使えるよう、必要な最小フィールドだけを要求する。
-type DupLike = { id: string; name: string; phone: string | null };
+type DupLike = { id: string; name: string; phone: string | null; confirm?: string | null };
 type AgencyLike = { name: string; industry: string | null };
 
 // ── 正規化 ───────────────────────────────────────────────────────
@@ -60,7 +60,8 @@ export function computeDuplicates<T extends DupLike>(customers: T[]): DuplicateI
 export function duplicateGroups<T extends DupLike>(customers: T[]): { reason: string; key: string; members: T[] }[] {
   const byName = new Map<string, T[]>();
   const byPhone = new Map<string, T[]>();
-  for (const c of customers) {
+  // 「別会社（重複ではない）」と確認済み（確認状況 OK）は候補にしない
+  for (const c of customers.filter((x) => x.confirm !== "OK")) {
     const n = normalizeCompanyName(c.name);
     if (n) (byName.get(n) ?? byName.set(n, []).get(n)!).push(c);
     const p = normalizePhone(c.phone);
