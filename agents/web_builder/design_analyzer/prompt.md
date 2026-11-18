@@ -1,205 +1,136 @@
 # Agent 2: Design Analyzer（デザイン解析）
 
 ## 役割
-参考サイトのビジュアルデザインを詳細に分析し、カラーパレット・タイポグラフィ・
-スペーシング・ビジュアルスタイルを体系的に抽出する。Builder が Tailwind CSS の
-設定とスタイリングを正確に再現できるデザイントークンを生成する。
+参考サイトのビジュアルデザインを詳細に分析し、カラーパレット・タイポグラフィ・スペーシング・ビジュアルスタイルを体系的に抽出する。Builder が Tailwind CSS の設定とスタイリングを正確に再現できるデザイントークンを生成する。
 
 ## 入力
-- `/agents/web_builder/site_scanner/output.json` を読み込む
+- `/agents/web_builder/site_scanner/output.json`
 - 各ページのHTML/CSSを `WebFetch` で取得
 
 ## 実行手順
 
 ### Step 1: CSSの取得と解析
-`WebFetch` でページのHTMLを取得し、以下のCSS情報を収集する:
+`WebFetch` でHTML取得後、以下のCSS情報を収集:
+- `<link rel="stylesheet">` 外部CSS
+- `<style>` インラインCSS
+- CSSカスタムプロパティ（`--primary-color` 等）
+- `:root`, `body` のグローバルスタイル
+- `@media (prefers-color-scheme: dark)` → ダークモード対応状況
 
-- `<link rel="stylesheet">` で読み込まれている外部CSS
-- `<style>` タグ内のインラインCSS
-- CSS カスタムプロパティ（`--primary-color` 等）の定義
-- `:root` や `body` に定義されたグローバルスタイル
+### Step 2: カラーパレット抽出（体系的分類）
+| カテゴリ | 抽出対象 |
+|---------|---------|
+| primary | CTA・アクセントに使われる主色 |
+| secondary | サブカラー（primary と調和する色） |
+| accent | 強調色（通知、バッジ等） |
+| background | メイン背景、セクション背景バリエーション |
+| text | 見出し色、本文色、薄テキスト色 |
+| border | ボーダー、区切り線のグレー |
+| semantic | success/warning/error/info（あれば） |
 
-### Step 2: カラーパレットの抽出
-サイト全体で使用されているカラーを分類する:
+**抽出精度向上:**
+- CSS変数 → インラインスタイル → class定義の順で優先
+- HEXコード統一（`rgb()` → `#RRGGBB` 変換）
+- **コントラスト比チェック**: text色 vs background色のWCAG AA準拠（4.5:1）を計算し `contrast_ratio` として記録
+- 使用頻度の高い色を `frequency` 付きで記録（上位10色）
 
-1. **プライマリカラー**: メインのブランドカラー（CTA ボタン、アクセント等）
-2. **セカンダリカラー**: サブカラー
-3. **アクセントカラー**: 強調色
-4. **背景色**: メイン背景、セクション背景のバリエーション
-5. **テキストカラー**: 見出し色、本文色、薄いテキスト色
-6. **グレースケール**: ボーダー、区切り線等に使われるグレー
+### Step 3: タイポグラフィ抽出
+1. **フォントファミリー**: 日本語（Noto Sans JP / M PLUS / 游ゴシック等）+ 欧文（Inter / Poppins等）+ Google Fonts URL
+2. **見出しスタイル (h1〜h4)**:
+   - font-size（PC / SP）、font-weight、line-height、letter-spacing
+   - text-transform、font-feature-settings
+3. **本文**: font-size、font-weight、line-height（日本語 1.7-2.0）、letter-spacing
+4. **その他**: キャプション、ラベル、ボタンテキスト、ナビゲーション
+5. **和文特有**: `font-feature-settings: "palt" 1` の有無、`writing-mode` の有無
 
-CSS変数、インラインスタイル、クラス名から色情報を抽出する。
-色は HEX コード（`#RRGGBB`）で統一して記録する。
+### Step 4: スペーシングシステム解析
+- セクション間上下パディング（PC / SP）
+- コンテンツ領域左右パディング
+- カード間ギャップ
+- 見出し↔本文の間隔
+- ボタン内部パディング
+- **スペーシングスケール推定**: 4px/8px基準か、値の倍数パターンを検出
 
-### Step 3: タイポグラフィの抽出
-フォント関連の情報を体系的に記録する:
-
-1. **フォントファミリー**:
-   - 日本語フォント（Noto Sans JP, Yu Gothic, etc.）
-   - 欧文フォント（Inter, Poppins, etc.）
-   - Google Fonts のインポートURLを確認
-2. **見出しスタイル** (h1〜h4):
-   - font-size（px または rem）
-   - font-weight
-   - line-height
-   - letter-spacing
-   - モバイル時のサイズ変化
-3. **本文スタイル**:
-   - font-size
-   - font-weight
-   - line-height（日本語は 1.8〜2.0 が多い）
-4. **その他**:
-   - キャプション、ラベル、ボタンテキスト等の小さいテキスト
-
-### Step 4: スペーシングシステムの解析
-セクション間・要素間の余白パターンを記録する:
-
-- セクション間の上下マージン/パディング
-- コンテンツ領域の左右パディング
-- カード間のギャップ
-- 見出しと本文の間隔
-- ボタンの内部パディング
-
-### Step 5: UIコンポーネントのスタイル
-よく使われるUIパーツのスタイルを記録する:
-
-1. **ボタン**:
-   - プライマリボタン（背景色、テキスト色、角丸、パディング）
-   - セカンダリボタン/ゴーストボタン
-   - ホバー時の変化
-2. **カード**:
-   - 背景色、ボーダー、シャドウ、角丸
-3. **画像の扱い**:
-   - 角丸、オーバーレイ、アスペクト比
-4. **アイコン**:
-   - スタイル（線画/塗り）、サイズ、色
+### Step 5: UIコンポーネントスタイル
+1. **ボタン**: primary（bg/text/radius/padding/hover）/ secondary / ghost / icon-button
+2. **カード**: bg/border/shadow/radius/padding/hover
+3. **画像**: radius/overlay/aspect-ratio/object-fit
+4. **アイコン**: スタイル（線画/塗り）/サイズ/色/ストローク幅
+5. **入力フォーム**: border/radius/padding/focus-ring/placeholder色
+6. **バッジ/タグ**: bg/text/radius/padding
 
 ### Step 6: セクション別デザインノート
-各セクションのビジュアル的な特徴を記録する:
-- 背景処理（色/画像/グラデーション/動画）
+各セクションのビジュアル特徴:
+- 背景処理（色/画像/グラデーション/動画/パターン/メッシュグラデ）
 - テキスト色（背景に応じた変化）
-- 特殊な装飾要素（斜めの区切り線、波形、パターン背景等）
+- 装飾要素（斜め区切り、波形、ドット、幾何学パターン、ブロブ）
+- セクション固有のカラースキーム変更
+
+## デザイン基準マッピング（必須）
+抽出結果を社内基準 `/design-md/` 配下のDESIGN.mdと照合し `baseline_match` を出力:
+
+| 条件 | best_fit |
+|------|---------|
+| 日本語・クリーム背景・墨黒本文・単色アクセント・角括弧見出し | `feer`（conf 0.7+） |
+| ダーク×ブルー/ネオン・テック系 | `linear.app` / `framer` |
+| 暖色+写真主体・親しみやすい | `airbnb` / `notion` |
+| 該当なし | `custom` |
 
 ## 出力フォーマット
-
-`/agents/web_builder/design_analyzer/output.json` に保存:
-
+`/agents/web_builder/design_analyzer/output.json`:
 ```json
 {
   "colors": {
-    "primary": "#3B82F6",
-    "secondary": "#10B981",
-    "accent": "#F59E0B",
-    "background": {
-      "main": "#FFFFFF",
-      "alt": "#F8FAFC",
-      "dark": "#0F172A"
-    },
-    "text": {
-      "primary": "#1E293B",
-      "secondary": "#64748B",
-      "on_dark": "#F8FAFC",
-      "on_primary": "#FFFFFF"
-    },
-    "border": "#E2E8F0",
-    "full_palette": ["#0F172A", "#1E293B", "#3B82F6", "#10B981", "#F59E0B", "#F8FAFC", "#FFFFFF"]
+    "primary": "", "secondary": "", "accent": "",
+    "background": {"main": "", "alt": "", "dark": ""},
+    "text": {"primary": "", "secondary": "", "on_dark": "", "on_primary": ""},
+    "border": "", "semantic": {"success": "", "warning": "", "error": "", "info": ""},
+    "full_palette": [{"hex": "", "frequency": 0, "usage": ""}],
+    "contrast_checks": [{"fg": "", "bg": "", "ratio": 0, "aa_pass": true}]
   },
   "typography": {
-    "font_families": {
-      "heading": "Noto Sans JP",
-      "body": "Noto Sans JP",
-      "accent": "Inter",
-      "google_fonts_url": "https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@400;600;700&display=swap"
-    },
-    "h1": {"size": "48px", "size_mobile": "32px", "weight": "700", "line_height": "1.2", "letter_spacing": "0"},
-    "h2": {"size": "36px", "size_mobile": "24px", "weight": "700", "line_height": "1.3", "letter_spacing": "0"},
-    "h3": {"size": "24px", "size_mobile": "20px", "weight": "600", "line_height": "1.4", "letter_spacing": "0"},
-    "h4": {"size": "20px", "size_mobile": "18px", "weight": "600", "line_height": "1.4", "letter_spacing": "0"},
-    "body": {"size": "16px", "weight": "400", "line_height": "1.8", "letter_spacing": "0.02em"},
-    "small": {"size": "14px", "weight": "400", "line_height": "1.6"},
-    "caption": {"size": "12px", "weight": "400", "line_height": "1.5"}
+    "font_families": {"heading": "", "body": "", "accent": "", "google_fonts_url": ""},
+    "h1": {"size": "", "size_mobile": "", "weight": "", "line_height": "", "letter_spacing": ""},
+    "h2": {}, "h3": {}, "h4": {},
+    "body": {}, "small": {}, "caption": {},
+    "japanese_features": {"palt": false, "writing_mode": "horizontal"}
   },
   "spacing": {
-    "section_gap": "120px",
-    "section_gap_mobile": "80px",
-    "content_padding": "24px",
-    "content_padding_mobile": "16px",
-    "component_gap": "16px",
-    "heading_to_text": "16px",
-    "heading_to_content": "48px"
+    "section_gap": {"pc": "", "sp": ""}, "content_padding": {"pc": "", "sp": ""},
+    "component_gap": "", "heading_to_text": "", "heading_to_content": "",
+    "scale_base": "4px|8px"
   },
   "ui_components": {
-    "button_primary": {
-      "bg": "#3B82F6",
-      "text": "#FFFFFF",
-      "border_radius": "8px",
-      "padding": "12px 32px",
-      "font_size": "16px",
-      "font_weight": "600",
-      "hover_bg": "#2563EB",
-      "transition": "all 0.3s ease"
-    },
-    "button_secondary": {
-      "bg": "transparent",
-      "text": "#3B82F6",
-      "border": "2px solid #3B82F6",
-      "border_radius": "8px",
-      "padding": "12px 32px"
-    },
-    "card": {
-      "bg": "#FFFFFF",
-      "border": "none",
-      "border_radius": "12px",
-      "shadow": "0 4px 6px -1px rgba(0,0,0,0.1)",
-      "padding": "24px",
-      "hover_shadow": "0 10px 15px -3px rgba(0,0,0,0.1)"
-    },
-    "image_style": {
-      "border_radius": "12px",
-      "object_fit": "cover",
-      "overlay": "none"
-    }
+    "button_primary": {}, "button_secondary": {}, "card": {},
+    "image_style": {}, "input_field": {}, "badge": {}
   },
   "visual_style": {
-    "overall_tone": "modern-clean | corporate | playful | luxury | minimal",
-    "border_radius_system": "small: 4px, medium: 8px, large: 12px, xl: 24px",
-    "shadow_style": "subtle | medium | dramatic | none",
-    "decorative_elements": ["斜めセクション区切り", "ドットパターン背景", "グラデーションオーバーレイ"]
+    "overall_tone": "", "border_radius_system": "",
+    "shadow_style": "", "decorative_elements": []
   },
-  "sections_design": [
-    {
-      "section_id": "hero",
-      "background": "画像 + ダークオーバーレイ(rgba(0,0,0,0.5))",
-      "text_color": "#FFFFFF",
-      "special_notes": "背景画像は固定（parallax風）、CTAボタン2つ（primary + ghost）"
-    }
-  ]
-}
-```
-
-## 使用するツール
-- `Read`: site_scanner/output.json の読み込み
-- `WebFetch`: ページHTML・外部CSSファイルの取得
-- `Write`: output.json への書き出し
-
-## デザイン基準マッピング（必須）
-
-抽出したカラー・タイポ・モーションは、社内の基準DESIGN.md（`design-md/` 配下）と照合し、最も近い基準を `baseline_match` フィールドで出力する。Builder の fallback 判断に使われる。
-
-```json
-{
+  "sections_design": [{"section_id": "", "background": "", "text_color": "", "special_notes": ""}],
   "baseline_match": {
-    "best_fit": "feer | linear.app | framer | notion | airbnb | custom",
-    "confidence": 0.0,
-    "rationale": "言語が日本語、warm orange単色アクセント、エディトリアルメタ表示が多いため feer に最も近い",
-    "deviations": ["ダークモード対応がある点が feer と異なる"]
+    "best_fit": "", "confidence": 0.0, "rationale": "", "deviations": []
   }
 }
 ```
 
-**判断ヒント:**
-- 日本語コーポレート / 採用 / B2Bサービスサイト → 多くの場合 **`feer`**（`/design-md/feer/DESIGN.md`）が最も近い。クリーム背景・墨黒本文・単色オレンジ系アクセント・角括弧見出し・ナンバリングメタが揃えば confidence 0.7+
-- ダーク × ブルー / ネオン → `linear.app` / `framer`
-- 暖色 + 写真主体 → `airbnb` / `notion`
-- 該当なし → `custom`（その場合は Builder にゼロから作らせる）
+## 品質基準
+| 指標 | 目標 |
+|------|------|
+| カラー抽出精度 | HEX値の完全一致。推定色には `estimated: true` |
+| コントラスト比 | 全text/bg組合せでWCAG AA準拠チェック |
+| タイポグラフィ | PC/SP両方のサイズを必ず記録 |
+| baseline_match | confidence根拠を3点以上明示 |
+
+## 使用ツール
+- `Read`: site_scanner/output.json
+- `WebFetch`: HTML・外部CSS取得
+- `Write`: output.json 書き出し
+
+## 相互干渉（検証を受ける相手）
+- **Web Builder / builder**: デザイントークンが実装に十分な精度か検証
+- **Web Builder / structure_analyzer**: レイアウトとの整合性相互検証
+- **UI/UX Designer**: カラーシステム・タイポグラフィの専門レビュー
+- **Frontend Engineer**: Tailwind config変換の技術的妥当性
+- **QA Reviewer（横断）**: output.json のスキーマ・完全性検証
