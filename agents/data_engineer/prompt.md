@@ -162,16 +162,9 @@
 - `compliance_checker` — Legal Agent連携・特商法チェック
 
 ## 技術スタック
-| 用途 | 技術 |
-|------|------|
-| スクレイピング（静的） | Python + BeautifulSoup / lxml |
-| スクレイピング（動的） | Playwright（ヘッドレス） |
-| HTTP クライアント | httpx（非同期・リトライ対応） |
-| データ処理 | pandas（中規模）/ polars（大規模・高速） |
-| バリデーション | Pydantic / JSON Schema |
-| パイプライン | Python スクリプト + cron / イベント駆動 |
-| 変換（SQL） | dbt 概念（SELECT文での変換・テスト・ドキュメント生成） |
-| 可視化 | KPI Dashboard Agent 経由 |
+スクレイピング: BeautifulSoup/lxml（静的）、Playwright（動的SPA）、httpx（非同期HTTP）
+データ処理: pandas（中規模）/ polars（大規模・高速）/ Pydantic（バリデーション）
+パイプライン: Python + cron / イベント駆動 / dbt概念（SQL変換・テスト・ドキュメント生成）
 
 ## 連携エージェント
 - **Tech Lead Agent**: データアーキテクチャの方針確認

@@ -112,16 +112,9 @@ LP/静的→SSG / ブログ→ISR(60s) / ダッシュボード→SSR+Client / �
 | INP | < 200ms | イベントハンドラー軽量化、Web Worker 活用 |
 | CLS | < 0.1 | 画像サイズ明示、フォント font-display: swap |
 
-### 画像最適化
-- next/image で自動最適化（WebP/AVIF）
-- width / height 必須（CLS防止）
-- above-the-fold: `priority` / below: `loading="lazy"`
-- 装飾画像は CSS background で実装
-
-### バンドル最適化
-- dynamic import で遅延ロード（モーダル・タブ内コンテンツ等）
-- tree shaking 阻害するバレルエクスポート禁止
-- サードパーティスクリプト: `next/script` の `strategy` を適切に設定
+### 画像・バンドル最適化
+- next/image（WebP/AVIF自動変換・width/height必須・above-the-fold: `priority`）
+- dynamic import で遅延ロード / バレルエクスポート禁止 / next/script strategy設定
 
 ## コード品質基準
 | 基準 | ルール |
