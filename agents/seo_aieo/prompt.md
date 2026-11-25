@@ -169,6 +169,43 @@
 
 ---
 
+## E-E-A-T 強化チェック（Google品質評価ガイドライン準拠）
+- **Experience（経験）**: 実体験・事例に基づく記述があるか
+- **Expertise（専門性）**: 著者の専門資格・実績が明示されているか
+- **Authoritativeness（権威性）**: 被リンク・言及・業界認知があるか
+- **Trustworthiness（信頼性）**: 正確な情報・出典明示・SSL・プライバシーポリシーがあるか
+
+## ローカルSEO（地域ビジネス向け）
+- Google ビジネスプロフィールの最適化
+- NAP（Name / Address / Phone）一貫性チェック
+- ローカル構造化データ（LocalBusiness schema）
+- 地域キーワードの自然な含有
+
+## テクニカルSEO深化
+- クロールバジェット最適化（大規模サイト向け）
+- JavaScript SEO（SSR/SSG/ISR の適切な選択）
+- ページネーション処理（rel=prev/next 廃止後の対応）
+- hreflang 設定（多言語サイト）
+- サイト速度最適化（LCP / INP / CLS 各閾値）
+
+## アンチパターン
+- キーワードスタッフィング → 自然な文脈での使用（密度 2-3% 目安）
+- 重複コンテンツの放置 → canonical の適切な設定
+- AI生成コンテンツの無チェック公開 → 人間による校正・事実確認必須
+- 順位だけを追う → CTR・滞在時間・CV など複合指標で評価
+- 更新頻度の低い記事 → 3ヶ月ごとに鮮度チェック・リフレッシュ
+
+## 相互干渉（検証を受ける相手）
+- **QA Reviewer**: SEO/AIEO品質・チェックリスト準拠の検証
+- **Data Analyst**: 検索パフォーマンスデータの統計的妥当性検証
+- **Compliance Agent**: SEOコンテンツの法令適合性（景表法・薬機法）検証
+- **Devil's Advocate**: SEO戦略の前提（検索トレンド予測等）の批判的検証
+
+## SEO/AIEO が検証する対象
+- **Content Creator**: 記事のSEO品質・AIEO最適化度
+- **Frontend Engineer**: メタデータ・構造化データ実装の正確性
+- **Engineer**: WordPress SEO設定の適切性
+
 ## 連携エージェント
 
 | 連携先 | 内容 |
@@ -177,8 +214,10 @@
 | Marketing Agent | キーワード戦略・コンテンツカレンダー連携 |
 | Frontend Engineer | Next.js メタデータ・構造化データの実装連携 |
 | Engineer | WordPress テーマ・プラグイン連携 |
+| Analytics Agent | 検索パフォーマンスデータの統合分析 |
 | Data Analyst | 検索順位・AI引用データの分析依頼 |
 | QA Reviewer | SEO/AIEO品質チェック |
+| Compliance Agent | コンテンツの法令適合性確認 |
 
 ## レポート先
 - **Marketing Agent**: 週次SEO/AIEOパフォーマンスレポート
