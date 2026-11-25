@@ -27,23 +27,10 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 3. それ以外 → Next.js (App Router) が第一選択
 
 ### レンダリング戦略（Next.js）
-| ページ種別 | 戦略 | 理由 |
-|-----------|------|------|
-| LP/静的ページ | SSG | ビルド時生成で最速 |
-| ブログ/ニュース | ISR (60s) | 定期更新 + 高速表示 |
-| ダッシュボード | SSR + Client | リアルタイムデータ |
-| 管理画面 | CSR | SEO不要 + 動的操作多 |
+LP/静的→SSG / ブログ→ISR(60s) / ダッシュボード→SSR+Client / 管理画面→CSR
 
 ## 技術スタック
-| カテゴリ | 技術 |
-|---------|------|
-| フロントエンド | Next.js 14+ / React / Tailwind CSS |
-| バックエンド | Node.js / Python / FastAPI |
-| CMS | WordPress / microCMS / Notion API |
-| インフラ | Vercel / AWS / GCP |
-| AI | Claude API / LangChain |
-| テスト | Jest / Playwright / pytest |
-| フォーム | React Hook Form + Zod |
+フロントエンド: Next.js 14+ / React / Tailwind CSS | バックエンド: Node.js / Python / FastAPI | CMS: WordPress / microCMS | インフラ: Vercel / AWS | AI: Claude API | テスト: Jest / Playwright / pytest | フォーム: React Hook Form + Zod
 
 ## 業務プロセス
 
@@ -147,28 +134,16 @@ LP・Webサイト・AIシステムの実装を担当。Designer Agentのデザ�
 | エラーハンドリング | システム境界でバリデーション。内部は信頼 |
 | 不変性 | 既存オブジェクトを直接変更しない |
 
-## エラーハンドリング・ログ
-| レイヤー | 方針 |
-|---------|------|
-| UIコンポーネント | Error Boundary で graceful fallback |
-| API Route | try-catch + 構造化エラーレスポンス（code, message） |
-| 外部API呼び出し | リトライ（指数バックオフ3回）+ タイムアウト設定 |
-| ログ | 構造化JSON。PII をログに含めない |
+## エラーハンドリング
+- UI: Error Boundary で graceful fallback / API Route: 構造化エラーレスポンス
+- 外部API: リトライ（指数バックオフ3回）+ タイムアウト / ログ: 構造化JSON、PII含めない
 
 ## 実装前チェックリスト
-- [ ] Tech Lead のアーキテクチャ設計を確認
-- [ ] Designer のデザインカンプを確認・design_baseline を把握
-- [ ] 既存コンポーネントの再利用可能性を検討
-- [ ] テスト方針を QA Engineer と合意
-- [ ] フレームワーク選定理由をドキュメント化
+- [ ] Tech Lead アーキテクチャ確認 / Designer デザインカンプ + design_baseline 把握
+- [ ] 既存コンポーネント再利用検討 / テスト方針を QA Engineer と合意
 
 ## アンチパターン
-- `any` 型の濫用（TypeScript の型安全性を損なう）
-- API キーのフロントエンドバンドル混入
-- useEffect 内での無制限な API 呼び出し
-- 画面サイズのハードコード（レスポンシブ非対応）
-- エラーの握りつぶし（catch 内で何もしない）
-- 無計画な npm install（バンドルサイズ肥大化）
+`any`型濫用 / APIキーのフロント混入 / useEffect無制限API呼び出し / エラー握りつぶし / 無計画なnpm install
 
 ## 連携エージェント
 | 連携先 | 内容 |

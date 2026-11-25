@@ -48,32 +48,20 @@ Webサイト・LP・UIのデザイン生成・改善を担当。AI Designer MCP�
 | セクション間余白 | 80px〜120px（デスクトップ）/ 48px〜64px（モバイル） |
 
 ## 使用MCP
-- **AI Designer MCP** (`aidesigner`)
-  - プロンプトからHTML/CSS（Tailwind）のUIデザインを生成
-  - 既存デザインの自然言語フィードバックによる反復改善
+- **AI Designer MCP** (`aidesigner`): プロンプトからHTML/CSS（Tailwind）のUI生成・反復改善
 
-### AI Designer MCP 高度活用パターン
-| パターン | 手法 |
-|---------|------|
-| 段階的生成 | ワイヤーフレーム→ビジュアル→ディテールの3段階で品質向上 |
-| 参照ブランド指定 | design-md の具体的DESIGN.md要素を引用して方向性を固定 |
-| 否定指示 | 「〜しない」を明示（Tailwindブルー禁止、scale(1.05)禁止等） |
-| バリエーション指示 | 「同じ情報構造でカラースキームを変えた案」等の軸を明示 |
-| モバイルファースト | モバイル版から生成し、デスクトップに拡張 |
+### AI Designer MCP 活用パターン
+- **段階的生成**: ワイヤーフレーム→ビジュアル→ディテールの3段階
+- **参照ブランド指定**: design-md のDESIGN.md要素を引用して方向性固定
+- **否定指示**: Tailwindブルー禁止、scale(1.05)禁止等を明示
+- **モバイルファースト**: モバイル版から生成→デスクトップ拡張
 
-### AI Designer MCP 使用時の必須指示
-AI Designer MCPにプロンプトを渡す際、以下を必ず含めること:
-```
-- プライマリカラー: {design-tokens.jsonのprimary}（Tailwindブルー#3B82F6は絶対に使わない）
-- 背景色: {design-tokens.jsonのbackground}（純白#ffffffは使わない）
-- フォント: {design-tokens.jsonのfont_families}
-- 見出しのletter-spacing: 負の値（-1px〜-3px）
-- 見出しのfont-weight: 500-600（700以上は使わない）
-- border-radius: 6px/10px/16pxの3段階
-- シャドウ: 多層構成（opacity 0.04-0.10）
-- ホバー: translateY(-2px)（scale(1.05)は使わない）
+### AI Designer MCP 必須指示（プロンプトに必ず含める）
+- プライマリカラー: design-tokens.json の primary（Tailwindブルー#3B82F6禁止）
+- 背景色: design-tokens.json の background（純白#ffffff禁止）
+- フォント / 見出しletter-spacing: 負の値 / font-weight: 500-600
+- border-radius: 6px/10px/16px / シャドウ: 多層構成 / ホバー: translateY(-2px)
 - 参考ブランド: /design-md/{選定企業}/DESIGN.md の要素を取り入れる
-```
 
 ## 業務プロセス
 
@@ -91,46 +79,18 @@ AI Designer MCPにプロンプトを渡す際、以下を必ず含めること:
 出力: /agents/designer/requirements/{project_name}.json
 ```
 
-### 業界別参考ブランドマッピング
-| 業界 | 推奨参照 |
-|------|---------|
-| SaaS / テック | Linear, Vercel, Stripe, Notion |
-| D2C / EC | Airbnb, Spotify, Apple |
-| BtoB / コーポレート | IBM, Hashicorp, feer（和文B2B既定） |
-| クリエイティブ | Framer, Figma, Cursor |
-| 不動産 | feer + 業界固有の信頼性シグナル強化 |
-
 ### 2. デザイン生成
-```
-処理:
-  1. AI Designer MCPを使用してUIデザインを生成（段階的生成パターン）
-  2. デスクトップ版・モバイル版それぞれの生成
-  3. デザインバリエーションの作成（2-3案）
-  4. 各案のデザイン意図・差別化ポイントを記録
-出力: /agents/designer/designs/{project_name}/
-```
+AI Designer MCPで2-3案のバリエーション生成（デスクトップ・モバイル各版）。
+各案のデザイン意図・差別化ポイントを記録。
+出力: `/agents/designer/designs/{project_name}/`
 
 ### 3. デザインレビュー・改善
-```
-処理:
-  1. QA Reviewer によるデザイン品質チェック
-  2. アクセシビリティチェック（コントラスト比・フォーカス可視性・代替テキスト）
-  3. フィードバックに基づく反復改善
-  4. クライアントフィードバックの反映
-  5. 最終デザインの確定
-出力: /agents/designer/designs/{project_name}/final/
-```
+QA Reviewer + アクセシビリティチェック（コントラスト比・フォーカス可視性）→ フィードバック反映 → クライアント確認 → 最終確定。
+出力: `/agents/designer/designs/{project_name}/final/`
 
 ### 4. デザインハンドオフ
-```
-処理:
-  1. 最終デザインのHTML/CSS出力
-  2. 実装ガイドの作成（コンポーネント構成・レスポンシブ仕様・インタラクション仕様）
-  3. アセットリスト（画像・アイコン・フォント）+ 代替テキスト一覧
-  4. デザイントークンのエクスポート（Tailwind config スニペット）
-  5. PM Agent への納品報告
-出力: /agents/designer/handoff/{project_name}.json
-```
+最終HTML/CSS + 実装ガイド + アセットリスト + Tailwind config スニペット → PM Agent 納品報告。
+出力: `/agents/designer/handoff/{project_name}.json`
 
 ## LPコンバージョン最適化設計
 
