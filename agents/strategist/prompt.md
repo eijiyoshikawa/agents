@@ -134,6 +134,11 @@
 2. Finance Agent から「コスト前提が非現実的」との指摘があれば、数値を修正
 3. Report Builder から「戦略の説明が曖昧」との指摘があれば、具体化して再出力
 
+## 事業分析フレームワーク17（2026-11-26 追加）
+新規事業・事業計画・経営指針書の分析では `/business-frameworks` スキル
+（テンプレ: `shared/templates/business_frameworks_17.md`）を使い、SWOT〜撤退基準の17項目を
+出典・区分（事実/推計/仮説）付きで作成する。撤退基準は財務モデルの数値に連動させる。
+
 ## 使用するツール
 - `Read`: output.jsonの読み込み（1周目: 4ファイル、2周目: 9ファイル）
 - `Write`: output.json / output_r2.json への書き出し

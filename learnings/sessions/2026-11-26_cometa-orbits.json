@@ -1,0 +1,82 @@
+{
+  "session_date": "2026-11-26",
+  "topic": "株式会社Cometa 新規事業（女性限定 婚活サロン Orbits・IBJ加盟）の市場調査・事業分析・財務モデル（cometa リポジトリ）",
+  "agents_involved": [
+    "market_researcher",
+    "marketing_analyst",
+    "legal",
+    "finance",
+    "subsidy_scout",
+    "analogy_finder",
+    "strategist",
+    "devils_advocate",
+    "data_analyst",
+    "qa_reviewer"
+  ],
+  "decisions_made": [
+    {
+      "decision": "成果物はリポジトリ内の xlsx/csv で納品し、連携中の Google アカウントには書き込まない",
+      "context": "代表の着地先が別アカウントのため",
+      "outcome": "good",
+      "lesson": "着地先が連携先と異なる案件は最初に前提へ明記する"
+    },
+    {
+      "decision": "財務モデルを Python 生成の数式ドリブン xlsx とし、価格ケースA/B/C×シナリオ3を切替可能にした",
+      "context": "料金は調査後に代表が再判断するため、判断材料として比較可能な形が必要",
+      "outcome": "good",
+      "lesson": "未確定の意思決定は『ケース列』としてモデルに持たせ、感度分析で並べると質問の質が上がる"
+    },
+    {
+      "decision": "IBJ加盟金を公式FAQで直接確認（従業員30名未満の法人 250万円税抜）し、エージェント間の矛盾（250万 vs 400万）を解消",
+      "context": "Legal と Finance の調査結果が食い違った",
+      "outcome": "good",
+      "lesson": "エージェント間で数値が食い違ったら一次資料で裁定する"
+    },
+    {
+      "decision": "特商法の中途解約精算を返金率として価格ケースに組み込んだ",
+      "context": "結婚相手紹介サービスは特定継続的役務。入会金の不返還特約は無効",
+      "outcome": "good",
+      "lesson": "前払い型のサービス業では、返金規制が価格構造（初期費用の大きさ）の採算を支配しうる"
+    },
+    {
+      "decision": "代表への確認を質問フォーム（4問×複数回）で行い、回答をその都度モデル・文書・質問ファイルに反映",
+      "context": "判断事項が25問以上あり、まとめて質問形式で投げてほしいという依頼",
+      "outcome": "good",
+      "lesson": "選択肢に推奨と影響額（万円）を添えると即答されやすい。前提（開業日など）の訂正は依存する回答を再確認する"
+    },
+    {
+      "decision": "財務分析・経営指針書・想定問答集・公庫計画書をテンプレート＋モデル値の自動生成にした",
+      "context": "前提変更が繰り返され、手作業の数値更新で食い違いが出始めた",
+      "outcome": "good",
+      "lesson": "数値を含む文書は早い段階で生成方式にする。年度インデックスのずれは読取側のテストで検出する"
+    },
+    {
+      "decision": "成婚率を全国値から関西値（24.5%）で再較正",
+      "context": "一次資料照合で地域差（全国の0.87倍）が判明",
+      "outcome": "good",
+      "lesson": "地域商圏の事業は全国平均ではなく地域統計で較正する"
+    },
+    {
+      "decision": "独立レビュー（M1〜M9・R1〜R18）の判断不要な指摘をすべて反映し、残りを代表の判断事項（D1〜D13）として1ファイルに集約",
+      "context": "「判断なしで進められるところは全て進め、判断事項は最後に残す」という依頼",
+      "outcome": "good",
+      "lesson": "レビュー文書に対応状況表を追記し、指摘→反映先の対応を残すと、次の見直しで差分が追える"
+    }
+  ],
+  "new_instincts": [
+    "GLB-010",
+    "GLB-011",
+    "GLB-012",
+    "GLB-013",
+    "GLB-014",
+    "GLB-015"
+  ],
+  "reinforced_instincts": [
+    "GLB-001"
+  ],
+  "corrected_instincts": [],
+  "new_skills": [
+    ".claude/skills/business-frameworks",
+    ".claude/skills/financial-analysis"
+  ]
+}
