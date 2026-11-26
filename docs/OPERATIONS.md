@@ -73,6 +73,7 @@
 | `/run-pipeline <会議名>` | 戦略提案パイプライン実行（QAゲート・アーカイブ込み） | `.claude/skills/run-pipeline/` |
 | `/daily-report [weekly]` | 日次・週次レポート一次案生成 | `.claude/skills/daily-report/` |
 | `/sns-batch <クライアント>` | SNS 週次投稿バッチ制作 | `.claude/skills/sns-batch/` |
+| `/business-frameworks <案件名>` | 事業分析フレームワーク17（SWOT・クロスSWOT・PEST・3C・5F・VRIO・STP・4P/4C・VC・PPM・アンゾフ・リーン・JTBD・VPC・BMC・OODA・撤退基準） | `.claude/skills/business-frameworks/`（テンプレ: `shared/templates/business_frameworks_17.md`） |
 
 補助スクリプト: `scripts/qa-gate.sh`（出力検証）/ `scripts/build-cockpit.py`（ダッシュボード生成）/
 既存: `scripts/context-budget.sh` / `scripts/security-scan.sh` / `scripts/bid_collect.py`
