@@ -74,6 +74,7 @@
 | `/daily-report [weekly]` | 日次・週次レポート一次案生成 | `.claude/skills/daily-report/` |
 | `/sns-batch <クライアント>` | SNS 週次投稿バッチ制作 | `.claude/skills/sns-batch/` |
 | `/business-frameworks <案件名>` | 事業分析フレームワーク17（SWOT・クロスSWOT・PEST・3C・5F・VRIO・STP・4P/4C・VC・PPM・アンゾフ・リーン・JTBD・VPC・BMC・OODA・撤退基準） | `.claude/skills/business-frameworks/`（テンプレ: `shared/templates/business_frameworks_17.md`） |
+| `/financial-analysis <案件名>` | 財務分析10（CF3区分・資金繰り/ランウェイ・BEP・収益性・安全性・回転期間/CCC・LTV/CAC・予実差異・NPV/IRR・感度/ストレス） | `.claude/skills/financial-analysis/`（テンプレ: `shared/templates/financial_analysis_10.md`） |
 
 補助スクリプト: `scripts/qa-gate.sh`（出力検証）/ `scripts/build-cockpit.py`（ダッシュボード生成）/
 既存: `scripts/context-budget.sh` / `scripts/security-scan.sh` / `scripts/bid_collect.py`
