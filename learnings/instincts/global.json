@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0",
   "description": "組織全体に適用される学習済みパターン（インスティンクト）",
-  "updated_at": "2026-07-06",
+  "updated_at": "2026-11-26",
   "instincts": [
     {
       "id": "GLB-001",
@@ -151,6 +151,38 @@
       "domain": "engineering",
       "created_at": "2026-09-30",
       "updated_at": "2026-09-30"
+    },
+    {
+      "id": "GLB-010",
+      "trigger": "公的統計・上場企業IR・業界団体の一次資料を使うリサーチ系エージェントを並列起動する",
+      "action": "起動前に get_environment でネットワーク許可を確認し、一次資料ドメイン（e-stat/mhlw/caa/jfc/対象企業IR等）が拒否されるなら先に環境の許可ホスト追加を提案する。WebSearch は全エージェント共有の上限があるため、エージェントごとの検索回数の目安（例: 40回）をプロンプトに明記する",
+      "confidence": 0.3,
+      "evidence": {
+        "count": 1,
+        "examples": [
+          "2026-11-26: Cometa/Orbits 市場調査で5体並列起動→一次資料サイトが proxy 403、検索上限200回に到達し複数項目が未確認・確信度medium止まりになった"
+        ]
+      },
+      "scope": "global",
+      "domain": "research",
+      "created_at": "2026-11-26",
+      "updated_at": "2026-11-26"
+    },
+    {
+      "id": "GLB-011",
+      "trigger": "財務モデル（xlsx）で感度分析・シナリオ比較を作る",
+      "action": "別ロジックで近似せず、モデル本体の入力セルを書き換えて LibreOffice で再計算した値を取る。全ケースの結果はJSONにキャッシュしてからシートへ書き出す（書き出し失敗時に再計算をやり直さないため）。資金ショートは負の現預金のまま放置せず『追加調達必要額』行で可視化する",
+      "confidence": 0.3,
+      "evidence": {
+        "count": 1,
+        "examples": [
+          "2026-11-26: Orbits モデルで32ケースの再計算後に書き出しで失敗し全再実行になった。追加調達行の導入で金融機関向け指標が意味を持つようになった"
+        ]
+      },
+      "scope": "global",
+      "domain": "finance",
+      "created_at": "2026-11-26",
+      "updated_at": "2026-11-26"
     }
   ]
 }

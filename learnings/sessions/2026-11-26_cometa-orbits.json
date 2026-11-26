@@ -1,0 +1,54 @@
+{
+  "session_date": "2026-11-26",
+  "topic": "株式会社Cometa 新規事業（女性限定 婚活サロン Orbits・IBJ加盟）の市場調査・事業分析・財務モデル（cometa リポジトリ）",
+  "agents_involved": [
+    "market_researcher",
+    "marketing_analyst",
+    "legal",
+    "finance",
+    "subsidy_scout",
+    "analogy_finder",
+    "strategist",
+    "devils_advocate",
+    "data_analyst",
+    "qa_reviewer"
+  ],
+  "decisions_made": [
+    {
+      "decision": "成果物はリポジトリ内の xlsx/csv で納品し、連携中の Google アカウントには書き込まない",
+      "context": "代表の着地先が別アカウントのため",
+      "outcome": "good",
+      "lesson": "着地先が連携先と異なる案件は最初に前提へ明記する"
+    },
+    {
+      "decision": "財務モデルを Python 生成の数式ドリブン xlsx とし、価格ケースA/B/C×シナリオ3を切替可能にした",
+      "context": "料金は調査後に代表が再判断するため、判断材料として比較可能な形が必要",
+      "outcome": "good",
+      "lesson": "未確定の意思決定は『ケース列』としてモデルに持たせ、感度分析で並べると質問の質が上がる"
+    },
+    {
+      "decision": "IBJ加盟金を公式FAQで直接確認（従業員30名未満の法人 250万円税抜）し、エージェント間の矛盾（250万 vs 400万）を解消",
+      "context": "Legal と Finance の調査結果が食い違った",
+      "outcome": "good",
+      "lesson": "エージェント間で数値が食い違ったら一次資料で裁定する"
+    },
+    {
+      "decision": "特商法の中途解約精算を返金率として価格ケースに組み込んだ",
+      "context": "結婚相手紹介サービスは特定継続的役務。入会金の不返還特約は無効",
+      "outcome": "good",
+      "lesson": "前払い型のサービス業では、返金規制が価格構造（初期費用の大きさ）の採算を支配しうる"
+    }
+  ],
+  "new_instincts": [
+    "GLB-010",
+    "GLB-011"
+  ],
+  "reinforced_instincts": [
+    "GLB-001"
+  ],
+  "corrected_instincts": [],
+  "new_skills": [
+    ".claude/skills/business-frameworks",
+    ".claude/skills/financial-analysis"
+  ]
+}
