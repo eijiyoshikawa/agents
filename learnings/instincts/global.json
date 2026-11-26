@@ -183,6 +183,38 @@
       "domain": "finance",
       "created_at": "2026-11-26",
       "updated_at": "2026-11-26"
+    },
+    {
+      "id": "GLB-012",
+      "trigger": "数値を多く含む計画書・分析書を、前提が変わりうる段階で作る",
+      "action": "文書をテンプレート＋財務モデルからの自動生成にし、前提変更後は再生成する。手で数値を書き換えない",
+      "confidence": 0.3,
+      "evidence": {
+        "count": 1,
+        "examples": [
+          "2026-11-26: Cometa/Orbits で前提変更が4回発生、生成方式に切り替えて食い違いを解消"
+        ]
+      },
+      "scope": "global",
+      "domain": "finance",
+      "created_at": "2026-11-26",
+      "updated_at": "2026-11-26"
+    },
+    {
+      "id": "GLB-013",
+      "trigger": "地域を商圏とする事業の需要・成果率を業界統計で置く",
+      "action": "全国平均ではなく、対象地域の統計（地域別成婚率など）で較正し、全国値との比率を出典に残す",
+      "confidence": 0.3,
+      "evidence": {
+        "count": 1,
+        "examples": [
+          "2026-11-26: IBJ女性成婚率 全国28.1% vs 関西24.5%（0.87倍）"
+        ]
+      },
+      "scope": "global",
+      "domain": "research",
+      "created_at": "2026-11-26",
+      "updated_at": "2026-11-26"
     }
   ]
 }
